@@ -2,27 +2,24 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:sledge/sledge.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/modular.dart';
-import 'todo_module.dart';
+import 'todo_module_model.dart';
 import 'widgets/todo_widget.dart';
 
 /// Main entry point to the todo list application.
 void main() {
-  placeholder();
-
   StartupContext startupContext = new StartupContext.fromStartupInfo();
 
-  TodoModule todoModule = new TodoModule();
+  TodoModuleModel todoModuleModel = new TodoModuleModel();
 
   MaterialApp materialApp = new MaterialApp(
       home: new TodoWidget(), theme: new ThemeData(primarySwatch: Colors.red));
 
-  ModuleWidget<TodoModule> todoWidget = new ModuleWidget<TodoModule>(
+  ModuleWidget<TodoModuleModel> todoWidget = new ModuleWidget<TodoModuleModel>(
     startupContext: startupContext,
-    moduleModel: todoModule,
+    moduleModel: todoModuleModel,
     child: materialApp,
   );
 

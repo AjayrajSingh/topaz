@@ -8,7 +8,7 @@ flutter_app("todo_list_sledge") {
   main_dart = "lib/main.dart"
 
   sources = [
-    "todo_module.dart"
+    "todo_module_model.dart"
   ]
 
   deps = [

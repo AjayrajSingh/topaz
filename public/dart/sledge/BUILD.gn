@@ -11,6 +11,11 @@ dart_library("sledge") {
   sources = [
     "sledge.dart",
   ]
+
+  deps = [
+    "//peridot/public/lib/ledger/fidl",
+    "//topaz/public/lib/module/dart",
+  ]
 }
 
 dart_test("dart_sledge_tests") {

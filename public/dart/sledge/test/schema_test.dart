@@ -39,7 +39,7 @@ void main() {
     Schema schema2 = new Schema(schemaDescription2);
 
     // Create a new Sledge document.
-    Sledge sledge = new Sledge();
+    Sledge sledge = new Sledge.testing();
     dynamic doc = sledge.newDocument(schema2);
 
     // Read and write properties of a Sledge document.
@@ -62,7 +62,7 @@ void main() {
     Schema schema = new Schema(schemaDescription);
 
     // Create a new Sledge document.
-    Sledge sledge = new Sledge();
+    Sledge sledge = new Sledge.testing();
     dynamic doc = sledge.newDocument(schema);
 
     // Read and write properties of a Sledge document.
@@ -89,7 +89,7 @@ void main() {
     Schema schema = new Schema(schemaDescription);
 
     // Create a new Sledge document.
-    Sledge sledge = new Sledge();
+    Sledge sledge = new Sledge.testing();
     dynamic doc = sledge.newDocument(schema);
 
     // Modify and get value of PosNegCounter.

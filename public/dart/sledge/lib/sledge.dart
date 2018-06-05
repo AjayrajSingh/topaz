@@ -6,3 +6,4 @@ export 'src/document/document.dart';
 export 'src/schema/base_type.dart';
 export 'src/schema/schema.dart';
 export 'src/sledge.dart';
+export 'src/sledge_page_id.dart';
