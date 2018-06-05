@@ -4,7 +4,7 @@
 
 #include "topaz/runtime/web_view/web_view_impl.h"
 
-#include <fdio/io.h>
+#include <lib/fdio/io.h>
 #include <hid/hid.h>
 #include <hid/usages.h>
 #include <lib/async/cpp/task.h>

@@ -36,7 +36,8 @@ VuMeterView::VuMeterView(
   FXL_DCHECK(params.is_valid());
 
   auto audio_server =
-      startup_context->ConnectToEnvironmentService<media::AudioServer>();
+      startup_context
+          ->ConnectToEnvironmentService<fuchsia::media::AudioServer>();
   audio_server->CreateCapturer(capturer_.NewRequest(), false);
 
   capturer_.set_error_handler([this]() {
@@ -44,7 +45,7 @@ VuMeterView::VuMeterView(
     Shutdown();
   });
 
-  capturer_->GetMediaType([this](media::MediaType type) {
+  capturer_->GetMediaType([this](fuchsia::media::MediaType type) {
     OnDefaultFormatFetched(std::move(type));
   });
 }
@@ -121,7 +122,7 @@ void VuMeterView::SendCaptureRequest() {
   // clang-format off
   capturer_->CaptureAt(
       0, payload_buffer_.size() / kBytesPerFrame,
-      [this](media::MediaPacket packet) {
+      [this](fuchsia::media::MediaPacket packet) {
         OnPacketCaptured(std::move(packet));
       });
   // clang-format on
@@ -129,13 +130,15 @@ void VuMeterView::SendCaptureRequest() {
   request_in_flight_ = true;
 }
 
-void VuMeterView::OnDefaultFormatFetched(media::MediaType default_type) {
+void VuMeterView::OnDefaultFormatFetched(
+    fuchsia::media::MediaType default_type) {
   // Set the media type, keep the default sample rate but make sure that we
   // normalize to stereo 16-bit LPCM.
   FXL_DCHECK(default_type.details.is_audio());
   const auto& audio_details = default_type.details.audio();
-  capturer_->SetMediaType(media::CreateLpcmMediaType(
-      media::AudioSampleFormat::SIGNED_16, 2, audio_details.frames_per_second));
+  capturer_->SetMediaType(
+      ::media::CreateLpcmMediaType(fuchsia::media::AudioSampleFormat::SIGNED_16,
+                                   2, audio_details.frames_per_second));
 
   uint64_t payload_buffer_size =
       kBytesPerFrame *
@@ -159,7 +162,7 @@ void VuMeterView::OnDefaultFormatFetched(media::MediaType default_type) {
   ToggleStartStop();
 }
 
-void VuMeterView::OnPacketCaptured(media::MediaPacket packet) {
+void VuMeterView::OnPacketCaptured(fuchsia::media::MediaPacket packet) {
   request_in_flight_ = false;
   if (!started_) {
     return;

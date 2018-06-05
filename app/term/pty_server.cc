@@ -5,9 +5,9 @@
 #include "topaz/app/term/pty_server.h"
 
 #include <fcntl.h>
-#include <fdio/io.h>
-#include <fdio/private.h>
-#include <fdio/spawn.h>
+#include <lib/fdio/io.h>
+#include <lib/fdio/private.h>
+#include <lib/fdio/spawn.h>
 #include <lib/async/default.h>
 #include <poll.h>
 #include <unistd.h>

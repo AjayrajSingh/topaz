@@ -4,7 +4,7 @@
 
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 
-#include <fdio/namespace.h>
+#include <lib/fdio/namespace.h>
 #include <zx/channel.h>
 
 #include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"

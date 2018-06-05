@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "fdio/namespace.h"
+#include "lib/fdio/namespace.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/memory/unique_object.h"
 

@@ -90,7 +90,7 @@ void SessionConnection::Present(flow::CompositorContext::ScopedFrame& frame) {
 void SessionConnection::EnqueueClearOps() {
   // We are going to be sending down a fresh node hierarchy every frame. So just
   // enqueue a detach op on the imported root node.
-  session_.Enqueue(scenic_lib::NewDetachChildrenCommand(root_node_.id()));
+  session_.Enqueue(scenic_lib::NewDetachChildrenCmd(root_node_.id()));
 }
 
 void SessionConnection::PresentSession() {

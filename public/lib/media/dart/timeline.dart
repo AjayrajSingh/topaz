@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_media/fidl.dart';
+import 'package:fidl_fuchsia_media/fidl.dart';
 
 /// Immutable rate of a subject timeline with respect to a reference timeline
 /// (subject / reference) expressed as the ratio of two ints.

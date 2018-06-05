@@ -16,13 +16,13 @@ class Resource {
   Resource._create(this.session, ui_gfx.ResourceArgs resource)
       : id = session.nextResourceId() {
     session.enqueue(new ui_gfx.Command.withCreateResource(
-        new ui_gfx.CreateResourceCommand(id: id, resource: resource)));
+        new ui_gfx.CreateResourceCmd(id: id, resource: resource)));
   }
 
   Resource._import(this.session, Handle token, ui_gfx.ImportSpec spec)
       : id = session.nextResourceId() {
     session.enqueue(new ui_gfx.Command.withImportResource(
-        new ui_gfx.ImportResourceCommand(id: id, token: token, spec: spec)));
+        new ui_gfx.ImportResourceCmd(id: id, token: token, spec: spec)));
   }
 }
 
@@ -44,7 +44,7 @@ class Node extends Resource {
 
   void setRotationValue(ui_gfx.QuaternionValue rotation) {
     session.enqueue(new ui_gfx.Command.withSetRotation(
-        new ui_gfx.SetRotationCommand(id: id, value: rotation)));
+        new ui_gfx.SetRotationCmd(id: id, value: rotation)));
   }
 
   void setTranslation(double x, double y, double z) {
@@ -54,7 +54,7 @@ class Node extends Resource {
 
   void setTranslationValue(ui_gfx.Vector3Value vec3) {
     session.enqueue(new ui_gfx.Command.withSetTranslation(
-        new ui_gfx.SetTranslationCommand(id: id, value: vec3)));
+        new ui_gfx.SetTranslationCmd(id: id, value: vec3)));
   }
 }
 
@@ -67,12 +67,12 @@ class ContainerNode extends Node {
 
   void addChild(Node child) {
     session.enqueue(new ui_gfx.Command.withAddChild(
-        new ui_gfx.AddChildCommand(nodeId: id, childId: child.id)));
+        new ui_gfx.AddChildCmd(nodeId: id, childId: child.id)));
   }
 
   void addPart(Node part) {
     session.enqueue(new ui_gfx.Command.withAddPart(
-        new ui_gfx.AddPartCommand(nodeId: id, partId: part.id)));
+        new ui_gfx.AddPartCmd(nodeId: id, partId: part.id)));
   }
 }
 
@@ -88,12 +88,12 @@ class ShapeNode extends Node {
 
   void setMaterial(Material material) {
     session.enqueue(new ui_gfx.Command.withSetMaterial(
-        new ui_gfx.SetMaterialCommand(nodeId: id, materialId: material.id)));
+        new ui_gfx.SetMaterialCmd(nodeId: id, materialId: material.id)));
   }
 
   void setShape(Shape shape) {
     session.enqueue(new ui_gfx.Command.withSetShape(
-        new ui_gfx.SetShapeCommand(nodeId: id, shapeId: shape.id)));
+        new ui_gfx.SetShapeCmd(nodeId: id, shapeId: shape.id)));
   }
 }
 
@@ -113,7 +113,7 @@ class Material extends Resource {
 
   void setColorValue(ui_gfx.ColorRgbaValue color) {
     session.enqueue(new ui_gfx.Command.withSetColor(
-        new ui_gfx.SetColorCommand(materialId: id, color: color)));
+        new ui_gfx.SetColorCmd(materialId: id, color: color)));
   }
 }
 

@@ -8,9 +8,9 @@
 #include <memory>
 #include <queue>
 
+#include <fuchsia/media/cpp/fidl.h>
 #include <lib/vmo-utils/vmo_mapper.h>
 #include <lib/async-loop/cpp/loop.h>
-#include <media/cpp/fidl.h>
 
 #include "examples/ui/lib/skia_view.h"
 #include "lib/app/cpp/startup_context.h"
@@ -75,11 +75,11 @@ class VuMeterView : public mozart::SkiaView {
   // Shutdown the app
   void Shutdown();
 
-  void OnDefaultFormatFetched(media::MediaType default_type);
-  void OnPacketCaptured(media::MediaPacket packet);
+  void OnDefaultFormatFetched(fuchsia::media::MediaType default_type);
+  void OnPacketCaptured(fuchsia::media::MediaPacket packet);
 
   async::Loop* const loop_;
-  media::AudioCapturerPtr capturer_;
+  fuchsia::media::AudioCapturerPtr capturer_;
   vmo_utils::VmoMapper payload_buffer_;
   bool started_ = false;
   bool request_in_flight_ = false;

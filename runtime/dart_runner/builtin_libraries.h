@@ -8,7 +8,7 @@
 #include <memory>
 #include <string>
 
-#include <fdio/namespace.h>
+#include <lib/fdio/namespace.h>
 
 #include <fuchsia/sys/cpp/fidl.h>
 #include "lib/app/cpp/startup_context.h"

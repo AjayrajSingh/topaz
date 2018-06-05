@@ -5,8 +5,8 @@
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
 
 #include <fcntl.h>
-#include <fdio/namespace.h>
-#include <fdio/util.h>
+#include <lib/fdio/namespace.h>
+#include <lib/fdio/util.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <zircon/status.h>

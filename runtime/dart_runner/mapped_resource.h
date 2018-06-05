@@ -5,7 +5,7 @@
 #ifndef APPS_DART_RUNNER_MAPPED_RESOURCE_H_
 #define APPS_DART_RUNNER_MAPPED_RESOURCE_H_
 
-#include <fdio/namespace.h>
+#include <lib/fdio/namespace.h>
 
 #include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fxl/macros.h"

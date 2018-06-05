@@ -5,7 +5,7 @@
 #ifndef TOPAZ_RUNTIME_DART_RUNNER_DART_COMPONENT_CONTROLLER_H_
 #define TOPAZ_RUNTIME_DART_RUNNER_DART_COMPONENT_CONTROLLER_H_
 
-#include <fdio/namespace.h>
+#include <lib/fdio/namespace.h>
 #include <lib/async/cpp/wait.h>
 #include <lib/zx/timer.h>
 

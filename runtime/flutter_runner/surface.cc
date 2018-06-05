@@ -5,7 +5,7 @@
 #include "surface.h"
 
 #include <fcntl.h>
-#include <fdio/watcher.h>
+#include <lib/fdio/watcher.h>
 #include <unistd.h>
 #include <zircon/device/vfs.h>
 
