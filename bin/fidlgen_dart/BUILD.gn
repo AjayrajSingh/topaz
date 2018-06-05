@@ -1,0 +1,30 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/go/go_binary.gni")
+import("//build/go/toolchain.gni")
+import("//build/host.gni")
+
+go_binary("fidlgen_dart") {
+  gopackage = "fidlgen_dart"
+  go_dependencies = [
+    {
+      package = "fidlgen_dart"
+      source = "//topaz/bin/fidlgen_dart"
+    },
+    {
+      package = "fidl/compiler/backend"
+      source = "//garnet/go/src/fidl/compiler/backend"
+    },
+  ]
+}
+
+install_host_tools("install") {
+  deps = [
+    ":fidlgen_dart",
+  ]
+  outputs = [
+    "fidlgen_dart",
+  ]
+}
