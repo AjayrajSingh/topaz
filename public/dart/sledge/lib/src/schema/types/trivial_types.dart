@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import '../../document/base_value.dart';
-import '../../document/values/trivial_values.dart';
+import '../../document/values/lww_value.dart';
 import '../base_type.dart';
 
 /// The Sledge type to store booleans.
@@ -15,7 +15,7 @@ class Boolean implements BaseType {
 
   @override
   BaseValue newValue() {
-    return new BooleanValue();
+    return new LastOneWinValue<bool>();
   }
 }
 
@@ -28,6 +28,32 @@ class Integer implements BaseType {
 
   @override
   BaseValue newValue() {
-    return new IntegerValue();
+    return new LastOneWinValue<int>();
+  }
+}
+
+/// The Sledge type to store doubles.
+class Double implements BaseType {
+  @override
+  String jsonValue() {
+    return '"Double"';
+  }
+
+  @override
+  BaseValue newValue() {
+    return new LastOneWinValue<double>();
+  }
+}
+
+/// The Sledge type to store strings with LWW merging strategy.
+class LastOneWinString implements BaseType {
+  @override
+  String jsonValue() {
+    return '"LastOneWinString"';
+  }
+
+  @override
+  BaseValue newValue() {
+    return new LastOneWinValue<String>();
   }
 }

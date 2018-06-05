@@ -1,3 +1,7 @@
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 // ignore_for_file: implementation_imports
 import 'dart:async';
 
@@ -106,10 +110,8 @@ void main() {
     cnt
       ..applyChanges(
           [new KeyValue(intConverter.serialize(4), intConverter.serialize(3))])
-      ..add(2)
       ..applyChanges(
           [new KeyValue(intConverter.serialize(2), intConverter.serialize(3))])
-      ..add(-7)
       ..applyChanges(
           [new KeyValue(intConverter.serialize(3), intConverter.serialize(9))]);
   });

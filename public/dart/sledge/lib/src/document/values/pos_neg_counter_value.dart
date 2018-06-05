@@ -23,8 +23,8 @@ class _PosNegCounterValue<T extends num> {
   final StreamController<T> _changeController =
       new StreamController<T>.broadcast();
 
-  _PosNegCounterValue(this._currentInstanceId)
-      : _storage = new KeyValueStorage<int, T>((T == int) ? 0 : 0.0) {
+  _PosNegCounterValue(this._currentInstanceId, T defaultValue)
+      : _storage = new KeyValueStorage<int, T>(defaultValue) {
     _sum = _storage.defaultValue;
   }
 
@@ -67,21 +67,24 @@ class _PosNegCounterValue<T extends num> {
 }
 
 /// Sledge Value to store numerical counter.
-class PosNegCounterValue<T extends num> implements BaseValue {
+class PosNegCounterValue<T extends num> implements BaseValue<T> {
   final _PosNegCounterValue<T> _counter;
-  final DataConverter _converter;
+  final DataConverter<int, T> _converter;
 
   /// Constructor.
   PosNegCounterValue(int id, [List<KeyValue> init])
       : _converter = new DataConverter<int, T>(),
-        _counter = new _PosNegCounterValue<T>(id) {
+        _counter =
+            new _PosNegCounterValue<T>(id, new Converter<T>().defaultValue) {
     applyChanges(init ?? <KeyValue>[]);
   }
 
   /// Ends transaction and retrieve its data.
+  @override
   List<KeyValue> put() => _converter.serialize(_counter.put());
 
   /// Applies external transactions.
+  @override
   void applyChanges(List<KeyValue> input) =>
       _counter.applyChanges(_converter.deserialize(input));
 
@@ -92,5 +95,6 @@ class PosNegCounterValue<T extends num> implements BaseValue {
   T get value => _counter.value;
 
   /// Gets Stream of changes.
+  @override
   Stream<T> get onChange => _counter.onChange;
 }

@@ -17,6 +17,9 @@ abstract class Converter<T> {
     return result;
   }
 
+  /// Returns default value for type T.
+  T get defaultValue;
+
   /// Converts from ByteData to T.
   T deserialize(final ByteData x);
 
@@ -26,7 +29,8 @@ abstract class Converter<T> {
 
 /// Class for converting Map<K, V> to List<KeyValue> and back.
 class DataConverter<K, V> {
-  final Converter _keyConverter, _valueConverter;
+  final Converter<K> _keyConverter;
+  final Converter<V> _valueConverter;
 
   /// Constructor.
   DataConverter()
@@ -60,7 +64,13 @@ class StringConverter implements Converter<String> {
   const StringConverter();
 
   @override
+  String get defaultValue => '';
+
+  @override
   String deserialize(final ByteData x) {
+    if (x.lengthInBytes.isOdd) {
+      throw new FormatException("Can't parse String. Length should be even.");
+    }
     return new String.fromCharCodes(x.buffer.asUint16List());
   }
 
@@ -77,6 +87,9 @@ class StringConverter implements Converter<String> {
 class IntConverter implements Converter<int> {
   /// Constructor.
   const IntConverter();
+
+  @override
+  int get defaultValue => 0;
 
   @override
   int deserialize(final ByteData x) {
@@ -96,7 +109,13 @@ class DoubleConverter implements Converter<double> {
   const DoubleConverter();
 
   @override
+  double get defaultValue => 0.0;
+
+  @override
   double deserialize(final ByteData x) {
+    if (x.lengthInBytes != 8) {
+      throw new FormatException("Can't parse double. Length should be 8.");
+    }
     return x.getFloat64(0);
   }
 
@@ -106,8 +125,36 @@ class DoubleConverter implements Converter<double> {
   }
 }
 
+/// Converter for bool.
+class BoolConverter implements Converter<bool> {
+  /// Constructor.
+  const BoolConverter();
+
+  @override
+  bool get defaultValue => false;
+
+  @override
+  bool deserialize(final ByteData x) {
+    if (x.lengthInBytes != 1) {
+      throw new FormatException("Can't parse bool. Length should be 1.");
+    }
+    int result = x.getInt8(0);
+    if (result != 0 && result != 1) {
+      throw new FormatException("Can't parse bool. Value should be 0 or 1,");
+    }
+    return result == 1;
+  }
+
+  @override
+  // ignore: avoid_positional_boolean_parameters
+  ByteData serialize(final bool x) {
+    return new ByteData(1)..setInt8(0, x ? 1 : 0);
+  }
+}
+
 const _converters = const <Type, Converter>{
   int: const IntConverter(),
   String: const StringConverter(),
-  double: const DoubleConverter()
+  double: const DoubleConverter(),
+  bool: const BoolConverter()
 };

@@ -51,6 +51,35 @@ void main() {
     expect(doc.foo.someInteger.value, equals(42));
   });
 
+  test('LastWriteWin basic types.', () {
+    // Create schemas.
+    Map<String, BaseType> schemaDescription = <String, BaseType>{
+      'someBool': new Boolean(),
+      'someInteger': new Integer(),
+      'someDouble': new Double(),
+      'someString': new LastOneWinString()
+    };
+    Schema schema = new Schema(schemaDescription);
+
+    // Create a new Sledge document.
+    Sledge sledge = new Sledge();
+    dynamic doc = sledge.newDocument(schema);
+
+    // Read and write properties of a Sledge document.
+    expect(doc.someBool.value, equals(false));
+    expect(doc.someInteger.value, equals(0));
+    expect(doc.someDouble.value, equals(0.0));
+    expect(doc.someString.value, equals(''));
+    doc.someBool.value = true;
+    doc.someInteger.value = 42;
+    doc.someDouble.value = 10.5;
+    doc.someString.value = 'abacaba';
+    expect(doc.someBool.value, equals(true));
+    expect(doc.someInteger.value, equals(42));
+    expect(doc.someDouble.value, equals(10.5));
+    expect(doc.someString.value, equals('abacaba'));
+  });
+
   test('Integration of PosNegCounter with Sledge', () {
     // Create Schema.
     Map<String, BaseType> schemaDescription = <String, BaseType>{
