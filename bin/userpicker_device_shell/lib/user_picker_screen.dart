@@ -33,7 +33,7 @@ class UserPickerScreen extends StatelessWidget {
                 alignment: FractionalOffset.bottomRight,
                 child: new RepaintBoundary(
                   child: new UserList(
-                    loginDisabled: !model.hasConfiguredUserShells,
+                    loginDisabled: false,
                   ),
                 ),
               ),

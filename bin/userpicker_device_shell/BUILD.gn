@@ -32,7 +32,6 @@ flutter_aot_app("userpicker_device_shell") {
     "user_picker_device_shell_model.dart",
     "user_picker_device_shell_screen.dart",
     "user_picker_screen.dart",
-    "user_watcher_impl.dart",
   ]
 
   deps = [
