@@ -56,12 +56,12 @@
     <project name="third_party/dart/third_party/pkg/dart2js_info"
              path="third_party/dart/third_party/pkg/dart2js_info"
              remote="https://dart.googlesource.com/dart2js_info.git"
-             revision="0.5.6+2"/>
+             revision="0.5.6+4"/>
 
     <project name="third_party/dart/third_party/pkg/dartdoc"
              path="third_party/dart/third_party/pkg/dartdoc"
              remote="https://dart.googlesource.com/dartdoc.git"
-             revision="v0.19.1"/>
+             revision="v0.20.0"/>
 
     <project name="third_party/dart/third_party/pkg/fixnum"
              path="third_party/dart/third_party/pkg/fixnum"
@@ -146,7 +146,7 @@
     <project name="third_party/dart/third_party/pkg/mockito"
              path="third_party/dart/third_party/pkg/mockito"
              remote="https://dart.googlesource.com/mockito.git"
-             revision="a92db054fba18bc2d605be7670aee74b7cadc00a"/>
+             revision="d39ac507483b9891165e422ec98d9fb480037c8b"/>
 
     <project name="third_party/dart/third_party/pkg/mustache4dart"
              path="third_party/dart/third_party/pkg/mustache4dart"

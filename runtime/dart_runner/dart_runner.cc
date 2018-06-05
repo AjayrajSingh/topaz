@@ -27,7 +27,6 @@ namespace {
 const char* kDartVMArgs[] = {
     // clang-format off
     // TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
-    "--limit_ints_to_64_bits",
     "--reify_generic_functions",
     "--strong",
     "--sync_async",

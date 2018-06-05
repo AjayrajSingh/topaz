@@ -100,9 +100,9 @@ bool VulkanSurfaceProducer::Initialize(scenic_lib::Session* mozart_session) {
   backend_context_->fMinAPIVersion = application_->GetAPIVersion();
   backend_context_->fFeatures = skia_features;
   backend_context_->fInterface.reset(interface.release());
-
-  logical_device_->ReleaseDeviceOwnership();
-  application_->ReleaseInstanceOwnership();
+  // This should already be set to true by default when we create the
+  // GrVkBackendContext, but we'll set it to true explicitly.
+  backend_context_->fOwnsInstanceAndDevice = true;
 
   context_ = GrContext::MakeVulkan(backend_context_);
 

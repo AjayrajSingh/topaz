@@ -992,7 +992,6 @@ template("flutter2_aot_app") {
     script = gen_snapshot
     args = [
       # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
-      "--limit_ints_to_64_bits",
       "--reify_generic_functions",
       "--strong",
       # Re-enable once enabled in //third_party/flutter/runtime/dart_vm.cc

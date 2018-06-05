@@ -62,7 +62,6 @@ template("create_kernel_core_snapshot") {
     args = [
       # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
       "--enable_mirrors=false",
-      "--limit_ints_to_64_bits",
       "--reify_generic_functions",
       "--strong",
       "--sync-async",
