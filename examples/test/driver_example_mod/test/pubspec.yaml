@@ -1,0 +1,11 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+name: driver_test
+description: An example test
+
+dependencies:
+  fuchsia_remote_debug_protocol:
+    sdk: flutter
+  test: any
+
