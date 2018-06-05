@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_echo2/fidl.dart';
+import 'package:fidl_fidl_examples_echo/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 

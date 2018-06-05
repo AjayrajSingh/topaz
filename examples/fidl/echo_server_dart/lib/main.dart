@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_echo2/fidl.dart';
+import 'package:fidl_fidl_examples_echo/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 
 class _EchoImpl extends Echo {
