@@ -7,6 +7,8 @@ import 'package:lib.app.dart/app.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.story.dart/story.dart';
 
+import '../utils/deprecate.dart';
+
 /// Called when Module connects to its [ModuleContext].
 typedef OnModuleReady = void Function(
   ModuleContext moduleContext,
@@ -68,6 +70,8 @@ class ModuleImpl implements Lifecycle {
     this.onDeviceMapChange,
     bool watchAll,
   }) : watchAll = watchAll ?? false {
+    deprecate('lib.widget\'s ModuleImpl');
+
     connectToService(
         startupContext.environmentServices, _moduleContextProxy.ctrl);
 

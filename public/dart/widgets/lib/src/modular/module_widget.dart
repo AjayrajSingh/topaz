@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';
 
+import '../utils/deprecate.dart';
 import '../widgets/window_media_query.dart';
 import 'module_impl.dart';
 import 'module_model.dart';
@@ -41,13 +42,16 @@ class ModuleWidget<T extends ModuleModel> extends StatelessWidget {
     @required StartupContext startupContext,
     @required T moduleModel,
     @required Widget child,
-  }) =>
-      new ModuleWidget<T>._create(
-        startupContext: startupContext,
-        moduleModel: moduleModel,
-        child: child,
-        lifecycleBinding: new LifecycleBinding(),
-      );
+  }) {
+    deprecate('ModuleWidget');
+
+    return new ModuleWidget<T>._create(
+      startupContext: startupContext,
+      moduleModel: moduleModel,
+      child: child,
+      lifecycleBinding: new LifecycleBinding(),
+    );
+  }
 
   ModuleWidget._create({
     @required this.startupContext,

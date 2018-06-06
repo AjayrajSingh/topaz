@@ -4,11 +4,12 @@
 
 import 'dart:async';
 
-import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 
+import '../utils/deprecate.dart';
 import 'module_widget.dart';
 
 export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
@@ -29,7 +30,9 @@ class ModuleModel extends Model {
   final bool watchAll;
 
   /// Creates a new instance of [ModuleModel].
-  ModuleModel({bool watchAll}) : watchAll = watchAll ?? false;
+  ModuleModel({bool watchAll}) : watchAll = watchAll ?? false {
+    deprecate('ModuleModel');
+  }
 
   /// The [ModuleContext] given to this Module.
   ModuleContext get moduleContext => _moduleContext;
