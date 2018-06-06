@@ -4,24 +4,6 @@
 
 import("//build/package.gni")
 
-executable("fidl_compatibility_test") {
-  testonly = true
-
-  sources = [
-    "compatibility_test.cc",
-  ]
-
-  deps = [
-    "//garnet/public/lib/app/cpp",
-    "//garnet/public/lib/fidl/compatibility_test:compatibility_test_service",
-    "//garnet/public/lib/fidl/compatibility_test:echo_client_app",
-    "//garnet/public/lib/fidl/cpp",
-    "//third_party/googletest:gtest",
-    "//zircon/public/lib/async-default",
-    "//zircon/public/lib/async-loop-cpp",
-  ]
-}
-
 copy("run_fidl_compatibility_test_topaz_sh") {
   sources = [ "run_fidl_compatibility_test_topaz.sh" ]
   outputs = [ "${root_build_dir}/run_fidl_compatibility_test_topaz.sh" ]
@@ -31,19 +13,10 @@ package("package") {
   package_name = "fidl_compatibility_test"
 
   deps = [
-    ":fidl_compatibility_test",
     ":run_fidl_compatibility_test_topaz_sh",
   ]
 
   testonly = true
-
-  # Declare it as a binary so humans and automation don't try to run it
-  # directly as a test, which would fail.
-  binaries = [
-    {
-      name = "fidl_compatibility_test"
-    },
-  ]
 
   tests = [
     {
