@@ -10,6 +10,7 @@ flutter_aot_app("wifi_settings") {
   manifest = "pubspec.yaml"
 
   deps = [
+    "//garnet/public/lib/netstack/fidl:fidl",
     "//garnet/public/lib/wlan/fidl:service",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/lib/settings:lib.settings",

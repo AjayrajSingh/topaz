@@ -10,13 +10,13 @@ import 'package:lib.widgets/model.dart';
 import 'fuchsia/access_point.dart';
 import 'fuchsia/wifi_settings_model.dart';
 
-TextStyle _titleTextStyle(double scale) => new TextStyle(
+TextStyle _titleTextStyle(double scale) => TextStyle(
       color: Colors.grey[900],
       fontSize: 48.0 * scale,
       fontWeight: FontWeight.w200,
     );
 
-TextStyle _textStyle(double scale) => new TextStyle(
+TextStyle _textStyle(double scale) => TextStyle(
       color: Colors.grey[900],
       fontSize: 24.0 * scale,
       fontWeight: FontWeight.w200,
@@ -29,25 +29,32 @@ class WlanManager extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      new ScopedModelDescendant<WifiSettingsModel>(
+      ScopedModelDescendant<WifiSettingsModel>(
           builder: (
         BuildContext context,
         Widget child,
         WifiSettingsModel model,
       ) =>
-              new LayoutBuilder(
+              LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) =>
-                      new Material(
-                          child: _getCurrentWidget(model, constraints))));
+                      Material(child: _getCurrentWidget(model, constraints))));
 
   Widget _getCurrentWidget(
       WifiSettingsModel model, BoxConstraints constraints) {
     double scale = constraints.maxHeight > 360.0 ? 1.0 : 0.5;
 
     Widget widget;
-
-    if (model.loading) {
-      widget = new SettingsPage(scale: scale, isLoading: true);
+    if (!model.hasWifiAdapter) {
+      widget = SettingsPage(
+        scale: scale,
+        sections: [
+          SettingsSection.error(
+              description: 'No wireless adapters are available on this device',
+              scale: scale)
+        ],
+      );
+    } else if (model.loading) {
+      widget = SettingsPage(scale: scale, isLoading: true);
     } else if (model.connecting || model.connectedAccessPoint != null) {
       widget = _buildCurrentNetwork(model, scale);
     } else if ((model.selectedAccessPoint?.isSecure ?? false) &&
@@ -67,9 +74,9 @@ class WlanManager extends StatelessWidget {
     final AccessPoint accessPoint =
         model.connectedAccessPoint ?? model.selectedAccessPoint;
 
-    List<Widget> widgets = <Widget>[
-      new Padding(padding: new EdgeInsets.only(top: 16.0 * scale)),
-      new SettingsTile(
+    List<Widget> widgets = [
+      Padding(padding: EdgeInsets.only(top: 16.0 * scale)),
+      SettingsTile(
           scale: scale,
           assetUrl: accessPoint.url,
           text: accessPoint.name,
@@ -77,9 +84,9 @@ class WlanManager extends StatelessWidget {
     ];
 
     if (model.connectedAccessPoint != null) {
-      widgets.addAll(<Widget>[
-        new Padding(padding: new EdgeInsets.only(top: 8.0 * scale)),
-        new SettingsButton(
+      widgets.addAll([
+        Padding(padding: EdgeInsets.only(top: 8.0 * scale)),
+        SettingsButton(
           scale: scale,
           text: 'Disconnect from current network',
           onTap: model.disconnect,
@@ -87,13 +94,13 @@ class WlanManager extends StatelessWidget {
       ]);
     }
 
-    return new SettingsPage(
+    return SettingsPage(
       title: 'Current Network',
       scale: scale,
-      sections: <SettingsSection>[
-        new SettingsSection(
+      sections: [
+        SettingsSection(
             scale: scale,
-            child: new Column(
+            child: Column(
               children: widgets,
               crossAxisAlignment: CrossAxisAlignment.start,
             ))
@@ -103,58 +110,57 @@ class WlanManager extends StatelessWidget {
 
   Widget _buildAvailableNetworks(WifiSettingsModel model, double scale) {
     if (model.accessPoints == null || model.accessPoints.isEmpty) {
-      return new SettingsPage(
+      return SettingsPage(
         scale: scale,
         title: 'Scanning...',
         isLoading: true,
       );
     }
 
-    return new SettingsPage(
+    return SettingsPage(
       scale: scale,
       title: 'Available Networks (${model.accessPoints.length} found)',
-      sections: <SettingsSection>[
-        new SettingsSection(
+      sections: [
+        SettingsSection(
           scale: scale,
-          child: new SettingsItemList(
-              items:
-                  model.accessPoints.map((AccessPoint ap) => new SettingsTile(
-                        scale: scale,
-                        text: ap.name,
-                        assetUrl: ap.url,
-                        description: ap.name == model.failedAccessPoint?.name
-                            ? model.connectionResultMessage
-                            : null,
-                        onTap: () {
-                          model.selectedAccessPoint = ap;
-                        },
-                      ))),
+          child: SettingsItemList(
+              items: model.accessPoints.map((AccessPoint ap) => SettingsTile(
+                    scale: scale,
+                    text: ap.name,
+                    assetUrl: ap.url,
+                    description: ap.name == model.failedAccessPoint?.name
+                        ? model.connectionResultMessage
+                        : null,
+                    onTap: () {
+                      model.selectedAccessPoint = ap;
+                    },
+                  ))),
         )
       ],
     );
   }
 
   Widget _buildPasswordBox(WifiSettingsModel model, double scale) {
-    return new SettingsPopup(
+    return SettingsPopup(
         onDismiss: model.onPasswordCanceled,
-        child: new Material(
+        child: Material(
             color: Colors.white,
-            child: new FractionallySizedBox(
+            child: FractionallySizedBox(
               widthFactor: 0.8,
               heightFactor: 0.5,
-              child: new Column(
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  new Padding(padding: new EdgeInsets.only(top: 16.0 * scale)),
-                  new Text(
+                  Padding(padding: EdgeInsets.only(top: 16.0 * scale)),
+                  Text(
                     'Enter password:',
                     style: _titleTextStyle(scale),
                   ),
-                  new ConstrainedBox(
-                    constraints: new BoxConstraints(maxWidth: 400.0 * scale),
-                    child: new Container(
-                      padding: new EdgeInsets.only(top: 32.0 * scale),
-                      child: new TextField(
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: 400.0 * scale),
+                    child: Container(
+                      padding: EdgeInsets.only(top: 32.0 * scale),
+                      child: TextField(
                         obscureText: true,
                         autofocus: true,
                         style: _textStyle(scale),
