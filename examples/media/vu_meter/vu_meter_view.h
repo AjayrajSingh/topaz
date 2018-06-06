@@ -8,7 +8,7 @@
 #include <memory>
 #include <queue>
 
-#include <fbl/vmo_mapper.h>
+#include <lib/vmo-utils/vmo_mapper.h>
 #include <lib/async-loop/cpp/loop.h>
 #include <media/cpp/fidl.h>
 
@@ -80,7 +80,7 @@ class VuMeterView : public mozart::SkiaView {
 
   async::Loop* const loop_;
   media::AudioCapturerPtr capturer_;
-  fbl::VmoMapper payload_buffer_;
+  vmo_utils::VmoMapper payload_buffer_;
   bool started_ = false;
   bool request_in_flight_ = false;
 

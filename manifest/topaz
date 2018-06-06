@@ -6,6 +6,6 @@
     <import remote="https://fuchsia.googlesource.com/peridot"
             manifest="manifest/peridot"
             name="peridot"
-            revision="c2c47f5aaece958c9b52c47411b427b18b105ef9"/>
+            revision="79e944a4be3203240de2836400cd055addea4162"/>
   </imports>
 </manifest>

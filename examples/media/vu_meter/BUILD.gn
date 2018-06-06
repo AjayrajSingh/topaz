@@ -21,6 +21,7 @@ executable("vu_meter") {
     "//topaz/examples/ui/lib:skia_view",
     "//zircon/public/lib/async-loop",
     "//zircon/public/lib/hid",
+    "//zircon/public/lib/vmo-utils",
   ]
 }
 
