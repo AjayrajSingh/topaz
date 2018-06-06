@@ -47,10 +47,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
       _componentContext,
       _tokenProvider,
       _outgoingServicesImpl,
-    ).then(
-      _readyCompleter.complete,
-      onError: _readyCompleter.completeError,
-    );
+    ).catchError((e) => throw e).whenComplete(_readyCompleter.complete);
   }
 
   @override
@@ -69,17 +66,13 @@ abstract class AgentImpl implements Agent, Lifecycle {
     String taskId,
     void callback(),
   ) {
-    onRunTask(taskId).catchError((Exception e) {
-      throw e;
-    }).whenComplete(callback);
+    onRunTask(taskId).catchError((e) => throw e).whenComplete(callback);
   }
 
   @override
   void terminate() {
     _agentBinding.close();
-    onStop().catchError((Exception e) {
-      throw e;
-    }).whenComplete(() {
+    onStop().catchError((e) => throw e).whenComplete(() {
       _tokenProvider.ctrl.close();
       _componentContext.ctrl.close();
       _agentContext.ctrl.close();
