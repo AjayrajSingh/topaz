@@ -1,0 +1,21 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+flutter_aot_app("device_settings") {
+  main_dart = "lib/main.dart"
+
+  manifest = "pubspec.yaml"
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//garnet/public/lib/amber/fidl",
+    "//topaz/lib/settings:lib.settings",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/schemas/dart",
+  ]
+}
