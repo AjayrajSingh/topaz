@@ -4,14 +4,14 @@
 
 import 'dart:async';
 
-import 'package:lib.media.dart/audio_player_controller.dart';
-import 'package:fidl_media_player/fidl.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:fidl_fuchsia_math/fidl.dart' as geom;
+import 'package:fidl_fuchsia_mediaplayer/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_ui_views_v1/fidl.dart';
 import 'package:fidl/fidl.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.media.dart/audio_player_controller.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -53,8 +53,8 @@ class MediaPlayerController extends AudioPlayerController
       connectToService(_services, viewManager.ctrl);
 
       InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
-      mediaPlayer.createView(viewManager.ctrl.unbind(),
-                             viewOwnerPair.passRequest());
+      mediaPlayer.createView(
+          viewManager.ctrl.unbind(), viewOwnerPair.passRequest());
 
       _videoViewConnection =
           new ChildViewConnection(viewOwnerPair.passHandle());
@@ -147,18 +147,16 @@ class MediaPlayerController extends AudioPlayerController
   ChildViewConnection get videoViewConnection => _videoViewConnection;
 
   @override
-  void onVideoGeometryUpdated(geom.Size videoSize,
-                              geom.Size pixelAspectRatio) {
+  void onVideoGeometryUpdated(geom.Size videoSize, geom.Size pixelAspectRatio) {
     if (!openOrConnected) {
       return;
     }
 
-    double ratio = pixelAspectRatio.width.toDouble() /
-        pixelAspectRatio.height.toDouble();
+    double ratio =
+        pixelAspectRatio.width.toDouble() / pixelAspectRatio.height.toDouble();
 
     _videoSize = new Size(
-        videoSize.width.toDouble() * ratio,
-        videoSize.height.toDouble());
+        videoSize.width.toDouble() * ratio, videoSize.height.toDouble());
 
     scheduleMicrotask(_notifyListeners);
   }

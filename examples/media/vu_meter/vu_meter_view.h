@@ -9,8 +9,8 @@
 #include <queue>
 
 #include <fuchsia/media/cpp/fidl.h>
-#include <lib/vmo-utils/vmo_mapper.h>
 #include <lib/async-loop/cpp/loop.h>
+#include <lib/vmo-utils/vmo_mapper.h>
 
 #include "examples/ui/lib/skia_view.h"
 #include "lib/app/cpp/startup_context.h"

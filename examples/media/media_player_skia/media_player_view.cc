@@ -20,8 +20,8 @@
 #include "third_party/skia/include/core/SkPath.h"
 #include "topaz/examples/media/media_player_skia/media_player_params.h"
 
-using media_player::MediaPlayer;
-using media_player::NetMediaService;
+using fuchsia::mediaplayer::MediaPlayer;
+using fuchsia::mediaplayer::NetMediaService;
 
 namespace examples {
 
@@ -57,7 +57,8 @@ MediaPlayerView::MediaPlayerView(
     async::Loop* loop, fuchsia::ui::views_v1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
         view_owner_request,
-    fuchsia::sys::StartupContext* startup_context, const MediaPlayerParams& params)
+    fuchsia::sys::StartupContext* startup_context,
+    const MediaPlayerParams& params)
     : mozart::BaseView(std::move(view_manager), std::move(view_owner_request),
                        "Media Player"),
 
@@ -85,7 +86,7 @@ MediaPlayerView::MediaPlayerView(
     // Create a player from all that stuff.
     media_player_ = startup_context->ConnectToEnvironmentService<MediaPlayer>();
     media_player_.events().StatusChanged =
-        [this](media_player::MediaPlayerStatus status) {
+        [this](fuchsia::mediaplayer::MediaPlayerStatus status) {
           HandleStatusChanged(status);
         };
 
@@ -359,7 +360,7 @@ void MediaPlayerView::DrawControls(SkCanvas* canvas, const SkISize& size) {
 }
 
 void MediaPlayerView::HandleStatusChanged(
-    const media_player::MediaPlayerStatus& status) {
+    const fuchsia::mediaplayer::MediaPlayerStatus& status) {
   // Process status received from the player.
   if (status.timeline_transform) {
     timeline_function_ = media::TimelineFunction(*status.timeline_transform);

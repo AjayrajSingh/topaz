@@ -4,11 +4,11 @@
 
 import 'dart:async';
 
-import 'package:lib.media.dart/timeline.dart';
-import 'package:fidl_media_player/fidl.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:fidl_fuchsia_mediaplayer/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_math/fidl.dart' as geom;
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.media.dart/timeline.dart';
 import 'package:zircon/zircon.dart';
 
 /// Type for |AudioPlayerController| update callbacks.
