@@ -4,6 +4,7 @@
 
 import 'dart:math';
 
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/widgets.dart';
 
 import 'layout_model.dart';
@@ -34,8 +35,27 @@ List<PositionedSurface> layoutSurfaces(
     return <PositionedSurface>[];
   }
   Surface focused = focusStack.last;
+  SurfaceArrangement focusedArrangement = focused.relation.arrangement;
 
   Tree<Surface> copresTree = focused.copresentSpanningTree;
+
+  // Ontop only applies if the currently focused mod has a parent. If there's
+  // only one sutface in the stack, fall through to the logic below.
+  if (focusedArrangement == SurfaceArrangement.ontop && focusStack.length > 1) {
+    // Determine the parent's position and then place the focused surface on top.
+    List<PositionedSurface> surfaces = layoutSurfaces(
+        context, focusStack.sublist(0, focusStack.length - 1), layoutModel);
+    PositionedSurface parentSurface =
+        surfaces.firstWhere((PositionedSurface positioned) {
+      return positioned.surface == focused.parent;
+    });
+    PositionedSurface ontopSurface = new PositionedSurface(
+      surface: focused,
+      position: parentSurface.position,
+    );
+    surfaces.add(ontopSurface);
+    return surfaces;
+  }
 
   int focusOrder(Tree<Surface> l, Tree<Surface> r) =>
       _compareByOtherList(l.value, r.value, focusStack);

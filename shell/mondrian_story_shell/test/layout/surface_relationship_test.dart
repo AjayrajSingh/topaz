@@ -115,4 +115,157 @@ void main() {
     test_util.assertSurfaceProperties(positionedSurfaces[0],
         height: 1.0, width: 1.0, topLeft: const Offset(0.0, 0.0));
   });
+
+  test('one surface ontop of another surface', () {
+    SurfaceGraph graph = new SurfaceGraph();
+
+    // properties for root surface
+    SurfaceProperties properties = new SurfaceProperties();
+    SurfaceRelation surfaceRelation = const SurfaceRelation(
+      arrangement: SurfaceArrangement.none,
+      dependency: SurfaceDependency.none,
+      emphasis: 1.0,
+    );
+    Surface root =
+        graph.addSurface('root_of_test', properties, '', surfaceRelation, '');
+
+    // properties for the ontop surface
+    properties = new SurfaceProperties();
+    surfaceRelation = const SurfaceRelation(
+      arrangement: SurfaceArrangement.ontop,
+      dependency: SurfaceDependency.none,
+      emphasis: 1.0,
+    );
+    Surface ontopSurface = graph.addSurface(
+        'ontop', properties, 'root_of_test', surfaceRelation, '');
+
+    List<Surface> surfaces = [
+      root,
+      ontopSurface,
+    ];
+    List<PositionedSurface> positionedSurfaces = copresent_layout
+        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
+    expect(positionedSurfaces.length, 2);
+
+    expect(positionedSurfaces[0].surface, root);
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
+        height: 1.0, width: 1.0, topLeft: const Offset(0.0, 0.0));
+
+    expect(positionedSurfaces[1].surface, ontopSurface);
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
+        height: 1.0, width: 1.0, topLeft: const Offset(0.0, 0.0));
+  });
+
+  test('two surfaces in copresent and one brought ontop of the root surface',
+      () {
+    SurfaceGraph graph = new SurfaceGraph();
+
+    // properties for root surface
+    SurfaceProperties properties = new SurfaceProperties();
+    SurfaceRelation surfaceRelation = const SurfaceRelation(
+      arrangement: SurfaceArrangement.none,
+      dependency: SurfaceDependency.none,
+      emphasis: 1.0,
+    );
+    Surface root =
+        graph.addSurface('root_of_test', properties, '', surfaceRelation, '');
+
+    // properties for root surface
+    properties = new SurfaceProperties();
+    surfaceRelation = const SurfaceRelation(
+      arrangement: SurfaceArrangement.copresent,
+      dependency: SurfaceDependency.none,
+      emphasis: 1.0,
+    );
+    Surface copresentSurface = graph.addSurface(
+        'copresent', properties, 'root_of_test', surfaceRelation, '');
+
+    // properties for the ontop surface
+    properties = new SurfaceProperties();
+    surfaceRelation = const SurfaceRelation(
+      arrangement: SurfaceArrangement.ontop,
+      dependency: SurfaceDependency.none,
+      emphasis: 1.0,
+    );
+    Surface ontopSurface = graph.addSurface(
+        'ontop', properties, 'root_of_test', surfaceRelation, '');
+
+    List<Surface> surfaces = [
+      root,
+      copresentSurface,
+      ontopSurface,
+    ];
+    List<PositionedSurface> positionedSurfaces = copresent_layout
+        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
+    expect(positionedSurfaces.length, 3);
+
+    expect(positionedSurfaces[0].surface, root);
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
+        height: 1.0, width: 0.5, topLeft: const Offset(0.0, 0.0));
+
+    expect(positionedSurfaces[1].surface, copresentSurface);
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
+        height: 1.0, width: 0.5, topLeft: const Offset(0.5, 0.0));
+
+    expect(positionedSurfaces[2].surface, ontopSurface);
+    test_util.assertSurfaceProperties(positionedSurfaces[2],
+        height: 1.0, width: 0.5, topLeft: const Offset(0.0, 0.0));
+  });
+
+  test(
+      'two surfaces in copresent and one brought ontop of the copresent surface',
+      () {
+    SurfaceGraph graph = new SurfaceGraph();
+
+    // properties for root surface
+    SurfaceProperties properties = new SurfaceProperties();
+    SurfaceRelation surfaceRelation = const SurfaceRelation(
+      arrangement: SurfaceArrangement.none,
+      dependency: SurfaceDependency.none,
+      emphasis: 1.0,
+    );
+    Surface root =
+        graph.addSurface('root_of_test', properties, '', surfaceRelation, '');
+
+    // properties for root surface
+    properties = new SurfaceProperties();
+    surfaceRelation = const SurfaceRelation(
+      arrangement: SurfaceArrangement.copresent,
+      dependency: SurfaceDependency.none,
+      emphasis: 1.0,
+    );
+    Surface copresentSurface = graph.addSurface(
+        'copresent', properties, 'root_of_test', surfaceRelation, '');
+
+    // properties for the ontop surface
+    properties = new SurfaceProperties();
+    surfaceRelation = const SurfaceRelation(
+      arrangement: SurfaceArrangement.ontop,
+      dependency: SurfaceDependency.none,
+      emphasis: 1.0,
+    );
+    Surface ontopSurface =
+        graph.addSurface('ontop', properties, 'copresent', surfaceRelation, '');
+
+    List<Surface> surfaces = [
+      root,
+      copresentSurface,
+      ontopSurface,
+    ];
+    List<PositionedSurface> positionedSurfaces = copresent_layout
+        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
+    expect(positionedSurfaces.length, 3);
+
+    expect(positionedSurfaces[0].surface, root);
+    test_util.assertSurfaceProperties(positionedSurfaces[0],
+        height: 1.0, width: 0.5, topLeft: const Offset(0.0, 0.0));
+
+    expect(positionedSurfaces[1].surface, copresentSurface);
+    test_util.assertSurfaceProperties(positionedSurfaces[1],
+        height: 1.0, width: 0.5, topLeft: const Offset(0.5, 0.0));
+
+    expect(positionedSurfaces[2].surface, ontopSurface);
+    test_util.assertSurfaceProperties(positionedSurfaces[2],
+        height: 1.0, width: 0.5, topLeft: const Offset(0.5, 0.0));
+  });
 }

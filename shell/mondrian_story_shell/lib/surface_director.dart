@@ -4,6 +4,7 @@
 
 import 'dart:math' as math;
 
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
@@ -184,7 +185,14 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           FractionalOffset surfaceOrigin = positionedSurfaces.length > 1
               ? offscreen
               : FractionalOffset.topLeft;
-          placedSurfaces[ps.surface] = _form(ps, depth, surfaceOrigin);
+          if (ps.surface.relation.arrangement == SurfaceArrangement.ontop) {
+            // Surfaces that are ontop will be placed above the current depth
+            // TODO(jphsiao): Revisit whether ontop should be placed on top of
+            // all surfaces or if it should push its parent back in z.
+            placedSurfaces[ps.surface] = _form(ps, -1.0, surfaceOrigin);
+          } else {
+            placedSurfaces[ps.surface] = _form(ps, depth, surfaceOrigin);
+          }
         }
       }
       depth = (depth + 0.1).clamp(0.0, 1.0);
