@@ -5,7 +5,7 @@
 import("//build/fidl/fidl.gni")
 
 fidl("services") {
-  name = "chat_content_provider"
+  name = "fuchsia.chat.content_provider"
   sources = [
     "chat_content_provider.fidl",
     "firebase_db_client.fidl",

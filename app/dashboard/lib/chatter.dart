@@ -6,7 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
-import 'package:fidl_chat_content_provider/fidl.dart'
+import 'package:fidl_fuchsia_chat_content_provider/fidl.dart'
     as chat;
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';

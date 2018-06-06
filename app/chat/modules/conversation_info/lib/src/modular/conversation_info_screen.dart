@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:fidl_chat_content_provider/fidl.dart'
+import 'package:fidl_fuchsia_chat_content_provider/fidl.dart'
     as fidl;
 
 import '../widgets.dart';
