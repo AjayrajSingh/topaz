@@ -228,14 +228,11 @@ class ChildViewConnection {
   ViewProperties _createViewProperties(
       double width,
       double height,
-      double devicePixelRatio,
       double insetTop,
       double insetRight,
       double insetBottom,
       double insetLeft) {
     if (_currentViewProperties != null &&
-        _currentViewProperties.displayMetrics.devicePixelRatio ==
-            devicePixelRatio &&
         _currentViewProperties.viewLayout.size.width == width &&
         _currentViewProperties.viewLayout.size.height == height &&
         _currentViewProperties.viewLayout.inset.top == insetTop &&
@@ -245,14 +242,11 @@ class ChildViewConnection {
       return null;
     }
 
-    DisplayMetrics displayMetrics =
-        new DisplayMetrics(devicePixelRatio: devicePixelRatio);
     fidl.SizeF size = new fidl.SizeF(width: width, height: height);
     fidl.InsetF inset = new fidl.InsetF(
         top: insetTop, right: insetRight, bottom: insetBottom, left: insetLeft);
     ViewLayout viewLayout = new ViewLayout(size: size, inset: inset);
     return _currentViewProperties = new ViewProperties(
-      displayMetrics: displayMetrics,
       viewLayout: viewLayout,
     );
   }
@@ -272,7 +266,7 @@ class ChildViewConnection {
       return;
     }
     ViewProperties viewProperties = _createViewProperties(width, height,
-        devicePixelRatio, insetTop, insetRight, insetBottom, insetLeft);
+        insetTop, insetRight, insetBottom, insetLeft);
     if (viewProperties == null) {
       return;
     }
