@@ -7,19 +7,35 @@ import 'base_value.dart';
 
 /// Class that maps field names to values.
 class ValueNode implements BaseValue {
-  Map<Symbol, dynamic> _childValues;
+  Map<Symbol, BaseValue> _childValues;
 
   /// Default constructor. |schemaDescription| specifies the name and type of
   /// every field.
   ValueNode(Map<String, BaseType> schemaDescription) {
     // Maps symbols to a value.
-    _childValues = <Symbol, Object>{};
+    _childValues = <Symbol, BaseValue>{};
 
     schemaDescription.forEach((String name, BaseType type) {
       Object value = type.newValue();
       assert(value != null);
       _childValues[new Symbol(name)] = value;
     });
+  }
+
+  /// Returns a Map from field name to value.
+  Map<String, BaseValue> collectFields() {
+    final fields = <String, BaseValue>{};
+    _childValues.forEach((Symbol symbolName, BaseValue value) {
+      String name = symbolName.toString();
+      if (value is ValueNode) {
+        value
+            .collectFields()
+            .forEach((key, value) => fields['$name.$key'] = value);
+      } else {
+        fields[name] = value;
+      }
+    });
+    return fields;
   }
 
   /// Intercepts invocations to provide easy access to specific _childValues.

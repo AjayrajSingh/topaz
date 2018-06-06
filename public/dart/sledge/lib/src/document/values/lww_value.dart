@@ -5,8 +5,9 @@
 import 'dart:async';
 
 import '../base_value.dart';
+import '../change.dart';
+import 'converted_change.dart';
 import 'converter.dart';
-import 'key_value.dart';
 
 class _LastOneWinValue<T> {
   T _value, _transaction;
@@ -21,24 +22,28 @@ class _LastOneWinValue<T> {
 
   T get value => _transaction ?? _value;
 
-  Map<int, T> put() {
+  ConvertedChange<int, T> put() {
     if (_transaction == null) {
-      return <int, T>{};
+      return new ConvertedChange<int, T>();
     }
-    var result = <int, T>{0: _transaction};
+    var result = new ConvertedChange<int, T>(<int, T>{0: _transaction});
     _value = _transaction;
     _transaction = null;
     return result;
   }
 
-  void applyChanges(Map<int, T> change) {
-    if (change.isEmpty) {
+  void applyChanges(ConvertedChange<int, T> change) {
+    if (change.changedEntries.isEmpty) {
       return;
     }
-    if (change.length != 1 || change[0] == null) {
+    if (change.deletedKeys.isNotEmpty) {
+      throw new FormatException('Should be no deleted keys.', change);
+    }
+    if (change.changedEntries.length != 1 ||
+        !change.changedEntries.containsKey(0)) {
       throw new FormatException('Changes have not supported format.', change);
     }
-    _value = change[0];
+    _value = change.changedEntries[0];
     _changeController.add(_value);
   }
 }
@@ -49,17 +54,17 @@ class LastOneWinValue<T> implements BaseValue<T> {
   final DataConverter<int, T> _converter;
 
   /// Constructor
-  LastOneWinValue([List<KeyValue> init])
+  LastOneWinValue([Change init])
       : _converter = new DataConverter<int, T>(),
         _value = new _LastOneWinValue<T>(new Converter<T>().defaultValue) {
-    applyChanges(init ?? <KeyValue>[]);
+    applyChanges(init ?? new Change());
   }
 
   @override
-  List<KeyValue> put() => _converter.serialize(_value.put());
+  Change put() => _converter.serialize(_value.put());
 
   @override
-  void applyChanges(List<KeyValue> input) =>
+  void applyChanges(Change input) =>
       _value.applyChanges(_converter.deserialize(input));
 
   /// Sets value.

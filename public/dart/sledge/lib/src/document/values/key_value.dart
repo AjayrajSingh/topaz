@@ -7,10 +7,10 @@ import 'dart:typed_data';
 /// Immutable Key Value pair.
 class KeyValue {
   /// Key.
-  final ByteData key;
+  final Uint8List key;
 
   /// Value.
-  final ByteData value;
+  final Uint8List value;
 
   /// Constructor.
   KeyValue(this.key, this.value);

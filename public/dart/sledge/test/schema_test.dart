@@ -4,7 +4,10 @@
 
 import 'dart:typed_data';
 
+// TODO: investigate whether we can get rid of the implementation_imports.
+// ignore_for_file: implementation_imports
 import 'package:sledge/sledge.dart';
+import 'package:sledge/src/document/change.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -149,5 +152,31 @@ void main() {
     expect(doc.cnt_d.value, equals(-5.2));
     doc.cnt_d.add(3.12);
     expect(doc.cnt_d.value, equals(-2.08));
+  });
+
+  test('Put and apply changes', () {
+    // Create Schema.
+    Map<String, BaseType> schemaDescription = <String, BaseType>{
+      'name': new LastOneWinString(),
+      'number': new Integer(),
+      'cnt': new IntCounter()
+    };
+    Schema schema = new Schema(schemaDescription);
+
+    // Create two Sledge documents
+    Sledge sledgeA = new Sledge.testing(), sledgeB = new Sledge.testing();
+    dynamic docA = sledgeA.newDocument(new DocumentId(schema)),
+        docB = sledgeB.newDocument(new DocumentId(schema));
+
+    docA
+      ..name.value = 'value + counter'
+      ..number.value = 5
+      ..cnt.add(1);
+    Change c1 = Document.put(docA);
+    Document.applyChanges(docB, c1);
+
+    expect(docB.name.value, equals('value + counter'));
+    expect(docB.number.value, equals(5));
+    expect(docB.cnt.value, equals(1));
   });
 }

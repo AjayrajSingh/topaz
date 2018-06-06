@@ -5,8 +5,9 @@
 import 'dart:async';
 
 import '../base_value.dart';
+import '../change.dart';
+import 'converted_change.dart';
 import 'converter.dart';
-import 'key_value.dart';
 import 'key_value_storage.dart';
 
 /// Implementation of Positive Negative Counter CRDT.
@@ -50,11 +51,11 @@ class _PosNegCounterValue<T extends num> {
     _storage[key] = cur + delta;
   }
 
-  Map<int, T> put() => _storage.put();
+  ConvertedChange<int, T> put() => _storage.put();
 
-  void applyChanges(Map<int, T> change) {
-    for (var key in change.keys) {
-      var diff = change[key] - _storage[key];
+  void applyChanges(ConvertedChange<int, T> change) {
+    for (var key in change.changedEntries.keys) {
+      var diff = change.changedEntries[key] - _storage[key];
       if (_isKeyPositive(key)) {
         _sum += diff;
       } else {
@@ -72,20 +73,20 @@ class PosNegCounterValue<T extends num> implements BaseValue<T> {
   final DataConverter<int, T> _converter;
 
   /// Constructor.
-  PosNegCounterValue(int id, [List<KeyValue> init])
+  PosNegCounterValue(int id, [Change init])
       : _converter = new DataConverter<int, T>(),
         _counter =
             new _PosNegCounterValue<T>(id, new Converter<T>().defaultValue) {
-    applyChanges(init ?? <KeyValue>[]);
+    applyChanges(init ?? new Change());
   }
 
   /// Ends transaction and retrieve its data.
   @override
-  List<KeyValue> put() => _converter.serialize(_counter.put());
+  Change put() => _converter.serialize(_counter.put());
 
   /// Applies external transactions.
   @override
-  void applyChanges(List<KeyValue> input) =>
+  void applyChanges(Change input) =>
       _counter.applyChanges(_converter.deserialize(input));
 
   /// Adds value (possibly negative) to counter.
