@@ -44,6 +44,16 @@ _entry_manifests = [
 template("flutter_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
+  product = !is_debug
+  if (defined(invoker.product)) {
+    product = invoker.product
+  }
+
+  product_suffix = ""
+  if (product) {
+    product_suffix = "_product"
+  }
+
   kernel_target_name = target_name + "_kernel"
   kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
 
@@ -146,7 +156,7 @@ template("flutter_jit_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit_runtime")
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime")
         dest = "runtime"
       },
     ]
@@ -181,6 +191,16 @@ template("flutter_jit_app") {
 
 template("flutter_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
+
+  product = !is_debug
+  if (defined(invoker.product)) {
+    product = invoker.product
+  }
+
+  product_suffix = ""
+  if (product) {
+    product_suffix = "_product"
+  }
 
   dart_library_target_name = target_name + "_dart_library"
   kernel_target_name = target_name + "_kernel"
@@ -254,7 +274,12 @@ template("flutter_aot_app") {
       snapshot_instructions_path,
     ]
 
-    script = gen_snapshot
+    if (product) {
+      script = gen_snapshot_product
+    } else {
+      script = gen_snapshot
+    }
+
     args = [
       # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
       "--reify_generic_functions",
@@ -283,7 +308,7 @@ template("flutter_aot_app") {
                   rebase_path(entry_manifest) ]
       }
     }
-    if (is_debug) {
+    if (is_debug && !product) {
       args += [ "--enable_asserts" ]
     }
     args += [ rebase_path(kernel_path) ]
@@ -389,7 +414,7 @@ template("flutter_aot_app") {
 
     meta = [
       {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/aot_runtime")
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/aot${product_suffix}_runtime")
         dest = "runtime"
       },
     ]
@@ -446,6 +471,10 @@ template("flutter_aot_app") {
 #
 #   aot (optional, flutter_app() only)
 #     A boolean. Whether to AOT compile the app. Default is false.
+#
+#   product (optional)
+#     A boolean. Whether to build/run the app in a stripped-down Dart VM.
+#     Defaults to !is_debug.
 template("flutter_app") {
   if (defined(invoker.aot) && invoker.aot) {
     flutter_aot_app(target_name) {

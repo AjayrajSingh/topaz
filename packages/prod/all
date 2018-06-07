@@ -16,6 +16,8 @@
         "topaz/packages/prod/flutter",
         "topaz/packages/prod/flutter_aot",
         "topaz/packages/prod/flutter_jit",
+        "topaz/packages/prod/flutter_aot_product",
+        "topaz/packages/prod/flutter_jit_product",
         "topaz/packages/prod/google_auth_provider",
         "topaz/packages/prod/image",
         "topaz/packages/prod/infinite_scroller",

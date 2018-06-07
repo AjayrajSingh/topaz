@@ -22,52 +22,70 @@ compile_platform("kernel_platform_files") {
   ]
 }
 
-action("kernel_core_snapshot") {
-  deps = gen_snapshot_deps + [
-    ":kernel_platform_files",
-  ]
+template("core_snapshot") {
+  assert(defined(invoker.product),
+      "core_snapshot requires 'product' to be defined")
 
-  platform_dill =
-      "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
-  compilation_trace = "//topaz/runtime/flutter_runner/compilation_trace.txt"
-  inputs = [
-    platform_dill,
-    compilation_trace,
-  ]
-
-  vm_snapshot_data = "$target_gen_dir/vm_isolate_snapshot.bin"
-  vm_snapshot_instructions = "$target_gen_dir/vm_snapshot_instructions.bin"
-  isolate_snapshot_data = "$target_gen_dir/isolate_snapshot.bin"
-  isolate_snapshot_instructions =
-      "$target_gen_dir/isolate_snapshot_instructions.bin"
-  outputs = [
-    vm_snapshot_data,
-    vm_snapshot_instructions,
-    isolate_snapshot_data,
-    isolate_snapshot_instructions,
-  ]
-
-  script = gen_snapshot
-  args = [
-    # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
-    "--reify_generic_functions",
-    "--strong",
-    # Re-enable once enabled in //third_party/flutter/runtime/dart_vm.cc
-    # "--sync-async",
-    "--enable_mirrors=false",
-    "--deterministic",
-    "--snapshot_kind=core-jit",
-    "--load_compilation_trace=" + rebase_path(compilation_trace, root_build_dir),
-    "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
-    "--vm_snapshot_instructions=" +
-        rebase_path(vm_snapshot_instructions, root_build_dir),
-    "--isolate_snapshot_data=" +
-        rebase_path(isolate_snapshot_data, root_build_dir),
-    "--isolate_snapshot_instructions=" +
-        rebase_path(isolate_snapshot_instructions, root_build_dir),
-  ]
-  if (is_debug) {
-    args += [ "--enable_asserts" ]
+  product_suffix = ""
+  if (invoker.product) {
+    product_suffix = "_product"
   }
-  args += [ rebase_path(platform_dill) ]
+
+  action(target_name) {
+    deps = gen_snapshot_deps + [
+      ":kernel_platform_files",
+    ]
+
+    platform_dill =
+        "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
+    compilation_trace = "//topaz/runtime/flutter_runner/compilation_trace.txt"
+    inputs = [
+      platform_dill,
+      compilation_trace,
+    ]
+
+    vm_snapshot_data = "$target_gen_dir/vm_isolate_snapshot${product_suffix}.bin"
+    vm_snapshot_instructions = "$target_gen_dir/vm_snapshot_instructions${product_suffix}.bin"
+    isolate_snapshot_data = "$target_gen_dir/isolate_snapshot${product_suffix}.bin"
+    isolate_snapshot_instructions =
+        "$target_gen_dir/isolate_snapshot_instructions${product_suffix}.bin"
+    outputs = [
+      vm_snapshot_data,
+      vm_snapshot_instructions,
+      isolate_snapshot_data,
+      isolate_snapshot_instructions,
+    ]
+
+    script = gen_snapshot
+    args = [
+      # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
+      "--reify_generic_functions",
+      "--strong",
+      # Re-enable once enabled in //third_party/flutter/runtime/dart_vm.cc
+      # "--sync-async",
+      "--enable_mirrors=false",
+      "--deterministic",
+      "--snapshot_kind=core-jit",
+      "--load_compilation_trace=" + rebase_path(compilation_trace, root_build_dir),
+      "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
+      "--vm_snapshot_instructions=" +
+          rebase_path(vm_snapshot_instructions, root_build_dir),
+      "--isolate_snapshot_data=" +
+          rebase_path(isolate_snapshot_data, root_build_dir),
+      "--isolate_snapshot_instructions=" +
+          rebase_path(isolate_snapshot_instructions, root_build_dir),
+    ]
+    if (is_debug && !invoker.product) {
+      args += [ "--enable_asserts" ]
+    }
+    args += [ rebase_path(platform_dill) ]
+  }
+}
+
+core_snapshot("kernel_core_snapshot") {
+  product = false
+}
+
+core_snapshot("kernel_core_snapshot_product") {
+  product = true
 }

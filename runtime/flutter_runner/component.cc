@@ -130,7 +130,11 @@ Application::Application(TerminationCallback termination_callback,
   settings_.isolate_snapshot_instr_path =
       "pkg/data/isolate_core_snapshot_instructions.bin";
 
+#if defined(DART_PRODUCT)
+  settings_.enable_observatory = false;
+#else
   settings_.enable_observatory = true;
+#endif
 
   settings_.icu_data_path = "";
 
