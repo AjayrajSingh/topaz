@@ -10,52 +10,62 @@ import 'package:fidl_fuchsia_sys/fidl.dart';
 class EchoImpl implements Echo {
   final StartupContext context;
 
+  // Saves references to proxies from which we're expecting events.
+  Map<String, EchoProxy> proxies = {};
+
   EchoImpl(this.context);
 
-  void proxyEcho(Struct value, void Function(Struct value) callback) {
-    assert(value.forwardToServer.isNotEmpty);
+  void proxyEcho(
+      Struct value, String forwardToServer,
+      void Function(Struct value) callback) {
+    assert(forwardToServer.isNotEmpty);
 
     final Services services = new Services();
     final LaunchInfo launchInfo = new LaunchInfo(
-        url: value.forwardToServer, directoryRequest: services.request());
+        url: forwardToServer, directoryRequest: services.request());
     final ComponentControllerProxy controller = new ComponentControllerProxy();
     context.launcher.createComponent(launchInfo, controller.ctrl.request());
-
-    final Struct newValue = new Struct(
-      primitiveTypes: value.primitiveTypes,
-      defaultValues: value.defaultValues,
-      arrays: value.arrays,
-      arrays2d: value.arrays2d,
-      vectors: value.vectors,
-      handles: value.handles,
-      strings: value.strings,
-      defaultEnum: value.defaultEnum,
-      i8Enum: value.i8Enum,
-      i16Enum: value.i16Enum,
-      i32Enum: value.i32Enum,
-      i64Enum: value.i64Enum,
-      u8Enum: value.u8Enum,
-      u16Enum: value.u16Enum,
-      u32Enum: value.u32Enum,
-      u64Enum: value.u64Enum,
-      structs: value.structs,
-      unions: value.unions,
-      b: value.b,
-      forwardToServer: null,
-    );
-
     final EchoProxy echo = new EchoProxy();
     services.connectToService(echo.ctrl);
 
-    echo.echoStruct(newValue, callback);
+    echo.echoStruct(value, '', callback);
   }
 
   @override
-  void echoStruct(Struct value, void Function(Struct value) callback) {
-    if (value.forwardToServer != null && value.forwardToServer.isNotEmpty) {
-      proxyEcho(value, callback);
+  void echoStruct(
+      Struct value, String forwardToServer,
+      void Function(Struct value) callback) {
+    if (forwardToServer != null && forwardToServer.isNotEmpty) {
+      proxyEcho(value, forwardToServer, callback);
     } else {
       callback(value);
+    }
+  }
+
+  void handleEchoEvent(Struct value, String serverUrl) {
+    _echoBinding.events.echoEvent(value);
+    // Not technically safe if there's more than one outstanding event on this
+    // proxy, but that shouldn't happen in the existing test.
+    proxies.remove(serverUrl);
+  }
+
+  @override
+  void echoStructNoRetVal(Struct value, String forwardToServer) {
+    if (forwardToServer != null && forwardToServer.isNotEmpty) {
+      final Services services = new Services();
+      final LaunchInfo launchInfo = new LaunchInfo(
+          url: forwardToServer, directoryRequest: services.request());
+      final ComponentControllerProxy controller = new ComponentControllerProxy();
+      context.launcher.createComponent(launchInfo, controller.ctrl.request());
+      final EchoProxy echo = new EchoProxy();
+      services.connectToService(echo.ctrl);
+      // Keep echo around until we process the expected event.
+      proxies[forwardToServer] = echo;
+      echo
+         ..echoEvent = (Struct val) { handleEchoEvent(val, forwardToServer); }
+         ..echoStructNoRetVal(value, '');
+    } else {
+      _echoBinding.events.echoEvent(value);
     }
   }
 }
