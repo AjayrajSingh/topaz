@@ -12,7 +12,7 @@
 
 #include <auth/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
-#include <web_view/cpp/fidl.h>
+#include <fuchsia/webview/cpp/fidl.h>
 
 #include "lib/app/cpp/startup_context.h"
 #include "lib/callback/cancellable.h"
@@ -24,7 +24,7 @@
 namespace spotify_auth_provider {
 
 class SpotifyAuthProviderImpl : public auth::AuthProvider,
-                                web_view::WebRequestDelegate {
+                                fuchsia::webview::WebRequestDelegate {
  public:
   SpotifyAuthProviderImpl(fuchsia::sys::StartupContext* context,
                           network_wrapper::NetworkWrapper* network_wrapper,
@@ -61,7 +61,7 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
       const fidl::StringPtr credential,
       const RevokeAppOrPersistentCredentialCallback callback) override;
 
-  // |web_view::WebRequestDelegate|
+  // |fuchsia::webview::WebRequestDelegate|
   void WillSendRequest(const fidl::StringPtr incoming_url) override;
 
   void GetUserProfile(const fidl::StringPtr credential,
@@ -83,10 +83,11 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
   auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
-  web_view::WebViewPtr web_view_;
+  fuchsia::webview::WebViewPtr web_view_;
   GetPersistentCredentialCallback get_persistent_credential_callback_;
 
-  fidl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
+  fidl::BindingSet<fuchsia::webview::WebRequestDelegate>
+      web_request_delegate_bindings_;
   fidl::Binding<auth::AuthProvider> binding_;
   callback::CancellableContainer requests_;
 

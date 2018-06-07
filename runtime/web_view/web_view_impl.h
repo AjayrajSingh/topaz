@@ -2,9 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#pragma once
+#ifndef TOPAZ_RUNTIME_WEB_VIEW_WEB_VIEW_IMPL_H_
+#define TOPAZ_RUNTIME_WEB_VIEW_WEB_VIEW_IMPL_H_
 
-#include <web_view/cpp/fidl.h>
+#include <fuchsia/webview/cpp/fidl.h>
 
 #include "lib/app/cpp/service_provider_impl.h"
 #include "lib/fidl/cpp/binding_set.h"
@@ -24,8 +25,7 @@ class TouchTracker {
   TouchTracker(int x = 0, int y = 0);
 
   void HandleEvent(const fuchsia::ui::input::PointerEvent& pointer,
-                   const fuchsia::ui::gfx::Metrics& metrics,
-                   WebView& web_view);
+                   const fuchsia::ui::gfx::Metrics& metrics, WebView& web_view);
 
  private:
   int start_x_;
@@ -35,11 +35,11 @@ class TouchTracker {
   bool is_drag_;
 };
 
-class WebViewImpl : public mozart::BaseView,
-                   public web_view::WebView {
+class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView {
  public:
   WebViewImpl(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-              fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
+              fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+                  view_owner_request,
               fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
                   outgoing_services_request,
               const std::string& url);
@@ -65,7 +65,8 @@ class WebViewImpl : public mozart::BaseView,
   void ClearCookies() override;
 
   void SetWebRequestDelegate(
-      ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) final;
+      ::fidl::InterfaceHandle<fuchsia::webview::WebRequestDelegate> delegate)
+      final;
 
   bool HandleKeyboardEvent(const fuchsia::ui::input::InputEvent& event);
   bool HandleMouseEvent(const fuchsia::ui::input::PointerEvent& pointer);
@@ -97,7 +98,7 @@ class WebViewImpl : public mozart::BaseView,
   scenic_lib::HostImageCycler image_cycler_;
 
   // Delegate that receives WillSendRequest calls. Can be null.
-  web_view::WebRequestDelegatePtr webRequestDelegate_;
+  fuchsia::webview::WebRequestDelegatePtr webRequestDelegate_;
 
   // We use this |ServiceProvider| to expose the |WebView| interface to
   // others.
@@ -107,3 +108,5 @@ class WebViewImpl : public mozart::BaseView,
 
   FXL_DISALLOW_COPY_AND_ASSIGN(WebViewImpl);
 };
+
+#endif  // TOPAZ_RUNTIME_WEB_VIEW_WEB_VIEW_IMPL_H_

@@ -14,10 +14,10 @@
 
 #include <fuchsia/net/oldhttp/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
+#include <fuchsia/webview/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 #include <modular_auth/cpp/fidl.h>
 #include <trace-provider/provider.h>
-#include <web_view/cpp/fidl.h>
 
 #include "lib/app/cpp/connect.h"
 #include "lib/app/cpp/startup_context.h"
@@ -925,8 +925,9 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
 
 // TODO(alhaad): Use variadic template in |Operation|. That way, parameters to
 // |callback| can be returned as parameters to |Done()|.
-class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
-                                                  web_view::WebRequestDelegate {
+class OAuthTokenManagerApp::GoogleUserCredsCall
+    : public Operation<>,
+      fuchsia::webview::WebRequestDelegate {
  public:
   GoogleUserCredsCall(modular_auth::AccountPtr account,
                       OAuthTokenManagerApp* const app,
@@ -940,14 +941,15 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
   // |Operation|
   void Run() override {
     // No FlowToken used here; calling Done() directly is more suitable,
-    // because of the flow of control through web_view::WebRequestDelegate.
+    // because of the flow of control through
+    // fuchsia::webview::WebRequestDelegate.
 
     auto view_owner = SetupWebView();
 
     // Set a delegate which will parse incoming URLs for authorization code.
     // TODO(alhaad/ukode): We need to set a timout here in-case we do not get
     // the code.
-    web_view::WebRequestDelegatePtr web_request_delegate;
+    fuchsia::webview::WebRequestDelegatePtr web_request_delegate;
     web_request_delegate_bindings_.AddBinding(
         this, web_request_delegate.NewRequest());
     web_view_->SetWebRequestDelegate(std::move(web_request_delegate));
@@ -976,7 +978,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
     auth_context_->StartOverlay(std::move(view_owner));
   }
 
-  // |web_view::WebRequestDelegate|
+  // |fuchsia::webview::WebRequestDelegate|
   void WillSendRequest(fidl::StringPtr incoming_url) override {
     const std::string& uri = incoming_url.get();
     const std::string prefix = std::string{kRedirectUri} + "?code=";
@@ -1150,13 +1152,14 @@ class OAuthTokenManagerApp::GoogleUserCredsCall : public Operation<>,
 
   modular_auth::AuthenticationContextPtr auth_context_;
 
-  web_view::WebViewPtr web_view_;
+  fuchsia::webview::WebViewPtr web_view_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
 
   http::HttpServicePtr http_service_;
   http::URLLoaderPtr url_loader_;
 
-  fidl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
+  fidl::BindingSet<fuchsia::webview::WebRequestDelegate>
+      web_request_delegate_bindings_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleUserCredsCall);
 };

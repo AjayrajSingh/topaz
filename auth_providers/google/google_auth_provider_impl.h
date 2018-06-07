@@ -9,7 +9,7 @@
 
 #include <auth/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
-#include <web_view/cpp/fidl.h>
+#include <fuchsia/webview/cpp/fidl.h>
 
 #include "lib/app/cpp/startup_context.h"
 #include "lib/callback/cancellable.h"
@@ -21,7 +21,7 @@
 namespace google_auth_provider {
 
 class GoogleAuthProviderImpl : auth::AuthProvider,
-                               web_view::WebRequestDelegate {
+                               fuchsia::webview::WebRequestDelegate {
  public:
   GoogleAuthProviderImpl(async_t* main_dispatcher,
                          fuchsia::sys::StartupContext* context,
@@ -58,7 +58,7 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
       fidl::StringPtr credential,
       RevokeAppOrPersistentCredentialCallback callback) override;
 
-  // |web_view::WebRequestDelegate|
+  // |fuchsia::webview::WebRequestDelegate|
   void WillSendRequest(fidl::StringPtr incoming_url) override;
 
   void GetUserProfile(fidl::StringPtr credential, fidl::StringPtr access_token);
@@ -80,10 +80,11 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
   auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
-  web_view::WebViewPtr web_view_;
+  fuchsia::webview::WebViewPtr web_view_;
   GetPersistentCredentialCallback get_persistent_credential_callback_;
 
-  fidl::BindingSet<web_view::WebRequestDelegate> web_request_delegate_bindings_;
+  fidl::BindingSet<fuchsia::webview::WebRequestDelegate>
+      web_request_delegate_bindings_;
   fidl::Binding<auth::AuthProvider> binding_;
   callback::CancellableContainer requests_;
 

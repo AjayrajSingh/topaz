@@ -77,7 +77,7 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
   auto view_owner = SetupWebView();
 
   // Set a delegate which will parse incoming URLs for authorization code.
-  web_view::WebRequestDelegatePtr web_request_delegate;
+  fuchsia::webview::WebRequestDelegatePtr web_request_delegate;
   web_request_delegate_bindings_.AddBinding(this,
                                             web_request_delegate.NewRequest());
   web_view_->SetWebRequestDelegate(std::move(web_request_delegate));

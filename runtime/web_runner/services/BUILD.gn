@@ -5,7 +5,7 @@
 import("//build/fidl/fidl.gni")
 
 fidl("services") {
-  name = "web_view"
+  name = "fuchsia.webview"
   sources = [
     "web_view.fidl",
   ]

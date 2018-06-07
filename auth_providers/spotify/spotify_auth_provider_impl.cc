@@ -4,8 +4,8 @@
 
 #include "topaz/auth_providers/spotify/spotify_auth_provider_impl.h"
 
-#include <fuchsia/ui/views_v1_token/cpp/fidl.h>
 #include <fuchsia/net/oldhttp/cpp/fidl.h>
+#include <fuchsia/ui/views_v1_token/cpp/fidl.h>
 
 #include "lib/app/cpp/connect.h"
 #include "lib/app/cpp/startup_context.h"
@@ -58,7 +58,7 @@ void SpotifyAuthProviderImpl::GetPersistentCredential(
   auto view_owner = SetupWebView();
 
   // Set a delegate which will parse incoming URLs for authorization code.
-  web_view::WebRequestDelegatePtr web_request_delegate;
+  fuchsia::webview::WebRequestDelegatePtr web_request_delegate;
   web_request_delegate_bindings_.AddBinding(this,
                                             web_request_delegate.NewRequest());
   web_view_->SetWebRequestDelegate(std::move(web_request_delegate));

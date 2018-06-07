@@ -4,11 +4,11 @@
 
 #include "topaz/runtime/web_view/web_view_impl.h"
 
-#include <lib/fdio/io.h>
 #include <hid/hid.h>
 #include <hid/usages.h>
 #include <lib/async/cpp/task.h>
 #include <lib/async/default.h>
+#include <lib/fdio/io.h>
 #include <zircon/pixelformat.h>
 #include <zircon/syscalls.h>
 #include <zircon/types.h>
@@ -65,7 +65,8 @@ void TouchTracker::HandleEvent(const fuchsia::ui::input::PointerEvent& pointer,
 
 WebViewImpl::WebViewImpl(
     fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
+    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+        view_owner_request,
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
         outgoing_services_request,
     const std::string& url)
@@ -84,19 +85,18 @@ WebViewImpl::WebViewImpl(
 
   if (outgoing_services_request) {
     // Expose |WebView| interface to caller
-    outgoing_services_.AddService<web_view::WebView>(
-        [this](fidl::InterfaceRequest<web_view::WebView> request) {
+    outgoing_services_.AddService<fuchsia::webview::WebView>(
+        [this](fidl::InterfaceRequest<fuchsia::webview::WebView> request) {
           FXL_LOG(INFO) << "web view service request";
           web_view_interface_bindings_.AddBinding(this, std::move(request));
         });
     outgoing_services_.AddBinding(std::move(outgoing_services_request));
   }
 
-  async::PostTask(async_get_default(),
-      ([weak = weak_factory_.GetWeakPtr()]() {
-        if (weak)
-          weak->CallIdle();
-      }));
+  async::PostTask(async_get_default(), ([weak = weak_factory_.GetWeakPtr()]() {
+                    if (weak)
+                      weak->CallIdle();
+                  }));
 }
 
 WebViewImpl::~WebViewImpl() {}
@@ -111,20 +111,21 @@ void WebViewImpl::SetUrl(fidl::StringPtr url) {
 }
 
 // |WebView|:
-void WebViewImpl::ClearCookies() {
-  web_view_.deleteAllCookies();
-}
+void WebViewImpl::ClearCookies() { web_view_.deleteAllCookies(); }
 
 void WebViewImpl::SetWebRequestDelegate(
-    ::fidl::InterfaceHandle<web_view::WebRequestDelegate> delegate) {
+    ::fidl::InterfaceHandle<fuchsia::webview::WebRequestDelegate> delegate) {
   webRequestDelegate_ = delegate.Bind();
 }
 
-bool WebViewImpl::HandleKeyboardEvent(const fuchsia::ui::input::InputEvent& event) {
+bool WebViewImpl::HandleKeyboardEvent(
+    const fuchsia::ui::input::InputEvent& event) {
   bool handled = true;
   const fuchsia::ui::input::KeyboardEvent& keyboard = event.keyboard();
-  bool pressed = keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::PRESSED;
-  bool repeating = keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::REPEAT;
+  bool pressed =
+      keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::PRESSED;
+  bool repeating =
+      keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::REPEAT;
   if (pressed && keyboard.code_point == 'c' &&
       keyboard.modifiers & fuchsia::ui::input::kModifierControl) {
     exit(0);
@@ -157,7 +158,8 @@ bool WebViewImpl::HandleKeyboardEvent(const fuchsia::ui::input::InputEvent& even
   return handled;
 }
 
-bool WebViewImpl::HandleMouseEvent(const fuchsia::ui::input::PointerEvent& pointer) {
+bool WebViewImpl::HandleMouseEvent(
+    const fuchsia::ui::input::PointerEvent& pointer) {
   bool handled = false;
   if (pointer.buttons & fuchsia::ui::input::kMousePrimaryButton) {
     switch (pointer.phase) {
@@ -183,13 +185,15 @@ bool WebViewImpl::HandleMouseEvent(const fuchsia::ui::input::PointerEvent& point
   return handled;
 }
 
-void WebViewImpl::HandleTouchDown(const fuchsia::ui::input::PointerEvent& pointer) {
+void WebViewImpl::HandleTouchDown(
+    const fuchsia::ui::input::PointerEvent& pointer) {
   const auto x = pointer.x * metrics().scale_x;
   const auto y = pointer.y * metrics().scale_y;
   touch_trackers_[pointer.pointer_id] = TouchTracker(x, y);
 }
 
-bool WebViewImpl::HandleTouchEvent(const fuchsia::ui::input::PointerEvent& pointer) {
+bool WebViewImpl::HandleTouchEvent(
+    const fuchsia::ui::input::PointerEvent& pointer) {
   bool handled = false;
   auto pointer_id = pointer.pointer_id;
   switch (pointer.phase) {
@@ -241,8 +245,7 @@ void WebViewImpl::OnSceneInvalidated(
   // Update the image.
   const scenic_lib::HostImage* image = image_cycler_.AcquireImage(
       physical_size().width, physical_size().height, physical_size().width * 4u,
-      fuchsia::images::PixelFormat::BGRA_8,
-      fuchsia::images::ColorSpace::SRGB);
+      fuchsia::images::PixelFormat::BGRA_8, fuchsia::images::ColorSpace::SRGB);
   FXL_DCHECK(image);
 
   // Paint the webview.
@@ -284,9 +287,8 @@ void WebViewImpl::OnSceneInvalidated(
 void WebViewImpl::CallIdle() {
   web_view_.iterateEventLoop();
   InvalidateScene();
-async::PostTask(async_get_default(),
-      ([weak = weak_factory_.GetWeakPtr()]() {
-        if (weak)
-          weak->CallIdle();
-      }));
+  async::PostTask(async_get_default(), ([weak = weak_factory_.GetWeakPtr()]() {
+                    if (weak)
+                      weak->CallIdle();
+                  }));
 }
