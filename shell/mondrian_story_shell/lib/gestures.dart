@@ -146,7 +146,7 @@ abstract class DragGestureRecognizer
                   new DragUpdateDetails(
                     sourceTimeStamp: event.timeStamp,
                     delta: _getDeltaForDetails(delta),
-                    primaryDelta: _getPrimaryValueFromOffset(delta),
+                    primaryDelta: null,
                     globalPosition: event.position,
                   ),
                 ),
