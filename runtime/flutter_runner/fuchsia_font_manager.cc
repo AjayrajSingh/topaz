@@ -20,6 +20,7 @@
 
 #include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fxl/logging.h"
+#include "third_party/icu/source/common/unicode/uchar.h"
 #include "txt/asset_font_style_set.h"
 
 namespace txt {
@@ -115,10 +116,13 @@ SkTypeface* FuchsiaFontManager::onMatchFamilyStyle(
 
 SkTypeface* FuchsiaFontManager::onMatchFamilyStyleCharacter(
     const char familyName[],
-    const SkFontStyle&,
+    const SkFontStyle& style,
     const char* bcp47[],
     int bcp47Count,
     SkUnichar character) const {
+  if (u_hasBinaryProperty(character, UCHAR_EMOJI)) {
+    return onMatchFamilyStyle("NotoColorEmoji", style);
+  }
   return nullptr;
 }
 
