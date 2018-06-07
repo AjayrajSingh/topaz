@@ -43,10 +43,8 @@ void _getEntriesRecursive(
       callback(status, <List<int>, String>{});
       return;
     }
-    if (entries != null) {
-      for (final ledger.InlinedEntry entry in entries) {
-        items[entry.key] = utf8.decode(entry.value);
-      }
+    for (final ledger.InlinedEntry entry in entries) {
+      items[entry.key] = utf8.decode(entry.inlinedValue.value);
     }
     if (status == ledger.Status.ok) {
       callback(ledger.Status.ok, items);
