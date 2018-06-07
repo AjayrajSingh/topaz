@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:typed_data';
+
 import 'package:sledge/sledge.dart';
 import 'package:test/test.dart';
 
@@ -26,6 +28,50 @@ void main() {
         equals('{"foo":{"someBool":"Boolean","someInteger":"Integer",},}'));
   });
 
+  test('Verify that two identical schemes result in identical hashes', () {
+    Map<String, BaseType> schemaDescription1 = <String, BaseType>{
+      'someBool': new Boolean(),
+      'someInteger': new Integer()
+    };
+    Map<String, BaseType> schemaDescription2 = <String, BaseType>{
+      'someInteger': new Integer(),
+      'someBool': new Boolean(),
+    };
+    Schema schema1 = new Schema(schemaDescription1);
+    Schema schema2 = new Schema(schemaDescription2);
+    expect(schema1.hash, equals(schema2.hash));
+  });
+
+  test('Verify that two different schemes result in different hashes', () {
+    Map<String, BaseType> schemaDescription1 = <String, BaseType>{
+      'someBool': new Boolean(),
+      'someInteger': new Integer()
+    };
+    Map<String, BaseType> schemaDescription2 = <String, BaseType>{
+      'someBool': new Boolean(),
+    };
+    Map<String, BaseType> schemaDescription3 = <String, BaseType>{
+      'someBool_': new Boolean(),
+      'someInteger': new Integer()
+    };
+    Schema schema1 = new Schema(schemaDescription1);
+    Schema schema2 = new Schema(schemaDescription2);
+    Schema schema3 = new Schema(schemaDescription3);
+    expect(schema1.hash, isNot(equals(schema2.hash)));
+    expect(schema1.hash, isNot(equals(schema3.hash)));
+  });
+
+  test('Verify that schemas can not be modified after their creation', () {
+    Map<String, BaseType> schemaDescription = <String, BaseType>{
+      'someBool': new Boolean(),
+    };
+    Schema schema = new Schema(schemaDescription);
+    Uint8List hash1 = schema.hash;
+    schemaDescription['foo'] = new Integer();
+    Uint8List hash2 = schema.hash;
+    expect(hash1, equals(hash2));
+  });
+
   test('Instantiate and initialize a Sledge document', () {
     // Create schemas.
     Map<String, BaseType> schemaDescription = <String, BaseType>{
@@ -40,7 +86,7 @@ void main() {
 
     // Create a new Sledge document.
     Sledge sledge = new Sledge.testing();
-    dynamic doc = sledge.newDocument(schema2);
+    dynamic doc = sledge.newDocument(new DocumentId(schema2));
 
     // Read and write properties of a Sledge document.
     expect(doc.foo.someBool.value, equals(false));
@@ -63,7 +109,7 @@ void main() {
 
     // Create a new Sledge document.
     Sledge sledge = new Sledge.testing();
-    dynamic doc = sledge.newDocument(schema);
+    dynamic doc = sledge.newDocument(new DocumentId(schema));
 
     // Read and write properties of a Sledge document.
     expect(doc.someBool.value, equals(false));
@@ -90,7 +136,7 @@ void main() {
 
     // Create a new Sledge document.
     Sledge sledge = new Sledge.testing();
-    dynamic doc = sledge.newDocument(schema);
+    dynamic doc = sledge.newDocument(new DocumentId(schema));
 
     // Modify and get value of PosNegCounter.
     expect(doc.cnt.value, equals(0));

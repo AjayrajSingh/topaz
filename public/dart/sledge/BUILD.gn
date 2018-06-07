@@ -14,12 +14,14 @@ dart_library("sledge") {
 
   deps = [
     "//peridot/public/lib/ledger/fidl",
+    "//third_party/dart-pkg/pub/crypto",
     "//topaz/public/lib/module/dart",
   ]
 }
 
 dart_test("dart_sledge_tests") {
   sources = [
+    "document_id_test.dart",
     "schema_test.dart",
     "values/pos_neg_counter_test.dart",
   ]

@@ -8,7 +8,7 @@ import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 
 import 'document/document.dart';
-import 'schema/schema.dart';
+import 'document/document_id.dart';
 import 'sledge_page_id.dart';
 
 /// The interface to the Sledge library.
@@ -64,8 +64,7 @@ class Sledge {
   }
 
   /// Returns a new document that can be stored in Sledge.
-  dynamic newDocument(Schema schema) {
-    return new Document(this, schema);
+  dynamic newDocument(DocumentId documentId) {
+    return new Document(this, documentId);
   }
-
 }

@@ -4,6 +4,7 @@
 
 import '../schema/schema.dart';
 import '../sledge.dart';
+import 'document_id.dart';
 import 'value_node.dart';
 
 // TODO: Use the |_sledge| field.
@@ -14,9 +15,11 @@ class Document {
   Sledge _sledge;
   Schema _schema;
   ValueNode _value;
+  DocumentId _documentId;
 
   /// Default constructor.
-  Document(this._sledge, this._schema) {
+  Document(this._sledge, this._documentId) {
+    _schema = _documentId.schema;
     _value = _schema.newValue();
   }
 

@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 export 'src/document/document.dart';
+export 'src/document/document_id.dart';
 export 'src/schema/base_type.dart';
 export 'src/schema/schema.dart';
 export 'src/sledge.dart';
