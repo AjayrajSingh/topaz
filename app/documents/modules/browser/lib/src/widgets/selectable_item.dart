@@ -4,9 +4,9 @@
 
 import 'dart:core';
 
+import 'package:fidl_fuchsia_documents/fidl.dart' as doc_fidl;
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:fidl_documents/fidl.dart' as doc_fidl;
 
 /// An item that can be selected, mult-selected, and interacted with
 abstract class SelectableItem extends StatelessWidget {

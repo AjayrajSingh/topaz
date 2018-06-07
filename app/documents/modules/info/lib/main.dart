@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fidl_fuchsia_documents/fidl.dart' as doc_fidl;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fidl_documents/fidl.dart' as doc_fidl;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.schemas.dart/com.fuchsia.documents.dart';

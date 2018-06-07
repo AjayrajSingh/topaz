@@ -5,7 +5,7 @@
 import("//build/fidl/fidl.gni")
 
 fidl("services") {
-  name = "documents"
+  name = "fuchsia.documents"
   sources = [
     "document.fidl",
   ]

@@ -4,9 +4,9 @@
 
 import 'dart:core';
 
+import 'package:fidl_fuchsia_documents/fidl.dart' as doc_fidl;
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
-import 'package:fidl_documents/fidl.dart' as doc_fidl;
 import 'package:utils/utils.dart' as utils;
 
 import './selectable_item.dart';
