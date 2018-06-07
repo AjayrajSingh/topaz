@@ -39,6 +39,7 @@ source_set("lib") {
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl",
     "//garnet/public/lib/network_wrapper",
+    "//garnet/public/lib/ui/views/fidl:v1",
     "//peridot/lib/rapidjson",
     "//topaz/auth_providers/oauth",
     "//topaz/runtime/web_runner/services",
