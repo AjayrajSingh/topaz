@@ -10,6 +10,7 @@ import 'package:args/args.dart';
 import 'package:front_end/src/api_prototype/compiler_options.dart';
 import 'package:front_end/src/api_prototype/compilation_message.dart'
     show Severity;
+import 'package:front_end/src/fasta/fasta_codes.dart' as codes;
 
 import 'package:kernel/ast.dart';
 import 'package:kernel/binary/ast_to_binary.dart';
@@ -25,12 +26,11 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addFlag('aot',
       help: 'Run compiler in AOT mode (enables whole-program transformations)',
       defaultsTo: false)
-  ..addFlag('drop-ast', help: 'Drop AST for members with bytecode',
-      defaultsTo: false)
-  ..addFlag('embed-sources', help: 'Embed sources in the output dill file',
-      defaultsTo: false)
-  ..addFlag('gen-bytecode', help: 'Generate bytecode',
-      defaultsTo: false)
+  ..addFlag('drop-ast',
+      help: 'Drop AST for members with bytecode', defaultsTo: false)
+  ..addFlag('embed-sources',
+      help: 'Embed sources in the output dill file', defaultsTo: false)
+  ..addFlag('gen-bytecode', help: 'Generate bytecode', defaultsTo: false)
   ..addOption('depfile', help: 'Path to output Ninja depfile')
   ..addOption('manifest', help: 'Path to output Fuchsia package manifest')
   ..addOption('output', help: 'Path to output dill file')
@@ -55,7 +55,7 @@ Uri _ensureFolderPath(String path) {
 // TODO(rmacnak): Fix nits and use ErrorPrinter from package:vm.
 class ErrorPrinter {
   final ProblemHandler previousErrorHandler;
-  final compilationMessages = <Uri, List<List>>{};
+  final Map<Uri, List<List>> compilationMessages = <Uri, List<List>>{};
 
   ErrorPrinter({this.previousErrorHandler});
 
@@ -65,8 +65,9 @@ class ErrorPrinter {
       List<codes.FormattedMessage> context) {
     if (shouldReportProblem(severity)) {
       final sourceUri = problem.locatedMessage.uri;
-      compilationMessages.putIfAbsent(sourceUri, () => [])
-        ..add([problem, context]);
+      compilationMessages
+          .putIfAbsent(sourceUri, () => [])
+          .add([problem, context]);
     }
     previousErrorHandler?.call(problem, severity, context);
   }
@@ -88,18 +89,18 @@ class ErrorPrinter {
   }
 }
 
-
 Future<void> main(List<String> args) async {
   ArgResults options;
   try {
     options = _argParser.parse(args);
     if (!options.rest.isNotEmpty) {
-      throw "Must specify input.dart";
+      throw new Exception('Must specify input.dart');
     }
-  } catch (error) {
+  } on Exception catch (error) {
     print('ERROR: $error\n');
     print(_usage);
     exitCode = 1;
+    return;
   }
 
   final Uri sdkRoot = _ensureFolderPath(options['sdk-root']);
@@ -127,7 +128,7 @@ Future<void> main(List<String> args) async {
       target = new FlutterRunnerTarget(targetFlags);
       break;
     default:
-      print("Unknown target: $targetName");
+      print('Unknown target: $targetName');
       exitCode = 1;
       return;
   }
@@ -144,17 +145,16 @@ Future<void> main(List<String> args) async {
 
   if (aot) {
     // Link in the platform to produce an output with no external references.
-    compilerOptions.linkedDependencies = <Uri>[
-      platformKernelDill
-    ];
+    compilerOptions.linkedDependencies = <Uri>[platformKernelDill];
   }
 
-  Component component =
-      await compileToKernel(filenameUri, compilerOptions,
-        aot: aot,
-        genBytecode: genBytecode,
-        dropAST: dropAST,
-      );
+  Component component = await compileToKernel(
+    filenameUri,
+    compilerOptions,
+    aot: aot,
+    genBytecode: genBytecode,
+    dropAST: dropAST,
+  );
 
   errorPrinter.printCompilationMessages(filenameUri);
   if (errorDetector.hasCompilationErrors || (component == null)) {
@@ -185,7 +185,7 @@ String escapePath(String path) {
 // https://ninja-build.org/manual.html#_depfile
 Future<void> writeDepfile(
     Component component, String output, String depfile) async {
-  var deps = new List<Uri>();
+  var deps = <Uri>[];
   for (Library lib in component.libraries) {
     deps.add(lib.fileUri);
     for (LibraryPart part in lib.parts) {
@@ -205,7 +205,8 @@ Future<void> writeDepfile(
   await file.close();
 }
 
-Future writePackages(Component component, String output, String packageManifestFilename) async {
+Future writePackages(
+    Component component, String output, String packageManifestFilename) async {
   // Package sharing: make the encoding not depend on the order in which parts
   // of a package are loaded.
   component.libraries.sort((Library a, Library b) {
@@ -218,48 +219,47 @@ Future writePackages(Component component, String output, String packageManifestF
   }
 
   final IOSink packageManifest = new File(packageManifestFilename).openWrite();
-  final String kernelListFilename = packageManifestFilename+".dilplist";
+  final String kernelListFilename = '$packageManifestFilename.dilplist';
   final IOSink kernelList = new File(kernelListFilename).openWrite();
 
   final packages = new Set<String>();
   for (Library lib in component.libraries) {
     packages.add(packageFor(lib));
   }
-  packages.remove("main");
+  packages.remove('main');
   packages.remove(null);
 
   for (String package in packages) {
     await writePackage(component, output, package, packageManifest, kernelList);
   }
-  await writePackage(component, output, "main", packageManifest, kernelList);
+  await writePackage(component, output, 'main', packageManifest, kernelList);
 
-  packageManifest.write("data/app.dilplist=$kernelListFilename\n");
+  packageManifest.write('data/app.dilplist=$kernelListFilename\n');
   await packageManifest.close();
   await kernelList.close();
 }
 
 Future writePackage(Component component, String output, String package,
-                    IOSink packageManifest, IOSink kernelList) async {
-  final String filenameInPackage = package + ".dilp";
-  final String filenameInBuild = output + "-" + package + ".dilp";
+    IOSink packageManifest, IOSink kernelList) async {
+  final String filenameInPackage = '$package.dilp';
+  final String filenameInBuild = '$output-$package.dilp';
   final IOSink sink = new File(filenameInBuild).openWrite();
 
   var main = component.mainMethod;
-  if (package != "main") {
+  if (package != 'main') {
     // Package sharing: remove the information about the importer from package
     // dilps.
     component.mainMethod = null;
   }
-  final BinaryPrinter printer =
-      new LimitedBinaryPrinter(sink, (lib) => packageFor(lib) == package,
-                               false /* excludeUriToSource */);
+  final BinaryPrinter printer = new LimitedBinaryPrinter(sink,
+      (lib) => packageFor(lib) == package, false /* excludeUriToSource */);
   printer.writeComponentFile(component);
   component.mainMethod = main;
 
   await sink.close();
 
-  packageManifest.write("data/$filenameInPackage=$filenameInBuild\n");
-  kernelList.write("$filenameInPackage\n");
+  packageManifest.write('data/$filenameInPackage=$filenameInBuild\n');
+  kernelList.write('$filenameInPackage\n');
 }
 
 String packageFor(Library lib) {
@@ -269,9 +269,9 @@ String packageFor(Library lib) {
 
   // Packages are written into their own dilp.
   Uri uri = lib.importUri;
-  if (uri.scheme == "package")
+  if (uri.scheme == 'package')
     return uri.pathSegments.first;
 
   // Everything else (e.g., file: or data: imports) is lumped into the main dilp.
-  return "main";
+  return 'main';
 }
