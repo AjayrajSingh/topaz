@@ -340,7 +340,6 @@ class UserList extends StatelessWidget {
             duration: const Duration(milliseconds: 250),
             opacity: model.showingRemoveUserTarget ? 0.0 : 1.0,
             child: new ListView(
-              controller: model.userPickerScrollController,
               padding: const EdgeInsets.only(
                 bottom: 24.0,
                 right: 24.0,

@@ -53,8 +53,6 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
   bool _showingUserActions = false;
   bool _addingUser = false;
   bool _loadingChildView = false;
-  bool _showingKernelPanic = false;
-  final ScrollController _userPickerScrollController = new ScrollController();
   final Set<Account> _draggedUsers = new Set<Account>();
 
   /// Constructor
@@ -64,33 +62,13 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
     this.onLogin,
     cobalt.CobaltEncoder encoder,
     this.onSetup,
-  }) : super(encoder) {
-    // Check for last kernel panic
-    File lastPanic = new File('/boot/log/last-panic.txt');
-    if (lastPanic.existsSync()) {
-      _showingKernelPanic = true;
-      notifyListeners();
-    }
-    _userPickerScrollController.addListener(_scrollListener);
-  }
-
-  /// Scroll Controller for the user picker
-  ScrollController get userPickerScrollController =>
-      _userPickerScrollController;
+  }) : super(encoder);
 
   @override
   void onStop() {
     onDeviceShellStopped?.call();
     super.dispose();
     super.onStop();
-  }
-
-  // Hide user actions on overscroll
-  void _scrollListener() {
-    if (_userPickerScrollController.offset >
-        _userPickerScrollController.position.maxScrollExtent + 40.0) {
-      hideUserActions();
-    }
   }
 
   /// Refreshes the list of users.
@@ -184,12 +162,6 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
     notifyListeners();
   }
 
-  /// Hide the kernel panic screen
-  void hideKernelPanic() {
-    _showingKernelPanic = false;
-    notifyListeners();
-  }
-
   /// Show the loading spinner if true
   bool get showingLoadingSpinner => _showingLoadingSpinner;
 
@@ -204,9 +176,6 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
 
   /// If true, show the remove user target
   bool get showingRemoveUserTarget => _draggedUsers.isNotEmpty;
-
-  /// If true, show kernel panic screen
-  bool get showingKernelPanic => _showingKernelPanic;
 
   /// Returns true the add user dialog is showing
   bool get addingUser => _addingUser;

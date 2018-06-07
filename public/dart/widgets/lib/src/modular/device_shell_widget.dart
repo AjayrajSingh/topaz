@@ -5,7 +5,6 @@
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular_auth/fidl.dart';
-import 'package:fidl_fuchsia_ui_input/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
@@ -30,9 +29,6 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
   final Set<DeviceShellBinding> _deviceShellBindingSet =
       new Set<DeviceShellBinding>();
 
-  final Set<SoftKeyboardContainerBinding> _softKeyboardContainerBindingSet =
-      new Set<SoftKeyboardContainerBinding>();
-
   /// The bindings for the [Lifecycle] service implemented by [DeviceShellImpl].
   final Set<LifecycleBinding> _lifecycleBindingSet =
       new Set<LifecycleBinding>();
@@ -43,9 +39,6 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
   /// The rest of the application.
   final Widget child;
 
-  /// A service that displays a soft keyboard.
-  final SoftKeyboardContainer softKeyboardContainer;
-
   final T _deviceShellModel;
 
   /// Constructor.
@@ -53,7 +46,6 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
     @required this.startupContext,
     T deviceShellModel,
     AuthenticationContext authenticationContext,
-    this.softKeyboardContainer,
     this.child,
   })  : _deviceShellModel = deviceShellModel,
         _deviceShell = _createDeviceShell(
@@ -89,18 +81,6 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
           ..bind(_deviceShell, request);
         _lifecycleBindingSet.add(binding);
       }, Lifecycle.$serviceName);
-
-    if (softKeyboardContainer != null) {
-      startupContext.outgoingServices.addServiceForName(
-        (InterfaceRequest<SoftKeyboardContainer> request) {
-          SoftKeyboardContainerBinding binding =
-              new SoftKeyboardContainerBinding()
-                ..bind(softKeyboardContainer, request);
-          _softKeyboardContainerBindingSet.add(binding);
-        },
-        SoftKeyboardContainer.$serviceName,
-      );
-    }
   }
 
   static DeviceShell _createDeviceShell(

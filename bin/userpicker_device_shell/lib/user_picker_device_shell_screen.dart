@@ -4,14 +4,11 @@
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/application.dart';
 import 'package:meta/meta.dart';
 
 import 'clock.dart';
 import 'user_picker_device_shell_model.dart';
 import 'user_picker_screen.dart';
-
-const double _kKernelPanicElevation = 799.9;
 
 /// The root widget which displays all the other windows of this app.
 class UserPickerDeviceShellScreen extends StatelessWidget {
@@ -44,27 +41,6 @@ class UserPickerDeviceShellScreen extends StatelessWidget {
               ),
             ),
           ]);
-        }
-
-        // Add kernel panic screen
-        if (model.showingKernelPanic) {
-          stackChildren.add(
-            /// TODO(apwilson): Remove gesture detector and make kernel_panic
-            /// hittestable when DNO-86 is fixed.
-            new GestureDetector(
-              onTap: model.hideKernelPanic,
-              child: new PhysicalModel(
-                color: Colors.black,
-                elevation: _kKernelPanicElevation,
-                child: new ApplicationWidget(
-                  url: 'kernel_panic',
-                  launcher: launcher,
-                  onDone: model.hideKernelPanic,
-                  hitTestable: false,
-                ),
-              ),
-            ),
-          );
         }
 
         if (model.childViewConnection != null) {
