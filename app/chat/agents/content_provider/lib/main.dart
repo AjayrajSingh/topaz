@@ -8,7 +8,7 @@ import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_chat_content_provider/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_modular_auth/fidl.dart';
+import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:lib.agent.dart/agent.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';

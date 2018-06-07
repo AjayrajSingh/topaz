@@ -4,7 +4,7 @@
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_chat_content_provider/fidl.dart';
-import 'package:fidl_modular_auth/fidl.dart';
+import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 
 import 'firebase_db_client_impl.dart';

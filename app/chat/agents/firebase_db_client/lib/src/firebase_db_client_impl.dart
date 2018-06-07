@@ -9,7 +9,7 @@ import 'dart:convert' show json;
 import 'package:config/config.dart';
 import 'package:eventsource/eventsource.dart';
 import 'package:fidl_fuchsia_chat_content_provider/fidl.dart';
-import 'package:fidl_modular_auth/fidl.dart';
+import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:http/http.dart' as http;
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';

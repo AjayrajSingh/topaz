@@ -16,7 +16,7 @@
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
-#include <modular_auth/cpp/fidl.h>
+#include <fuchsia/modular/auth/cpp/fidl.h>
 #include <trace-provider/provider.h>
 
 #include "lib/app/cpp/connect.h"
@@ -52,10 +52,10 @@ namespace auth {
 namespace http = ::fuchsia::net::oldhttp;
 
 using ShortLivedTokenCallback =
-    std::function<void(std::string, modular_auth::AuthErr)>;
+    std::function<void(std::string, fuchsia::modular::auth::AuthErr)>;
 
 using FirebaseTokenCallback =
-    std::function<void(modular_auth::FirebaseTokenPtr, modular_auth::AuthErr)>;
+    std::function<void(fuchsia::modular::auth::FirebaseTokenPtr, fuchsia::modular::auth::AuthErr)>;
 
 namespace {
 
@@ -221,7 +221,7 @@ std::string GetRefreshTokenFromCredsFile(const std::string& account_id) {
 // Exactly one of success_callback and failure_callback is ever invoked.
 void Post(const std::string& request_body, http::URLLoader* const url_loader,
           const std::string& url, const std::function<void()>& success_callback,
-          const std::function<void(modular_auth::Status, std::string)>&
+          const std::function<void(fuchsia::modular::auth::Status, std::string)>&
               failure_callback,
           const std::function<bool(rapidjson::Document)>& set_token_callback) {
   std::string encoded_request_body(request_body);
@@ -274,7 +274,7 @@ void Post(const std::string& request_body, http::URLLoader* const url_loader,
 
     if (response.error) {
       failure_callback(
-          modular_auth::Status::NETWORK_ERROR,
+          fuchsia::modular::auth::Status::NETWORK_ERROR,
           "POST error: " + std::to_string(response.error->code) +
               " , with description: " + response.error->description->data());
       return;
@@ -286,7 +286,7 @@ void Post(const std::string& request_body, http::URLLoader* const url_loader,
       // TODO(alhaad/ukode): Use non-blocking variant.
       if (!fsl::BlockingCopyToString(std::move(response.body->stream()),
                                      &response_body)) {
-        failure_callback(modular_auth::Status::NETWORK_ERROR,
+        failure_callback(fuchsia::modular::auth::Status::NETWORK_ERROR,
                          "Failed to read response from socket with status:" +
                              std::to_string(response.status_code));
         return;
@@ -295,7 +295,7 @@ void Post(const std::string& request_body, http::URLLoader* const url_loader,
 
     if (response.status_code != 200) {
       failure_callback(
-          modular_auth::Status::OAUTH_SERVER_ERROR,
+          fuchsia::modular::auth::Status::OAUTH_SERVER_ERROR,
           "Received status code:" + std::to_string(response.status_code) +
               ", and response body:" + response_body);
       return;
@@ -305,7 +305,7 @@ void Post(const std::string& request_body, http::URLLoader* const url_loader,
     rapidjson::ParseResult ok = doc.Parse(response_body);
     if (!ok) {
       std::string error_msg = GetParseError_En(ok.Code());
-      failure_callback(modular_auth::Status::BAD_RESPONSE,
+      failure_callback(fuchsia::modular::auth::Status::BAD_RESPONSE,
                        "JSON parse error: " + error_msg);
       return;
     };
@@ -313,7 +313,7 @@ void Post(const std::string& request_body, http::URLLoader* const url_loader,
     if (result) {
       success_callback();
     } else {
-      failure_callback(modular_auth::Status::BAD_RESPONSE,
+      failure_callback(fuchsia::modular::auth::Status::BAD_RESPONSE,
                        "Invalid response: " + JsonValueToPrettyString(doc));
     }
     return;
@@ -324,7 +324,7 @@ void Post(const std::string& request_body, http::URLLoader* const url_loader,
 void Get(http::URLLoader* const url_loader, const std::string& url,
          const std::string& access_token,
          const std::function<void()>& success_callback,
-         const std::function<void(modular_auth::Status status, std::string)>&
+         const std::function<void(fuchsia::modular::auth::Status status, std::string)>&
              failure_callback,
          const std::function<bool(rapidjson::Document)>& set_token_callback) {
   http::URLRequest request;
@@ -354,7 +354,7 @@ void Get(http::URLLoader* const url_loader, const std::string& url,
                                             http::URLResponse response) {
     if (response.error) {
       failure_callback(
-          modular_auth::Status::NETWORK_ERROR,
+          fuchsia::modular::auth::Status::NETWORK_ERROR,
           "GET error: " + std::to_string(response.error->code) +
               " ,with description: " + response.error->description->data());
       return;
@@ -366,7 +366,7 @@ void Get(http::URLLoader* const url_loader, const std::string& url,
       // TODO(alhaad/ukode): Use non-blocking variant.
       if (!fsl::BlockingCopyToString(std::move(response.body->stream()),
                                      &response_body)) {
-        failure_callback(modular_auth::Status::NETWORK_ERROR,
+        failure_callback(fuchsia::modular::auth::Status::NETWORK_ERROR,
                          "Failed to read response from socket with status:" +
                              std::to_string(response.status_code));
         return;
@@ -375,7 +375,7 @@ void Get(http::URLLoader* const url_loader, const std::string& url,
 
     if (response.status_code != 200) {
       failure_callback(
-          modular_auth::Status::OAUTH_SERVER_ERROR,
+          fuchsia::modular::auth::Status::OAUTH_SERVER_ERROR,
           "Status code: " + std::to_string(response.status_code) +
               " while fetching tokens with error description:" + response_body);
       return;
@@ -385,7 +385,7 @@ void Get(http::URLLoader* const url_loader, const std::string& url,
     rapidjson::ParseResult ok = doc.Parse(response_body);
     if (!ok) {
       std::string error_msg = GetParseError_En(ok.Code());
-      failure_callback(modular_auth::Status::BAD_RESPONSE,
+      failure_callback(fuchsia::modular::auth::Status::BAD_RESPONSE,
                        "JSON parse error: " + error_msg);
       return;
     };
@@ -393,7 +393,7 @@ void Get(http::URLLoader* const url_loader, const std::string& url,
     if (result) {
       success_callback();
     } else {
-      failure_callback(modular_auth::Status::BAD_RESPONSE,
+      failure_callback(fuchsia::modular::auth::Status::BAD_RESPONSE,
                        "Invalid response: " + JsonValueToPrettyString(doc));
     }
   });
@@ -402,30 +402,30 @@ void Get(http::URLLoader* const url_loader, const std::string& url,
 }  // namespace
 
 // Implementation of the OAuth Token Manager app.
-class OAuthTokenManagerApp : modular_auth::AccountProvider {
+class OAuthTokenManagerApp : fuchsia::modular::auth::AccountProvider {
  public:
   OAuthTokenManagerApp(async::Loop* loop);
 
  private:
   // |AccountProvider|
-  void Initialize(fidl::InterfaceHandle<modular_auth::AccountProviderContext>
+  void Initialize(fidl::InterfaceHandle<fuchsia::modular::auth::AccountProviderContext>
                       provider) override;
 
   // |AccountProvider|
   void Terminate() override;
 
   // |AccountProvider|
-  void AddAccount(modular_auth::IdentityProvider identity_provider,
+  void AddAccount(fuchsia::modular::auth::IdentityProvider identity_provider,
                   AddAccountCallback callback) override;
 
   // |AccountProvider|
-  void RemoveAccount(modular_auth::Account account, bool revoke_all,
+  void RemoveAccount(fuchsia::modular::auth::Account account, bool revoke_all,
                      RemoveAccountCallback callback) override;
 
   // |AccountProvider|
   void GetTokenProviderFactory(
       fidl::StringPtr account_id,
-      fidl::InterfaceRequest<modular_auth::TokenProviderFactory> request)
+      fidl::InterfaceRequest<fuchsia::modular::auth::TokenProviderFactory> request)
       override;
 
   // Generate a random account id.
@@ -444,9 +444,9 @@ class OAuthTokenManagerApp : modular_auth::AccountProvider {
 
   std::shared_ptr<fuchsia::sys::StartupContext> startup_context_;
 
-  modular_auth::AccountProviderContextPtr account_provider_context_;
+  fuchsia::modular::auth::AccountProviderContextPtr account_provider_context_;
 
-  fidl::Binding<modular_auth::AccountProvider> binding_;
+  fidl::Binding<fuchsia::modular::auth::AccountProvider> binding_;
 
   class TokenProviderFactoryImpl;
   // account_id -> TokenProviderFactoryImpl
@@ -499,12 +499,12 @@ class OAuthTokenManagerApp : modular_auth::AccountProvider {
 };
 
 class OAuthTokenManagerApp::TokenProviderFactoryImpl
-    : modular_auth::TokenProviderFactory,
-      modular_auth::TokenProvider {
+    : fuchsia::modular::auth::TokenProviderFactory,
+      fuchsia::modular::auth::TokenProvider {
  public:
   TokenProviderFactoryImpl(
       const fidl::StringPtr& account_id, OAuthTokenManagerApp* const app,
-      fidl::InterfaceRequest<modular_auth::TokenProviderFactory> request)
+      fidl::InterfaceRequest<fuchsia::modular::auth::TokenProviderFactory> request)
       : account_id_(account_id), binding_(this, std::move(request)), app_(app) {
     binding_.set_error_handler(
         [this] { app_->token_provider_factory_impls_.erase(account_id_); });
@@ -514,7 +514,7 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl
   // |TokenProviderFactory|
   void GetTokenProvider(
       fidl::StringPtr /*application_url*/,
-      fidl::InterfaceRequest<modular_auth::TokenProvider> request) override {
+      fidl::InterfaceRequest<fuchsia::modular::auth::TokenProvider> request) override {
     // TODO(alhaad/ukode): Current implementation is agnostic about which
     // agent is requesting what token. Fix this.
     token_provider_bindings_.AddBinding(this, std::move(request));
@@ -540,8 +540,8 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl
     // Oauth id token is used as input to fetch firebase auth token.
     GetIdToken(
         [this, firebase_api_key = firebase_api_key, callback](
-            const std::string id_token, const modular_auth::AuthErr auth_err) {
-          if (auth_err.status != modular_auth::Status::OK) {
+            const std::string id_token, const fuchsia::modular::auth::AuthErr auth_err) {
+          if (auth_err.status != fuchsia::modular::auth::Status::OK) {
             FXL_LOG(ERROR) << "Error in refreshing Idtoken.";
             callback(nullptr, std::move(auth_err));
             return;
@@ -558,8 +558,8 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl
   }
 
   std::string account_id_;
-  fidl::Binding<modular_auth::TokenProviderFactory> binding_;
-  fidl::BindingSet<modular_auth::TokenProvider> token_provider_bindings_;
+  fidl::Binding<fuchsia::modular::auth::TokenProviderFactory> binding_;
+  fidl::BindingSet<fuchsia::modular::auth::TokenProvider> token_provider_bindings_;
 
   OAuthTokenManagerApp* const app_;
 
@@ -567,7 +567,7 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl
 };
 
 class OAuthTokenManagerApp::GoogleFirebaseTokensCall
-    : public Operation<modular_auth::FirebaseTokenPtr, modular_auth::AuthErr> {
+    : public Operation<fuchsia::modular::auth::FirebaseTokenPtr, fuchsia::modular::auth::AuthErr> {
  public:
   GoogleFirebaseTokensCall(std::string account_id, std::string firebase_api_key,
                            std::string id_token,
@@ -584,12 +584,12 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
     FlowToken flow{this, &firebase_token_, &auth_err_};
 
     if (account_id_.empty()) {
-      Failure(flow, modular_auth::Status::BAD_REQUEST, "Account id is empty");
+      Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST, "Account id is empty");
       return;
     }
 
     if (firebase_api_key_.empty()) {
-      Failure(flow, modular_auth::Status::BAD_REQUEST,
+      Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST,
               "Firebase Api key is empty");
       return;
     }
@@ -641,7 +641,7 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
            FXL_CHECK(flow);
            Success(*flow);
          },
-         [this, branch](const modular_auth::Status status,
+         [this, branch](const fuchsia::modular::auth::Status status,
                         const std::string error_message) {
            std::unique_ptr<FlowToken> flow = branch.Continue();
            FXL_CHECK(flow);
@@ -710,7 +710,7 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
 
   void Success(FlowToken /*flow*/) {
     // Set firebase token
-    firebase_token_ = modular_auth::FirebaseToken::New();
+    firebase_token_ = fuchsia::modular::auth::FirebaseToken::New();
     if (id_token_.empty()) {
       firebase_token_->id_token = "";
       firebase_token_->local_id = "";
@@ -724,11 +724,11 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
     }
 
     // Set status to success
-    auth_err_.status = modular_auth::Status::OK;
+    auth_err_.status = fuchsia::modular::auth::Status::OK;
     auth_err_.message = "";
   }
 
-  void Failure(FlowToken /*flow*/, const modular_auth::Status& status,
+  void Failure(FlowToken /*flow*/, const fuchsia::modular::auth::Status& status,
                const std::string& error_message) {
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
@@ -741,8 +741,8 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
   const std::string id_token_;
   OAuthTokenManagerApp* const app_;
 
-  modular_auth::FirebaseTokenPtr firebase_token_;
-  modular_auth::AuthErr auth_err_;
+  fuchsia::modular::auth::FirebaseTokenPtr firebase_token_;
+  fuchsia::modular::auth::AuthErr auth_err_;
 
   http::HttpServicePtr http_service_;
   http::URLLoaderPtr url_loader_;
@@ -751,7 +751,7 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
 };
 
 class OAuthTokenManagerApp::GoogleOAuthTokensCall
-    : public Operation<fidl::StringPtr, modular_auth::AuthErr> {
+    : public Operation<fidl::StringPtr, fuchsia::modular::auth::AuthErr> {
  public:
   GoogleOAuthTokensCall(std::string account_id, const TokenType& token_type,
                         OAuthTokenManagerApp* const app,
@@ -766,7 +766,7 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
     FlowToken flow{this, &result_, &auth_err_};
 
     if (account_id_.empty()) {
-      Failure(flow, modular_auth::Status::BAD_REQUEST, "Account id is empty.");
+      Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST, "Account id is empty.");
       return;
     }
 
@@ -813,7 +813,7 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
            FXL_CHECK(flow);
            Success(*flow);
          },
-         [this, branch](const modular_auth::Status status,
+         [this, branch](const fuchsia::modular::auth::Status status,
                         const std::string error_message) {
            std::unique_ptr<FlowToken> flow = branch.Continue();
            FXL_CHECK(flow);
@@ -891,17 +891,17 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
           result_ = app_->oauth_tokens_[account_id_].id_token;
           break;
         case FIREBASE_JWT_TOKEN:
-          Failure(flow, modular_auth::Status::INTERNAL_ERROR,
+          Failure(flow, fuchsia::modular::auth::Status::INTERNAL_ERROR,
                   "invalid token type");
       }
     }
 
     // Set status to success
-    auth_err_.status = modular_auth::Status::OK;
+    auth_err_.status = fuchsia::modular::auth::Status::OK;
     auth_err_.message = "";
   }
 
-  void Failure(FlowToken /*flow*/, const modular_auth::Status& status,
+  void Failure(FlowToken /*flow*/, const fuchsia::modular::auth::Status& status,
                const std::string& error_message) {
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
@@ -918,7 +918,7 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
   http::URLLoaderPtr url_loader_;
 
   fidl::StringPtr result_;
-  modular_auth::AuthErr auth_err_;
+  fuchsia::modular::auth::AuthErr auth_err_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleOAuthTokensCall);
 };
@@ -929,7 +929,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
     : public Operation<>,
       fuchsia::webview::WebRequestDelegate {
  public:
-  GoogleUserCredsCall(modular_auth::AccountPtr account,
+  GoogleUserCredsCall(fuchsia::modular::auth::AccountPtr account,
                       OAuthTokenManagerApp* const app,
                       AddAccountCallback callback)
       : Operation("OAuthTokenManagerApp::GoogleUserCredsCall", [] {}),
@@ -988,7 +988,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
     auto cancel_pos = uri.find(cancel_prefix);
     // user denied OAuth permissions
     if (cancel_pos == 0) {
-      Failure(modular_auth::Status::USER_CANCELLED,
+      Failure(fuchsia::modular::auth::Status::USER_CANCELLED,
               "User cancelled OAuth flow");
       return;
     }
@@ -1020,7 +1020,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
 
     Post(request_body, url_loader_.get(), kGoogleOAuthTokenEndpoint,
          [this] { Success(); },
-         [this](const modular_auth::Status status,
+         [this](const fuchsia::modular::auth::Status status,
                 const std::string error_message) {
            Failure(status, error_message);
          },
@@ -1113,7 +1113,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
     Done();
   }
 
-  void Failure(const modular_auth::Status& status,
+  void Failure(const fuchsia::modular::auth::Status& status,
                const std::string& error_message) {
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
@@ -1146,11 +1146,11 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
     return view_owner;
   }
 
-  modular_auth::AccountPtr account_;
+  fuchsia::modular::auth::AccountPtr account_;
   OAuthTokenManagerApp* const app_;
   const AddAccountCallback callback_;
 
-  modular_auth::AuthenticationContextPtr auth_context_;
+  fuchsia::modular::auth::AuthenticationContextPtr auth_context_;
 
   fuchsia::webview::WebViewPtr web_view_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
@@ -1165,9 +1165,9 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
 };
 
 class OAuthTokenManagerApp::GoogleRevokeTokensCall
-    : public Operation<modular_auth::AuthErr> {
+    : public Operation<fuchsia::modular::auth::AuthErr> {
  public:
-  GoogleRevokeTokensCall(modular_auth::AccountPtr account, bool revoke_all,
+  GoogleRevokeTokensCall(fuchsia::modular::auth::AccountPtr account, bool revoke_all,
                          OAuthTokenManagerApp* const app,
                          RemoveAccountCallback callback)
       : Operation("OAuthTokenManagerApp::GoogleRevokeTokensCall", callback),
@@ -1182,18 +1182,18 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
     FlowToken flow{this, &auth_err_};
 
     if (!account_) {
-      Failure(flow, modular_auth::Status::BAD_REQUEST, "Account is null.");
+      Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST, "Account is null.");
       return;
     }
 
     switch (account_->identity_provider) {
-      case modular_auth::IdentityProvider::DEV:
+      case fuchsia::modular::auth::IdentityProvider::DEV:
         Success(flow);  // guest mode
         return;
-      case modular_auth::IdentityProvider::GOOGLE:
+      case fuchsia::modular::auth::IdentityProvider::GOOGLE:
         break;
       default:
-        Failure(flow, modular_auth::Status::BAD_REQUEST, "Unsupported IDP.");
+        Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST, "Unsupported IDP.");
         return;
     }
 
@@ -1208,7 +1208,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
     // delete local cache first.
     if (app_->oauth_tokens_.find(account_->id) != app_->oauth_tokens_.end()) {
       if (!app_->oauth_tokens_.erase(account_->id)) {
-        Failure(flow, modular_auth::Status::INTERNAL_ERROR,
+        Failure(flow, fuchsia::modular::auth::Status::INTERNAL_ERROR,
                 "Unable to delete cached tokens for account:" +
                     std::string(account_->id));
         return;
@@ -1217,7 +1217,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
 
     // delete user credentials from local persistent storage.
     if (!DeleteCredentials()) {
-      Failure(flow, modular_auth::Status::INTERNAL_ERROR,
+      Failure(flow, fuchsia::modular::auth::Status::INTERNAL_ERROR,
               "Unable to delete persistent credentials for account:" +
                   std::string(account_->id));
       return;
@@ -1248,7 +1248,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
            FXL_CHECK(flow);
            Success(*flow);
          },
-         [this, branch](const modular_auth::Status status,
+         [this, branch](const fuchsia::modular::auth::Status status,
                         const std::string error_message) {
            std::unique_ptr<FlowToken> flow = branch.Continue();
            FXL_CHECK(flow);
@@ -1316,11 +1316,11 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
 
   void Success(FlowToken /*flow*/) {
     // Set status to success
-    auth_err_.status = modular_auth::Status::OK;
+    auth_err_.status = fuchsia::modular::auth::Status::OK;
     auth_err_.message = "";
   }
 
-  void Failure(FlowToken /*flow*/, const modular_auth::Status& status,
+  void Failure(FlowToken /*flow*/, const fuchsia::modular::auth::Status& status,
                const std::string& error_message) {
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
@@ -1328,7 +1328,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
     auth_err_.message = error_message;
   }
 
-  modular_auth::AccountPtr account_;
+  fuchsia::modular::auth::AccountPtr account_;
   // By default, RemoveAccount deletes account only from the device where the
   // user performed the operation.
   bool revoke_all_ = false;
@@ -1338,14 +1338,14 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
   http::HttpServicePtr http_service_;
   http::URLLoaderPtr url_loader_;
 
-  modular_auth::AuthErr auth_err_;
+  fuchsia::modular::auth::AuthErr auth_err_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleRevokeTokensCall);
 };
 
 class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
  public:
-  GoogleProfileAttributesCall(modular_auth::AccountPtr account,
+  GoogleProfileAttributesCall(fuchsia::modular::auth::AccountPtr account,
                               OAuthTokenManagerApp* const app,
                               AddAccountCallback callback)
       : Operation("OAuthTokenManagerApp::GoogleProfileAttributesCall", [] {}),
@@ -1357,7 +1357,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
   // |Operation|
   void Run() override {
     if (!account_) {
-      Failure(modular_auth::Status::BAD_REQUEST, "Account is null.");
+      Failure(fuchsia::modular::auth::Status::BAD_REQUEST, "Account is null.");
       return;
     }
 
@@ -1377,7 +1377,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
     // https://developers.google.com/+/web/api/rest/latest/people/get api.
     Get(url_loader_.get(), kGooglePeopleGetEndpoint, access_token,
         [this] { Success(); },
-        [this](const modular_auth::Status status,
+        [this](const fuchsia::modular::auth::Status status,
                const std::string error_message) {
           Failure(status, error_message);
         },
@@ -1422,7 +1422,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
     Done();
   }
 
-  void Failure(const modular_auth::Status& status,
+  void Failure(const fuchsia::modular::auth::Status& status,
                const std::string& error_message) {
     FXL_LOG(ERROR) << "Failed with error status:" << status
                    << " ,and message:" << error_message;
@@ -1432,7 +1432,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
     Done();
   }
 
-  modular_auth::AccountPtr account_;
+  fuchsia::modular::auth::AccountPtr account_;
   OAuthTokenManagerApp* const app_;
   const AddAccountCallback callback_;
 
@@ -1461,7 +1461,7 @@ OAuthTokenManagerApp::OAuthTokenManagerApp(async::Loop* loop)
 }
 
 void OAuthTokenManagerApp::Initialize(
-    fidl::InterfaceHandle<modular_auth::AccountProviderContext> provider) {
+    fidl::InterfaceHandle<fuchsia::modular::auth::AccountProviderContext> provider) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::Initialize()";
   account_provider_context_.Bind(std::move(provider));
 }
@@ -1483,10 +1483,10 @@ std::string OAuthTokenManagerApp::GenerateAccountId() {
 }
 
 void OAuthTokenManagerApp::AddAccount(
-    modular_auth::IdentityProvider identity_provider,
+    fuchsia::modular::auth::IdentityProvider identity_provider,
     AddAccountCallback callback) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::AddAccount()";
-  auto account = modular_auth::Account::New();
+  auto account = fuchsia::modular::auth::Account::New();
   account->id = GenerateAccountId();
   account->identity_provider = identity_provider;
   account->display_name = "";
@@ -1494,13 +1494,13 @@ void OAuthTokenManagerApp::AddAccount(
   account->image_url = "";
 
   switch (identity_provider) {
-    case modular_auth::IdentityProvider::DEV:
+    case fuchsia::modular::auth::IdentityProvider::DEV:
       callback(std::move(account), nullptr);
       return;
-    case modular_auth::IdentityProvider::GOOGLE:
+    case fuchsia::modular::auth::IdentityProvider::GOOGLE:
       operation_queue_.Add(new GoogleUserCredsCall(
           std::move(account), this,
-          [this, callback](modular_auth::AccountPtr account,
+          [this, callback](fuchsia::modular::auth::AccountPtr account,
                            const fidl::StringPtr error_msg) {
             if (error_msg) {
               callback(nullptr, error_msg);
@@ -1516,7 +1516,7 @@ void OAuthTokenManagerApp::AddAccount(
   }
 }
 
-void OAuthTokenManagerApp::RemoveAccount(modular_auth::Account account,
+void OAuthTokenManagerApp::RemoveAccount(fuchsia::modular::auth::Account account,
                                          bool revoke_all,
                                          RemoveAccountCallback callback) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::RemoveAccount()";
@@ -1526,7 +1526,7 @@ void OAuthTokenManagerApp::RemoveAccount(modular_auth::Account account,
 
 void OAuthTokenManagerApp::GetTokenProviderFactory(
     fidl::StringPtr account_id,
-    fidl::InterfaceRequest<modular_auth::TokenProviderFactory> request) {
+    fidl::InterfaceRequest<fuchsia::modular::auth::TokenProviderFactory> request) {
   new TokenProviderFactoryImpl(account_id, this, std::move(request));
 }
 

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_modular_auth/fidl.dart';
+import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:fidl_fuchsia_ui_views_v1_token/fidl.dart';
 import 'package:flutter/widgets.dart';

@@ -4,7 +4,7 @@
 
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_modular_auth/fidl.dart';
+import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl_fuchsia_ui_input/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
