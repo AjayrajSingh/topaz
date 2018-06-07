@@ -6,6 +6,7 @@ import("//build/fidl/fidl.gni")
 
 fidl("interfaces") {
   name = "fuchsia.examples.hello"
+  cpp_legacy_callbacks = true
 
   sources = [
     "hello.fidl",
