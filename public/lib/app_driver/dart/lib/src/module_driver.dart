@@ -431,6 +431,14 @@ class ModuleDriver {
     return completer.future;
   }
 
+  /// Report that this module is active even without user interaction. This
+  /// is used by the story shell to allow long running modules to avoid
+  /// timeout due to user inactivity.
+  void active() {
+    log.fine('#active(...)');
+    moduleContext.active();
+  }
+
   /// Log a cobalt metric when the link data first becomes non-null.
   void _observeLinkData(String linkName, String data) {
     if (!_firstObservationSent.contains(linkName) && data != null) {

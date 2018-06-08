@@ -338,6 +338,27 @@ class ModuleContextClient {
     return completer.future;
   }
 
+  /// See [fidl:ModuleContext#active].
+  Future<Null> active() async {
+    Completer<Null> completer = new Completer<Null>();
+    try {
+      await bound;
+
+      // ignore: unawaited_futures
+      proxy.ctrl.error.then((Object error) {
+        if (!completer.isCompleted) {
+          completer.completeError(error);
+        }
+      });
+
+      proxy.active();
+      completer.complete(null);
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+    }
+    return completer.future;
+  }
+
   void _handleConnectionError() {
     Exception err = new Exception('binding connection failed');
     throw err;
