@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/foundation.dart';
-import 'package:fidl_time_zone/fidl.dart';
+import 'package:fidl_fuchsia_timezone/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.device_shell/netstack_model.dart';
 import 'package:lib.widgets/model.dart';

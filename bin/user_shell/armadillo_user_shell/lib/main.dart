@@ -15,7 +15,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_power/fidl.dart';
-import 'package:fidl_time_zone/fidl.dart';
+import 'package:fidl_fuchsia_timezone/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.media.dart/audio.dart';

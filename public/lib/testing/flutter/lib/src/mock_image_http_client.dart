@@ -27,7 +27,7 @@ MockHttpClient createMockImageHttpClient(SecurityContext _) {
   when(request.close()).thenReturn(new Future<HttpClientResponse>
                        .value(response));
   when(response.contentLength).thenReturn(_kTransparentImageBytes.length);
-  when(response.statusCode).thenReturn(HttpStatus.OK);
+  when(response.statusCode).thenReturn(HttpStatus.ok);
   when(response.listen(typed(any))).thenAnswer((Invocation invocation) {
     final void Function(List<int>) onData = invocation.positionalArguments[0];
     final void Function() onDone = invocation.namedArguments[#onDone];
