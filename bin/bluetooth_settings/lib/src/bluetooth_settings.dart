@@ -147,4 +147,4 @@ SettingsTile _activeAdapterTile(AdapterInfo adapter, double scale) {
   );
 }
 
-const String _availableDevicesTitle = 'Available Device';
+const String _availableDevicesTitle = 'Available Devices';

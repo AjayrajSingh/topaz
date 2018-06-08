@@ -6,12 +6,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/widgets.dart';
 
-TextStyle _subTitleTextStyle(double scale) => TextStyle(
-      color: Colors.grey[900],
-      fontSize: 48.0 * scale,
-      fontWeight: FontWeight.w200,
-    );
-
 TextStyle _textStyle(double scale) => TextStyle(
       color: Colors.grey[900],
       fontSize: 24.0 * scale,
@@ -27,26 +21,11 @@ TextStyle _titleTextStyle(double scale) => TextStyle(
 // Padding that is used as an edge inset for settings lists.
 const double _listPadding = 28.0;
 
-/// Simple text based button shown in settings
-class SettingsButton extends SettingsItem {
-  /// Label the button is displayed with
-  final String text;
-
-  /// Action taken when button is pressed
-  final VoidCallback onTap;
-
-  /// Constructor.
-  const SettingsButton(
-      {@required this.text, @required this.onTap, @required double scale})
-      : super(scale);
-
-  @override
-  Widget build(BuildContext context) {
-    return FlatButton(
-      child: SettingsText(text: text, scale: scale),
-      onPressed: onTap,
-    );
-  }
+Widget _applyStartPadding({@required Widget child, @required double scale}) {
+  return Container(
+    padding: EdgeInsets.only(left: _listPadding * scale),
+    child: child,
+  );
 }
 
 /// A settings item should have a flexible width but height as specified
@@ -101,18 +80,17 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> children = <Widget>[];
+    final List<Widget> children = [];
 
     final verticalInsets = EdgeInsets.only(
         top: _listPadding * scale, bottom: _listPadding * scale);
 
     if (title != null) {
-      children.add(
-        Container(
-            padding: EdgeInsets.only(
-                left: _listPadding * scale, right: _listPadding * scale),
-            child: Text(title, style: _titleTextStyle(scale))),
-      );
+      children.add(SettingsSection(
+        title: title,
+        scale: scale,
+        child: Offstage(offstage: true),
+      ));
     }
 
     if (isLoading) {
@@ -162,7 +140,7 @@ class SettingsPopup extends StatelessWidget {
               onTap: onDismiss,
             )));
 
-    return Stack(children: <Widget>[
+    return Stack(children: [
       overlayCancel,
       Center(child: child),
     ]);
@@ -206,25 +184,20 @@ class SettingsSection extends StatelessWidget {
     return SettingsSection(
       scale: scale,
       title: title,
-      child: Container(
-        padding: EdgeInsets.only(top: 8.0 * scale, bottom: 16.0 * scale),
-        child: SettingsText(
-          scale: scale,
-          text: description,
-        ),
-      ),
+      child: SettingsTile(scale: scale, text: description),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     if (title != null) {
-      return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(title, style: _subTitleTextStyle(scale)),
-            child
-          ]);
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+            padding: EdgeInsets.only(
+                left: _listPadding * scale, right: _listPadding * scale),
+            child: Text(title, style: _titleTextStyle(scale))),
+        child
+      ]);
     }
     return child;
   }
@@ -258,6 +231,29 @@ class SettingsSwitchTile extends SettingsItem {
   }
 }
 
+/// Simple text based button shown in settings
+class SettingsButton extends SettingsItem {
+  /// Label the button is displayed with
+  final String text;
+
+  /// Action taken when button is pressed
+  final VoidCallback onTap;
+
+  /// Constructor.
+  const SettingsButton(
+      {@required this.text, @required this.onTap, @required double scale})
+      : super(scale);
+
+  @override
+  Widget build(BuildContext context) {
+    return SettingsTile(
+      text: text,
+      scale: scale,
+      onTap: onTap,
+    );
+  }
+}
+
 /// Text with style consistent for the body of a settings page.
 class SettingsText extends SettingsItem {
   final String text;
@@ -265,7 +261,8 @@ class SettingsText extends SettingsItem {
   const SettingsText({this.text, double scale}) : super(scale);
 
   @override
-  Widget build(BuildContext context) => Text(text, style: _textStyle(scale));
+  Widget build(BuildContext context) => _applyStartPadding(
+      child: Text(text, style: _textStyle(scale)), scale: scale);
 }
 
 /// A tile that can be used to display a setting with icon, text, and optional
@@ -303,16 +300,19 @@ class SettingsTile extends SettingsItem {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-        leading: _buildLogo(),
-        title: _title(),
-        subtitle: description != null ? _subTitle() : null,
-        onTap: onTap);
+    return Container(
+        constraints: BoxConstraints(minHeight: height),
+        child: ListTile(
+            leading: _buildLogo(),
+            title: _title(),
+            subtitle: description != null ? _subTitle() : null,
+            onTap: onTap));
   }
 
   Widget _buildLogo() {
-    assert(iconData != null || assetUrl != null);
-    assert(iconData == null || assetUrl == null);
+    if (assetUrl == null && iconData == null) {
+      return null; // No logo to show.
+    }
 
     Widget logo = iconData != null
         ? Icon(iconData, size: height, color: Colors.grey[900])
@@ -321,13 +321,7 @@ class SettingsTile extends SettingsItem {
             height: height,
             width: height,
           );
-
-    return Container(
-        padding: EdgeInsets.only(
-          left: _listPadding * scale,
-          right: 16.0 * scale,
-        ),
-        child: logo);
+    return _applyStartPadding(child: logo, scale: scale);
   }
 
   Widget _subTitle() => SettingsText(text: description, scale: scale);

@@ -59,7 +59,7 @@ class WlanManager extends StatelessWidget {
       widget = _buildCurrentNetwork(model, scale);
     } else if ((model.selectedAccessPoint?.isSecure ?? false) &&
         !model.connecting) {
-      widget = new Stack(children: <Widget>[
+      widget = Stack(children: [
         _buildAvailableNetworks(model, scale),
         _buildPasswordBox(model, scale),
       ]);
@@ -86,11 +86,11 @@ class WlanManager extends StatelessWidget {
     if (model.connectedAccessPoint != null) {
       widgets.addAll([
         Padding(padding: EdgeInsets.only(top: 8.0 * scale)),
-        SettingsButton(
+        SettingsTile(
           scale: scale,
           text: 'Disconnect from current network',
           onTap: model.disconnect,
-        )
+        ),
       ]);
     }
 
@@ -150,7 +150,7 @@ class WlanManager extends StatelessWidget {
               heightFactor: 0.5,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
+                children: [
                   Padding(padding: EdgeInsets.only(top: 16.0 * scale)),
                   Text(
                     'Enter password:',
