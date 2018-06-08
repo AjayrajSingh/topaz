@@ -1,6 +1,5 @@
 {
     "imports": [
-        "topaz/packages/prod/bluetooth_settings",
         "topaz/packages/prod/color",
         "topaz/packages/prod/contacts",
         "topaz/packages/prod/dart_aot_runner",
