@@ -8,7 +8,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:fidl_cobalt/fidl.dart' as cobalt;
+import 'package:fidl_fuchsia_cobalt/fidl.dart' as cobalt;
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';

@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_cobalt/fidl.dart' as cobalt;
+import 'package:fidl_fuchsia_cobalt/fidl.dart' as cobalt;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl_fuchsia_netstack/fidl.dart';
