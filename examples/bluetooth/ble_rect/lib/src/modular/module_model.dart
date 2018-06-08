@@ -6,10 +6,10 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:fidl_fuchsia_bluetooth/fidl.dart' as bt;
+import 'package:fidl_fuchsia_bluetooth_gatt/fidl.dart' as gatt;
+import 'package:fidl_fuchsia_bluetooth_le/fidl.dart' as ble;
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_bluetooth/fidl.dart' as bt;
-import 'package:fidl_bluetooth_gatt/fidl.dart' as gatt;
-import 'package:fidl_bluetooth_low_energy/fidl.dart' as ble;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
 

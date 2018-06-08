@@ -4,8 +4,8 @@
 
 import 'dart:async';
 
-import 'package:fidl_bluetooth/fidl.dart';
-import 'package:fidl_bluetooth_low_energy/fidl.dart' as ble;
+import 'package:fidl_fuchsia_bluetooth/fidl.dart';
+import 'package:fidl_fuchsia_bluetooth_le/fidl.dart' as ble;
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 

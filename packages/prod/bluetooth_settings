@@ -1,0 +1,5 @@
+{
+    "packages": {
+        "bluetooth_settings": "//topaz/bin/bluetooth_settings"
+    }
+}
