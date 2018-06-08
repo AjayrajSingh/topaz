@@ -183,11 +183,11 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
 
   String _statusTextFromBuildStatus(BuildStatusModel model) {
     if (model.buildResult == BuildResultEnum.success) {
-      return 'passing 🙆';
+      return '\u{1F646} passing';
     } else if (model.buildResult == BuildResultEnum.failure) {
-      return 'failing 🙅';
+      return '\u{1F645} failing';
     } else {
-      return 'unknown 🤷';
+      return '\u{1F937} unknown';
     }
   }
 
