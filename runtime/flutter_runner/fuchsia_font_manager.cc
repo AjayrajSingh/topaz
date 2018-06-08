@@ -121,7 +121,7 @@ SkTypeface* FuchsiaFontManager::onMatchFamilyStyleCharacter(
     int bcp47Count,
     SkUnichar character) const {
   if (u_hasBinaryProperty(character, UCHAR_EMOJI)) {
-    return onMatchFamilyStyle("NotoColorEmoji", style);
+    return onMatchFamilyStyle("Noto Color Emoji", style);
   }
   return nullptr;
 }
