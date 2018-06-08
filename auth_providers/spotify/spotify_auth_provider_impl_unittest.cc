@@ -57,7 +57,7 @@ TEST_F(SpotifyAuthProviderImplTest, GetAppAccessTokenSuccess) {
   rapidjson::Document ok_response;
   ok_response.Parse("{\"access_token\":\"at_token\", \"expires_in\":3600}");
   network_wrapper_.SetStringResponse(
-      fuchsia::modular::JsonValueToPrettyString(ok_response), 200);
+      modular::JsonValueToPrettyString(ok_response), 200);
 
   auth_provider_->GetAppAccessToken(
       "credential", "app_client_id", std::move(scopes),
@@ -84,7 +84,7 @@ TEST_F(SpotifyAuthProviderImplTest, GetAppAccessTokenError) {
   rapidjson::Document ok_response;
   ok_response.Parse("{\"error\":\"invalid_client\"}");
   network_wrapper_.SetStringResponse(
-      fuchsia::modular::JsonValueToPrettyString(ok_response), 401);
+      modular::JsonValueToPrettyString(ok_response), 401);
 
   auth_provider_->GetAppAccessToken(
       "credential", "invalid_client_id", std::move(scopes),

@@ -45,7 +45,7 @@ using auth::AuthProviderStatus;
 using auth::AuthTokenPtr;
 using auth_providers::oauth::OAuthRequestBuilder;
 using auth_providers::oauth::ParseOAuthResponse;
-using fuchsia::modular::JsonValueToPrettyString;
+using modular::JsonValueToPrettyString;
 
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
     async_t* const main_dispatcher, fuchsia::sys::StartupContext* context,

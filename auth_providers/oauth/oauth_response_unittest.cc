@@ -93,41 +93,37 @@ TEST_F(OAuthResponseTest, CheckParseOAuthResponse) {
   rapidjson::Document json_200;
   json_200.Parse("{\"token\":\"xyz\"}");
   VerifyOAuthResponse(
-      ParseOAuthResponse(FakeSuccess(
-          200, fuchsia::modular::JsonValueToPrettyString(json_200))),
+      ParseOAuthResponse(
+          FakeSuccess(200, modular::JsonValueToPrettyString(json_200))),
       OAuthResponse(AuthProviderStatus::OK, "", std::move(json_200)));
 
   rapidjson::Document json_400;
   json_400.Parse("{\"error\":\"invalid_grant\"}");
-  VerifyOAuthResponse(
-      ParseOAuthResponse(FakeSuccess(
-          400, fuchsia::modular::JsonValueToPrettyString(json_400))),
-      OAuthResponse(AuthProviderStatus::REAUTH_REQUIRED, "400",
-                    std::move(json_400)));
+  VerifyOAuthResponse(ParseOAuthResponse(FakeSuccess(
+                          400, modular::JsonValueToPrettyString(json_400))),
+                      OAuthResponse(AuthProviderStatus::REAUTH_REQUIRED, "400",
+                                    std::move(json_400)));
 
   rapidjson::Document json_400_br;
   json_400_br.Parse("{\"error\":\"invalid_argument\"}");
-  VerifyOAuthResponse(
-      ParseOAuthResponse(FakeSuccess(
-          400, fuchsia::modular::JsonValueToPrettyString(json_400_br))),
-      OAuthResponse(AuthProviderStatus::OAUTH_SERVER_ERROR, "400",
-                    std::move(json_400_br)));
+  VerifyOAuthResponse(ParseOAuthResponse(FakeSuccess(
+                          400, modular::JsonValueToPrettyString(json_400_br))),
+                      OAuthResponse(AuthProviderStatus::OAUTH_SERVER_ERROR,
+                                    "400", std::move(json_400_br)));
 
   rapidjson::Document json_401;
   json_401.Parse("{\"error\":\"invalid_client\"}");
-  VerifyOAuthResponse(
-      ParseOAuthResponse(FakeSuccess(
-          401, fuchsia::modular::JsonValueToPrettyString(json_401))),
-      OAuthResponse(AuthProviderStatus::OAUTH_SERVER_ERROR, "401",
-                    std::move(json_401)));
+  VerifyOAuthResponse(ParseOAuthResponse(FakeSuccess(
+                          401, modular::JsonValueToPrettyString(json_401))),
+                      OAuthResponse(AuthProviderStatus::OAUTH_SERVER_ERROR,
+                                    "401", std::move(json_401)));
 
   rapidjson::Document json_403;
   json_403.Parse("{\"error\":\"access_denied\"}");
-  VerifyOAuthResponse(
-      ParseOAuthResponse(FakeSuccess(
-          403, fuchsia::modular::JsonValueToPrettyString(json_403))),
-      OAuthResponse(AuthProviderStatus::OAUTH_SERVER_ERROR, "403",
-                    std::move(json_403)));
+  VerifyOAuthResponse(ParseOAuthResponse(FakeSuccess(
+                          403, modular::JsonValueToPrettyString(json_403))),
+                      OAuthResponse(AuthProviderStatus::OAUTH_SERVER_ERROR,
+                                    "403", std::move(json_403)));
 }
 
 }  // namespace oauth

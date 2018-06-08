@@ -75,12 +75,12 @@ void WebViewProvider::CreateView(
 void WebViewProvider::Terminate() { loop_->Quit(); }
 
 void WebViewProvider::Notify(fidl::StringPtr json) {
-  fuchsia::modular::JsonDoc parsed_json;
+  modular::JsonDoc parsed_json;
   parsed_json.Parse(json);
 
   if (!parsed_json.IsObject()) {
     FXL_LOG(WARNING) << "Not an object: "
-                     << fuchsia::modular::JsonValueToPrettyString(parsed_json);
+                     << modular::JsonValueToPrettyString(parsed_json);
     return;
   }
 

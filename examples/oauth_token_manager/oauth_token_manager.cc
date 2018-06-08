@@ -45,9 +45,7 @@
 #include "third_party/rapidjson/rapidjson/writer.h"
 #include "topaz/examples/oauth_token_manager/credentials_generated.h"
 
-namespace fuchsia {
-namespace modular {
-namespace auth {
+namespace {
 
 namespace http = ::fuchsia::net::oldhttp;
 
@@ -487,7 +485,7 @@ class OAuthTokenManagerApp : fuchsia::modular::auth::AccountProvider {
   // Instead we may want to create an operation for what
   // TokenProviderFactoryImpl::GetFirebaseAuthToken() is doing in an sub
   // operation queue.
-  OperationQueue operation_queue_;
+  modular::OperationQueue operation_queue_;
 
   class GoogleFirebaseTokensCall;
   class GoogleOAuthTokensCall;
@@ -567,7 +565,8 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl
 };
 
 class OAuthTokenManagerApp::GoogleFirebaseTokensCall
-    : public Operation<fuchsia::modular::auth::FirebaseTokenPtr, fuchsia::modular::auth::AuthErr> {
+    : public modular::Operation<fuchsia::modular::auth::FirebaseTokenPtr,
+                                fuchsia::modular::auth::AuthErr> {
  public:
   GoogleFirebaseTokensCall(std::string account_id, std::string firebase_api_key,
                            std::string id_token,
@@ -751,7 +750,8 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
 };
 
 class OAuthTokenManagerApp::GoogleOAuthTokensCall
-    : public Operation<fidl::StringPtr, fuchsia::modular::auth::AuthErr> {
+    : public modular::Operation<fidl::StringPtr,
+                                fuchsia::modular::auth::AuthErr> {
  public:
   GoogleOAuthTokensCall(std::string account_id, const TokenType& token_type,
                         OAuthTokenManagerApp* const app,
@@ -926,7 +926,7 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
 // TODO(alhaad): Use variadic template in |Operation|. That way, parameters to
 // |callback| can be returned as parameters to |Done()|.
 class OAuthTokenManagerApp::GoogleUserCredsCall
-    : public Operation<>,
+    : public modular::Operation<>,
       fuchsia::webview::WebRequestDelegate {
  public:
   GoogleUserCredsCall(fuchsia::modular::auth::AccountPtr account,
@@ -1165,7 +1165,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
 };
 
 class OAuthTokenManagerApp::GoogleRevokeTokensCall
-    : public Operation<fuchsia::modular::auth::AuthErr> {
+    : public modular::Operation<fuchsia::modular::auth::AuthErr> {
  public:
   GoogleRevokeTokensCall(fuchsia::modular::auth::AccountPtr account, bool revoke_all,
                          OAuthTokenManagerApp* const app,
@@ -1343,7 +1343,8 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleRevokeTokensCall);
 };
 
-class OAuthTokenManagerApp::GoogleProfileAttributesCall : public Operation<> {
+class OAuthTokenManagerApp::GoogleProfileAttributesCall
+    : public modular::Operation<> {
  public:
   GoogleProfileAttributesCall(fuchsia::modular::auth::AccountPtr account,
                               OAuthTokenManagerApp* const app,
@@ -1546,9 +1547,7 @@ void OAuthTokenManagerApp::RefreshFirebaseToken(
       account_id, firebase_api_key, id_token, this, callback));
 }
 
-}  // namespace auth
-}  // namespace modular
-}  // namespace fuchsia
+}  // namespace
 
 int main(int argc, const char** argv) {
   auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);
@@ -1559,7 +1558,7 @@ int main(int argc, const char** argv) {
   async::Loop loop(&kAsyncLoopConfigMakeDefault);
   trace::TraceProvider trace_provider(loop.async());
 
-  fuchsia::modular::auth::OAuthTokenManagerApp app(&loop);
+  OAuthTokenManagerApp app(&loop);
   loop.Run();
   return 0;
 }
