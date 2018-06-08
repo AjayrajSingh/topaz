@@ -35,10 +35,9 @@ VuMeterView::VuMeterView(
   FXL_DCHECK(loop);
   FXL_DCHECK(params.is_valid());
 
-  auto audio_server =
-      startup_context
-          ->ConnectToEnvironmentService<fuchsia::media::AudioServer>();
-  audio_server->CreateCapturer(capturer_.NewRequest(), false);
+  auto audio =
+      startup_context->ConnectToEnvironmentService<fuchsia::media::Audio>();
+  audio->CreateCapturer(capturer_.NewRequest(), false);
 
   capturer_.set_error_handler([this]() {
     FXL_LOG(ERROR) << "Connection error occurred. Quitting.";
