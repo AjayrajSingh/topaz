@@ -14,7 +14,7 @@ namespace oauth {
 
 namespace http = ::fuchsia::net::oldhttp;
 
-using auth::AuthProviderStatus;
+using fuchsia::auth::AuthProviderStatus;
 
 OAuthResponse ParseOAuthResponse(http::URLResponse response) {
   rapidjson::Document out;

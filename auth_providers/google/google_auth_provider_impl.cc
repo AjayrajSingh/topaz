@@ -41,8 +41,10 @@ std::string GetClientId(const std::string& app_client_id) {
 
 }  // namespace
 
-using auth::AuthProviderStatus;
-using auth::AuthTokenPtr;
+using fuchsia::auth::AuthProviderStatus;
+using fuchsia::auth::AuthTokenPtr;
+using fuchsia::auth::AuthenticationUIContext;
+using fuchsia::auth::FirebaseTokenPtr;
 using auth_providers::oauth::OAuthRequestBuilder;
 using auth_providers::oauth::ParseOAuthResponse;
 using modular::JsonValueToPrettyString;
@@ -50,7 +52,7 @@ using modular::JsonValueToPrettyString;
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
     async_t* const main_dispatcher, fuchsia::sys::StartupContext* context,
     network_wrapper::NetworkWrapper* network_wrapper,
-    fidl::InterfaceRequest<auth::AuthProvider> request)
+    fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request)
     : main_dispatcher_(main_dispatcher),
       context_(context),
       network_wrapper_(network_wrapper),
@@ -69,7 +71,7 @@ GoogleAuthProviderImpl::GoogleAuthProviderImpl(
 GoogleAuthProviderImpl::~GoogleAuthProviderImpl() {}
 
 void GoogleAuthProviderImpl::GetPersistentCredential(
-    fidl::InterfaceHandle<auth::AuthenticationUIContext> auth_ui_context,
+    fidl::InterfaceHandle<AuthenticationUIContext> auth_ui_context,
     GetPersistentCredentialCallback callback) {
   FXL_DCHECK(auth_ui_context);
   get_persistent_credential_callback_ = std::move(callback);
@@ -141,8 +143,8 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
       return;
     }
 
-    AuthTokenPtr access_token = auth::AuthToken::New();
-    access_token->token_type = auth::TokenType::ACCESS_TOKEN;
+    AuthTokenPtr access_token = fuchsia::auth::AuthToken::New();
+    access_token->token_type = fuchsia::auth::TokenType::ACCESS_TOKEN;
     access_token->token =
         oauth_response.json_response["access_token"].GetString();
     access_token->expires_in =
@@ -178,9 +180,9 @@ void GoogleAuthProviderImpl::GetAppIdToken(fidl::StringPtr credential,
       return;
     }
 
-    AuthTokenPtr id_token = auth::AuthToken::New();
+    AuthTokenPtr id_token = fuchsia::auth::AuthToken::New();
     id_token->token = oauth_response.json_response["id_token"].GetString();
-    id_token->token_type = auth::TokenType::ID_TOKEN;
+    id_token->token_type = fuchsia::auth::TokenType::ID_TOKEN;
     id_token->expires_in =
         oauth_response.json_response["expires_in"].GetUint64();
 
@@ -220,7 +222,7 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
       return;
     }
 
-    auth::FirebaseTokenPtr fb_token = auth::FirebaseToken::New();
+    FirebaseTokenPtr fb_token = fuchsia::auth::FirebaseToken::New();
     fb_token->id_token = oauth_response.json_response["id_token"].GetString();
     fb_token->email = oauth_response.json_response["email"].GetString();
     fb_token->local_id = oauth_response.json_response["local_id"].GetString();
@@ -337,7 +339,8 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
 
   Request(std::move(request_factory), [this,
                                        credential](http::URLResponse response) {
-    auth::UserProfileInfoPtr user_profile_info = auth::UserProfileInfo::New();
+    fuchsia::auth::UserProfileInfoPtr user_profile_info =
+        fuchsia::auth::UserProfileInfo::New();
 
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {

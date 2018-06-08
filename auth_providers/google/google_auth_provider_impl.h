@@ -7,7 +7,7 @@
 // |auth_provider.fidl| interface and is typically invoked by the Token Manager
 // service in Garnet layer.
 
-#include <auth/cpp/fidl.h>
+#include <fuchsia/auth/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 
@@ -20,13 +20,13 @@
 
 namespace google_auth_provider {
 
-class GoogleAuthProviderImpl : auth::AuthProvider,
+class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
                                fuchsia::webview::WebRequestDelegate {
  public:
   GoogleAuthProviderImpl(async_t* main_dispatcher,
                          fuchsia::sys::StartupContext* context,
                          network_wrapper::NetworkWrapper* network_wrapper,
-                         fidl::InterfaceRequest<auth::AuthProvider> request);
+                         fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request);
 
   ~GoogleAuthProviderImpl() override;
 
@@ -35,7 +35,7 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
  private:
   // |AuthProvider|
   void GetPersistentCredential(
-      fidl::InterfaceHandle<auth::AuthenticationUIContext> auth_ui_context,
+      fidl::InterfaceHandle<fuchsia::auth::AuthenticationUIContext> auth_ui_context,
       GetPersistentCredentialCallback callback) override;
 
   // |AuthProvider|
@@ -78,14 +78,14 @@ class GoogleAuthProviderImpl : auth::AuthProvider,
   async_t* const main_dispatcher_;
   fuchsia::sys::StartupContext* context_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
-  auth::AuthenticationUIContextPtr auth_ui_context_;
+  fuchsia::auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
   fuchsia::webview::WebViewPtr web_view_;
   GetPersistentCredentialCallback get_persistent_credential_callback_;
 
   fidl::BindingSet<fuchsia::webview::WebRequestDelegate>
       web_request_delegate_bindings_;
-  fidl::Binding<auth::AuthProvider> binding_;
+  fidl::Binding<fuchsia::auth::AuthProvider> binding_;
   callback::CancellableContainer requests_;
 
   fxl::Closure on_empty_;

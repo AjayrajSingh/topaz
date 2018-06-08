@@ -5,7 +5,7 @@
 #include <trace-provider/provider.h>
 #include <memory>
 
-#include <auth/cpp/fidl.h>
+#include <fuchsia/auth/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 
 #include "lib/app/cpp/startup_context.h"
@@ -21,6 +21,8 @@
 namespace {
 
 namespace http = ::fuchsia::net::oldhttp;
+
+using fuchsia::auth::AuthProviderFactory;
 
 class SpotifyAuthProviderApp {
  public:
@@ -41,8 +43,8 @@ class SpotifyAuthProviderApp {
   ~SpotifyAuthProviderApp() { loop_.Quit(); }
 
   void Run() {
-    startup_context_->outgoing().AddPublicService<auth::AuthProviderFactory>(
-        [this](fidl::InterfaceRequest<auth::AuthProviderFactory> request) {
+    startup_context_->outgoing().AddPublicService<AuthProviderFactory>(
+        [this](fidl::InterfaceRequest<AuthProviderFactory> request) {
           factory_impl_.Bind(std::move(request));
         });
     loop_.Run();

@@ -27,8 +27,8 @@ class SpotifyFactoryImplTest : public gtest::TestWithLoop {
  protected:
   network_wrapper::FakeNetworkWrapper network_wrapper_;
   fuchsia::sys::StartupContext* context_;
-  auth::AuthProviderPtr auth_provider_;
-  auth::AuthProviderFactoryPtr factory_;
+  fuchsia::auth::AuthProviderPtr auth_provider_;
+  fuchsia::auth::AuthProviderFactoryPtr factory_;
 
   FactoryImpl factory_impl_;
 
@@ -37,7 +37,7 @@ class SpotifyFactoryImplTest : public gtest::TestWithLoop {
 };
 
 TEST_F(SpotifyFactoryImplTest, GetAuthProvider) {
-  auth::AuthProviderStatus status;
+  fuchsia::auth::AuthProviderStatus status;
   auth_provider_.Unbind();
   bool callback_called = false;
   factory_->GetAuthProvider(
@@ -45,7 +45,7 @@ TEST_F(SpotifyFactoryImplTest, GetAuthProvider) {
       callback::Capture(callback::SetWhenCalled(&callback_called), &status));
   RunLoopUntilIdle();
   EXPECT_TRUE(callback_called);
-  EXPECT_EQ(auth::AuthProviderStatus::OK, status);
+  EXPECT_EQ(fuchsia::auth::AuthProviderStatus::OK, status);
 }
 
 }  // namespace spotify_auth_provider

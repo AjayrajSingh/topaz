@@ -15,6 +15,9 @@
 namespace spotify_auth_provider {
 namespace {
 
+using fuchsia::auth::AuthProviderStatus;
+using fuchsia::auth::AuthTokenPtr;
+
 class SpotifyAuthProviderImplTest : public gtest::TestWithLoop {
  public:
   SpotifyAuthProviderImplTest()
@@ -28,7 +31,7 @@ class SpotifyAuthProviderImplTest : public gtest::TestWithLoop {
  protected:
   network_wrapper::FakeNetworkWrapper network_wrapper_;
   fuchsia::sys::StartupContext* context_;
-  auth::AuthProviderPtr auth_provider_;
+  fuchsia::auth::AuthProviderPtr auth_provider_;
   SpotifyAuthProviderImpl spotify_auth_provider_impl_;
 
  private:
@@ -48,8 +51,8 @@ TEST_F(SpotifyAuthProviderImplTest, EmptyWhenClientDisconnected) {
 
 TEST_F(SpotifyAuthProviderImplTest, GetAppAccessTokenSuccess) {
   bool callback_called = false;
-  auto status = auth::AuthProviderStatus::INTERNAL_ERROR;
-  auth::AuthTokenPtr access_token;
+  auto status = AuthProviderStatus::INTERNAL_ERROR;
+  AuthTokenPtr access_token;
   auto scopes = fidl::VectorPtr<fidl::StringPtr>::New(0);
   scopes.push_back("http://spotifyapis.test.com/scope1");
   scopes.push_back("http://spotifyapis.test.com/scope2");
@@ -66,17 +69,17 @@ TEST_F(SpotifyAuthProviderImplTest, GetAppAccessTokenSuccess) {
 
   RunLoopUntilIdle();
   EXPECT_TRUE(callback_called);
-  EXPECT_EQ(status, auth::AuthProviderStatus::OK);
+  EXPECT_EQ(status, AuthProviderStatus::OK);
   EXPECT_FALSE(access_token == NULL);
-  EXPECT_EQ(access_token->token_type, auth::TokenType::ACCESS_TOKEN);
+  EXPECT_EQ(access_token->token_type, fuchsia::auth::TokenType::ACCESS_TOKEN);
   EXPECT_EQ(access_token->token, "at_token");
   EXPECT_EQ(access_token->expires_in, 3600u);
 }
 
 TEST_F(SpotifyAuthProviderImplTest, GetAppAccessTokenError) {
   bool callback_called = false;
-  auto status = auth::AuthProviderStatus::INTERNAL_ERROR;
-  auth::AuthTokenPtr access_token;
+  auto status = AuthProviderStatus::INTERNAL_ERROR;
+  AuthTokenPtr access_token;
   auto scopes = fidl::VectorPtr<fidl::StringPtr>::New(0);
   scopes.push_back("http://spotifyapis.test.com/scope1");
   scopes.push_back("http://spotifyapis.test.com/scope2");
@@ -93,14 +96,14 @@ TEST_F(SpotifyAuthProviderImplTest, GetAppAccessTokenError) {
 
   RunLoopUntilIdle();
   EXPECT_TRUE(callback_called);
-  EXPECT_EQ(status, auth::AuthProviderStatus::OAUTH_SERVER_ERROR);
+  EXPECT_EQ(status, AuthProviderStatus::OAUTH_SERVER_ERROR);
   EXPECT_TRUE(access_token == NULL);
 }
 
 TEST_F(SpotifyAuthProviderImplTest, GetAppIdTokenUnsupported) {
   bool callback_called = false;
-  auto status = auth::AuthProviderStatus::INTERNAL_ERROR;
-  auth::AuthTokenPtr id_token;
+  auto status = AuthProviderStatus::INTERNAL_ERROR;
+  AuthTokenPtr id_token;
 
   auth_provider_->GetAppIdToken(
       "", "",
@@ -109,14 +112,14 @@ TEST_F(SpotifyAuthProviderImplTest, GetAppIdTokenUnsupported) {
 
   RunLoopUntilIdle();
   EXPECT_TRUE(callback_called);
-  EXPECT_EQ(status, auth::AuthProviderStatus::BAD_REQUEST);
+  EXPECT_EQ(status, AuthProviderStatus::BAD_REQUEST);
   EXPECT_TRUE(id_token == NULL);
 }
 
 TEST_F(SpotifyAuthProviderImplTest, GetAppFirebaseTokenUnsupported) {
   bool callback_called = false;
-  auto status = auth::AuthProviderStatus::INTERNAL_ERROR;
-  auth::FirebaseTokenPtr fb_token;
+  auto status = AuthProviderStatus::INTERNAL_ERROR;
+  fuchsia::auth::FirebaseTokenPtr fb_token;
 
   auth_provider_->GetAppFirebaseToken(
       "", "",
@@ -125,14 +128,14 @@ TEST_F(SpotifyAuthProviderImplTest, GetAppFirebaseTokenUnsupported) {
 
   RunLoopUntilIdle();
   EXPECT_TRUE(callback_called);
-  EXPECT_EQ(status, auth::AuthProviderStatus::BAD_REQUEST);
+  EXPECT_EQ(status, AuthProviderStatus::BAD_REQUEST);
   EXPECT_TRUE(fb_token == NULL);
 }
 
 TEST_F(SpotifyAuthProviderImplTest,
        RevokeAppOrPersistentCredentialUnsupported) {
   bool callback_called = false;
-  auto status = auth::AuthProviderStatus::INTERNAL_ERROR;
+  auto status = AuthProviderStatus::INTERNAL_ERROR;
 
   auth_provider_->RevokeAppOrPersistentCredential(
       "",
@@ -140,7 +143,7 @@ TEST_F(SpotifyAuthProviderImplTest,
 
   RunLoopUntilIdle();
   EXPECT_TRUE(callback_called);
-  EXPECT_EQ(status, auth::AuthProviderStatus::BAD_REQUEST);
+  EXPECT_EQ(status, AuthProviderStatus::BAD_REQUEST);
 }
 
 }  // namespace

@@ -24,16 +24,16 @@ namespace spotify_auth_provider {
 
 namespace http = ::fuchsia::net::oldhttp;
 
-using auth::AuthProviderStatus;
-using auth::AuthTokenPtr;
 using auth_providers::oauth::OAuthRequestBuilder;
 using auth_providers::oauth::ParseOAuthResponse;
+using fuchsia::auth::AuthProviderStatus;
+using fuchsia::auth::AuthTokenPtr;
 using modular::JsonValueToPrettyString;
 
 SpotifyAuthProviderImpl::SpotifyAuthProviderImpl(
     fuchsia::sys::StartupContext* context,
     network_wrapper::NetworkWrapper* network_wrapper,
-    fidl::InterfaceRequest<auth::AuthProvider> request)
+    fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request)
     : context_(context),
       network_wrapper_(network_wrapper),
       binding_(this, std::move(request)) {
@@ -50,7 +50,8 @@ SpotifyAuthProviderImpl::SpotifyAuthProviderImpl(
 SpotifyAuthProviderImpl::~SpotifyAuthProviderImpl() {}
 
 void SpotifyAuthProviderImpl::GetPersistentCredential(
-    fidl::InterfaceHandle<auth::AuthenticationUIContext> auth_ui_context,
+    fidl::InterfaceHandle<fuchsia::auth::AuthenticationUIContext>
+        auth_ui_context,
     GetPersistentCredentialCallback callback) {
   FXL_DCHECK(auth_ui_context);
   get_persistent_credential_callback_ = std::move(callback);
@@ -129,8 +130,8 @@ void SpotifyAuthProviderImpl::GetAppAccessToken(
       return;
     }
 
-    AuthTokenPtr access_token = auth::AuthToken::New();
-    access_token->token_type = auth::TokenType::ACCESS_TOKEN;
+    AuthTokenPtr access_token = fuchsia::auth::AuthToken::New();
+    access_token->token_type = fuchsia::auth::TokenType::ACCESS_TOKEN;
     access_token->token =
         oauth_response.json_response["access_token"].GetString();
     access_token->expires_in =
@@ -243,7 +244,8 @@ void SpotifyAuthProviderImpl::GetUserProfile(
 
   Request(std::move(request_factory), [this,
                                        credential](http::URLResponse response) {
-    auth::UserProfileInfoPtr user_profile_info = auth::UserProfileInfo::New();
+    fuchsia::auth::UserProfileInfoPtr user_profile_info =
+        fuchsia::auth::UserProfileInfo::New();
 
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {

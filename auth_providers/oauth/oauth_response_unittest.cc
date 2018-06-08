@@ -15,7 +15,7 @@
 namespace auth_providers {
 namespace oauth {
 
-using auth::AuthProviderStatus;
+using fuchsia::auth::AuthProviderStatus;
 
 namespace {
 

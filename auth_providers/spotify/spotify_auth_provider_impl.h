@@ -10,7 +10,7 @@
 #ifndef TOPAZ_AUTH_PROVIDERS_SPOTIFY_SPOTIFY_AUTH_PROVIDER_IMPL_H_
 #define TOPAZ_AUTH_PROVIDERS_SPOTIFY_SPOTIFY_AUTH_PROVIDER_IMPL_H_
 
-#include <auth/cpp/fidl.h>
+#include <fuchsia/auth/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 
@@ -23,12 +23,13 @@
 
 namespace spotify_auth_provider {
 
-class SpotifyAuthProviderImpl : public auth::AuthProvider,
+class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
                                 fuchsia::webview::WebRequestDelegate {
  public:
-  SpotifyAuthProviderImpl(fuchsia::sys::StartupContext* context,
-                          network_wrapper::NetworkWrapper* network_wrapper,
-                          fidl::InterfaceRequest<auth::AuthProvider> request);
+  SpotifyAuthProviderImpl(
+      fuchsia::sys::StartupContext* context,
+      network_wrapper::NetworkWrapper* network_wrapper,
+      fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request);
 
   ~SpotifyAuthProviderImpl() override;
 
@@ -37,7 +38,8 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
  private:
   // |AuthProvider|
   void GetPersistentCredential(
-      fidl::InterfaceHandle<auth::AuthenticationUIContext> auth_ui_context,
+      fidl::InterfaceHandle<fuchsia::auth::AuthenticationUIContext>
+          auth_ui_context,
       GetPersistentCredentialCallback callback) override;
 
   // |AuthProvider|
@@ -81,14 +83,14 @@ class SpotifyAuthProviderImpl : public auth::AuthProvider,
 
   fuchsia::sys::StartupContext* context_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
-  auth::AuthenticationUIContextPtr auth_ui_context_;
+  fuchsia::auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
   fuchsia::webview::WebViewPtr web_view_;
   GetPersistentCredentialCallback get_persistent_credential_callback_;
 
   fidl::BindingSet<fuchsia::webview::WebRequestDelegate>
       web_request_delegate_bindings_;
-  fidl::Binding<auth::AuthProvider> binding_;
+  fidl::Binding<fuchsia::auth::AuthProvider> binding_;
   callback::CancellableContainer requests_;
 
   fxl::Closure on_empty_;

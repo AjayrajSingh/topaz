@@ -19,16 +19,16 @@ FactoryImpl::FactoryImpl(async_t* main_dispatcher,
 FactoryImpl::~FactoryImpl() {}
 
 void FactoryImpl::Bind(
-    fidl::InterfaceRequest<auth::AuthProviderFactory> request) {
+    fidl::InterfaceRequest<fuchsia::auth::AuthProviderFactory> request) {
   factory_bindings_.AddBinding(this, std::move(request));
 }
 
 void FactoryImpl::GetAuthProvider(
-    fidl::InterfaceRequest<auth::AuthProvider> auth_provider,
+    fidl::InterfaceRequest<fuchsia::auth::AuthProvider> auth_provider,
     GetAuthProviderCallback callback) {
   providers_.emplace(main_dispatcher_, context_, network_wrapper_,
                      std::move(auth_provider));
-  callback(auth::AuthProviderStatus::OK);
+  callback(fuchsia::auth::AuthProviderStatus::OK);
 }
 
 }  // namespace google_auth_provider

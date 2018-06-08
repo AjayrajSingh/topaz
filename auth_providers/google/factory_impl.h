@@ -5,7 +5,7 @@
 #ifndef TOPAZ_AUTH_PROVIDERS_GOOGLE_FACTORY_IMPL_H_
 #define TOPAZ_AUTH_PROVIDERS_GOOGLE_FACTORY_IMPL_H_
 
-#include <auth/cpp/fidl.h>
+#include <fuchsia/auth/cpp/fidl.h>
 #include <lib/async/dispatcher.h>
 
 #include "lib/callback/auto_cleanable.h"
@@ -16,19 +16,20 @@
 
 namespace google_auth_provider {
 
-class FactoryImpl : public auth::AuthProviderFactory {
+class FactoryImpl : public fuchsia::auth::AuthProviderFactory {
  public:
   FactoryImpl(async_t* main_dispatcher, fuchsia::sys::StartupContext* context,
               network_wrapper::NetworkWrapper* network_wrapper);
 
   ~FactoryImpl() override;
 
-  void Bind(fidl::InterfaceRequest<auth::AuthProviderFactory> request);
+  void Bind(fidl::InterfaceRequest<fuchsia::auth::AuthProviderFactory> request);
 
  private:
   // Factory:
-  void GetAuthProvider(fidl::InterfaceRequest<auth::AuthProvider> auth_provider,
-                       GetAuthProviderCallback callback) override;
+  void GetAuthProvider(
+      fidl::InterfaceRequest<fuchsia::auth::AuthProvider> auth_provider,
+      GetAuthProviderCallback callback) override;
 
   async_t* const main_dispatcher_;
   fuchsia::sys::StartupContext* const context_;
@@ -36,7 +37,7 @@ class FactoryImpl : public auth::AuthProviderFactory {
 
   callback::AutoCleanableSet<GoogleAuthProviderImpl> providers_;
 
-  fidl::BindingSet<auth::AuthProviderFactory> factory_bindings_;
+  fidl::BindingSet<fuchsia::auth::AuthProviderFactory> factory_bindings_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(FactoryImpl);
 };

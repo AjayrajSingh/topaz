@@ -5,7 +5,7 @@
 #ifndef TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_RESPONSE_H_
 #define TOPAZ_AUTH_PROVIDERS_OAUTH_OAUTH_RESPONSE_H_
 
-#include <auth/cpp/fidl.h>
+#include <fuchsia/auth/cpp/fidl.h>
 #include <fuchsia/net/oldhttp/cpp/fidl.h>
 
 #include "third_party/rapidjson/rapidjson/document.h"
@@ -14,11 +14,11 @@ namespace auth_providers {
 namespace oauth {
 
 struct OAuthResponse {
-  const auth::AuthProviderStatus status;
+  const fuchsia::auth::AuthProviderStatus status;
   const std::string error_description;
   rapidjson::Document json_response;
 
-  OAuthResponse(const auth::AuthProviderStatus& status,
+  OAuthResponse(const fuchsia::auth::AuthProviderStatus& status,
                 const std::string& error_description,
                 rapidjson::Document json_response)
       : status(status),
