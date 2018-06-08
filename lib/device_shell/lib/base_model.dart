@@ -8,10 +8,12 @@ import 'package:fidl/fidl.dart';
 import 'package:fidl_cobalt/fidl.dart' as cobalt;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular_auth/fidl.dart';
+import 'package:fidl_fuchsia_netstack/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_ui_gfx/fidl.dart';
 import 'package:fidl_fuchsia_ui_input/fidl.dart' as input;
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
+import 'package:lib.app.dart/app.dart' as app;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.device_shell/user_shell_chooser.dart';
 import 'package:lib.ui.flutter/child_view.dart';
@@ -19,6 +21,7 @@ import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart' show Channel;
 
+import 'netstack_model.dart';
 import 'user_manager.dart';
 
 export 'package:lib.widgets/model.dart'
@@ -51,6 +54,8 @@ class BaseDeviceShellModel extends DeviceShellModel
   ///
   /// Shouldn't be used before onReady.
   DeviceShellUserManager _userManager;
+
+  NetstackModel _netstackModel;
 
   /// Encodes metrics into cobalt.
   final cobalt.CobaltEncoder encoder;
@@ -140,6 +145,34 @@ class BaseDeviceShellModel extends DeviceShellModel
     presentation.getPresentationMode(callback);
   }
 
+  /// Whether or not the device has an internet connection.
+  ///
+  /// Currently, having an IP is equivalent to having internet, although
+  /// this is not completely reliable. This will be always false until
+  /// onReady is called.
+  bool get hasInternetConnection => _netstackModel?.hasIp ?? false;
+
+  Future<void> waitForInternetConnection() async {
+    if (hasInternetConnection) {
+      return null;
+    }
+
+    trace('waiting for internet connection');
+
+    final completer = Completer<void>();
+
+    void listener() {
+      if (_netstackModel.hasIp) {
+        _netstackModel.removeListener(listener);
+        completer.complete();
+      }
+    }
+
+    _netstackModel.addListener(listener);
+
+    return completer.future;
+  }
+
   /// Login with given user
   Future<void> login(String accountId) async {
     final completer = Completer<void>();
@@ -152,6 +185,8 @@ class BaseDeviceShellModel extends DeviceShellModel
       completer.complete();
       return completer;
     }
+    await waitForInternetConnection();
+
     trace('logging in $accountId');
     encoder.startTimer(
       _kUserShellLoginTimeMetricId,
@@ -277,6 +312,11 @@ class BaseDeviceShellModel extends DeviceShellModel
   ) async {
     super.onReady(userProvider, deviceShellContext, presentation);
 
+    final netstackProxy = NetstackProxy();
+    app.connectToService(StartupContext.fromStartupInfo().environmentServices,
+        netstackProxy.ctrl);
+    _netstackModel = NetstackModel(netstack: netstackProxy)..start();
+
     enableClipping(_currentClippingEnabled);
 
     _addShortcut(key: _kKeyCodeSpacebar, modifier: _kKeyModifierLeftCtrl);
@@ -327,6 +367,7 @@ class BaseDeviceShellModel extends DeviceShellModel
       binding.close();
     }
     _presentationModeListenerBinding.close();
+    _netstackModel.dispose();
     super.onStop();
   }
 
