@@ -10,24 +10,15 @@ import 'package:fuchsia_remote_debug_protocol/fuchsia_remote_debug_protocol.dart
 import 'package:fuchsia_remote_debug_protocol/logging.dart';
 import 'package:test/test.dart';
 
-void main(List<String> args) {
+void main() {
   group('driver example tests', () {
-    // TODO(awdavies): Since we're within the tree, these should be known in
-    // advance. Once GN automation is added these will be stored in the
-    // environment.
-    const String address = 'fe80::8eae:4cff:fef4:9246';
-    const String interface = 'eno1';
-    // Example ssh config path for the Fuchsia device.
-    const String sshConfigPath =
-        '../../../../../../fuchsia/out/x64/ssh-keys/ssh_config';
-
     FlutterDriver driver;
     FuchsiaRemoteConnection connection;
 
     setUpAll(() async {
       Logger.globalLevel = LoggingLevel.all;
-      connection = await FuchsiaRemoteConnection.connect(
-          address, interface, sshConfigPath);
+      // Expects FUCHSIA_REMOTE_URL and FUCHSIA_SSH_CONFIG to be set in the env.
+      connection = await FuchsiaRemoteConnection.connect();
       const Pattern isolatePattern = 'driver_example_mod_wrapper';
       print('Finding $isolatePattern');
       final List<IsolateRef> refs =
@@ -52,7 +43,6 @@ void main(List<String> args) {
     });
 
     test('add to counter. remove from counter', () async {
-      const String testString = 'Accomplish a super important test';
       await driver.tap(find.text('+1'));
       await new Future<Null>.delayed(const Duration(milliseconds: 200));
       await driver.tap(find.text('+1'));
@@ -65,6 +55,13 @@ void main(List<String> args) {
           find.text('This counter has a value of: 6');
       // If this value hasn't been set correctly the app will crash, as the
       // widget will not be findable.
+      await driver.tap(textFinder);
+      await new Future<Null>.delayed(const Duration(milliseconds: 200));
+      await driver.tap(find.text('-5'));
+      await new Future<Null>.delayed(const Duration(milliseconds: 200));
+      await driver.tap(find.text('-1'));
+      await new Future<Null>.delayed(const Duration(milliseconds: 200));
+      textFinder = find.text('This counter has a value of: 0');
       await driver.tap(textFinder);
     });
   });

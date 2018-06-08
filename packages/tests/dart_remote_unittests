@@ -1,0 +1,5 @@
+{
+    "host_tests" : [
+      "//topaz/examples/test/driver_example_mod:driver_mod_integration_tests"
+    ]
+}
