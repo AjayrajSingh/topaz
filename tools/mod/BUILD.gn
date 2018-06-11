@@ -21,13 +21,13 @@ dart_tool("mod") {
   ]
 }
 
-dart_test("mod_tests") {
-  sources = [
-    "commands/create_test.dart",
-  ]
+# dart_test("mod_tests") {
+#   sources = [
+#     "commands/create_test.dart",
+#   ]
 
-  deps = [
-    ":mod_dart_library",
-    "//third_party/dart-pkg/pub/test",
-  ]
-}
+#   deps = [
+#     ":mod_dart_library",
+#     "//third_party/dart-pkg/pub/test",
+#   ]
+# }

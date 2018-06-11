@@ -45,27 +45,28 @@ flutter_aot_app("dashboard") {
   ]
 }
 
-dart_test("dashboard_tests") {
-  sources = [
-    "build_bucket_service_test.dart",
-    "enums_test.dart",
-  ]
+# dart_test("dashboard_tests") {
+#   sources = [
+#     "build_bucket_service_test.dart",
+#     "enums_test.dart",
+#   ]
 
-  deps = [
-    ":dashboard_dart_library",
-    "//third_party/dart-pkg/pub/buildbucket",
-    "//third_party/dart-pkg/pub/mockito",
-    "//third_party/dart-pkg/pub/test",
-  ]
-}
+#   deps = [
+#     ":dashboard_dart_library",
+#     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+#     "//third_party/dart-pkg/pub/buildbucket",
+#     "//third_party/dart-pkg/pub/mockito",
+#     "//third_party/dart-pkg/pub/test",
+#   ]
+# }
 
-group("tests") {
-  testonly = true
+# group("tests") {
+#   testonly = true
 
-  deps = [
-    ":dashboard_tests",
-  ]
-}
+#   deps = [
+#     ":dashboard_tests",
+#   ]
+# }
 
 package("config") {
   deprecated_system_image = true

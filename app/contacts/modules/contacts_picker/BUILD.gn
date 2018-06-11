@@ -26,16 +26,16 @@ flutter_app("contacts_picker") {
   ]
 }
 
-dart_test("contacts_picker_tests") {
-  sources = [
-    "stores/contact_item_store_test.dart",
-    "widgets/contact_item_test.dart",
-    "widgets/contacts_picker_test.dart",
-  ]
+# dart_test("contacts_picker_tests") {
+#   sources = [
+#     "stores/contact_item_store_test.dart",
+#     "widgets/contact_item_test.dart",
+#     "widgets/contacts_picker_test.dart",
+#   ]
 
-  deps = [
-    ":contacts_picker_dart_library",
-    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
-    "//third_party/dart-pkg/pub/test",
-  ]
-}
+#   deps = [
+#     ":contacts_picker_dart_library",
+#     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+#     "//third_party/dart-pkg/pub/test",
+#   ]
+# }

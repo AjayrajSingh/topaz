@@ -16,6 +16,6 @@ group("tests") {
 
   deps = [
     "packages/widget_explorer_core:widget_explorer_core_tests",
-    "tools/widget_explorer_gen:widget_explorer_gen_tests",
+    # "tools/widget_explorer_gen:widget_explorer_gen_tests",
   ]
 }

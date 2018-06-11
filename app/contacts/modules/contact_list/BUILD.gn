@@ -29,14 +29,14 @@ flutter_app("contact_list") {
   ]
 }
 
-dart_test("contact_list_tests") {
-  sources = [
-    "models/contact_item_test.dart",
-    "models/contact_list_model_test.dart",
-  ]
+# dart_test("contact_list_tests") {
+#   sources = [
+#     "models/contact_item_test.dart",
+#     "models/contact_list_model_test.dart",
+#   ]
 
-  deps = [
-    ":contact_list_dart_library",
-    "//third_party/dart-pkg/pub/test",
-  ]
-}
+#   deps = [
+#     ":contact_list_dart_library",
+#     "//third_party/dart-pkg/pub/test",
+#   ]
+# }
