@@ -96,3 +96,13 @@ class AsyncProxyController<T, SYNC> {
   /// request an implementation of [T].
   String get $serviceName => _syncCtrl.$serviceName;
 }
+
+/// Convert an [InterfaceHandle] from one interface type to another.
+InterfaceHandle<NEW> convertInterfaceHandle<OLD, NEW>(
+        InterfaceHandle<OLD> old) =>
+    new InterfaceHandle<NEW>(old.passChannel());
+
+/// Convert an [InterfaceRequest] from one interface type to another.
+InterfaceRequest<NEW> convertInterfaceRequest<OLD, NEW>(
+        InterfaceRequest<OLD> old) =>
+    new InterfaceRequest<NEW>(old.passChannel());

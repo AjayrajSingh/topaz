@@ -605,9 +605,9 @@ func (c *compiler) compileParameterArray(val []types.Parameter) []Parameter {
 		name := c.compileLowerCamelIdentifier(v.Name)
 		convert := ""
 		if t.declType == types.InterfaceDeclType {
-			convert = "_convertInterfaceHandle"
+			convert = "$fidl.convertInterfaceHandle"
 		} else if v.Type.Kind == types.RequestType {
-			convert = "_convertInterfaceRequest"
+			convert = "$fidl.convertInterfaceRequest"
 		}
 		p := Parameter{
 			Type:     t,

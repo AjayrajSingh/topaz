@@ -126,12 +126,6 @@ import 'fidl.dart' as $sync;
 // ignore: unused_element, avoid_private_typedef_functions
 typedef _VoidCallback = void Function();
 
-// Converters between interface handle / request types.
-// ignore: unused_element
-$fidl.InterfaceHandle<NEW> _convertInterfaceHandle<OLD, NEW>($fidl.InterfaceHandle<OLD> old) => new $fidl.InterfaceHandle<NEW>(old.passChannel());
-// ignore: unused_element
-$fidl.InterfaceRequest<NEW> _convertInterfaceRequest<OLD, NEW>($fidl.InterfaceRequest<OLD> old) => new $fidl.InterfaceRequest<NEW>(old.passChannel());
-
 {{ range $interface := .Interfaces -}}
 {{ template "InterfaceAsyncDeclaration" $interface }}
 {{ end -}}
