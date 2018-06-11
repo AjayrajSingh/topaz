@@ -43,6 +43,7 @@ class UserSetupModel extends Model {
   final AuthenticationOverlayModel _authModel;
   final TimezoneProxy _timeZoneProxy;
   VoidCallback _loginAsGuest;
+  bool _userPresent;
   final NetstackModel _netstackModel;
 
   /// StartupContext to allow setup to launch apps
@@ -94,11 +95,12 @@ class UserSetupModel extends Model {
   void start({
     @required VoidCallback addNewUser,
     @required VoidCallback loginAsGuest,
+    @required bool userPresent,
   }) {
     // This should be refactored into the model
     this.addNewUser = addNewUser;
     _loginAsGuest = loginAsGuest;
-
+    _userPresent = userPresent;
     _currentIndex = _stages.indexOf(SetupStage.notStarted);
     nextStep();
   }
@@ -172,9 +174,10 @@ class UserSetupModel extends Model {
   /// Does not apply to going backwards, as a user may
   /// need to connect to a different wifi network
   bool get _shouldSkipStage =>
-      currentStage == SetupStage.wifi &&
-      !_connectedToWifi &&
-      _netstackModel.hasIp;
+      (currentStage == SetupStage.welcome && _userPresent)
+        || (currentStage == SetupStage.wifi
+          && !_connectedToWifi
+          && _netstackModel.hasIp);
 
   /// Ends the setup flow and immediately logs in as guest
   void loginAsGuest() {

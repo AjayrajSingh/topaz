@@ -25,6 +25,7 @@ typedef GetPresentationModeCallback = void Function(PresentationMode mode);
 typedef SetupCallback = void Function({
   VoidCallback addNewUser,
   VoidCallback loginAsGuest,
+  bool userPresent,
 });
 
 const Duration _kShowLoadingSpinnerDelay = const Duration(milliseconds: 500);
@@ -119,7 +120,8 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
         loginAsGuest: () {
           login(null);
           hideUserActions();
-        });
+        },
+        userPresent:accounts.isNotEmpty);
   }
 
   /// Login with given user
