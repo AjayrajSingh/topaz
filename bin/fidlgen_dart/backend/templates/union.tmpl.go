@@ -27,8 +27,9 @@ class {{ .Name }} extends $fidl.Union {
 
 {{- range .Members }}
   {{ .Type.Decl }} get {{ .Name }} {
-    if (tag != {{ $.TagName }}.{{ .Name }})
+    if (tag != {{ $.TagName }}.{{ .Name }}) {
       return null;
+    }
     return _data;
   }
 {{- end }}
