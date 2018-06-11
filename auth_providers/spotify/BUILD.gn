@@ -61,8 +61,8 @@ source_set("unittests") {
     "//garnet/public/lib/fxl:fxl_printers",
     "//garnet/public/lib/gtest:gtest",
     "//garnet/public/lib/network_wrapper:fake",
-    "//garnet/public/lib/test_runner/cpp:gtest_main",
     "//peridot/lib/rapidjson",
+    "//third_party/googletest:gtest_main",
   ]
 }
 
