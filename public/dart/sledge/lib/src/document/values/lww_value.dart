@@ -49,7 +49,7 @@ class _LastOneWinValue<T> {
 }
 
 /// Sledge Last-Write-Win value.
-class LastOneWinValue<T> implements BaseValue<T> {
+class LastOneWinValue<T> extends BaseValue<T> {
   final _LastOneWinValue _value;
   final DataConverter<int, T> _converter;
 
@@ -68,7 +68,10 @@ class LastOneWinValue<T> implements BaseValue<T> {
       _value.applyChanges(_converter.deserialize(input));
 
   /// Sets value.
-  set value(T value) => _value.value = value;
+  set value(T value) {
+    _value.value = value;
+    observer.valueWasChanged();
+  }
 
   /// Gets value.
   T get value => _value.value;

@@ -68,7 +68,7 @@ class _PosNegCounterValue<T extends num> {
 }
 
 /// Sledge Value to store numerical counter.
-class PosNegCounterValue<T extends num> implements BaseValue<T> {
+class PosNegCounterValue<T extends num> extends BaseValue<T> {
   final _PosNegCounterValue<T> _counter;
   final DataConverter<int, T> _converter;
 
@@ -90,7 +90,10 @@ class PosNegCounterValue<T extends num> implements BaseValue<T> {
       _counter.applyChanges(_converter.deserialize(input));
 
   /// Adds value (possibly negative) to counter.
-  void add(final T delta) => _counter.add(delta);
+  void add(final T delta) {
+    _counter.add(delta);
+    observer.valueWasChanged();
+  }
 
   /// Gets current value of counter.
   T get value => _counter.value;

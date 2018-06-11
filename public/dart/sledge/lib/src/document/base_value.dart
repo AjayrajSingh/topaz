@@ -5,9 +5,16 @@
 import 'dart:async';
 
 import 'change.dart';
+import 'value_observer.dart';
 
 /// Interface implemented by all Sledge Values.
 abstract class BaseValue<T> {
+  // TODO: Not all BaseValue need to have an observer.
+  // Create a subclass of BaseValue that contains an observer and
+  // have all values that need to be observable extend this new class.
+  /// Observes events occuring on this value.
+  ValueObserver observer;
+
   /// Ends the transaction and retrieves its data.
   Change put();
 

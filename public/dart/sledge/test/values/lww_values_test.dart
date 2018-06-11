@@ -11,9 +11,17 @@ import 'package:sledge/src/document/values/key_value.dart';
 import 'package:sledge/src/document/values/lww_value.dart';
 import 'package:test/test.dart';
 
+import '../dummies/dummy_value_observer.dart';
+
+class TestLastOneWinValue<T> extends LastOneWinValue<T> {
+  TestLastOneWinValue([Change init]) : super(init) {
+    this.observer = new DummyValueObserver();
+  }
+}
+
 void main() {
   test('Integer', () {
-    var cnt = new LastOneWinValue<int>();
+    var cnt = new TestLastOneWinValue<int>();
     expect(cnt.value, equals(0));
     cnt.value = 3;
     expect(cnt.value, equals(3));
@@ -22,7 +30,7 @@ void main() {
   });
 
   test('Double', () {
-    var cnt = new LastOneWinValue<double>();
+    var cnt = new TestLastOneWinValue<double>();
     expect(cnt.value, equals(0.0));
     cnt.value = 3.5;
     expect(cnt.value, equals(3.5));
@@ -31,7 +39,7 @@ void main() {
   });
 
   test('Boolean', () {
-    var cnt = new LastOneWinValue<bool>();
+    var cnt = new TestLastOneWinValue<bool>();
     expect(cnt.value, equals(false));
     cnt.value = true;
     expect(cnt.value, equals(true));
@@ -40,7 +48,7 @@ void main() {
   });
 
   test('String', () {
-    var cnt = new LastOneWinValue<String>();
+    var cnt = new TestLastOneWinValue<String>();
     expect(cnt.value, equals(''));
     cnt.value = 'aba';
     expect(cnt.value, equals('aba'));
@@ -54,7 +62,7 @@ void main() {
   Converter<String> stringConverter = new Converter<String>();
 
   test('Integer oprations', () {
-    var x = new LastOneWinValue<int>(new Change(
+    var x = new TestLastOneWinValue<int>(new Change(
         [new KeyValue(intConverter.serialize(0), intConverter.serialize(-3))]));
     expect(x.value, equals(-3));
     x.applyChanges(new Change(
@@ -72,7 +80,7 @@ void main() {
   });
 
   test('Double operations', () {
-    var x = new LastOneWinValue<double>(new Change([
+    var x = new TestLastOneWinValue<double>(new Change([
       new KeyValue(intConverter.serialize(0), doubleConverter.serialize(-3.5))
     ]));
     expect(x.value, equals(-3.5));
@@ -93,7 +101,7 @@ void main() {
   });
 
   test('String operations', () {
-    var x = new LastOneWinValue<String>(new Change([
+    var x = new TestLastOneWinValue<String>(new Change([
       new KeyValue(intConverter.serialize(0), stringConverter.serialize('bar'))
     ]));
     expect(x.value, equals('bar'));
@@ -114,7 +122,7 @@ void main() {
   });
 
   test('Boolean operations', () {
-    var x = new LastOneWinValue<bool>(new Change([
+    var x = new TestLastOneWinValue<bool>(new Change([
       new KeyValue(intConverter.serialize(0), boolConverter.serialize(true))
     ]));
     expect(x.value, equals(true));
@@ -133,7 +141,7 @@ void main() {
   });
 
   test('onChange stream', () {
-    var cnt = new LastOneWinValue<String>(new Change([
+    var cnt = new TestLastOneWinValue<String>(new Change([
       new KeyValue(intConverter.serialize(0), stringConverter.serialize('aba'))
     ]));
     Stream<String> changeStream = cnt.onChange;

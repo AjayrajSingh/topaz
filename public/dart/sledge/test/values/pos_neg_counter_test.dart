@@ -11,9 +11,17 @@ import 'package:sledge/src/document/values/key_value.dart';
 import 'package:sledge/src/document/values/pos_neg_counter_value.dart';
 import 'package:test/test.dart';
 
+import '../dummies/dummy_value_observer.dart';
+
+class TestPosNegCounterValue<T extends num> extends PosNegCounterValue<T> {
+  TestPosNegCounterValue(int id, [Change init]) : super(id, init) {
+    observer = new DummyValueObserver();
+  }
+}
+
 void main() {
   test('PosNegCounterValue accumulate additions', () {
-    var cnt = new PosNegCounterValue<int>(1);
+    var cnt = new TestPosNegCounterValue<int>(1);
     expect(cnt.value, equals(0));
     cnt.add(1);
     expect(cnt.value, equals(1));
@@ -24,7 +32,7 @@ void main() {
   });
 
   test('PosNegCounterValue accumulate subtractions', () {
-    var cnt = new PosNegCounterValue<int>(1);
+    var cnt = new TestPosNegCounterValue<int>(1);
     expect(cnt.value, equals(0));
     cnt.add(-1);
     expect(cnt.value, equals(-1));
@@ -35,7 +43,7 @@ void main() {
   });
 
   test('PosNegCounterValue accumulate', () {
-    var cnt = new PosNegCounterValue<int>(1);
+    var cnt = new TestPosNegCounterValue<int>(1);
     expect(cnt.value, equals(0));
     cnt.add(-3);
     expect(cnt.value, equals(-3));
@@ -46,7 +54,7 @@ void main() {
   });
 
   test('PosNegCounterValue accumulate', () {
-    var cnt = new PosNegCounterValue<double>(1);
+    var cnt = new TestPosNegCounterValue<double>(1);
     expect(cnt.value, equals(0.0));
     cnt.add(-3.2);
     expect(cnt.value, equals(-3.2));
@@ -60,7 +68,7 @@ void main() {
   Converter<double> doubleConverter = new Converter<double>();
 
   test('PosNegCounterValue construction', () {
-    var cnt = new PosNegCounterValue<int>(
+    var cnt = new TestPosNegCounterValue<int>(
         1,
         new Change([
           new KeyValue(intConverter.serialize(2), intConverter.serialize(4)),
@@ -70,7 +78,7 @@ void main() {
   });
 
   test('PosNegCounterValue construction 2', () {
-    var cnt = new PosNegCounterValue<int>(
+    var cnt = new TestPosNegCounterValue<int>(
         1,
         new Change([
           new KeyValue(intConverter.serialize(2), intConverter.serialize(4)),
@@ -82,7 +90,7 @@ void main() {
   });
 
   test('PosNegCounterValue construction double', () {
-    var cnt = new PosNegCounterValue<double>(
+    var cnt = new TestPosNegCounterValue<double>(
         1,
         new Change([
           new KeyValue(
@@ -98,7 +106,7 @@ void main() {
   });
 
   test('PosNegCounterValue applyChanges', () {
-    var cnt = new PosNegCounterValue<int>(1);
+    var cnt = new TestPosNegCounterValue<int>(1);
     expect(cnt.value, equals(0));
     cnt.applyChanges(new Change(
         [new KeyValue(intConverter.serialize(2), intConverter.serialize(4))]));
@@ -112,7 +120,7 @@ void main() {
   });
 
   test('PosNegCounterValue onChange stream', () {
-    var cnt = new PosNegCounterValue<int>(
+    var cnt = new TestPosNegCounterValue<int>(
         1,
         new Change([
           new KeyValue(intConverter.serialize(2), intConverter.serialize(1)),

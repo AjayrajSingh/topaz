@@ -10,20 +10,24 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'document/document.dart';
 import 'document/document_id.dart';
 import 'sledge_page_id.dart';
+import 'transaction.dart';
 
 /// The interface to the Sledge library.
 class Sledge {
   final ComponentContextProxy _componentContextProxy =
       new ComponentContextProxy();
   final ledger.LedgerProxy _ledgerProxy = new ledger.LedgerProxy();
-  final ledger.PageProxy _pageProxy = new ledger.PageProxy();
+  final ledger.PageProxy _pageProxy;
 
   // Contains the status of the initialization.
   // ignore: unused_field
   Future<bool> _initializationSucceeded;
 
+  Transaction _currentTransaction;
+
   /// Default constructor.
-  Sledge(final ModuleContext moduleContext, [SledgePageId pageId]) {
+  Sledge(final ModuleContext moduleContext, [SledgePageId pageId])
+      : _pageProxy = new ledger.PageProxy() {
     pageId ??= new SledgePageId();
 
     moduleContext.getComponentContext(_componentContextProxy.ctrl.request());
@@ -54,7 +58,9 @@ class Sledge {
   }
 
   /// Convenience constructor for tests.
-  Sledge.testing();
+  Sledge.testing(this._pageProxy) {
+    _initializationSucceeded = new Future.value(true);
+  }
 
   /// Closes connection to ledger.
   void close() {
@@ -66,5 +72,38 @@ class Sledge {
   /// Returns a new document that can be stored in Sledge.
   dynamic newDocument(DocumentId documentId) {
     return new Document(this, documentId);
+  }
+
+  /// Transactionally save modifications.
+  /// Await the end of the method before calling |runInTransaction| again.
+  /// Returns false if an error occured and the modifications couldn't be
+  /// commited.
+  /// Returns true otherwise.
+  Future<bool> runInTransaction(void modifications()) async {
+    if (_currentTransaction != null) {
+      throw new StateError('Transaction already started.');
+    }
+    _currentTransaction = new Transaction();
+
+    bool initializationSucceeded = await _initializationSucceeded;
+    if (!initializationSucceeded) {
+      _currentTransaction = null;
+      return false;
+    }
+
+    // Run the modification.
+    bool savingModificationsWasSuccesfull =
+        await _currentTransaction.saveModifications(modifications, _pageProxy);
+
+    _currentTransaction = null;
+    return new Future.value(savingModificationsWasSuccesfull);
+  }
+
+  /// Returns the current transaction.
+  Transaction get transaction {
+    if (_currentTransaction == null) {
+      throw new StateError('Transaction already started.');
+    }
+    return _currentTransaction;
   }
 }

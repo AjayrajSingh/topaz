@@ -8,20 +8,21 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart';
 
-import '../schema/schema.dart';
 import '../sledge.dart';
+import '../transaction.dart';
 import 'base_value.dart';
 import 'change.dart';
 import 'document_id.dart';
 import 'value_node.dart';
+import 'value_observer.dart';
 
-// TODO: Use the |_sledge| field and |_put|, |_applyChanges| methods.
+// TODO: Use the |_sledge| and |_documentId| fields.
+// TODO: Use the |_put| and |_applyChanges| methods.
 // ignore_for_file: unused_field, unused_element
 
 /// Represents structured data that can be stored in Sledge.
-class Document {
+class Document implements ValueObserver {
   final Sledge _sledge;
-  final Schema _schema;
   final DocumentId _documentId;
   ValueNode _value;
   final Map<Uint8List, BaseValue> _fields;
@@ -31,18 +32,21 @@ class Document {
   Document(this._sledge, this._documentId)
       : _fields = new HashMap<Uint8List, BaseValue>(
             equals: new ListEquality().equals,
-            hashCode: new ListEquality().hash),
-        _schema = _documentId.schema {
-    _value = _schema.newValue();
-    Map<String, BaseValue> fields = _value.collectFields();
-    for (final key in fields.keys) {
+            hashCode: new ListEquality().hash) {
+    _value = _documentId.schema.newValue();
+
+    _value.collectFields().forEach((final String key, final BaseValue value) {
+      value.observer = this;
+
+      // Hash the key
       final keyBytes =
           new Uint16List.fromList(key.codeUnits).buffer.asUint8List();
       Uint8List hashBytes =
           new Uint8List.fromList(sha1.convert(keyBytes).bytes);
       assert(hashBytes.length == _hashLength);
-      _fields[hashBytes] = fields[key];
-    }
+      // Insert |value| with the hashed key in |_fields|.
+      _fields[hashBytes] = value;
+    });
   }
 
   /// Get a changes for all fields of doc.
@@ -70,6 +74,15 @@ class Document {
     for (final prefix in splittedChanges.keys) {
       _fields[prefix].applyChanges(splittedChanges[prefix]);
     }
+  }
+
+  @override
+  void valueWasChanged() {
+    Transaction transaction = _sledge.transaction;
+    if (transaction == null) {
+      throw new StateError('Value changed outside of transaction.');
+    }
+    transaction.documentWasModified(this);
   }
 
   @override

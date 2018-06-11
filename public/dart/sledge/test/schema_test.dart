@@ -10,6 +10,8 @@ import 'package:sledge/sledge.dart';
 import 'package:sledge/src/document/change.dart';
 import 'package:test/test.dart';
 
+import 'fakes/fake_ledger_page.dart';
+
 void main() {
   test('Create schemas and serialize them to json', () {
     // Create and test flat schema.
@@ -75,7 +77,7 @@ void main() {
     expect(hash1, equals(hash2));
   });
 
-  test('Instantiate and initialize a Sledge document', () {
+  test('Instantiate and initialize a Sledge document', () async {
     // Create schemas.
     Map<String, BaseType> schemaDescription = <String, BaseType>{
       'someBool': new Boolean(),
@@ -88,19 +90,21 @@ void main() {
     Schema schema2 = new Schema(schemaDescription2);
 
     // Create a new Sledge document.
-    Sledge sledge = new Sledge.testing();
+    Sledge sledge = new Sledge.testing(new FakeLedgerPage());
     dynamic doc = sledge.newDocument(new DocumentId(schema2));
 
     // Read and write properties of a Sledge document.
     expect(doc.foo.someBool.value, equals(false));
     expect(doc.foo.someInteger.value, equals(0));
-    doc.foo.someBool.value = true;
-    doc.foo.someInteger.value = 42;
+    await sledge.runInTransaction(() {
+      doc.foo.someBool.value = true;
+      doc.foo.someInteger.value = 42;
+    });
     expect(doc.foo.someBool.value, equals(true));
     expect(doc.foo.someInteger.value, equals(42));
   });
 
-  test('LastWriteWin basic types.', () {
+  test('LastWriteWin basic types.', () async {
     // Create schemas.
     Map<String, BaseType> schemaDescription = <String, BaseType>{
       'someBool': new Boolean(),
@@ -111,7 +115,7 @@ void main() {
     Schema schema = new Schema(schemaDescription);
 
     // Create a new Sledge document.
-    Sledge sledge = new Sledge.testing();
+    Sledge sledge = new Sledge.testing(new FakeLedgerPage());
     dynamic doc = sledge.newDocument(new DocumentId(schema));
 
     // Read and write properties of a Sledge document.
@@ -119,17 +123,19 @@ void main() {
     expect(doc.someInteger.value, equals(0));
     expect(doc.someDouble.value, equals(0.0));
     expect(doc.someString.value, equals(''));
-    doc.someBool.value = true;
-    doc.someInteger.value = 42;
-    doc.someDouble.value = 10.5;
-    doc.someString.value = 'abacaba';
+    await sledge.runInTransaction(() {
+      doc.someBool.value = true;
+      doc.someInteger.value = 42;
+      doc.someDouble.value = 10.5;
+      doc.someString.value = 'abacaba';
+    });
     expect(doc.someBool.value, equals(true));
     expect(doc.someInteger.value, equals(42));
     expect(doc.someDouble.value, equals(10.5));
     expect(doc.someString.value, equals('abacaba'));
   });
 
-  test('Integration of PosNegCounter with Sledge', () {
+  test('Integration of PosNegCounter with Sledge', () async {
     // Create Schema.
     Map<String, BaseType> schemaDescription = <String, BaseType>{
       'cnt': new IntCounter(),
@@ -138,23 +144,29 @@ void main() {
     Schema schema = new Schema(schemaDescription);
 
     // Create a new Sledge document.
-    Sledge sledge = new Sledge.testing();
+    Sledge sledge = new Sledge.testing(new FakeLedgerPage());
     dynamic doc = sledge.newDocument(new DocumentId(schema));
 
     // Modify and get value of PosNegCounter.
     expect(doc.cnt.value, equals(0));
     expect(doc.cnt_d.value, equals(0.0));
-    doc.cnt.add(5);
+    await sledge.runInTransaction(() {
+      doc.cnt.add(5);
+    });
     expect(doc.cnt.value, equals(5));
-    doc.cnt.add(-3);
-    doc.cnt_d.add(-5.2);
+    await sledge.runInTransaction(() {
+      doc.cnt.add(-3);
+      doc.cnt_d.add(-5.2);
+    });
     expect(doc.cnt.value, equals(2));
     expect(doc.cnt_d.value, equals(-5.2));
-    doc.cnt_d.add(3.12);
+    await sledge.runInTransaction(() {
+      doc.cnt_d.add(3.12);
+    });
     expect(doc.cnt_d.value, equals(-2.08));
   });
 
-  test('Put and apply changes', () {
+  test('get and apply changes', () async {
     // Create Schema.
     Map<String, BaseType> schemaDescription = <String, BaseType>{
       'name': new LastOneWinString(),
@@ -164,15 +176,21 @@ void main() {
     Schema schema = new Schema(schemaDescription);
 
     // Create two Sledge documents
-    Sledge sledgeA = new Sledge.testing(), sledgeB = new Sledge.testing();
+    Sledge sledgeA = new Sledge.testing(new FakeLedgerPage()),
+        sledgeB = new Sledge.testing(new FakeLedgerPage());
     dynamic docA = sledgeA.newDocument(new DocumentId(schema)),
         docB = sledgeB.newDocument(new DocumentId(schema));
 
-    docA
-      ..name.value = 'value + counter'
-      ..number.value = 5
-      ..cnt.add(1);
-    Change c1 = Document.put(docA);
+    Change c1;
+    await sledgeA.runInTransaction(() {
+      docA
+        ..name.value = 'value + counter'
+        ..number.value = 5
+        ..cnt.add(1);
+
+      c1 = Document.put(docA);
+    });
+
     Document.applyChanges(docB, c1);
 
     expect(docB.name.value, equals('value + counter'));
