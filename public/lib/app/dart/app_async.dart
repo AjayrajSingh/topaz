@@ -1,12 +1,13 @@
-// Copyright 2016 The Fuchsia Authors. All rights reserved.
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
+// found in the LICENSE file
 
-// ignore_for_file: public_member_api_docs
+/// A version of app.dart built on the new async bindings.
 
+import 'dart:async';
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia/fuchsia.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl_async.dart';
 import 'package:zircon/zircon.dart';
 
 import 'src/rio.dart';
@@ -56,8 +57,8 @@ class StartupContext {
   }
 }
 
-void connectToService<T>(
-    ServiceProvider serviceProvider, ProxyController<T> controller) {
+void connectToService<T, SYNC>(
+    ServiceProvider serviceProvider, AsyncProxyController<T, SYNC> controller) {
   final String serviceName = controller.$serviceName;
   assert(serviceName != null,
       'controller.\$serviceName must not be null. Check the FIDL file for a missing [Discoverable]');
@@ -101,7 +102,7 @@ class ServiceProviderImpl extends ServiceProvider {
   }
 
   @override
-  void connectToService(String serviceName, Channel channel) {
+  Future<Null> connectToService(String serviceName, Channel channel) {
     final _ServiceConnectorThunk connectorThunk = _connectorThunks[serviceName];
     if (connectorThunk != null) {
       connectorThunk(channel);
@@ -110,6 +111,7 @@ class ServiceProviderImpl extends ServiceProvider {
     } else {
       channel.close();
     }
+    return null;
   }
 }
 
@@ -125,7 +127,7 @@ class Services {
     return pair.first;
   }
 
-  void connectToService<T>(ProxyController<T> controller) {
+  void connectToService<T, OTHER>(AsyncProxyController<T, OTHER> controller) {
     final String serviceName = controller.$serviceName;
     assert(serviceName != null,
         'controller.\$serviceName must not be null. Check the FIDL file for a missing [Discoverable]');

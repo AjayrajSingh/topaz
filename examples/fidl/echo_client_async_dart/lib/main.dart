@@ -4,7 +4,7 @@
 
 import 'dart:async';
 import 'package:fidl_fidl_examples_echo/fidl_async.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/app_async.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart' show LaunchInfo;
 import 'package:fuchsia/fuchsia.dart' show exit;
 
@@ -22,7 +22,8 @@ Future<Null> main(List<String> args) async {
   final Services services = new Services();
   final LaunchInfo launchInfo =
       new LaunchInfo(url: server, directoryRequest: services.request());
-  _context.launcher.createComponent(launchInfo, null);
+
+  await _context.launcher.createComponent(launchInfo, null);
 
   _echo = new EchoProxy();
   _echo.ctrl.bind(services.connectToServiceByName<Echo>(Echo.$serviceName));

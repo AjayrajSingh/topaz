@@ -8,6 +8,7 @@ export 'src/codec.dart';
 export 'src/enum.dart';
 export 'src/error.dart';
 export 'src/interface.dart';
+export 'src/interface_async.dart';
 export 'src/message.dart';
 export 'src/struct.dart';
 export 'src/types.dart';

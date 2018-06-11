@@ -376,11 +376,11 @@ abstract class {{ .Name }} {
 
 class {{ .Name }}Proxy implements {{ .Name }} {
   final $sync.{{ .Name }}Proxy _syncProxy;
-  $fidl.ProxyControllerWrapper<{{ .Name }}, $sync.{{ .Name }}> _ctrl;
+  $fidl.AsyncProxyController<{{ .Name }}, $sync.{{ .Name }}> _ctrl;
   final _completers = new Set<Completer<dynamic>>();
   {{ .Name }}Proxy() : _syncProxy = new $sync.{{ .Name }}Proxy()
   {
-    _ctrl = new $fidl.ProxyControllerWrapper<{{ .Name }}, $sync.{{ .Name }}>(_syncProxy.ctrl);
+    _ctrl = new $fidl.AsyncProxyController<{{ .Name }}, $sync.{{ .Name }}>(_syncProxy.ctrl);
     {{- range .Methods }}
       {{- if not .HasRequest }}
         _syncProxy.{{ .Name }} = ({{ template "SyncParams" .Response }}) =>
@@ -399,7 +399,7 @@ class {{ .Name }}Proxy implements {{ .Name }} {
     _syncProxy.ctrl.error.then(_errorOccurred);
   }
 
-  $fidl.ProxyControllerWrapper<{{ .Name }}, $sync.{{ .Name }}> get ctrl => _ctrl;
+  $fidl.AsyncProxyController<{{ .Name }}, $sync.{{ .Name }}> get ctrl => _ctrl;
 
   void _errorOccurred($fidl.ProxyError err) {
     // Make a copy of the set of completers and then clear it.

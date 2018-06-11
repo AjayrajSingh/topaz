@@ -6,7 +6,7 @@ import 'dart:async';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fidl_examples_echo/fidl_async.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/app_async.dart';
 
 class _EchoImpl extends Echo {
   final EchoBinding _binding = new EchoBinding();

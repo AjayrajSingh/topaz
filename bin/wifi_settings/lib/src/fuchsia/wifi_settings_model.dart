@@ -6,7 +6,7 @@ import 'dart:async';
 
 import 'package:fidl_fuchsia_netstack/fidl_async.dart' as net;
 import 'package:fidl_fuchsia_wlan_service/fidl_async.dart' as wlan;
-import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/app_async.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.schemas.dart/com.fuchsia.status.dart';
