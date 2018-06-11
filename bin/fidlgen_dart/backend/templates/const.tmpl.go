@@ -4,6 +4,7 @@
 
 package templates
 
+// Const is the template for const declarations.
 const Const = `
 {{- define "ConstDeclaration" -}}
 const {{ .Type.Decl }} {{ .Name }} = {{ .Value }};

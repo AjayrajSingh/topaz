@@ -4,6 +4,7 @@
 
 package templates
 
+// Struct is the template for struct declarations.
 const Struct = `
 {{- define "StructDeclaration" -}}
 class {{ .Name }} extends $fidl.Struct {

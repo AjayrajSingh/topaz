@@ -4,6 +4,7 @@
 
 package templates
 
+// Enum is the template for enum declarations.
 const Enum = `
 {{- define "EnumDeclaration" -}}
 class {{ .Name }} extends $fidl.Enum {

@@ -13,21 +13,25 @@ import (
 	"strings"
 )
 
+// Type represents a FIDL datatype.
 type Type struct {
-	Decl          string
-	SyncDecl      string
+	Decl          string // type in traditional bindings
+	SyncDecl      string // type in async bindings when referring to traditional bindings
+	AsyncDecl     string // type in async bindings when referring to async bindings
 	Nullable      bool
 	declType      types.DeclType
 	typedDataDecl string
 	typeExpr      string
 }
 
+// Const represents a constant declaration.
 type Const struct {
 	Type  Type
 	Name  string
 	Value string
 }
 
+// Enum represents an enum declaration.
 type Enum struct {
 	Name       string
 	Members    []EnumMember
@@ -35,11 +39,13 @@ type Enum struct {
 	TypeExpr   string
 }
 
+// EnumMember represents a member of an enum declaration.
 type EnumMember struct {
 	Name  string
 	Value string
 }
 
+// Union represents a union declaration.
 type Union struct {
 	Name       string
 	TagName    string
@@ -48,6 +54,7 @@ type Union struct {
 	TypeExpr   string
 }
 
+// UnionMember represents a member of a union declaration.
 type UnionMember struct {
 	Type     Type
 	Name     string
@@ -56,6 +63,7 @@ type UnionMember struct {
 	typeExpr string
 }
 
+// Struct represents a struct declaration.
 type Struct struct {
 	Name       string
 	Members    []StructMember
@@ -63,6 +71,7 @@ type Struct struct {
 	TypeExpr   string
 }
 
+// StructMember represents a member of a struct declaration.
 type StructMember struct {
 	Type         Type
 	Name         string
@@ -71,6 +80,7 @@ type StructMember struct {
 	typeExpr     string
 }
 
+// Interface represents an interface declaration.
 type Interface struct {
 	Name        string
 	ServiceName string
@@ -81,6 +91,7 @@ type Interface struct {
 	HasEvents   bool
 }
 
+// Method represents a method declaration within an interface declaration.
 type Method struct {
 	Ordinal            types.Ordinal
 	OrdinalName        string
@@ -98,6 +109,7 @@ type Method struct {
 	TypeExpr           string
 }
 
+// Parameter represents an interface method parameter.
 type Parameter struct {
 	Type     Type
 	Name     string
@@ -106,13 +118,14 @@ type Parameter struct {
 	typeExpr string
 }
 
+// Import describes another FIDL library that will be imported.
 type Import struct {
-	Url            string
-	LocalName      string
-	AsyncUrl       string
-	AsyncLocalName string
+	URL       string
+	LocalName string
+	AsyncURL  string
 }
 
+// Root holds all of the declarations for a FIDL library.
 type Root struct {
 	LibraryName string
 	Imports     []Import
@@ -431,11 +444,13 @@ func (c *compiler) compileType(val types.Type) Type {
 		t := c.compileType(*val.ElementType)
 		if len(t.typedDataDecl) > 0 {
 			r.Decl = t.typedDataDecl
+			r.SyncDecl = r.Decl
+			r.AsyncDecl = r.Decl
 		} else {
 			r.Decl = fmt.Sprintf("List<%s>", t.Decl)
-			if t.SyncDecl != "" {
-				r.SyncDecl = fmt.Sprintf("List<%s>", t.SyncDecl)
-			}
+			r.SyncDecl = fmt.Sprintf("List<%s>", t.SyncDecl)
+			r.AsyncDecl = fmt.Sprintf("List<%s>", t.AsyncDecl)
+
 		}
 		elementStr := fmt.Sprintf("element: %s", t.typeExpr)
 		elementCountStr := fmt.Sprintf("elementCount: %s", formatInt(val.ElementCount))
@@ -444,11 +459,12 @@ func (c *compiler) compileType(val types.Type) Type {
 		t := c.compileType(*val.ElementType)
 		if len(t.typedDataDecl) > 0 {
 			r.Decl = t.typedDataDecl
+			r.SyncDecl = r.Decl
+			r.AsyncDecl = r.Decl
 		} else {
 			r.Decl = fmt.Sprintf("List<%s>", t.Decl)
-			if t.SyncDecl != "" {
-				r.SyncDecl = fmt.Sprintf("List<%s>", t.SyncDecl)
-			}
+			r.SyncDecl = fmt.Sprintf("List<%s>", t.SyncDecl)
+			r.AsyncDecl = fmt.Sprintf("List<%s>", t.AsyncDecl)
 		}
 		elementStr := fmt.Sprintf("element: %s", t.typeExpr)
 		maybeElementCountStr := fmt.Sprintf("maybeElementCount: %s", formatInt(val.ElementCount))
@@ -457,6 +473,8 @@ func (c *compiler) compileType(val types.Type) Type {
 			r.Decl, elementStr, maybeElementCountStr, nullableStr)
 	case types.StringType:
 		r.Decl = "String"
+		r.SyncDecl = r.Decl
+		r.AsyncDecl = r.Decl
 		r.typeExpr = fmt.Sprintf("const $fidl.StringType(maybeElementCount: %s, nullable: %s)",
 			formatInt(val.ElementCount), formatBool(val.Nullable))
 	case types.HandleType:
@@ -470,6 +488,8 @@ func (c *compiler) compileType(val types.Type) Type {
 		default:
 			r.Decl = "Handle"
 		}
+		r.SyncDecl = r.Decl
+		r.AsyncDecl = r.Decl
 		r.typeExpr = fmt.Sprintf("const $fidl.%sType(nullable: %s)",
 			r.Decl, formatBool(val.Nullable))
 	case types.RequestType:
@@ -481,10 +501,13 @@ func (c *compiler) compileType(val types.Type) Type {
 		} else {
 			r.SyncDecl = fmt.Sprintf("$fidl.InterfaceRequest<$sync.%s>", t)
 		}
+		r.AsyncDecl = r.Decl
 		r.typeExpr = fmt.Sprintf("const $fidl.InterfaceRequestType<%s>(nullable: %s)",
 			t, formatBool(val.Nullable))
 	case types.PrimitiveType:
 		r.Decl = c.compilePrimitiveSubtype(val.PrimitiveSubtype)
+		r.SyncDecl = r.Decl
+		r.AsyncDecl = r.Decl
 		r.typedDataDecl = typedDataDecl[val.PrimitiveSubtype]
 		r.typeExpr = typeExprForPrimitiveSubtype(val.PrimitiveSubtype)
 	case types.IdentifierType:
@@ -510,6 +533,7 @@ func (c *compiler) compileType(val types.Type) Type {
 			} else {
 				r.SyncDecl = fmt.Sprintf("$sync.%s", t)
 			}
+			r.AsyncDecl = r.SyncDecl
 			r.typeExpr = c.typeSymbolForCompoundIdentifier(types.ParseCompoundIdentifier(val.Identifier))
 			if val.Nullable {
 				r.typeExpr = fmt.Sprintf("const $fidl.PointerType<%s>(element: %s)",
@@ -523,6 +547,7 @@ func (c *compiler) compileType(val types.Type) Type {
 			} else {
 				r.SyncDecl = fmt.Sprintf("$fidl.InterfaceHandle<$sync.%s>", t)
 			}
+			r.AsyncDecl = r.Decl
 			r.typeExpr = fmt.Sprintf("const $fidl.InterfaceHandleType<%s>(nullable: %s)",
 				t, formatBool(val.Nullable))
 		default:
@@ -530,6 +555,12 @@ func (c *compiler) compileType(val types.Type) Type {
 		}
 	default:
 		log.Fatal("Unknown type kind: ", val.Kind)
+	}
+	if r.AsyncDecl == "" {
+		log.Fatalf("No AsyncDecl for %s", r.Decl)
+	}
+	if r.SyncDecl == "" {
+		log.Fatalf("No SyncDecl for %s", r.Decl)
 	}
 	return r
 }
@@ -730,6 +761,7 @@ func (c *compiler) compileUnion(val types.Union) Union {
 	return r
 }
 
+// Compile the language independent type definition into the Dart-specific representation.
 func Compile(r types.Root) Root {
 	root := Root{}
 	c := compiler{&r.Decls, types.ParseLibraryName(r.Name)}
@@ -763,9 +795,9 @@ func Compile(r types.Root) Root {
 		}
 		library := types.ParseLibraryName(l.Name)
 		root.Imports = append(root.Imports, Import{
-			Url:       fmt.Sprintf("package:fidl_%s/fidl.dart", formatLibraryName(library)),
+			URL:       fmt.Sprintf("package:fidl_%s/fidl.dart", formatLibraryName(library)),
 			LocalName: libraryPrefix(library),
-			AsyncUrl:  fmt.Sprintf("package:fidl_%s/fidl_async.dart", formatLibraryName(library)),
+			AsyncURL:  fmt.Sprintf("package:fidl_%s/fidl_async.dart", formatLibraryName(library)),
 		})
 	}
 

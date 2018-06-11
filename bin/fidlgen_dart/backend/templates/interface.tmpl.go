@@ -4,6 +4,7 @@
 
 package templates
 
+// Interface is the template for interface declarations.
 const Interface = `
 {{- define "Params" -}}
   {{- range $index, $param := . -}}
@@ -253,6 +254,23 @@ class {{ .BindingName }} extends $fidl.Binding<{{ .Name }}> {
 
 {{ end }}
 
+
+{{/* Generate a parameter list (eg "int foo, String baz") with AsyncDecl types */}}
+{{- define "AsyncParams" -}}
+  {{- range $index, $param := . -}}
+    {{- if $index }}, {{ end -}}{{ $param.Type.AsyncDecl }} {{ $param.Name }}
+  {{- end -}}
+{{ end }}
+
+
+{{/* Generate a parameter list (eg "int foo, String baz") with SyncDecl types */}}
+{{- define "SyncParams" -}}
+  {{- range $index, $param := . -}}
+    {{- if $index }}, {{ end -}}{{ $param.Type.SyncDecl }} {{ $param.Name }}
+  {{- end -}}
+{{ end }}
+
+
 {{- define "AsyncReturn" -}}
 {{- if .HasResponse -}}
 Future<{{ .AsyncResponseType }}>
@@ -333,7 +351,7 @@ Future<Null>
   {{- if .AsyncResponseClass }}
 class {{ .AsyncResponseClass }} {
     {{- range .Response }}
-  final {{ .Type.Decl }} {{ .Name }};
+  final {{ .Type.SyncDecl }} {{ .Name }};
     {{- end }}
   {{ .AsyncResponseClass }}(
     {{- range .Response }}
@@ -349,7 +367,7 @@ abstract class {{ .Name }} {
 
 {{- range .Methods }}
   {{- if .HasRequest }}
-  {{ template "AsyncReturn" . }} {{ .Name }}({{ template "Params" .Request }});
+  {{ template "AsyncReturn" . }} {{ .Name }}({{ template "AsyncParams" .Request }});
   {{- else }}
   Stream<{{ .AsyncResponseType}}> get {{ .Name }};
   {{- end }}
@@ -365,7 +383,7 @@ class {{ .Name }}Proxy implements {{ .Name }} {
     _ctrl = new $fidl.ProxyControllerWrapper<{{ .Name }}, $sync.{{ .Name }}>(_syncProxy.ctrl);
     {{- range .Methods }}
       {{- if not .HasRequest }}
-        _syncProxy.{{ .Name }} = ({{ template "Params" .Response }}) =>
+        _syncProxy.{{ .Name }} = ({{ template "SyncParams" .Response }}) =>
           _{{ .Name }}EventStreamController.add(
             {{- if .AsyncResponseClass -}}
               new {{ .AsyncResponseClass }}({{ template "ForwardParams" .Response }})
@@ -398,7 +416,7 @@ class {{ .Name }}Proxy implements {{ .Name }} {
 {{- range .Methods }}
   {{- if .HasRequest }}
   @override
-  {{ template "AsyncReturn" . }} {{ .Name }}({{ template "Params" .Request }}) {
+  {{ template "AsyncReturn" . }} {{ .Name }}({{ template "AsyncParams" .Request }}) {
     {{- if .HasResponse }}
     final _completer = new Completer<{{ .AsyncResponseType }}>();
     _completers.add(_completer);

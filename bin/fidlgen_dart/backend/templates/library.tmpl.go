@@ -4,6 +4,7 @@
 
 package templates
 
+// Library is the top-level template.
 const Library = `
 {{- define "GenerateLibraryFile" -}}
 // Copyright 2018 The Fuchsia Authors. All rights reserved.
@@ -22,7 +23,7 @@ import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
 {{ range .Imports -}}
-import '{{ .Url }}' as {{ .LocalName }};
+import '{{ .URL }}' as {{ .LocalName }};
 {{ end -}}
 
 // ignore_for_file: always_specify_types
@@ -64,10 +65,6 @@ import '{{ .Url }}' as {{ .LocalName }};
 
 {{- define "ExportNames" -}}
 {{ if . }}
-import 'fidl.dart' show {{ range $index, $item := . }}
-{{- if $index }}, {{ end -}}
-{{ .Name -}}
-{{ end -}};
 export 'fidl.dart' show {{ range $index, $item := . }}
 {{- if $index }}, {{ end -}}
 {{ .Name -}}
@@ -92,8 +89,8 @@ import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
 {{ range .Imports -}}
-import '{{ .Url }}' as sync${{ .LocalName }};
-import '{{ .AsyncUrl }}' as {{ .LocalName }};
+import '{{ .URL }}' as sync${{ .LocalName }};
+import '{{ .AsyncURL }}' as {{ .LocalName }};
 {{ end -}}
 
 import 'fidl.dart' as $sync;
@@ -119,7 +116,6 @@ import 'fidl.dart' as $sync;
 // ignore_for_file: prefer_equal_for_default_values
 // ignore_for_file: avoid_catches_without_on_clauses
 // ignore_for_file: unused_shown_name
-// ignore_for_file: directives_ordering
 // ignore_for_file: unnecessary_lambdas
 
 {{ template "ExportNames" .Consts -}}

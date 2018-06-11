@@ -4,6 +4,7 @@
 
 package templates
 
+// Union is the template for union declarations.
 const Union = `
 {{- define "UnionDeclaration" -}}
 enum {{ .TagName }} {
