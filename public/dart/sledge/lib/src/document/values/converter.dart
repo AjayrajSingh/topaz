@@ -160,9 +160,25 @@ class BoolConverter implements Converter<bool> {
   }
 }
 
+/// Converter for Uint8List.
+class Uint8ListConverter implements Converter<Uint8List> {
+  /// Constructor.
+  const Uint8ListConverter();
+
+  @override
+  Uint8List get defaultValue => new Uint8List(0);
+
+  @override
+  Uint8List deserialize(final Uint8List x) => x;
+
+  @override
+  Uint8List serialize(final Uint8List x) => x;
+}
+
 const _converters = const <Type, Converter>{
   int: const IntConverter(),
   String: const StringConverter(),
   double: const DoubleConverter(),
-  bool: const BoolConverter()
+  bool: const BoolConverter(),
+  Uint8List: const Uint8ListConverter()
 };

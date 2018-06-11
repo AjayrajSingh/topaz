@@ -4,6 +4,7 @@
 
 // ignore_for_file: implementation_imports
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:sledge/src/document/change.dart';
 import 'package:sledge/src/document/values/converter.dart';
@@ -54,6 +55,15 @@ void main() {
     expect(cnt.value, equals('aba'));
     cnt.value = 'foo';
     expect(cnt.value, equals('foo'));
+  });
+
+  test('Uint8List', () {
+    var cnt = new TestLastOneWinsValue<Uint8List>();
+    expect(cnt.value, equals(new Uint8List(0)));
+    cnt.value = new Uint8List.fromList([1, 2, 3]);
+    expect(cnt.value, equals(new Uint8List.fromList([1, 2, 3])));
+    cnt.value = new Uint8List.fromList([2, 5, 3]);
+    expect(cnt.value, equals(new Uint8List.fromList([2, 5, 3])));
   });
 
   Converter<int> intConverter = new Converter<int>();

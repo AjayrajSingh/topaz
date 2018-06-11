@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:typed_data';
+
 import '../../document/base_value.dart';
 import '../../document/values/last_one_wins_value.dart';
 import '../base_type.dart';
@@ -46,14 +48,27 @@ class Double implements BaseType {
 }
 
 /// The Sledge type to store strings with LWW merging strategy.
-class LastOneWinString implements BaseType {
+class LastOneWinsString implements BaseType {
   @override
   String jsonValue() {
-    return '"LastOneWinString"';
+    return '"LastOneWinsString"';
   }
 
   @override
   BaseValue newValue() {
     return new LastOneWinsValue<String>();
+  }
+}
+
+/// The Sledge type to store byte data with LWW merging strategy.
+class LastOneWinsUint8List implements BaseType {
+  @override
+  String jsonValue() {
+    return '"LastOntWinsUint8List"';
+  }
+
+  @override
+  BaseValue newValue() {
+    return new LastOneWinsValue<Uint8List>();
   }
 }

@@ -110,7 +110,7 @@ void main() {
       'someBool': new Boolean(),
       'someInteger': new Integer(),
       'someDouble': new Double(),
-      'someString': new LastOneWinString()
+      'someString': new LastOneWinsString()
     };
     Schema schema = new Schema(schemaDescription);
 
@@ -169,7 +169,7 @@ void main() {
   test('get and apply changes', () async {
     // Create Schema.
     Map<String, BaseType> schemaDescription = <String, BaseType>{
-      'name': new LastOneWinString(),
+      'name': new LastOneWinsString(),
       'number': new Integer(),
       'cnt': new IntCounter()
     };
