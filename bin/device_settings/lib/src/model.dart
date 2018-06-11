@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_amber/fidl.dart' as amber;
+import 'package:fidl_fuchsia_amber/fidl.dart' as amber;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/model.dart';
 
