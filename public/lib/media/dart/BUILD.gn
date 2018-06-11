@@ -9,14 +9,13 @@ dart_library("dart") {
 
   sources = [
     "audio_player_controller.dart",
-    "audio_policy.dart",
+    "audio.dart",
     "timeline.dart",
   ]
 
   source_dir = "."
 
   deps = [
-    "//garnet/public/lib/audio_policy/fidl",
     "//garnet/public/lib/media/fidl",
     "//garnet/public/lib/media/fidl:media_player",
     "//garnet/public/lib/ui/geometry/fidl",

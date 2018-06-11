@@ -18,7 +18,7 @@ import 'package:fidl_fuchsia_power/fidl.dart';
 import 'package:fidl_time_zone/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.media.dart/audio_policy.dart';
+import 'package:lib.media.dart/audio.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:lib.widgets/widgets.dart';
@@ -172,11 +172,11 @@ Widget buildArmadilloUserShell({
     ),
   );
 
-  AudioPolicy audioPolicy = new AudioPolicy(
+  Audio audio = new Audio(
     startupContext.environmentServices,
   );
   VolumeModel volumeModel = new AudioPolicyVolumeModel(
-    audioPolicy: audioPolicy,
+    audio: audio,
   )..level = 1.0;
 
   PowerManagerProxy powerManagerProxy = new PowerManagerProxy();
@@ -203,7 +203,7 @@ Widget buildArmadilloUserShell({
     onUserUpdated: contextProviderContextModel.onUserUpdated,
     contextTopics: ContextProviderContextModel.topics,
     onUserShellStopped: () {
-      audioPolicy.dispose();
+      audio.dispose();
       powerManagerProxy.ctrl.close();
       powerModel.close();
       deviceMapProxy.ctrl.close();

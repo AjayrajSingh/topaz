@@ -3,20 +3,20 @@
 // found in the LICENSE file.
 
 import 'package:armadillo/now.dart';
-import 'package:lib.media.dart/audio_policy.dart';
+import 'package:lib.media.dart/audio.dart';
 
-/// Uses an [AudioPolicy] to set and get volume.
+/// Uses an [Audio] object to set and get volume.
 class AudioPolicyVolumeModel extends VolumeModel {
   /// Used to get and set the volume.
-  final AudioPolicy audioPolicy;
+  final Audio audio;
 
   /// Ranges from 0.0 to 1.0.
   double _level = 0.0;
 
   /// Constructor.
-  AudioPolicyVolumeModel({this.audioPolicy}) {
+  AudioPolicyVolumeModel({this.audio}) {
     _setLevelFromAudioPolicy();
-    audioPolicy.updateCallback = _setLevelFromAudioPolicy;
+    audio.updateCallback = _setLevelFromAudioPolicy;
   }
 
   @override
@@ -28,13 +28,13 @@ class AudioPolicyVolumeModel extends VolumeModel {
       return;
     }
     _level = level;
-    audioPolicy.systemAudioPerceivedLevel = level;
+    audio.systemAudioPerceivedLevel = level;
     notifyListeners();
   }
 
   void _setLevelFromAudioPolicy() {
-    level = audioPolicy.systemAudioMuted
+    level = audio.systemAudioMuted
         ? 0.0
-        : audioPolicy.systemAudioPerceivedLevel;
+        : audio.systemAudioPerceivedLevel;
   }
 }

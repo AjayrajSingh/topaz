@@ -3,17 +3,16 @@
 // found in the LICENSE file.
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_audio_policy/fidl.dart' as audio_policy;
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_media/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 
-/// Type for |AudioPolicy| update callbacks.
+/// Type for |Audio| update callbacks.
 typedef UpdateCallback = void Function();
 
-/// System audio policy.
-class AudioPolicy {
+/// System audio.
+class Audio {
   static const double _minLevelGain = -60.0;
   static const double _unityGain = 0.0;
   static const double _initialGain = -12.0;
@@ -23,20 +22,19 @@ class AudioPolicy {
   static const double _minDbDiff = 0.006;
   static const double _minPerceivedDiff = 0.0001;
 
-  final audio_policy.AudioPolicyProxy _audioPolicyService =
-      new audio_policy.AudioPolicyProxy();
+  final AudioProxy _audioService = new AudioProxy();
 
   double _systemAudioGainDb = _initialGain;
   bool _systemAudioMuted = false;
   double _systemAudioPerceivedLevel = gainToLevel(_initialGain);
 
-  /// Constructs a AudioPolicy object.
-  AudioPolicy(ServiceProvider services) {
-    connectToService(services, _audioPolicyService.ctrl);
-    _audioPolicyService.ctrl.onConnectionError = _handleConnectionError;
-    _audioPolicyService.ctrl.error
+  /// Constructs an Audio object.
+  Audio(ServiceProvider services) {
+    connectToService(services, _audioService.ctrl);
+    _audioService.ctrl.onConnectionError = _handleConnectionError;
+    _audioService.ctrl.error
         .then((ProxyError error) => _handleConnectionError(error: error));
-    _handleServiceUpdates(kInitialStatus, null);
+    _audioService.systemGainMuteChanged = _handleGainMuteChanged;
   }
 
   /// Called when properties have changed significantly.
@@ -44,7 +42,7 @@ class AudioPolicy {
 
   /// Disposes this object.
   void dispose() {
-    _audioPolicyService.ctrl.close();
+    _audioService.ctrl.close();
   }
 
   /// Gets the system-wide audio gain in decibels. Gain values are in the range
@@ -68,7 +66,7 @@ class AudioPolicy {
       _systemAudioMuted = true;
     }
 
-    _audioPolicyService.setSystemAudioGain(_systemAudioGainDb);
+    _audioService.setSystemGain(_systemAudioGainDb);
   }
 
   /// Gets system-wide audio muted state. |systemAudioMuted| is always true
@@ -84,7 +82,7 @@ class AudioPolicy {
     }
 
     _systemAudioMuted = muted;
-    _audioPolicyService.setSystemAudioMute(_systemAudioMuted);
+    _audioService.setSystemMute(_systemAudioMuted);
   }
 
   /// Gets the perceived system-wide audio level in the range [0,1]. This value
@@ -98,38 +96,33 @@ class AudioPolicy {
   set systemAudioPerceivedLevel(double value) {
     _systemAudioPerceivedLevel = value.clamp(0.0, 1.0);
     _systemAudioGainDb = levelToGain(_systemAudioPerceivedLevel);
-    _audioPolicyService.setSystemAudioGain(_systemAudioGainDb);
+    _audioService.setSystemGain(_systemAudioGainDb);
   }
 
-  // Handles a status update from the audio policy service. Call with
+  // Handles a status update from the audio service. Call with
   // kInitialStatus, null to initiate status updates.
-  void _handleServiceUpdates(
-      int version, audio_policy.AudioPolicyStatus status) {
-    if (status != null) {
-      bool callUpdate = _systemAudioMuted != status.systemAudioMuted ||
-          (_systemAudioGainDb - status.systemAudioGainDb).abs() > _minDbDiff;
+  void _handleGainMuteChanged(double gainDb, bool muted) {
+    bool callUpdate = _systemAudioMuted != muted ||
+        (_systemAudioGainDb - gainDb).abs() > _minDbDiff;
 
-      _systemAudioGainDb = status.systemAudioGainDb;
-      _systemAudioMuted = status.systemAudioMuted;
+    _systemAudioGainDb = gainDb;
+    _systemAudioMuted = muted;
 
-      double newPerceivedLevel = gainToLevel(_systemAudioGainDb);
-      if ((_systemAudioPerceivedLevel - newPerceivedLevel).abs() >
-          _minPerceivedDiff) {
-        _systemAudioPerceivedLevel = newPerceivedLevel;
-        callUpdate = true;
-      }
-
-      if (callUpdate && updateCallback != null) {
-        updateCallback();
-      }
+    double newPerceivedLevel = gainToLevel(_systemAudioGainDb);
+    if ((_systemAudioPerceivedLevel - newPerceivedLevel).abs() >
+        _minPerceivedDiff) {
+      _systemAudioPerceivedLevel = newPerceivedLevel;
+      callUpdate = true;
     }
 
-    _audioPolicyService.getStatus(version, _handleServiceUpdates);
+    if (callUpdate && updateCallback != null) {
+      updateCallback();
+    }
   }
 
-  /// Handles connection error to the audio policy service.
+  /// Handles connection error to the audio service.
   void _handleConnectionError({ProxyError error}) {
-    log.severe('Unable to connect to Audio Policy service', error);
+    log.severe('Unable to connect to audio service', error);
   }
 
   /// Converts a gain in db to an audio 'level' in the range 0.0 to 1.0
