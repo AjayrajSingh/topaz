@@ -48,14 +48,14 @@ sk_sp<SkData> MakeSkDataFromBuffer(const fuchsia::mem::Buffer& data) {
                               UnmapMemory, reinterpret_cast<void*>(size));
 }
 
-fonts::FontSlant ToFontSlant(SkFontStyle::Slant slant) {
-  return (slant == SkFontStyle::kItalic_Slant) ? fonts::FontSlant::ITALIC
-                                               : fonts::FontSlant::UPRIGHT;
+fuchsia::fonts::FontSlant ToFontSlant(SkFontStyle::Slant slant) {
+  return (slant == SkFontStyle::kItalic_Slant) ? fuchsia::fonts::FontSlant::ITALIC
+                                               : fuchsia::fonts::FontSlant::UPRIGHT;
 }
 
 }  // anonymous namespace
 
-FuchsiaFontManager::FuchsiaFontManager(fonts::FontProviderSyncPtr provider)
+FuchsiaFontManager::FuchsiaFontManager(fuchsia::fonts::FontProviderSyncPtr provider)
     : font_provider_(std::move(provider)) {}
 
 FuchsiaFontManager::~FuchsiaFontManager() = default;
@@ -91,13 +91,13 @@ SkFontStyleSet* FuchsiaFontManager::onMatchFamily(
 SkTypeface* FuchsiaFontManager::onMatchFamilyStyle(
     const char family_name[],
     const SkFontStyle& style) const {
-  fonts::FontRequest request;
+  fuchsia::fonts::FontRequest request;
   request.family = family_name;
   request.weight = style.weight();
   request.width = style.width();
   request.slant = ToFontSlant(style.slant());
 
-  fonts::FontResponsePtr response;
+  fuchsia::fonts::FontResponsePtr response;
   if (!font_provider_->GetFont(std::move(request), &response)) {
     FXL_DLOG(ERROR) << "Unable to contact the font provider. Did you run "
                        "Flutter in an environment that has a font manager?";

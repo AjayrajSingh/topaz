@@ -17,7 +17,7 @@
 #ifndef TXT_FUCHSIA_FONT_MANAGER_H_
 #define TXT_FUCHSIA_FONT_MANAGER_H_
 
-#include <fonts/cpp/fidl.h>
+#include <fuchsia/fonts/cpp/fidl.h>
 #include <memory>
 #include "lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkStream.h"
@@ -28,7 +28,7 @@ namespace txt {
 
 class FuchsiaFontManager final : public SkFontMgr {
  public:
-  FuchsiaFontManager(fonts::FontProviderSyncPtr provider);
+  FuchsiaFontManager(fuchsia::fonts::FontProviderSyncPtr provider);
 
   ~FuchsiaFontManager() override;
 
@@ -81,7 +81,7 @@ class FuchsiaFontManager final : public SkFontMgr {
   FXL_DISALLOW_COPY_AND_ASSIGN(FuchsiaFontManager);
 
  private:
-  mutable fonts::FontProviderSyncPtr font_provider_;
+  mutable fuchsia::fonts::FontProviderSyncPtr font_provider_;
 };
 
 }  // namespace txt

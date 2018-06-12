@@ -11,16 +11,16 @@
 
 namespace mozart {
 
-SkiaFontLoader::SkiaFontLoader(fonts::FontProviderPtr font_provider)
+SkiaFontLoader::SkiaFontLoader(fuchsia::fonts::FontProviderPtr font_provider)
     : font_provider_(std::move(font_provider)) {}
 
 SkiaFontLoader::~SkiaFontLoader() {}
 
-void SkiaFontLoader::LoadFont(fonts::FontRequest request,
+void SkiaFontLoader::LoadFont(fuchsia::fonts::FontRequest request,
                               FontCallback callback) {
   // TODO(jeffbrown): Handle errors in case the font provider itself dies.
   font_provider_->GetFont(
-      std::move(request), [this, callback](fonts::FontResponsePtr response) {
+      std::move(request), [this, callback](fuchsia::fonts::FontResponsePtr response) {
         if (response) {
           fsl::SizedVmo vmo;
           if (!fsl::SizedVmo::FromTransport(std::move(response->data.buffer),
@@ -40,7 +40,7 @@ void SkiaFontLoader::LoadFont(fonts::FontRequest request,
 }
 
 void SkiaFontLoader::LoadDefaultFont(FontCallback callback) {
-  fonts::FontRequest request;
+  fuchsia::fonts::FontRequest request;
   request.family = "Roboto";
   LoadFont(std::move(request), callback);
 }

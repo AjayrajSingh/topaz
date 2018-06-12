@@ -128,7 +128,7 @@ void Runner::SetupGlobalFonts() {
       blink::FontCollection::ForProcess().GetFontCollection();
 
   // Connect to the system font provider.
-  fonts::FontProviderSyncPtr sync_font_provider;
+  fuchsia::fonts::FontProviderSyncPtr sync_font_provider;
   host_context_->ConnectToEnvironmentService(sync_font_provider.NewRequest());
 
   // Set the default font manager.

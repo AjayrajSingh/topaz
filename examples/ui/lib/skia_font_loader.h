@@ -7,7 +7,7 @@
 
 #include <functional>
 
-#include <fonts/cpp/fidl.h>
+#include <fuchsia/fonts/cpp/fidl.h>
 
 #include "lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkTypeface.h"
@@ -19,19 +19,19 @@ class SkiaFontLoader {
  public:
   using FontCallback = std::function<void(sk_sp<SkTypeface>)>;
 
-  SkiaFontLoader(fonts::FontProviderPtr font_provider);
+  SkiaFontLoader(fuchsia::fonts::FontProviderPtr font_provider);
   ~SkiaFontLoader();
 
   // Loads the requested font and invokes the callback when done.
   // If the request fails, the callback will receive a null typeface.
-  void LoadFont(fonts::FontRequest request, FontCallback callback);
+  void LoadFont(fuchsia::fonts::FontRequest request, FontCallback callback);
 
   // Loads the default font and invokes the callback when done.
   // If the request fails, the callback will receive a null typeface.
   void LoadDefaultFont(FontCallback callback);
 
  private:
-  fonts::FontProviderPtr font_provider_;
+  fuchsia::fonts::FontProviderPtr font_provider_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(SkiaFontLoader);
 };
