@@ -10,7 +10,7 @@ import (
 
 func main() {
 	flags := cmdline.BaseFlags()
-	dartfmt := flag.String("dartfmt", "", "path to the dartfmt tool")
+	_ = flag.String("dartfmt", "", "path to the dartfmt tool")
 	flag.Parse()
 	if !flag.Parsed() || !flags.Valid() {
 		flag.PrintDefaults()
@@ -19,7 +19,7 @@ func main() {
 	fidl := flags.FidlTypes()
 	config := flags.Config()
 
-	err := backend.GenerateFidl(fidl, &config, *dartfmt)
+	err := backend.GenerateFidl(fidl, &config, "")
 	if err != nil {
 		log.Fatalf("Error running generator: %v", err)
 	}
