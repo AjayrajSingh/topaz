@@ -104,7 +104,7 @@ void main() {
     expect(doc.foo.someInteger.value, equals(42));
   });
 
-  test('LastWriteWin basic types.', () async {
+  test('Last One Wins basic types.', () async {
     // Create schemas.
     Map<String, BaseType> schemaDescription = <String, BaseType>{
       'someBool': new Boolean(),

@@ -9,12 +9,12 @@ import '../change.dart';
 import 'converted_change.dart';
 import 'converter.dart';
 
-class _LastOneWinValue<T> {
+class _LastOneWinsValue<T> {
   T _value, _transaction;
   final StreamController<T> _changeController =
       new StreamController<T>.broadcast();
 
-  _LastOneWinValue(this._value);
+  _LastOneWinsValue(this._value);
 
   Stream<T> get onChange => _changeController.stream;
 
@@ -48,15 +48,15 @@ class _LastOneWinValue<T> {
   }
 }
 
-/// Sledge Last-Write-Win value.
-class LastOneWinValue<T> extends BaseValue<T> {
-  final _LastOneWinValue _value;
+/// Sledge Last One Wins value.
+class LastOneWinsValue<T> extends BaseValue<T> {
+  final _LastOneWinsValue _value;
   final DataConverter<int, T> _converter;
 
-  /// Constructor
-  LastOneWinValue([Change init])
+  /// Default constructor.
+  LastOneWinsValue([Change init])
       : _converter = new DataConverter<int, T>(),
-        _value = new _LastOneWinValue<T>(new Converter<T>().defaultValue) {
+        _value = new _LastOneWinsValue<T>(new Converter<T>().defaultValue) {
     applyChanges(init ?? new Change());
   }
 

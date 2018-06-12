@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import '../../document/base_value.dart';
-import '../../document/values/lww_value.dart';
+import '../../document/values/last_one_wins_value.dart';
 import '../base_type.dart';
 
 /// The Sledge type to store booleans.
@@ -15,7 +15,7 @@ class Boolean implements BaseType {
 
   @override
   BaseValue newValue() {
-    return new LastOneWinValue<bool>();
+    return new LastOneWinsValue<bool>();
   }
 }
 
@@ -28,7 +28,7 @@ class Integer implements BaseType {
 
   @override
   BaseValue newValue() {
-    return new LastOneWinValue<int>();
+    return new LastOneWinsValue<int>();
   }
 }
 
@@ -41,7 +41,7 @@ class Double implements BaseType {
 
   @override
   BaseValue newValue() {
-    return new LastOneWinValue<double>();
+    return new LastOneWinsValue<double>();
   }
 }
 
@@ -54,6 +54,6 @@ class LastOneWinString implements BaseType {
 
   @override
   BaseValue newValue() {
-    return new LastOneWinValue<String>();
+    return new LastOneWinsValue<String>();
   }
 }

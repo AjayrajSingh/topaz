@@ -16,7 +16,7 @@ import 'key_value_storage.dart';
 /// total value of the counter is the sum, over all instances, of the difference
 /// between the positive and negative variable.
 /// Each variable pair may be modified by only one instance, so the
-/// last-write-wins merge strategy works.
+/// Last One Wins merge strategy works.
 class _PosNegCounterValue<T extends num> {
   final KeyValueStorage<int, T> _storage;
   final int _currentInstanceId;
