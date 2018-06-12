@@ -7,11 +7,14 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 
+// TODO: consider short function names and importing with prefix.
+
 /// Concatenate two byte arrays.
 Uint8List concatUint8Lists(Uint8List a, Uint8List b) {
   return new Uint8List(a.length + b.length)..setAll(0, a)..setAll(a.length, b);
 }
 
+// TODO: consider using Iterable instead of List.
 /// Concatenate list of byte arrays.
 Uint8List concatListOfUint8Lists(List<Uint8List> list) {
   int sumLength = 0;

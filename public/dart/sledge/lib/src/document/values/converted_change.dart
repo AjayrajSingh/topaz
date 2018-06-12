@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:collection';
+
 // TODO: consider making Changes immutable.
 
 /// Interface to get changes applied to MapValue.
@@ -30,6 +32,21 @@ class SetChange<E> {
   SetChange(ConvertedChange<E, E> change)
       : insertedElements = change.changedEntries.keys.toSet(),
         deletedElements = new Set<E>.from(change.deletedKeys);
+}
+
+/// Interface to get changes applied to OrderedList.
+class OrderedListChange<E> {
+  /// Sorted list of positions of deleted elements.
+  /// Positions are given in initial OrderedList.
+  List<int> deletedPositions;
+
+  /// Sorted Map of positions and values of inserted elements.
+  /// Positions are given in the OrderedList obtained after
+  /// all specified operations (both insertions and deletions).
+  SplayTreeMap<int, E> insertedElements;
+
+  /// Constructor.
+  OrderedListChange(this.deletedPositions, this.insertedElements);
 }
 
 /// Change in inner represention of Sledge data types.

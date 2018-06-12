@@ -13,11 +13,13 @@ import '../document/value_node.dart';
 import '../sledge_connection_id.dart';
 import 'base_type.dart';
 import 'types/map_type.dart';
+import 'types/ordered_list_type.dart';
 import 'types/pos_neg_counter_type.dart';
 import 'types/set_type.dart';
 import 'types/trivial_types.dart';
 
 export 'types/map_type.dart';
+export 'types/ordered_list_type.dart';
 export 'types/pos_neg_counter_type.dart';
 export 'types/set_type.dart';
 export 'types/trivial_types.dart';
@@ -48,6 +50,7 @@ class Schema implements BaseType {
     new DoubleCounter(),
     new BytelistMap(),
     new BytelistSet(),
+    new OrderedList()
   ]);
 
   /// Default constructor. Note that the values of the map can be other

@@ -192,6 +192,38 @@ void main() {
     expect(doc.cnt_d.value, equals(-2.08));
   });
 
+  // TODO: add tests for BytelistMap and BytelistSet.
+
+  test('Integration of OrderedList with Sledge', () async {
+    Map<String, BaseType> schemaDescription = <String, BaseType>{
+      'list': new OrderedList()
+    };
+    Schema schema = new Schema(schemaDescription);
+
+    // Create a new Sledge document.
+    Sledge sledge = newSledgeForTesting();
+    dynamic doc;
+    await sledge.runInTransaction(() async {
+      doc = await sledge.getDocument(new DocumentId(schema));
+    });
+
+    // Apply modifications to OrderedList.
+    expect(doc.list.toList(), equals([]));
+    await sledge.runInTransaction(() {
+      doc.list.insert(0, new Uint8List.fromList([1]));
+    });
+    expect(doc.list.toList().length, equals(1));
+    expect(doc.list[0].toList(), equals([1]));
+    await sledge.runInTransaction(() {
+      doc.list.insert(1, new Uint8List.fromList([3]));
+      doc.list.insert(1, new Uint8List.fromList([2]));
+    });
+    expect(doc.list.toList().length, equals(3));
+    expect(doc.list[0].toList(), equals([1]));
+    expect(doc.list[1].toList(), equals([2]));
+    expect(doc.list[2].toList(), equals([3]));
+  });
+
   test('get and apply changes', () async {
     // Create Schema.
     Map<String, BaseType> schemaDescription = <String, BaseType>{

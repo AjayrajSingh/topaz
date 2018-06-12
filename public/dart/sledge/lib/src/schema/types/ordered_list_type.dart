@@ -12,7 +12,7 @@ import '../base_type.dart';
 /// The Sledge type for Ordered Set of [Uint8List].
 class OrderedList implements BaseType {
   @override
-  String jsonValue() => '"OrderedList"';
+  String toJson() => 'OrderedList';
 
   @override
   BaseValue newValue(ConnectionId connectionId) =>

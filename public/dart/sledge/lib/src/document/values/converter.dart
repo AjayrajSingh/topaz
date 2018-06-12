@@ -37,9 +37,9 @@ class DataConverter<K, V> {
   final Compressor _compressor = new Compressor();
 
   /// Constructor.
-  DataConverter()
-      : _keyConverter = new Converter<K>(),
-        _valueConverter = new Converter<V>();
+  DataConverter({Converter<K> keyConverter, Converter<V> valueConverter})
+      : _keyConverter = keyConverter ?? new Converter<K>(),
+        _valueConverter = valueConverter ?? new Converter<V>();
 
   /// Converts from List<KeyValue> to Map<K, V>.
   ConvertedChange<K, V> deserialize(final Change _input) {
