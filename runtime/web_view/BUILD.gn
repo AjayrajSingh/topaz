@@ -141,6 +141,10 @@ package("web_view") {
               "//garnet/bin/fonts/third_party/roboto/Roboto-Regular.ttf")
       dest = "webkit/Roboto-Regular.ttf"
     },
+    {
+      path = rebase_path("//third_party/icu/common/icudtl.dat")
+      dest = "icudtl.dat"
+    },
   ]
 
   if (experimental_web_entity_extraction) {

@@ -200,6 +200,10 @@ package("flutter_aot_runner") {
       path = rebase_path(observatory_archive_file)
       dest = "observatory.tar"
     },
+    {
+      path = rebase_path("//third_party/icu/common/icudtl.dat")
+      dest = "icudtl.dat"
+    },
   ]
 
   meta = [
@@ -216,6 +220,13 @@ package("flutter_aot_product_runner") {
   ]
 
   binary = "flutter_aot_product_runner"
+
+  resources = [
+    {
+      path = rebase_path("//third_party/icu/common/icudtl.dat")
+      dest = "icudtl.dat"
+    },
+  ]
 
   meta = [
     {
@@ -253,6 +264,10 @@ package("flutter_jit_runner") {
     {
       path = rebase_path("$snapshot_gen_dir/isolate_snapshot_instructions.bin")
       dest = "isolate_core_snapshot_instructions.bin"
+    },
+    {
+      path = rebase_path("//third_party/icu/common/icudtl.dat")
+      dest = "icudtl.dat"
     },
   ]
 
@@ -299,6 +314,10 @@ package("flutter_jit_product_runner") {
     {
       path = rebase_path("$snapshot_gen_dir/isolate_snapshot_instructions_product.bin")
       dest = "isolate_core_snapshot_instructions.bin"
+    },
+    {
+      path = rebase_path("//third_party/icu/common/icudtl.dat")
+      dest = "icudtl.dat"
     },
   ]
 
