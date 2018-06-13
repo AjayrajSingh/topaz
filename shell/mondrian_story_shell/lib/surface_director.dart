@@ -39,11 +39,9 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
   ) =>
       new SurfaceForm.single(
         key: new GlobalObjectKey(ps.surface),
-        child: new ScopedModel<Surface>(
-          model: ps.surface,
-          child: new MondrianChildView(
-            interactable: depth <= 0.0,
-          ),
+        child: MondrianChildView(
+          surface: ps.surface,
+          interactable: depth <= 0.0,
         ),
         position: ps.position,
         initPosition: ps.position.shift(new Offset(offscreen.dx, offscreen.dy)),
@@ -77,11 +75,9 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           Surface surface, SurfaceForm form, FractionalOffset offscreen) =>
       new SurfaceForm.single(
         key: form.key,
-        child: new ScopedModel<Surface>(
-          model: surface,
-          child: const MondrianChildView(
-            interactable: false,
-          ),
+        child: MondrianChildView(
+          surface: surface,
+          interactable: false,
         ),
         position: form.position.shift(new Offset(offscreen.dx, offscreen.dy)),
         initPosition: form.initPosition,
@@ -96,47 +92,33 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
       );
 
   @override
-  Widget build(BuildContext context) => new LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          if (constraints.biggest.isInfinite || constraints.biggest.isEmpty) {
-            return new Container();
-          }
-          return new SizedBox(
-            width: constraints.maxWidth,
-            height: constraints.maxHeight,
-            child: new ScopedModelDescendant<InsetManager>(
+  Widget build(BuildContext context) => ScopedModelDescendant<InsetManager>(
+        builder: (
+          BuildContext context,
+          Widget child,
+          InsetManager insetManager,
+        ) =>
+            ScopedModelDescendant<LayoutModel>(
               builder: (
                 BuildContext context,
                 Widget child,
-                InsetManager insetManager,
-              ) {
-                return new ScopedModelDescendant<LayoutModel>(
-                  builder: (
-                    BuildContext context,
-                    Widget child,
-                    LayoutModel layoutModel,
-                  ) {
-                    return new ScopedModelDescendant<SurfaceGraph>(
-                      builder: (
-                        BuildContext context,
-                        Widget child,
-                        SurfaceGraph graph,
-                      ) {
-                        return _buildStage(
+                LayoutModel layoutModel,
+              ) =>
+                  ScopedModelDescendant<SurfaceGraph>(
+                    builder: (
+                      BuildContext context,
+                      Widget child,
+                      SurfaceGraph graph,
+                    ) =>
+                        _buildStage(
                           context,
                           FractionalOffset.topRight,
                           insetManager,
                           layoutModel,
                           graph,
-                        );
-                      },
-                    );
-                  },
-                );
-              },
+                        ),
+                  ),
             ),
-          );
-        },
       );
 
   Widget _buildStage(

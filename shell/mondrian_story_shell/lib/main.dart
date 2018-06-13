@@ -222,30 +222,32 @@ class MondrianState extends State<Mondrian> {
   @override
   Widget build(BuildContext context) {
     _traceFrame();
-    return new Stack(
-      children: <Widget>[
-        new ScopedModel<SurfaceGraph>(
-          model: _surfaceGraph,
-          child: _showOverview ? const Overview() : new SurfaceDirector(),
-        ),
-        new Positioned(
-          left: 0.0,
-          bottom: 0.0,
-          child: new GestureDetector(
-            child: new Container(
-              width: 40.0,
-              height: 40.0,
-              child: _showOverview ? const MondrianLogo() : null,
+    return ScopedModel<SurfaceGraph>(
+      model: _surfaceGraph,
+      child: Stack(
+        children: <Widget>[
+          _showOverview
+              ? Overview()
+              : Positioned.fill(child: SurfaceDirector()),
+          Positioned(
+            left: 0.0,
+            bottom: 0.0,
+            child: GestureDetector(
+              child: Container(
+                width: 40.0,
+                height: 40.0,
+                child: _showOverview ? const MondrianLogo() : null,
+              ),
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                setState(() {
+                  _showOverview = !_showOverview;
+                });
+              },
             ),
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              setState(() {
-                _showOverview = !_showOverview;
-              });
-            },
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -263,12 +265,22 @@ void main() {
   _surfaceGraph.addListener(() {
     insetManager.onSurfacesChanged(surfaces: _surfaceGraph.size);
   });
+
+  void onWindowMetricsChanged() {
+    trace(
+      'Mondrian: onWindowMetricsChanged '
+          '${new MediaQueryData.fromWindow(window).size.width},'
+          '${new MediaQueryData.fromWindow(window).size.height}',
+    );
+  }
+
   // Note: This implementation only supports one StoryShell at a time.
   // Initialize the one Flutter application we support
   runApp(
     new Directionality(
       textDirection: TextDirection.ltr,
       child: new WindowMediaQuery(
+        onWindowMetricsChanged: onWindowMetricsChanged,
         child: new ScopedModel<LayoutModel>(
           model: layoutModel,
           child: new ScopedModel<InsetManager>(

@@ -28,29 +28,24 @@ class SurfaceFrame extends StatelessWidget {
   final double depth;
 
   @override
-  Widget build(BuildContext context) => new LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) =>
-            new AnimatedContainer(
-              duration: _scaleAnimationDuration,
-              curve: _scaleCurve,
-              transform: _scale(constraints.biggest.center(Offset.zero)),
-              child: new IgnorePointer(
-                child: new PhysicalModel(
-                  elevation: (1.0 - depth) * 125.0,
-                  color: const Color(0x00000000),
-                  child: child,
-                ),
-              ),
-            ),
+  Widget build(BuildContext context) => new AnimatedContainer(
+        duration: _scaleAnimationDuration,
+        curve: _scaleCurve,
+        alignment: FractionalOffset.center,
+        transform: _scale,
+        child: new IgnorePointer(
+          child: new PhysicalModel(
+            elevation: (1.0 - depth) * 125.0,
+            color: const Color(0x00000000),
+            child: child,
+          ),
+        ),
       );
 
-  Matrix4 _scale(Offset center) {
+  Matrix4 get _scale {
     double scale =
         _scaleMinScale + (1.0 - depth.clamp(0.0, 1.0)) * (1.0 - _scaleMinScale);
-    Matrix4 matrix = new Matrix4.identity()
-      ..translate(center.dx, center.dy)
-      ..scale(scale, scale)
-      ..translate(-center.dx, -center.dy);
+    Matrix4 matrix = new Matrix4.identity()..scale(scale, scale);
     return matrix;
   }
 }
