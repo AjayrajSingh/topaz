@@ -1,9 +1,11 @@
 {
+    "imports": [
+        "topaz/packages/examples/noodles"
+    ],
     "packages": [
         "//topaz/examples/ui/async_hello_mod",
         "//topaz/examples/ui/hello_mod",
         "//topaz/examples/ui/jank:package",
-        "//topaz/examples/ui/noodles:package",
         "//topaz/examples/ui/paint:package",
         "//topaz/examples/ui/sketchy_flutter"
     ]

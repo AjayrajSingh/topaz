@@ -4,6 +4,7 @@
         "topaz/packages/examples/fidl",
         "topaz/packages/examples/misc",
         "topaz/packages/examples/mondrian",
+        "topaz/packages/examples/noodles",
         "topaz/packages/examples/screen_test",
         "topaz/packages/examples/simple_flutter",
         "topaz/packages/examples/spinning_cube",
