@@ -252,21 +252,21 @@ class ChildViewConnection {
   }
 
   void _setChildProperties(
-      double width,
-      double height,
-      double devicePixelRatio,
-      double insetTop,
-      double insetRight,
-      double insetBottom,
-      double insetLeft) {
+    double width,
+    double height,
+    double insetTop,
+    double insetRight,
+    double insetBottom,
+    double insetLeft,
+  ) {
     assert(_attached);
     assert(_attachments == 1);
     assert(_viewKey != null);
     if (_viewContainer == null) {
       return;
     }
-    ViewProperties viewProperties = _createViewProperties(width, height,
-        insetTop, insetRight, insetBottom, insetLeft);
+    ViewProperties viewProperties = _createViewProperties(
+        width, height, insetTop, insetRight, insetBottom, insetLeft);
     if (viewProperties == null) {
       return;
     }
@@ -276,16 +276,11 @@ class ChildViewConnection {
 
 class _RenderChildView extends RenderBox {
   /// Creates a child view render object.
-  ///
-  /// The [scale] argument must not be null.
   _RenderChildView({
-    @required double scale,
     ChildViewConnection connection,
     bool hitTestable = true,
   })  : _connection = connection,
-        _scale = scale,
         _hitTestable = hitTestable,
-        assert(scale != null),
         assert(hitTestable != null);
 
   /// The child to display.
@@ -309,20 +304,6 @@ class _RenderChildView extends RenderBox {
     if (_connection == null) {
       markNeedsPaint();
     } else {
-      markNeedsLayout();
-    }
-  }
-
-  /// The device pixel ratio to provide the child.
-  double get scale => _scale;
-  double _scale;
-  set scale(double value) {
-    assert(value != null);
-    if (value == _scale) {
-      return;
-    }
-    _scale = value;
-    if (_connection != null) {
       markNeedsLayout();
     }
   }
@@ -375,8 +356,7 @@ class _RenderChildView extends RenderBox {
     if (_connection != null) {
       _width = size.width;
       _height = size.height;
-      _connection._setChildProperties(
-          _width, _height, scale, 0.0, 0.0, 0.0, 0.0);
+      _connection._setChildProperties(_width, _height, 0.0, 0.0, 0.0, 0.0);
       assert(() {
         if (_viewContainer == null) {
           _debugErrorMessage ??= new TextPainter(
@@ -418,14 +398,12 @@ class _RenderChildView extends RenderBox {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
-    description
-      ..add(
-        new DiagnosticsProperty<ChildViewConnection>(
-          'connection',
-          connection,
-        ),
-      )
-      ..add(new DoubleProperty('scale', scale));
+    description.add(
+      new DiagnosticsProperty<ChildViewConnection>(
+        'connection',
+        connection,
+      ),
+    );
   }
 }
 
@@ -504,7 +482,6 @@ class ChildView extends LeafRenderObjectWidget {
   _RenderChildView createRenderObject(BuildContext context) {
     return new _RenderChildView(
       connection: connection,
-      scale: MediaQuery.of(context).devicePixelRatio,
       hitTestable: hitTestable,
     );
   }
@@ -513,7 +490,6 @@ class ChildView extends LeafRenderObjectWidget {
   void updateRenderObject(BuildContext context, _RenderChildView renderObject) {
     renderObject
       ..connection = connection
-      ..scale = MediaQuery.of(context).devicePixelRatio
       ..hitTestable = hitTestable;
   }
 }
