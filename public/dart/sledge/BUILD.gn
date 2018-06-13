@@ -17,6 +17,7 @@ dart_library("sledge") {
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/crypto",
     "//topaz/public/lib/module/dart",
+    "//topaz/public/lib/ledger/dart",
   ]
 }
 

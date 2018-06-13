@@ -8,12 +8,37 @@ import 'package:sledge/sledge.dart';
 
 /// Handles the lifecycle of the Todo module.
 class TodoModuleModel extends ModuleModel {
-  // ignore: unused_field
-  Sledge _sledge;
+  // TODO: Move into separate target.
+  void _runSledgeTest(final ModuleContext moduleContext) async {
+    Sledge sledge = new Sledge(moduleContext, new SledgePageId('my page'));
+
+    Map<String, BaseType> schemaDescription = <String, BaseType>{
+      'someBool': new Boolean(),
+      'someInteger': new Integer()
+    };
+    Schema schema = new Schema(schemaDescription);
+    DocumentId id = new DocumentId(schema);
+
+    await sledge.runInTransaction(() async {
+      dynamic doc = await sledge.getDocument(id);
+      assert(doc.someBool.value == false);
+      assert(doc.someInteger.value == 0);
+      doc.someBool.value = true;
+      doc.someInteger.value = 42;
+      assert(doc.someBool.value == true);
+      assert(doc.someInteger.value == 42);
+    });
+    await sledge.runInTransaction(() async {
+      dynamic doc = await sledge.getDocument(id);
+      assert(doc.someBool.value == true);
+      assert(doc.someInteger.value == 42);
+      print('it works!');
+    });
+  }
 
   @override
   void onReady(final ModuleContext moduleContext, final Link link) {
-    _sledge = new Sledge(moduleContext, new SledgePageId('my page'));
+    _runSledgeTest(moduleContext);
     super.onReady(moduleContext, link);
   }
 }

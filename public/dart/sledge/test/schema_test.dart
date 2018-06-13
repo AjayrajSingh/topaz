@@ -10,7 +10,7 @@ import 'package:sledge/sledge.dart';
 import 'package:sledge/src/document/change.dart';
 import 'package:test/test.dart';
 
-import 'fakes/fake_ledger_page.dart';
+import 'helpers.dart';
 
 void main() {
   test('Create schemas and serialize them to json', () {
@@ -90,7 +90,7 @@ void main() {
     Schema schema2 = new Schema(schemaDescription2);
 
     // Create a new Sledge document.
-    Sledge sledge = new Sledge.testing(new FakeLedgerPage());
+    Sledge sledge = newSledgeForTesting();
     dynamic doc = sledge.newDocument(new DocumentId(schema2));
 
     // Read and write properties of a Sledge document.
@@ -115,7 +115,7 @@ void main() {
     Schema schema = new Schema(schemaDescription);
 
     // Create a new Sledge document.
-    Sledge sledge = new Sledge.testing(new FakeLedgerPage());
+    Sledge sledge = newSledgeForTesting();
     dynamic doc = sledge.newDocument(new DocumentId(schema));
 
     // Read and write properties of a Sledge document.
@@ -144,7 +144,7 @@ void main() {
     Schema schema = new Schema(schemaDescription);
 
     // Create a new Sledge document.
-    Sledge sledge = new Sledge.testing(new FakeLedgerPage());
+    Sledge sledge = newSledgeForTesting();
     dynamic doc = sledge.newDocument(new DocumentId(schema));
 
     // Modify and get value of PosNegCounter.
@@ -176,8 +176,7 @@ void main() {
     Schema schema = new Schema(schemaDescription);
 
     // Create two Sledge documents
-    Sledge sledgeA = new Sledge.testing(new FakeLedgerPage()),
-        sledgeB = new Sledge.testing(new FakeLedgerPage());
+    Sledge sledgeA = newSledgeForTesting(), sledgeB = newSledgeForTesting();
     dynamic docA = sledgeA.newDocument(new DocumentId(schema)),
         docB = sledgeB.newDocument(new DocumentId(schema));
 

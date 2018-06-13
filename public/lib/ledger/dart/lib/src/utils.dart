@@ -45,15 +45,15 @@ Future<List<Entry>> getFullEntries(
   List<int> keyPrefix,
 }) async {
   List<Entry> entries = <Entry>[];
-  await _getFullEntriesRecursively(snapshot, entries);
+  await _getFullEntriesRecursively(snapshot, entries, keyPrefix);
   return entries;
 }
 
 /// Helper method for the [getFullEntries] method.
 Future<Null> _getFullEntriesRecursively(
   PageSnapshot snapshot,
-  List<Entry> result, {
-  List<int> keyPrefix,
+  List<Entry> result,
+  List<int> keyPrefix, {
   Token token,
 }) async {
   Completer<Status> statusCompleter = new Completer<Status>();
@@ -80,7 +80,7 @@ Future<Null> _getFullEntriesRecursively(
     await _getFullEntriesRecursively(
       snapshot,
       result,
-      keyPrefix: keyPrefix,
+      keyPrefix,
       token: nextToken,
     );
   }

@@ -46,6 +46,9 @@ class Document implements ValueObserver {
     });
   }
 
+  /// Returns this document's documentId.
+  DocumentId get documentId => _documentId;
+
   /// Get a changes for all fields of doc.
   static Change put(final Document doc) {
     return doc._put();

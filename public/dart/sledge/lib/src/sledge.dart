@@ -9,6 +9,7 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 
 import 'document/document.dart';
 import 'document/document_id.dart';
+import 'ledger_helpers.dart';
 import 'sledge_page_id.dart';
 import 'transaction.dart';
 
@@ -19,6 +20,9 @@ class Sledge {
   final ledger.LedgerProxy _ledgerProxy = new ledger.LedgerProxy();
   final ledger.PageProxy _pageProxy;
 
+  // The factories used for fake object injection.
+  final LedgerPageSnapshotFactory _pageSnapshotFactory;
+
   // Contains the status of the initialization.
   // ignore: unused_field
   Future<bool> _initializationSucceeded;
@@ -27,7 +31,8 @@ class Sledge {
 
   /// Default constructor.
   Sledge(final ModuleContext moduleContext, [SledgePageId pageId])
-      : _pageProxy = new ledger.PageProxy() {
+      : _pageProxy = new ledger.PageProxy(),
+        _pageSnapshotFactory = new LedgerPageSnapshotFactoryImpl() {
     pageId ??= new SledgePageId();
 
     moduleContext.getComponentContext(_componentContextProxy.ctrl.request());
@@ -58,7 +63,7 @@ class Sledge {
   }
 
   /// Convenience constructor for tests.
-  Sledge.testing(this._pageProxy) {
+  Sledge.testing(this._pageProxy, this._pageSnapshotFactory) {
     _initializationSucceeded = new Future.value(true);
   }
 
@@ -70,6 +75,7 @@ class Sledge {
   }
 
   /// Returns a new document that can be stored in Sledge.
+  /// TODO: remove (replaced with |getDocument|).
   dynamic newDocument(DocumentId documentId) {
     return new Document(this, documentId);
   }
@@ -83,7 +89,8 @@ class Sledge {
     if (_currentTransaction != null) {
       throw new StateError('Transaction already started.');
     }
-    _currentTransaction = new Transaction();
+    _currentTransaction =
+        new Transaction(this, _pageSnapshotFactory.newInstance());
 
     bool initializationSucceeded = await _initializationSucceeded;
     if (!initializationSucceeded) {
@@ -96,13 +103,28 @@ class Sledge {
         await _currentTransaction.saveModifications(modifications, _pageProxy);
 
     _currentTransaction = null;
+
     return new Future.value(savingModificationsWasSuccesfull);
+  }
+
+  /// Returns the document identified with |documentId|.
+  /// If the document does not exist or an error occurs, an empty
+  /// document is returned.
+  Future<Document> getDocument(DocumentId documentId) async {
+    if (_currentTransaction == null) {
+      throw new StateError('No transaction started.');
+    }
+
+    // TODO: If the document was already created, don't create a new instance.
+    Document document = await _currentTransaction.getDocument(documentId);
+
+    return document;
   }
 
   /// Returns the current transaction.
   Transaction get transaction {
     if (_currentTransaction == null) {
-      throw new StateError('Transaction already started.');
+      throw new StateError('No transaction started.');
     }
     return _currentTransaction;
   }

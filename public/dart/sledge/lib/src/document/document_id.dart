@@ -15,6 +15,9 @@ class DocumentId {
   Uint8List _subId;
   static const int _subIdByteCount = 16;
   static const int _schemahashByteCount = 20;
+
+  /// The length of the prefix.
+  static const int prefixLength = _subIdByteCount + _schemahashByteCount;
   static final Random _random = new Random();
 
   /// Default constructor.
@@ -36,7 +39,7 @@ class DocumentId {
     return new DocumentId(schema, bytes);
   }
 
-  /// Returns the 36 bytes long prefix to be used to store in Ledger the
+  /// Returns the |prefixLength| bytes long prefix to be used to store in Ledger the
   /// document identified with this DocumentId.
   Uint8List get prefix {
     Uint8List prefix = new Uint8List(_schemahashByteCount + _subIdByteCount);

@@ -32,4 +32,10 @@ class FakeLedgerPage extends ledger.PageProxy {
   void rollback(void callback(ledger.Status status)) {
     callback(ledger.Status.ok);
   }
+
+  @override
+  void getSnapshot(Object snapshotRequest, Uint8List keyPrefix, Object watcher,
+      void callback(ledger.Status status)) {
+    callback(ledger.Status.ok);
+  }
 }
