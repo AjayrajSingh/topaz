@@ -185,7 +185,11 @@ class BaseDeviceShellModel extends DeviceShellModel
       completer.complete();
       return completer;
     }
-    await waitForInternetConnection();
+
+    // Internet is needed to log in unless the user is a guest.
+    if (accountId != null) {
+      await waitForInternetConnection();
+    }
 
     trace('logging in $accountId');
     encoder.startTimer(
