@@ -4,9 +4,10 @@
 
 import 'dart:async';
 
-import 'package:fidl_fuchsia_netstack/fidl.dart' as net;
-import 'package:fidl_fuchsia_wlan_service/fidl.dart' as wlan;
+import 'package:fidl_fuchsia_netstack/fidl_async.dart' as net;
+import 'package:fidl_fuchsia_wlan_service/fidl_async.dart' as wlan;
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.schemas.dart/com.fuchsia.status.dart';
 import 'package:lib.widgets/model.dart';
@@ -18,7 +19,7 @@ const int _kConnectionScanInterval = 3;
 /// The model for the wifi settings module.
 ///
 /// All subclasses must connect the [WlanProxy] in their constructor
-class WifiSettingsModel extends Model implements net.NotificationListener {
+class WifiSettingsModel extends Model {
   /// How often to poll the wlan for wifi information.
   final Duration _updatePeriod = const Duration(seconds: 3);
 
@@ -28,7 +29,7 @@ class WifiSettingsModel extends Model implements net.NotificationListener {
   final wlan.WlanProxy _wlanProxy = wlan.WlanProxy();
 
   final net.NetstackProxy _netstackProxy = net.NetstackProxy();
-  net.NotificationListenerBinding _netstackListenerBinding;
+  StreamSubscription _netstackStreamSubscription;
 
   /// Whether or not we've ever gotten the wifi status. Before this,
   /// we show the loading screen.
@@ -183,27 +184,29 @@ class WifiSettingsModel extends Model implements net.NotificationListener {
   }
 
   /// Disconnects from the current network.
-  void disconnect() {
-    _wlanProxy.disconnect((wlan.Error error) {
-      _selectedAccessPoint = null;
-      _loading = true;
-      _update();
-    });
+  Future<void> disconnect() async {
+    final error = await _wlanProxy.disconnect();
+    if (error != null) {
+      log.severe('failure disconnecting from network: $error');
+    }
+
+    _selectedAccessPoint = null;
+    _loading = true;
+    await _update();
   }
 
   /// Cleans up the model state.
-  void dispose() {
+  Future<void> dispose() async {
     _updateTimer.cancel();
     _scanTimer.cancel();
     _wlanProxy.ctrl.close();
-    _netstackListenerBinding?.close();
+    await _netstackStreamSubscription?.cancel();
   }
 
   /// Listens for any changes to network interfaces.
   ///
   /// Sets whether or not there exists a wlan interface
-  @override
-  void onInterfacesChanged(List<net.NetInterface> interfaces) {
+  void _onInterfacesChanged(List<net.NetInterface> interfaces) {
     _hasWlanInterface =
         interfaces.any((interface) => interface.name.contains('wlan'));
     notifyListeners();
@@ -220,30 +223,27 @@ class WifiSettingsModel extends Model implements net.NotificationListener {
     _connect(_selectedAccessPoint, password);
   }
 
-  void _connect(AccessPoint accessPoint, [String password]) {
+  Future<void> _connect(AccessPoint accessPoint, [String password]) async {
     _connecting = true;
     _scannedAps = null;
-
-    _wlanProxy.connect(
-      new wlan.ConnectConfig(
-          ssid: accessPoint.name,
-          passPhrase: password ?? '',
-          scanInterval: _kConnectionScanInterval,
-          bssid: ''),
-      (wlan.Error error) {
-        if (error.code == wlan.ErrCode.ok) {
-          _connectionResultMessage = null;
-          _failedAccessPoint = null;
-        } else {
-          _connectionResultMessage = error.description;
-          _failedAccessPoint = selectedAccessPoint;
-          _selectedAccessPoint = null;
-          _connecting = false;
-        }
-        _update();
-      },
-    );
     notifyListeners();
+
+    final error = await _wlanProxy.connect(new wlan.ConnectConfig(
+        ssid: accessPoint.name,
+        passPhrase: password ?? '',
+        scanInterval: _kConnectionScanInterval,
+        bssid: ''));
+
+    if (error.code == wlan.ErrCode.ok) {
+      _connectionResultMessage = null;
+      _failedAccessPoint = null;
+    } else {
+      _connectionResultMessage = error.description;
+      _failedAccessPoint = selectedAccessPoint;
+      _selectedAccessPoint = null;
+      _connecting = false;
+    }
+    await _update();
   }
 
   /// Remove duplicate and incompatible networks
@@ -268,12 +268,12 @@ class WifiSettingsModel extends Model implements net.NotificationListener {
   }
 
   /// Starts listening for netstack interfaces.
-  void _initInterfaceListener() {
-    _netstackListenerBinding?.close();
-    _netstackListenerBinding = new net.NotificationListenerBinding();
-    _netstackProxy
-      ..registerListener(_netstackListenerBinding.wrap(this))
-      ..getInterfaces(onInterfacesChanged);
+  Future<void> _initInterfaceListener() async {
+    await _netstackStreamSubscription?.cancel();
+    _netstackStreamSubscription =
+        _netstackProxy.interfacesChanged.listen(_onInterfacesChanged);
+
+    _onInterfacesChanged(await _netstackProxy.getInterfaces());
   }
 
   /// Broadcasts settings as a mod.
@@ -290,29 +290,29 @@ class WifiSettingsModel extends Model implements net.NotificationListener {
     } on Exception catch (_) {}
   }
 
-  void _scan() {
+  Future<void> _scan() async {
     if (!_connecting) {
-      _wlanProxy.scan(const wlan.ScanRequest(timeout: 25),
-          (wlan.ScanResult scanResult) {
-        _scannedAps = _dedupeAndRemoveIncompatible(scanResult);
-        notifyListeners();
-      });
+      _scannedAps = _dedupeAndRemoveIncompatible(
+          await _wlanProxy.scan(const wlan.ScanRequest(timeout: 25)));
+      notifyListeners();
     }
   }
 
-  void _update() {
-    _wlanProxy.status((wlan.WlanStatus status) {
-      _status = status;
-      _loading = false;
+  Future<void> _update() async {
+    final newStatus = await _wlanProxy.status();
 
-      if (status.state == wlan.State.associated ||
-          status.error.code != wlan.ErrCode.ok) {
+    if (loading || _status != newStatus) {
+      _loading = false;
+      _status = newStatus;
+
+      if (_status.state == wlan.State.associated ||
+          _status.error.code != wlan.ErrCode.ok) {
         _selectedAccessPoint = null;
         _connecting = false;
       }
 
       notifyListeners();
-    });
+    }
   }
 
   void _updateStatus() {

@@ -11,7 +11,7 @@ import 'src/wlan_manager.dart';
 
 /// Main entry point to the wifi settings module.
 void main() {
-  setupLogger();
+  setupLogger(name: 'wifi_settings');
 
   Widget app = new MaterialApp(
     home: new Container(
