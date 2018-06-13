@@ -175,15 +175,12 @@ class BaseDeviceShellModel extends DeviceShellModel
 
   /// Login with given user
   Future<void> login(String accountId) async {
-    final completer = Completer<void>();
-
     if (_serviceProviderBinding.isBound) {
       log.warning(
         'Ignoring unsupported attempt to log in'
             ' while already logged in!',
       );
-      completer.complete();
-      return completer;
+      return;
     }
 
     // Internet is needed to log in unless the user is a guest.
@@ -220,21 +217,18 @@ class BaseDeviceShellModel extends DeviceShellModel
       viewOwnerHandle,
       onAvailable: (ChildViewConnection connection) {
         trace('user shell available');
-        log.info('UserPickerDeviceShell: Child view connection available!');
+        log.info('DeviceShell: Child view connection available!');
         connection.requestFocus();
-        completer.complete();
         notifyListeners();
       },
       onUnavailable: (ChildViewConnection connection) {
-        trace('user shell unavailable');
-        log.info(
-            'UserPickerDeviceShell: Child view connection now unavailable!');
+        trace('DeviceShell: Child view connection now unavailable!');
+        log.info('DeviceShell: Child view connection now unavailable!');
         onLogout();
         notifyListeners();
       },
     );
     notifyListeners();
-    return completer.future;
   }
 
   /// |KeyboardCaptureListener|.
