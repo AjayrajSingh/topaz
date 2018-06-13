@@ -13,7 +13,6 @@ flutter_aot_app("dashboard") {
     "build_status_model.dart",
     "build_status_widget.dart",
     "buildbucket/build_bucket_service.dart",
-    "chatter.dart",
     "dashboard_app.dart",
     "dashboard_module_model.dart",
     "enums.dart",

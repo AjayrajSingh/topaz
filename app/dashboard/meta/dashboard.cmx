@@ -3,6 +3,7 @@
         "binary": "bin/app"
     },
     "sandbox": {
+        "system": [ "data" ],
         "features": [ "persistent-storage" ]
     }
 }

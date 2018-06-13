@@ -10,7 +10,6 @@ import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
 import 'package:dashboard/build_status_model.dart';
-import 'package:dashboard/info_text.dart' show toConciseString;
 
 /// Displays a build status using its ancestor [BuildStatusModel].
 class BuildStatusWidget extends StatefulWidget {
@@ -106,39 +105,6 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
               );
             }
 
-            if (model.lastFailTime != null) {
-              Duration lastFailureTime =
-                  new DateTime.now().difference(model.lastFailTime);
-              stackChildren.add(
-                new Align(
-                  alignment: FractionalOffset.topRight,
-                  child: new Container(
-                    margin: const EdgeInsets.only(top: 8.0),
-                    child: new Text(
-                      toConciseString(lastFailureTime),
-                      style: _getTimerStyle(backgroundColor),
-                    ),
-                  ),
-                ),
-              );
-            } else if (model.lastPassTime != null) {
-              Duration lastPassTime = new DateTime.now().difference(
-                model.lastPassTime,
-              );
-              stackChildren.add(
-                new Align(
-                  alignment: FractionalOffset.topRight,
-                  child: new Container(
-                    margin: const EdgeInsets.only(top: 8.0),
-                    child: new Text(
-                      toConciseString(lastPassTime),
-                      style: _getTimerStyle(backgroundColor),
-                    ),
-                  ),
-                ),
-              );
-            }
-
             stackChildren.add(
               new Align(
                 alignment: FractionalOffset.topLeft,
@@ -153,9 +119,7 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
             );
 
             return new Material(
-              elevation: 2.0,
               color: backgroundColor,
-              borderRadius: new BorderRadius.circular(8.0),
               child: new InkWell(
                 onTap: () => widget.onTap?.call(),
                 child: new Container(
@@ -216,11 +180,6 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
   TextStyle _getUnimportantStyle(Color backgroundColor) =>
       _getImportantStyle(backgroundColor).copyWith(
         fontWeight: FontWeight.w300,
-      );
-
-  TextStyle _getTimerStyle(Color backgroundColor) =>
-      _getImportantStyle(backgroundColor).copyWith(
-        fontSize: _timerFontSize,
       );
 
   TextStyle get _errorStyle => new TextStyle(

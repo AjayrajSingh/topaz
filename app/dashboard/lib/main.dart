@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io';
+
 import 'package:dashboard/build_status_model.dart';
 import 'package:dashboard/dashboard_app.dart';
 import 'package:dashboard/dashboard_module_model.dart';
@@ -42,7 +44,7 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
     ],
     const <String>[
       'peridot-arm64-release-qemu_kvm',
-      'arm64-releas',
+      'arm64-release',
       'peridot',
     ],
     const <String>[
@@ -141,8 +143,22 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   ]
 ];
 
+const String _kLastUpdate = '/system/data/build/last-update';
+
 void main() {
   setupLogger();
+
+  DateTime buildTimestamp;
+  File lastUpdateFile = new File(_kLastUpdate);
+  if (lastUpdateFile.existsSync()) {
+    String lastUpdate = lastUpdateFile.readAsStringSync();
+    log.info('Build timestamp: ${lastUpdate.trim()}');
+    try {
+      buildTimestamp = DateTime.parse(lastUpdate.trim());
+    } on FormatException {
+      log.warning('Could not parse build timestamp! ${lastUpdate.trim()}');
+    }
+  }
 
   final BuildService buildService = new BuildService();
 
@@ -177,6 +193,7 @@ void main() {
     child: new DashboardApp(
       buildService: buildService,
       buildStatusModels: buildStatusModels,
+      buildTimestamp: buildTimestamp,
       onRefresh: () {
         buildStatusModels
             .expand((List<BuildStatusModel> models) => models)

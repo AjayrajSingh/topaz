@@ -15,7 +15,6 @@ import 'package:lib.widgets/modular.dart';
 import 'package:web_view/web_view.dart' as web_view;
 
 import 'package:dashboard/build_status_model.dart';
-import 'package:dashboard/chatter.dart';
 
 /// Manages the framework FIDL services for this module.
 class DashboardModuleModel extends ModuleModel implements TickerProvider {
@@ -33,7 +32,6 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   ModuleWatcherBinding _webviewModuleWatcherBinding;
   ModuleControllerProxy _webviewModuleControllerProxy;
   Timer _deviceMapTimer;
-  Chatter _chatter;
 
   /// Constructor.
   DashboardModuleModel({this.startupContext, this.buildStatusModels}) {
@@ -45,18 +43,8 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   }
 
   @override
-  void onReady(
-    ModuleContext moduleContext,
-    Link link,
-  ) {
-    super.onReady(moduleContext, link);
-    _chatter = new Chatter(moduleContext);
-  }
-
-  @override
   void onStop() {
     closeWebView();
-    _chatter.onStop();
     _deviceMapProxy.ctrl.close();
     _deviceMapTimer?.cancel();
     _deviceMapTimer = null;
@@ -74,16 +62,6 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
 
   /// The devices for the current user.
   List<String> get devices => _devices;
-
-  /// Launches the chat module.
-  void launchChat() {
-    _chatter.launchChat();
-  }
-
-  /// Closes the chat module.
-  void closeChat() {
-    _chatter.closeChat();
-  }
 
   /// Starts loading the device map from the environment.
   void loadDeviceMap() {

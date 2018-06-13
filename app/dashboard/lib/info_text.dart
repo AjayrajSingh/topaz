@@ -21,6 +21,7 @@ const TextStyle _kImportantStyle = const TextStyle(
 );
 
 final TextStyle _kUnimportantStyle = _kImportantStyle.copyWith(
+  color: Colors.grey[900],
   fontWeight: FontWeight.w300,
 );
 
@@ -33,8 +34,10 @@ class InfoText extends StatefulWidget {
   /// A percentage representing no. timed out requests / no. total requests.
   final _GetTimeoutRate timeoutRate;
 
+  final DateTime buildTimestamp;
+
   /// Initializing constructor.
-  const InfoText({this.timeoutRate});
+  const InfoText({this.timeoutRate, this.buildTimestamp});
 
   @override
   _InfoTextState createState() => new _InfoTextState(timeoutRate: timeoutRate);
@@ -108,11 +111,15 @@ class _InfoTextState extends State<InfoText> {
           new RichText(
             textAlign: TextAlign.right,
             text: new TextSpan(
-              text: 'Timeout Rate ',
+              text: 'Built ',
               style: _kUnimportantStyle,
               children: <TextSpan>[
                 new TextSpan(
-                  text: '${timeoutRate().ceil()}%',
+                  text: widget.buildTimestamp == null
+                      ? ''
+                      : new DateFormat('MM/dd h:mm a', 'en_US').format(
+                          widget.buildTimestamp,
+                        ),
                   style: _kImportantStyle,
                 )
               ],

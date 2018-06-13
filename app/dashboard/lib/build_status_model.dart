@@ -11,7 +11,7 @@ import 'package:dashboard/service/build_info.dart';
 import 'package:dashboard/service/build_service.dart';
 
 final DateTime _kHalloween = new DateTime.utc(
-  2017,
+  2018,
   10,
   31,
   12,

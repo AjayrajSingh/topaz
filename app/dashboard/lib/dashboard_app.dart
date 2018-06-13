@@ -10,8 +10,6 @@ import 'package:dashboard/build_status_model.dart';
 import 'package:dashboard/build_status_widget.dart';
 import 'package:dashboard/info_text.dart';
 
-const double _kSpaceBetween = 4.0;
-
 const Color _kFuchsiaColor = const Color(0xFFFF0080);
 
 /// Callback to launch a module that displays the [url].
@@ -31,10 +29,13 @@ class DashboardApp extends StatelessWidget {
   /// The service used to fetch build information.
   final BuildService buildService;
 
+  final DateTime buildTimestamp;
+
   /// Constructor.
   const DashboardApp({
     this.buildService,
     this.buildStatusModels,
+    this.buildTimestamp,
     this.onRefresh,
     this.onLaunchUrl,
   });
@@ -62,16 +63,10 @@ class DashboardApp extends StatelessWidget {
       List<Widget> rowChildren = models
           .map(
             (BuildStatusModel model) => new Expanded(
-                  child: new Container(
-                    margin: const EdgeInsets.only(
-                      right: _kSpaceBetween,
-                      top: _kSpaceBetween,
-                    ),
-                    child: new ScopedModel<BuildStatusModel>(
-                      model: model,
-                      child: new BuildStatusWidget(
-                        onTap: () => onLaunchUrl?.call(model.url),
-                      ),
+                  child: new ScopedModel<BuildStatusModel>(
+                    model: model,
+                    child: new BuildStatusWidget(
+                      onTap: () => onLaunchUrl?.call(model.url),
                     ),
                   ),
                 ),
@@ -91,20 +86,22 @@ class DashboardApp extends StatelessWidget {
 
       rows.add(
         new Expanded(
-          child: new Container(
-            margin: const EdgeInsets.only(left: _kSpaceBetween),
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.max,
-              children: rowChildren,
-            ),
+          child: new Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.max,
+            children: rowChildren,
           ),
         ),
       );
     }
 
-    rows.add(new InfoText(timeoutRate: () => buildService.timeoutRate));
+    rows.add(
+      new InfoText(
+        buildTimestamp: buildTimestamp,
+        timeoutRate: () => buildService.timeoutRate,
+      ),
+    );
 
     return new MaterialApp(
       title: 'Fuchsia Build Status',
@@ -118,23 +115,6 @@ class DashboardApp extends StatelessWidget {
             child: new Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                /*
-                // TODO: Re-add this when we have a working chat app.
-                // MS-1461
-                new Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 16.0,
-                    right: 16.0,
-                  ),
-                  child: new FloatingActionButton(
-                    backgroundColor: _kFuchsiaColor,
-                    onPressed: () =>
-                        DashboardModuleModel.of(context).launchChat(),
-                    tooltip: 'Chat',
-                    child: new Icon(Icons.chat),
-                  ),
-                ),
-                */
                 new Padding(
                   padding: const EdgeInsets.only(
                     bottom: 16.0,
