@@ -168,7 +168,6 @@ bool DartComponentController::SetupFromKernel() {
     std::string path = "pkg/data/" + str.substr(start, end - start);
     start = end + 1;
 
-    // TODO(rmacnak): Keep these in memory and remove copying from the VM.
     MappedResource kernel;
     if (!MappedResource::LoadFromNamespace(namespace_, path, kernel)) {
       return false;
@@ -179,6 +178,8 @@ bool DartComponentController::SetupFromKernel() {
       Dart_ExitScope();
       return false;
     }
+
+    kernel_peices_.emplace_back(std::move(kernel));
   }
   Dart_SetRootLibrary(library);
 

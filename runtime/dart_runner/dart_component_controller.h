@@ -68,6 +68,7 @@ class DartComponentController : public fuchsia::sys::ComponentController {
   MappedResource isolate_snapshot_instructions_;
   MappedResource shared_snapshot_data_;
   MappedResource shared_snapshot_instructions_;
+  std::vector<MappedResource> kernel_peices_;
 
   Dart_Isolate isolate_;
   int32_t return_code_ = 0;
