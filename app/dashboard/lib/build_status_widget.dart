@@ -147,11 +147,11 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
 
   String _statusTextFromBuildStatus(BuildStatusModel model) {
     if (model.buildResult == BuildResultEnum.success) {
-      return '\u{1F646} passing';
+      return '\u{1F44D}';
     } else if (model.buildResult == BuildResultEnum.failure) {
-      return '\u{1F645} failing';
+      return '\u{1F44E}';
     } else {
-      return '\u{1F937} unknown';
+      return '\u{1F937}';
     }
   }
 
@@ -168,9 +168,8 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
   }
 
   double get _fontSize => _size.height / 6.0;
-  double get _timerFontSize => _size.height / 10.0;
   double get _errorFontSize => _size.height / 10.0;
-  double get _statusFontSize => _timerFontSize;
+  double get _statusFontSize => _size.height / 6.0;
   TextStyle _getImportantStyle(Color backgroundColor) => new TextStyle(
         color: _getTextColor(backgroundColor),
         fontSize: _fontSize,

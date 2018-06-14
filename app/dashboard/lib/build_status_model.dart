@@ -67,21 +67,27 @@ class BuildStatusModel extends ModuleModel {
   String get errorMessage => _errorMessage;
 
   /// The color to use as the background of a successful build.
+  /// The default success color was chosen from
+  /// http://www.visualisingdata.com/2015/11/colour-swatch-alternatives-to-green-and-red/
+  /// to allow it to be more easily seen by those with color blindness.
   Color get successColor {
     Duration difference = new DateTime.now().difference(_kHalloween).abs();
     if (difference < const Duration(days: 1)) {
       return Colors.orange[700];
     }
-    return Colors.green[300];
+    return new Color(0xFF4DAC26);
   }
 
   /// The color to use as the background of a failed build.
+  /// The default success color was chosen from
+  /// http://www.visualisingdata.com/2015/11/colour-swatch-alternatives-to-green-and-red/
+  /// to allow it to be more easily seen by those with color blindness.
   Color get failColor {
     Duration difference = new DateTime.now().difference(_kHalloween).abs();
     if (difference < const Duration(days: 1)) {
       return Colors.black;
     }
-    return Colors.red[400];
+    return new Color(0xFFD01C8B);
   }
 
   /// Starts the model refreshing periodically.
