@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert';
 import 'dart:ui' show window;
 
 import 'package:fidl/fidl.dart';
@@ -29,7 +28,6 @@ import 'surface_details.dart';
 import 'surface_director.dart';
 
 final StartupContext _context = new StartupContext.fromStartupInfo();
-final DeviceMapWatcherBinding _deviceMapWatcher = new DeviceMapWatcherBinding();
 
 /// This is used for keeping the reference around.
 // ignore: unused_element
@@ -292,18 +290,6 @@ void main() {
     ),
   );
 
-  DeviceMapProxy deviceMapProxy = new DeviceMapProxy();
-
-  connectToService(_context.environmentServices, deviceMapProxy.ctrl);
-
-  deviceMapProxy.watchDeviceMap(
-    _deviceMapWatcher.wrap(
-      new _DeviceMapWatcherImpl(
-        onProfileChanged: layoutModel.onDeviceProfileChanged,
-      ),
-    ),
-  );
-
   _storyShellImpl = new StoryShellImpl();
 
   _context.outgoingServices
@@ -318,26 +304,6 @@ void main() {
       _storyShellImpl.bindLifecycle(request);
     }, Lifecycle.$serviceName);
   trace('started');
-}
-
-class _DeviceMapWatcherImpl extends DeviceMapWatcher {
-  ValueChanged<Map<String, String>> onProfileChanged;
-
-  _DeviceMapWatcherImpl({this.onProfileChanged});
-  @override
-  void onDeviceMapChange(DeviceMapEntry entry) {
-    trace('device map changed');
-    dynamic decodedJson = json.decode(entry.profile);
-    if (decodedJson is Map) {
-      decodedJson = decodedJson.cast<String, String>();
-      onProfileChanged(decodedJson);
-    } else {
-      log.severe(
-        'Device profile expected to be a map of strings!'
-            ' ${entry.profile}',
-      );
-    }
-  }
 }
 
 int _frameCounter = 1;
