@@ -4,7 +4,7 @@
 
 import 'package:flutter/widgets.dart';
 
-import 'model.dart';
+import 'surface.dart';
 
 /// A pair of Surface and a Rect position.
 class PositionedSurface {

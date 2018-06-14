@@ -5,250 +5,22 @@
 import 'dart:ui' show window;
 
 import 'package:fidl/fidl.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_ui_policy/fidl.dart';
-import 'package:fidl_fuchsia_ui_views_v1_token/fidl.dart';
-import 'package:fuchsia/fuchsia.dart' show exit;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:lib.widgets/utils.dart';
 import 'package:lib.widgets/widgets.dart';
 
 import 'inset_manager.dart';
 import 'layout_model.dart';
-import 'logo.dart';
-import 'model.dart';
-import 'overview.dart';
-import 'surface_details.dart';
-import 'surface_director.dart';
-
-final StartupContext _context = new StartupContext.fromStartupInfo();
+import 'mondrian.dart';
+import 'story_shell_impl.dart';
+import 'surface.dart';
 
 /// This is used for keeping the reference around.
 // ignore: unused_element
 StoryShellImpl _storyShellImpl;
-
-SurfaceGraph _surfaceGraph;
-
-StoryVisualState _visualState;
-
-/// An implementation of the [StoryShell] interface.
-class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
-  final StoryShellBinding _storyShellBinding = new StoryShellBinding();
-  final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
-  final StoryContextProxy _storyContext = new StoryContextProxy();
-  final PointerEventsListener _pointerEventsListener =
-      new PointerEventsListener();
-  final StoryVisualStateWatcherBinding _visualStateWatcherBinding =
-      new StoryVisualStateWatcherBinding();
-
-  /// StoryShell
-  @override
-  void initialize(InterfaceHandle<StoryContext> contextHandle) {
-    _storyContext.ctrl.bind(contextHandle);
-    _storyContext.watchVisualState(_visualStateWatcherBinding.wrap(this));
-  }
-
-  /// Bind an [InterfaceRequest] for a [StoryShell] interface to this object.
-  void bindStoryShell(InterfaceRequest<StoryShell> request) {
-    _storyShellBinding.bind(this, request);
-  }
-
-  /// Bind an [InterfaceRequest] for a [Lifecycle] interface to this object.
-  void bindLifecycle(InterfaceRequest<Lifecycle> request) {
-    _lifecycleBinding.bind(this, request);
-  }
-
-  /// Introduce a new [ViewOwner] to the current Story, with relationship
-  /// of viewType between this view and the [ViewOwner] of id parentId
-  /// @params view The [ViewOwner]
-  /// @params viewId The ID of the view being added
-  /// @params parentId The ID of the parent view
-  /// @params surfaceRelation The relationship between this view and its parent
-  @override
-  void connectView(
-    InterfaceHandle<ViewOwner> view,
-    String viewId,
-    String parentId,
-    SurfaceRelation surfaceRelation,
-    ModuleManifest manifest,
-  ) {
-    trace('connecting view $viewId with parent $parentId');
-    log.fine('Connecting view $viewId with parent $parentId');
-    _surfaceGraph
-      ..addSurface(
-        viewId,
-        new SurfaceProperties(),
-        parentId,
-        surfaceRelation ?? const SurfaceRelation(),
-        manifest != null ? manifest.compositionPattern : '',
-      )
-      ..connectView(viewId, view);
-  }
-
-  /// Focus the view with this id
-  @override
-  void focusView(String viewId, String relativeViewId) {
-    trace('focusing view $viewId');
-    _surfaceGraph.focusSurface(viewId, relativeViewId);
-  }
-
-  /// Defocus the view with this id
-  @override
-  void defocusView(String viewId, void callback()) {
-    trace('defocusing view $viewId');
-    _surfaceGraph.dismissSurface(viewId);
-    // TODO(alangardner, djmurphy): Make Mondrian not crash if the process
-    // associated with viewId is closed after callback returns.
-    callback();
-  }
-
-  /// Add a container node to the graph, with associated layout as a property,
-  /// and optionally specify a parent and a relationship to the parent
-  @override
-  void addContainer(
-      String containerName,
-      String parentId,
-      SurfaceRelation relation,
-      List<ContainerLayout> layouts,
-      List<ContainerRelationEntry> relationships,
-      List<ContainerView> views) {
-    // Add a root node for the container
-    trace('adding container $containerName with parent $parentId');
-    _surfaceGraph.addContainer(
-      containerName,
-      new SurfaceProperties(),
-      parentId,
-      relation,
-      layouts,
-    );
-
-    Map<String, ContainerRelationEntry> nodeMap =
-        <String, ContainerRelationEntry>{};
-    Map<String, List<String>> parentChildrenMap = <String, List<String>>{};
-    Map<String, InterfaceHandle<ViewOwner>> viewMap =
-        <String, InterfaceHandle<ViewOwner>>{};
-    for (ContainerView view in views) {
-      viewMap[view.nodeName] = view.owner;
-    }
-    for (ContainerRelationEntry relatedNode in relationships) {
-      nodeMap[relatedNode.nodeName] = relatedNode;
-      parentChildrenMap
-          .putIfAbsent(relatedNode.parentNodeName, () => <String>[])
-          .add(relatedNode.nodeName);
-    }
-    List<String> nodeQueue =
-        views.map((ContainerView v) => v.nodeName).toList();
-    List<String> addedParents = <String>[containerName];
-    int i = 0;
-    while (nodeQueue.isNotEmpty) {
-      String nodeId = nodeQueue.elementAt(i);
-      String parentId = nodeMap[nodeId].parentNodeName;
-      if (addedParents.contains(parentId)) {
-        for (nodeId in parentChildrenMap[parentId]) {
-          SurfaceProperties prop = new SurfaceProperties()
-            ..containerMembership = <String>[containerName]
-            ..containerLabel = nodeId;
-          _surfaceGraph.addSurface(
-              nodeId, prop, parentId, nodeMap[nodeId].relationship, null);
-          addedParents.add(nodeId);
-          _surfaceGraph.connectView(nodeId, viewMap[nodeId]);
-          nodeQueue.remove(nodeId);
-          _surfaceGraph.focusSurface(nodeId, null);
-        }
-        i = 0;
-      } else {
-        i++;
-        if (i > nodeQueue.length) {
-          log.warning('''Error iterating through container children.
-          All nodes iterated without finding all parents specified in
-          Container Relations''');
-          return;
-        }
-      }
-    }
-  }
-
-  /// Terminate the StoryShell.
-  @override
-  void terminate() {
-    trace('terminating');
-    log.info('StoryShellImpl::terminate call');
-    _pointerEventsListener.stop();
-    _visualStateWatcherBinding.close();
-    _storyContext.ctrl.close();
-    _storyShellBinding.close();
-    _lifecycleBinding.close();
-    exit(0);
-  }
-
-  @override
-  void onVisualStateChange(StoryVisualState visualState) {
-    if (_visualState == visualState) {
-      return;
-    }
-    _visualState = visualState;
-
-    _pointerEventsListener.stop();
-    if (visualState == StoryVisualState.maximized) {
-      PresentationProxy presentationProxy = new PresentationProxy();
-      _storyContext.getPresentation(presentationProxy.ctrl.request());
-      _pointerEventsListener.listen(presentationProxy);
-      presentationProxy.ctrl.close();
-    }
-  }
-}
-
-/// High level class for choosing between presentations
-class Mondrian extends StatefulWidget {
-  /// Constructor
-  const Mondrian({Key key}) : super(key: key);
-
-  @override
-  MondrianState createState() => new MondrianState();
-}
-
-/// State
-class MondrianState extends State<Mondrian> {
-  bool _showOverview = false;
-
-  @override
-  Widget build(BuildContext context) {
-    _traceFrame();
-    return ScopedModel<SurfaceGraph>(
-      model: _surfaceGraph,
-      child: Stack(
-        children: <Widget>[
-          _showOverview
-              ? Overview()
-              : Positioned.fill(child: SurfaceDirector()),
-          Positioned(
-            left: 0.0,
-            bottom: 0.0,
-            child: GestureDetector(
-              child: Container(
-                width: 40.0,
-                height: 40.0,
-                child: _showOverview ? const MondrianLogo() : null,
-              ),
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                setState(() {
-                  _showOverview = !_showOverview;
-                });
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 /// Entry point.
 void main() {
@@ -256,12 +28,12 @@ void main() {
   trace('starting');
   log.info('Started');
 
-  LayoutModel layoutModel = new LayoutModel();
-  InsetManager insetManager = new InsetManager();
+  LayoutModel layoutModel = LayoutModel();
+  InsetManager insetManager = InsetManager();
 
-  _surfaceGraph = new SurfaceGraph();
-  _surfaceGraph.addListener(() {
-    insetManager.onSurfacesChanged(surfaces: _surfaceGraph.size);
+  final surfaceGraph = SurfaceGraph();
+  surfaceGraph.addListener(() {
+    insetManager.onSurfacesChanged(surfaces: surfaceGraph.size);
   });
 
   void onWindowMetricsChanged() {
@@ -275,49 +47,39 @@ void main() {
   // Note: This implementation only supports one StoryShell at a time.
   // Initialize the one Flutter application we support
   runApp(
-    new Directionality(
+    Directionality(
       textDirection: TextDirection.ltr,
-      child: new WindowMediaQuery(
+      child: WindowMediaQuery(
         onWindowMetricsChanged: onWindowMetricsChanged,
-        child: new ScopedModel<LayoutModel>(
+        child: ScopedModel<LayoutModel>(
           model: layoutModel,
-          child: new ScopedModel<InsetManager>(
+          child: ScopedModel<InsetManager>(
             model: insetManager,
-            child: const Mondrian(),
+            child: Mondrian(surfaceGraph: surfaceGraph),
           ),
         ),
       ),
     ),
   );
 
-  _storyShellImpl = new StoryShellImpl();
+  _storyShellImpl = new StoryShellImpl(surfaceGraph);
 
-  _context.outgoingServices
-    ..addServiceForName((InterfaceRequest<StoryShell> request) {
-      trace('story shell request');
-      log.fine('Received binding request for StoryShell');
-      _storyShellImpl.bindStoryShell(request);
-    }, StoryShell.$serviceName)
-    ..addServiceForName((InterfaceRequest<Lifecycle> request) {
-      trace('lifecycle request');
-      log.fine('Received binding request for Lifecycle');
-      _storyShellImpl.bindLifecycle(request);
-    }, Lifecycle.$serviceName);
+  StartupContext.fromStartupInfo().outgoingServices
+    ..addServiceForName(
+      (InterfaceRequest<StoryShell> request) {
+        trace('story shell request');
+        log.fine('Received binding request for StoryShell');
+        _storyShellImpl.bindStoryShell(request);
+      },
+      StoryShell.$serviceName,
+    )
+    ..addServiceForName(
+      (InterfaceRequest<Lifecycle> request) {
+        trace('lifecycle request');
+        log.fine('Received binding request for Lifecycle');
+        _storyShellImpl.bindLifecycle(request);
+      },
+      Lifecycle.$serviceName,
+    );
   trace('started');
-}
-
-int _frameCounter = 1;
-void _traceFrame() {
-  Size size = window.physicalSize / window.devicePixelRatio;
-  trace('building, size: $size');
-  SchedulerBinding.instance.addPostFrameCallback(_frameCallback);
-}
-
-void _frameCallback(Duration duration) {
-  Size size = window.physicalSize / window.devicePixelRatio;
-  trace('frame $_frameCounter, size: $size');
-  _frameCounter++;
-  if (size.isEmpty) {
-    SchedulerBinding.instance.addPostFrameCallback(_frameCallback);
-  }
 }

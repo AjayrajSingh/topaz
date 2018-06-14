@@ -9,14 +9,14 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'child_view.dart';
 import 'container_layout.dart' as container;
 import 'copresent_layout.dart' as copresent;
 import 'inset_manager.dart';
 import 'layout_model.dart';
-import 'model.dart';
+import 'mondrian_child_view.dart';
 import 'pattern_layout.dart' as pattern;
 import 'positioned_surface.dart';
+import 'surface.dart';
 import 'surface_form.dart';
 import 'surface_stage.dart';
 import 'tree.dart';

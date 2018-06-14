@@ -6,7 +6,7 @@ import 'package:lib.ui.flutter/child_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-import 'model.dart';
+import 'surface.dart';
 
 /// Frame for child views
 class MondrianChildView extends StatelessWidget {

@@ -11,7 +11,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'surface_details.dart';
+import 'surface_properties.dart';
 import 'tree.dart';
 
 /// The parentId that means no parent

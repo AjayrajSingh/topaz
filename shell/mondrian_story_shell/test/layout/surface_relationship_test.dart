@@ -6,10 +6,10 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mondrian/layout_model.dart';
-import 'package:mondrian/model.dart';
 import 'package:mondrian/copresent_layout.dart' as copresent_layout;
 import 'package:mondrian/positioned_surface.dart';
-import 'package:mondrian/surface_details.dart';
+import 'package:mondrian/surface.dart';
+import 'package:mondrian/surface_properties.dart';
 
 import '../layout_test_utils.dart' as test_util;
 

@@ -7,8 +7,8 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 
 import 'layout_model.dart';
-import 'model.dart';
 import 'positioned_surface.dart';
+import 'surface.dart';
 import 'tree.dart';
 
 /// Returns in the order they should stacked

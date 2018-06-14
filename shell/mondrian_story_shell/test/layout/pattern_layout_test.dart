@@ -6,9 +6,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mondrian/layout_model.dart';
-import 'package:mondrian/model.dart';
 import 'package:mondrian/pattern_layout.dart' as pattern_layout;
 import 'package:mondrian/positioned_surface.dart';
+import 'package:mondrian/surface.dart';
 
 import '../layout_test_utils.dart' as test_util;
 

@@ -8,8 +8,8 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/widgets.dart';
 
 import 'layout_model.dart';
-import 'model.dart';
 import 'positioned_surface.dart';
+import 'surface.dart';
 import 'tree.dart';
 
 // Convenience comparator used to ensure more focused items get higher priority

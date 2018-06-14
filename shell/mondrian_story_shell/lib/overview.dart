@@ -12,7 +12,7 @@ import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'isometric_widget.dart';
-import 'model.dart';
+import 'surface.dart';
 
 /// Printable names for relation arrangement
 const Map<SurfaceArrangement, String> relName =

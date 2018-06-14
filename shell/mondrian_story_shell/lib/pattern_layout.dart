@@ -8,8 +8,8 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/logging.dart';
 
 import 'layout_model.dart';
-import 'model.dart';
 import 'positioned_surface.dart';
+import 'surface.dart';
 
 const String _parentId = 'parent';
 const String _tickerPattern = 'ticker';

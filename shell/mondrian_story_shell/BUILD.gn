@@ -10,20 +10,19 @@ flutter_aot_app("mondrian") {
   main_dart = "lib/main.dart"
 
   sources = [
-    "child_view.dart",
     "copresent_layout.dart",
     "flux.dart",
     "isometric_widget.dart",
     "layout_model.dart",
-    "logo.dart",
-    "model.dart",
+    "mondrian_child_view.dart",
+    "mondrian_logo.dart",
     "overview.dart",
     "sim.dart",
-    "sized_surface.dart",
-    "surface_details.dart",
+    "surface.dart",
     "surface_director.dart",
     "surface_form.dart",
     "surface_frame.dart",
+    "surface_properties.dart",
     "surface_stage.dart",
     "tree.dart",
   ]
