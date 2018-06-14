@@ -9,8 +9,11 @@ import 'dart:isolate';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:fidl_fuchsia_logger/fidl.dart' show LogSinkProxy;
+import 'package:lib.app.dart/app.dart' show connectToService, StartupContext;
 import 'package:logging/logging.dart' show Level;
 import 'package:stack_trace/stack_trace.dart';
+import 'package:zircon/zircon.dart' as zircon;
 
 import 'fuchsia_log_record.dart';
 import 'fuchsia_logger.dart';
@@ -45,28 +48,41 @@ typedef LogWriter = void Function(LogWriterMessage message);
 /// If [globalTags] is provided, these tags will be added to each message logged
 /// via this logger.
 ///
-/// [logSocket] is a transitional option to allow smooth transition to logging
-/// via Zircon Socket to a universal logging mechanism.
+/// [logToStdoutForTest] will redirect log output to stdout. This should only be
+/// used when debugging tests that run on device to mix the log output with
+/// the messages from the test infrastructure. It has no effect for on-host
+/// tests and should not be included in production code.
 ///
-/// [logWriter] is intended only for testing purposes.
+/// [logWriter] and [logSocket] are intended only for testing purposes.
 void setupLogger({
-  FuchsiaLogger logger,
   String name,
   Level level,
   bool forceShowCodeLocation,
+  bool logToStdoutForTest,
   List<String> globalTags,
-  Socket logSocket,
+  zircon.Socket logSocket,
   LogWriter logWriter,
 }) {
   final String scopeName = name ??
       Platform.script?.pathSegments?.lastWhere((_) => true, orElse: () => null);
   final List<String> approvedTags = _verifyGlobalTags(globalTags);
 
-  log = logger ?? new FuchsiaLogger(level ?? Level.INFO);
+  log = new FuchsiaLogger(level ?? Level.INFO);
 
-  LogWriter activeLogWriter =
-      logWriter ?? (logSocket == null ? writeLogToStdout : writeLogToSocket);
-  _logSocket = logSocket;
+  // This code decides how to log messages. Here's the why:
+  // If not running on zircon, there is no sys_logger so must use stdout.
+  // The author can force stdout via flag to assist is debugging tests.
+  // logSocket and logWriter are used for internal logging tests.
+  LogWriter activeLogWriter;
+  if (logWriter != null) {
+    activeLogWriter = logWriter;
+  } else if (logToStdoutForTest != true &&
+      (Platform.isFuchsia || logSocket != null)) {
+    _logSocket = logSocket ?? _connectToLoggerSocket();
+    activeLogWriter = writeLogToSocket;
+  } else {
+    activeLogWriter = writeLogToStdout;
+  }
   _loggerName = scopeName;
 
   bool inCheckedMode = false;
@@ -97,6 +113,18 @@ void setupLogger({
       tags: approvedTags,
     ));
   });
+}
+
+/// Create a Socket and connect it to the FIDL logger
+zircon.Socket _connectToLoggerSocket() {
+  final socketPair = zircon.SocketPair(zircon.Socket.DATAGRAM);
+  final logSinkProxy = new LogSinkProxy();
+  connectToService(
+    new StartupContext.fromStartupInfo().environmentServices,
+    logSinkProxy.ctrl,
+  );
+  logSinkProxy.connect(socketPair.second);
+  return socketPair.first;
 }
 
 /// All information required to construct a log message to either stdout or
@@ -132,7 +160,7 @@ FuchsiaLogger log = new FuchsiaLogger(Level.ALL)
 String _loggerName = 'uninitialized';
 
 /// Socket used to write to the universal Zircon logger.
-Socket _logSocket;
+zircon.Socket _logSocket;
 
 // Enforce limits on number of global tags and length of each tag
 List<String> _verifyGlobalTags(List<String> globalTags) {
@@ -233,7 +261,7 @@ void writeLogToSocket(LogWriterMessage message) {
   }
   bytes.setUint8(byteOffset++, 0);
   assert(byteOffset <= _socketBufferLength);
-  _logSocket.add(bytes.buffer.asInt8List(0, byteOffset));
+  _logSocket.write(new ByteData.view(bytes.buffer, 0, byteOffset));
 }
 
 // Write a string to ByteData with a leading length byte. Return the byteOffstet

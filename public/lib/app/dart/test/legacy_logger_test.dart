@@ -3,11 +3,12 @@
 // found in the LICENSE file.
 
 import 'dart:convert';
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:lib.app.dart/logging.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
+import 'package:zircon/zircon.dart';
 
 import 'legacy_code.dart';
 import 'socket_validate.dart';
@@ -28,7 +29,8 @@ void _testLegacyLogger() {
 
   makeOneLegacyLogCall();
 
-  List<int> logged = verify(mockSocket.add(captureAny)).captured.single;
+  ByteData byteData = verify(mockSocket.write(captureAny)).captured.single;
+  List<int> logged = byteData.buffer.asInt8List(0, byteData.lengthInBytes);
   validateFixedBlock(logged, Level.INFO);
   expect(logged[32], equals(4));
   expect(utf8.decode(logged.sublist(33, 37)), equals('TEST'));

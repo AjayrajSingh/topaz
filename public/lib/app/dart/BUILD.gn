@@ -25,6 +25,7 @@ dart_library("dart") {
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/zircon",
     "//zircon/public/fidl/cobalt:cobalt",
+    "//zircon/public/fidl/logger",
   ]
 }
 
