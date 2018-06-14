@@ -4,6 +4,7 @@
 
 import 'package:fidl_fuchsia_amber/fidl.dart' as amber;
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.settings/device_info.dart';
 import 'package:lib.widgets/model.dart';
 
 /// Model containing state needed for the device settings app.
@@ -19,11 +20,16 @@ class DeviceSettingsModel extends Model {
   /// TODO: replace with better status info from update service
   DateTime _lastUpdate;
 
+  /// Holds the time the source code was updated.
+  DateTime _sourceDate;
+
   DeviceSettingsModel() {
     _onStart();
   }
 
   DateTime get lastUpdate => _lastUpdate;
+
+  DateTime get sourceDate => _sourceDate;
 
   bool get updateCheckDisabled =>
       DateTime.now().isAfter(_lastUpdate.add(Duration(seconds: 60)));
@@ -41,6 +47,7 @@ class DeviceSettingsModel extends Model {
 
   void _onStart() {
     final startupContext = StartupContext.fromStartupInfo();
+    _sourceDate = DeviceInfo.getSourceDate();
     connectToService(startupContext.environmentServices, _amberControl.ctrl);
   }
 }

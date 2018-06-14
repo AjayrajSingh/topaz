@@ -11,7 +11,18 @@ import 'model.dart';
 
 Widget _buildDeviceSettings(
     {@required DeviceSettingsModel model, @required double scale}) {
-  return SettingsPage(scale: scale, sections: [_update(model, scale)]);
+  return SettingsPage(scale: scale,
+    sections: [_buildInfo(model, scale), _update(model, scale)]);
+}
+
+SettingsSection _buildInfo(DeviceSettingsModel model, double scale) {
+    final buildSyncDate = SettingsText(
+      text:'Source date: ${model.sourceDate}',
+      scale: scale);
+  return SettingsSection(
+    title: 'Build Info',
+    scale: scale,
+    child: SettingsItemList(items:[buildSyncDate]));
 }
 
 SettingsSection _update(DeviceSettingsModel model, double scale) {
@@ -28,11 +39,12 @@ SettingsSection _update(DeviceSettingsModel model, double scale) {
   );
 
   return SettingsSection(
-      title: 'System Update',
+      title: 'Update',
       scale: scale,
       child: SettingsItemList(
         items: [lastUpdatedText, updateButton],
-      ));
+      ),
+      topSection: false);
 }
 
 /// Widget that displays system settings such as update.

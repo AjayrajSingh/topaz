@@ -9,6 +9,13 @@ flutter_aot_app("device_settings") {
 
   manifest = "pubspec.yaml"
 
+  meta = [
+    {
+      path = rebase_path("meta/device_settings.cmx")
+      dest = "device_settings.cmx"
+    },
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//garnet/public/lib/amber/fidl",

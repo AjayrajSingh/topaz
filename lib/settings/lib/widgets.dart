@@ -163,10 +163,14 @@ class SettingsSection extends StatelessWidget {
   /// Scale at which to render the text
   final double scale;
 
+  /// Whether we are the top section
+  final bool topSection;
+
   const SettingsSection({
     @required this.child,
     @required this.scale,
     this.title,
+    this.topSection = true,
   });
 
   /// Returns an empty section with no title.
@@ -194,6 +198,7 @@ class SettingsSection extends StatelessWidget {
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
             padding: EdgeInsets.only(
+                top: topSection ? 0.0 : _listPadding * scale,
                 left: _listPadding * scale, right: _listPadding * scale),
             child: Text(title, style: _titleTextStyle(scale))),
         child
