@@ -15,7 +15,7 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
       lifecycle_binding_(this),
       main_link_watcher_binding_(this) {
   FXL_DCHECK(loop);
-  if (!icu_data::Initialize(context_.get())) {
+  if (!icu_data::Initialize(context_.get(), "/system/data/web_view/icudtl.dat")) {
     FXL_LOG(WARNING) << "Could not load ICU data";
   }
 
