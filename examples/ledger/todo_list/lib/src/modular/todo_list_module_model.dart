@@ -106,10 +106,10 @@ class TodoListModuleModel extends ModuleModel implements ledger.PageWatcher {
     });
   }
 
-  List<int> _makeKey() {
-    List<int> key = <int>[];
+  Uint8List _makeKey() {
+    Uint8List key = new Uint8List(16);
     for (int i = 0; i < 16; i++) {
-      key.add(_random.nextInt(256));
+      key[i] = _random.nextInt(256);
     }
     return key;
   }
