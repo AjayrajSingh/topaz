@@ -333,7 +333,6 @@ class BaseDeviceShellModel extends DeviceShellModel
 
     await _userShellChooser.init();
 
-    _updatePresentation(_userShellChooser.currentUserShell);
     _userManager = DeviceShellUserManager(userProvider, _userShellChooser);
 
     _userManager.onLogout.listen((_) {
@@ -353,6 +352,9 @@ class BaseDeviceShellModel extends DeviceShellModel
       log.info('UserPickerDeviceShell: User logged out!');
       onLogout();
     });
+
+    _updatePresentation(_userShellChooser.currentUserShell);
+
     await refreshUsers();
   }
 
