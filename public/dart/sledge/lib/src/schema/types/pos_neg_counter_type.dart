@@ -9,25 +9,19 @@ import '../base_type.dart';
 /// The Sledge type for positive-negative counter
 class IntCounter implements BaseType {
   @override
-  String jsonValue() {
-    return '"IntCounter"';
-  }
+  String jsonValue() => '"IntCounter"';
 
+  // TODO: pass connection ID
   @override
-  BaseValue newValue() {
-    return new PosNegCounterValue<int>(1); // TODO: pass connection ID
-  }
+  BaseValue newValue() => new PosNegCounterValue<int>(1);
 }
 
 /// The Sledge type for positive-negative counter
 class DoubleCounter implements BaseType {
   @override
-  String jsonValue() {
-    return '"DoubleCounter"';
-  }
+  String jsonValue() => '"DoubleCounter"';
 
+  // TODO: pass connection ID
   @override
-  BaseValue newValue() {
-    return new PosNegCounterValue<double>(1); // TODO: pass connection ID
-  }
+  BaseValue newValue() => new PosNegCounterValue<double>(1);
 }

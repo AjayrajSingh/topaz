@@ -11,64 +11,44 @@ import '../base_type.dart';
 /// The Sledge type to store booleans.
 class Boolean implements BaseType {
   @override
-  String jsonValue() {
-    return '"Boolean"';
-  }
+  String jsonValue() => '"Boolean"';
 
   @override
-  BaseValue newValue() {
-    return new LastOneWinsValue<bool>();
-  }
+  BaseValue newValue() => new LastOneWinsValue<bool>();
 }
 
 /// The Sledge type to store integers.
 class Integer implements BaseType {
   @override
-  String jsonValue() {
-    return '"Integer"';
-  }
+  String jsonValue() => '"Integer"';
 
   @override
-  BaseValue newValue() {
-    return new LastOneWinsValue<int>();
-  }
+  BaseValue newValue() => new LastOneWinsValue<int>();
 }
 
 /// The Sledge type to store doubles.
 class Double implements BaseType {
   @override
-  String jsonValue() {
-    return '"Double"';
-  }
+  String jsonValue() => '"Double"';
 
   @override
-  BaseValue newValue() {
-    return new LastOneWinsValue<double>();
-  }
+  BaseValue newValue() => new LastOneWinsValue<double>();
 }
 
 /// The Sledge type to store strings with LWW merging strategy.
 class LastOneWinsString implements BaseType {
   @override
-  String jsonValue() {
-    return '"LastOneWinsString"';
-  }
+  String jsonValue() => '"LastOneWinsString"';
 
   @override
-  BaseValue newValue() {
-    return new LastOneWinsValue<String>();
-  }
+  BaseValue newValue() => new LastOneWinsValue<String>();
 }
 
 /// The Sledge type to store byte data with LWW merging strategy.
 class LastOneWinsUint8List implements BaseType {
   @override
-  String jsonValue() {
-    return '"LastOntWinsUint8List"';
-  }
+  String jsonValue() => '"LastOntWinsUint8List"';
 
   @override
-  BaseValue newValue() {
-    return new LastOneWinsValue<Uint8List>();
-  }
+  BaseValue newValue() => new LastOneWinsValue<Uint8List>();
 }
