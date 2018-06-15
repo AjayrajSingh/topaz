@@ -64,6 +64,7 @@ constexpr char kClientId[] =
     "934259141868-rejmm4ollj1bs7th1vg2ur6antpbug79.apps.googleusercontent.com";
 constexpr char kGoogleOAuthAuthEndpoint[] =
     "https://accounts.google.com/o/oauth2/v2/auth";
+constexpr char kGoogleOAuthGlifParam[] = "false";
 constexpr char kGoogleOAuthTokenEndpoint[] =
     "https://www.googleapis.com/oauth2/v4/token";
 constexpr char kGoogleRevokeTokenEndpoint[] =
@@ -963,6 +964,8 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
     url += "?scope=" + joined_scopes;
     url += "&response_type=code&redirect_uri=";
     url += kRedirectUri;
+    url += "&glif=";
+    url += kGoogleOAuthGlifParam;
     url += "&client_id=";
     url += kClientId;
 
