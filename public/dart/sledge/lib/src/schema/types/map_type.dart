@@ -12,7 +12,7 @@ import '../base_type.dart';
 /// Last One Wins strategy is applied for conflict resolution per key.
 class BytelistMap implements BaseType {
   @override
-  String jsonValue() => '"BytelistMap"';
+  String toJson() => 'BytelistMap';
 
   @override
   BaseValue newValue() => new MapValue<String, Uint8List>();

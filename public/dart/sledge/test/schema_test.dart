@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert' show json;
 import 'dart:typed_data';
 
 // TODO: investigate whether we can get rid of the implementation_imports.
@@ -12,25 +13,41 @@ import 'package:test/test.dart';
 
 import 'helpers.dart';
 
-void main() {
-  test('Create schemas and serialize them to json', () {
-    // Create and test flat schema.
-    Map<String, BaseType> schemaDescription = <String, BaseType>{
-      'someBool': new Boolean(),
-      'someInteger': new Integer()
-    };
-    Schema schema = new Schema(schemaDescription);
-    expect(schema.jsonValue(),
-        equals('{"someBool":"Boolean","someInteger":"Integer",}'));
+Map<String, BaseType> flatSchema() {
+  return <String, BaseType>{
+    'someBool': new Boolean(),
+    'someInteger': new Integer()
+  };
+}
 
-    // TODO(jif): Split in a separate test.
-    // Create and test schema that embeds another schema.
-    Map<String, BaseType> schemaDescription2 = <String, BaseType>{
-      'foo': schema
-    };
-    Schema schema2 = new Schema(schemaDescription2);
-    expect(schema2.jsonValue(),
-        equals('{"foo":{"someBool":"Boolean","someInteger":"Integer",},}'));
+Map<String, BaseType> schemaWithEmbeddedSchema() {
+  Schema schema = new Schema(flatSchema());
+  return <String, BaseType>{'foo': schema};
+}
+
+void main() {
+  test('Create flat schema', () {
+    new Schema(flatSchema());
+  });
+
+  test('Create schema with embedded schema.', () {
+    new Schema(schemaWithEmbeddedSchema());
+  });
+
+  test('Serialize and deserialize flat schema', () {
+    Schema schema1 = new Schema(flatSchema());
+    final json1 = json.encode(schema1);
+    Schema schema2 = new Schema.fromJson(json.decode(json1));
+    final json2 = json.encode(schema2);
+    expect(json1, equals(json2));
+  });
+
+  test('Serialize and deserialize schema with embedded schema', () {
+    Schema schema1 = new Schema(schemaWithEmbeddedSchema());
+    final json1 = json.encode(schema1);
+    Schema schema2 = new Schema.fromJson(json.decode(json1));
+    final json2 = json.encode(schema2);
+    expect(json1, equals(json2));
   });
 
   test('Verify that two identical schemes result in identical hashes', () {

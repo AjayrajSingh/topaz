@@ -16,7 +16,7 @@ class BytelistSet implements BaseType {
   static const _listEquality = const ListEquality<int>();
 
   @override
-  String jsonValue() => '"BytelistSet"';
+  String toJson() => 'BytelistSet';
 
   @override
   BaseValue newValue() => new SetValue<Uint8List>(
