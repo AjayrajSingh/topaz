@@ -1,0 +1,8 @@
+{
+    "imports": [
+        "topaz/packages/prod/web_runner_prototype"
+    ],
+    "packages": {
+        "web_runner_tests": "//topaz/runtime/web_runner_prototype:web_runner_tests"
+    }
+}

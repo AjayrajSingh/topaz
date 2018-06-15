@@ -6,6 +6,7 @@
         "topaz/packages/tests/dart_remote_unittests",
         "topaz/packages/tests/dart_unittests",
         "topaz/packages/tests/examples/all",
+        "topaz/packages/tests/web_runner",
         "topaz/packages/tests/web_view"
     ]
 }

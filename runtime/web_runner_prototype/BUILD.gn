@@ -29,10 +29,38 @@ executable("bin") {
   ]
 }
 
+executable("web_runner_unittests") {
+  testonly = true
+
+  sources = [
+    "runner_unittest.cc",
+  ]
+
+  deps = [
+    ":lib",
+    "//garnet/public/lib/app/cpp/testing",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
 package("web_runner_prototype") {
   deps = [
     ":bin",
   ]
 
   binary = "web_runner_prototype"
+}
+
+package("web_runner_tests") {
+  testonly = true
+
+  deps = [
+    ":web_runner_unittests",
+  ]
+
+  tests = [
+    {
+      name = "web_runner_unittests"
+    },
+  ]
 }
