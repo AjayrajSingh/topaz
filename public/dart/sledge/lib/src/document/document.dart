@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:collection';
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart';
 
 import '../sledge.dart';
@@ -13,6 +11,7 @@ import '../transaction.dart';
 import 'base_value.dart';
 import 'change.dart';
 import 'document_id.dart';
+import 'uint8list_ops.dart';
 import 'value_node.dart';
 import 'value_observer.dart';
 
@@ -30,9 +29,7 @@ class Document implements ValueObserver {
 
   /// Default constructor.
   Document(this._sledge, this._documentId)
-      : _fields = new HashMap<Uint8List, BaseValue>(
-            equals: new ListEquality().equals,
-            hashCode: new ListEquality().hash) {
+      : _fields = new Uint8ListMapFactory<BaseValue>().newMap() {
     _value = _documentId.schema.newValue();
 
     _value.collectFields().forEach((final String key, final BaseValue value) {

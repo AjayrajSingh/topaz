@@ -2,10 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:collection';
 import 'dart:typed_data';
-
-import 'package:collection/collection.dart';
 
 import 'uint8list_ops.dart';
 import 'values/key_value.dart';
@@ -44,8 +41,7 @@ class Change {
 
   /// Splits all changes by prefixes.
   Map<Uint8List, Change> splitByPrefix(int prefixLen) {
-    final splittedChanges = new HashMap<Uint8List, Change>(
-        equals: new ListEquality().equals, hashCode: new ListEquality().hash);
+    final splittedChanges = new Uint8ListMapFactory<Change>().newMap();
     for (final change in changedEntries) {
       final prefix = getUint8ListPrefix(change.key, prefixLen);
       final newChange = splittedChanges.putIfAbsent(prefix, () => new Change());
