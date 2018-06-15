@@ -18,3 +18,13 @@ sdk("dart") {
   ]
 }
 
+sdk("topaz") {
+  category = "partner"
+
+  testonly = true
+
+  deps = [
+    "//garnet/public/sdk:garnet_molecule",
+    "//topaz/runtime/dart:kernel_compiler_sdk($host_toolchain)",
+  ]
+}
