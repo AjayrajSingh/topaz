@@ -2,6 +2,7 @@
     "host_tests" : [
       "//topaz/app/contacts/agents/content_provider:contacts_content_provider_tests",
       "//topaz/app/documents/packages/utils:document_util_tests",
+      "//topaz/examples/test/flutter_widget_test",
       "//topaz/public/dart/fixtures:dart_fixture_tests",
       "//topaz/public/dart/sledge:dart_sledge_tests",
       "//topaz/public/lib/app/dart:dart_app_tests",
@@ -11,6 +12,6 @@
       "//topaz/tools/widget_explorer/packages/widget_explorer_core:widget_explorer_core_tests"
     ],
     "labels": [
-        "//topaz:dart_unittests"
+      "//topaz:dart_unittests"
     ]
 }

@@ -11,6 +11,7 @@ group("dart_unittests") {
     "app/contacts:tests",
     # "app/dashboard:tests",
     "app/documents/packages/utils:document_util_tests",
+    "examples/test/flutter_widget_test:flutter_widget_test",
     "public/dart/fixtures:dart_fixture_tests",
     "public/dart/sledge:dart_sledge_tests",
     # "public/dart/widgets:dart_widget_tests",
