@@ -12,6 +12,21 @@ Uint8List concatUint8Lists(Uint8List a, Uint8List b) {
   return new Uint8List(a.length + b.length)..setAll(0, a)..setAll(a.length, b);
 }
 
+/// Concatenate list of byte arrays.
+Uint8List concatListOfUint8Lists(List<Uint8List> list) {
+  int sumLength = 0;
+  for (final x in list) {
+    sumLength += x.length;
+  }
+  final result = new Uint8List(sumLength);
+  int pos = 0;
+  for (final x in list) {
+    result.setAll(pos, x);
+    pos += x.length;
+  }
+  return result;
+}
+
 /// Returns the prefix of [x] of length [prefixLen].
 Uint8List getUint8ListPrefix(Uint8List x, int prefixLen) {
   return new Uint8List(prefixLen)..setAll(0, x.getRange(0, prefixLen));

@@ -5,6 +5,7 @@
 // ignore_for_file: implementation_imports
 import 'dart:typed_data';
 
+import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/converter.dart';
 import 'package:sledge/src/document/values/key_value.dart';
 import 'package:test/test.dart';
@@ -49,6 +50,26 @@ void main() {
       expect(
           stringConverter.deserialize(stringConverter.serialize('"?123 x  ')),
           equals('"?123 x  '));
+    });
+
+    test('data converter', () {
+      final conv = new DataConverter<String, int>();
+      String long = '', short = 'aba';
+      for (int i = 0; i < 100; i++) {
+        long = '$long$i';
+      }
+      final change = new ConvertedChange<String, int>({long: 10, short: 1});
+      final serializedChange = conv.serialize(change);
+      expect(serializedChange.changedEntries[0].key.length <= 128 + 1, isTrue);
+      final deserializedChange = conv.deserialize(serializedChange);
+      expect(deserializedChange.changedEntries[short], equals(1));
+      expect(deserializedChange.changedEntries[long], equals(10));
+      final change2 =
+          new ConvertedChange<String, int>({}, [short, long].toSet());
+      final deserializedChange2 = conv.deserialize(conv.serialize(change2));
+      expect(change2.deletedKeys.length, equals(2));
+      expect(change2.deletedKeys.contains(short), isTrue);
+      expect(change2.deletedKeys.contains(long), isTrue);
     });
   });
 

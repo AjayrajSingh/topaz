@@ -7,6 +7,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:sledge/src/document/change.dart';
+import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/converter.dart';
 import 'package:sledge/src/document/values/key_value.dart';
 import 'package:sledge/src/document/values/last_one_wins_value.dart';
@@ -72,11 +73,11 @@ void main() {
   Converter<String> stringConverter = new Converter<String>();
 
   test('Integer oprations', () {
-    var x = new TestLastOneWinsValue<int>(new Change(
-        [new KeyValue(intConverter.serialize(0), intConverter.serialize(-3))]));
+    final conv = new DataConverter<int, int>();
+    var x = new TestLastOneWinsValue<int>(
+        conv.serialize(new ConvertedChange<int, int>({0: -3})));
     expect(x.value, equals(-3));
-    x.applyChanges(new Change(
-        [new KeyValue(intConverter.serialize(0), intConverter.serialize(5))]));
+    x.applyChanges(conv.serialize(new ConvertedChange<int, int>({0: 5})));
     expect(x.value, equals(5));
     x.value = 2;
     expect(x.value, equals(2));
@@ -84,19 +85,16 @@ void main() {
     expect(x.value, equals(-1));
     x.put();
     expect(x.value, equals(-1));
-    x.applyChanges(new Change(
-        [new KeyValue(intConverter.serialize(0), intConverter.serialize(4))]));
+    x.applyChanges(conv.serialize(new ConvertedChange<int, int>({0: 4})));
     expect(x.value, equals(4));
   });
 
   test('Double operations', () {
-    var x = new TestLastOneWinsValue<double>(new Change([
-      new KeyValue(intConverter.serialize(0), doubleConverter.serialize(-3.5))
-    ]));
+    final conv = new DataConverter<int, double>();
+    var x = new TestLastOneWinsValue<double>(
+        conv.serialize(new ConvertedChange<int, double>({0: -3.5})));
     expect(x.value, equals(-3.5));
-    x.applyChanges(new Change([
-      new KeyValue(intConverter.serialize(0), doubleConverter.serialize(4.2))
-    ]));
+    x.applyChanges(conv.serialize(new ConvertedChange<int, double>({0: 4.2})));
     expect(x.value, equals(4.2));
     x.value = 0.5;
     expect(x.value, equals(0.5));
@@ -104,20 +102,17 @@ void main() {
     expect(x.value, equals(-1.0));
     x.put();
     expect(x.value, equals(-1.0));
-    x.applyChanges(new Change([
-      new KeyValue(intConverter.serialize(0), doubleConverter.serialize(4.25))
-    ]));
+    x.applyChanges(conv.serialize(new ConvertedChange<int, double>({0: 4.25})));
     expect(x.value, equals(4.25));
   });
 
   test('String operations', () {
-    var x = new TestLastOneWinsValue<String>(new Change([
-      new KeyValue(intConverter.serialize(0), stringConverter.serialize('bar'))
-    ]));
+    final conv = new DataConverter<int, String>();
+    var x = new TestLastOneWinsValue<String>(
+        conv.serialize(new ConvertedChange<int, String>({0: 'bar'})));
     expect(x.value, equals('bar'));
-    x.applyChanges(new Change([
-      new KeyValue(intConverter.serialize(0), stringConverter.serialize('foo'))
-    ]));
+    x.applyChanges(
+        conv.serialize(new ConvertedChange<int, String>({0: 'foo'})));
     expect(x.value, equals('foo'));
     x.value = 'bar';
     expect(x.value, equals('bar'));
@@ -125,48 +120,38 @@ void main() {
     expect(x.value, equals('tor'));
     x.put();
     expect(x.value, equals('tor'));
-    x.applyChanges(new Change([
-      new KeyValue(intConverter.serialize(0), stringConverter.serialize('cir'))
-    ]));
+    x.applyChanges(
+        conv.serialize(new ConvertedChange<int, String>({0: 'cir'})));
     expect(x.value, equals('cir'));
   });
 
   test('Boolean operations', () {
-    var x = new TestLastOneWinsValue<bool>(new Change([
-      new KeyValue(intConverter.serialize(0), boolConverter.serialize(true))
-    ]));
+    final conv = new DataConverter<int, bool>();
+    var x = new TestLastOneWinsValue<bool>(
+        conv.serialize(new ConvertedChange<int, bool>({0: true})));
     expect(x.value, equals(true));
-    x.applyChanges(new Change([
-      new KeyValue(intConverter.serialize(0), boolConverter.serialize(false))
-    ]));
+    x.applyChanges(conv.serialize(new ConvertedChange<int, bool>({0: false})));
     expect(x.value, equals(false));
     x.value = true;
     expect(x.value, equals(true));
     x.put();
     expect(x.value, equals(true));
-    x.applyChanges(new Change([
-      new KeyValue(intConverter.serialize(0), boolConverter.serialize(false))
-    ]));
+    x.applyChanges(conv.serialize(new ConvertedChange<int, bool>({0: false})));
     expect(x.value, equals(false));
   });
 
   test('onChange stream', () {
-    var cnt = new TestLastOneWinsValue<String>(new Change([
-      new KeyValue(intConverter.serialize(0), stringConverter.serialize('aba'))
-    ]));
-    Stream<String> changeStream = cnt.onChange;
+    final conv = new DataConverter<int, String>();
+    var x = new TestLastOneWinsValue<String>(
+        conv.serialize(new ConvertedChange<int, String>({0: 'aba'})));
+    Stream<String> changeStream = x.onChange;
     expect(changeStream, emitsInOrder(['bar', 'foo', 'a']));
-    cnt
-      ..applyChanges(new Change([
-        new KeyValue(
-            intConverter.serialize(0), stringConverter.serialize('bar'))
-      ]))
-      ..applyChanges(new Change([
-        new KeyValue(
-            intConverter.serialize(0), stringConverter.serialize('foo'))
-      ]))
-      ..applyChanges(new Change([
-        new KeyValue(intConverter.serialize(0), stringConverter.serialize('a'))
-      ]));
+    x
+      ..applyChanges(
+          conv.serialize(new ConvertedChange<int, String>({0: 'bar'})))
+      ..applyChanges(
+          conv.serialize(new ConvertedChange<int, String>({0: 'foo'})))
+      ..applyChanges(
+          conv.serialize(new ConvertedChange<int, String>({0: 'a'})));
   });
 }

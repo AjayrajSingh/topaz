@@ -5,6 +5,7 @@
 import 'dart:typed_data';
 
 import '../change.dart';
+import 'compressor.dart';
 import 'converted_change.dart';
 import 'key_value.dart';
 
@@ -33,6 +34,7 @@ abstract class Converter<T> {
 class DataConverter<K, V> {
   final Converter<K> _keyConverter;
   final Converter<V> _valueConverter;
+  final Compressor _compressor = new Compressor();
 
   /// Constructor.
   DataConverter()
@@ -40,7 +42,8 @@ class DataConverter<K, V> {
         _valueConverter = new Converter<V>();
 
   /// Converts from List<KeyValue> to Map<K, V>.
-  ConvertedChange<K, V> deserialize(final Change input) {
+  ConvertedChange<K, V> deserialize(final Change _input) {
+    final input = _uncompressKeysInChange(_input);
     final result = new ConvertedChange<K, V>();
     for (var keyValue in input.changedEntries) {
       result.changedEntries[_keyConverter.deserialize(keyValue.key)] =
@@ -61,6 +64,30 @@ class DataConverter<K, V> {
     }
     for (var key in input.deletedKeys) {
       result.deletedKeys.add(_keyConverter.serialize(key));
+    }
+    return _compressKeysInChange(result);
+  }
+
+  /// Restores (key, value)s from stored in Ledger state.
+  Change _uncompressKeysInChange(final Change input) {
+    Change result = new Change();
+    for (final entry in input.changedEntries) {
+      result.changedEntries.add(_compressor.uncompressKeyInEntry(entry));
+    }
+    for (final key in input.deletedKeys) {
+      result.deletedKeys.add(_compressor.uncompressKey(key));
+    }
+    return result;
+  }
+
+  /// Prepares (key, value)s to store in Ledger. (geting rid of long keys)
+  Change _compressKeysInChange(final Change input) {
+    Change result = new Change();
+    for (final entry in input.changedEntries) {
+      result.changedEntries.add(_compressor.compressKeyInEntry(entry));
+    }
+    for (var key in input.deletedKeys) {
+      result.deletedKeys.add(_compressor.compressKey(key));
     }
     return result;
   }

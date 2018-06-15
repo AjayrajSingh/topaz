@@ -6,8 +6,8 @@
 import 'dart:async';
 
 import 'package:sledge/src/document/change.dart';
+import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/converter.dart';
-import 'package:sledge/src/document/values/key_value.dart';
 import 'package:sledge/src/document/values/pos_neg_counter_value.dart';
 import 'package:test/test.dart';
 
@@ -64,77 +64,52 @@ void main() {
     expect(cnt.value, equals(3.92));
   });
 
-  Converter<int> intConverter = new Converter<int>();
-  Converter<double> doubleConverter = new Converter<double>();
-
   test('PosNegCounterValue construction', () {
+    DataConverter conv = new DataConverter<int, int>();
     var cnt = new TestPosNegCounterValue<int>(
-        1,
-        new Change([
-          new KeyValue(intConverter.serialize(2), intConverter.serialize(4)),
-          new KeyValue(intConverter.serialize(3), intConverter.serialize(3))
-        ]));
+        1, conv.serialize(new ConvertedChange<int, int>({2: 4, 3: 3})));
     expect(cnt.value, equals(1));
   });
 
   test('PosNegCounterValue construction 2', () {
+    DataConverter conv = new DataConverter<int, int>();
     var cnt = new TestPosNegCounterValue<int>(
         1,
-        new Change([
-          new KeyValue(intConverter.serialize(2), intConverter.serialize(4)),
-          new KeyValue(intConverter.serialize(3), intConverter.serialize(3)),
-          new KeyValue(intConverter.serialize(6), intConverter.serialize(5)),
-          new KeyValue(intConverter.serialize(7), intConverter.serialize(2))
-        ]));
+        conv.serialize(
+            new ConvertedChange<int, int>({2: 4, 3: 3, 6: 5, 7: 2})));
     expect(cnt.value, equals(4));
   });
 
   test('PosNegCounterValue construction double', () {
+    DataConverter conv = new DataConverter<int, double>();
     var cnt = new TestPosNegCounterValue<double>(
         1,
-        new Change([
-          new KeyValue(
-              intConverter.serialize(2), doubleConverter.serialize(4.25)),
-          new KeyValue(
-              intConverter.serialize(3), doubleConverter.serialize(3.0)),
-          new KeyValue(
-              intConverter.serialize(6), doubleConverter.serialize(2.5)),
-          new KeyValue(
-              intConverter.serialize(9), doubleConverter.serialize(4.125))
-        ]));
+        conv.serialize(new ConvertedChange<int, double>(
+            {2: 4.25, 3: 3.0, 6: 2.5, 9: 4.125})));
     expect(cnt.value, equals(-0.375));
   });
 
   test('PosNegCounterValue applyChanges', () {
+    DataConverter conv = new DataConverter<int, int>();
     var cnt = new TestPosNegCounterValue<int>(1);
     expect(cnt.value, equals(0));
-    cnt.applyChanges(new Change(
-        [new KeyValue(intConverter.serialize(2), intConverter.serialize(4))]));
+    cnt.applyChanges(conv.serialize(new ConvertedChange<int, int>({2: 4})));
     expect(cnt.value, equals(4));
-    cnt.applyChanges(new Change(
-        [new KeyValue(intConverter.serialize(2), intConverter.serialize(1))]));
+    cnt.applyChanges(conv.serialize(new ConvertedChange<int, int>({2: 1})));
     expect(cnt.value, equals(1));
-    cnt.applyChanges(new Change(
-        [new KeyValue(intConverter.serialize(5), intConverter.serialize(5))]));
+    cnt.applyChanges(conv.serialize(new ConvertedChange<int, int>({5: 5})));
     expect(cnt.value, equals(-4));
   });
 
   test('PosNegCounterValue onChange stream', () {
+    DataConverter conv = new DataConverter<int, int>();
     var cnt = new TestPosNegCounterValue<int>(
-        1,
-        new Change([
-          new KeyValue(intConverter.serialize(2), intConverter.serialize(1)),
-          new KeyValue(intConverter.serialize(3), intConverter.serialize(2))
-        ]));
+        1, conv.serialize(new ConvertedChange({2: 1, 3: 2})));
     Stream<int> changeStream = cnt.onChange;
     expect(changeStream, emitsInOrder([2, 4, -3]));
     cnt
-      ..applyChanges(new Change(
-          [new KeyValue(intConverter.serialize(4), intConverter.serialize(3))]))
-      ..applyChanges(new Change(
-          [new KeyValue(intConverter.serialize(2), intConverter.serialize(3))]))
-      ..applyChanges(new Change([
-        new KeyValue(intConverter.serialize(3), intConverter.serialize(9))
-      ]));
+      ..applyChanges(conv.serialize(new ConvertedChange<int, int>({4: 3})))
+      ..applyChanges(conv.serialize(new ConvertedChange<int, int>({2: 3})))
+      ..applyChanges(conv.serialize(new ConvertedChange<int, int>({3: 9})));
   });
 }
