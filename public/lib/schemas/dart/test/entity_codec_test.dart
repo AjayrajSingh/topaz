@@ -24,7 +24,7 @@ void main() {
           .map((BasicExample e) => e.name)
           .toList();
 
-      expect(results.length + 1, equals(list.length));
+      expect(results.length, equals(list.length));
     });
   });
 }
