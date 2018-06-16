@@ -28,8 +28,7 @@ class LinkWatcherHost {
   /// Constructor.
   LinkWatcherHost({
     @required this.onNotify,
-  })
-      : assert(onNotify != null) {
+  }) : assert(onNotify != null) {
     impl = new LinkWatcherImpl(
       onNotify: onNotify,
     );

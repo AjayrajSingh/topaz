@@ -16,7 +16,6 @@ import 'package:meta/meta.dart';
 
 import 'module_controller_client.dart';
 
-export 'package:fidl_fuchsia_modular/fidl.dart';
 export 'package:lib.component.dart/component.dart' show ComponentContextClient;
 
 /// When Module resolution fails.

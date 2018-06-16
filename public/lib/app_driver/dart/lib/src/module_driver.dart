@@ -537,17 +537,26 @@ class ModuleDriver {
   /// * [ModuleContext#StartModule](https://goo.gl/9T8Gkv).
   /// * [ModuleController](https://goo.gl/ZXcYW3).
   ///
+  /// TODO(MS-1714): collapse name params or clearly document thier differences.
   Future<ModuleControllerClient> startModule({
-    @required String module,
     @required Intent intent,
+    String name,
+    String module,
     SurfaceRelation surfaceRelation = const SurfaceRelation(
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
       emphasis: 0.5,
     ),
   }) async {
-    assert(module != null && module.isNotEmpty);
+    name ??= module;
+    assert(name != null && name.isNotEmpty);
     assert(intent != null);
+
+    if (module != null) {
+      // TODO(MS-1443): remove deprecation notice once client usage has been
+      // updated.
+      log.warning('param "module" is deprecated, use "name" instead');
+    }
 
     return moduleContext.startModule(
       module: module,
