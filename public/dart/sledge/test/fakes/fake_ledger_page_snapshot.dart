@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:typed_data';
+
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 
@@ -17,4 +19,13 @@ class FakeLedgerPageSnapshot extends ledger.PageSnapshotProxy {
   @override
   ProxyController<FakeLedgerPageSnapshot> get ctrl =>
       new _FakeProxyController<FakeLedgerPageSnapshot>();
+
+  @override
+  void getEntries(
+      Uint8List keyPrefix,
+      ledger.Token token,
+      void callback(ledger.Status status, List<ledger.Entry> entriesResult,
+          ledger.Token nextTokenResult)) {
+    callback(ledger.Status.ok, <ledger.Entry>[], token);
+  }
 }

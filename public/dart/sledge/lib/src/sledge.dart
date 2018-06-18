@@ -3,12 +3,14 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 
 import 'document/document.dart';
 import 'document/document_id.dart';
+import 'document/uint8list_ops.dart';
 import 'ledger_helpers.dart';
 import 'sledge_page_id.dart';
 import 'transaction.dart';
@@ -19,6 +21,10 @@ class Sledge {
       new ComponentContextProxy();
   final ledger.LedgerProxy _ledgerProxy = new ledger.LedgerProxy();
   final ledger.PageProxy _pageProxy;
+
+  // Cache to get document by documentId.prefix.
+  final Map<Uint8List, Document> _documentByPrefix = _mapFactory.newMap();
+  static final _mapFactory = new Uint8ListMapFactory<Document>();
 
   // The factories used for fake object injection.
   final LedgerPageSnapshotFactory _pageSnapshotFactory;
@@ -74,12 +80,6 @@ class Sledge {
     _componentContextProxy.ctrl.close();
   }
 
-  /// Returns a new document that can be stored in Sledge.
-  /// TODO: remove (replaced with |getDocument|).
-  dynamic newDocument(DocumentId documentId) {
-    return new Document(this, documentId);
-  }
-
   /// Transactionally save modifications.
   /// Await the end of the method before calling |runInTransaction| again.
   /// Returns false if an error occured and the modifications couldn't be
@@ -115,10 +115,12 @@ class Sledge {
       throw new StateError('No transaction started.');
     }
 
-    // TODO: If the document was already created, don't create a new instance.
-    Document document = await _currentTransaction.getDocument(documentId);
+    if (!_documentByPrefix.containsKey(documentId.prefix)) {
+      _documentByPrefix[documentId.prefix] =
+          await _currentTransaction.getDocument(documentId);
+    }
 
-    return document;
+    return _documentByPrefix[documentId.prefix];
   }
 
   /// Returns the current transaction.

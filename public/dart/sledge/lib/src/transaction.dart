@@ -131,6 +131,7 @@ class Transaction {
       final change = new Change(kvs);
       Document.applyChanges(document, change);
     }
+
     return document;
   }
 

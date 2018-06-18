@@ -108,8 +108,10 @@ void main() {
 
     // Create a new Sledge document.
     Sledge sledge = newSledgeForTesting();
-    dynamic doc = sledge.newDocument(new DocumentId(schema2));
-
+    dynamic doc;
+    await sledge.runInTransaction(() async {
+      doc = await sledge.getDocument(new DocumentId(schema2));
+    });
     // Read and write properties of a Sledge document.
     expect(doc.foo.someBool.value, equals(false));
     expect(doc.foo.someInteger.value, equals(0));
@@ -133,7 +135,10 @@ void main() {
 
     // Create a new Sledge document.
     Sledge sledge = newSledgeForTesting();
-    dynamic doc = sledge.newDocument(new DocumentId(schema));
+    dynamic doc;
+    await sledge.runInTransaction(() async {
+      doc = await sledge.getDocument(new DocumentId(schema));
+    });
 
     // Read and write properties of a Sledge document.
     expect(doc.someBool.value, equals(false));
@@ -162,7 +167,10 @@ void main() {
 
     // Create a new Sledge document.
     Sledge sledge = newSledgeForTesting();
-    dynamic doc = sledge.newDocument(new DocumentId(schema));
+    dynamic doc;
+    await sledge.runInTransaction(() async {
+      doc = await sledge.getDocument(new DocumentId(schema));
+    });
 
     // Modify and get value of PosNegCounter.
     expect(doc.cnt.value, equals(0));
@@ -194,8 +202,13 @@ void main() {
 
     // Create two Sledge documents
     Sledge sledgeA = newSledgeForTesting(), sledgeB = newSledgeForTesting();
-    dynamic docA = sledgeA.newDocument(new DocumentId(schema)),
-        docB = sledgeB.newDocument(new DocumentId(schema));
+    dynamic docA, docB;
+    await sledgeA.runInTransaction(() async {
+      docA = await sledgeA.getDocument(new DocumentId(schema));
+    });
+    await sledgeB.runInTransaction(() async {
+      docB = await sledgeB.getDocument(new DocumentId(schema));
+    });
 
     Change c1;
     await sledgeA.runInTransaction(() {
