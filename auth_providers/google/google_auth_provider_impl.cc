@@ -230,6 +230,8 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
     fb_token->id_token = oauth_response.json_response["id_token"].GetString();
     fb_token->email = oauth_response.json_response["email"].GetString();
     fb_token->local_id = oauth_response.json_response["local_id"].GetString();
+    fb_token->expires_in =
+        oauth_response.json_response["expires_in"].GetUint64();
 
     callback(AuthProviderStatus::OK, std::move(fb_token));
   });
