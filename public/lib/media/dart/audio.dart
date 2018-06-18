@@ -125,6 +125,10 @@ class Audio {
     log.severe('Unable to connect to audio service', error);
   }
 
+  void setRoutingPolicy(AudioOutputRoutingPolicy policy) {
+    _audioService.setRoutingPolicy(policy);
+  }
+
   /// Converts a gain in db to an audio 'level' in the range 0.0 to 1.0
   /// inclusive.
   static double gainToLevel(double gain) {
