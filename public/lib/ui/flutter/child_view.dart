@@ -353,21 +353,35 @@ class _RenderChildView extends RenderBox {
   @override
   void performLayout() {
     size = constraints.biggest;
-    if (_connection != null) {
-      _width = size.width;
-      _height = size.height;
-      _connection._setChildProperties(_width, _height, 0.0, 0.0, 0.0, 0.0);
-      assert(() {
-        if (_viewContainer == null) {
-          _debugErrorMessage ??= new TextPainter(
-              text: const TextSpan(
-                  text:
-                      'Child views are supported only when running in Scenic.'));
-          _debugErrorMessage.layout(minWidth: size.width, maxWidth: size.width);
-        }
-        return true;
-      }());
+
+    // Ignore if we have no child view connection.
+    if (_connection == null) {
+      return;
     }
+
+    if (_width != null && _height != null) {
+      double deltaWidth = (_width - size.width).abs();
+      double deltaHeight = (_height - size.height).abs();
+
+      // Ignore insignificant changes in size that are likely rounding errors.
+      if (deltaWidth < 0.0001 && deltaHeight < 0.0001) {
+        return;
+      }
+    }
+
+    _width = size.width;
+    _height = size.height;
+    _connection._setChildProperties(_width, _height, 0.0, 0.0, 0.0, 0.0);
+    assert(() {
+      if (_viewContainer == null) {
+        _debugErrorMessage ??= new TextPainter(
+            text: const TextSpan(
+                text:
+                    'Child views are supported only when running in Scenic.'));
+        _debugErrorMessage.layout(minWidth: size.width, maxWidth: size.width);
+      }
+      return true;
+    }());
   }
 
   @override
