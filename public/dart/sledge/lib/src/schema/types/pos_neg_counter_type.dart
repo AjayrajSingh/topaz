@@ -4,6 +4,7 @@
 
 import '../../document/base_value.dart';
 import '../../document/values/pos_neg_counter_value.dart';
+import '../../sledge_connection_id.dart';
 import '../base_type.dart';
 
 /// The Sledge type for positive-negative counter
@@ -13,7 +14,8 @@ class IntCounter implements BaseType {
 
   // TODO: pass connection ID
   @override
-  BaseValue newValue() => new PosNegCounterValue<int>(1);
+  BaseValue newValue(ConnectionId connectionId) =>
+      new PosNegCounterValue<int>(connectionId.id);
 }
 
 /// The Sledge type for positive-negative counter
@@ -23,5 +25,6 @@ class DoubleCounter implements BaseType {
 
   // TODO: pass connection ID
   @override
-  BaseValue newValue() => new PosNegCounterValue<double>(1);
+  BaseValue newValue(ConnectionId connectionId) =>
+      new PosNegCounterValue<double>(connectionId.id);
 }

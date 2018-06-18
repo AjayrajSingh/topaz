@@ -5,17 +5,16 @@
 import 'dart:typed_data';
 
 import '../../document/base_value.dart';
-import '../../document/values/map_value.dart';
+import '../../document/values/ordered_list_value.dart';
 import '../../sledge_connection_id.dart';
 import '../base_type.dart';
 
-/// The Sledge type for Map from String to Uint8List.
-/// Last One Wins strategy is applied for conflict resolution per key.
-class BytelistMap implements BaseType {
+/// The Sledge type for Ordered Set of [Uint8List].
+class OrderedList implements BaseType {
   @override
-  String toJson() => 'BytelistMap';
+  String jsonValue() => '"OrderedList"';
 
   @override
   BaseValue newValue(ConnectionId connectionId) =>
-      new MapValue<String, Uint8List>();
+      new OrderedListValue<Uint8List>(connectionId.id);
 }

@@ -10,6 +10,7 @@ import 'package:crypto/crypto.dart';
 
 import '../document/base_value.dart';
 import '../document/value_node.dart';
+import '../sledge_connection_id.dart';
 import 'base_type.dart';
 import 'types/map_type.dart';
 import 'types/pos_neg_counter_type.dart';
@@ -75,8 +76,8 @@ class Schema implements BaseType {
       new SplayTreeMap<String, dynamic>.from(_schemaDescription);
 
   @override
-  BaseValue newValue() {
-    return new ValueNode(_schemaDescription);
+  BaseValue newValue(ConnectionId id) {
+    return new ValueNode(_schemaDescription, id);
   }
 
   /// Returns a description of the schema.

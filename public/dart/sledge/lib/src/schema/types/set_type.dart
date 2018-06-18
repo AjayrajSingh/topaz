@@ -8,6 +8,7 @@ import 'package:collection/collection.dart';
 
 import '../../document/base_value.dart';
 import '../../document/values/map_value.dart';
+import '../../sledge_connection_id.dart';
 import '../base_type.dart';
 
 /// The Sledge type for Set of [Uint8List].
@@ -19,6 +20,6 @@ class BytelistSet implements BaseType {
   String toJson() => 'BytelistSet';
 
   @override
-  BaseValue newValue() => new SetValue<Uint8List>(
+  BaseValue newValue(ConnectionId connectionId) => new SetValue<Uint8List>(
       equals: _listEquality.equals, hashCode: _listEquality.hash);
 }

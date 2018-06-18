@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import '../schema/base_type.dart';
+import '../sledge_connection_id.dart';
 import 'base_value.dart';
 
 /// Class that maps field names to values.
@@ -11,12 +12,13 @@ class ValueNode implements BaseValue {
 
   /// Default constructor. |schemaDescription| specifies the name and type of
   /// every field.
-  ValueNode(Map<String, BaseType> schemaDescription) {
+  ValueNode(
+      Map<String, BaseType> schemaDescription, ConnectionId connectionId) {
     // Maps symbols to a value.
     _childValues = <Symbol, BaseValue>{};
 
     schemaDescription.forEach((String name, BaseType type) {
-      Object value = type.newValue();
+      Object value = type.newValue(connectionId);
       assert(value != null);
       _childValues[new Symbol(name)] = value;
     });

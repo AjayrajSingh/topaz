@@ -7,6 +7,7 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 
 import '../sledge.dart';
+import '../sledge_connection_id.dart';
 import '../transaction.dart';
 import 'base_value.dart';
 import 'change.dart';
@@ -25,12 +26,14 @@ class Document implements ValueObserver {
   final DocumentId _documentId;
   ValueNode _value;
   final Map<Uint8List, BaseValue> _fields;
+  final ConnectionId _connectionId;
   static const int _hashLength = 20;
 
   /// Default constructor.
   Document(this._sledge, this._documentId)
-      : _fields = new Uint8ListMapFactory<BaseValue>().newMap() {
-    _value = _documentId.schema.newValue();
+      : _fields = new Uint8ListMapFactory<BaseValue>().newMap(),
+        _connectionId = _sledge.connectionId {
+    _value = _documentId.schema.newValue(_connectionId);
 
     _value.collectFields().forEach((final String key, final BaseValue value) {
       value.observer = this;

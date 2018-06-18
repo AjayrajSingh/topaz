@@ -3,13 +3,18 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:typed_data';
+
+import 'package:collection/collection.dart';
 
 import '../base_value.dart';
 import '../change.dart';
+import '../uint8list_ops.dart';
 import 'converted_change.dart';
 import 'converter.dart';
 import 'key_value_storage.dart';
 
+// TODO: keep one value per connection.
 /// Implementation of Positive Negative Counter CRDT.
 /// For each instance we create a pair of monotonically increasing variables:
 /// one to accumulate increments, and another to accumulate decrements. The
@@ -18,20 +23,24 @@ import 'key_value_storage.dart';
 /// Each variable pair may be modified by only one instance, so the
 /// Last One Wins merge strategy works.
 class _PosNegCounterValue<T extends num> {
-  final KeyValueStorage<int, T> _storage;
-  final int _currentInstanceId;
+  final KeyValueStorage<Uint8List, T> _storage;
+  final Uint8List _currentInstanceId;
   T _sum;
   final StreamController<T> _changeController =
       new StreamController<T>.broadcast();
+  static final _listEquality = new ListEquality();
 
   _PosNegCounterValue(this._currentInstanceId, T defaultValue)
-      : _storage = new KeyValueStorage<int, T>(defaultValue) {
+      : _storage = new KeyValueStorage<Uint8List, T>(defaultValue,
+            equals: _listEquality.equals, hashCode: _listEquality.hash) {
     _sum = _storage.defaultValue;
   }
 
-  int get _positiveKey => 2 * _currentInstanceId;
-  int get _negativeKey => 2 * _currentInstanceId + 1;
-  bool _isKeyPositive(int key) => key > 0 && key.isEven;
+  Uint8List get _positiveKey =>
+      concatUint8Lists(new Uint8List.fromList([0]), _currentInstanceId);
+  Uint8List get _negativeKey =>
+      concatUint8Lists(new Uint8List.fromList([1]), _currentInstanceId);
+  bool _isKeyPositive(Uint8List key) => key[0] == 0;
 
   Stream<T> get onChange => _changeController.stream;
 
@@ -46,14 +55,14 @@ class _PosNegCounterValue<T extends num> {
 
   T get value => _sum;
 
-  void _addPositiveValue(int key, T delta) {
+  void _addPositiveValue(Uint8List key, T delta) {
     T cur = _storage[key];
     _storage[key] = cur + delta;
   }
 
-  ConvertedChange<int, T> put() => _storage.put();
+  ConvertedChange<Uint8List, T> put() => _storage.put();
 
-  void applyChanges(ConvertedChange<int, T> change) {
+  void applyChanges(ConvertedChange<Uint8List, T> change) {
     for (var key in change.changedEntries.keys) {
       var diff = change.changedEntries[key] - _storage[key];
       if (_isKeyPositive(key)) {
@@ -70,11 +79,11 @@ class _PosNegCounterValue<T extends num> {
 /// Sledge Value to store numerical counter.
 class PosNegCounterValue<T extends num> extends BaseValue<T> {
   final _PosNegCounterValue<T> _counter;
-  final DataConverter<int, T> _converter;
+  final DataConverter<Uint8List, T> _converter;
 
   /// Constructor.
-  PosNegCounterValue(int id, [Change init])
-      : _converter = new DataConverter<int, T>(),
+  PosNegCounterValue(Uint8List id, [Change init])
+      : _converter = new DataConverter<Uint8List, T>(),
         _counter =
             new _PosNegCounterValue<T>(id, new Converter<T>().defaultValue) {
     applyChanges(init ?? new Change());

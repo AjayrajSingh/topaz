@@ -12,6 +12,7 @@ import 'document/document.dart';
 import 'document/document_id.dart';
 import 'document/uint8list_ops.dart';
 import 'ledger_helpers.dart';
+import 'sledge_connection_id.dart';
 import 'sledge_page_id.dart';
 import 'transaction.dart';
 
@@ -20,6 +21,7 @@ class Sledge {
   final ComponentContextProxy _componentContextProxy;
   final ledger.LedgerProxy _ledgerProxy = new ledger.LedgerProxy();
   final ledger.PageProxy _pageProxy;
+  final ConnectionId _connectionId = new ConnectionId.random();
 
   // Cache to get document by documentId.prefix.
   final Map<Uint8List, Document> _documentByPrefix = _mapFactory.newMap();
@@ -137,4 +139,7 @@ class Sledge {
     }
     return _currentTransaction;
   }
+
+  /// Returns an ID, unique among active connections accross devices.
+  ConnectionId get connectionId => _connectionId;
 }
