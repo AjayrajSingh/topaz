@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <thread>
 #include <utility>
+#include <zircon/syscalls.h>
 
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/arraysize.h"
@@ -130,6 +131,21 @@ std::string GetLabelFromURL(const std::string& url) {
   return url;
 }
 
+bool EntropySource(uint8_t* buffer, intptr_t count) {
+  intptr_t read = 0;
+  while (read < count) {
+    const intptr_t remaining = count - read;
+    const intptr_t len =
+        (ZX_CPRNG_DRAW_MAX_LEN < remaining) ? ZX_CPRNG_DRAW_MAX_LEN : remaining;
+    const zx_status_t status = zx_cprng_draw_new(buffer + read, len);
+    if (status != ZX_OK) {
+      return false;
+    }
+    read += len;
+  }
+  return true;
+}
+
 }  // namespace
 
 DartRunner::DartRunner()
@@ -168,6 +184,7 @@ DartRunner::DartRunner()
   params.create = IsolateCreateCallback;
   params.shutdown = IsolateShutdownCallback;
   params.cleanup = IsolateCleanupCallback;
+  params.entropy_source = EntropySource;
 #if !defined(DART_PRODUCT)
   params.get_service_assets = GetVMServiceAssetsArchiveCallback;
 #endif
