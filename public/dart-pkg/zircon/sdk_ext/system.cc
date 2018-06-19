@@ -202,11 +202,9 @@ zx_status_t System::ChannelWrite(fxl::RefPtr<Handle> channel,
   zx_status_t status = zx_channel_write(channel->handle(), 0, data.data(),
                                         data.length_in_bytes(),
                                         zx_handles.data(), zx_handles.size());
-  if (status == ZX_OK) {
-    // Handles were transferred.
-    for (Handle* handle : handles) {
-      handle->ReleaseHandle();
-    }
+  // Handles are always consumed.
+  for (Handle* handle : handles) {
+    handle->ReleaseHandle();
   }
 
   return status;
