@@ -59,7 +59,7 @@ class ErrorPrinter {
 
   ErrorPrinter({this.previousErrorHandler});
 
-  bool shouldReportProblem(Severity severity) => severity != Severity.nit;
+  bool shouldReportProblem(Severity severity) => severity != Severity.ignored;
 
   void call(codes.FormattedMessage problem, Severity severity,
       List<codes.FormattedMessage> context) {

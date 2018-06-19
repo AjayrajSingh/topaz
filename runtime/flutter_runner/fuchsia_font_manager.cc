@@ -21,7 +21,7 @@
 #include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fxl/logging.h"
 #include "third_party/icu/source/common/unicode/uchar.h"
-#include "txt/asset_font_style_set.h"
+#include "txt/typeface_font_asset_provider.h"
 
 namespace txt {
 
@@ -81,8 +81,8 @@ SkFontStyleSet* FuchsiaFontManager::onMatchFamily(
   if (!typeface)
     return nullptr;
 
-  sk_sp<txt::AssetFontStyleSet> font_style_set(
-      sk_make_sp<txt::AssetFontStyleSet>());
+  sk_sp<txt::TypefaceFontStyleSet> font_style_set(
+      sk_make_sp<txt::TypefaceFontStyleSet>());
   font_style_set->registerTypeface(typeface);
 
   return font_style_set.release();

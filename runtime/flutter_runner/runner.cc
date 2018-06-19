@@ -41,8 +41,6 @@ Runner::Runner()
 
   SetupICU();
 
-  SetupGlobalFonts();
-
   SetProcessName();
 
   SetThreadName("io.flutter.runner.main");
@@ -119,21 +117,6 @@ void Runner::SetupICU() {
   if (!icu_data::Initialize(host_context_.get())) {
     FXL_LOG(ERROR) << "Could not initialize ICU data.";
   }
-}
-
-void Runner::SetupGlobalFonts() {
-  // Fuchsia does not have per application (shell) fonts. Instead, all fonts
-  // must be obtained from the font provider.
-  auto process_font_collection =
-      blink::FontCollection::ForProcess().GetFontCollection();
-
-  // Connect to the system font provider.
-  fuchsia::fonts::FontProviderSyncPtr sync_font_provider;
-  host_context_->ConnectToEnvironmentService(sync_font_provider.NewRequest());
-
-  // Set the default font manager.
-  process_font_collection->SetDefaultFontManager(
-      sk_make_sp<txt::FuchsiaFontManager>(std::move(sync_font_provider)));
 }
 
 }  // namespace flutter

@@ -6,9 +6,7 @@ import("//build/dart/dart_tool.gni")
 import("//third_party/dart/utils/compile_platform.gni")
 
 compile_platform("kernel_platform_files") {
-  sources = [
-    "libraries.json",
-  ]
+  libraries_specification_uri = "libraries.json"
 
   outputs = [
     "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill",

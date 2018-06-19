@@ -10,6 +10,7 @@
 #include "flutter/fml/task_runner.h"
 #include "flutter/shell/common/rasterizer.h"
 #include "flutter/shell/common/run_configuration.h"
+#include "fuchsia_font_manager.h"
 #include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/functional/make_copyable.h"
 #include "lib/fxl/synchronization/waitable_event.h"
@@ -239,14 +240,24 @@ Engine::Engine(
     }
   };
 
+  // Connect to the system font provider.
+  fuchsia::fonts::FontProviderSyncPtr sync_font_provider;
+  startup_context.ConnectToEnvironmentService(sync_font_provider.NewRequest());
+
   shell_->GetTaskRunners().GetUITaskRunner()->PostTask(
-      fxl::MakeCopyable([engine = shell_->GetEngine(),                      //
-                         run_configuration = std::move(run_configuration),  //
-                         on_run_failure                                     //
+      fxl::MakeCopyable([engine = shell_->GetEngine(),                       //
+                         run_configuration = std::move(run_configuration),   //
+                         sync_font_provider = std::move(sync_font_provider), //
+                         on_run_failure                                      //
   ]() mutable {
         if (!engine) {
           return;
         }
+
+        // Set default font manager.
+        engine->GetFontCollection().GetFontCollection()->SetDefaultFontManager(
+            sk_make_sp<txt::FuchsiaFontManager>(std::move(sync_font_provider)));
+
         if (!engine->Run(std::move(run_configuration))) {
           on_run_failure();
         }

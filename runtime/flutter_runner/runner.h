@@ -58,8 +58,6 @@ class Runner final : public fuchsia::sys::Runner {
 
   void SetupICU();
 
-  void SetupGlobalFonts();
-
   FXL_DISALLOW_COPY_AND_ASSIGN(Runner);
 };
 
