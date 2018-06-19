@@ -64,7 +64,7 @@ void main() {
 
 /// Generic error handler.
 // TODO(SO-1123): hook up to a snackbar.
-void handleError(Error error, StackTrace stackTrace) {
+void handleError(Object error, StackTrace stackTrace) {
   log.severe('An error ocurred', error, stackTrace);
 }
 

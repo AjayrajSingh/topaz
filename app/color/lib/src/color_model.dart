@@ -10,7 +10,7 @@ import 'package:lib.widgets.dart/model.dart';
 class ColorModel extends Model {
   /// Gets the color.
   Color get color => _color;
-  Color _color = Colors.black;
+  Color _color = Colors.pink[800];
 
   set color(Color value) {
     _color = value;
