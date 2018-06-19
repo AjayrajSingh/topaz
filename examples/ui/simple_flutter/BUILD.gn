@@ -1,0 +1,26 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+flutter_app("simple_flutter") {
+  main_dart = "lib/main.dart"
+
+  deps = [
+    "//garnet/public/lib/ui/gfx/fidl:fidl",
+    "//garnet/public/lib/ui/scenic/fidl:fidl",
+    "//garnet/public/lib/ui/views/fidl:v1",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/ui/flutter",
+  ]
+}
+
+flutter_app("leaf_flutter") {
+  main_dart = "lib/leaf.dart"
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+  ]
+}

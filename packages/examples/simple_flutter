@@ -1,0 +1,6 @@
+{
+    "packages": [
+        "//topaz/examples/ui/simple_flutter:simple_flutter",
+        "//topaz/examples/ui/simple_flutter:leaf_flutter"
+    ]
+}

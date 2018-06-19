@@ -5,6 +5,7 @@
         "topaz/packages/examples/misc",
         "topaz/packages/examples/mondrian",
         "topaz/packages/examples/spinning_cube",
-        "topaz/packages/examples/ui"
+        "topaz/packages/examples/ui",
+        "topaz/packages/examples/simple_flutter"
     ]
 }
