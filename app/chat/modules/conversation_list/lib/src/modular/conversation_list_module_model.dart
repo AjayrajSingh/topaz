@@ -697,7 +697,7 @@ class ChatConversationListModuleModel extends ModuleModel {
   /// Callback that handles the text change event in the new conversation form.
   void handleNewConversationFormChanged(String text) {
     // Update the link data for contacts picker.
-    _pickerLink.updateObject(
+    _pickerLink.set(
       const <String>['prefix'],
       json.encode(<String, String>{'content': text}),
     );

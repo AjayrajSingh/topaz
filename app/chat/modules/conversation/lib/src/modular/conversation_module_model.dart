@@ -169,7 +169,7 @@ class ChatConversationModuleModel extends ModuleModel {
         if (embedders != null) {
           for (Embedder embedder in embedders) {
             // Set the link value.
-            embedder.link?.updateObject(
+            embedder.link?.set(
               const <String>['lastMessage'],
               json.encode(<String, String>{'content': lastTextMessage.text}),
             );

@@ -178,7 +178,7 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
 
     try {
       if (additionalLinkData != null) {
-        link.updateObject(null, json.encode(additionalLinkData));
+        link.set(null, json.encode(additionalLinkData));
       }
     } on Exception catch (e, stackTrace) {
       log.warning(
