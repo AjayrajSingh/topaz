@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:lib.app.dart/logging.dart';
 
 /// ignore_for_file: avoid_annotating_with_dynamic
 
@@ -98,11 +99,11 @@ abstract class XiClient {
       if (callback != null) {
         callback(decoded['result']);
       } else {
-        print('missing callback for id=$id');
+        log.warning('missing callback for id=$id');
       }
     } else if (_handler == null) {
       // not a response, so it must be a request
-      print('no handler registered for request');
+      log.warning('no handler registered for request');
     } else {
       String method = decoded['method'];
       dynamic params = decoded['params'];
@@ -151,11 +152,7 @@ abstract class XiClient {
 
   /// Generic error handler that can be used or everyone by implementations of [XiClient].
   void onError(Object error, StackTrace stackTrace) {
-    print('[XiClient ERROR]: $error');
-    if (stackTrace != null) {
-      print(stackTrace);
-    }
-
+    log.severe('[XiClient ERROR]:', error, stackTrace);
     streamController.close();
   }
 }

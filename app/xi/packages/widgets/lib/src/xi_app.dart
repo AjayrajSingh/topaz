@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:xi_client/client.dart';
 
 import 'editor.dart';
@@ -55,7 +56,7 @@ class XiAppHandler extends XiRpcHandler {
         //print('scroll_to: $params');
         break;
       default:
-        print('notification, unknown method $method, params=$params');
+        log.warning('notification, unknown method $method, params=$params');
     }
   }
 
@@ -66,7 +67,7 @@ class XiAppHandler extends XiRpcHandler {
         return _editorState.measureWidths(params);
         break;
       default:
-        print('rpc request, unknown method $method, params=$params');
+        log.warning('rpc request, unknown method $method, params=$params');
     }
     return null;
   }
@@ -122,7 +123,7 @@ class XiAppState extends State<XiApp> {
       // a pending queue of new_view requests, waiting for init to complete. This is easier.
       return widget.xi.sendRpc('new_view', <String, dynamic>{}, (dynamic id) {
         _viewId = id;
-        print('id = $id');
+        log.info('view_id = $id');
         if (_pendingReqs != null) {
           for (_PendingNotification pending in _pendingReqs) {
             sendNotification(pending.method, pending.params);

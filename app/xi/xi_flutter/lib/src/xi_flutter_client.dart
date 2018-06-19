@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:xi_client/client.dart';
@@ -41,7 +42,7 @@ class XiFlutterClient extends XiClient {
       // Note: we'll get a "text file busy" error when doing a reload from
       // "flutter run", so best to log the error and go on. Might want to
       // make error catching more fine-grained here.
-      print('Error copying file: $e');
+      log.warning('Error copying file: $e');
     }
 
     // Make the xi-core copy executable and start it.
@@ -51,7 +52,7 @@ class XiFlutterClient extends XiClient {
     // Transform the unstructured stderr from the xi-core process and print
     // it.
     process.stderr.transform(utf8.decoder).listen(
-          (String data) => print('[xi-core stderr]: $data'),
+          (String data) => log.info('[xi-core stderr]: $data'),
           onError: onError,
           cancelOnError: true,
         );

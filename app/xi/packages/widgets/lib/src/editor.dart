@@ -8,6 +8,7 @@ import 'dart:ui' as ui
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lib.app.dart/logging.dart';
 
 import 'line_cache.dart';
 import 'text_line.dart';
@@ -369,7 +370,7 @@ class EditorState extends State<Editor> {
     if (event is RawKeyDownEvent) {
       RawKeyEventData data = event.data;
       if (data is RawKeyEventDataAndroid) {
-        print(
+        log.info(
             'codePoint=${data.codePoint}, metaState=${data.metaState}, keyCode=${data.keyCode}');
         int modifiers = _metaStateToModifiers(data.metaState);
         if (data.codePoint != 0) {
@@ -378,7 +379,7 @@ class EditorState extends State<Editor> {
           _handleHidKey(_androidToHid[data.keyCode], modifiers);
         }
       } else if (data is RawKeyEventDataFuchsia) {
-        print(
+        log.info(
             'codePoint=${data.codePoint}, modifiers=${data.modifiers}, hidUsage=${data.hidUsage}');
         if (data.codePoint != 0 &&
             (data.modifiers & _modifierAltCtrlMask) == 0) {
@@ -444,7 +445,7 @@ class EditorState extends State<Editor> {
       int start = pos.pixels ~/ _lineHeight;
       // TODO: be less noisy, send only if changed
       _sendNotification('scroll', <int>[start, start + viewHeight]);
-      print('sending scroll $start $viewHeight');
+      log.info('sending scroll $start $viewHeight');
     }
   }
 

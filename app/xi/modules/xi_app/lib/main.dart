@@ -8,20 +8,17 @@ import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_ledger/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:xi_widgets/widgets.dart';
 
 import 'src/xi_fuchsia_client.dart';
 
 /// ignore_for_file: avoid_annotating_with_dynamic
 
-void _log(String msg) {
-  print('[xi_app] $msg');
-}
-
 dynamic _handleResponse(String description) {
   return (Status status) {
     if (status != Status.ok) {
-      _log('$description: $status');
+      log.info('$description: $status');
     }
   };
 }
@@ -31,7 +28,7 @@ dynamic _handleResponse(String description) {
 class ModuleImpl implements Lifecycle {
   /// Constructor.
   ModuleImpl(this._ledgerRequest) {
-    _log('ModuleImpl::init call');
+    log.info('ModuleImpl::init call');
     connectToService(kContext.environmentServices, _moduleContext.ctrl);
     _moduleContext.getComponentContext(_componentContext.ctrl.request());
     _componentContext.getLedger(_ledgerRequest, _handleResponse('getLedger'));
@@ -49,7 +46,7 @@ class ModuleImpl implements Lifecycle {
 
   @override
   void terminate() {
-    _log('ModuleImpl::stop call');
+    log.info('ModuleImpl::stop call');
 
     // Cleaning up.
     _moduleContext.ctrl.close();
@@ -61,18 +58,18 @@ class ModuleImpl implements Lifecycle {
 
 /// Main entry point to the example parent module.
 void main() {
-  _log('Module main called');
+  setupLogger(name: '[xi_app]');
+  log.info('Module main called');
 
   InterfacePair<Ledger> pair = new InterfacePair<Ledger>();
   final ModuleImpl module = new ModuleImpl(pair.passRequest());
 
-  kContext.outgoingServices
-    .addServiceForName(
-      module.bindLifecycle,
-      Lifecycle.$serviceName,
-    );
+  kContext.outgoingServices.addServiceForName(
+    module.bindLifecycle,
+    Lifecycle.$serviceName,
+  );
 
-  _log('Starting Flutter app...');
+  log.info('Starting Flutter app...');
 
   XiFuchsiaClient xi = new XiFuchsiaClient(pair.passHandle());
 
