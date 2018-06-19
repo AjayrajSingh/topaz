@@ -36,7 +36,7 @@ sdk_atom("kernel_compiler_sdk") {
     },
     {
       source = "$dart_sdk/bin/dart"
-      dest = "dart_prebuilts/dart"
+      dest = "dart"
     },
     {
       source = "$root_out_dir/dart_runner_patched_sdk/platform_strong.dill"
