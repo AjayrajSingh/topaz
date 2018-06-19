@@ -8,13 +8,18 @@ import 'dart:typed_data';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 
+import 'document/change.dart';
 import 'document/document.dart';
 import 'document/document_id.dart';
 import 'document/uint8list_ops.dart';
 import 'ledger_helpers.dart';
 import 'sledge_connection_id.dart';
 import 'sledge_page_id.dart';
+import 'subscription/subscription.dart';
 import 'transaction.dart';
+
+// TODO: consider throwing exceptions when inintialization or transaction fails.
+// Insted of current approach to return false.
 
 /// The interface to the Sledge library.
 class Sledge {
@@ -61,7 +66,7 @@ class Sledge {
         print('Sledge failed to GetPage: $status');
         initializationCompleter.complete(false);
       } else {
-        initializationCompleter.complete(true);
+        _subscribe(initializationCompleter);
       }
     });
 
@@ -141,4 +146,21 @@ class Sledge {
 
   /// Returns an ID, unique among active connections accross devices.
   ConnectionId get connectionId => _connectionId;
+
+  /// Call |applyChanges| for all registered documents.
+  void _applyChanges(Change change) {
+    final splittedChange = change.splitByPrefix(DocumentId.prefixLength);
+    for (final prefix in splittedChange.keys) {
+      Document.applyChanges(_documentByPrefix[prefix], splittedChange[prefix]);
+    }
+  }
+
+  /// Subscribes for page.onChange to perform applyChanges.
+  Subscription _subscribe(Completer<bool> subscriptionCompleter) {
+    if (_currentTransaction == null) {
+      throw new StateError('Must be called inside a transaction.');
+    }
+    return new Subscription(
+        _pageProxy, _pageSnapshotFactory, _applyChanges, subscriptionCompleter);
+  }
 }

@@ -10,6 +10,7 @@ import 'package:fidl_fuchsia_mem/fidl.dart';
 import 'package:lib.ledger.dart/ledger.dart';
 import 'package:zircon/zircon.dart' show ZX, ReadResult;
 
+import 'document/change.dart';
 import 'document/values/key_value.dart';
 
 // ignore_for_file: one_member_abstracts
@@ -53,4 +54,14 @@ Future<List<KeyValue>> getEntriesFromSnapshotWithPrefix(
   }
   print('Succesfully read ${keyValues.length} entries');
   return keyValues;
+}
+
+/// Returns Change with the same content as a pageChange.
+Change getChangeFromPageChange(ledger.PageChange pageChange) {
+  return new Change(
+      pageChange.changedEntries
+          .map((ledger.Entry entry) =>
+              new KeyValue(entry.key, readBuffer(entry.value)))
+          .toList(),
+      pageChange.deletedKeys);
 }

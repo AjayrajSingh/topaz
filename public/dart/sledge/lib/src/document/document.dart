@@ -16,10 +16,6 @@ import 'uint8list_ops.dart';
 import 'value_node.dart';
 import 'value_observer.dart';
 
-// TODO: Use the |_sledge| and |_documentId| fields.
-// TODO: Use the |_put| and |_applyChanges| methods.
-// ignore_for_file: unused_field, unused_element
-
 /// Represents structured data that can be stored in Sledge.
 class Document implements ValueObserver {
   final Sledge _sledge;

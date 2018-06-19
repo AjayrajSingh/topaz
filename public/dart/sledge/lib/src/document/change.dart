@@ -55,4 +55,10 @@ class Change {
     }
     return splittedChanges;
   }
+
+  /// Clear change.
+  void clear() {
+    changedEntries.clear();
+    deletedKeys.clear();
+  }
 }
