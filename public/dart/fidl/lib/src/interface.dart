@@ -440,6 +440,7 @@ class ProxyController<T> {
       onUnbind();
     }
 
+    // TODO(rosswang): Do we need to _reset() here?
     return new InterfaceHandle<T>(_reader.unbind());
   }
 
@@ -523,6 +524,8 @@ class ProxyController<T> {
   /// Always called when the channel underneath closes. If [onConnectionError]
   /// is set, it is called.
   void _handleError(ChannelReaderError error) {
+    proxyError(error.toString());
+    _reset();
     if (onConnectionError != null) {
       onConnectionError();
     }
