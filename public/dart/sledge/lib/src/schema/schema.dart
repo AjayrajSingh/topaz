@@ -71,7 +71,8 @@ class Schema implements BaseType {
   }
 
   @override
-  Map<String, dynamic> toJson() => new SplayTreeMap<String, dynamic>.from(_schemaDescription);
+  Map<String, dynamic> toJson() =>
+      new SplayTreeMap<String, dynamic>.from(_schemaDescription);
 
   @override
   BaseValue newValue() {

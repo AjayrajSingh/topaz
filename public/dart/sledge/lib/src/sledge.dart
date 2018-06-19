@@ -17,8 +17,7 @@ import 'transaction.dart';
 
 /// The interface to the Sledge library.
 class Sledge {
-  final ComponentContextProxy _componentContextProxy =
-      new ComponentContextProxy();
+  final ComponentContextProxy _componentContextProxy;
   final ledger.LedgerProxy _ledgerProxy = new ledger.LedgerProxy();
   final ledger.PageProxy _pageProxy;
 
@@ -36,12 +35,11 @@ class Sledge {
   Transaction _currentTransaction;
 
   /// Default constructor.
-  Sledge(final ModuleContext moduleContext, [SledgePageId pageId])
+  Sledge(this._componentContextProxy, [SledgePageId pageId])
       : _pageProxy = new ledger.PageProxy(),
         _pageSnapshotFactory = new LedgerPageSnapshotFactoryImpl() {
     pageId ??= new SledgePageId();
 
-    moduleContext.getComponentContext(_componentContextProxy.ctrl.request());
     _componentContextProxy.getLedger(_ledgerProxy.ctrl.request(),
         (ledger.Status status) {
       if (status != ledger.Status.ok) {
@@ -68,8 +66,17 @@ class Sledge {
     _initializationSucceeded = initializationCompleter.future;
   }
 
+  /// Convenience factory for modules.
+  factory Sledge.fromModule(final ModuleContext moduleContext,
+      [SledgePageId pageId]) {
+    ComponentContextProxy componentContextProxy = new ComponentContextProxy();
+    moduleContext.getComponentContext(componentContextProxy.ctrl.request());
+    return new Sledge(componentContextProxy, pageId);
+  }
+
   /// Convenience constructor for tests.
-  Sledge.testing(this._pageProxy, this._pageSnapshotFactory) {
+  Sledge.testing(this._pageProxy, this._pageSnapshotFactory)
+      : _componentContextProxy = null {
     _initializationSucceeded = new Future.value(true);
   }
 

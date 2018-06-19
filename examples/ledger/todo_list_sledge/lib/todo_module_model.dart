@@ -10,7 +10,7 @@ import 'package:sledge/sledge.dart';
 class TodoModuleModel extends ModuleModel {
   // TODO: Move into separate target.
   void _runSledgeTest(final ModuleContext moduleContext) async {
-    Sledge sledge = new Sledge(moduleContext, new SledgePageId('my page'));
+    Sledge sledge = new Sledge.fromModule(moduleContext, new SledgePageId('my page'));
 
     Map<String, BaseType> schemaDescription = <String, BaseType>{
       'someBool': new Boolean(),
