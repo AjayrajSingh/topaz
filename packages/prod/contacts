@@ -1,8 +1,8 @@
 {
-    "packages": {
-        "contact_card": "//topaz/app/contacts/modules/contact_card",
-        "contact_list": "//topaz/app/contacts/modules/contact_list",
-        "contacts_content_provider": "//topaz/app/contacts/agents/content_provider:contacts_content_provider",
-        "contacts_picker": "//topaz/app/contacts/modules/contacts_picker"
-    }
+    "packages": [
+        "//topaz/app/contacts/modules/contact_card",
+        "//topaz/app/contacts/modules/contact_list",
+        "//topaz/app/contacts/agents/content_provider:contacts_content_provider",
+        "//topaz/app/contacts/modules/contacts_picker"
+    ]
 }

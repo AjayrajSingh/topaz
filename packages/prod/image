@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "image": "//topaz/app/image"
-    }
+    "packages": [
+        "//topaz/app/image"
+    ]
 }

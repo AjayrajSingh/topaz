@@ -2,7 +2,7 @@
     "imports": [
         "garnet/packages/prod/fonts"
     ],
-    "packages": {
-        "term": "//topaz/app/term"
-    }
+    "packages": [
+        "//topaz/app/term"
+    ]
 }

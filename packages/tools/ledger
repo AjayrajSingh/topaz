@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "ledger_dashboard": "//topaz/app/ledger/ledger_dashboard"
-    }
+    "packages": [
+        "//topaz/app/ledger/ledger_dashboard"
+    ]
 }

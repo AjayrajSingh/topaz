@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "mondrian": "//topaz/shell/mondrian_story_shell:mondrian"
-    }
+    "packages": [
+        "//topaz/shell/mondrian_story_shell:mondrian"
+    ]
 }

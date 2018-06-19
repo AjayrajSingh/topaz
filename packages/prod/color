@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "color": "//topaz/app/color"
-    }
+    "packages": [
+        "//topaz/app/color"
+    ]
 }

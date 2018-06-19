@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "dashboard": "//topaz/app/dashboard"
-    }
+    "packages": [
+        "//topaz/app/dashboard"
+    ]
 }

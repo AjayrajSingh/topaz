@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "web_runner_prototype": "//topaz/runtime/web_runner_prototype"
-    }
+    "packages": [
+        "//topaz/runtime/web_runner_prototype"
+    ]
 }

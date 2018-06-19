@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "example_manual_relationships": "//topaz/examples/example_manual_relationships"
-    }
+    "packages": [
+        "//topaz/examples/example_manual_relationships"
+    ]
 }

@@ -1,6 +1,6 @@
 {
-    "packages": {
-        "chat_content_provider_test": "//topaz/app/chat/tests/chat_content_provider_test",
-        "chat_tests": "//topaz/app/chat:chat_tests"
-    }
+    "packages": [
+        "//topaz/app/chat/tests/chat_content_provider_test",
+        "//topaz/app/chat:chat_tests"
+    ]
 }

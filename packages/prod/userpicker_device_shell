@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "userpicker_device_shell": "//topaz/bin/userpicker_device_shell"
-    }
+    "packages": [
+        "//topaz/bin/userpicker_device_shell"
+    ]
 }

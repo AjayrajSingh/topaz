@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "perspective": "//topaz/app/perspective"
-    }
+    "packages": [
+        "//topaz/app/perspective"
+    ]
 }

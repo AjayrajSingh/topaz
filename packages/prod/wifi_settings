@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "wifi_settings": "//topaz/bin/wifi_settings"
-    }
+    "packages": [
+        "//topaz/bin/wifi_settings"
+    ]
 }

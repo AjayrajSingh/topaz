@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "oauth_token_manager": "//topaz/examples/oauth_token_manager"
-    }
+    "packages": [
+        "//topaz/examples/oauth_token_manager"
+    ]
 }

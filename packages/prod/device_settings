@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "device_settings": "//topaz/bin/device_settings"
-    }
+    "packages": [
+        "//topaz/bin/device_settings"
+    ]
 }

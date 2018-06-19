@@ -3,7 +3,7 @@
         "garnet/packages/prod/fonts",
         "garnet/packages/prod/scenic"
     ],
-    "packages": {
-        "flutter_jit_runner": "//topaz/runtime/flutter_runner:flutter_jit_runner"
-    }
+    "packages": [
+        "//topaz/runtime/flutter_runner:flutter_jit_runner"
+    ]
 }

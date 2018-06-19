@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "spinning_cube": "//topaz/app/spinning_cube"
-    }
+    "packages": [
+        "//topaz/app/spinning_cube"
+    ]
 }

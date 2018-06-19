@@ -1,6 +1,6 @@
 {
-    "packages": {
-        "fidl_compatibility_test_server_dart": "//topaz/bin/fidl_compatibility_test/dart:fidl_compatibility_test_server_dart"
+    "packages": [
+        "//topaz/bin/fidl_compatibility_test/dart:fidl_compatibility_test_server_dart"
 
-    }
+    ]
 }

@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "dashboard_config": "//topaz/app/dashboard:config"
-    }
+    "packages": [
+        "//topaz/app/dashboard:config"
+    ]
 }

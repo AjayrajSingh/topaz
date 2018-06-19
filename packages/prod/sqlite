@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "sqlite": "//third_party/sqlite:package"
-    }
+    "packages": [
+        "//third_party/sqlite:package"
+    ]
 }

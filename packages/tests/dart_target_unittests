@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "dart_zircon_test": "//topaz/public/dart-pkg/zircon:dart_zircon_test"
-    }
+    "packages": [
+        "//topaz/public/dart-pkg/zircon:dart_zircon_test"
+    ]
 }

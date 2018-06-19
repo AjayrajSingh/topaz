@@ -2,16 +2,16 @@
     "imports": [
         "garnet/packages/prod/drivers"
     ],
-    "packages": {
-        "ble_rect": "//topaz/examples/bluetooth/ble_rect",
-        "ble_scanner": "//topaz/examples/bluetooth/ble_scanner",
-        "eddystone_advertiser": "//topaz/examples/bluetooth/eddystone_advertiser",
-        "eddystone_agent": "//topaz/examples/eddystone_agent",
-        "media_player_flutter": "//topaz/examples/media/media_player_flutter",
-        "media_player_skia": "//topaz/examples/media/media_player_skia:package",
-        "mine_digger": "//topaz/examples/mine_digger",
-        "todo_list": "//topaz/examples/ledger/todo_list",
-        "todo_list_sledge": "//topaz/examples/ledger/todo_list_sledge",
-        "vu_meter": "//topaz/examples/media/vu_meter:package"
-    }
+    "packages": [
+        "//topaz/examples/bluetooth/ble_rect",
+        "//topaz/examples/bluetooth/ble_scanner",
+        "//topaz/examples/bluetooth/eddystone_advertiser",
+        "//topaz/examples/eddystone_agent",
+        "//topaz/examples/media/media_player_flutter",
+        "//topaz/examples/media/media_player_skia:package",
+        "//topaz/examples/mine_digger",
+        "//topaz/examples/ledger/todo_list",
+        "//topaz/examples/ledger/todo_list_sledge",
+        "//topaz/examples/media/vu_meter:package"
+    ]
 }

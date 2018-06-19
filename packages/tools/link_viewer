@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "link_viewer": "//topaz/app/link_viewer"
-    }
+    "packages": [
+        "//topaz/app/link_viewer"
+    ]
 }

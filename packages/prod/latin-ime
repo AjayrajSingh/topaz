@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "latin-ime": "//topaz/app/latin-ime"
-    }
+    "packages": [
+        "//topaz/app/latin-ime"
+    ]
 }

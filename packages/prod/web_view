@@ -5,7 +5,7 @@
         "garnet/packages/tools/curl",
         "topaz/packages/prod/sqlite"
     ],
-    "packages": {
-        "web_view": "//topaz/runtime/web_view"
-    }
+    "packages": [
+        "//topaz/runtime/web_view"
+    ]
 }

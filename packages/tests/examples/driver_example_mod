@@ -1,5 +1,5 @@
 {
-    "packages": {
-        "driver_example": "//topaz/examples/test/driver_example_mod:driver_example_mod_wrapper"
-    }
+    "packages": [
+        "//topaz/examples/test/driver_example_mod:driver_example_mod_wrapper"
+    ]
 }

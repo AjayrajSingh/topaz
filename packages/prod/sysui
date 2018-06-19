@@ -3,11 +3,11 @@
         "topaz/packages/prod/userpicker_device_shell",
         "topaz/packages/prod/wifi_settings"
     ],
-    "packages": {
-        "armadillo_user_shell": "//topaz/bin/user_shell/armadillo_user_shell",
-        "capybara_user_shell": "//topaz/bin/user_shell/capybara_user_shell",
-        "home_work_agent": "//topaz/shell/agents/home_work_agent",
-        "kernel_panic": "//topaz/shell/kernel_panic",
-        "sysui": "//topaz/shell:sysui"
-    }
+    "packages": [
+        "//topaz/bin/user_shell/armadillo_user_shell",
+        "//topaz/bin/user_shell/capybara_user_shell",
+        "//topaz/shell/agents/home_work_agent",
+        "//topaz/shell/kernel_panic",
+        "//topaz/shell:sysui"
+    ]
 }
