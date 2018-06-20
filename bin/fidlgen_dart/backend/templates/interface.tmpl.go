@@ -496,36 +496,49 @@ class _{{ .Name }}Futurize implements $sync.{{ .Name }} {
 {{- end }}
 }
 
-class {{ .Name }}Binding {
+class {{ .Name }}Binding implements $fidl.Binding<{{ .Name }}> {
+  {{ .Name }} _impl;
   final $sync.{{ .Name }}Binding _syncBinding;
   {{ .Name }}Binding() : _syncBinding = new $sync.{{ .Name }}Binding();
 
+  @override
   _VoidCallback get onBind => _syncBinding.onBind;
+  @override
   set onBind(_VoidCallback f) => _syncBinding.onBind = f;
+  @override
   _VoidCallback get onUnbind => _syncBinding.onUnbind;
+  @override
   set onUnbind(_VoidCallback f) => _syncBinding.onUnbind = f;
+  @override
   _VoidCallback get onClose => _syncBinding.onClose;
+  @override
   set onClose(_VoidCallback f) => _syncBinding.onClose = f;
+  @override
   _VoidCallback get onConnectionError => _syncBinding.onConnectionError;
+  @override
   set onConnectionError(_VoidCallback f) => _syncBinding.onConnectionError = f;
 
+  @override
   $fidl.InterfaceHandle<{{ .Name }}> wrap({{ .Name }} impl) {
     final handle = new $fidl.InterfaceHandle<{{ .Name }}>(_syncBinding.wrap(new _{{ .Name }}Futurize(impl)).passChannel());
     _bind(impl);
     return handle;
   }
 
+  @override
   void bind({{ .Name }} impl, $fidl.InterfaceRequest<{{ .Name }}> interfaceRequest) {
     _syncBinding.bind(new _{{ .Name }}Futurize(impl), new $fidl.InterfaceRequest<$sync.{{ .Name }}>(interfaceRequest.passChannel()));
     _bind(impl);
-   }
+  }
 
+  @override
   $fidl.InterfaceRequest<{{ .Name }}> unbind() {
     final req = new $fidl.InterfaceRequest<{{ .Name }}>(_syncBinding.unbind().passChannel());
     _unbind();
     return req;
   }
 
+  @override
   bool get isBound => _syncBinding.isBound;
 
   {{- range .Methods }}
@@ -534,7 +547,9 @@ class {{ .Name }}Binding {
   {{- end }}
   {{- end }}
 
+  // ignore: use_setters_to_change_properties
   void _bind({{ .Name }} impl) {
+    _impl = impl;
     {{- range .Methods }}
     {{- if not .HasRequest }}
     _{{ .Name }}_subscription = impl.{{ .Name }}.listen(
@@ -545,6 +560,7 @@ class {{ .Name }}Binding {
   }
 
   void _unbind() {
+    _impl = null;
     {{- range .Methods }}
     {{- if not .HasRequest }}
     _{{ .Name }}_subscription.cancel();
@@ -553,10 +569,21 @@ class {{ .Name }}Binding {
     {{- end }}
   }
 
+  @override
   void close() {
     _unbind();
     _syncBinding.close();
   }
+
+  @override
+  @protected
+  void handleMessage($fidl.Message message, $fidl.MessageSink respond) => _syncBinding.handleMessage(message, respond);
+
+  @override
+  void sendMessage($fidl.Message response) => _syncBinding.sendMessage(response);
+
+  @override
+  {{ .Name }} get impl => _impl;
 }
 
 {{ end }}
