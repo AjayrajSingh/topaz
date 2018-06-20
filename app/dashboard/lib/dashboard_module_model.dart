@@ -12,7 +12,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
-import 'package:web_view/web_view.dart' as web_view;
 
 import 'package:dashboard/build_status_model.dart';
 
@@ -90,13 +89,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
     final String url =
         'https://luci-scheduler.appspot.com/jobs/fuchsia/$buildName';
 
-    final Map<String, Map<String, String>> webviewLinkData =
-        <String, Map<String, String>>{
-      'view': <String, String>{'uri': url}
-    };
-    IntentBuilder intentBuilder =
-        new IntentBuilder.handler(web_view.kWebViewURL)
-          ..addParameter(null, webviewLinkData);
+    IntentBuilder intentBuilder = new IntentBuilder.handler(url);
 
     _webviewModuleControllerProxy?.ctrl?.close();
     _webviewModuleControllerProxy = new ModuleControllerProxy();

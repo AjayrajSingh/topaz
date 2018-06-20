@@ -40,7 +40,6 @@ flutter_aot_app("dashboard") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/module_resolver/dart",
     "//topaz/public/lib/ui/flutter",
-    "//topaz/runtime/web_runner/lib/dart:web_view",
   ]
 }
 

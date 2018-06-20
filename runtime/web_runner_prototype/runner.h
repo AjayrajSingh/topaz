@@ -6,10 +6,12 @@
 #define TOPAZ_RUNTIME_WEB_RUNNER_PROTOTYPE_RUNNER_H_
 
 #include <memory>
+#include <set>
 
 #include "lib/app/cpp/startup_context.h"
 
 namespace web {
+class ComponentController;
 
 class Runner : public fuchsia::sys::Runner {
  public:
@@ -19,14 +21,22 @@ class Runner : public fuchsia::sys::Runner {
   Runner(const Runner&) = delete;
   Runner& operator=(const Runner&) = delete;
 
- private:
+  fuchsia::sys::Launcher* launcher() const {
+    return context_->launcher().get();
+  }
+
+  void DestroyComponent(ComponentController* component);
+
   // |fuchsia::sys::Runner|
   void StartComponent(fuchsia::sys::Package package,
                       fuchsia::sys::StartupInfo startup_info,
                       fidl::InterfaceRequest<fuchsia::sys::ComponentController>
-                          controller) override;
+                          controller) final;
 
+ private:
   std::unique_ptr<fuchsia::sys::StartupContext> context_;
+  fidl::BindingSet<fuchsia::sys::Runner> bindings_;
+  std::set<ComponentController*> components_;
 };
 
 }  // namespace web
