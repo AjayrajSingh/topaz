@@ -8,6 +8,9 @@ import("//build/host.gni")
 
 go_binary("fidlgen_dart") {
   gopackage = "fidlgen_dart"
+
+  sdk_category = "partner"
+
   go_dependencies = [
     {
       package = "fidlgen_dart"

@@ -25,6 +25,7 @@ sdk("topaz") {
 
   deps = [
     "//garnet/public/sdk:garnet_molecule",
+    "//topaz/bin/fidlgen_dart:fidlgen_dart_sdk($host_toolchain)",
     "//topaz/runtime/dart:kernel_compiler_sdk($host_toolchain)",
   ]
 }

@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"text/template"
 )
 
@@ -18,6 +19,9 @@ func writeFile(outputFilename string,
 	templateName string,
 	tmpls *template.Template,
 	tree ir.Root, dartfmt string) error {
+	if err := os.MkdirAll(filepath.Dir(outputFilename), os.ModePerm); err != nil {
+		return err
+	}
 	generated, err := os.Create(outputFilename)
 	if err != nil {
 		return err
