@@ -10,3 +10,14 @@ group("xi") {
     "//topaz/app/xi/xi_flutter",
   ]
 }
+
+# Top-level group for xi dart tests. To build tests, this must be
+# included in the dart_unittests group in //topaz/BUILD.gn.
+# Additionally, each referenced `dart_test` target must be listed in
+# //topaz/packages/tests/dart_unittests
+group("dart_unittests") {
+  testonly = true
+  deps = [
+    "modules/xi_app:xi_app_tests",
+  ]
+}

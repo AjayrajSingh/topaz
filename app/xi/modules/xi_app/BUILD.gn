@@ -3,19 +3,42 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
+import("//build/dart/dart_test.gni")
+
+app_deps = [
+  "//garnet/public/lib/ui/views/fidl:v1",
+  "//garnet/public/lib/xi/fidl:fidl",
+  "//peridot/public/lib:fidl",
+  "//third_party/dart-pkg/git/flutter/packages/flutter",
+  "//topaz/app/xi/packages/widgets:xi_widgets",
+  "//topaz/public/dart/fidl",
+  "//topaz/public/dart/fuchsia",
+  "//topaz/public/lib/app/dart",
+  "//topaz/public/lib/ui/flutter",
+]
 
 flutter_app("xi_app") {
   main_dart = "lib/main.dart"
+  deps = app_deps
+}
+
+dart_library("testlib") {
+  package_name = "xi_app.testlib"
+  sources = [
+    # workaround for "Don't import implementation files from another package"
+    "_src_under_test.dart",
+  ]
+  deps = app_deps
+}
+
+dart_test("xi_app_tests") {
+  sources = [
+    "xi_fuchsia_client_test.dart",
+  ]
 
   deps = [
-    "//garnet/public/lib/ui/views/fidl:v1",
-    "//garnet/public/lib/xi/fidl:fidl",
-    "//peridot/public/lib:fidl",
-    "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/app/xi/packages/widgets:xi_widgets",
-    "//topaz/public/dart/fidl",
-    "//topaz/public/dart/fuchsia",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/ui/flutter",
+    ":testlib",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/pub/test",
   ]
 }
