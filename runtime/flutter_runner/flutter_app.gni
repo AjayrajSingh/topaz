@@ -22,6 +22,14 @@ declare_args() {
   } else {
     flutter_aot_sharing_basis = "//topaz/bin/user_shell/armadillo_user_shell"
   }
+
+  # Enable profiling and tracing. Default is true in Debug builds and false
+  # in release builds.
+  if (is_debug) {
+    flutter_profile = true
+  } else {
+    flutter_profile = false
+  }
 }
 
 flutter_base = "//third_party/dart-pkg/git/flutter"
@@ -45,7 +53,7 @@ _entry_manifests = [
 template("flutter_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
-  product = !is_debug
+  product = !flutter_profile
   if (defined(invoker.product)) {
     product = invoker.product
   }
@@ -193,7 +201,7 @@ template("flutter_jit_app") {
 template("flutter_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
-  product = !is_debug
+  product = !flutter_profile
   if (defined(invoker.product)) {
     product = invoker.product
   }
