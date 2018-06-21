@@ -413,8 +413,8 @@ Dart_Handle System::VmoMap(fxl::RefPtr<Handle> vmo) {
     return ConstructDartObject(kMapResult, ToDart(status));
 
   uintptr_t mapped_addr;
-  status = zx_vmar_map(zx_vmar_root_self(), 0, vmo->handle(), 0, size,
-                       ZX_VM_FLAG_PERM_READ, &mapped_addr);
+  status = zx_vmar_map_old(zx_vmar_root_self(), 0, vmo->handle(), 0, size,
+                           ZX_VM_FLAG_PERM_READ, &mapped_addr);
   if (status != ZX_OK)
     return ConstructDartObject(kMapResult, ToDart(status));
 
