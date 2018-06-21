@@ -18,7 +18,7 @@ import 'transaction.dart';
 
 /// The interface to the Sledge library.
 class Sledge {
-  final ComponentContextProxy _componentContextProxy;
+  final ComponentContext _componentContext;
   final ledger.LedgerProxy _ledgerProxy = new ledger.LedgerProxy();
   final ledger.PageProxy _pageProxy;
   final ConnectionId _connectionId = new ConnectionId.random();
@@ -37,12 +37,12 @@ class Sledge {
   Transaction _currentTransaction;
 
   /// Default constructor.
-  Sledge(this._componentContextProxy, [SledgePageId pageId])
+  Sledge(this._componentContext, [SledgePageId pageId])
       : _pageProxy = new ledger.PageProxy(),
         _pageSnapshotFactory = new LedgerPageSnapshotFactoryImpl() {
     pageId ??= new SledgePageId();
 
-    _componentContextProxy.getLedger(_ledgerProxy.ctrl.request(),
+    _componentContext.getLedger(_ledgerProxy.ctrl.request(),
         (ledger.Status status) {
       if (status != ledger.Status.ok) {
         print('Sledge failed to connect to Ledger: $status');
@@ -78,7 +78,7 @@ class Sledge {
 
   /// Convenience constructor for tests.
   Sledge.testing(this._pageProxy, this._pageSnapshotFactory)
-      : _componentContextProxy = null {
+      : _componentContext = null {
     _initializationSucceeded = new Future.value(true);
   }
 
@@ -86,7 +86,6 @@ class Sledge {
   void close() {
     _pageProxy.ctrl.close();
     _ledgerProxy.ctrl.close();
-    _componentContextProxy.ctrl.close();
   }
 
   /// Transactionally save modifications.
