@@ -15,6 +15,9 @@ import 'src/xi_fuchsia_client.dart';
 
 /// ignore_for_file: avoid_annotating_with_dynamic
 
+/// If `true`, draws the editor with a watermarked background.
+const bool kDrawDebugBackground = true;
+
 dynamic _handleResponse(String description) {
   return (Status status) {
     if (status != Status.ok) {
@@ -75,5 +78,6 @@ void main() {
 
   runApp(new XiApp(
     xi: xi,
+    drawDebugBackground: kDrawDebugBackground,
   ));
 }
