@@ -1,5 +1,8 @@
 {
     "host_tests" : [
+      "//topaz/app/chat/modules/conversation_list:chat_conversation_list_tests",
+      "//topaz/app/chat/modules/conversation:chat_conversation_tests",
+      "//topaz/app/chat/modules/conversation_info:chat_conversation_info_tests",
       "//topaz/app/dashboard:dashboard_tests",
       "//topaz/shell/keyboard:keyboard_tests",
       "//topaz/public/dart/widgets:dart_widget_tests",

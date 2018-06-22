@@ -3,7 +3,6 @@
         "topaz/packages/tests/auth_provider_unittests",
         "topaz/packages/tests/dart",
         "topaz/packages/tests/dart_target_unittests",
-        "topaz/packages/tests/dart_remote_unittests",
         "topaz/packages/tests/dart_unittests",
         "topaz/packages/tests/examples/all",
         "topaz/packages/tests/fidl_compatibility_test",
