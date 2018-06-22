@@ -8,8 +8,7 @@
       "//topaz/public/lib/app/dart:dart_app_tests",
       "//topaz/public/lib/schemas/dart:dart_schema_tests",
       "//topaz/shell/mondrian_story_shell:mondrian_story_shell_tests",
-      "//topaz/tools/dartfmt_extras:dartfmt_extras_tests",
-      "//topaz/tools/widget_explorer/packages/widget_explorer_core:widget_explorer_core_tests"
+      "//topaz/tools/dartfmt_extras:dartfmt_extras_tests"
     ],
     "labels": [
       "//topaz:dart_unittests"
