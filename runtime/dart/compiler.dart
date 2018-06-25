@@ -31,6 +31,7 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addFlag('embed-sources',
       help: 'Embed sources in the output dill file', defaultsTo: false)
   ..addFlag('gen-bytecode', help: 'Generate bytecode', defaultsTo: false)
+  ..addFlag('print-dependencies', help: 'Print dependencies to stdout', defaultsTo: false)
   ..addOption('depfile', help: 'Path to output Ninja depfile')
   ..addOption('manifest', help: 'Path to output Fuchsia package manifest')
   ..addOption('output', help: 'Path to output dill file')
@@ -105,8 +106,6 @@ Future<void> main(List<String> args) async {
 
   final Uri sdkRoot = _ensureFolderPath(options['sdk-root']);
   final String packages = options['packages'];
-  final String depfile = options['depfile'];
-  final String kernelBinaryFilename = options['output'];
   final bool aot = options['aot'];
   final bool embedSources = options['embed-sources'];
   final String targetName = options['target'];
@@ -162,19 +161,32 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final IOSink sink = new File(kernelBinaryFilename).openWrite();
-  final BinaryPrinter printer = new LimitedBinaryPrinter(sink,
-      (Library lib) => aot || !lib.isExternal, false /* excludeUriToSource */);
-  printer.writeComponentFile(component);
-  await sink.close();
+  // Single-file output.
+  final String kernelBinaryFilename = options['output'];
+  if (kernelBinaryFilename != null) {
+    final IOSink sink = new File(kernelBinaryFilename).openWrite();
+    final BinaryPrinter printer = new LimitedBinaryPrinter(sink,
+        (Library lib) => aot || !lib.isExternal, false /* excludeUriToSource */);
+    printer.writeComponentFile(component);
+    await sink.close();
 
-  if (depfile != null) {
-    await writeDepfile(component, kernelBinaryFilename, depfile);
+    final String depfile = options['depfile'];
+    if (depfile != null) {
+      await writeDepfile(component, kernelBinaryFilename, depfile);
+    }
   }
 
+  // Multiple-file output.
   final String manifestFilename = options['manifest'];
   if (manifestFilename != null) {
     await writePackages(component, kernelBinaryFilename, manifestFilename);
+  }
+
+  // Dependencies output.
+  if (options['print-dependencies']) {
+    for (Uri dep in getDependencies(component)) {
+      print(dep.toFilePath());
+    }
   }
 }
 
@@ -182,9 +194,7 @@ String escapePath(String path) {
   return path.replaceAll('\\', '\\\\').replaceAll(' ', '\\ ');
 }
 
-// https://ninja-build.org/manual.html#_depfile
-Future<void> writeDepfile(
-    Component component, String output, String depfile) async {
+List<Uri> getDependencies(Component component) {
   var deps = <Uri>[];
   for (Library lib in component.libraries) {
     deps.add(lib.fileUri);
@@ -193,11 +203,16 @@ Future<void> writeDepfile(
       deps.add(fileUri);
     }
   }
+  return deps;
+}
 
+// https://ninja-build.org/manual.html#_depfile
+Future<void> writeDepfile(
+    Component component, String output, String depfile) async {
   var file = new File(depfile).openWrite();
   file.write(escapePath(output));
   file.write(':');
-  for (Uri dep in deps) {
+  for (Uri dep in getDependencies(component)) {
     file.write(' ');
     file.write(escapePath(dep.toFilePath()));
   }
