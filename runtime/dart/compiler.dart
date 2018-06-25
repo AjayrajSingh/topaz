@@ -8,16 +8,14 @@ import 'dart:io';
 import 'package:args/args.dart';
 
 import 'package:front_end/src/api_prototype/compiler_options.dart';
-import 'package:front_end/src/api_prototype/compilation_message.dart'
-    show Severity;
-import 'package:front_end/src/fasta/fasta_codes.dart' as codes;
 
 import 'package:kernel/ast.dart';
 import 'package:kernel/binary/ast_to_binary.dart';
 import 'package:kernel/binary/limited_ast_to_binary.dart';
 import 'package:kernel/target/targets.dart';
 
-import 'package:vm/kernel_front_end.dart' show compileToKernel, ErrorDetector;
+import 'package:vm/kernel_front_end.dart'
+    show compileToKernel, ErrorDetector, ErrorPrinter;
 import 'package:vm/target/dart_runner.dart' show DartRunnerTarget;
 import 'package:vm/target/flutter_runner.dart' show FlutterRunnerTarget;
 
@@ -51,43 +49,6 @@ Uri _ensureFolderPath(String path) {
     uriPath = '$uriPath/';
   }
   return Uri.base.resolve(uriPath);
-}
-
-// TODO(rmacnak): Fix nits and use ErrorPrinter from package:vm.
-class ErrorPrinter {
-  final ProblemHandler previousErrorHandler;
-  final Map<Uri, List<List>> compilationMessages = <Uri, List<List>>{};
-
-  ErrorPrinter({this.previousErrorHandler});
-
-  bool shouldReportProblem(Severity severity) => severity != Severity.ignored;
-
-  void call(codes.FormattedMessage problem, Severity severity,
-      List<codes.FormattedMessage> context) {
-    if (shouldReportProblem(severity)) {
-      final sourceUri = problem.locatedMessage.uri;
-      compilationMessages
-          .putIfAbsent(sourceUri, () => [])
-          .add([problem, context]);
-    }
-    previousErrorHandler?.call(problem, severity, context);
-  }
-
-  void printCompilationMessages(Uri baseUri) {
-    final sortedUris = compilationMessages.keys.toList()
-      ..sort((a, b) => '$a'.compareTo('$b'));
-    for (final Uri sourceUri in sortedUris) {
-      for (final List errorTuple in compilationMessages[sourceUri]) {
-        final codes.FormattedMessage message = errorTuple.first;
-        print(message.formatted);
-
-        final List context = errorTuple.last;
-        for (final codes.FormattedMessage message in context?.reversed) {
-          print(message.formatted);
-        }
-      }
-    }
-  }
 }
 
 Future<void> main(List<String> args) async {
