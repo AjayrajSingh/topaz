@@ -14,6 +14,5 @@ dart_app("module_suggester") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/module_resolver/dart",
     "//topaz/public/lib/proposal/dart",
-    "//topaz/runtime/web_runner/lib/dart:web_view",
   ]
 }

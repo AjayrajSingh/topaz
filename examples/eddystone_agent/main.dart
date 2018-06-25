@@ -6,7 +6,6 @@
 // ignore_for_file: public_member_api_docs
 
 import 'dart:async';
-import 'dart:convert' show json;
 
 import 'package:fidl_fuchsia_bluetooth/fidl.dart' as bt;
 import 'package:fidl_fuchsia_bluetooth_le/fidl.dart' as ble;
@@ -15,7 +14,6 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.proposal.dart/proposal.dart';
-import 'package:web_view/web_view.dart' as web_view;
 
 final ProposalPublisherProxy _proposalPublisher = new ProposalPublisherProxy();
 final StartupContext _context = new StartupContext.fromStartupInfo();
@@ -41,18 +39,7 @@ Future<Null> proposeUrl(String url) async {
     color: 0xFF0000FF,
     actions: <Action>[
       new Action.withCreateStory(
-        new CreateStory(
-            intent: (new IntentBuilder.handler(web_view.kWebViewURL)
-                  ..addParameter(
-                      null,
-                      json.encode(
-                        {
-                          'view': {
-                            'uri': url,
-                          }
-                        },
-                      )))
-                .intent),
+        new CreateStory(intent: new IntentBuilder.handler(url).intent),
       )
     ],
   ));

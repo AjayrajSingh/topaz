@@ -3,13 +3,11 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show json;
 
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:web_view/web_view.dart' as web_view;
 
 final IntelligenceServicesProxy _intelligenceServices =
     new IntelligenceServicesProxy();
@@ -48,13 +46,10 @@ class _QueryHandlerImpl extends QueryHandler {
 
       proposals.add(
         await _createProposal(
-          id: 'launch web_view',
-          appUrl: web_view.kWebViewURL,
+          id: 'launch web mod',
+          appUrl: url,
           headline: 'Go to ${query.text}',
           color: 0xff8080ff,
-          initialData: json.encode(<String, dynamic>{
-            'view': <String, dynamic>{'uri': url}
-          }),
         ),
       );
     }
