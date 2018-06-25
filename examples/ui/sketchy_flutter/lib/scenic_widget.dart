@@ -90,4 +90,7 @@ class _Layer extends Layer {
       hitTestable: hitTestable,
     );
   }
+
+  @override
+  S find<S>(Offset regionOffset) => null;
 }

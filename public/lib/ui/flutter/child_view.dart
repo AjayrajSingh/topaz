@@ -472,6 +472,9 @@ class ChildSceneLayer extends Layer {
       ..add(new DiagnosticsProperty<ui.SceneHost>('sceneHost', sceneHost))
       ..add(new DiagnosticsProperty<bool>('hitTestable', hitTestable));
   }
+
+  @override
+  S find<S>(Offset regionOffset) => null;
 }
 
 /// A widget that is replaced by content from another process.
