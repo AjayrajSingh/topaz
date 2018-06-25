@@ -5,20 +5,22 @@
 import 'dart:async';
 import 'dart:core';
 
+import 'package:fuchsia_driver/fuchsia_driver.dart';
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:fuchsia_remote_debug_protocol/fuchsia_remote_debug_protocol.dart';
 import 'package:fuchsia_remote_debug_protocol/logging.dart';
 import 'package:test/test.dart';
 
-void main() {
+// Args are unused in this function, but it is currently required in order to
+// run tests on a Fuchsia device.
+void main(List<String> _unusedArgs) {
   group('driver example tests', () {
     FlutterDriver driver;
     FuchsiaRemoteConnection connection;
 
     setUpAll(() async {
       Logger.globalLevel = LoggingLevel.all;
-      // Expects FUCHSIA_REMOTE_URL and FUCHSIA_SSH_CONFIG to be set in the env.
-      connection = await FuchsiaRemoteConnection.connect();
+      connection = await FuchsiaDriver.connect();
       const Pattern isolatePattern = 'driver_example_mod_wrapper';
       print('Finding $isolatePattern');
       final List<IsolateRef> refs =
@@ -40,6 +42,7 @@ void main() {
       if (connection != null) {
         await connection.stop();
       }
+      await FuchsiaDriver.cleanup();
     });
 
     test('add to counter. remove from counter', () async {
@@ -65,4 +68,7 @@ void main() {
       await driver.tap(textFinder);
     });
   });
+
+  // TODO(US-511): This fails to exit when run on the Fuchsia device. Behavior
+  // is normal on the host.
 }

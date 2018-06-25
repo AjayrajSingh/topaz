@@ -1,0 +1,149 @@
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+/// Convenience methods for location-agnostic Flutter application driving. Can
+/// be run on either a host machine (making a remote connection to a Fuchsia
+/// device), or on the target Fuchsia machine.
+library fuchsia_driver;
+
+import 'dart:async';
+import 'dart:core';
+import 'dart:io';
+
+import 'package:flutter_driver/flutter_driver.dart';
+import 'package:fuchsia_remote_debug_protocol/fuchsia_remote_debug_protocol.dart';
+
+// TODO(DX-291): Update this to use the hub.
+final Directory _kDartPortDir = new Directory('/tmp/dart.services');
+
+/// Convenience method for driving an `Isolate` by pattern.
+///
+/// Accepts a [FuchsiaRemoteConnection] that will be used to search for the
+/// [Pattern] passed. If the pattern cannot be found an exception will be
+/// raised. Once the `Isolate` is found, the [driverFunction] will be executed,
+/// passing the [FlutterDriver] connection to the function to execute the series
+/// of driver commands.
+///
+/// example:
+///
+/// ```dart
+/// FuchsiaRemoteConnection connection = await FuchsiaDriver.connect();
+///
+/// Future<Null> tapWidget(FlutterDriver driver) {
+///   await driver.tap(find.text('foo'));
+/// }
+///
+/// drive(
+///   isolatePattern: 'bar',
+///   driverFunction: tapWidget,
+///   connection: connection,
+/// );
+/// ```
+Future<Null> drive({
+  FuchsiaRemoteConnection connection,
+  Future<Null> driverFunction(FlutterDriver driver),
+  Pattern isolatePattern,
+}) async {
+  final List<IsolateRef> isolateRefs =
+      await connection.getMainIsolatesByPattern(isolatePattern);
+  final IsolateRef ref = isolateRefs.first;
+  final FlutterDriver driver = await FlutterDriver.connect(
+    dartVmServiceUrl: ref.dartVm.uri.toString(),
+    isolateNumber: ref.number,
+    printCommunication: true,
+    logCommunicationToFile: false,
+  );
+  await driverFunction(driver);
+  await driver.close();
+}
+
+class _DummyPortForwarder implements PortForwarder {
+  _DummyPortForwarder(this._port, this._remotePort);
+
+  final int _port;
+  final int _remotePort;
+
+  @override
+  int get port => _port;
+
+  @override
+  int get remotePort => _remotePort;
+
+  @override
+  Future<Null> stop() async {}
+}
+
+class _DummySshCommandRunner implements SshCommandRunner {
+  _DummySshCommandRunner();
+
+  @override
+  String get sshConfigPath => null;
+
+  @override
+  String get address => InternetAddress.loopbackIPv4.address;
+
+  @override
+  String get interface => null;
+
+  @override
+  Future<List<String>> run(String command) async {
+    final Completer<List<String>> completer = new Completer<List<String>>();
+    final List<String> res = <String>[];
+    _kDartPortDir.list(recursive: false, followLinks: false).listen(
+        (FileSystemEntity entity) {
+      // Bit of a hack to get the basename.
+      final String basename = entity.path
+          .replaceAll(entity.parent.path, '')
+          .replaceFirst(Platform.pathSeparator, '');
+      res.add(basename);
+    }, onDone: () {
+      completer.complete(res);
+    });
+    return completer.future;
+  }
+}
+
+Future<PortForwarder> _dummyPortForwardingFunction(
+  String address,
+  int remotePort, [
+  String interface = '',
+  String configFile,
+]) async {
+  return new _DummyPortForwarder(remotePort, remotePort);
+}
+
+/// Utility class for creating connections to the Fuchsia Device.
+///
+/// If executed on a host (non-Fuchsia device), behaves the same as running
+/// [FuchsiaRemoteConnection.connect] whereby the `FUCHSIA_REMOTE_URL` and
+/// `FUCHSIA_SSH_CONFIG` variables must be set. If run on a Fuchsia device, will
+/// connect locally without need for environment variables.
+class FuchsiaDriver {
+  static Future<Null> _init() async {
+    fuchsiaPortForwardingFunction = _dummyPortForwardingFunction;
+  }
+
+  /// Restores state to normal if running on a Fuchsia device.
+  ///
+  /// Noop if running on the host machine.
+  static Future<Null> cleanup() async {
+    restoreFuchsiaPortForwardingFunction();
+  }
+
+  /// Creates a connection to the Fuchsia device's Dart VM's.
+  ///
+  /// See [FuchsiaRemoteConnection.connect] for more details.
+  /// [FuchsiaDriver.cleanup] must be called when the connection is no longer in
+  /// use. It is the caller's responsibility to call
+  /// [FuchsiaRemoteConnection.stop].
+  static Future<FuchsiaRemoteConnection> connect() async {
+    if (Platform.isFuchsia) {
+      await FuchsiaDriver._init();
+      return FuchsiaRemoteConnection
+          // ignore: invalid_use_of_visible_for_testing_member
+          .connectWithSshCommandRunner(new _DummySshCommandRunner());
+    }
+    return FuchsiaRemoteConnection.connect();
+  }
+}
