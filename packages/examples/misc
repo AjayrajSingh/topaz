@@ -3,10 +3,6 @@
         "garnet/packages/prod/drivers"
     ],
     "packages": [
-        "//topaz/examples/bluetooth/ble_rect",
-        "//topaz/examples/bluetooth/ble_scanner",
-        "//topaz/examples/bluetooth/eddystone_advertiser",
-        "//topaz/examples/eddystone_agent",
         "//topaz/examples/media/media_player_flutter",
         "//topaz/examples/media/media_player_skia:package",
         "//topaz/examples/mine_digger",
