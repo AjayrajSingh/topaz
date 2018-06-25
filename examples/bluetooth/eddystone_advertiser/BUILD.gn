@@ -10,8 +10,8 @@ flutter_app("eddystone_advertiser") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//garnet/public/lib/bluetooth/fidl:bluetooth",
-    "//garnet/public/lib/bluetooth/fidl:bluetooth_low_energy",
+    "//garnet/public/lib/bluetooth/fidl/common",
+    "//garnet/public/lib/bluetooth/fidl/le",
     "//peridot/public/lib:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
