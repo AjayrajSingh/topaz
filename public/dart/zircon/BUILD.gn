@@ -14,3 +14,9 @@ dart_library("zircon") {
     "zircon.dart",
   ]
 }
+
+# This is effectively a host test target.
+copy("test_extract_zircon_constants") {
+  sources = [ "test-extract-zircon-constants.sh" ]
+  outputs = [ "$root_out_dir/test_extract_zircon_constants" ]
+}
