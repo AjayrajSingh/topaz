@@ -588,6 +588,11 @@ class ProxyController<T> {
 
   /// Complete the [error] future with the given message.
   void proxyError(String message) {
+    // In debug builds always print the proxy error.
+    assert(() {
+      print(message);
+      return true;
+    }());
     if (!_errorCompleter.isCompleted) {
       error.whenComplete(() {
         _errorCompleter = new Completer<ProxyError>();

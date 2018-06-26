@@ -122,7 +122,11 @@ void _copyFloat64(ByteData data, Float64List value, int offset) {
 }
 
 String _convertFromUTF8(Uint8List bytes) {
-  return const Utf8Decoder().convert(bytes);
+  try {
+    return const Utf8Decoder().convert(bytes);
+  } on FormatException {
+    throw FidlError('Received a string with invalid UTF8: $bytes');
+  }
 }
 
 Uint8List _convertToUTF8(String string) {
@@ -733,10 +737,12 @@ class MethodType extends FidlType<Null> {
   const MethodType({
     this.request,
     this.response,
+    this.name,
   });
 
   final List<MemberType> request;
   final List<MemberType> response;
+  final String name;
 
   @override
   void encode(Encoder encoder, Null value, int offset) {

@@ -300,11 +300,12 @@ func formatLibraryName(library types.LibraryIdentifier) string {
 	return strings.Join(parts, "_")
 }
 
-func typeExprForMethod(request []Parameter, response []Parameter) string {
+func typeExprForMethod(request []Parameter, response []Parameter, name string) string {
 	return fmt.Sprintf(`const $fidl.MethodType(
     request: %s,
-    response: %s,
-  )`, formatParameterList(request), formatParameterList(response))
+	response: %s,
+	name: "%s",
+  )`, formatParameterList(request), formatParameterList(response), name)
 }
 
 func typeExprForPrimitiveSubtype(val types.PrimitiveSubtype) string {
@@ -675,7 +676,7 @@ func (c *compiler) compileInterface(val types.Interface) Interface {
 			asyncResponseType,
 			fmt.Sprintf("%s%sCallback", r.Name, v.Name),
 			fmt.Sprintf("_k%s_%s_Type", r.Name, v.Name),
-			typeExprForMethod(request, response),
+			typeExprForMethod(request, response, fmt.Sprintf("%s.%s", r.Name, v.Name)),
 		}
 		r.Methods = append(r.Methods, m)
 		if !v.HasRequest && v.HasResponse {

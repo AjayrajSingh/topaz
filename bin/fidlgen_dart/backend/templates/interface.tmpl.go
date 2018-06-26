@@ -63,18 +63,26 @@ class {{ .ProxyName }} extends $fidl.Proxy<{{ .Name }}>
 {{- if not .HasRequest }}
   {{- if .HasResponse }}
       case {{ .OrdinalName }}:
-        final Function $callback = {{ .Name }};
-        if ($callback == null) {
-          $message.closeHandles();
-          return;
+        try {
+          final Function $callback = {{ .Name }};
+          if ($callback == null) {
+            $message.closeHandles();
+            return;
+          }
+          final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
+          $decoder.claimMemory({{ .ResponseSize }});
+          $callback(
+      {{- range $index, $response := .Response }}
+            $types[{{ $index }}].decode($decoder, 0),
+      {{- end }}
+          );
+        // ignore: avoid_catches_without_on_clauses
+        } catch(_e) {
+          final String _name = {{ .TypeSymbol }}.name;
+          ctrl.proxyError('Exception handling event $_name: $_e');
+          ctrl.close();
+          rethrow;
         }
-        final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
-        $decoder.claimMemory({{ .ResponseSize }});
-        $callback(
-    {{- range $index, $response := .Response }}
-          $types[{{ $index }}].decode($decoder, 0),
-    {{- end }}
-        );
         break;
   {{- end }}
 {{- end }}
@@ -103,13 +111,21 @@ class {{ .ProxyName }} extends $fidl.Proxy<{{ .Name }}>
   {{- if .HasRequest }}
     {{- if .HasResponse }}
       case {{ .OrdinalName }}:
-        final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
-        $decoder.claimMemory({{ .ResponseSize }});
-        $callback(
-      {{- range $index, $response := .Response }}
-          $types[{{ $index }}].decode($decoder, 0),
-      {{- end }}
-        );
+        try {
+          final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
+          $decoder.claimMemory({{ .ResponseSize }});
+          $callback(
+        {{- range $index, $response := .Response }}
+            $types[{{ $index }}].decode($decoder, 0),
+        {{- end }}
+          );
+        // ignore: avoid_catches_without_on_clauses
+        } catch(_e) {
+          final String _name = {{ .TypeSymbol }}.name;
+          ctrl.proxyError('Exception handling method response $_name: $_e');
+          ctrl.close();
+          rethrow;
+        }
         break;
     {{- end }}
   {{- end }}
@@ -233,16 +249,24 @@ class {{ .BindingName }} extends $fidl.Binding<{{ .Name }}> {
 {{- range .Methods }}
   {{- if .HasRequest }}
       case {{ .OrdinalName }}:
-        final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.request;
-        $decoder.claimMemory({{ .RequestSize }});
-        impl.{{ .Name }}(
-    {{- range $index, $request := .Request }}
-          $types[{{ $index }}].decode($decoder, 0),
-    {{- end }}
-    {{- if .HasResponse }}
-          _{{ .Name }}Responder($respond, $message.txid),
-    {{- end }}
-        );
+        try {
+          final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.request;
+          $decoder.claimMemory({{ .RequestSize }});
+          impl.{{ .Name }}(
+      {{- range $index, $request := .Request }}
+            $types[{{ $index }}].decode($decoder, 0),
+      {{- end }}
+      {{- if .HasResponse }}
+            _{{ .Name }}Responder($respond, $message.txid),
+      {{- end }}
+          );
+        // ignore: avoid_catches_without_on_clauses
+        } catch(_e) {
+          close();
+          final String _name = {{ .TypeSymbol }}.name;
+          print('Exception handling method call $_name: $_e');
+          rethrow;
+        }
         break;
   {{- end }}
 {{- end }}
