@@ -13,8 +13,8 @@
 #include "component.h"
 #include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/macros.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
 
 namespace flutter {
 
@@ -28,11 +28,11 @@ class Runner final : public fuchsia::sys::Runner {
 
  private:
   struct ActiveApplication {
-    std::unique_ptr<fsl::Thread> thread;
+    std::unique_ptr<deprecated_loop::Thread> thread;
     std::unique_ptr<Application> application;
 
     ActiveApplication(
-        std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
+        std::pair<std::unique_ptr<deprecated_loop::Thread>, std::unique_ptr<Application>>
             pair)
         : thread(std::move(pair.first)), application(std::move(pair.second)) {}
 

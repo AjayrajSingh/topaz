@@ -4,11 +4,11 @@
 
 #include <trace-provider/provider.h>
 
-#include "lib/fsl/tasks/message_loop.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/runtime/dart_runner/dart_runner.h"
 
 int main(int argc, const char** argv) {
-  fsl::MessageLoop loop;
+  deprecated_loop::MessageLoop loop;
   trace::TraceProvider provider(loop.async());
   dart_runner::DartRunner runner;
   loop.Run();

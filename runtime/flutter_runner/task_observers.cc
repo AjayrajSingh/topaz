@@ -6,7 +6,7 @@
 
 #include <map>
 
-#include "lib/fsl/tasks/message_loop.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
 
 namespace flutter {
 
@@ -25,7 +25,7 @@ void CurrentMessageLoopAddAfterTaskObserver(intptr_t key,
   }
 
   if (tTaskObservers.size() == 0) {
-    fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(
+    deprecated_loop::MessageLoop::GetCurrent()->SetAfterTaskCallback(
         std::bind(&ExecuteAfterTaskObservers));
   }
 
@@ -36,7 +36,7 @@ void CurrentMessageLoopRemoveAfterTaskObserver(intptr_t key) {
   tTaskObservers.erase(key);
 
   if (tTaskObservers.size() == 0) {
-    fsl::MessageLoop::GetCurrent()->ClearAfterTaskCallback();
+    deprecated_loop::MessageLoop::GetCurrent()->ClearAfterTaskCallback();
   }
 }
 

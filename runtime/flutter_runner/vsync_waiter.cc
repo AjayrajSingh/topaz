@@ -4,7 +4,7 @@
 
 #include "vsync_waiter.h"
 
-#include "lib/fsl/tasks/message_loop.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
 
 namespace flutter {
 
@@ -63,7 +63,7 @@ void VsyncWaiter::AwaitVSync() {
 
 void VsyncWaiter::FireCallbackWhenSessionAvailable() {
   FXL_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
-  if (session_wait_.Begin(fsl::MessageLoop::GetCurrent()->async()) != ZX_OK) {
+  if (session_wait_.Begin(deprecated_loop::MessageLoop::GetCurrent()->async()) != ZX_OK) {
     FXL_LOG(ERROR) << "Could not begin wait for Vsync.";
   }
 }

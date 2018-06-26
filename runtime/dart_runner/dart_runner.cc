@@ -9,11 +9,11 @@
 #include <utility>
 #include <zircon/syscalls.h>
 
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/tonic/dart_microtask_queue.h"
 #include "lib/tonic/dart_state.h"
 #include "third_party/dart/runtime/bin/embedded_dart_io.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
 #include "topaz/runtime/dart_runner/service_isolate.h"
 
@@ -70,8 +70,8 @@ Dart_Isolate IsolateCreateCallback(const char* uri, const char* main,
 
 void IsolateShutdownCallback(void* callback_data) {
   // The service isolate (and maybe later the kernel isolate) doesn't have an
-  // fsl::MessageLoop.
-  fsl::MessageLoop* loop = fsl::MessageLoop::GetCurrent();
+  // deprecated_loop::MessageLoop.
+  deprecated_loop::MessageLoop* loop = deprecated_loop::MessageLoop::GetCurrent();
   if (loop) {
     loop->SetAfterTaskCallback(nullptr);
     tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
@@ -89,7 +89,7 @@ void RunApplication(
     fuchsia::sys::StartupInfo startup_info,
     ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   int64_t start = Dart_TimelineGetMicros();
-  fsl::MessageLoop loop;
+  deprecated_loop::MessageLoop loop;
   DartComponentController app(token->label(), std::move(package),
                               std::move(startup_info), std::move(controller));
   bool success = app.Setup();
@@ -150,7 +150,7 @@ bool EntropySource(uint8_t* buffer, intptr_t count) {
 
 DartRunner::DartRunner()
     : context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()),
-      loop_(fsl::MessageLoop::GetCurrent()) {
+      loop_(deprecated_loop::MessageLoop::GetCurrent()) {
   context_->outgoing().AddPublicService<fuchsia::sys::Runner>(
       [this](fidl::InterfaceRequest<fuchsia::sys::Runner> request) {
         bindings_.AddBinding(this, std::move(request));

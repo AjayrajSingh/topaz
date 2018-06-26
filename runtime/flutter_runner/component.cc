@@ -14,20 +14,20 @@
 #include "lib/fsl/vmo/file.h"
 #include "lib/fsl/vmo/vector.h"
 #include "lib/fxl/command_line.h"
-#include "lib/fxl/synchronization/waitable_event.h"
 #include "task_observers.h"
+#include "topaz/lib/deprecated_loop/waitable_event.h"
 
 namespace flutter {
 
-std::pair<std::unique_ptr<fsl::Thread>, std::unique_ptr<Application>>
+std::pair<std::unique_ptr<deprecated_loop::Thread>, std::unique_ptr<Application>>
 Application::Create(
     TerminationCallback termination_callback, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
     fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
-  auto thread = std::make_unique<fsl::Thread>();
+  auto thread = std::make_unique<deprecated_loop::Thread>();
   std::unique_ptr<Application> application;
 
-  fxl::AutoResetWaitableEvent latch;
+  deprecated_loop::AutoResetWaitableEvent latch;
   thread->TaskRunner()->PostTask([&]() mutable {
     application.reset(new Application(termination_callback,     //
                                       std::move(package),       //

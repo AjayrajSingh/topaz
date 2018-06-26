@@ -69,7 +69,7 @@ void Runner::StartComponent(
   // there being multiple application runner instance in the process at the same
   // time. So it is safe to use the raw pointer.
   Application::TerminationCallback termination_callback =
-      [task_runner = fsl::MessageLoop::GetCurrent()->task_runner(),  //
+      [task_runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner(),  //
        application_runner = this                                     //
   ](const Application* application) {
         task_runner->PostTask([application_runner, application]() {
@@ -106,7 +106,7 @@ void Runner::OnApplicationTerminate(const Application* application) {
       [instance = std::move(application_to_destroy)]() mutable {
         instance.reset();
 
-        fsl::MessageLoop::GetCurrent()->PostQuitTask();
+        deprecated_loop::MessageLoop::GetCurrent()->PostQuitTask();
       }));
 
   // This works because just posted the quit task on the hosted thread.

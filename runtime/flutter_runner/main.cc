@@ -6,10 +6,10 @@
 #include <cstdlib>
 
 #include "runner.h"
-#include "lib/fsl/tasks/message_loop.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
 
 int main(int argc, char const* argv[]) {
-  fsl::MessageLoop loop;
+  deprecated_loop::MessageLoop loop;
 
   trace::TraceProvider provider(loop.async());
   FXL_DCHECK(provider.is_valid()) << "Trace provider must be valid.";

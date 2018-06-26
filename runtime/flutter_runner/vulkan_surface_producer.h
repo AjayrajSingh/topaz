@@ -9,11 +9,11 @@
 #include "flutter/vulkan/vulkan_device.h"
 #include "flutter/vulkan/vulkan_proc_table.h"
 #include "flutter/vulkan/vulkan_provider.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/macros.h"
 #include "lib/ui/scenic/client/resources.h"
 #include "lib/ui/scenic/client/session.h"
 #include "third_party/skia/include/gpu/vk/GrVkBackendContext.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
 #include "vulkan_surface.h"
 #include "vulkan_surface_pool.h"
 

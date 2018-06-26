@@ -11,10 +11,10 @@
 #include "flutter/shell/common/rasterizer.h"
 #include "flutter/shell/common/run_configuration.h"
 #include "fuchsia_font_manager.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/functional/make_copyable.h"
-#include "lib/fxl/synchronization/waitable_event.h"
 #include "platform_view.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
+#include "topaz/lib/deprecated_loop/waitable_event.h"
 
 namespace flutter {
 
@@ -86,7 +86,7 @@ Engine::Engine(
   // Session errors may occur on the GPU thread, but we must terminate ourselves
   // on the platform thread.
   fxl::Closure on_session_error_callback =
-      [runner = fsl::MessageLoop::GetCurrent()->task_runner(),
+      [runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner(),
        weak = weak_factory_.GetWeakPtr()]() {
         runner->PostTask([weak]() {
           if (weak) {
@@ -155,7 +155,7 @@ Engine::Engine(
   // used as the "platform" thread.
   blink::TaskRunners task_runners(
       thread_label_,                                  // Dart thread labels
-      fsl::MessageLoop::GetCurrent()->task_runner(),  // platform
+      deprecated_loop::MessageLoop::GetCurrent()->task_runner(),  // platform
       host_threads_[0].TaskRunner(),                  // gpu
       host_threads_[1].TaskRunner(),                  // ui
       host_threads_[2].TaskRunner()                   // io
@@ -231,7 +231,7 @@ Engine::Engine(
 
   auto on_run_failure = [weak = weak_factory_.GetWeakPtr(),  //
                          runner =
-                             fsl::MessageLoop::GetCurrent()->task_runner()  //
+                             deprecated_loop::MessageLoop::GetCurrent()->task_runner()  //
   ]() {
     // The engine could have been killed by the caller right after the
     // constructor was called but before it could run on the UI thread.
@@ -268,7 +268,7 @@ Engine::~Engine() {
   shell_.reset();
   for (const auto& thread : host_threads_) {
     thread.TaskRunner()->PostTask(
-        []() { fsl::MessageLoop::GetCurrent()->PostQuitTask(); });
+        []() { deprecated_loop::MessageLoop::GetCurrent()->PostQuitTask(); });
   }
 }
 
@@ -277,7 +277,7 @@ std::pair<bool, uint32_t> Engine::GetEngineReturnCode() const {
   if (!shell_) {
     return code;
   }
-  fxl::AutoResetWaitableEvent latch;
+  deprecated_loop::AutoResetWaitableEvent latch;
   fml::TaskRunner::RunNowOrPostTask(
       shell_->GetTaskRunners().GetUITaskRunner(),
       [&latch, &code, engine = shell_->GetEngine()]() {

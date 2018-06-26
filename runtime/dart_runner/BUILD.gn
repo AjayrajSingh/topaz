@@ -52,6 +52,7 @@ template("runner") {
              "//garnet/public/lib/fsl",
              "//garnet/public/lib/fxl",
              "//garnet/public/lib/svc/cpp",
+             "//topaz/lib/deprecated_loop",
              "//topaz/lib/tonic",
              "//topaz/public/dart-pkg/fuchsia",
              "//zircon/public/lib/trace-provider",

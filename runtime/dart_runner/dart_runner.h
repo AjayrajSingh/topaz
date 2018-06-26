@@ -9,8 +9,8 @@
 #include "lib/app/cpp/connect.h"
 #include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/macros.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/runtime/dart_runner/mapped_resource.h"
 
 namespace dart_runner {
@@ -45,7 +45,7 @@ class DartRunner : public fuchsia::sys::Runner {
   void UpdateProcessLabel();
 
   std::unique_ptr<fuchsia::sys::StartupContext> context_;
-  fsl::MessageLoop* loop_;
+  deprecated_loop::MessageLoop* loop_;
   fidl::BindingSet<fuchsia::sys::Runner> bindings_;
   std::vector<ControllerToken*> controllers_;
 #if !defined(AOT_RUNTIME)

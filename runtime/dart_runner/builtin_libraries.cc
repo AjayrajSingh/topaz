@@ -8,7 +8,6 @@
 #include <zx/channel.h>
 
 #include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
 #include "lib/tonic/converter/dart_converter.h"
@@ -16,6 +15,7 @@
 #include "lib/tonic/logging/dart_error.h"
 #include "third_party/dart/runtime/bin/io_natives.h"
 #include "third_party/dart/runtime/include/dart_api.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
 
 using tonic::ToDart;
 
@@ -148,7 +148,7 @@ void InitBuiltinLibrariesForIsolate(
     schedule_immediate_closure = Dart_Invoke(
         isolate_lib, ToDart("_getIsolateScheduleImmediateClosure"), 0, nullptr);
   } else {
-    // Running on fsl::MessageLoop.
+    // Running on deprecated_loop::MessageLoop.
     schedule_immediate_closure = Dart_Invoke(
         builtin_lib, ToDart("_getScheduleMicrotaskClosure"), 0, nullptr);
   }

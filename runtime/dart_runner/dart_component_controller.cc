@@ -17,7 +17,6 @@
 #include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fidl/cpp/string.h"
-#include "lib/fsl/tasks/message_loop.h"
 #include "lib/fsl/vmo/file.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
@@ -27,6 +26,7 @@
 #include "lib/tonic/dart_state.h"
 #include "lib/tonic/logging/dart_error.h"
 #include "third_party/dart/runtime/include/dart_tools_api.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 
 using tonic::ToDart;
@@ -291,7 +291,7 @@ bool DartComponentController::CreateIsolate(
   state->SetIsolate(isolate_);
 
   state->message_handler().Initialize(
-      fsl::MessageLoop::GetCurrent()->task_runner());
+      deprecated_loop::MessageLoop::GetCurrent()->task_runner());
 
   state->SetReturnCodeCallback(
       [this](uint32_t return_code) { return_code_ = return_code; });
@@ -303,7 +303,7 @@ bool DartComponentController::Main() {
   Dart_EnterScope();
 
   tonic::DartMicrotaskQueue::StartForCurrentThread();
-  fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(AfterTask);
+  deprecated_loop::MessageLoop::GetCurrent()->SetAfterTaskCallback(AfterTask);
 
   fidl::VectorPtr<fidl::StringPtr> arguments =
       std::move(startup_info_.launch_info.arguments);
@@ -372,10 +372,10 @@ bool DartComponentController::Main() {
 
 void DartComponentController::Kill() {
   if (Dart_CurrentIsolate()) {
-    fsl::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
+    deprecated_loop::MessageLoop::GetCurrent()->SetAfterTaskCallback(nullptr);
     tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
 
-    fsl::MessageLoop::GetCurrent()->QuitNow();
+    deprecated_loop::MessageLoop::GetCurrent()->QuitNow();
 
     // TODO(rosswang): The docs warn of threading issues if doing this again,
     // but without this, attempting to shut down the isolate finalizes app
