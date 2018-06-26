@@ -1,12 +1,16 @@
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+// ignore_for_file: implementation_imports
+
 import 'dart:typed_data';
 
+// ignore_for_file: library_prefixes
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
-import 'package:fidl_fuchsia_mem/fidl.dart' as lib$fuchsia_mem;
 import 'package:sledge/src/ledger_helpers.dart';
 import 'package:sledge/src/document/change.dart';
-import 'package:sledge/src/document/values/key_value.dart';
 import 'package:test/test.dart';
-import 'package:zircon/zircon.dart';
 
 import 'values/matchers.dart';
 

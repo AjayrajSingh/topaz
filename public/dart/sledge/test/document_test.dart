@@ -20,8 +20,9 @@ void main() {
     Schema schema = newSchema();
     final id = new DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
+    // ignore: unused_local_variable
     Document doc;
-    sledge.runInTransaction(() async {
+    await sledge.runInTransaction(() async {
       doc = await sledge.getDocument(id);
     });
   });

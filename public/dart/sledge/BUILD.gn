@@ -24,8 +24,15 @@ dart_library("sledge") {
 dart_test("dart_sledge_tests") {
   sources = [
     "document_id_test.dart",
+    "document_test.dart",
+    "ledger_helpers_test.dart",
     "schema_test.dart",
+    "values/compressor_test.dart",
+    "values/converter_test.dart",
+    "values/last_one_wins_values_test.dart",
+    "values/map_value_test.dart",
     "values/pos_neg_counter_test.dart",
+    "values/set_value_test.dart"
   ]
 
   deps = [

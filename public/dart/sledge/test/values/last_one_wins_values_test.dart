@@ -9,7 +9,6 @@ import 'dart:typed_data';
 import 'package:sledge/src/document/change.dart';
 import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/converter.dart';
-import 'package:sledge/src/document/values/key_value.dart';
 import 'package:sledge/src/document/values/last_one_wins_value.dart';
 import 'package:test/test.dart';
 
@@ -17,7 +16,7 @@ import '../dummies/dummy_value_observer.dart';
 
 class TestLastOneWinsValue<T> extends LastOneWinsValue<T> {
   TestLastOneWinsValue([Change init]) : super(init) {
-    this.observer = new DummyValueObserver();
+    observer = new DummyValueObserver();
   }
 }
 
@@ -66,11 +65,6 @@ void main() {
     cnt.value = new Uint8List.fromList([2, 5, 3]);
     expect(cnt.value, equals(new Uint8List.fromList([2, 5, 3])));
   });
-
-  Converter<int> intConverter = new Converter<int>();
-  Converter<double> doubleConverter = new Converter<double>();
-  Converter<bool> boolConverter = new Converter<bool>();
-  Converter<String> stringConverter = new Converter<String>();
 
   test('Integer oprations', () {
     final conv = new DataConverter<int, int>();

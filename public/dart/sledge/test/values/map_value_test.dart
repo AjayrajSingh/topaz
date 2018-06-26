@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
-import 'dart:async';
-
 import 'package:sledge/src/document/values/map_value.dart';
 import 'package:test/test.dart';
 
@@ -12,7 +10,7 @@ import '../dummies/dummy_value_observer.dart';
 
 class TestMapValue<K, V> extends MapValue<K, V> {
   TestMapValue() : super() {
-    this.observer = new DummyValueObserver();
+    observer = new DummyValueObserver();
   }
 }
 
