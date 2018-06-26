@@ -37,10 +37,10 @@ void main() {
     test('getBucketByName should fetch build info based on the given name',
         () async {
       when(mockApi.search(
-        bucket: const <String>['luci.fuchsia.continuous'],
+        bucket: const <String>['luci.fuchsia.ci'],
         status: BuildStatusEnum.completed.value,
         tag: <String>['builder:$buildName'],
-      )).thenReturn(new Future<ApiSearchResponseMessage>.value(
+      )).thenAnswer((_) => new Future<ApiSearchResponseMessage>.value(
           new ApiSearchResponseMessage()
             ..builds = <ApiCommonBuildMessage>[buildInfoResponse]));
 
@@ -57,10 +57,10 @@ void main() {
     test('getBuildsByname should fetch build info based on the given names',
         () async {
       when(mockApi.search(
-        bucket: const <String>['luci.fuchsia.continuous'],
+        bucket: const <String>['luci.fuchsia.ci'],
         status: BuildStatusEnum.completed.value,
         tag: <String>['builder:$buildName'],
-      )).thenReturn(new Future<ApiSearchResponseMessage>.value(
+      )).thenAnswer((_) => new Future<ApiSearchResponseMessage>.value(
           new ApiSearchResponseMessage()
             ..builds = <ApiCommonBuildMessage>[buildInfoResponse]));
 
