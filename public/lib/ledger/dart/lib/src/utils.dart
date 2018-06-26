@@ -14,6 +14,8 @@ import 'package:fidl_fuchsia_mem/fidl.dart';
 import 'package:quiver/core.dart' as quiver;
 import 'package:zircon/zircon.dart' show ZX, ReadResult;
 
+import 'helpers.dart';
+
 // This file defines global functions that are useful for directly manipulating
 // Ledger data.
 
@@ -75,8 +77,10 @@ Future<Null> _getFullEntriesRecursively(
     );
   }
 
-  result.addAll(entries ?? const <Entry>[]);
-  if (status == Status.partialResult) {
+  result.addAll(entries.takeWhile((entry) => hasPrefix(entry.key, keyPrefix)));
+
+  if (status == Status.partialResult &&
+      hasPrefix(entries[entries.length - 1].key, keyPrefix)) {
     await _getFullEntriesRecursively(
       snapshot,
       result,
