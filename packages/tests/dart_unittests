@@ -5,6 +5,7 @@
       "//topaz/app/documents/packages/utils:document_util_tests",
       "//topaz/app/xi/modules/xi_app:xi_app_tests",
       "//topaz/examples/test/flutter_widget_test",
+      "//topaz/examples/tictactoe/common:tictactoe_game_test",
       "//topaz/public/dart/fixtures:dart_fixture_tests",
       "//topaz/public/dart/sledge:dart_sledge_tests",
       "//topaz/public/lib/app/dart:dart_app_tests",

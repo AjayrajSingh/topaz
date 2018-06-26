@@ -4,9 +4,10 @@
         "topaz/packages/examples/fidl",
         "topaz/packages/examples/misc",
         "topaz/packages/examples/mondrian",
+        "topaz/packages/examples/simple_flutter",
         "topaz/packages/examples/spinning_cube",
+        "topaz/packages/examples/simple_flutter",
         "topaz/packages/examples/tests",
-        "topaz/packages/examples/ui",
-        "topaz/packages/examples/simple_flutter"
+        "topaz/packages/examples/ui"
     ]
 }
