@@ -8,12 +8,12 @@
 #include "lib/callback/set_when_called.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
-#include "lib/gtest/test_with_loop.h"
+#include "lib/gtest/test_loop_fixture.h"
 #include "lib/network_wrapper/fake_network_wrapper.h"
 
 namespace spotify_auth_provider {
 
-class SpotifyFactoryImplTest : public gtest::TestWithLoop {
+class SpotifyFactoryImplTest : public gtest::TestLoopFixture {
  public:
   SpotifyFactoryImplTest()
       : network_wrapper_(dispatcher()),

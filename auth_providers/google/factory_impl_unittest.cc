@@ -8,12 +8,12 @@
 #include "lib/callback/set_when_called.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
-#include "lib/gtest/test_with_loop.h"
+#include "lib/gtest/test_loop_fixture.h"
 #include "lib/network_wrapper/fake_network_wrapper.h"
 
 namespace google_auth_provider {
 
-class GoogleFactoryImplTest : public gtest::TestWithLoop {
+class GoogleFactoryImplTest : public gtest::TestLoopFixture {
  public:
   GoogleFactoryImplTest()
       : network_wrapper_(dispatcher()),

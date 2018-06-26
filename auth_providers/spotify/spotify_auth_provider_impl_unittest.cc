@@ -8,7 +8,7 @@
 #include "lib/callback/set_when_called.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
-#include "lib/gtest/test_with_loop.h"
+#include "lib/gtest/test_loop_fixture.h"
 #include "lib/network_wrapper/fake_network_wrapper.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
 
@@ -18,7 +18,7 @@ namespace {
 using fuchsia::auth::AuthProviderStatus;
 using fuchsia::auth::AuthTokenPtr;
 
-class SpotifyAuthProviderImplTest : public gtest::TestWithLoop {
+class SpotifyAuthProviderImplTest : public gtest::TestLoopFixture {
  public:
   SpotifyAuthProviderImplTest()
       : network_wrapper_(dispatcher()),

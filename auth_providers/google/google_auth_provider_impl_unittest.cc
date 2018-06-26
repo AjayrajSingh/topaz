@@ -6,13 +6,13 @@
 
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
-#include "lib/gtest/test_with_loop.h"
+#include "lib/gtest/test_loop_fixture.h"
 #include "lib/network_wrapper/fake_network_wrapper.h"
 
 namespace google_auth_provider {
 namespace {
 
-class GoogleAuthProviderImplTest : public gtest::TestWithLoop {
+class GoogleAuthProviderImplTest : public gtest::TestLoopFixture {
  public:
   GoogleAuthProviderImplTest()
       : network_wrapper_(dispatcher()),
