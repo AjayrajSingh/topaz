@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:io';
 import 'package:fidl_fuchsia_amber/fidl.dart' as amber;
 import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.settings/device_info.dart';
 import 'package:lib.widgets/model.dart';
 
@@ -23,11 +25,17 @@ class DeviceSettingsModel extends Model {
   /// Holds the time the source code was updated.
   DateTime _sourceDate;
 
+  bool _showResetConfirmation = false;
+
   DeviceSettingsModel() {
     _onStart();
   }
 
   DateTime get lastUpdate => _lastUpdate;
+
+  /// Determines whether the confirmation dialog for factory reset should
+  /// be displayed.
+  bool get showResetConfirmation => _showResetConfirmation;
 
   DateTime get sourceDate => _sourceDate;
 
@@ -49,5 +57,27 @@ class DeviceSettingsModel extends Model {
     final startupContext = StartupContext.fromStartupInfo();
     _sourceDate = DeviceInfo.getSourceDate();
     connectToService(startupContext.environmentServices, _amberControl.ctrl);
+  }
+
+  void factoryReset() async {
+    if (showResetConfirmation) {
+      // Reset has been confirmed, perform reset.
+      var dm = File('/dev/misc/dmctl');
+      if (dm.existsSync()) {
+        final flagSet = await DeviceInfo.setFactoryResetFlag(shouldReset: true);
+        log.severe('Factory Reset flag set successfully: $flagSet');
+        dm.writeAsStringSync('reboot', flush: true);
+      } else {
+        log.severe('dmctl unable to be found.');
+      }
+    } else {
+      _showResetConfirmation = true;
+      notifyListeners();
+    }
+  }
+
+  void cancelFactoryReset() {
+    _showResetConfirmation = false;
+    notifyListeners();
   }
 }

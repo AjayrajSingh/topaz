@@ -3,6 +3,7 @@
         "binary": "bin/app"
     },
     "sandbox": {
+        "dev": [ "misc" ],
         "system": [ "data" ]
     }
 }

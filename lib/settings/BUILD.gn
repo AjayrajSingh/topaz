@@ -14,6 +14,7 @@ dart_library("lib.settings") {
   ]
 
   deps = [
+    "//garnet/public/lib/device_settings/fidl:fidl",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/widgets:lib.widgets",
   ]
