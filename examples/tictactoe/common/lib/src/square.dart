@@ -9,7 +9,7 @@ enum SquareState {
 }
 
 class Square {
-  final SquareState state;
+  SquareState state;
 
   Square(this.state);
 }

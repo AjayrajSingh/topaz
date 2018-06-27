@@ -17,6 +17,7 @@ dart_test("tictactoe_game_test") {
   source_dir = "."
 
   sources = [
+    "test/game_test.dart",
     "test/win_detection_test.dart",
   ]
 

@@ -9,19 +9,17 @@ import '../lib/src/game.dart'; // ignore: avoid_relative_lib_imports
 import '../lib/src/square.dart'; // ignore: avoid_relative_lib_imports
 import '../lib/src/win_detection.dart'; // ignore: avoid_relative_lib_imports
 
+const SquareState _ = SquareState.empty;
+const SquareState x = SquareState.x;
+const SquareState o = SquareState.o;
+
 void main() {
   test('empty board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty
+          [_, _, _],
+          [_, _, _],
+          [_, _, _],
         ])),
         GameState.inProgress);
   });
@@ -29,15 +27,9 @@ void main() {
   test('one move board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.x,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.empty
+          [_, _, _],
+          [_, x, _],
+          [_, _, _],
         ])),
         GameState.inProgress);
   });
@@ -45,15 +37,9 @@ void main() {
   test('x win down board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.o,
-          SquareState.x,
-          SquareState.o,
-          SquareState.empty,
-          SquareState.x,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.x,
-          SquareState.o
+          [o, x, o],
+          [_, x, _],
+          [_, x, o],
         ])),
         GameState.xWin);
   });
@@ -61,15 +47,9 @@ void main() {
   test('x win across board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.x,
-          SquareState.x,
-          SquareState.x,
-          SquareState.empty,
-          SquareState.o,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.o,
-          SquareState.empty
+          [x, x, x],
+          [_, o, _],
+          [_, o, _],
         ])),
         GameState.xWin);
   });
@@ -77,15 +57,9 @@ void main() {
   test('x win diagonal board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.x,
-          SquareState.o,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.x,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.o,
-          SquareState.x
+          [x, o, _],
+          [_, x, _],
+          [_, o, x],
         ])),
         GameState.xWin);
   });
@@ -93,15 +67,9 @@ void main() {
   test('x win anti-diagonal board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.o,
-          SquareState.o,
-          SquareState.x,
-          SquareState.empty,
-          SquareState.x,
-          SquareState.empty,
-          SquareState.x,
-          SquareState.o,
-          SquareState.x
+          [o, o, x],
+          [_, x, _],
+          [x, o, x],
         ])),
         GameState.xWin);
   });
@@ -109,15 +77,9 @@ void main() {
   test('o win down board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.o,
-          SquareState.empty,
-          SquareState.o,
-          SquareState.empty,
-          SquareState.x,
-          SquareState.o,
-          SquareState.empty,
-          SquareState.x,
-          SquareState.o
+          [o, _, o],
+          [_, x, o],
+          [_, x, o],
         ])),
         GameState.oWin);
   });
@@ -125,15 +87,9 @@ void main() {
   test('o win across board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.x,
-          SquareState.x,
-          SquareState.o,
-          SquareState.o,
-          SquareState.o,
-          SquareState.o,
-          SquareState.empty,
-          SquareState.x,
-          SquareState.empty
+          [x, x, o],
+          [o, o, o],
+          [_, x, _],
         ])),
         GameState.oWin);
   });
@@ -141,15 +97,9 @@ void main() {
   test('o win diagonal board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.o,
-          SquareState.x,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.o,
-          SquareState.empty,
-          SquareState.empty,
-          SquareState.x,
-          SquareState.o
+          [o, x, _],
+          [_, o, _],
+          [_, x, o],
         ])),
         GameState.oWin);
   });
@@ -157,15 +107,9 @@ void main() {
   test('o win anti-diagonal board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.x,
-          SquareState.x,
-          SquareState.o,
-          SquareState.empty,
-          SquareState.o,
-          SquareState.empty,
-          SquareState.o,
-          SquareState.x,
-          SquareState.x
+          [x, x, o],
+          [_, o, _],
+          [o, x, x],
         ])),
         GameState.oWin);
   });
@@ -173,21 +117,16 @@ void main() {
   test('cats board', () {
     expect(
         getGameState(buildBoard([
-          SquareState.x,
-          SquareState.o,
-          SquareState.x,
-          SquareState.x,
-          SquareState.x,
-          SquareState.o,
-          SquareState.o,
-          SquareState.x,
-          SquareState.o
+          [x, o, x],
+          [x, x, o],
+          [o, x, o],
         ])),
         GameState.cats);
   });
 }
 
-Board buildBoard(List<SquareState> states) {
-  return new Board.withSquares(new List.generate(
-      9, (i) => new Square(states[i])));
+Board buildBoard(List<List<SquareState>> states) {
+  return new Board.withSquares(states
+      .map((row) => row.map((state) => new Square(state)).toList())
+      .toList());
 }
