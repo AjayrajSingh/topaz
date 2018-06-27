@@ -7,20 +7,58 @@ import 'dart:collection';
 import 'converted_change.dart';
 
 /// Sledge DataTypes internal storage.
-class KeyValueStorage<K, V> {
+class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
   final Map<K, V> _storage;
+  // TODO: rename this field.
   final ConvertedChange<K, V> _transaction;
-
-  /// Value used for nonexisting keys.
-  final V defaultValue;
+  bool Function(K, K) _equals;
+  int Function(K) _hashCode;
 
   /// Creates a storage using the provided [equals] as equality.
-  KeyValueStorage(this.defaultValue,
-      {bool equals(K key1, K key2), int hashCode(K key)})
-      : _storage = new HashMap<K, V>(equals: equals, hashCode: hashCode),
+  KeyValueStorage({bool equals(K key1, K key2), int hashCode(K key)})
+      : _equals = equals,
+        _hashCode = hashCode,
+        _storage = new HashMap<K, V>(equals: equals, hashCode: hashCode),
         _transaction = new ConvertedChange(
             new HashMap<K, V>(equals: equals, hashCode: hashCode),
             new HashSet<K>(equals: equals, hashCode: hashCode));
+
+  @override
+  V operator [](Object key) {
+    if (_transaction.deletedKeys.contains(key)) {
+      return null;
+    }
+    return _transaction.changedEntries[key] ?? _storage[key];
+  }
+
+  @override
+  void operator []=(K key, V value) {
+    _transaction.deletedKeys.remove(key);
+    _transaction.changedEntries[key] = value;
+  }
+
+  @override
+  V remove(Object key) {
+    V result = this[key];
+    _transaction.deletedKeys.add(key);
+    _transaction.changedEntries.remove(key);
+    return result;
+  }
+
+  @override
+  void clear() {
+    _transaction.changedEntries.clear();
+    _transaction.deletedKeys.addAll(_storage.keys);
+  }
+
+  // TODO: return lazy iterable
+  @override
+  Set<K> get keys {
+    return new HashSet<K>(equals: _equals, hashCode: _hashCode)
+      ..addAll(_storage.keys)
+      ..addAll(_transaction.changedEntries.keys)
+      ..removeAll(_transaction.deletedKeys);
+  }
 
   /// Ends transaction and retrieve it's data.
   ConvertedChange<K, V> getChange() {
@@ -30,32 +68,14 @@ class KeyValueStorage<K, V> {
     return change;
   }
 
-  /// Returns the value for the given [key] or defaultValue if [key] is not in
-  /// the storage.
-  V operator [](K key) {
-    if (_transaction.deletedKeys.contains(key)) {
-      return defaultValue;
-    }
-    return _transaction.changedEntries[key] ?? _storage[key] ?? defaultValue;
-  }
-
-  /// Associates the [key] with the given [value].
-  void operator []=(K key, V value) {
-    _transaction.deletedKeys.remove(key);
-    _transaction.changedEntries[key] = value;
-  }
-
-  /// Removes [key] and its associated value, if present, from the storage.
-  V remove(K key) {
-    V result = this[key];
-    _transaction.deletedKeys.add(key);
-    _transaction.changedEntries.remove(key);
-    return result;
-  }
-
   /// Applies external transaction.
   void applyChange(ConvertedChange<K, V> change) {
     _storage.addAll(change.changedEntries);
     change.deletedKeys.forEach(_storage.remove);
+  }
+
+  /// Rollbacks current transaction.
+  void rollback() {
+    _transaction.clear();
   }
 }

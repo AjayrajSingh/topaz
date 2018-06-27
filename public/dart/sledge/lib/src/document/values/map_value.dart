@@ -20,8 +20,7 @@ class MapValue<K, V> extends BaseValue<MapChange<K, V>> {
   /// Creates a MapValue with provided [equals] as equality.
   MapValue({bool equals(K key1, K key2), int hashCode(K key)})
       : _converter = new DataConverter<K, V>(),
-        _map =
-            new KeyValueStorage<K, V>(null, equals: equals, hashCode: hashCode);
+        _map = new KeyValueStorage<K, V>(equals: equals, hashCode: hashCode);
 
   @override
   Change getChange() => _converter.serialize(_map.getChange());
@@ -66,8 +65,7 @@ class SetValue<E> extends BaseValue<SetChange<E>> {
   /// Creates a SetValue with provided [equals] as equality.
   /// It should be coherent with encoding of [E] done by Converter.
   SetValue({bool equals(E entry1, E enrtry2), int hashCode(E entry)})
-      : _map = new KeyValueStorage<E, bool>(null,
-            equals: equals, hashCode: hashCode),
+      : _map = new KeyValueStorage<E, bool>(equals: equals, hashCode: hashCode),
         _converter = new DataConverter<E, bool>();
 
   @override
@@ -81,7 +79,7 @@ class SetValue<E> extends BaseValue<SetChange<E>> {
   }
 
   /// Returns true if [value] is in the set.
-  bool contains(E value) => _map[value] == true;
+  bool contains(E value) => _map.containsKey(value);
 
   /// Adds [value] to the set.
   /// Returns true if [value] was not yet in the set. Otherwise returns

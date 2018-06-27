@@ -29,6 +29,7 @@ dart_test("dart_sledge_tests") {
     "schema_test.dart",
     "values/compressor_test.dart",
     "values/converter_test.dart",
+    "values/key_value_storage_test.dart",
     "values/last_one_wins_values_test.dart",
     "values/map_value_test.dart",
     "values/pos_neg_counter_test.dart",

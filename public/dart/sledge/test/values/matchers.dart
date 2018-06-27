@@ -4,8 +4,6 @@
 
 // ignore_for_file: implementation_imports
 
-import 'dart:typed_data';
-
 import 'package:collection/collection.dart';
 import 'package:matcher/matcher.dart';
 import 'package:sledge/src/document/change.dart';
@@ -39,22 +37,6 @@ const ListEquality _keyValueListEquality =
     const ListEquality<KeyValue>(_keyValueEquality);
 const ListEquality _keysListEquality =
     const ListEquality<List<int>>(_listEquality);
-
-class Uint8ListMatcher extends Matcher {
-  final Uint8List _list;
-
-  // Default constructor.
-  Uint8ListMatcher(this._list);
-
-  @override
-  bool matches(dynamic list, Map matchState) {
-    return _listEquality.equals(list, _list);
-  }
-
-  @override
-  Description describe(Description description) =>
-      description.add('Uint8List equals to ').addDescriptionOf(_list.toList());
-}
 
 class KeyValueMatcher extends Matcher {
   final KeyValue _kv;

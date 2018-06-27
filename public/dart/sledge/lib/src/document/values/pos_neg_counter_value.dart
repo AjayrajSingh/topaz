@@ -26,14 +26,15 @@ class _PosNegCounterValue<T extends num> {
   final KeyValueStorage<Uint8List, T> _storage;
   final Uint8List _currentInstanceId;
   T _sum;
+  final T _defaultValue;
   final StreamController<T> _changeController =
       new StreamController<T>.broadcast();
   static final _listEquality = new ListEquality();
 
-  _PosNegCounterValue(this._currentInstanceId, T defaultValue)
-      : _storage = new KeyValueStorage<Uint8List, T>(defaultValue,
+  _PosNegCounterValue(this._currentInstanceId, this._defaultValue)
+      : _storage = new KeyValueStorage<Uint8List, T>(
             equals: _listEquality.equals, hashCode: _listEquality.hash) {
-    _sum = _storage.defaultValue;
+    _sum = _defaultValue;
   }
 
   Uint8List get _positiveKey =>
@@ -56,7 +57,7 @@ class _PosNegCounterValue<T extends num> {
   T get value => _sum;
 
   void _addPositiveValue(Uint8List key, T delta) {
-    T cur = _storage[key];
+    T cur = _storage[key] ?? _defaultValue;
     _storage[key] = cur + delta;
   }
 
@@ -64,7 +65,7 @@ class _PosNegCounterValue<T extends num> {
 
   void applyChange(ConvertedChange<Uint8List, T> change) {
     for (var key in change.changedEntries.keys) {
-      var diff = change.changedEntries[key] - _storage[key];
+      var diff = change.changedEntries[key] - (_storage[key] ?? _defaultValue);
       if (_isKeyPositive(key)) {
         _sum += diff;
       } else {

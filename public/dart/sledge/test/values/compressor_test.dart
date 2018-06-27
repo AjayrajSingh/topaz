@@ -25,11 +25,11 @@ void main() {
       final c = new Compressor();
       final key = new Uint8List.fromList([3, 8, 2]);
       final keyUc = c.uncompressKey(c.compressKey(key));
-      expect(keyUc, new Uint8ListMatcher(key));
+      expect(keyUc, equals(key));
 
       final keyOth = new Uint8List.fromList([3]);
       final keyOthUc = c.uncompressKey(c.compressKey(keyOth));
-      expect(keyOthUc, new Uint8ListMatcher(keyOth));
+      expect(keyOthUc, equals(keyOth));
     });
   });
 
