@@ -60,9 +60,9 @@ class _PosNegCounterValue<T extends num> {
     _storage[key] = cur + delta;
   }
 
-  ConvertedChange<Uint8List, T> put() => _storage.put();
+  ConvertedChange<Uint8List, T> getChange() => _storage.getChange();
 
-  void applyChanges(ConvertedChange<Uint8List, T> change) {
+  void applyChange(ConvertedChange<Uint8List, T> change) {
     for (var key in change.changedEntries.keys) {
       var diff = change.changedEntries[key] - _storage[key];
       if (_isKeyPositive(key)) {
@@ -71,7 +71,7 @@ class _PosNegCounterValue<T extends num> {
         _sum -= diff;
       }
     }
-    _storage.applyChanges(change);
+    _storage.applyChange(change);
     _changeController.add(_sum);
   }
 }
@@ -86,17 +86,17 @@ class PosNegCounterValue<T extends num> extends BaseValue<T> {
       : _converter = new DataConverter<Uint8List, T>(),
         _counter =
             new _PosNegCounterValue<T>(id, new Converter<T>().defaultValue) {
-    applyChanges(init ?? new Change());
+    applyChange(init ?? new Change());
   }
 
   /// Ends transaction and retrieve its data.
   @override
-  Change put() => _converter.serialize(_counter.put());
+  Change getChange() => _converter.serialize(_counter.getChange());
 
   /// Applies external transactions.
   @override
-  void applyChanges(Change input) =>
-      _counter.applyChanges(_converter.deserialize(input));
+  void applyChange(Change input) =>
+      _counter.applyChange(_converter.deserialize(input));
 
   /// Adds value (possibly negative) to counter.
   void add(final T delta) {

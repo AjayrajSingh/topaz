@@ -22,7 +22,7 @@ class _LastOneWinsValue<T> {
 
   T get value => _transaction ?? _value;
 
-  ConvertedChange<int, T> put() {
+  ConvertedChange<int, T> getChange() {
     if (_transaction == null) {
       return new ConvertedChange<int, T>();
     }
@@ -32,7 +32,7 @@ class _LastOneWinsValue<T> {
     return result;
   }
 
-  void applyChanges(ConvertedChange<int, T> change) {
+  void applyChange(ConvertedChange<int, T> change) {
     if (change.changedEntries.isEmpty) {
       return;
     }
@@ -57,15 +57,15 @@ class LastOneWinsValue<T> extends BaseValue<T> {
   LastOneWinsValue([Change init])
       : _converter = new DataConverter<int, T>(),
         _value = new _LastOneWinsValue<T>(new Converter<T>().defaultValue) {
-    applyChanges(init ?? new Change());
+    applyChange(init ?? new Change());
   }
 
   @override
-  Change put() => _converter.serialize(_value.put());
+  Change getChange() => _converter.serialize(_value.getChange());
 
   @override
-  void applyChanges(Change input) =>
-      _value.applyChanges(_converter.deserialize(input));
+  void applyChange(Change input) =>
+      _value.applyChange(_converter.deserialize(input));
 
   /// Sets value.
   set value(T value) {

@@ -16,10 +16,10 @@ abstract class BaseValue<T> {
   ValueObserver observer;
 
   /// Ends the transaction and retrieves its data.
-  Change put();
+  Change getChange();
 
   /// Applies external transactions.
-  void applyChanges(Change input);
+  void applyChange(Change input);
 
   /// Gets Stream of changes.
   Stream<T> get onChange;

@@ -44,11 +44,11 @@ void main() {
     expect(s.contains('-'), equals(false));
     expect(s.add('-'), equals(true));
     expect(s.add('-'), equals(false));
-    s.put();
+    s.getChange();
     expect(s.add('-'), equals(false));
     expect(s.remove('-'), equals(true));
     expect(s.remove('-'), equals(false));
-    s.put();
+    s.getChange();
     expect(s.remove('-'), equals(false));
     expect(s.add('-'), equals(true));
     expect(s.add('-'), equals(false));

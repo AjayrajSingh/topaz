@@ -23,10 +23,10 @@ class KeyValueStorage<K, V> {
             new HashSet<K>(equals: equals, hashCode: hashCode));
 
   /// Ends transaction and retrieve it's data.
-  ConvertedChange<K, V> put() {
+  ConvertedChange<K, V> getChange() {
     var change = new ConvertedChange.from(_transaction);
     _transaction.clear();
-    applyChanges(change);
+    applyChange(change);
     return change;
   }
 
@@ -54,7 +54,7 @@ class KeyValueStorage<K, V> {
   }
 
   /// Applies external transaction.
-  void applyChanges(ConvertedChange<K, V> change) {
+  void applyChange(ConvertedChange<K, V> change) {
     _storage.addAll(change.changedEntries);
     change.deletedKeys.forEach(_storage.remove);
   }

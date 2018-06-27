@@ -35,7 +35,7 @@ void main() {
     expect(m[0], equals(3));
     m.remove(0);
     expect(m[0], equals(null));
-    m.put();
+    m.getChange();
     expect(m[0], equals(null));
     m[0] = 2;
     expect(m[0], equals(2));
@@ -43,7 +43,7 @@ void main() {
     expect(m[0], equals(null));
     m[0] = 1;
     expect(m[0], equals(1));
-    m.put();
+    m.getChange();
     expect(m[0], equals(1));
   });
 }

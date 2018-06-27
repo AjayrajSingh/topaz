@@ -58,7 +58,7 @@ class Transaction {
     // TODO: Don't await individual ledger operations, await the aggregation
     // of all the ledger operations.
     for (final document in _documents) {
-      final Change change = Document.put(document);
+      final Change change = Document.getChange(document);
 
       final Uint8List documentPrefix = document.documentId.prefix;
 
@@ -129,7 +129,7 @@ class Transaction {
 
     if (kvs.isNotEmpty) {
       final change = new Change(kvs);
-      Document.applyChanges(document, change);
+      Document.applyChange(document, change);
     }
 
     return document;

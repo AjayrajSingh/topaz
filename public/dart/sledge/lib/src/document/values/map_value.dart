@@ -25,12 +25,12 @@ class MapValue<K, V> extends BaseValue<MapChange<K, V>> {
             new KeyValueStorage<K, V>(null, equals: equals, hashCode: hashCode);
 
   @override
-  Change put() => _converter.serialize(_map.put());
+  Change getChange() => _converter.serialize(_map.getChange());
 
   @override
-  void applyChanges(Change input) {
+  void applyChange(Change input) {
     final change = _converter.deserialize(input);
-    _map.applyChanges(change);
+    _map.applyChange(change);
     _changeController.add(new MapChange<K, V>(change));
   }
 
@@ -73,12 +73,12 @@ class SetValue<E> extends BaseValue<SetChange<E>> {
         _converter = new DataConverter<E, bool>();
 
   @override
-  Change put() => _converter.serialize(_map.put());
+  Change getChange() => _converter.serialize(_map.getChange());
 
   @override
-  void applyChanges(Change input) {
+  void applyChange(Change input) {
     final change = _converter.deserialize(input);
-    _map.applyChanges(change);
+    _map.applyChange(change);
     _changeController.add(new SetChange<E>(change));
   }
 

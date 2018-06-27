@@ -217,10 +217,10 @@ void main() {
         ..number.value = 5
         ..cnt.add(1);
 
-      c1 = Document.put(docA);
+      c1 = Document.getChange(docA);
     });
 
-    Document.applyChanges(docB, c1);
+    Document.applyChange(docB, c1);
 
     expect(docB.name.value, equals('value + counter'));
     expect(docB.number.value, equals(5));

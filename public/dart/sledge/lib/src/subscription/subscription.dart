@@ -17,13 +17,13 @@ class Subscription extends ledger.PageWatcher {
   final ledger.PageSnapshotProxy _snapshotProxy;
   final ledger.PageWatcherBinding _pageWatcherBinding =
       new ledger.PageWatcherBinding();
-  final void Function(Change change) _applyChangesCallback;
+  final void Function(Change change) _applyChangeCallback;
   final Change _currentChange = new Change();
 
   /// Register a watcher for Ledger page, which pass all changes to
-  /// _applyChangesCallback.
+  /// _applyChangeCallback.
   Subscription(this._pageProxy, LedgerPageSnapshotFactory snapshotFactory,
-      this._applyChangesCallback, Completer<bool> subscriptionCompleter)
+      this._applyChangeCallback, Completer<bool> subscriptionCompleter)
       : _snapshotProxy = snapshotFactory.newInstance() {
     Completer<ledger.Status> completer = new Completer<ledger.Status>();
     _pageProxy.getSnapshot(
@@ -49,7 +49,7 @@ class Subscription extends ledger.PageWatcher {
     // For a given change, |onChange| can be called multiple times.
     if (resultState == ledger.ResultState.completed ||
         resultState == ledger.ResultState.partialCompleted) {
-      _applyChangesCallback(_currentChange);
+      _applyChangeCallback(_currentChange);
       _currentChange.clear();
     }
 

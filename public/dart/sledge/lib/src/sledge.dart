@@ -147,20 +147,20 @@ class Sledge {
   /// Returns an ID, unique among active connections accross devices.
   ConnectionId get connectionId => _connectionId;
 
-  /// Call |applyChanges| for all registered documents.
-  void _applyChanges(Change change) {
+  /// Call |applyChange| for all registered documents.
+  void _applyChange(Change change) {
     final splittedChange = change.splitByPrefix(DocumentId.prefixLength);
     for (final prefix in splittedChange.keys) {
-      Document.applyChanges(_documentByPrefix[prefix], splittedChange[prefix]);
+      Document.applyChange(_documentByPrefix[prefix], splittedChange[prefix]);
     }
   }
 
-  /// Subscribes for page.onChange to perform applyChanges.
+  /// Subscribes for page.onChange to perform applyChange.
   Subscription _subscribe(Completer<bool> subscriptionCompleter) {
     if (_currentTransaction == null) {
       throw new StateError('Must be called inside a transaction.');
     }
     return new Subscription(
-        _pageProxy, _pageSnapshotFactory, _applyChanges, subscriptionCompleter);
+        _pageProxy, _pageSnapshotFactory, _applyChange, subscriptionCompleter);
   }
 }

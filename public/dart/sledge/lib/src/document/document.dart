@@ -48,30 +48,30 @@ class Document implements ValueObserver {
   /// Returns this document's documentId.
   DocumentId get documentId => _documentId;
 
-  /// Get a changes for all fields of doc.
-  static Change put(final Document doc) {
-    return doc._put();
+  /// Get the change for all fields of doc.
+  static Change getChange(final Document doc) {
+    return doc._getChange();
   }
 
-  /// Applies changes to fields of document.
-  static void applyChanges(final Document doc, final Change change) {
-    doc._applyChanges(change);
+  /// Applies change to fields of document.
+  static void applyChange(final Document doc, final Change change) {
+    doc._applyChange(change);
   }
 
-  /// Gets a changes for all fields of document.
-  Change _put() {
+  /// Gets the change for all fields of document.
+  Change _getChange() {
     Change result = new Change();
     for (final prefix in _fields.keys) {
-      result.addAll(_fields[prefix].put().withPrefix(prefix));
+      result.addAll(_fields[prefix].getChange().withPrefix(prefix));
     }
     return result;
   }
 
-  /// Applies changes to fields of document.
-  void _applyChanges(final Change change) {
+  /// Applies change to fields of document.
+  void _applyChange(final Change change) {
     Map<Uint8List, Change> splittedChanges = change.splitByPrefix(_hashLength);
     for (final prefix in splittedChanges.keys) {
-      _fields[prefix].applyChanges(splittedChanges[prefix]);
+      _fields[prefix].applyChange(splittedChanges[prefix]);
     }
   }
 
