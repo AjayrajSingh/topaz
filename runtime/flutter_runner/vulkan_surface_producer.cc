@@ -100,9 +100,7 @@ bool VulkanSurfaceProducer::Initialize(scenic_lib::Session* mozart_session) {
   backend_context_->fMinAPIVersion = application_->GetAPIVersion();
   backend_context_->fFeatures = skia_features;
   backend_context_->fInterface.reset(interface.release());
-
-  logical_device_->ReleaseDeviceOwnership();
-  application_->ReleaseInstanceOwnership();
+  backend_context_->fOwnsInstanceAndDevice = false;
 
   context_ = GrContext::MakeVulkan(backend_context_);
 
