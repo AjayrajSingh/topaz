@@ -7,7 +7,7 @@
 #include <utility>
 
 #include "examples/ui/lib/skia_vmo_data.h"
-#include "third_party/skia/include/ports/SkFontMgr.h"
+#include "third_party/skia/include/core/SkFontMgr.h"
 
 namespace mozart {
 
