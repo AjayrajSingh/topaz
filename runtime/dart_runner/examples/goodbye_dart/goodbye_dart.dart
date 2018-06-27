@@ -12,6 +12,11 @@ Timer _timer;
 void main(List<String> args) {
   print('Hello, Dart!');
 
+  if (args.isNotEmpty && args.first == '--now') {
+    print('Goodbye now!');
+    fuchsia.exit(23);
+  }
+
   _timer = new Timer(const Duration(seconds: 1), () {
     print('Goodbye, Dart!');
     fuchsia.exit(42);

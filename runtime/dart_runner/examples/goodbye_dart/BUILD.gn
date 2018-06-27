@@ -23,3 +23,18 @@ dart_aot_app("goodbye_dart_aot") {
     "//topaz/public/dart/fuchsia",
   ]
 }
+
+copy("copy_goodbye_dart_test") {
+  sources = [ "goodbye_dart_test.sh" ]
+  outputs = [ "${root_build_dir}/goodbye_dart_test.sh" ]
+}
+
+package("goodbye_dart_test") {
+  testonly = true
+  tests = [{
+    name = "goodbye_dart_test.sh"
+  }]
+  deps = [
+    ":copy_goodbye_dart_test"
+  ]
+}

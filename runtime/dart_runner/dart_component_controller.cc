@@ -361,8 +361,12 @@ bool DartComponentController::Main() {
   Dart_Handle main_result =
       Dart_Invoke(Dart_RootLibrary(), ToDart("main"), arraysize(argv), argv);
   if (Dart_IsError(main_result)) {
-    FXL_LOG(ERROR) << Dart_GetError(main_result);
-    return_code_ = tonic::GetErrorExitCode(main_result);
+    auto dart_state = tonic::DartState::Current();
+    if (!dart_state->has_set_return_code()) {
+      // The program hasn't set a return code meaning this exit is unexpected.
+      FXL_LOG(ERROR) << Dart_GetError(main_result);
+      return_code_ = tonic::GetErrorExitCode(main_result);
+    }
     Dart_ExitScope();
     return false;
   }
@@ -411,8 +415,7 @@ void DartComponentController::MessageEpilogue(Dart_Handle result) {
   // If the Dart program has set a return code, then it is intending to shut
   // down by way of a fatal error, and so there is no need to override
   // return_code_.
-  if (dart_state->has_set_return_code() && Dart_IsError(result) &&
-      Dart_IsFatalError(result)) {
+  if (dart_state->has_set_return_code()) {
     Dart_ShutdownIsolate();
     return;
   }

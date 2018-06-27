@@ -22,6 +22,7 @@ DartState::DartState(int dirfd, std::function<void(Dart_Handle)> message_epilogu
       message_handler_(new DartMessageHandler()),
       file_loader_(new FileLoader(dirfd)),
       message_epilogue_(message_epilogue),
+      has_set_return_code_(false),
       weak_factory_(this) {}
 
 DartState::~DartState() {}
