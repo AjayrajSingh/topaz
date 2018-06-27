@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math';
 import 'dart:typed_data';
+
+import 'utils_random.dart' as random;
 
 // TODO: 1. add device ID as a part of connection ID.
 // 2. Reuse IDs.
@@ -18,12 +19,7 @@ class ConnectionId {
   ConnectionId(this._id);
 
   /// Creates a completely random conncection ID.
-  ConnectionId.random() : _id = new Uint8List(20) {
-    final random = new Random(new DateTime.now().microsecondsSinceEpoch);
-    for (int i = 0; i < 20; i++) {
-      _id[i] = random.nextInt(256);
-    }
-  }
+  ConnectionId.random() : _id = random.randomUint8List(20);
 
   /// Returns byte representation of ID.
   Uint8List get id => _id;

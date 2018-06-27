@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math';
 import 'dart:typed_data';
 
 import '../schema/schema.dart';
+import '../utils_random.dart' as random;
 
 /// Uniquely identifies a document.
 class DocumentId {
@@ -18,7 +18,6 @@ class DocumentId {
 
   /// The length of the prefix.
   static const int prefixLength = _subIdByteCount + _schemahashByteCount;
-  static final Random _random = new Random();
 
   /// Default constructor.
   /// |identifier| uniquely identifies documents for the given schema.
@@ -52,11 +51,6 @@ class DocumentId {
   /// Returns |identifier| which can be used to create the same DocumentId.
   Uint8List get subId => new Uint8List.fromList(_subId);
 
-  static Uint8List _randomByteArrayForSubIds() {
-    final array = new Uint8List(_subIdByteCount);
-    for (int i = 0; i < _subIdByteCount; i++) {
-      array[i] = _random.nextInt(255);
-    }
-    return array;
-  }
+  static Uint8List _randomByteArrayForSubIds() =>
+      random.randomUint8List(_subIdByteCount);
 }
