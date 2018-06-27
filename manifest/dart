@@ -9,12 +9,12 @@
              path="third_party/dart"
              remote="https://dart.googlesource.com/sdk"
              gerrithost="https://dart-review.googlesource.com"
-             revision="4c9689c1d2da97d0aa25cf16cc90c2e463ad157f"/>
+             revision="84ca27a09ebd6a65cd23ee52d835d89cbe06c574"/>
     <project name="dart/observatory_pub_packages"
              path="third_party/dart/third_party/observatory_pub_packages"
              remote="https://dart.googlesource.com/observatory_pub_packages/"
              gerrithost="https://dart-review.googlesource.com"
-             revision="d3a3aebefbd35aa30fe7bbc2889b772b398f7d7f"/>
+             revision="caf0aecfb15077fc7a34d48e9df13606c793fddf"/>
 
     <project name="third_party/dart-pkg"
              path="third_party/dart-pkg/pub"

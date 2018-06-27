@@ -19,15 +19,8 @@ HOST_ARCH = utils.GuessArchitecture()
 SCRIPT_DIR = os.path.dirname(sys.argv[0])
 DART_ROOT = os.path.realpath(os.path.join(SCRIPT_DIR, '..', '..', 'third_party', 'dart'))
 
-DEFAULT_DART_VERSION = '2.0.0-dev.55.0'
+DEFAULT_DART_VERSION = '2.0.0-dev.65.0'
 BASE_URL = 'http://gsdview.appspot.com/dart-archive/channels/dev/raw/%s/sdk/%s'
-
-def host_os_for_sdk(host_os):
-  if host_os.startswith('macos'):
-    return 'mac'
-  if host_os.startswith('win'):
-    return 'windows'
-  return host_os
 
 # Python's zipfile doesn't preserve file permissions during extraction, so we
 # have to do it manually.
@@ -46,10 +39,9 @@ def extract_file(zf, info, extract_dir):
   return True
 
 def main(argv):
-  host_os = host_os_for_sdk(HOST_OS)
   zip_file = ('dartsdk-%s-x64-release.zip' % HOST_OS)
   sha_file = zip_file + '.sha256sum'
-  sdk_path = os.path.join(DART_ROOT, 'tools', 'sdks', host_os)
+  sdk_path = os.path.join(DART_ROOT, 'tools', 'sdks')
   local_sha_path = os.path.join(sdk_path, sha_file)
   remote_sha_path = os.path.join(sdk_path, sha_file + '.remote')
   zip_path = os.path.join(sdk_path, zip_file)
