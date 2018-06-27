@@ -69,20 +69,21 @@ void Runner::StartComponent(
   // there being multiple application runner instance in the process at the same
   // time. So it is safe to use the raw pointer.
   Application::TerminationCallback termination_callback =
-      [task_runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner(),  //
-       application_runner = this                                     //
+      [task_runner =
+           deprecated_loop::MessageLoop::GetCurrent()->task_runner(),  //
+       application_runner = this                                       //
   ](const Application* application) {
         task_runner->PostTask([application_runner, application]() {
           application_runner->OnApplicationTerminate(application);
         });
       };
 
-  auto thread_application_pair =
-      Application::Create(termination_callback,     // termination callback
-                          std::move(package),       // application pacakge
-                          std::move(startup_info),  // startup info
-                          std::move(controller)     // controller request
-      );
+  auto thread_application_pair = Application::Create(
+      std::move(termination_callback),  // termination callback
+      std::move(package),               // application pacakge
+      std::move(startup_info),          // startup info
+      std::move(controller)             // controller request
+  );
 
   auto key = thread_application_pair.second.get();
 

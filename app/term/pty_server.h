@@ -5,10 +5,10 @@
 #ifndef TOPAZ_APP_TERM_PTY_SERVER_H_
 #define TOPAZ_APP_TERM_PTY_SERVER_H_
 
-#include <zx/process.h>
-
-#include <functional>
 #include <vector>
+
+#include <lib/fit/function.h>
+#include <zx/process.h>
 
 #include "lib/fsl/tasks/fd_waiter.h"
 #include "lib/fxl/files/unique_fd.h"
@@ -18,8 +18,8 @@ namespace term {
 class PTYServer {
  public:
   using ReceiveCallback =
-      std::function<void(const void* bytes, size_t num_bytes)>;
-  using TerminationCallback = std::function<void()>;
+      fit::function<void(const void* bytes, size_t num_bytes)>;
+  using TerminationCallback = fit::closure;
 
   PTYServer();
   ~PTYServer();

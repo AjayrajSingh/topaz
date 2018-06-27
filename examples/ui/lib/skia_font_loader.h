@@ -2,12 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef LIB_UI_SKIA_SKIA_FONT_LOADER_H_
-#define LIB_UI_SKIA_SKIA_FONT_LOADER_H_
+#ifndef TOPAZ_EXAMPLES_UI_LIB_SKIA_FONT_LOADER_H_
+#define TOPAZ_EXAMPLES_UI_LIB_SKIA_FONT_LOADER_H_
 
 #include <functional>
 
 #include <fuchsia/fonts/cpp/fidl.h>
+#include <lib/fit/function.h>
 
 #include "lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkTypeface.h"
@@ -17,7 +18,7 @@ namespace mozart {
 // Loads fonts from a font provider.
 class SkiaFontLoader {
  public:
-  using FontCallback = std::function<void(sk_sp<SkTypeface>)>;
+  using FontCallback = fit::function<void(sk_sp<SkTypeface>)>;
 
   SkiaFontLoader(fuchsia::fonts::FontProviderPtr font_provider);
   ~SkiaFontLoader();
@@ -38,4 +39,4 @@ class SkiaFontLoader {
 
 }  // namespace mozart
 
-#endif  // LIB_UI_SKIA_SKIA_FONT_LOADER_H_
+#endif  // TOPAZ_EXAMPLES_UI_LIB_SKIA_FONT_LOADER_H_

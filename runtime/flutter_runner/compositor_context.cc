@@ -11,12 +11,9 @@ namespace flutter {
 
 class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
  public:
-  ScopedFrame(flow::CompositorContext& context,
-              bool instrumentation_enabled,
+  ScopedFrame(flow::CompositorContext& context, bool instrumentation_enabled,
               SessionConnection& session_connection)
-      : flow::CompositorContext::ScopedFrame(context,
-                                             nullptr,
-                                             nullptr,
+      : flow::CompositorContext::ScopedFrame(context, nullptr, nullptr,
                                              instrumentation_enabled),
         session_connection_(session_connection) {}
 
@@ -57,24 +54,19 @@ class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
 
 CompositorContext::CompositorContext(
     fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic,
-    std::string debug_label,
-    zx::eventpair import_token,
+    std::string debug_label, zx::eventpair import_token,
     OnMetricsUpdate session_metrics_did_change_callback,
-    fxl::Closure session_error_callback,
-    zx_handle_t vsync_event_handle)
+    fit::closure session_error_callback, zx_handle_t vsync_event_handle)
     : debug_label_(std::move(debug_label)),
-      session_connection_(std::move(scenic),
-                          debug_label_,
-                          std::move(import_token),
-                          std::move(session_metrics_did_change_callback),
-                          std::move(session_error_callback),
-                          vsync_event_handle) {}
+      session_connection_(
+          std::move(scenic), debug_label_, std::move(import_token),
+          std::move(session_metrics_did_change_callback),
+          std::move(session_error_callback), vsync_event_handle) {}
 
 CompositorContext::~CompositorContext() = default;
 
 std::unique_ptr<flow::CompositorContext::ScopedFrame>
-CompositorContext::AcquireFrame(GrContext* gr_context,
-                                SkCanvas* canvas,
+CompositorContext::AcquireFrame(GrContext* gr_context, SkCanvas* canvas,
                                 bool instrumentation_enabled) {
   // TODO: The AcquireFrame interface is too broad and must be refactored to get
   // rid of the context and canvas arguments as those seem to be only used for

@@ -19,7 +19,8 @@
 
 namespace flutter {
 
-std::pair<std::unique_ptr<deprecated_loop::Thread>, std::unique_ptr<Application>>
+std::pair<std::unique_ptr<deprecated_loop::Thread>,
+          std::unique_ptr<Application>>
 Application::Create(
     TerminationCallback termination_callback, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
@@ -29,11 +30,9 @@ Application::Create(
 
   deprecated_loop::AutoResetWaitableEvent latch;
   thread->TaskRunner()->PostTask([&]() mutable {
-    application.reset(new Application(termination_callback,     //
-                                      std::move(package),       //
-                                      std::move(startup_info),  //
-                                      std::move(controller)     //
-                                      ));
+    application.reset(
+        new Application(std::move(termination_callback), std::move(package),
+                        std::move(startup_info), std::move(controller)));
     latch.Signal();
   });
   thread->Run();
@@ -50,12 +49,12 @@ static std::string DebugLabelForURL(const std::string& url) {
   }
 }
 
-Application::Application(TerminationCallback termination_callback,
-                         fuchsia::sys::Package,
-                         fuchsia::sys::StartupInfo startup_info,
-                         fidl::InterfaceRequest<fuchsia::sys::ComponentController>
-                             application_controller_request)
-    : termination_callback_(termination_callback),
+Application::Application(
+    TerminationCallback termination_callback, fuchsia::sys::Package,
+    fuchsia::sys::StartupInfo startup_info,
+    fidl::InterfaceRequest<fuchsia::sys::ComponentController>
+        application_controller_request)
+    : termination_callback_(std::move(termination_callback)),
       debug_label_(DebugLabelForURL(startup_info.launch_info.url)),
       application_controller_(this) {
   application_controller_.set_error_handler([this]() { Kill(); });

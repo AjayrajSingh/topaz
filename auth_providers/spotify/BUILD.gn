@@ -11,6 +11,10 @@ executable("bin") {
     "main.cc",
   ]
 
+  public_deps = [
+    "//zircon/public/lib/fit",
+  ]
+
   deps = [
     ":lib",
     "//garnet/public/lib/app/cpp",

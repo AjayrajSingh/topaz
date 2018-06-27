@@ -74,7 +74,9 @@ ViewController::ViewController(
                             view_listener_binding_.NewBinding(),
                             std::move(parent_export_token), kViewLabel);
   view_listener_binding_.set_error_handler(
-      [this, disconnect_handler] { disconnect_handler(this); });
+      [this, disconnect_handler = std::move(disconnect_handler)] {
+        disconnect_handler(this);
+      });
   view_->GetContainer(view_container_.NewRequest());
   view_container_->SetListener(view_container_listener_binding_.NewBinding());
 

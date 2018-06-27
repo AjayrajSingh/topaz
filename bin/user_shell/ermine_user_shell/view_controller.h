@@ -7,12 +7,12 @@
 
 #include <lib/async/cpp/task.h>
 
-#include <functional>
 #include <memory>
 #include <vector>
 
 #include <fuchsia/ui/input/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
+#include <lib/fit/function.h>
 
 #include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding.h"
@@ -27,7 +27,7 @@ class ViewController : public fuchsia::ui::views_v1::ViewListener,
                        public fuchsia::ui::views_v1::ViewContainerListener,
                        public fuchsia::ui::input::InputListener {
  public:
-  using DisconnectCallback = std::function<void(ViewController*)>;
+  using DisconnectCallback = fit::function<void(ViewController*)>;
 
   ViewController(fuchsia::sys::Launcher* launcher,
                  fuchsia::ui::views_v1::ViewManagerPtr view_manager,

@@ -10,11 +10,11 @@
 #include <fuchsia/auth/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
+#include <lib/fit/function.h>
 
 #include "lib/app/cpp/startup_context.h"
 #include "lib/callback/cancellable.h"
 #include "lib/fidl/cpp/binding.h"
-#include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
 #include "lib/network_wrapper/network_wrapper.h"
 
@@ -23,19 +23,20 @@ namespace google_auth_provider {
 class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
                                fuchsia::webview::WebRequestDelegate {
  public:
-  GoogleAuthProviderImpl(async_t* main_dispatcher,
-                         fuchsia::sys::StartupContext* context,
-                         network_wrapper::NetworkWrapper* network_wrapper,
-                         fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request);
+  GoogleAuthProviderImpl(
+      async_t* main_dispatcher, fuchsia::sys::StartupContext* context,
+      network_wrapper::NetworkWrapper* network_wrapper,
+      fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request);
 
   ~GoogleAuthProviderImpl() override;
 
-  void set_on_empty(const fxl::Closure& on_empty) { on_empty_ = on_empty; }
+  void set_on_empty(fit::closure on_empty) { on_empty_ = std::move(on_empty); }
 
  private:
   // |AuthProvider|
   void GetPersistentCredential(
-      fidl::InterfaceHandle<fuchsia::auth::AuthenticationUIContext> auth_ui_context,
+      fidl::InterfaceHandle<fuchsia::auth::AuthenticationUIContext>
+          auth_ui_context,
       GetPersistentCredentialCallback callback) override;
 
   // |AuthProvider|
@@ -83,7 +84,7 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
   fidl::Binding<fuchsia::auth::AuthProvider> binding_;
   callback::CancellableContainer requests_;
 
-  fxl::Closure on_empty_;
+  fit::closure on_empty_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(GoogleAuthProviderImpl);
 };

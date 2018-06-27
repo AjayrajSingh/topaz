@@ -39,6 +39,10 @@ source_set("skia_fonts") {
     "skia_font_loader.h",
   ]
 
+  public_deps = [
+    "//zircon/public/lib/fit",
+  ]
+
   deps = [
     ":skia_type_converters",
     ":skia_vmo",

@@ -5,18 +5,17 @@
 #include "session_connection.h"
 
 #include "lib/fidl/cpp/optional.h"
-#include "lib/ui/scenic/cpp/fidl_helpers.h"
+#include "lib/fxl/functional/make_copyable.h"
+#include "lib/ui/scenic/fidl_helpers.h"
 #include "vsync_waiter.h"
 
 namespace flutter {
 
 SessionConnection::SessionConnection(
     fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic_handle,
-    std::string debug_label,
-    zx::eventpair import_token,
+    std::string debug_label, zx::eventpair import_token,
     OnMetricsUpdate session_metrics_did_change_callback,
-    fxl::Closure session_error_callback,
-    zx_handle_t vsync_event_handle)
+    fit::closure session_error_callback, zx_handle_t vsync_event_handle)
     : debug_label_(std::move(debug_label)),
       scenic_(scenic_handle.Bind()),
       session_(scenic_.get()),
@@ -25,7 +24,8 @@ SessionConnection::SessionConnection(
       scene_update_context_(&session_, surface_producer_.get()),
       metrics_changed_callback_(std::move(session_metrics_did_change_callback)),
       vsync_event_handle_(vsync_event_handle) {
-  session_.set_error_handler(std::move(session_error_callback));
+  session_.set_error_handler(
+      fxl::MakeCopyable(std::move(session_error_callback)));
   session_.set_event_handler(std::bind(&SessionConnection::OnSessionEvents,
                                        this, std::placeholders::_1));
 

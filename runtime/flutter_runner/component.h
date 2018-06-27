@@ -12,6 +12,7 @@
 #include <fuchsia/sys/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/ui/views_v1_token/cpp/fidl.h>
+#include <lib/fit/function.h>
 
 #include "engine.h"
 #include "flutter/common/settings.h"
@@ -32,14 +33,15 @@ class Application final : public Engine::Delegate,
                           public fuchsia::sys::ComponentController,
                           public fuchsia::ui::views_v1::ViewProvider {
  public:
-  using TerminationCallback = std::function<void(const Application*)>;
+  using TerminationCallback = fit::function<void(const Application*)>;
 
   // Creates a dedicated thread to run the application and constructions the
   // application on it. The application can be accessed only on this thread.
   // This is a synchronous operation.
-  static std::pair<std::unique_ptr<deprecated_loop::Thread>, std::unique_ptr<Application>>
-  Create(TerminationCallback termination_callback, fuchsia::sys::Package package,
-         fuchsia::sys::StartupInfo startup_info,
+  static std::pair<std::unique_ptr<deprecated_loop::Thread>,
+                   std::unique_ptr<Application>>
+  Create(TerminationCallback termination_callback,
+         fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
          fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller);
 
   // Must be called on the same thread returned from the create call. The thread
@@ -56,7 +58,8 @@ class Application final : public Engine::Delegate,
   fxl::UniqueFD application_directory_;
   fxl::UniqueFD application_assets_directory_;
   fidl::Binding<fuchsia::sys::ComponentController> application_controller_;
-  fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services_request_;
+  fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
+      outgoing_services_request_;
   fuchsia::sys::ServiceProviderBridge service_provider_bridge_;
   std::unique_ptr<fuchsia::sys::StartupContext> startup_context_;
   fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> shells_bindings_;

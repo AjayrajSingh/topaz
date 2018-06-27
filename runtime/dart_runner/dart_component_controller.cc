@@ -392,7 +392,7 @@ void DartComponentController::Kill() {
 }
 
 void DartComponentController::Detach() {
-  binding_.set_error_handler(fxl::Closure());
+  binding_.set_error_handler(fit::closure());
 }
 
 void DartComponentController::Wait(WaitCallback callback) {

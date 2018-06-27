@@ -18,6 +18,10 @@ executable("bin") {
     "view_controller.h",
   ]
 
+  public_deps = [
+    "//zircon/public/lib/fit",
+  ]
+
   deps = [
     "//garnet/public/lib/app/cpp",
     "//garnet/public/fidl/fuchsia.sys",

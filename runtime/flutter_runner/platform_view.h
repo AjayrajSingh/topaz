@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#pragma once
+#ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_PLATFORM_VIEW_H_
+#define TOPAZ_RUNTIME_FLUTTER_RUNNER_PLATFORM_VIEW_H_
 
 #include <map>
 #include <set>
@@ -11,6 +12,7 @@
 #include <fuchsia/ui/input/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/ui/views_v1_token/cpp/fidl.h>
+#include <lib/fit/function.h>
 
 #include "accessibility_bridge.h"
 #include "flutter/lib/ui/window/viewport_metrics.h"
@@ -71,7 +73,7 @@ class PlatformView final : public shell::PlatformView,
   std::set<int> down_pointers_;
   std::map<
       std::string /* channel */,
-      std::function<void(
+      fit::function<void(
           fxl::RefPtr<blink::PlatformMessage> /* message */)> /* handler */>
       platform_message_handlers_;
   zx_handle_t vsync_event_handle_ = 0;
@@ -129,3 +131,5 @@ class PlatformView final : public shell::PlatformView,
 };
 
 }  // namespace flutter
+
+#endif  // TOPAZ_RUNTIME_FLUTTER_RUNNER_PLATFORM_VIEW_H_

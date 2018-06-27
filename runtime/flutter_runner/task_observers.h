@@ -2,15 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#pragma once
+#ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_TASK_OBSERVERS_H_
+#define TOPAZ_RUNTIME_FLUTTER_RUNNER_TASK_OBSERVERS_H_
 
-#include "lib/fxl/functional/closure.h"
+#include <lib/fit/function.h>
 
 namespace flutter {
 
 void CurrentMessageLoopAddAfterTaskObserver(intptr_t key,
-                                            fxl::Closure observer);
+                                            fit::closure observer);
 
 void CurrentMessageLoopRemoveAfterTaskObserver(intptr_t key);
 
 }  // namespace flutter
+
+#endif  // TOPAZ_RUNTIME_FLUTTER_RUNNER_TASK_OBSERVERS_H_

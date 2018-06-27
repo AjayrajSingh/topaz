@@ -2,14 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#pragma once
+#ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_SESSION_CONNECTION_H_
+#define TOPAZ_RUNTIME_FLUTTER_RUNNER_SESSION_CONNECTION_H_
 
+#include <lib/fit/function.h>
 #include <zx/eventpair.h>
 
 #include "flutter/flow/compositor_context.h"
 #include "flutter/flow/scene_update_context.h"
 #include "lib/fidl/cpp/interface_handle.h"
-#include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
 #include "lib/ui/scenic/cpp/resources.h"
 #include "lib/ui/scenic/cpp/session.h"
@@ -17,17 +18,16 @@
 
 namespace flutter {
 
-using OnMetricsUpdate = std::function<void(double /* device pixel ratio */)>;
+using OnMetricsUpdate = fit::function<void(double /* device pixel ratio */)>;
 
 // The component residing on the GPU thread that is responsible for
 // maintaining the Scenic session connection and presenting node updates.
 class SessionConnection final {
  public:
   SessionConnection(fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic,
-                    std::string debug_label,
-                    zx::eventpair import_token,
+                    std::string debug_label, zx::eventpair import_token,
                     OnMetricsUpdate session_metrics_did_change_callback,
-                    fxl::Closure session_error_callback,
+                    fit::closure session_error_callback,
                     zx_handle_t vsync_event_handle);
 
   ~SessionConnection();
@@ -68,3 +68,5 @@ class SessionConnection final {
 };
 
 }  // namespace flutter
+
+#endif  // TOPAZ_RUNTIME_FLUTTER_RUNNER_SESSION_CONNECTION_H_

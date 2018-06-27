@@ -6,6 +6,7 @@
 #define TOPAZ_APP_TERM_VIEW_CONTROLLER_H_
 
 #include <lib/async/cpp/task.h>
+#include <lib/fit/function.h>
 
 #include "examples/ui/lib/skia_font_loader.h"
 #include "examples/ui/lib/skia_view.h"
@@ -20,7 +21,7 @@ namespace term {
 
 class ViewController : public mozart::SkiaView, public TermModel::Delegate {
  public:
-  using DisconnectCallback = std::function<void(ViewController*)>;
+  using DisconnectCallback = fit::function<void(ViewController*)>;
 
   ViewController(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
                  fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>

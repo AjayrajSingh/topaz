@@ -85,7 +85,7 @@ Engine::Engine(
 
   // Session errors may occur on the GPU thread, but we must terminate ourselves
   // on the platform thread.
-  fxl::Closure on_session_error_callback =
+  fit::closure on_session_error_callback =
       [runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner(),
        weak = weak_factory_.GetWeakPtr()]() {
         runner->PostTask([weak]() {
@@ -106,12 +106,13 @@ Engine::Engine(
   // rasterizer.
   std::unique_ptr<flow::CompositorContext> compositor_context =
       std::make_unique<flutter::CompositorContext>(
-          std::move(scenic),                   // scenic
-          thread_label_,                       // debug label
-          std::move(import_token),             // import token
-          on_session_metrics_change_callback,  // session metrics did change
-          on_session_error_callback,           // session did encounter error
-          vsync_event_.get()                   // vsync event handle
+          std::move(scenic),        // scenic
+          thread_label_,            // debug label
+          std::move(import_token),  // import token
+          // session metrics did change
+          std::move(on_session_metrics_change_callback),
+          std::move(on_session_error_callback),  // session did encounter error
+          vsync_event_.get()                     // vsync event handle
       );
 
   // Setup the callback that will instantiate the platform view.
@@ -154,11 +155,11 @@ Engine::Engine(
   // Get the task runners from the managed threads. The current thread will be
   // used as the "platform" thread.
   blink::TaskRunners task_runners(
-      thread_label_,                                  // Dart thread labels
+      thread_label_,  // Dart thread labels
       deprecated_loop::MessageLoop::GetCurrent()->task_runner(),  // platform
-      host_threads_[0].TaskRunner(),                  // gpu
-      host_threads_[1].TaskRunner(),                  // ui
-      host_threads_[2].TaskRunner()                   // io
+      host_threads_[0].TaskRunner(),                              // gpu
+      host_threads_[1].TaskRunner(),                              // ui
+      host_threads_[2].TaskRunner()                               // io
   );
 
   UpdateNativeThreadLabelNames(thread_label_, task_runners);
@@ -229,26 +230,26 @@ Engine::Engine(
   auto run_configuration =
       shell::RunConfiguration::InferFromSettings(settings_);
 
-  auto on_run_failure = [weak = weak_factory_.GetWeakPtr(),  //
-                         runner =
-                             deprecated_loop::MessageLoop::GetCurrent()->task_runner()  //
+  auto on_run_failure =
+      [weak = weak_factory_.GetWeakPtr(),                                  //
+       runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner()  //
   ]() {
-    // The engine could have been killed by the caller right after the
-    // constructor was called but before it could run on the UI thread.
-    if (weak) {
-      weak->Terminate();
-    }
-  };
+        // The engine could have been killed by the caller right after the
+        // constructor was called but before it could run on the UI thread.
+        if (weak) {
+          weak->Terminate();
+        }
+      };
 
   // Connect to the system font provider.
   fuchsia::fonts::FontProviderSync2Ptr sync_font_provider;
   startup_context.ConnectToEnvironmentService(sync_font_provider.NewRequest());
 
   shell_->GetTaskRunners().GetUITaskRunner()->PostTask(
-      fxl::MakeCopyable([engine = shell_->GetEngine(),                       //
-                         run_configuration = std::move(run_configuration),   //
-                         sync_font_provider = std::move(sync_font_provider), //
-                         on_run_failure                                      //
+      fxl::MakeCopyable([engine = shell_->GetEngine(),                        //
+                         run_configuration = std::move(run_configuration),    //
+                         sync_font_provider = std::move(sync_font_provider),  //
+                         on_run_failure                                       //
   ]() mutable {
         if (!engine) {
           return;

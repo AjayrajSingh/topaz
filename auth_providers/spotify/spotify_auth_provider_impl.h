@@ -18,7 +18,6 @@
 #include "lib/app/cpp/startup_context.h"
 #include "lib/callback/cancellable.h"
 #include "lib/fidl/cpp/binding.h"
-#include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
 #include "lib/network_wrapper/network_wrapper.h"
 
@@ -34,7 +33,7 @@ class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
 
   ~SpotifyAuthProviderImpl() override;
 
-  void set_on_empty(const fxl::Closure& on_empty) { on_empty_ = on_empty; }
+  void set_on_empty(fit::closure on_empty) { on_empty_ = std::move(on_empty); }
 
  private:
   // |AuthProvider|
@@ -89,7 +88,7 @@ class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
   fidl::Binding<fuchsia::auth::AuthProvider> binding_;
   callback::CancellableContainer requests_;
 
-  fxl::Closure on_empty_;
+  fit::closure on_empty_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(SpotifyAuthProviderImpl);
 };

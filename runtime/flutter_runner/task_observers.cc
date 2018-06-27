@@ -10,7 +10,7 @@
 
 namespace flutter {
 
-thread_local std::map<intptr_t, fxl::Closure> tTaskObservers;
+thread_local std::map<intptr_t, fit::closure> tTaskObservers;
 
 static void ExecuteAfterTaskObservers() {
   for (const auto& callback : tTaskObservers) {
@@ -19,7 +19,7 @@ static void ExecuteAfterTaskObservers() {
 }
 
 void CurrentMessageLoopAddAfterTaskObserver(intptr_t key,
-                                            fxl::Closure observer) {
+                                            fit::closure observer) {
   if (!observer) {
     return;
   }
@@ -29,7 +29,7 @@ void CurrentMessageLoopAddAfterTaskObserver(intptr_t key,
         std::bind(&ExecuteAfterTaskObservers));
   }
 
-  tTaskObservers[key] = observer;
+  tTaskObservers[key] = std::move(observer);
 }
 
 void CurrentMessageLoopRemoveAfterTaskObserver(intptr_t key) {
