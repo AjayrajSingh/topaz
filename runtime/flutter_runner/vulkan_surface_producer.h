@@ -12,7 +12,6 @@
 #include "lib/fxl/macros.h"
 #include "lib/ui/scenic/client/resources.h"
 #include "lib/ui/scenic/client/session.h"
-#include "third_party/skia/include/gpu/vk/GrVkBackendContext.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "vulkan_surface.h"
 #include "vulkan_surface_pool.h"
@@ -57,12 +56,8 @@ class VulkanSurfaceProducer final
 
   // Note: the order here is very important. The proctable must be destroyed
   // last because it contains the function pointers for VkDestroyDevice and
-  // VkDestroyInstance. The backend context owns the VkDevice and the
-  // VkInstance, so it must be destroyed after the logical device and the
-  // application, which own other vulkan objects associated with the device
-  // and instance.
+  // VkDestroyInstance.
   fxl::RefPtr<vulkan::VulkanProcTable> vk_;
-  sk_sp<GrVkBackendContext> backend_context_;
   std::unique_ptr<vulkan::VulkanDevice> logical_device_;
   std::unique_ptr<vulkan::VulkanApplication> application_;
   sk_sp<GrContext> context_;
