@@ -7,30 +7,56 @@ import 'dart:async';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_device_display/fidl.dart';
+import 'package:fidl_fuchsia_devicesettings/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 
 /// This class abstracts away the DisplayManager fidl interface,
 class Display {
+  final String _brightnessSettingsKey = 'Display.Brightness';
+
+  // Used to modify the physical display.
   final DisplayManagerProxy _displayManagerService = DisplayManagerProxy();
+
+  // Used to store and retrieve user settings.
+  final DeviceSettingsManagerProxy _deviceSettingsManagerService =
+      DeviceSettingsManagerProxy();
   double _brightness;
 
   Display(ServiceProvider services) {
     connectToService(services, _displayManagerService.ctrl);
-    _displayManagerService.ctrl.onConnectionError = _handleConnectionError;
-    _displayManagerService.ctrl.error
-        .then((ProxyError error) => _handleConnectionError(error: error));
+    _displayManagerService.ctrl.onConnectionError =
+        _handleDisplayConnectionError;
+    _displayManagerService.ctrl.error.then(
+        (ProxyError error) => _handleDisplayConnectionError(error: error));
 
-    // fetch initial brightness
-    _displayManagerService.getBrightness((bool success, double brightness) {
-      if (success) {
-        _brightness = brightness;
+    connectToService(services, _deviceSettingsManagerService.ctrl);
+    _deviceSettingsManagerService.ctrl.onConnectionError =
+        _handleSettingsConnectionError;
+    _deviceSettingsManagerService.ctrl.error.then(
+        (ProxyError error) => _handleSettingsConnectionError(error: error));
+
+    // fetch initial brightness from device settings.
+    _deviceSettingsManagerService.getString(_brightnessSettingsKey,
+        (String val, Status status) {
+      if (status == Status.ok) {
+        // If previous value exists, restore brightness.
+        setBrightness(double.parse(val));
+      } else {
+        // If no previous value is found, fetch display brightness and set.
+        // Setting is a noop from the device side, but makes sure our locale
+        // cache is updated.
+        _displayManagerService.getBrightness((bool success, double brightness) {
+          if (success) {
+            setBrightness(brightness);
+          }
+        });
       }
     });
   }
 
-  /// Returns the current brightness as a percentage of the maximum backlight
-  /// brightness.
+  // Cache the brightness so callers can retrieve it without reading the
+  // device settings or display.
   double get brightness => _brightness;
 
   /// Sets the brightness to the specified percentage. If specified, the
@@ -46,6 +72,15 @@ class Display {
     _displayManagerService.setBrightness(brightness, (bool success) {
       if (success) {
         _brightness = brightness;
+        _deviceSettingsManagerService.setString(
+            _brightnessSettingsKey, brightness.toString(), (bool result) {
+          // This is a silent failure. While we couldn't store the brightness,
+          // it still took effect on the physical display.
+          if (!result) {
+            log.warning('Could not persist display brightness');
+          }
+        });
+
         completer.complete(true);
       } else {
         _displayManagerService
@@ -62,7 +97,12 @@ class Display {
   }
 
   /// Handles connection error to the display service.
-  void _handleConnectionError({ProxyError error}) {
+  void _handleDisplayConnectionError({ProxyError error}) {
     log.severe('Unable to connect to display service', error);
+  }
+
+  /// Handles connection error to the settings service.
+  void _handleSettingsConnectionError({ProxyError error}) {
+    log.severe('Unable to connect to settings service', error);
   }
 }
