@@ -6,7 +6,6 @@ import("//build/fidl/fidl.gni")
 
 fidl("services") {
   name = "fuchsia.webview"
-  cpp_legacy_callbacks = true
   sources = [
     "web_view.fidl",
   ]
