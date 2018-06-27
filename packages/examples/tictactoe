@@ -1,0 +1,5 @@
+{
+    "packages": [
+        "//topaz/examples/tictactoe/gameboard_mod:tictactoe_gameboard_mod"
+    ]
+}
