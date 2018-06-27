@@ -49,6 +49,9 @@ class DocumentId {
     return prefix;
   }
 
+  /// Returns |identifier| which can be used to create the same DocumentId.
+  Uint8List get subId => new Uint8List.fromList(_subId);
+
   static Uint8List _randomByteArrayForSubIds() {
     final array = new Uint8List(_subIdByteCount);
     for (int i = 0; i < _subIdByteCount; i++) {
