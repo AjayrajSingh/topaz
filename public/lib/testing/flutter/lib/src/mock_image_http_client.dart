@@ -21,14 +21,14 @@ MockHttpClient createMockImageHttpClient(SecurityContext _) {
   final MockHttpClientRequest request = new MockHttpClientRequest();
   final MockHttpClientResponse response = new MockHttpClientResponse();
   final MockHttpHeaders headers = new MockHttpHeaders();
-  when(client.getUrl(typed(any))).thenReturn(new Future<HttpClientRequest>
+  when(client.getUrl(any)).thenReturn(new Future<HttpClientRequest>
                                  .value(request));
   when(request.headers).thenReturn(headers);
   when(request.close()).thenReturn(new Future<HttpClientResponse>
                        .value(response));
   when(response.contentLength).thenReturn(_kTransparentImageBytes.length);
   when(response.statusCode).thenReturn(HttpStatus.ok);
-  when(response.listen(typed(any))).thenAnswer((Invocation invocation) {
+  when(response.listen(any)).thenAnswer((Invocation invocation) {
     final void Function(List<int>) onData = invocation.positionalArguments[0];
     final void Function() onDone = invocation.namedArguments[#onDone];
     final void Function(Object, [StackTrace]) onError =
