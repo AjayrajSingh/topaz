@@ -72,6 +72,8 @@ template("flutter_runner") {
       "platform_view.h",
       "runner.cc",
       "runner.h",
+      "semantics_bridge.cc",
+      "semantics_bridge.h",
       "session_connection.cc",
       "session_connection.h",
       "surface.cc",
@@ -114,6 +116,7 @@ template("flutter_runner") {
     deps = [
              "//third_party/dart/runtime/bin:libdart_builtin${product_suffix}",
              "//garnet/public/lib/component/cpp",
+             "//garnet/public/fidl/fuchsia.accessibility",
              "//garnet/public/fidl/fuchsia.fonts",
              "//garnet/public/lib/fsl",
              "//garnet/public/lib/fxl",

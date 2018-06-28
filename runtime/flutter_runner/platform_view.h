@@ -8,6 +8,7 @@
 #include <map>
 #include <set>
 
+#include <fuchsia/accessibility/cpp/fidl.h>
 #include <fuchsia/modular/cpp/fidl.h>
 #include <fuchsia/ui/input/cpp/fidl.h>
 #ifndef SCENIC_VIEWS2
@@ -21,6 +22,7 @@
 #include "flutter/shell/common/platform_view.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
+#include "semantics_bridge.h"
 #include "surface.h"
 
 namespace flutter {
@@ -108,6 +110,9 @@ class PlatformView final : public shell::PlatformView,
   fuchsia::sys::ServiceProviderPtr parent_environment_service_provider_;
   fuchsia::modular::ClipboardPtr clipboard_;
   AccessibilityBridge accessibility_bridge_;
+  // The Semantics bridge is used to provide semantics data from this platform
+  // view to the accessibility manager.
+  SemanticsBridge semantics_bridge_;
   std::unique_ptr<Surface> surface_;
   blink::LogicalMetrics metrics_;
 #ifdef SCENIC_VIEWS2
@@ -126,6 +131,9 @@ class PlatformView final : public shell::PlatformView,
   void RegisterPlatformMessageHandlers();
 
 #ifndef SCENIC_VIEWS2
+  // Method to connect the a11y bridge with the a11y manager with a view id.
+  void ConnectSemanticsProvider(::fuchsia::ui::viewsv1token::ViewToken token);
+
   void UpdateViewportMetrics(const fuchsia::ui::viewsv1::ViewLayout& layout);
 #else
   void UpdateViewportMetrics(const fuchsia::ui::gfx::Metrics& metrics);
@@ -181,6 +189,12 @@ class PlatformView final : public shell::PlatformView,
   void UpdateSemantics(
       blink::SemanticsNodeUpdates update,
       blink::CustomAccessibilityActionUpdates actions) override;
+
+  // Channel handler for kAccessibilityChannel. This is currently not
+  // being used, but it is necessary to handle accessibility messages
+  // that are sent by Flutter when semantics is enabled.
+  void HandleAccessibilityChannelPlatformMessage(
+      fxl::RefPtr<blink::PlatformMessage> message);
 
   // Channel handler for kFlutterPlatformChannel
   void HandleFlutterPlatformChannelPlatformMessage(

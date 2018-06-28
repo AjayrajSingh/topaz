@@ -23,6 +23,7 @@ namespace flutter {
 constexpr char kFlutterPlatformChannel[] = "flutter/platform";
 constexpr char kTextInputChannel[] = "flutter/textinput";
 constexpr char kKeyEventChannel[] = "flutter/keyevent";
+constexpr char kAccessibilityChannel[] = "flutter/accessibility";
 
 // FL(77): Terminate engine if Fuchsia system FIDL connections have error.
 template <class T>
@@ -65,6 +66,7 @@ PlatformView::PlatformView(
       input_listener_(this),
       ime_client_(this),
       accessibility_bridge_(std::move(accessibility_context_writer)),
+      semantics_bridge_(this, &metrics_),
       surface_(std::make_unique<Surface>(debug_label_)),
       vsync_event_handle_(vsync_event_handle) {
   // Register all error handlers.
@@ -115,6 +117,11 @@ PlatformView::PlatformView(
 
   // Finally! Register the native platform message handlers.
   RegisterPlatformMessageHandlers();
+
+#ifndef SCENIC_VIEWS2
+  view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
+                            std::placeholders::_1));
+#endif
 }
 
 PlatformView::~PlatformView() = default;
@@ -125,8 +132,8 @@ void PlatformView::OfferServiceProvider(
     fidl::VectorPtr<fidl::StringPtr> services) {
   view_->OfferServiceProvider(std::move(service_provider), std::move(services));
 }
-
 #endif
+
 void PlatformView::RegisterPlatformMessageHandlers() {
   platform_message_handlers_[kFlutterPlatformChannel] =
       std::bind(&PlatformView::HandleFlutterPlatformChannelPlatformMessage,  //
@@ -135,6 +142,10 @@ void PlatformView::RegisterPlatformMessageHandlers() {
   platform_message_handlers_[kTextInputChannel] =
       std::bind(&PlatformView::HandleFlutterTextInputChannelPlatformMessage,  //
                 this,                                                         //
+                std::placeholders::_1);
+  platform_message_handlers_[kAccessibilityChannel] =
+      std::bind(&PlatformView::HandleAccessibilityChannelPlatformMessage,  //
+                this,                                                      //
                 std::placeholders::_1);
 }
 
@@ -177,6 +188,14 @@ void PlatformView::OnPropertiesChanged(
 #endif
 
 #ifndef SCENIC_VIEWS2
+void PlatformView::ConnectSemanticsProvider(
+    fuchsia::ui::viewsv1token::ViewToken token) {
+  fuchsia::accessibility::SemanticsRootPtr root_ptr;
+  component::ConnectToService(parent_environment_service_provider_.get(),
+                              root_ptr.NewRequest());
+  semantics_bridge_.SetupConnection(token.value, root_ptr.Unbind());
+}
+
 void PlatformView::UpdateViewportMetrics(
     const fuchsia::ui::viewsv1::ViewLayout& layout) {
   metrics_.size.width = layout.size.width;
@@ -534,6 +553,13 @@ void PlatformView::UpdateSemantics(
     blink::SemanticsNodeUpdates update,
     blink::CustomAccessibilityActionUpdates actions) {
   accessibility_bridge_.UpdateSemantics(update);
+  semantics_bridge_.UpdateSemantics(update);
+}
+
+// Channel handler for kAccessibilityChannel
+void PlatformView::HandleAccessibilityChannelPlatformMessage(
+    fxl::RefPtr<blink::PlatformMessage> message) {
+  FXL_DCHECK(message->channel() == kAccessibilityChannel);
 }
 
 // Channel handler for kFlutterPlatformChannel
