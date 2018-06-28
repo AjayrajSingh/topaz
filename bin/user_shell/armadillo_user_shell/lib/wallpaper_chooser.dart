@@ -1,4 +1,4 @@
- // Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -178,11 +178,10 @@ class _CustomAction extends CustomAction {
         );
         storyControllerProxy.getInfo((StoryInfo info, StoryState state) {
           focusProvider.request(info.id);
-          storyControllerProxy.getLink(
-            _kImageSelectorLinkPath,
-            _kImageSelectorLinkName,
-            linkProxy.ctrl.request(),
-          );
+          var linkPath = new LinkPath(
+              modulePath: _kImageSelectorLinkPath,
+              linkName: _kImageSelectorLinkName);
+          storyControllerProxy.getLink(linkPath, linkProxy.ctrl.request());
           storyControllerProxy?.ctrl?.close();
           storyControllerProxy = null;
 

@@ -176,11 +176,9 @@ class _CustomAction extends CustomAction {
         );
         storyControllerProxy.getInfo((StoryInfo info, StoryState state) {
           focusProvider.request(info.id);
+          var linkPath = new LinkPath(modulePath: <String>[], linkName: 'root');
           storyControllerProxy.getLink(
-            <String>[],
-            'root',
-            agentProviderWatcherImpl.link.ctrl.request(),
-          );
+              linkPath, agentProviderWatcherImpl.link.ctrl.request());
           storyControllerProxy?.ctrl?.close();
           storyControllerProxy = null;
         });
