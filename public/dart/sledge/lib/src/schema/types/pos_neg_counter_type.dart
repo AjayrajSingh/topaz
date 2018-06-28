@@ -12,7 +12,6 @@ class IntCounter implements BaseType {
   @override
   String toJson() => 'IntCounter';
 
-  // TODO: pass connection ID
   @override
   BaseValue newValue(ConnectionId connectionId) =>
       new PosNegCounterValue<int>(connectionId.id);
@@ -23,7 +22,6 @@ class DoubleCounter implements BaseType {
   @override
   String toJson() => 'DoubleCounter';
 
-  // TODO: pass connection ID
   @override
   BaseValue newValue(ConnectionId connectionId) =>
       new PosNegCounterValue<double>(connectionId.id);

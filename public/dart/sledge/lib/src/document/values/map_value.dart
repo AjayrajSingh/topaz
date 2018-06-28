@@ -10,7 +10,6 @@ import 'converted_change.dart';
 import 'converter.dart';
 import 'key_value_storage.dart';
 
-// TODO: handle keys of arbitrary length
 /// Sledge Value to store Map.
 class MapValue<K, V> extends BaseValue<MapChange<K, V>> {
   final KeyValueStorage<K, V> _map;
@@ -56,7 +55,6 @@ class MapValue<K, V> extends BaseValue<MapChange<K, V>> {
   Stream<MapChange<K, V>> get onChange => _changeController.stream;
 }
 
-// TODO: handle elements of arbitrary length
 /// Sledge Value to store Set.
 class SetValue<E> extends BaseValue<SetChange<E>> {
   final KeyValueStorage<E, bool> _map;

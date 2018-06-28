@@ -9,6 +9,7 @@ import 'dart:typed_data';
 // ignore_for_file: implementation_imports
 import 'package:sledge/sledge.dart';
 import 'package:sledge/src/document/change.dart';
+import 'package:sledge/src/utils_random.dart';
 import 'package:test/test.dart';
 
 import 'helpers.dart';
@@ -225,5 +226,36 @@ void main() {
     expect(docB.name.value, equals('value + counter'));
     expect(docB.number.value, equals(5));
     expect(docB.cnt.value, equals(1));
+  });
+
+  test('put large list into set', () async {
+    // Create Schema.
+    Map<String, BaseType> schemaDescription = <String, BaseType>{
+      'names': new BytelistSet(),
+    };
+    Schema schema = new Schema(schemaDescription);
+
+    // Create two Sledge documents
+    Sledge sledgeA = newSledgeForTesting(), sledgeB = newSledgeForTesting();
+    dynamic docA, docB;
+    await sledgeA.runInTransaction(() async {
+      docA = await sledgeA.getDocument(new DocumentId(schema));
+    });
+    await sledgeB.runInTransaction(() async {
+      docB = await sledgeB.getDocument(new DocumentId(schema));
+    });
+
+    final largeList = randomUint8List(10000);
+
+    Change c1;
+    await sledgeA.runInTransaction(() {
+      docA.names.add(largeList);
+      c1 = Document.getChange(docA);
+    });
+
+    Document.applyChange(docB, c1);
+
+    // TODO: use docB.names.single
+    expect(docB.names.contains(largeList), isTrue);
   });
 }
