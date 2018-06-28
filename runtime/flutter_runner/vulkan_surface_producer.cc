@@ -12,7 +12,6 @@
 #include "third_party/skia/include/gpu/GrBackendSemaphore.h"
 #include "third_party/skia/include/gpu/GrBackendSurface.h"
 #include "third_party/skia/include/gpu/GrContext.h"
-#include "third_party/skia/include/gpu/vk/GrVkBackendContext.h"
 #include "third_party/skia/include/gpu/vk/GrVkTypes.h"
 
 namespace flutter {
@@ -33,7 +32,7 @@ VulkanSurfaceProducer::VulkanSurfaceProducer(
 VulkanSurfaceProducer::~VulkanSurfaceProducer() {
   // Make sure queue is idle before we start destroying surfaces
   VkResult wait_result =
-      VK_CALL_LOG_ERROR(vk_->QueueWaitIdle(logical_device_->GetQueueHandle()));
+      VK_CALL_LOG_ERROR(vk_->QueueWaitIdle(backend_context_->fQueue));
   FXL_DCHECK(wait_result == VK_SUCCESS);
 };
 
@@ -90,26 +89,26 @@ bool VulkanSurfaceProducer::Initialize(scenic_lib::Session* mozart_session) {
     return false;
   }
 
-  GrVkBackendContext backend_context;
-  backend_context.fInstance = application_->GetInstance();
-  backend_context.fPhysicalDevice =
+  backend_context_ = sk_make_sp<GrVkBackendContext>();
+  backend_context_->fInstance = application_->GetInstance();
+  backend_context_->fPhysicalDevice =
       logical_device_->GetPhysicalDeviceHandle();
-  backend_context.fDevice = logical_device_->GetHandle();
-  backend_context.fQueue = logical_device_->GetQueueHandle();
-  backend_context.fGraphicsQueueIndex =
+  backend_context_->fDevice = logical_device_->GetHandle();
+  backend_context_->fQueue = logical_device_->GetQueueHandle();
+  backend_context_->fGraphicsQueueIndex =
       logical_device_->GetGraphicsQueueIndex();
-  backend_context.fMinAPIVersion = application_->GetAPIVersion();
-  backend_context.fFeatures = skia_features;
-  backend_context.fInterface.reset(interface.release());
-  backend_context.fOwnsInstanceAndDevice = false;
+  backend_context_->fMinAPIVersion = application_->GetAPIVersion();
+  backend_context_->fFeatures = skia_features;
+  backend_context_->fInterface.reset(interface.release());
+  backend_context_->fOwnsInstanceAndDevice = false;
 
-  context_ = GrContext::MakeVulkan(backend_context);
+  context_ = GrContext::MakeVulkan(backend_context_);
 
   context_->setResourceCacheLimits(vulkan::kGrCacheMaxCount,
                                    vulkan::kGrCacheMaxByteSize);
 
   surface_pool_ = std::make_unique<VulkanSurfacePool>(
-      *this, context_, mozart_session);
+      *this, context_, backend_context_, mozart_session);
 
   return true;
 }
