@@ -355,6 +355,11 @@ class BaseDeviceShellModel extends DeviceShellModel
 
     _updatePresentation(_userShellChooser.currentUserShell);
 
+    if (_userShellChooser.currentUserShell.autoLogin) {
+      await login(null);
+      return;
+    }
+
     await refreshUsers();
   }
 
@@ -456,8 +461,5 @@ class BaseDeviceShellModel extends DeviceShellModel
   void _updatePresentation(UserShellInfo info) {
     setDisplayUsage(info.displayUsage);
     setDisplaySizeInMm(info.screenWidthMm, info.screenHeightMm);
-    if (info.autoLogin) {
-      login(null);
-    }
   }
 }
