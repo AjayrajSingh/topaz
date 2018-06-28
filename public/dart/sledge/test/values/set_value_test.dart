@@ -7,6 +7,7 @@ import 'package:sledge/src/document/values/map_value.dart';
 import 'package:test/test.dart';
 
 import '../dummies/dummy_value_observer.dart';
+import 'set_api_tester.dart';
 
 class TestSetValue<E> extends SetValue<E> {
   TestSetValue() : super() {
@@ -15,6 +16,13 @@ class TestSetValue<E> extends SetValue<E> {
 }
 
 void main() {
+  group('Set API coverage', () {
+    final tester =
+        new SetApiTester<TestSetValue>(() => new TestSetValue<int>());
+    // ignore: cascade_invocations
+    tester.testApi();
+  });
+
   test('SetValue add and contains.', () {
     var s = new TestSetValue<int>();
     expect(s.contains(0), equals(false));

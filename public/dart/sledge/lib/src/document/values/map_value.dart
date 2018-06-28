@@ -72,11 +72,15 @@ class MapValue<K, V> extends MapBase<K, V>
 }
 
 /// Sledge Value to store Set.
-class SetValue<E> extends BaseValue<SetChange<E>> {
+class SetValue<E> extends SetBase<E>
+    with SetMixin<E>
+    implements BaseValue<SetChange<E>> {
   final KeyValueStorage<E, bool> _map;
   final DataConverter _converter;
   final StreamController<SetChange<E>> _changeController =
       new StreamController<SetChange<E>>.broadcast();
+  @override
+  ValueObserver observer;
 
   // TODO: consider Converter as a provider of |equals| and |hashCode| methods.
   /// Creates a SetValue with provided [equals] as equality.
@@ -96,26 +100,49 @@ class SetValue<E> extends BaseValue<SetChange<E>> {
   }
 
   /// Returns true if [value] is in the set.
-  bool contains(E value) => _map.containsKey(value);
+  @override
+  bool contains(Object value) => _map.containsKey(value);
 
   /// Adds [value] to the set.
   /// Returns true if [value] was not yet in the set. Otherwise returns
   /// false and the set is not changed.
-  bool add(E value) {
+  @override
+  bool add(Object value) {
     final result = !contains(value);
     _map[value] = true;
     observer.valueWasChanged();
     return result;
   }
 
+  @override
+  Set<E> toSet() => _map.keys;
+
+  // TODO: write more efficient method.
+  @override
+  E lookup(Object object) {
+    for (final key in toSet()) {
+      if (key == object) {
+        return key;
+      }
+    }
+    return null;
+  }
+
+  @override
+  int get length => toSet().length;
+
   /// Removes [value] from the set. Returns true if [value] was in the set.
   /// Returns false otherwise. The method has no effect if [value] was not in
   /// the set.
-  bool remove(E value) {
+  @override
+  bool remove(Object value) {
     final result = _map.remove(value) == true;
     observer.valueWasChanged();
     return result;
   }
+
+  @override
+  Iterator<E> get iterator => toSet().iterator;
 
   @override
   Stream<SetChange<E>> get onChange => _changeController.stream;
