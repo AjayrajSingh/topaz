@@ -36,7 +36,7 @@ class SkiaView : public BaseView {
   void ReleaseAndSwapCanvas();
 
  private:
-  scenic_lib::skia::HostCanvasCycler canvas_cycler_;
+  scenic::skia::HostCanvasCycler canvas_cycler_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(SkiaView);
 };

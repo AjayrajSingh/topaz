@@ -14,7 +14,7 @@ namespace flutter {
 VulkanSurfacePool::VulkanSurfacePool(vulkan::VulkanProvider& vulkan_provider,
                                      sk_sp<GrContext> context,
                                      sk_sp<GrVkBackendContext> backend_context,
-                                     scenic_lib::Session* mozart_session)
+                                     scenic::Session* mozart_session)
     : vulkan_provider_(vulkan_provider),
       context_(std::move(context)),
       backend_context_(std::move(backend_context)),

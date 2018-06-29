@@ -20,7 +20,7 @@ class VulkanSurfacePool final {
   VulkanSurfacePool(vulkan::VulkanProvider& vulkan_provider,
                     sk_sp<GrContext> context,
                     sk_sp<GrVkBackendContext> backend_context,
-                    scenic_lib::Session* mozart_session);
+                    scenic::Session* mozart_session);
 
   ~VulkanSurfacePool();
 
@@ -54,7 +54,7 @@ class VulkanSurfacePool final {
   vulkan::VulkanProvider& vulkan_provider_;
   sk_sp<GrContext> context_;
   sk_sp<GrVkBackendContext> backend_context_;
-  scenic_lib::Session* mozart_session_;
+  scenic::Session* mozart_session_;
   std::unordered_map<SkISize, SurfacesSet, SkISizeHash> available_surfaces_;
   std::unordered_map<
       uintptr_t,

@@ -12,22 +12,22 @@
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 
 #include "lib/fidl/cpp/interface_request.h"
-#include "lib/ui/scenic/client/resources.h"
-#include "lib/ui/scenic/client/session.h"
+#include "lib/ui/scenic/cpp/resources.h"
+#include "lib/ui/scenic/cpp/session.h"
 
 namespace ermine_user_shell {
 
 class Tile {
  public:
   Tile(fuchsia::sys::Launcher* launcher, std::string url,
-       scenic_lib::Session* session);
+       scenic::Session* session);
   ~Tile();
 
   Tile(const Tile&) = delete;
   Tile& operator=(const Tile&) = delete;
 
   uint32_t key() const { return key_; }
-  scenic_lib::EntityNode& node() { return node_; }
+  scenic::EntityNode& node() { return node_; }
 
   const fuchsia::ui::views_v1::ViewProperties& view_properties() const {
     return view_properties_;
@@ -47,7 +47,7 @@ class Tile {
   fuchsia::sys::ComponentControllerPtr controller_;
 
   const uint32_t key_;
-  scenic_lib::EntityNode node_;
+  scenic::EntityNode node_;
   fuchsia::ui::views_v1::ViewProperties view_properties_;
 };
 

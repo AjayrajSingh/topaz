@@ -11,7 +11,7 @@
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
-#include "lib/ui/scenic/client/host_image_cycler.h"
+#include "lib/ui/scenic/cpp/host_image_cycler.h"
 #include "lib/ui/view_framework/base_view.h"
 
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
@@ -95,7 +95,7 @@ class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView {
   SchemaOrgContext schema_org_;
 #endif
 
-  scenic_lib::HostImageCycler image_cycler_;
+  scenic::HostImageCycler image_cycler_;
 
   // Delegate that receives WillSendRequest calls. Can be null.
   fuchsia::webview::WebRequestDelegatePtr webRequestDelegate_;

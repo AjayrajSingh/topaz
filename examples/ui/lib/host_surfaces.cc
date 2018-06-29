@@ -7,7 +7,7 @@
 #include "examples/ui/lib/image_info.h"
 #include "lib/fxl/logging.h"
 
-namespace scenic_lib {
+namespace scenic {
 namespace skia {
 namespace {
 void ReleaseData(void* pixels, void* context) {
@@ -65,4 +65,4 @@ sk_sp<SkSurface> HostSkSurfacePool::GetSkSurface(uint32_t index) {
 }
 
 }  // namespace skia
-}  // namespace scenic_lib
+}  // namespace scenic

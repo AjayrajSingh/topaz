@@ -10,8 +10,8 @@
 #include "flutter/vulkan/vulkan_proc_table.h"
 #include "flutter/vulkan/vulkan_provider.h"
 #include "lib/fxl/macros.h"
-#include "lib/ui/scenic/client/resources.h"
-#include "lib/ui/scenic/client/session.h"
+#include "lib/ui/scenic/cpp/resources.h"
+#include "lib/ui/scenic/cpp/session.h"
 #include "third_party/skia/include/gpu/vk/GrVkBackendContext.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "vulkan_surface.h"
@@ -23,7 +23,7 @@ class VulkanSurfaceProducer final
     : public flow::SceneUpdateContext::SurfaceProducer,
       public vulkan::VulkanProvider {
  public:
-  VulkanSurfaceProducer(scenic_lib::Session* mozart_session);
+  VulkanSurfaceProducer(scenic::Session* mozart_session);
 
   ~VulkanSurfaceProducer();
 
@@ -69,7 +69,7 @@ class VulkanSurfaceProducer final
   std::unique_ptr<VulkanSurfacePool> surface_pool_;
   bool valid_ = false;
 
-  bool Initialize(scenic_lib::Session* mozart_session);
+  bool Initialize(scenic::Session* mozart_session);
 
   FXL_DISALLOW_COPY_AND_ASSIGN(VulkanSurfaceProducer);
 };

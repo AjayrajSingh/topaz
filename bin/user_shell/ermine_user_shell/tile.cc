@@ -18,7 +18,7 @@ uint32_t g_next_key = 1;
 }  // namespace
 
 Tile::Tile(fuchsia::sys::Launcher* launcher, std::string url,
-           scenic_lib::Session* session)
+           scenic::Session* session)
     : launcher_(launcher),
       url_(std::move(url)),
       key_(g_next_key++),

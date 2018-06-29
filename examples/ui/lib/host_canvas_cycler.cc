@@ -6,10 +6,10 @@
 
 #include "lib/fxl/logging.h"
 
-namespace scenic_lib {
+namespace scenic {
 namespace skia {
 
-HostCanvasCycler::HostCanvasCycler(scenic_lib::Session* session)
+HostCanvasCycler::HostCanvasCycler(scenic::Session* session)
     : EntityNode(session),
       content_node_(session),
       content_material_(session),
@@ -55,12 +55,12 @@ void HostCanvasCycler::ReleaseAndSwapCanvas() {
   acquired_surface_->flush();
   acquired_surface_.reset();
 
-  const scenic_lib::HostImage* image = surface_pool_.GetImage(surface_index_);
+  const scenic::HostImage* image = surface_pool_.GetImage(surface_index_);
   FXL_DCHECK(image);
   content_material_.SetTexture(*image);
 
   if (reconfigured_) {
-    scenic_lib::Rectangle content_rect(content_node_.session(), logical_width_,
+    scenic::Rectangle content_rect(content_node_.session(), logical_width_,
                                        logical_height_);
     content_node_.SetShape(content_rect);
     reconfigured_ = false;
@@ -72,4 +72,4 @@ void HostCanvasCycler::ReleaseAndSwapCanvas() {
 }
 
 }  // namespace skia
-}  // namespace scenic_lib
+}  // namespace scenic

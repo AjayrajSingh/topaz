@@ -5,10 +5,10 @@
 #ifndef LIB_UI_SCENIC_SKIA_HOST_SURFACES_H_
 #define LIB_UI_SCENIC_SKIA_HOST_SURFACES_H_
 
-#include "lib/ui/scenic/client/host_memory.h"
+#include "lib/ui/scenic/cpp/host_memory.h"
 #include "third_party/skia/include/core/SkSurface.h"
 
-namespace scenic_lib {
+namespace scenic {
 namespace skia {
 
 // Creates a Skia surface backed by host-accessible shared memory associated
@@ -75,6 +75,6 @@ class HostSkSurfacePool {
 };
 
 }  // namespace skia
-}  // namespace scenic_lib
+}  // namespace scenic
 
 #endif  // LIB_UI_SCENIC_SKIA_HOST_SURFACES_H_

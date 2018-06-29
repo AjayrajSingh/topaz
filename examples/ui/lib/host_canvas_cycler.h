@@ -8,7 +8,7 @@
 #include "examples/ui/lib/host_surfaces.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 
-namespace scenic_lib {
+namespace scenic {
 namespace skia {
 
 // Creates a node which presents double-buffered content drawn to a Skia canvas
@@ -46,6 +46,6 @@ class HostCanvasCycler : public EntityNode {
 };
 
 }  // namespace skia
-}  // namespace scenic_lib
+}  // namespace scenic
 
 #endif  // LIB_UI_SCENIC_SKIA_HOST_CANVAS_CYCLER_H_

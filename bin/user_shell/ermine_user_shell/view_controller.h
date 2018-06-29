@@ -17,8 +17,8 @@
 #include "lib/app/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fidl/cpp/interface_request.h"
-#include "lib/ui/scenic/client/resources.h"
-#include "lib/ui/scenic/client/session.h"
+#include "lib/ui/scenic/cpp/resources.h"
+#include "lib/ui/scenic/cpp/session.h"
 
 namespace ermine_user_shell {
 class Tile;
@@ -89,9 +89,9 @@ class ViewController : public fuchsia::ui::views_v1::ViewListener,
   fuchsia::math::Size physical_size_;
   fuchsia::ui::gfx::Metrics metrics_;
 
-  scenic_lib::Session session_;
-  scenic_lib::ImportNode parent_node_;
-  scenic_lib::EntityNode container_node_;
+  scenic::Session session_;
+  scenic::ImportNode parent_node_;
+  scenic::EntityNode container_node_;
 
   std::vector<std::unique_ptr<Tile>> tiles_;
 

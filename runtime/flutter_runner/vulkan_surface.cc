@@ -16,7 +16,7 @@ namespace flutter {
 VulkanSurface::VulkanSurface(vulkan::VulkanProvider& vulkan_provider,
                              sk_sp<GrContext> context,
                              sk_sp<GrVkBackendContext> backend_context,
-                             scenic_lib::Session* session,
+                             scenic::Session* session,
                              const SkISize& size)
     : vulkan_provider_(vulkan_provider),
       backend_context_(std::move(backend_context)),
@@ -292,13 +292,13 @@ bool VulkanSurface::SetupSkiaSurface(sk_sp<GrContext> context,
   return true;
 }
 
-bool VulkanSurface::PushSessionImageSetupOps(scenic_lib::Session* session,
+bool VulkanSurface::PushSessionImageSetupOps(scenic::Session* session,
                                              zx::vmo exported_vmo) {
   if (sk_surface_ == nullptr) {
     return false;
   }
 
-  scenic_lib::Memory memory(session, std::move(exported_vmo),
+  scenic::Memory memory(session, std::move(exported_vmo),
                             fuchsia::images::MemoryType::VK_DEVICE_MEMORY);
 
   fuchsia::images::ImageInfo image_info;
@@ -309,13 +309,13 @@ bool VulkanSurface::PushSessionImageSetupOps(scenic_lib::Session* session,
   image_info.color_space = fuchsia::images::ColorSpace::SRGB;
   image_info.tiling = fuchsia::images::Tiling::LINEAR;
 
-  session_image_ = std::make_unique<scenic_lib::Image>(
+  session_image_ = std::make_unique<scenic::Image>(
       memory, 0 /* memory offset */, std::move(image_info));
 
   return session_image_ != nullptr;
 }
 
-scenic_lib::Image* VulkanSurface::GetImage() {
+scenic::Image* VulkanSurface::GetImage() {
   if (!valid_) {
     return 0;
   }

@@ -17,7 +17,7 @@
 namespace flutter {
 
 VulkanSurfaceProducer::VulkanSurfaceProducer(
-    scenic_lib::Session* mozart_session) {
+    scenic::Session* mozart_session) {
   valid_ = Initialize(mozart_session);
 
   if (valid_) {
@@ -36,7 +36,7 @@ VulkanSurfaceProducer::~VulkanSurfaceProducer() {
   FXL_DCHECK(wait_result == VK_SUCCESS);
 };
 
-bool VulkanSurfaceProducer::Initialize(scenic_lib::Session* mozart_session) {
+bool VulkanSurfaceProducer::Initialize(scenic::Session* mozart_session) {
   vk_ = fxl::MakeRefCounted<vulkan::VulkanProcTable>();
 
   std::vector<std::string> extensions = {

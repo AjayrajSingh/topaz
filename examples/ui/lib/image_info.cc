@@ -6,7 +6,7 @@
 
 #include "lib/fxl/logging.h"
 
-namespace scenic_lib {
+namespace scenic {
 namespace skia {
 
 SkImageInfo MakeSkImageInfo(const fuchsia::images::ImageInfo& image_info) {
@@ -25,4 +25,4 @@ SkImageInfo MakeSkImageInfo(const fuchsia::images::ImageInfo& image_info) {
 }
 
 }  // namespace skia
-}  // namespace scenic_lib
+}  // namespace scenic

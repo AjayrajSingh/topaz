@@ -9,13 +9,13 @@
 
 #include "third_party/skia/include/core/SkImageInfo.h"
 
-namespace scenic_lib {
+namespace scenic {
 namespace skia {
 
 // Creates Skia image information from a |fuchsia::images::ImageInfo| object.
 SkImageInfo MakeSkImageInfo(const fuchsia::images::ImageInfo& image_info);
 
 }  // namespace skia
-}  // namespace scenic_lib
+}  // namespace scenic
 
 #endif  // LIB_UI_SCENIC_SKIA_IMAGE_INFO_H_

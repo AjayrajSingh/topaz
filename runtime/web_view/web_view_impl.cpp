@@ -243,7 +243,7 @@ void WebViewImpl::OnSceneInvalidated(
     return;
 
   // Update the image.
-  const scenic_lib::HostImage* image = image_cycler_.AcquireImage(
+  const scenic::HostImage* image = image_cycler_.AcquireImage(
       physical_size().width, physical_size().height, physical_size().width * 4u,
       fuchsia::images::PixelFormat::BGRA_8, fuchsia::images::ColorSpace::SRGB);
   FXL_DCHECK(image);

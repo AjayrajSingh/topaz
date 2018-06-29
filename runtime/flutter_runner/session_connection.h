@@ -11,8 +11,8 @@
 #include "lib/fidl/cpp/interface_handle.h"
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
-#include "lib/ui/scenic/client/resources.h"
-#include "lib/ui/scenic/client/session.h"
+#include "lib/ui/scenic/cpp/resources.h"
+#include "lib/ui/scenic/cpp/session.h"
 #include "vulkan_surface_producer.h"
 
 namespace flutter {
@@ -42,15 +42,15 @@ class SessionConnection final {
     return scene_update_context_;
   }
 
-  scenic_lib::ImportNode& root_node() { return root_node_; }
+  scenic::ImportNode& root_node() { return root_node_; }
 
   void Present(flow::CompositorContext::ScopedFrame& frame);
 
  private:
   const std::string debug_label_;
   fuchsia::ui::scenic::ScenicPtr scenic_;
-  scenic_lib::Session session_;
-  scenic_lib::ImportNode root_node_;
+  scenic::Session session_;
+  scenic::ImportNode root_node_;
   std::unique_ptr<VulkanSurfaceProducer> surface_producer_;
   flow::SceneUpdateContext scene_update_context_;
   OnMetricsUpdate metrics_changed_callback_;

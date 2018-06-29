@@ -74,9 +74,9 @@ class MediaPlayerView : public mozart::BaseView {
 
   async::Loop* const loop_;
 
-  scenic_lib::ShapeNode background_node_;
-  scenic_lib::skia::HostCanvasCycler controls_widget_;
-  std::unique_ptr<scenic_lib::EntityNode> video_host_node_;
+  scenic::ShapeNode background_node_;
+  scenic::skia::HostCanvasCycler controls_widget_;
+  std::unique_ptr<scenic::EntityNode> video_host_node_;
 
   fuchsia::mediaplayer::MediaPlayerPtr media_player_;
   fuchsia::math::Size video_size_;

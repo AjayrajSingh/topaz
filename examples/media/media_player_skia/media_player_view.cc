@@ -68,7 +68,7 @@ MediaPlayerView::MediaPlayerView(
   FXL_DCHECK(loop);
   FXL_DCHECK(params.is_valid());
 
-  scenic_lib::Material background_material(session());
+  scenic::Material background_material(session());
   background_material.SetColor(0x1a, 0x23, 0x7e, 0xff);  // Indigo 900
   background_node_.SetMaterial(background_material);
   parent_node().AddChild(background_node_);
@@ -98,7 +98,7 @@ MediaPlayerView::MediaPlayerView(
         video_view_owner.NewRequest());
 
     zx::eventpair video_host_import_token;
-    video_host_node_.reset(new scenic_lib::EntityNode(session()));
+    video_host_node_.reset(new scenic::EntityNode(session()));
     video_host_node_->ExportAsRequest(&video_host_import_token);
     parent_node().AddChild(*video_host_node_);
     GetViewContainer()->AddChild(kVideoChildKey, std::move(video_view_owner),
@@ -193,7 +193,7 @@ void MediaPlayerView::Layout() {
     return;
 
   // Make the background fill the space.
-  scenic_lib::Rectangle background_shape(session(), logical_size().width,
+  scenic::Rectangle background_shape(session(), logical_size().width,
                                          logical_size().height);
   background_node_.SetShape(background_shape);
   background_node_.SetTranslation(logical_size().width * .5f,

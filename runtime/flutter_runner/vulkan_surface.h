@@ -16,7 +16,7 @@
 #include "flutter/vulkan/vulkan_proc_table.h"
 #include "flutter/vulkan/vulkan_provider.h"
 #include "lib/fxl/macros.h"
-#include "lib/ui/scenic/client/resources.h"
+#include "lib/ui/scenic/cpp/resources.h"
 #include "third_party/skia/include/core/SkSurface.h"
 #include "third_party/skia/include/gpu/vk/GrVkBackendContext.h"
 
@@ -28,7 +28,7 @@ class VulkanSurface final
   VulkanSurface(vulkan::VulkanProvider& vulkan_provider,
                 sk_sp<GrContext> context,
                 sk_sp<GrVkBackendContext> backend_context,
-                scenic_lib::Session* session,
+                scenic::Session* session,
                 const SkISize& size);
 
   ~VulkanSurface() override;
@@ -51,7 +51,7 @@ class VulkanSurface final
       std::function<void(void)> on_writes_committed) override;
 
   // |flow::SceneUpdateContext::SurfaceProducerSurface|
-  scenic_lib::Image* GetImage() override;
+  scenic::Image* GetImage() override;
 
   // |flow::SceneUpdateContext::SurfaceProducerSurface|
   sk_sp<SkSurface> GetSkiaSurface() const override;
@@ -92,7 +92,7 @@ class VulkanSurface final
 
   bool CreateFences();
 
-  bool PushSessionImageSetupOps(scenic_lib::Session* session,
+  bool PushSessionImageSetupOps(scenic::Session* session,
                                 zx::vmo exported_vmo);
 
   void Reset();
@@ -102,12 +102,12 @@ class VulkanSurface final
 
   vulkan::VulkanProvider& vulkan_provider_;
   sk_sp<GrVkBackendContext> backend_context_;
-  scenic_lib::Session* session_;
+  scenic::Session* session_;
   vulkan::VulkanHandle<VkImage> vk_image_;
   vulkan::VulkanHandle<VkDeviceMemory> vk_memory_;
   vulkan::VulkanHandle<VkFence> command_buffer_fence_;
   sk_sp<SkSurface> sk_surface_;
-  std::unique_ptr<scenic_lib::Image> session_image_;
+  std::unique_ptr<scenic::Image> session_image_;
   zx::event acquire_event_;
   vulkan::VulkanHandle<VkSemaphore> acquire_semaphore_;
   std::unique_ptr<vulkan::VulkanCommandBuffer> command_buffer_;
