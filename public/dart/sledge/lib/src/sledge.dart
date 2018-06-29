@@ -99,13 +99,14 @@ class Sledge {
   /// commited.
   /// Returns true otherwise.
   Future<bool> runInTransaction(void modifications()) async {
+    bool initializationSucceeded = await _initializationSucceeded;
+
     if (_currentTransaction != null) {
       throw new StateError('Transaction already started.');
     }
     _currentTransaction =
         new Transaction(this, _pageSnapshotFactory.newInstance());
 
-    bool initializationSucceeded = await _initializationSucceeded;
     if (!initializationSucceeded) {
       _currentTransaction = null;
       return false;
@@ -157,8 +158,8 @@ class Sledge {
 
   /// Subscribes for page.onChange to perform applyChange.
   Subscription _subscribe(Completer<bool> subscriptionCompleter) {
-    if (_currentTransaction == null) {
-      throw new StateError('Must be called inside a transaction.');
+    if (_currentTransaction != null) {
+      throw new StateError('Must be called before any transaction can start.');
     }
     return new Subscription(
         _pageProxy, _pageSnapshotFactory, _applyChange, subscriptionCompleter);
