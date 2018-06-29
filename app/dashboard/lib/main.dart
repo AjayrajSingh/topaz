@@ -2,12 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dashboard/build_status_model.dart';
 import 'package:dashboard/dashboard_app.dart';
 import 'package:dashboard/dashboard_module_model.dart';
 import 'package:dashboard/service/build_service.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:fidl_fuchsia_testing_runner/fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
@@ -144,6 +147,13 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
 ];
 
 const String _kLastUpdate = '/system/data/build/last-update';
+const String _testName = 'dashboard_boot_test';
+
+TestRunnerProxy runnerProxy;
+LauncherProxy launcherProxy;
+
+final List<List<BuildStatusModel>> _buildStatusModels =
+    <List<BuildStatusModel>>[];
 
 void main() {
   setupLogger();
@@ -162,9 +172,6 @@ void main() {
 
   final BuildService buildService = new BuildService();
 
-  final List<List<BuildStatusModel>> buildStatusModels =
-      <List<BuildStatusModel>>[];
-
   for (List<List<String>> buildConfigs in _kTargetsMap) {
     List<BuildStatusModel> categoryModels = <BuildStatusModel>[];
     for (List<String> config in buildConfigs) {
@@ -176,14 +183,14 @@ void main() {
       )..start();
       categoryModels.add(buildStatusModel);
     }
-    buildStatusModels.add(categoryModels);
+    _buildStatusModels.add(categoryModels);
   }
 
   StartupContext startupContext = new StartupContext.fromStartupInfo();
 
   DashboardModuleModel dashboardModuleModel = new DashboardModuleModel(
     startupContext: startupContext,
-    buildStatusModels: buildStatusModels,
+    buildStatusModels: _buildStatusModels,
   );
 
   ModuleWidget<DashboardModuleModel> moduleWidget =
@@ -192,14 +199,9 @@ void main() {
     moduleModel: dashboardModuleModel,
     child: new DashboardApp(
       buildService: buildService,
-      buildStatusModels: buildStatusModels,
+      buildStatusModels: _buildStatusModels,
       buildTimestamp: buildTimestamp,
-      onRefresh: () {
-        buildStatusModels
-            .expand((List<BuildStatusModel> models) => models)
-            // ignore: avoid_function_literals_in_foreach_calls
-            .forEach((BuildStatusModel model) => model.refresh());
-      },
+      onRefresh: onRefresh,
       onLaunchUrl: dashboardModuleModel.launchWebView,
     ),
   );
@@ -208,4 +210,89 @@ void main() {
 
   moduleWidget.advertise();
   dashboardModuleModel.loadDeviceMap();
+
+  _reportTestResultsIfInTestHarness(startupContext.environmentServices);
+}
+
+void onRefresh() {
+  _buildStatusModels
+      .expand((List<BuildStatusModel> models) => models)
+      // ignore: avoid_function_literals_in_foreach_calls
+      .forEach((BuildStatusModel model) => model.refresh());
+}
+
+void _reportTestResultsIfInTestHarness(
+    ServiceProviderProxy environmentServices) {
+  runnerProxy = new TestRunnerProxy();
+  try {
+    connectToService(environmentServices, runnerProxy.ctrl);
+    runnerProxy.identify(_testName, () {});
+    try {
+      launcherProxy = new LauncherProxy();
+      connectToService(environmentServices, launcherProxy.ctrl);
+
+      runTestIterations();
+    } on Exception catch (e) {
+      log.warning('Not able to launch. Not enabling test mode: $e');
+      runnerProxy.teardown(() {
+        runnerProxy.ctrl.close();
+      });
+    }
+  } on Exception catch (e) {
+    log.warning('Not in automated test. Using normal mode: $e');
+  }
+}
+
+const int kMaxAttempts = 3;
+const int kDelayBeforeCaptureSeconds = 7;
+
+int _iterationAttempt = 0;
+
+void runTestIterations() {
+  Stopwatch stopWatch = new Stopwatch()..start();
+  new Timer(const Duration(seconds: kDelayBeforeCaptureSeconds), () {
+    LaunchInfo launchInfo =
+        new LaunchInfo(url: 'screencap', arguments: ['-histogram']);
+    final ComponentControllerProxy controller = new ComponentControllerProxy();
+    launcherProxy.createComponent(launchInfo, controller.ctrl.request());
+    controller.wait((int r) {
+      if (r == 0) {
+        log.info('elapsed: ${stopWatch.elapsedMilliseconds}');
+        TestResult testResult = new TestResult(
+          name: _testName,
+          elapsed: stopWatch.elapsedMilliseconds,
+          failed: false,
+          message: 'success',
+        );
+        launcherProxy.ctrl.close();
+        runnerProxy
+          ..reportResult(testResult)
+          ..teardown(() {
+            runnerProxy.ctrl.close();
+          });
+        return;
+      } else {
+        _iterationAttempt++;
+        if (_iterationAttempt >= kMaxAttempts) {
+          log.info('elapsed: ${stopWatch.elapsedMilliseconds}');
+          TestResult testResult = new TestResult(
+              name: _testName,
+              elapsed: stopWatch.elapsedMilliseconds,
+              failed: true,
+              message: 'failed: See log for more info');
+          launcherProxy.ctrl.close();
+          runnerProxy
+            ..reportResult(testResult)
+            ..teardown(() {
+              runnerProxy.ctrl.close();
+            });
+          return;
+        }
+
+        // Try refreshing the screen captures and comparing again
+        onRefresh();
+        runTestIterations();
+      }
+    });
+  });
 }

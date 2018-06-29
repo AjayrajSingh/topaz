@@ -5,7 +5,6 @@
         "topaz/packages/tools/ermine_user_shell",
         "topaz/packages/tools/fidlgen_dart",
         "topaz/packages/tools/ledger",
-        "topaz/packages/tools/link_viewer",
-        "topaz/packages/tools/ppm_histogram"
+        "topaz/packages/tools/link_viewer"
     ]
 }
