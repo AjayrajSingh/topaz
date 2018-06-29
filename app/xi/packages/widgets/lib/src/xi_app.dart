@@ -87,6 +87,8 @@ class XiAppState extends State<XiApp> {
   /// Allows parent [Widget]s in either vanilla Flutter or Fuchsia to modify
   /// the message.
   String message;
+
+  /// If `true`, draws a watermark in the background of the editor view.
   bool debugBackground = false;
   String _viewId;
   List<_PendingNotification> _pendingReqs;
@@ -143,12 +145,6 @@ class XiAppState extends State<XiApp> {
   /// Handle messages from xi-core.
   void handleMessage(dynamic data) {
     setState(() => message = '$data');
-  }
-
-  /// Handler passed into [XiApp] for negotiating IPC calls to the xi-core
-  /// service. Currently this is unsupported for vanilla Flutter.
-  void handlePingButtonPressed() {
-    sendNotification('insert', <String, dynamic>{'chars': 'a'});
   }
 
   /// Uses a [MaterialApp] as the root of the Xi UI hierarchy.
