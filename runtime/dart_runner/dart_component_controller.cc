@@ -341,7 +341,8 @@ bool DartComponentController::Main() {
   Dart_EnterIsolate(isolate_);
   Dart_EnterScope();
 
-  Dart_Handle dart_arguments = Dart_NewList(arguments->size());
+  Dart_Handle dart_arguments =
+      Dart_NewListOf(Dart_CoreType_String, arguments->size());
   if (Dart_IsError(dart_arguments)) {
     FXL_LOG(ERROR) << "Failed to allocate Dart arguments list: "
                    << Dart_GetError(dart_arguments);
