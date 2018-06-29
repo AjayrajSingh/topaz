@@ -30,7 +30,7 @@ executable("web_view_bin") {
     "//third_party/boringssl",
     "//third_party/rapidjson",
     "//topaz/runtime/web_runner/services",
-    "//zircon/public/lib/async-loop",
+    "//zircon/public/lib/async-loop-cpp",
     "//zircon/public/lib/hid",
   ]
 

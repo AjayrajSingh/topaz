@@ -22,6 +22,7 @@ executable("media_player_skia") {
     "//garnet/public/lib/url",
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_view",
+    "//zircon/public/lib/async-loop-cpp",
     "//zircon/public/lib/hid",
   ]
 }
