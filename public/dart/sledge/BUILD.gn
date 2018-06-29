@@ -33,6 +33,7 @@ dart_test("dart_sledge_tests") {
     "values/last_one_wins_values_test.dart",
     "values/map_value_test.dart",
     "values/pos_neg_counter_test.dart",
+    "values/pos_neg_counter_ss_test.dart",
     "values/set_value_test.dart"
   ]
 
