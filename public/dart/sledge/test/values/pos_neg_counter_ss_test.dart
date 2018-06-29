@@ -9,6 +9,7 @@ import 'package:sledge/src/document/change.dart';
 import 'package:sledge/src/document/values/pos_neg_counter_value.dart';
 import 'package:test/test.dart';
 
+import '../crdt_test_framework/crdt_test_framework.dart';
 import '../crdt_test_framework/storage_state.dart';
 import '../dummies/dummy_value_observer.dart';
 
@@ -37,5 +38,37 @@ void main() {
     expect(cnt2.value, equals(6));
     cnt3.applyChange(ss3.updateWith(ss2));
     expect(cnt3.value, equals(6));
+  });
+
+  test('PosNegCounter with framework', () {
+    // TODO: consider changing generator.
+    // Pass random as an insttanceId is bad because it makes tests non
+    // reproducable.
+    // ignore: unused_local_variable
+    final fleet = new Fleet<PosNegCounterValue<int>>(
+        3,
+        (index) =>
+            new TestPosNegCounterValue<int>(new Uint8List.fromList([index])))
+      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) {
+        cnt0.add(1);
+      })
+      ..runInTransaction(1, (PosNegCounterValue<int> cnt1) {
+        cnt1.add(2);
+      })
+      ..synchronize([0, 1])
+      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) {
+        expect(cnt0.value, equals(3));
+      })
+      ..runInTransaction(2, (PosNegCounterValue<int> cnt2) {
+        cnt2.add(-5);
+      })
+      ..synchronize([0, 2])
+      ..runInTransaction(2, (PosNegCounterValue<int> cnt2) {
+        expect(cnt2.value, equals(-2));
+      })
+      ..runInTransaction(1, (PosNegCounterValue<int> cnt2) {
+        expect(cnt2.value, equals(3));
+      })
+      ..testSingleOrder();
   });
 }
