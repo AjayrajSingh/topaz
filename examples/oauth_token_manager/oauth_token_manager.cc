@@ -1477,9 +1477,8 @@ void OAuthTokenManagerApp::Terminate() {
 
 // TODO(alhaad): Check if account id already exists.
 std::string OAuthTokenManagerApp::GenerateAccountId() {
-  uint32_t random_number;
-  zx_status_t status = zx_cprng_draw_new(&random_number, sizeof(random_number));
-  FXL_CHECK(status == ZX_OK);
+  uint32_t random_number = 0;
+  zx_cprng_draw(&random_number, sizeof(random_number));
   return std::to_string(random_number);
 }
 
