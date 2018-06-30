@@ -32,7 +32,7 @@ executable("bin") {
     "//garnet/public/lib/ui/geometry/fidl",
     "//garnet/public/lib/ui/input/cpp",
     "//garnet/public/lib/ui/input/fidl",
-    "//garnet/public/lib/ui/scenic:client",
+    "//garnet/public/lib/ui/scenic/cpp",
     "//garnet/public/lib/ui/scenic/fidl",
     "//garnet/public/lib/ui/view_framework:view_provider",
     "//garnet/public/lib/ui/views/fidl:v1",

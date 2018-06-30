@@ -23,7 +23,7 @@ executable("bin") {
     "//garnet/public/lib/app/fidl",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/ui/input/fidl",
-    "//garnet/public/lib/ui/scenic:client",
+    "//garnet/public/lib/ui/scenic/cpp",
     "//garnet/public/lib/ui/scenic/fidl",
     "//garnet/public/lib/ui/views/fidl:v1",
     "//zircon/public/lib/async-cpp",

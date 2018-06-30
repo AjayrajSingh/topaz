@@ -18,7 +18,7 @@ source_set("scenic_skia") {
 
   public_deps = [
     "//garnet/public/lib/fxl",
-    "//garnet/public/lib/ui/scenic:client",
+    "//garnet/public/lib/ui/scenic/cpp",
     "//third_party/skia",
   ]
 
