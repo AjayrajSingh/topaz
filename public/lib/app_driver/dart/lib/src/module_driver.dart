@@ -559,7 +559,7 @@ class ModuleDriver {
     }
 
     return moduleContext.startModule(
-      module: module,
+      module: name,
       intent: intent,
       surfaceRelation: surfaceRelation,
     );
