@@ -15,6 +15,10 @@ import 'package:lib.app.dart/logging.dart';
 class Display {
   final String _brightnessSettingsKey = 'Display.Brightness';
 
+  // Used to publish brightness events.
+  final StreamController<double> _brightnessStreamController =
+      StreamController.broadcast();
+
   // Used to modify the physical display.
   final DisplayManagerProxy _displayManagerService = DisplayManagerProxy();
 
@@ -36,7 +40,16 @@ class Display {
     _deviceSettingsManagerService.ctrl.error.then(
         (ProxyError error) => _handleSettingsConnectionError(error: error));
 
-    // fetch initial brightness from device settings.
+    // Immediately get brightness on construction.
+    _refreshBrightness();
+  }
+
+  /// Invoked during creation to refresh the internal cached brightness.
+  void _refreshBrightness() {
+    if (brightness != null) {
+      return;
+    }
+
     _deviceSettingsManagerService.getString(_brightnessSettingsKey,
         (String val, Status status) {
       if (status == Status.ok) {
@@ -54,6 +67,9 @@ class Display {
       }
     });
   }
+
+  // Stream for listening to changes in brightness.
+  Stream<double> get brightnessStream => _brightnessStreamController.stream;
 
   // Cache the brightness so callers can retrieve it without reading the
   // device settings or display.
@@ -81,12 +97,14 @@ class Display {
           }
         });
 
+        _notifyBrightnessChange();
         completer.complete(true);
       } else {
         _displayManagerService
             .getBrightness((bool success, double brightnessVal) {
           if (success) {
             _brightness = brightnessVal;
+            _notifyBrightnessChange();
           }
           completer.complete(false);
         });
@@ -94,6 +112,12 @@ class Display {
     });
 
     return completer.future;
+  }
+
+  /// Invoked internally to signal to a registered listener (if set) of a
+  /// change in brightness.
+  void _notifyBrightnessChange() {
+    _brightnessStreamController.add(brightness);
   }
 
   /// Handles connection error to the display service.
