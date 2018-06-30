@@ -6,6 +6,8 @@ import 'package:fidl/fidl.dart';
 import 'package:fidl_fidl_examples_echo/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 
+bool quiet = false;
+
 class _EchoImpl extends Echo {
   final EchoBinding _binding = new EchoBinding();
 
@@ -15,7 +17,9 @@ class _EchoImpl extends Echo {
 
   @override
   void echoString(String value, void callback(String response)) {
-    print('EchoString: $value');
+    if (!quiet) {
+      print('EchoString: $value');
+    }
     callback(value);
   }
 }
@@ -24,6 +28,7 @@ StartupContext _context;
 _EchoImpl _echo;
 
 void main(List<String> args) {
+  quiet = args.contains('-q');
   _context = new StartupContext.fromStartupInfo();
   _echo = new _EchoImpl();
   _context.outgoingServices

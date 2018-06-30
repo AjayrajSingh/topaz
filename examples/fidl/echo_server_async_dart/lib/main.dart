@@ -8,6 +8,8 @@ import 'package:fidl/fidl.dart';
 import 'package:fidl_fidl_examples_echo/fidl_async.dart';
 import 'package:lib.app.dart/app_async.dart';
 
+bool quiet = false;
+
 class _EchoImpl extends Echo {
   final EchoBinding _binding = new EchoBinding();
 
@@ -17,7 +19,9 @@ class _EchoImpl extends Echo {
 
   @override
   Future<String> echoString(String value) async {
-    print('EchoString: $value');
+    if (!quiet) {
+      print('EchoString: $value');
+    }
     return value;
   }
 }
@@ -26,6 +30,7 @@ StartupContext _context;
 _EchoImpl _echo;
 
 void main(List<String> args) {
+  quiet = args.contains('-q');
   _context = new StartupContext.fromStartupInfo();
   _echo = new _EchoImpl();
   _context.outgoingServices
