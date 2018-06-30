@@ -12,7 +12,9 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 
 /// This class abstracts away the DisplayManager fidl interface,
-class Display {
+class Display extends DeviceSettingsWatcher {
+  final DeviceSettingsWatcherBinding _deviceSettingsWatcherBinding =
+      DeviceSettingsWatcherBinding();
   final String _brightnessSettingsKey = 'Display.Brightness';
 
   // Used to publish brightness events.
@@ -40,13 +42,15 @@ class Display {
     _deviceSettingsManagerService.ctrl.error.then(
         (ProxyError error) => _handleSettingsConnectionError(error: error));
 
+    _deviceSettingsManagerService.watch(
+        _brightnessSettingsKey, _deviceSettingsWatcherBinding.wrap(this), null);
     // Immediately get brightness on construction.
     _refreshBrightness();
   }
 
   /// Invoked during creation to refresh the internal cached brightness.
-  void _refreshBrightness() {
-    if (brightness != null) {
+  void _refreshBrightness([bool force = false]) {
+    if (brightness != null && !force) {
       return;
     }
 
@@ -128,5 +132,10 @@ class Display {
   /// Handles connection error to the settings service.
   void _handleSettingsConnectionError({ProxyError error}) {
     log.severe('Unable to connect to settings service', error);
+  }
+
+  @override
+  void onChangeSettings(ValueType type) {
+    _refreshBrightness(true);
   }
 }
