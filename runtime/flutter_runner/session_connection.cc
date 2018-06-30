@@ -5,7 +5,7 @@
 #include "session_connection.h"
 
 #include "lib/fidl/cpp/optional.h"
-#include "lib/ui/scenic/fidl_helpers.h"
+#include "lib/ui/scenic/cpp/fidl_helpers.h"
 #include "vsync_waiter.h"
 
 namespace flutter {
