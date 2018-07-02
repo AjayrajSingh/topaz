@@ -82,7 +82,7 @@ class SetValue<E> extends SetBase<E>
   @override
   ValueObserver observer;
 
-  // TODO: consider Converter as a provider of |equals| and |hashCode| methods.
+  // TODO: consider Converter as a provider of [equals] and [hashCode] methods.
   /// Creates a SetValue with provided [equals] as equality.
   /// It should be coherent with encoding of [E] done by Converter.
   SetValue({bool equals(E entry1, E enrtry2), int hashCode(E entry)})

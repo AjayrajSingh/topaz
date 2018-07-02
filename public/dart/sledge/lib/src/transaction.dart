@@ -17,7 +17,7 @@ import 'sledge.dart';
 
 typedef Modification = Future Function();
 
-/// Runs |modification| and tracks modified documents in order to write the
+/// Runs a modification and tracks modified documents in order to write the
 /// changes to Ledger.
 class Transaction {
   // List of Documents modified during the transaction.
@@ -29,7 +29,7 @@ class Transaction {
   /// Default constructor.
   Transaction(this._sledge, this._pageSnapshotProxy);
 
-  /// Runs |modification| and saves the resulting changes to |_pageProxy|.
+  /// Runs [modification] and saves the resulting changes to [pageProxy].
   Future<bool> saveModification(
       Modification modification, ledger.PageProxy pageProxy) async {
     // Start Ledger transaction.
@@ -109,12 +109,12 @@ class Transaction {
     return true;
   }
 
-  /// Notification that |document| was modified.
+  /// Notification that [document] was modified.
   void documentWasModified(Document document) {
     _documents.add(document);
   }
 
-  /// Returns the document identified with |documentId|.
+  /// Returns the document identified with [documentId].
   /// If the document does not exist, a new document is returned.
   Future<Document> getDocument(DocumentId documentId) async {
     final document = new Document(_sledge, documentId);

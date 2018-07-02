@@ -40,7 +40,7 @@ class Document implements ValueObserver {
       Uint8List hashBytes =
           new Uint8List.fromList(sha1.convert(keyBytes).bytes);
       assert(hashBytes.length == _hashLength);
-      // Insert |value| with the hashed key in |_fields|.
+      // Insert [value] with the hashed key in [_fields].
       _fields[hashBytes] = value;
     });
   }

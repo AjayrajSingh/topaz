@@ -10,7 +10,7 @@ import 'base_value.dart';
 class ValueNode implements BaseValue {
   Map<Symbol, BaseValue> _childValues;
 
-  /// Default constructor. |schemaDescription| specifies the name and type of
+  /// Default constructor. [schemaDescription] specifies the name and type of
   /// every field.
   ValueNode(
       Map<String, BaseType> schemaDescription, ConnectionId connectionId) {
@@ -40,7 +40,7 @@ class ValueNode implements BaseValue {
     return fields;
   }
 
-  /// Intercepts invocations to provide easy access to specific _childValues.
+  /// Intercepts invocations to provide easy access to specific [_childValues].
   @override
   dynamic noSuchMethod(Invocation invocation) {
     Object value = _childValues[invocation.memberName];

@@ -28,7 +28,7 @@ class LedgerPageSnapshotFactoryImpl implements LedgerPageSnapshotFactory {
   }
 }
 
-/// Returns data stored in |buffer|.
+/// Returns data stored in [buffer].
 Uint8List readBuffer(Buffer buffer) {
   ReadResult readResult = buffer.vmo.read(buffer.size);
   if (readResult.status != ZX.OK) {
@@ -40,7 +40,8 @@ Uint8List readBuffer(Buffer buffer) {
   return new Uint8List.view(readResult.bytes.buffer);
 }
 
-/// Returns all the KV pairs stored in |snapshot| whose key start with |keyPrefix|.
+/// Returns all the KV pairs stored in [pageSnapshotProxy] whose key start
+/// with [keyPrefix].
 /// The KV are ordered by key in ascending order.
 Future<List<KeyValue>> getEntriesFromSnapshotWithPrefix(
     ledger.PageSnapshotProxy pageSnapshotProxy, Uint8List keyPrefix) async {

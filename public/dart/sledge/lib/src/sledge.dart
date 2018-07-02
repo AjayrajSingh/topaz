@@ -110,7 +110,7 @@ class Sledge {
     return _modificationQueue.queueModification(modification);
   }
 
-  /// Returns the document identified with |documentId|.
+  /// Returns the document identified with [documentId].
   /// If the document does not exist or an error occurs, an empty
   /// document is returned.
   Future<Document> getDocument(DocumentId documentId) async {
@@ -138,7 +138,7 @@ class Sledge {
   /// Returns an ID, unique among active connections accross devices.
   ConnectionId get connectionId => _connectionId;
 
-  /// Call |applyChange| for all registered documents.
+  /// Calls applyChange for all registered documents.
   void _applyChange(Change change) {
     final splittedChange = change.splitByPrefix(DocumentId.prefixLength);
     for (final prefix in splittedChange.keys) {

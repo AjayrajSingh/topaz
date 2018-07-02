@@ -16,7 +16,7 @@ class SledgePageId {
   SledgePageId([String pageName = '']) {
     pageName ??= '';
 
-    // TODO: use the hash of |pageName| and then add unittests.
+    // TODO: use the hash of [pageName] and then add unittests.
     List<int> encodedPageName =
         new List<int>.from(utf8.encode('sledge_$pageName'));
     if (encodedPageName.length > 16) {

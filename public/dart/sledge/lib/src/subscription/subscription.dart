@@ -46,7 +46,7 @@ class Subscription extends ledger.PageWatcher {
       void callback(InterfaceRequest<ledger.PageSnapshot> snapshotRequest)) {
     _currentChange.addAll(getChangeFromPageChange(pageChange));
 
-    // For a given change, |onChange| can be called multiple times.
+    // For a given change, [onChange] can be called multiple times.
     if (resultState == ledger.ResultState.completed ||
         resultState == ledger.ResultState.partialCompleted) {
       _applyChangeCallback(_currentChange);

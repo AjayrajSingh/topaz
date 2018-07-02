@@ -12,7 +12,7 @@ import 'key_value.dart';
 
 // Insted of storing (key, value) pair in Ledger we do modification:
 // We store ({hash_of_key}, {|key|}{key}{value}).
-// |key| is an Uint64 and takes 8 bytes to store.
+// [key] is an Uint64 and takes 8 bytes to store.
 
 /// Class to compress long keys.
 class Compressor {
