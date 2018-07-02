@@ -77,11 +77,11 @@ class Document implements ValueObserver {
 
   @override
   void valueWasChanged() {
-    Transaction transaction = _sledge.transaction;
-    if (transaction == null) {
+    Transaction currentTransaction = _sledge.currentTransaction;
+    if (currentTransaction == null) {
       throw new StateError('Value changed outside of transaction.');
     }
-    transaction.documentWasModified(this);
+    currentTransaction.documentWasModified(this);
   }
 
   @override

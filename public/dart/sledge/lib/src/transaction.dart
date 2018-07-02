@@ -15,6 +15,8 @@ import 'document/values/key_value.dart';
 import 'ledger_helpers.dart';
 import 'sledge.dart';
 
+typedef Modification = Future Function();
+
 /// Runs |modification| and tracks modified documents in order to write the
 /// changes to Ledger.
 class Transaction {
@@ -27,9 +29,9 @@ class Transaction {
   /// Default constructor.
   Transaction(this._sledge, this._pageSnapshotProxy);
 
-  /// Runs |modifications| and saves the resulting changes to |_pageProxy|.
-  Future<bool> saveModifications(
-      Future modifications(), ledger.PageProxy pageProxy) async {
+  /// Runs |modification| and saves the resulting changes to |_pageProxy|.
+  Future<bool> saveModification(
+      Modification modification, ledger.PageProxy pageProxy) async {
     // Start Ledger transaction.
     Completer<ledger.Status> completer = new Completer<ledger.Status>();
     pageProxy.startTransaction(completer.complete);
@@ -51,7 +53,7 @@ class Transaction {
       return false;
     }
 
-    await modifications();
+    await modification();
 
     // Iterate through all the documents modified by this transaction and
     // forward the changes to Ledger.
@@ -73,7 +75,7 @@ class Transaction {
         );
         bool deleteOk = (await completer.future) == ledger.Status.ok;
         if (!deleteOk) {
-          rollbackModifications(pageProxy);
+          rollbackModification(pageProxy);
           return false;
         }
       }
@@ -91,7 +93,7 @@ class Transaction {
 
         bool putOk = (await completer.future) == ledger.Status.ok;
         if (!putOk) {
-          rollbackModifications(pageProxy);
+          rollbackModification(pageProxy);
           return false;
         }
       }
@@ -101,7 +103,7 @@ class Transaction {
     pageProxy.commit(completer.complete);
     bool commitOk = (await completer.future) == ledger.Status.ok;
     if (!commitOk) {
-      rollbackModifications(pageProxy);
+      rollbackModification(pageProxy);
       return false;
     }
     return true;
@@ -136,7 +138,7 @@ class Transaction {
   }
 
   /// Rollback the documents that were modified during the transaction.
-  void rollbackModifications(ledger.PageProxy pageProxy) {
+  void rollbackModification(ledger.PageProxy pageProxy) {
     // TODO: implement.
   }
 }

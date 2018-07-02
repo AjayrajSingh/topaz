@@ -13,6 +13,7 @@ import 'document/document.dart';
 import 'document/document_id.dart';
 import 'document/uint8list_ops.dart';
 import 'ledger_helpers.dart';
+import 'modification_queue.dart';
 import 'sledge_connection_id.dart';
 import 'sledge_page_id.dart';
 import 'subscription/subscription.dart';
@@ -39,7 +40,7 @@ class Sledge {
   // ignore: unused_field
   Future<bool> _initializationSucceeded;
 
-  Transaction _currentTransaction;
+  ModificationQueue _modificationQueue;
 
   /// Default constructor.
   Sledge(this._componentContext, [SledgePageId pageId])
@@ -66,6 +67,8 @@ class Sledge {
         print('Sledge failed to GetPage: $status');
         initializationCompleter.complete(false);
       } else {
+        _modificationQueue =
+            new ModificationQueue(this, _pageSnapshotFactory, _pageProxy);
         _subscribe(initializationCompleter);
       }
     });
@@ -84,6 +87,8 @@ class Sledge {
   /// Convenience constructor for tests.
   Sledge.testing(this._pageProxy, this._pageSnapshotFactory)
       : _componentContext = null {
+    _modificationQueue =
+        new ModificationQueue(this, _pageSnapshotFactory, _pageProxy);
     _initializationSucceeded = new Future.value(true);
   }
 
@@ -93,56 +98,41 @@ class Sledge {
     _ledgerProxy.ctrl.close();
   }
 
-  /// Transactionally save modifications.
-  /// Await the end of the method before calling |runInTransaction| again.
-  /// Returns false if an error occured and the modifications couldn't be
+  /// Transactionally save modification.
+  /// Returns false if an error occured and the modification couldn't be
   /// commited.
   /// Returns true otherwise.
-  Future<bool> runInTransaction(void modifications()) async {
+  Future<bool> runInTransaction(Modification modification) async {
     bool initializationSucceeded = await _initializationSucceeded;
-
-    if (_currentTransaction != null) {
-      throw new StateError('Transaction already started.');
-    }
-    _currentTransaction =
-        new Transaction(this, _pageSnapshotFactory.newInstance());
-
     if (!initializationSucceeded) {
-      _currentTransaction = null;
       return false;
     }
-
-    // Run the modification.
-    bool savingModificationsWasSuccesfull =
-        await _currentTransaction.saveModifications(modifications, _pageProxy);
-
-    _currentTransaction = null;
-
-    return new Future.value(savingModificationsWasSuccesfull);
+    return _modificationQueue.queueModification(modification);
   }
 
   /// Returns the document identified with |documentId|.
   /// If the document does not exist or an error occurs, an empty
   /// document is returned.
   Future<Document> getDocument(DocumentId documentId) async {
-    if (_currentTransaction == null) {
+    // TODO: Throw an error only if the document has not been instantiated
+    // before.
+    if (currentTransaction == null) {
       throw new StateError('No transaction started.');
     }
-
     if (!_documentByPrefix.containsKey(documentId.prefix)) {
+      // TODO: Prevent multiple documents from being created by the
+      // current transaction.
       _documentByPrefix[documentId.prefix] =
-          await _currentTransaction.getDocument(documentId);
+          await currentTransaction.getDocument(documentId);
     }
 
     return _documentByPrefix[documentId.prefix];
   }
 
   /// Returns the current transaction.
-  Transaction get transaction {
-    if (_currentTransaction == null) {
-      throw new StateError('No transaction started.');
-    }
-    return _currentTransaction;
+  /// Returns null if no transaction is in progress.
+  Transaction get currentTransaction {
+    return _modificationQueue.currentTransaction;
   }
 
   /// Returns an ID, unique among active connections accross devices.
@@ -158,7 +148,7 @@ class Sledge {
 
   /// Subscribes for page.onChange to perform applyChange.
   Subscription _subscribe(Completer<bool> subscriptionCompleter) {
-    if (_currentTransaction != null) {
+    if (_modificationQueue.currentTransaction != null) {
       throw new StateError('Must be called before any transaction can start.');
     }
     return new Subscription(

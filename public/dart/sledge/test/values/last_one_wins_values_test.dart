@@ -105,8 +105,7 @@ void main() {
     var x = new TestLastOneWinsValue<String>(
         conv.serialize(new ConvertedChange<int, String>({0: 'bar'})));
     expect(x.value, equals('bar'));
-    x.applyChange(
-        conv.serialize(new ConvertedChange<int, String>({0: 'foo'})));
+    x.applyChange(conv.serialize(new ConvertedChange<int, String>({0: 'foo'})));
     expect(x.value, equals('foo'));
     x.value = 'bar';
     expect(x.value, equals('bar'));
@@ -114,8 +113,7 @@ void main() {
     expect(x.value, equals('tor'));
     x.getChange();
     expect(x.value, equals('tor'));
-    x.applyChange(
-        conv.serialize(new ConvertedChange<int, String>({0: 'cir'})));
+    x.applyChange(conv.serialize(new ConvertedChange<int, String>({0: 'cir'})));
     expect(x.value, equals('cir'));
   });
 
@@ -145,7 +143,6 @@ void main() {
           conv.serialize(new ConvertedChange<int, String>({0: 'bar'})))
       ..applyChange(
           conv.serialize(new ConvertedChange<int, String>({0: 'foo'})))
-      ..applyChange(
-          conv.serialize(new ConvertedChange<int, String>({0: 'a'})));
+      ..applyChange(conv.serialize(new ConvertedChange<int, String>({0: 'a'})));
   });
 }
