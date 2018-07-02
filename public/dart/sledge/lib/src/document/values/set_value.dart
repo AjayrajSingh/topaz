@@ -16,8 +16,10 @@ import 'key_value_storage.dart';
 class SetValue<E> extends SetBase<E>
     with SetMixin<E>
     implements BaseValue<SetChange<E>> {
-  final KeyValueStorage<E, bool> _map;
-  final DataConverter _converter;
+  // Stores elements of [this]. Each element is stored both in a key and in a
+  // value. It's done to provide an appropriate [lookup] method.
+  final KeyValueStorage<E, E> _map;
+  final DataConverter<E, bool> _converter;
   final StreamController<SetChange<E>> _changeController =
       new StreamController<SetChange<E>>.broadcast();
   @override
@@ -27,15 +29,15 @@ class SetValue<E> extends SetBase<E>
   /// Creates a SetValue with provided [equals] as equality.
   /// It should be coherent with encoding of [E] done by Converter.
   SetValue({bool equals(E entry1, E enrtry2), int hashCode(E entry)})
-      : _map = new KeyValueStorage<E, bool>(equals: equals, hashCode: hashCode),
+      : _map = new KeyValueStorage<E, E>(equals: equals, hashCode: hashCode),
         _converter = new DataConverter<E, bool>();
 
   @override
-  Change getChange() => _converter.serialize(_map.getChange());
+  Change getChange() => _converter.serialize(_removeValue(_map.getChange()));
 
   @override
   void applyChange(Change input) {
-    final change = _converter.deserialize(input);
+    final change = _copyKeyToValue(_converter.deserialize(input));
     _map.applyChange(change);
     _changeController.add(new SetChange<E>(change));
   }
@@ -50,7 +52,7 @@ class SetValue<E> extends SetBase<E>
   @override
   bool add(Object value) {
     final result = !contains(value);
-    _map[value] = true;
+    _map[value] = value;
     observer.valueWasChanged();
     return result;
   }
@@ -58,26 +60,20 @@ class SetValue<E> extends SetBase<E>
   @override
   Set<E> toSet() => _map.keys;
 
-  // TODO: write more efficient method.
   @override
   E lookup(Object object) {
-    for (final key in toSet()) {
-      if (key == object) {
-        return key;
-      }
-    }
-    return null;
+    return _map[object];
   }
 
   @override
-  int get length => toSet().length;
+  int get length => _map.length;
 
   /// Removes [value] from the set. Returns true if [value] was in the set.
   /// Returns false otherwise. The method has no effect if [value] was not in
   /// the set.
   @override
   bool remove(Object value) {
-    final result = _map.remove(value) == true;
+    final result = (_map.remove(value) != null);
     observer.valueWasChanged();
     return result;
   }
@@ -87,4 +83,16 @@ class SetValue<E> extends SetBase<E>
 
   @override
   Stream<SetChange<E>> get onChange => _changeController.stream;
+
+  ConvertedChange<E, bool> _removeValue(ConvertedChange<E, E> change) {
+    return new ConvertedChange<E, bool>(
+        new Map<E, bool>.fromIterable(change.changedEntries.keys,
+            value: (item) => true),
+        change.deletedKeys);
+  }
+
+  ConvertedChange<E, E> _copyKeyToValue(ConvertedChange<E, bool> change) {
+    return new ConvertedChange<E, E>(
+        new Map<E, E>.fromIterable(change.changedEntries.keys));
+  }
 }

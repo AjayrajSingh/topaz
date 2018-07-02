@@ -68,5 +68,8 @@ class MapValue<K, V> extends MapBase<K, V>
   Iterable<K> get keys => _map.keys;
 
   @override
+  int get length => _map.length;
+
+  @override
   Stream<MapChange<K, V>> get onChange => _changeController.stream;
 }

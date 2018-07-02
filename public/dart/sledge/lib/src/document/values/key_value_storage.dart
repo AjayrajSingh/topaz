@@ -13,6 +13,8 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
   final ConvertedChange<K, V> _localChange;
   bool Function(K, K) _equals;
   int Function(K) _hashCode;
+  int _length = 0;
+  int _localLength = 0;
 
   /// Creates a storage using the provided [equals] as equality.
   KeyValueStorage({bool equals(K key1, K key2), int hashCode(K key)})
@@ -33,6 +35,9 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
 
   @override
   void operator []=(K key, V value) {
+    if (this[key] == null) {
+      _localLength += 1;
+    }
     _localChange.deletedKeys.remove(key);
     _localChange.changedEntries[key] = value;
   }
@@ -40,6 +45,9 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
   @override
   V remove(Object key) {
     V result = this[key];
+    if (result != null) {
+      _localLength -= 1;
+    }
     _localChange.deletedKeys.add(key);
     _localChange.changedEntries.remove(key);
     return result;
@@ -48,6 +56,7 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
   @override
   void clear() {
     _localChange.changedEntries.clear();
+    _localLength = 0;
     _localChange.deletedKeys.addAll(_storage.keys);
   }
 
@@ -60,9 +69,13 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
       ..removeAll(_localChange.deletedKeys);
   }
 
+  @override
+  int get length => _localLength;
+
   /// Ends transaction and retrieve it's data.
   ConvertedChange<K, V> getChange() {
     var change = new ConvertedChange.from(_localChange);
+    _length = _localLength;
     _localChange.clear();
     applyChange(change);
     return change;
@@ -76,6 +89,7 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
 
   /// Rollbacks current transaction.
   void rollback() {
+    _localLength = _length;
     _localChange.clear();
   }
 }

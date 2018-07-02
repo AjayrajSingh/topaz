@@ -27,7 +27,7 @@ class SetChange<E> {
   Set<E> deletedElements;
 
   /// Constructor from MapChange.
-  SetChange(ConvertedChange<E, bool> change)
+  SetChange(ConvertedChange<E, E> change)
       : insertedElements = change.changedEntries.keys.toSet(),
         deletedElements = new Set<E>.from(change.deletedKeys);
 }
