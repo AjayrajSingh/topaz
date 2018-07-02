@@ -358,7 +358,7 @@ class ProxyController<T> {
   /// Proxy controllers are not typically created directly. Instead, you
   /// typically obtain a [ProxyController<T>] object as the [Proxy<T>.ctrl]
   /// property of a `TProxy` object.
-  ProxyController({this.$serviceName}) {
+  ProxyController({this.$serviceName, this.$interfaceName}) {
     _reader
       ..onReadable = _handleReadable
       ..onError = _handleError;
@@ -375,12 +375,18 @@ class ProxyController<T> {
 
   /// The service name associated with [T], if any.
   ///
-  /// Corresponds to the `[ServiceName]` attribute in the FIDL interface
-  /// definition.
+  /// Will be set if the `[Discoverable]` attribute is on the FIDL interface
+  /// definition. If set it will be the fully-qualified name of the interface.
   ///
   /// This string is typically used with the `ServiceProvider` interface to
   /// request an implementation of [T].
   final String $serviceName;
+
+  /// The name of the interface of [T].
+  ///
+  /// Unlike [$serviceName] should always be set and won't be fully qualified.
+  /// This should only be used for debugging and logging purposes.
+  final String $interfaceName;
 
   /// Creates an interface request whose peer is bound to this interface proxy.
   ///

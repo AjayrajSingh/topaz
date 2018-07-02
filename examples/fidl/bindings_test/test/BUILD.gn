@@ -1,0 +1,17 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/dart_runner/dart_app.gni")
+import("//build/dart/dart_fuchsia_test.gni")
+
+dart_fuchsia_test("bindings_test") {
+  source_dir = "test/"
+
+  deps = [
+    "//third_party/dart-pkg/pub/collection",
+    "//topaz/examples/fidl/bindings_test/fidl:bindings_test",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/lib/app/dart",
+  ]
+}

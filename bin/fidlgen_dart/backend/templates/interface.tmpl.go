@@ -52,7 +52,7 @@ typedef void {{ .CallbackType }}({{ template "Params" .Response }});
 class {{ .ProxyName }} extends $fidl.Proxy<{{ .Name }}>
     implements {{ .Name }} {
 
-  {{ .ProxyName }}() : super(new $fidl.ProxyController<{{ .Name }}>($serviceName: {{ .ServiceName }})) {
+  {{ .ProxyName }}() : super(new $fidl.ProxyController<{{ .Name }}>($serviceName: {{ .ServiceName }}, $interfaceName: '{{ .Name }}')) {
     ctrl.onResponse = _handleResponse;
   }
 
@@ -154,6 +154,7 @@ class {{ .ProxyName }} extends $fidl.Proxy<{{ .Name }}>
     {{- range $index, $request := .Request }}
     $types[{{ $index }}].encode($encoder, {{ .Name }}, 0);
     {{- end }}
+
     {{- if .HasResponse }}
     Function $zonedCallback;
     if ((callback == null) || identical(Zone.current, Zone.root)) {
@@ -279,10 +280,19 @@ class {{ .BindingName }} extends $fidl.Binding<{{ .Name }}> {
 {{ end }}
 
 
+
+
+{{/*
+
+  New-style Futures-oriented bindings:
+
+*/}}
+
+
 {{/* Generate a parameter list (eg "int foo, String baz") with AsyncDecl types */}}
 {{- define "AsyncParams" -}}
   {{- range $index, $param := . -}}
-    {{- if $index }}, {{ end -}}{{ $param.Type.AsyncDecl }} {{ $param.Name }}
+    {{- if $index }}, {{ end -}}{{ $param.Type.Decl }} {{ $param.Name }}
   {{- end -}}
 {{ end }}
 
@@ -307,75 +317,69 @@ Future<Null>
 {{ range $index, $param := . }}{{ if $index }}, {{ end }}{{ $param.Name }}{{ end }}
 {{- end -}}
 
-{{- define "ForwardParamsConvert" -}}
-  {{- range $index, $param := . -}}
-    {{- if $index }}, {{ end -}}
-    {{- if $param.Convert -}}
-      {{- $param.Convert -}}({{- $param.Name -}})
-    {{- else -}}
-      {{- $param.Name -}}
-    {{- end -}}
-  {{- end }}
-{{- end -}}
 
-{{- define "ForwardResponseParams" -}}
+
+
+{{/*
+  Decode a method response message.
+  The current object is the method (ir.Method).
+  The Dart local variables are:
+    List<$fidl.MemberType> $types - the table for the response.
+    $fidl.Decoder $decoder - the decoder for the message.
+  This template expands to an expression so it can be assigned or passed as an argument.
+*/}}
+{{- define "DecodeResponse" -}}
   {{- if .AsyncResponseClass -}}
-    {{- range $index, $param := .Response }}{{ if $index }}, {{ end }}_response.{{ $param.Name }}{{ end -}}
-  {{- else -}}
-    {{- if .AsyncResponseType -}}
-      _response
-    {{- end -}}
-  {{- end -}}
-{{- end -}}
-
-{{- define "ForwardResponseParamsConvert" -}}
-  {{- if .AsyncResponseClass -}}
-    {{- range $index, $param := .Response -}}
-      {{- if $index }}, {{ end -}}
-      {{- if $param.Convert -}}
-        {{- $param.Convert }}(_response.{{ $param.Name -}})
-      {{- else -}}
-        _response.{{ $param.Name -}}
+    new {{ .AsyncResponseClass }}(
+      {{- range $index, $response := .Response }}
+        $types[{{ $index }}].decode($decoder, 0),
       {{- end -}}
-    {{- end -}}
+    )
   {{- else -}}
-    {{- if .AsyncResponseType -}}
-      {{- with $param := index .Response 0 -}}
-        {{- if $param.Convert -}}
-          {{- $param.Convert }}(_response)
-        {{- else -}}
-          _response
-        {{- end -}}
-      {{- end -}}
-    {{- end -}}
-  {{- end -}}
-{{- end -}}
-
-{{- define "FuturizeParams" -}}
-  {{- range $index, $param := . -}}
-    {{- if $index }}, {{ end -}}
-    {{- if $param.Type.SyncDecl -}}
-      {{- $param.Type.SyncDecl -}}
+    {{- if .Response -}}
+      $types[0].decode($decoder, 0),
     {{- else -}}
-      {{- $param.Type.Decl -}}
-    {{- end }} {{ $param.Name }}
+      null
+    {{- end -}}
   {{- end -}}
-{{ end }}
+{{ end -}}
 
-{{- define "FuturizeRequestMethodSignature" -}}
-  {{- if .HasResponse -}}
-{{ .Name }}({{ template "FuturizeParams" .Request }}{{ if .Request }}, {{ end }}void callback({{ template "FuturizeParams" .Response }}))
+
+{{/*
+  Encode a method response message.
+  The current object is the method (ir.Method).
+  The Dart local variables are:
+    List<$fidl.MemberType> $types - the table for the response.
+    $fidl.Encoder $encoder - the encoder for the message.
+    $response - the Dart response type.
+  This template expands to a statement.
+*/}}
+{{- define "EncodeResponse" -}}
+  {{- if .AsyncResponseClass -}}
+    {{- range $index, $response := .Response }}
+      $types[{{ $index }}].encode($encoder, $response.{{ .Name }}, 0);
+    {{- end }}
   {{- else -}}
-{{ .Name }}({{ template "FuturizeParams" .Request }})
+    {{- if .Response -}}
+      $types[0].encode($encoder, $response, 0);
+    {{- end -}}
   {{- end -}}
 {{ end -}}
 
 {{- define "InterfaceAsyncDeclaration" -}}
+
+{{ range .Methods }}
+// {{ .Name }}: {{ if .HasRequest }}({{ template "AsyncParams" .Request }}){{ end -}}
+                {{- if .HasResponse }} -> ({{ template "AsyncParams" .Response }}){{ end }}
+const int {{ .OrdinalName }} = {{ .Ordinal }};
+const $fidl.MethodType {{ .TypeSymbol }} = {{ .TypeExpr }};
+{{- end }}
+
 {{- range .Methods }}
   {{- if .AsyncResponseClass }}
 class {{ .AsyncResponseClass }} {
     {{- range .Response }}
-  final {{ .Type.SyncDecl }} {{ .Name }};
+  final {{ .Type.Decl }} {{ .Name }};
     {{- end }}
   {{ .AsyncResponseClass }}(
     {{- range .Response }}
@@ -398,216 +402,207 @@ abstract class {{ .Name }} {
 {{- end }}
 }
 
-class {{ .Name }}Proxy implements {{ .Name }} {
-  final $sync.{{ .Name }}Proxy _syncProxy;
-  $fidl.AsyncProxyController<{{ .Name }}, $sync.{{ .Name }}> _ctrl;
-  final _completers = new Set<Completer<dynamic>>();
-  {{ .Name }}Proxy() : _syncProxy = new $sync.{{ .Name }}Proxy()
-  {
-    _ctrl = new $fidl.AsyncProxyController<{{ .Name }}, $sync.{{ .Name }}>(_syncProxy.ctrl);
-    {{- range .Methods }}
-      {{- if not .HasRequest }}
-        _syncProxy.{{ .Name }} = ({{ template "SyncParams" .Response }}) =>
-          _{{ .Name }}EventStreamController.add(
-            {{- if .AsyncResponseClass -}}
-              new {{ .AsyncResponseClass }}({{ template "ForwardParams" .Response }})
-            {{- else -}}
-              {{- if .Response -}}
-                {{- template "ForwardParams" .Response -}}
-              {{- else -}}
-                null
-              {{- end -}}
-            {{- end -}});
-      {{- end }}
+class {{ .ProxyName }} extends $fidl.AsyncProxy<{{ .Name }}>
+    implements {{ .Name }} {
+  {{ .ProxyName }}() : super(new $fidl.AsyncProxyController<{{ .Name }}>($serviceName: {{ .ServiceName }}, $interfaceName: '{{ .Name }}')) {
+    ctrl.onResponse = _handleResponse;
+
+    {{- if .HasEvents }}
+      ctrl.whenClosed.then((_) {
+        {{- range .Methods }}
+          {{- if not .HasRequest }}
+            {{- if .HasResponse }}
+              _{{ .Name }}EventStreamController.close();
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      }, onError: (_) { });
     {{- end }}
-    _syncProxy.ctrl.error.then(_errorOccurred);
+
   }
 
-  $fidl.AsyncProxyController<{{ .Name }}, $sync.{{ .Name }}> get ctrl => _ctrl;
-
-  void _errorOccurred($fidl.ProxyError err) {
-    // Make a copy of the set of completers and then clear it.
-    final errorCompleters = new List<Completer<dynamic>>.from(_completers);
-    _completers.clear();
-    // Dispatch the error to all of the completers.
-    for (var c in errorCompleters) {
-      c.completeError(err);
+  void _handleEvent($fidl.Message $message) {
+    final $fidl.Decoder $decoder = new $fidl.Decoder($message);
+    switch ($message.ordinal) {
+{{- range .Methods }}
+{{- if not .HasRequest }}
+  {{- if .HasResponse }}
+      case {{ .OrdinalName }}:
+        try {
+          final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
+          $decoder.claimMemory({{ .ResponseSize }});
+          _{{ .Name }}EventStreamController.add(
+            {{- template "DecodeResponse" . -}}
+          );
+        // ignore: avoid_catches_without_on_clauses
+        } catch(_e) {
+          final String _name = {{ .TypeSymbol }}.name;
+          ctrl.proxyError(new $fidl.FidlError('Exception handling event $_name: $_e'));
+          ctrl.close();
+          rethrow;
+        }
+        break;
+  {{- end }}
+{{- end }}
+{{- end }}
+      default:
+        ctrl.proxyError(new $fidl.FidlError('Unexpected message ordinal: ${$message.ordinal}'));
+        ctrl.close();
+        break;
     }
-    // Ask for the next error.
-    _syncProxy.ctrl.error.then(_errorOccurred);
+  }
+
+  void _handleResponse($fidl.Message $message) {
+    final int $txid = $message.txid;
+    if ($txid == 0) {
+      _handleEvent($message);
+      return;
+    }
+    final Completer $completer = ctrl.getCompleter($txid);
+    if ($completer == null) {
+      $message.closeHandles();
+      return;
+    }
+    final $fidl.Decoder $decoder = new $fidl.Decoder($message);
+    switch ($message.ordinal) {
+{{- range .Methods }}
+  {{- if .HasRequest }}
+    {{- if .HasResponse }}
+      case {{ .OrdinalName }}:
+        try {
+          final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
+          $decoder.claimMemory({{ .ResponseSize }});
+          $completer.complete(
+            {{- template "DecodeResponse" . -}}
+          );
+        // ignore: avoid_catches_without_on_clauses
+        } catch(_e) {
+          final String _name = {{ .TypeSymbol }}.name;
+          ctrl.proxyError(new $fidl.FidlError('Exception handling method response $_name: $_e'));
+          ctrl.close();
+          rethrow;
+        }
+        break;
+    {{- end }}
+  {{- end }}
+{{- end }}
+      default:
+        ctrl.proxyError(new $fidl.FidlError('Unexpected message ordinal: ${$message.ordinal}'));
+        ctrl.close();
+        break;
+    }
   }
 
 {{- range .Methods }}
   {{- if .HasRequest }}
-  @override
-  {{ template "AsyncReturn" . }} {{ .Name }}({{ template "AsyncParams" .Request }}) {
-    {{- if .HasResponse }}
-    final _completer = new Completer<{{ .AsyncResponseType }}>();
-    _completers.add(_completer);
-    void _call() {
-        _syncProxy.{{ .Name }}({{ template "ForwardParamsConvert" .Request -}}
-        {{- if .Request }}, {{ end -}}
-        ({{ template "FuturizeParams" .Response }}) {
-          _completers.remove(_completer);
-          _completer.complete(
-        {{- if .AsyncResponseClass -}}
-          new {{ .AsyncResponseClass }}({{ template "ForwardParamsConvert" .Response }})
-        {{- else -}}
-          {{- template "ForwardParamsConvert" .Response -}}
-        {{- end -}}
-        );
-      });
-    }
-    try {
-      if (_syncProxy.ctrl.isBound) {
-        _call();
-      } else {
-        _syncProxy.ctrl.bound.then((_) =>_call());
+    @override
+    {{ template "AsyncReturn" . }} {{ .Name }}({{ template "AsyncParams" .Request }}) async {
+      if (!ctrl.isBound) {
+        return new Future.error(new $fidl.FidlStateException('The proxy is closed.'));
       }
-    } catch(err) {
-      _completers.remove(_completer);
-      _completer.completeError(err);
+
+      final $fidl.Encoder $encoder = new $fidl.Encoder({{ .OrdinalName }});
+      {{- if .Request }}
+        $encoder.alloc({{ .RequestSize }} - $fidl.kMessageHeaderSize);
+        final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.request;
+      {{- end }}
+      {{- range $index, $request := .Request }}
+        $types[{{ $index }}].encode($encoder, {{ .Name }}, 0);
+      {{- end }}  
+  
+      {{- if .HasResponse }}
+        final $completer = new Completer<{{ .AsyncResponseType }}>();
+        ctrl.sendMessageWithResponse($encoder.message, $completer);
+        return $completer.future;
+      {{- else }}
+        return new Future.sync(() {
+          ctrl.sendMessage($encoder.message);
+        });
+      {{- end }}
     }
-    return _completer.future;
-    {{- else }}
-    final _completer = new Completer<Null>();
-    _completers.add(_completer);
-    if (_syncProxy.ctrl.isBound) {
-      _syncProxy.{{ .Name }}({{ template "ForwardParamsConvert" .Request}});
-      _completers.remove(_completer);
-      _completer.complete();
-    } else {
-      _syncProxy.ctrl.bound.then((_) {
-        _syncProxy.{{ .Name }}({{ template "ForwardParamsConvert" .Request}});
-        _completers.remove(_completer);
-        _completer.complete();
-      }, onError: (dynamic error, StackTrace stackTrace) {
-        _completers.remove(_completer);
-        _completer.completeError(error, stackTrace);
-      });
-    }
-    return _completer.future;
-    {{- end }}
-  }
   {{ else }}
-  final _{{ .Name }}EventStreamController = new StreamController<{{ .AsyncResponseType }}>.broadcast();
-  @override
-  Stream<{{ .AsyncResponseType}}> get {{ .Name }} => _{{ .Name }}EventStreamController.stream;
+    final _{{ .Name }}EventStreamController = new StreamController<{{ .AsyncResponseType }}>.broadcast();
+    @override
+    Stream<{{ .AsyncResponseType }}> get {{ .Name }} => _{{ .Name }}EventStreamController.stream;
   {{ end }}
 {{- end }}
 }
 
-class _{{ .Name }}Futurize implements $sync.{{ .Name }} {
-  final {{ .Name }} _inner;
-  _{{ .Name }}Futurize(this._inner);
-
-{{- range .Methods }}
-  {{- if .HasRequest }}
-  @override
-  void {{ template "FuturizeRequestMethodSignature" . }} =>
-    {{- if .HasResponse }}
-    _inner.{{ .Name }}({{ template "ForwardParamsConvert" .Request }}).then(
-  ({{ if .AsyncResponseType }}{{ .AsyncResponseType }} _response{{ end }}) =>
-  callback(
-      {{- if .Response -}}
-        {{- template "ForwardResponseParamsConvert" . -}}
-      {{- end -}}));
-    {{- else }}
-    _inner.{{ .Name }}({{ template "ForwardParamsConvert" .Request}});
-    {{- end }}
-  {{- else }}
-  {{- end }}
-{{- end }}
-}
-
-class {{ .Name }}Binding implements $fidl.Binding<{{ .Name }}> {
-  {{ .Name }} _impl;
-  final $sync.{{ .Name }}Binding _syncBinding;
-  {{ .Name }}Binding() : _syncBinding = new $sync.{{ .Name }}Binding();
-
-  @override
-  _VoidCallback get onBind => _syncBinding.onBind;
-  @override
-  set onBind(_VoidCallback f) => _syncBinding.onBind = f;
-  @override
-  _VoidCallback get onUnbind => _syncBinding.onUnbind;
-  @override
-  set onUnbind(_VoidCallback f) => _syncBinding.onUnbind = f;
-  @override
-  _VoidCallback get onClose => _syncBinding.onClose;
-  @override
-  set onClose(_VoidCallback f) => _syncBinding.onClose = f;
-  @override
-  _VoidCallback get onConnectionError => _syncBinding.onConnectionError;
-  @override
-  set onConnectionError(_VoidCallback f) => _syncBinding.onConnectionError = f;
-
-  @override
-  $fidl.InterfaceHandle<{{ .Name }}> wrap({{ .Name }} impl) {
-    final handle = new $fidl.InterfaceHandle<{{ .Name }}>(_syncBinding.wrap(new _{{ .Name }}Futurize(impl)).passChannel());
-    _bind(impl);
-    return handle;
+class {{ .BindingName }} extends $fidl.AsyncBinding<{{ .Name }}> {
+  {{ .BindingName }}() : super("{{ .Name }}")
+  {{- if .HasEvents }} {
+    final List<StreamSubscription<dynamic>> $subscriptions = [];
+    void $unsubscribe() {
+      for (final $sub in $subscriptions) {
+        $sub.cancel();
+      }
+      $subscriptions.clear();
+    }
+    whenBound.then((_) {
+      {{- range .Methods }}
+        {{- if not .HasRequest }}
+          $subscriptions.add(impl.{{ .Name }}.listen(($response) {
+            final $fidl.Encoder $encoder = new $fidl.Encoder({{ .OrdinalName }});
+            $encoder.alloc({{ .ResponseSize }} - $fidl.kMessageHeaderSize);
+            final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
+            {{ template "EncodeResponse" . }}
+            sendMessage($encoder.message);
+          }));
+        {{- end }}
+      {{- end }}
+    });
+    whenClosed.then((_) => $unsubscribe());
   }
-
-  @override
-  void bind({{ .Name }} impl, $fidl.InterfaceRequest<{{ .Name }}> interfaceRequest) {
-    _syncBinding.bind(new _{{ .Name }}Futurize(impl), new $fidl.InterfaceRequest<$sync.{{ .Name }}>(interfaceRequest.passChannel()));
-    _bind(impl);
-  }
-
-  @override
-  $fidl.InterfaceRequest<{{ .Name }}> unbind() {
-    final req = new $fidl.InterfaceRequest<{{ .Name }}>(_syncBinding.unbind().passChannel());
-    _unbind();
-    return req;
-  }
-
-  @override
-  bool get isBound => _syncBinding.isBound;
-
-  {{- range .Methods }}
-  {{- if not .HasRequest }}
-  StreamSubscription<{{ .AsyncResponseType }}> _{{ .Name }}_subscription;
-  {{- end }}
+  {{- else -}}
+    ;
   {{- end }}
 
-  // ignore: use_setters_to_change_properties
-  void _bind({{ .Name }} impl) {
-    _impl = impl;
+  @override
+  void handleMessage($fidl.Message $message, $fidl.MessageSink $respond) {
+    final $fidl.Decoder $decoder = new $fidl.Decoder($message);
+    switch ($message.ordinal) {
     {{- range .Methods }}
-    {{- if not .HasRequest }}
-    _{{ .Name }}_subscription = impl.{{ .Name }}.listen(
-  ({{ if .AsyncResponseType }}{{ .AsyncResponseType }} _response{{ end }}) =>
-  _syncBinding.events.{{ .Name }}({{ if .Response }}{{ template "ForwardResponseParams" . }}{{ end }}));
+      {{- if .HasRequest }}
+          case {{ .OrdinalName }}:
+            try {
+              final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.request;
+              $decoder.claimMemory({{ .RequestSize }});
+              final {{ template "AsyncReturn" . }} $future = impl.{{ .Name }}(
+              {{- range $index, $request := .Request }}
+                $types[{{ $index }}].decode($decoder, 0),
+              {{- end }});
+
+              {{- if .HasResponse }}
+                $future.then(($response) {
+                  final $fidl.Encoder $encoder = new $fidl.Encoder({{ .OrdinalName }});
+                  {{- if .Response }}
+                    $encoder.alloc({{ .ResponseSize }} - $fidl.kMessageHeaderSize);
+                    final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
+                    {{ template "EncodeResponse" . -}}
+                  {{- end }}
+                  $fidl.Message $responseMessage = $encoder.message;
+                  $responseMessage.txid = $message.txid;
+                  $respond($responseMessage);            
+                }, onError: (_e) {
+                  close();
+                  final String _name = {{ .TypeSymbol }}.name;
+                  print('Exception handling method call $_name: $_e');
+                });
+              {{- end }}
+            // ignore: avoid_catches_without_on_clauses
+            } catch(_e) {
+              close();
+              final String _name = {{ .TypeSymbol }}.name;
+              print('Exception handling method call $_name: $_e');
+              rethrow;
+            }
+            break;
+      {{- end }}
     {{- end }}
-    {{- end }}
+      default:
+        throw new $fidl.FidlError('Unexpected message name');
+    }
   }
-
-  void _unbind() {
-    _impl = null;
-    {{- range .Methods }}
-    {{- if not .HasRequest }}
-    _{{ .Name }}_subscription.cancel();
-    _{{ .Name }}_subscription = null;
-    {{- end }}
-    {{- end }}
-  }
-
-  @override
-  void close() {
-    _unbind();
-    _syncBinding.close();
-  }
-
-  @override
-  @protected
-  void handleMessage($fidl.Message message, $fidl.MessageSink respond) => _syncBinding.handleMessage(message, respond);
-
-  @override
-  void sendMessage($fidl.Message response) => _syncBinding.sendMessage(response);
-
-  @override
-  {{ .Name }} get impl => _impl;
 }
 
 {{ end }}

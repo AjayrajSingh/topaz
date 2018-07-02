@@ -645,7 +645,7 @@ func (c *compiler) compileInterface(val types.Interface) Interface {
 		response := c.compileParameterArray(v.Response)
 		asyncResponseClass := ""
 		if len(response) > 1 {
-			asyncResponseClass = fmt.Sprintf("_%s$%s$Response", r.Name, v.Name)
+			asyncResponseClass = fmt.Sprintf("%s$%s$Response", r.Name, v.Name)
 		}
 		asyncResponseType := ""
 		if v.HasResponse {
@@ -654,7 +654,7 @@ func (c *compiler) compileInterface(val types.Interface) Interface {
 			} else if len(response) == 1 {
 				responseType := response[0].Type
 				if responseType.SyncDecl != "" {
-					asyncResponseType = responseType.SyncDecl
+					asyncResponseType = responseType.Decl
 				} else {
 					asyncResponseType = responseType.Decl
 				}

@@ -57,11 +57,14 @@ class StartupContext {
   }
 }
 
-void connectToService<T, SYNC>(
-    ServiceProvider serviceProvider, AsyncProxyController<T, SYNC> controller) {
+void connectToService<T>(
+    ServiceProvider serviceProvider, AsyncProxyController<T> controller) {
   final String serviceName = controller.$serviceName;
-  assert(serviceName != null,
-      'controller.\$serviceName must not be null. Check the FIDL file for a missing [Discoverable]');
+  if (serviceName == null) {
+    throw new Exception(
+        "${controller.$interfaceName}'s controller.\$serviceName"
+        ' must not be null. Check the FIDL file for a missing [Discoverable]');
+  }
   serviceProvider.connectToService(
       serviceName, controller.request().passChannel());
 }
@@ -122,15 +125,21 @@ class Services {
 
   Channel request() {
     ChannelPair pair = new ChannelPair();
-    assert(pair.status == ZX.OK);
+    if (pair.status != ZX.OK) {
+      throw new Exception(
+          'Failed to create new ChannelPair: ${getStringForStatus(pair.status)}');
+    }
     _directory = pair.second;
     return pair.first;
   }
 
-  void connectToService<T, OTHER>(AsyncProxyController<T, OTHER> controller) {
+  void connectToService<T>(AsyncProxyController<T> controller) {
     final String serviceName = controller.$serviceName;
-    assert(serviceName != null,
-        'controller.\$serviceName must not be null. Check the FIDL file for a missing [Discoverable]');
+    if (serviceName == null) {
+      throw new Exception(
+          "${controller.$interfaceName}'s controller.\$serviceName"
+          ' must not be null. Check the FIDL file for a missing [Discoverable]');
+    }
     rioConnectToService(
         _directory, controller.request().passChannel(), serviceName);
   }

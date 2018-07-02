@@ -89,11 +89,8 @@ import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
 {{ range .Imports -}}
-import '{{ .URL }}' as sync${{ .LocalName }};
 import '{{ .AsyncURL }}' as {{ .LocalName }};
 {{ end -}}
-
-import 'fidl.dart' as $sync;
 
 // ignore_for_file: always_specify_types
 // ignore_for_file: avoid_positional_boolean_parameters
@@ -118,10 +115,18 @@ import 'fidl.dart' as $sync;
 // ignore_for_file: unused_shown_name
 // ignore_for_file: unnecessary_lambdas
 
-{{ template "ExportNames" .Consts -}}
-{{ template "ExportNames" .Enums -}}
-{{ template "ExportNames" .Unions -}}
-{{ template "ExportNames" .Structs -}}
+{{ range $const := .Consts -}}
+{{ template "ConstDeclaration" $const }}
+{{ end -}}
+{{ range $enum := .Enums -}}
+{{ template "EnumDeclaration" $enum }}
+{{ end -}}
+{{ range $union := .Unions -}}
+{{ template "UnionDeclaration" $union }}
+{{ end -}}
+{{ range $struct := .Structs -}}
+{{ template "StructDeclaration" $struct }}
+{{ end -}}
 
 // ignore: unused_element, avoid_private_typedef_functions
 typedef _VoidCallback = void Function();

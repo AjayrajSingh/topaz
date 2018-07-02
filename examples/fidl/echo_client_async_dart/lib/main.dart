@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'package:fidl_fidl_examples_echo/fidl_async.dart';
 import 'package:lib.app.dart/app_async.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart' show LaunchInfo;
+import 'package:fidl_fuchsia_sys/fidl_async.dart' show LaunchInfo;
 import 'package:fuchsia/fuchsia.dart' show exit;
 
 StartupContext _context;

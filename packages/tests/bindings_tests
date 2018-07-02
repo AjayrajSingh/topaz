@@ -1,0 +1,6 @@
+{
+    "packages": [
+        "//topaz/examples/fidl/bindings_test/test:bindings_test",
+        "//topaz/examples/fidl/bindings_test/server:bindings_test_server"
+    ]
+}

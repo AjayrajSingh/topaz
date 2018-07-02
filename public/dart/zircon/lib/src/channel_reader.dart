@@ -99,7 +99,7 @@ class ChannelReader {
         }
       } else if ((pending & Channel.PEER_CLOSED) != 0) {
         close();
-        _errorSoon(null);
+        _errorSoon(new ChannelReaderError('Peer unexpectedly closed', null));
       }
       // ignore: avoid_catching_errors
     } on Error catch (_) {
