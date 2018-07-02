@@ -3,14 +3,26 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.run_mod.dart/run_mod.dart';
-import 'package:lib.widgets.dart/model.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.widgets/model.dart';
+
+final ModuleDriver _driver = ModuleDriver();
 
 void main() {
-  runMod(
-    child: new ScopedModel<_MyModel>(
-      model: new _MyModel(),
-      child: new _MyScaffold(),
+  setupLogger(name: 'Hello mod');
+
+  _driver.start().then((ModuleDriver driver) {
+      log.info('Hello mod started');
+    });
+
+  runApp(
+    MaterialApp(
+      title: 'Hello mod',
+      home: ScopedModel<_MyModel>(
+        model: _MyModel(),
+        child: _MyScaffold(),
+      ),
     ),
   );
 }
@@ -24,14 +36,14 @@ class _MyModel extends Model {
 class _MyScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      body: new ScopedModelDescendant<_MyModel>(builder: (
+    return ScopedModelDescendant<_MyModel>(
+      builder: (
         BuildContext context,
         Widget child,
         _MyModel model,
       ) {
-        return new Text(model.text);
-      }),
+        return Text(model.text);
+      },
     );
   }
 }

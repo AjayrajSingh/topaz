@@ -12,7 +12,7 @@ flutter_app("hello_mod") {
 
 
   deps = [
-    "//topaz/public/lib/run_mod/dart",
-    "//topaz/public/lib/widgets/dart",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app_driver/dart",
   ]
 }
