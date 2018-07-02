@@ -7,11 +7,10 @@ import("//build/package.gni")
 package("flutter_screencap_test") {
   testonly = true
 
-  tests = [
+  # This is really a test, but we list it as a binary because we don't want to
+  # run this test by default in CI since it requires specific hardware.
+  binaries = [
     {
-      # We don't want to run this test by default in CI since it requires
-      # specific hardware.
-      disabled = true
       name = rebase_path("run_flutter_screencap_test.sh")
       dest = "run_flutter_screencap_test.sh"
     },

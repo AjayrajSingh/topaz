@@ -1,9 +1,10 @@
 {
     "imports": [
         "garnet/packages/prod/scenic_tools",
-        "garnet/packages/prod/test_runner"
+        "garnet/packages/prod/test_runner",
+        "topaz/packages/products/dashboard"
     ],
     "packages": [
-      "//topaz/bin/flutter_screencap_test"
+        "//topaz/bin/flutter_screencap_test"
     ]
 }
