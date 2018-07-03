@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
-import 'package:sledge/src/document/values/map_value.dart';
+import 'package:sledge/src/document/values/set_value.dart';
 import 'package:test/test.dart';
 
 import '../dummies/dummy_value_observer.dart';

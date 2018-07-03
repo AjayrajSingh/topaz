@@ -7,7 +7,7 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 
 import '../../document/base_value.dart';
-import '../../document/values/map_value.dart';
+import '../../document/values/set_value.dart';
 import '../../sledge_connection_id.dart';
 import '../base_type.dart';
 
