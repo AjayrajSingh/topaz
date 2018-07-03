@@ -10,7 +10,7 @@ import 'converted_change.dart';
 import 'converter.dart';
 
 class _LastOneWinsValue<T> {
-  T _value, _transaction;
+  T _value, _localChange;
   final StreamController<T> _changeController =
       new StreamController<T>.broadcast();
 
@@ -18,17 +18,17 @@ class _LastOneWinsValue<T> {
 
   Stream<T> get onChange => _changeController.stream;
 
-  set value(T value) => _transaction = value;
+  set value(T value) => _localChange = value;
 
-  T get value => _transaction ?? _value;
+  T get value => _localChange ?? _value;
 
   ConvertedChange<int, T> getChange() {
-    if (_transaction == null) {
+    if (_localChange == null) {
       return new ConvertedChange<int, T>();
     }
-    var result = new ConvertedChange<int, T>(<int, T>{0: _transaction});
-    _value = _transaction;
-    _transaction = null;
+    var result = new ConvertedChange<int, T>(<int, T>{0: _localChange});
+    _value = _localChange;
+    _localChange = null;
     return result;
   }
 

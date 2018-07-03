@@ -10,7 +10,7 @@ import 'converted_change.dart';
 class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
   final Map<K, V> _storage;
   // TODO: rename this field.
-  final ConvertedChange<K, V> _transaction;
+  final ConvertedChange<K, V> _localChange;
   bool Function(K, K) _equals;
   int Function(K) _hashCode;
 
@@ -19,36 +19,36 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
       : _equals = equals,
         _hashCode = hashCode,
         _storage = new HashMap<K, V>(equals: equals, hashCode: hashCode),
-        _transaction = new ConvertedChange(
+        _localChange = new ConvertedChange(
             new HashMap<K, V>(equals: equals, hashCode: hashCode),
             new HashSet<K>(equals: equals, hashCode: hashCode));
 
   @override
   V operator [](Object key) {
-    if (_transaction.deletedKeys.contains(key)) {
+    if (_localChange.deletedKeys.contains(key)) {
       return null;
     }
-    return _transaction.changedEntries[key] ?? _storage[key];
+    return _localChange.changedEntries[key] ?? _storage[key];
   }
 
   @override
   void operator []=(K key, V value) {
-    _transaction.deletedKeys.remove(key);
-    _transaction.changedEntries[key] = value;
+    _localChange.deletedKeys.remove(key);
+    _localChange.changedEntries[key] = value;
   }
 
   @override
   V remove(Object key) {
     V result = this[key];
-    _transaction.deletedKeys.add(key);
-    _transaction.changedEntries.remove(key);
+    _localChange.deletedKeys.add(key);
+    _localChange.changedEntries.remove(key);
     return result;
   }
 
   @override
   void clear() {
-    _transaction.changedEntries.clear();
-    _transaction.deletedKeys.addAll(_storage.keys);
+    _localChange.changedEntries.clear();
+    _localChange.deletedKeys.addAll(_storage.keys);
   }
 
   // TODO: return lazy iterable
@@ -56,14 +56,14 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
   Set<K> get keys {
     return new HashSet<K>(equals: _equals, hashCode: _hashCode)
       ..addAll(_storage.keys)
-      ..addAll(_transaction.changedEntries.keys)
-      ..removeAll(_transaction.deletedKeys);
+      ..addAll(_localChange.changedEntries.keys)
+      ..removeAll(_localChange.deletedKeys);
   }
 
   /// Ends transaction and retrieve it's data.
   ConvertedChange<K, V> getChange() {
-    var change = new ConvertedChange.from(_transaction);
-    _transaction.clear();
+    var change = new ConvertedChange.from(_localChange);
+    _localChange.clear();
     applyChange(change);
     return change;
   }
@@ -76,6 +76,6 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
 
   /// Rollbacks current transaction.
   void rollback() {
-    _transaction.clear();
+    _localChange.clear();
   }
 }
