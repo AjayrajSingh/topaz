@@ -3,6 +3,7 @@
         "//topaz/app/xi"
     ],
     "packages": [
-        "//topaz/app/xi/modules/xi_app"
+        "//topaz/app/xi/modules/xi_app",
+        "//garnet/bin/xi_core"
     ]
 }
