@@ -30,8 +30,8 @@ class Sledge {
   final ConnectionId _connectionId = new ConnectionId.random();
 
   // Cache to get document by documentId.prefix.
-  final Map<Uint8List, Document> _documentByPrefix = _mapFactory.newMap();
-  static final _mapFactory = new Uint8ListMapFactory<Document>();
+  final Map<Uint8List, Future<Document>> _documentByPrefix = _mapFactory.newMap();
+  static final _mapFactory = new Uint8ListMapFactory<Future<Document>>();
 
   // The factories used for fake object injection.
   final LedgerPageSnapshotFactory _pageSnapshotFactory;
@@ -113,17 +113,14 @@ class Sledge {
   /// Returns the document identified with [documentId].
   /// If the document does not exist or an error occurs, an empty
   /// document is returned.
-  Future<Document> getDocument(DocumentId documentId) async {
+  Future<Document> getDocument(DocumentId documentId) {
     // TODO: Throw an error only if the document has not been instantiated
     // before.
     if (currentTransaction == null) {
       throw new StateError('No transaction started.');
     }
     if (!_documentByPrefix.containsKey(documentId.prefix)) {
-      // TODO: Prevent multiple documents from being created by the
-      // current transaction.
-      _documentByPrefix[documentId.prefix] =
-          await currentTransaction.getDocument(documentId);
+      _documentByPrefix[documentId.prefix] = currentTransaction.getDocument(documentId);
     }
 
     return _documentByPrefix[documentId.prefix];
@@ -142,7 +139,10 @@ class Sledge {
   void _applyChange(Change change) {
     final splittedChange = change.splitByPrefix(DocumentId.prefixLength);
     for (final prefix in splittedChange.keys) {
-      Document.applyChange(_documentByPrefix[prefix], splittedChange[prefix]);
+      assert(_documentByPrefix.containsKey(prefix));
+      _documentByPrefix[prefix].then((document) {
+        Document.applyChange(document, splittedChange[prefix]);
+      });
     }
   }
 

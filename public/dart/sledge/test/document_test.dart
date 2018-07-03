@@ -51,8 +51,10 @@ void main() {
     Sledge sledge = newSledgeForTesting();
     Document doc1, doc2;
     await sledge.runInTransaction(() async {
-      doc1 = await sledge.getDocument(id);
-      doc2 = await sledge.getDocument(id);
+      final future1 = sledge.getDocument(id);
+      final future2 = sledge.getDocument(id);
+      doc1 = await future1;
+      doc2 = await future2;
     });
     expect(doc1, equals(doc2));
   });
