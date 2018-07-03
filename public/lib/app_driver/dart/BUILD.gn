@@ -25,6 +25,6 @@ dart_library("dart") {
     "//topaz/public/lib/module_resolver/dart",
     "//topaz/public/lib/schemas/dart",
     "//topaz/public/lib/story/dart",
-    "//zircon/public/fidl/cobalt:cobalt",
+    "//zircon/public/fidl/fuchsia-cobalt",
   ]
 }
