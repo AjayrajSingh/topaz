@@ -122,6 +122,11 @@ SkTypeface* FuchsiaFontManager::onMatchFamilyStyleCharacter(
     SkUnichar character) const {
   if (u_hasBinaryProperty(character, UCHAR_EMOJI)) {
     return onMatchFamilyStyle("Noto Color Emoji", style);
+  } else if (character == 8242 || character == 8243) {
+    // GoogleSans does not have Prime and Double Prime symbols.
+    // Fallback to Roboto.
+    // http://www.codetable.net/decimal/8242
+    return onMatchFamilyStyle("Roboto", style);
   }
   return nullptr;
 }
