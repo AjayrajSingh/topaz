@@ -10,7 +10,7 @@ dart_app("module_suggester") {
   source_dir = "."
 
   deps = [
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/module_resolver/dart",
     "//topaz/public/lib/proposal/dart",

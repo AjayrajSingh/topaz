@@ -15,7 +15,7 @@ dart_app("firebase_db_client") {
   ]
 
   deps = [
-    "//peridot/public/lib/auth/fidl",
+    "//peridot/public/fidl/fuchsia.modular.auth",
     "//third_party/dart-pkg/pub/eventsource",
     "//topaz/app/chat/services:services",
     "//topaz/public/dart/config",

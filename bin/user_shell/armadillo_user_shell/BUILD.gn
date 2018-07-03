@@ -45,8 +45,8 @@ flutter_app("armadillo_user_shell") {
   deps = [
     "//garnet/public/lib/power_manager/fidl",
     "//garnet/public/lib/time_zone/fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib/speech/fidl",
+    "//peridot/public/fidl/fuchsia.modular",
+    "//peridot/public/fidl/fuchsia.speech",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart/third_party/pkg/intl",

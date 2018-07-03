@@ -12,7 +12,7 @@ flutter_app("eddystone_advertiser") {
   deps = [
     "//garnet/public/lib/bluetooth/fidl/common",
     "//garnet/public/lib/bluetooth/fidl/le",
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",

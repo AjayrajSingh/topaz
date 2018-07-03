@@ -20,7 +20,7 @@ dart_library("lib.widgets") {
   deps = [
     "//garnet/public/lib/ui/policy/fidl",
     "//garnet/public/lib/ui/views/fidl:v1",
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/flutter_image",
     "//topaz/public/dart/fidl",

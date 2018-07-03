@@ -117,7 +117,7 @@ template("flutter_runner") {
              "//garnet/public/lib/ui/views/fidl:v1",
              "//garnet/public/lib/vulkan",
              "//garnet/public/lib/zip",
-             "//peridot/public/lib:fidl",
+             "//peridot/public/fidl/fuchsia.modular",
              "//third_party/rapidjson",
              "//third_party/skia",
              "//topaz/lib/deprecated_loop",
@@ -186,7 +186,8 @@ observatory_target =
     "//third_party/dart/runtime/observatory:observatory_archive"
 observatory_archive_dir = get_label_info(observatory_target, "target_gen_dir")
 observatory_archive_name = get_label_info(observatory_target, "name")
-observatory_archive_file = "${observatory_archive_dir}/${observatory_archive_name}.tar"
+observatory_archive_file =
+    "${observatory_archive_dir}/${observatory_archive_name}.tar"
 
 package("flutter_aot_runner") {
   deps = [
@@ -305,7 +306,8 @@ package("flutter_jit_product_runner") {
       dest = "vm_snapshot_data.bin"
     },
     {
-      path = rebase_path("$snapshot_gen_dir/vm_snapshot_instructions_product.bin")
+      path =
+          rebase_path("$snapshot_gen_dir/vm_snapshot_instructions_product.bin")
       dest = "vm_snapshot_instructions.bin"
     },
     {
@@ -313,7 +315,8 @@ package("flutter_jit_product_runner") {
       dest = "isolate_core_snapshot_data.bin"
     },
     {
-      path = rebase_path("$snapshot_gen_dir/isolate_snapshot_instructions_product.bin")
+      path = rebase_path(
+              "$snapshot_gen_dir/isolate_snapshot_instructions_product.bin")
       dest = "isolate_core_snapshot_instructions.bin"
     },
     {

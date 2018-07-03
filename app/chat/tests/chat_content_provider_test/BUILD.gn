@@ -11,7 +11,7 @@ dart_app("chat_content_provider_test") {
 
   deps = [
     "//garnet/public/lib/test_runner/fidl:fidl",
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/matcher",
     "//third_party/dart-pkg/pub/meta",

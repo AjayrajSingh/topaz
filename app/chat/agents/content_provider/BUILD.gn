@@ -16,9 +16,9 @@ dart_app("chat_content_provider") {
 
   deps = [
     "//garnet/public/lib/app/fidl:fidl",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib/auth/fidl",
-    "//peridot/public/lib/ledger/fidl",
+    "//peridot/public/fidl/fuchsia.ledger",
+    "//peridot/public/fidl/fuchsia.modular",
+    "//peridot/public/fidl/fuchsia.modular.auth",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/uuid",
     "//topaz/app/chat/services",

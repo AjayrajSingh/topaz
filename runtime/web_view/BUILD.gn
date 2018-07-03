@@ -26,7 +26,7 @@ executable("web_view_bin") {
     "//garnet/public/lib/ui/views/fidl:v1",
     "//garnet/public/lib/url",
     "//peridot/lib/rapidjson",
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//third_party/boringssl",
     "//third_party/rapidjson",
     "//topaz/runtime/web_runner/services",

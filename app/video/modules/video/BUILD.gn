@@ -15,7 +15,7 @@ flutter_aot_app("video") {
   deps = [
     "//garnet/public/lib/netconnector/fidl:fidl",
     "//garnet/public/lib/ui/views/fidl:v1",
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/entity_schemas:entity_schemas",
     "//topaz/public/dart/fidl",

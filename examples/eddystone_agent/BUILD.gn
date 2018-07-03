@@ -12,7 +12,7 @@ dart_app("eddystone_agent") {
   deps = [
     "//garnet/public/lib/bluetooth/fidl/common",
     "//garnet/public/lib/bluetooth/fidl/le",
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

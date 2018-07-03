@@ -13,7 +13,7 @@ dart_library("dart") {
   ]
 
   deps = [
-    "//peridot/public/lib/ledger/fidl",
+    "//peridot/public/fidl/fuchsia.ledger",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/quiver",
   ]
@@ -27,7 +27,6 @@ dart_test("dart_tests") {
   deps = [
     ":dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
-    "//third_party/dart-pkg/pub/test"
+    "//third_party/dart-pkg/pub/test",
   ]
 }
-

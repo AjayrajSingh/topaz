@@ -29,7 +29,7 @@ flutter_aot_app("mondrian") {
 
   deps = [
     "//garnet/public/lib/ui/views/fidl:v1",
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/quiver",
@@ -43,14 +43,14 @@ flutter_aot_app("mondrian") {
 
 dart_test("mondrian_story_shell_tests") {
   sources = [
-    "tree_test.dart",
     "layout/pattern_layout_test.dart",
     "layout/surface_relationship_test.dart",
+    "tree_test.dart",
   ]
 
   deps = [
     ":mondrian_dart_library",
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",

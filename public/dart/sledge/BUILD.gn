@@ -13,11 +13,11 @@ dart_library("sledge") {
   ]
 
   deps = [
-    "//peridot/public/lib/ledger/fidl",
+    "//peridot/public/fidl/fuchsia.ledger",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/crypto",
-    "//topaz/public/lib/module/dart",
     "//topaz/public/lib/ledger/dart",
+    "//topaz/public/lib/module/dart",
   ]
 }
 
@@ -33,9 +33,9 @@ dart_test("dart_sledge_tests") {
     "values/key_value_storage_test.dart",
     "values/last_one_wins_values_test.dart",
     "values/map_value_test.dart",
-    "values/pos_neg_counter_test.dart",
     "values/pos_neg_counter_ss_test.dart",
-    "values/set_value_test.dart"
+    "values/pos_neg_counter_test.dart",
+    "values/set_value_test.dart",
   ]
 
   deps = [

@@ -16,14 +16,14 @@ flutter_app("contact_list") {
   deps = [
     "//garnet/public/lib/app/fidl:fidl",
     "//garnet/public/lib/ui/views/fidl:v1",
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/app/contacts/services:services",
     "//topaz/app/contacts/services:contacts_services",
+    "//topaz/app/contacts/services:services",
     "//topaz/public/dart/fixtures",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/component/dart",
     "//topaz/public/lib/module_resolver/dart",
   ]

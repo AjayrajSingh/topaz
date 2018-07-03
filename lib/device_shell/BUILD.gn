@@ -10,9 +10,9 @@ dart_library("lib.device_shell") {
   sources = [
     "base_model.dart",
     "netstack_model.dart",
-    "user_shell_chooser.dart",
     "user_manager.dart",
-    "user_watcher_impl.dart"
+    "user_shell_chooser.dart",
+    "user_watcher_impl.dart",
   ]
 
   deps = [
@@ -20,8 +20,8 @@ dart_library("lib.device_shell") {
     "//garnet/public/lib/time_zone/fidl:fidl",
     "//garnet/public/lib/ui/input/fidl:fidl",
     "//garnet/public/lib/ui/views/fidl:v1",
-    "//peridot/public/lib:fidl",
-    "//peridot/public/lib/auth/fidl",
+    "//peridot/public/fidl/fuchsia.modular",
+    "//peridot/public/fidl/fuchsia.modular.auth",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",

@@ -8,7 +8,7 @@ flutter_app("todo_list") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//peridot/public/lib/ledger/fidl",
+    "//peridot/public/fidl/fuchsia.ledger",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

@@ -16,7 +16,7 @@ dart_library("dart") {
   ]
 
   deps = [
-    "//peridot/public/lib:fidl",
+    "//peridot/public/fidl/fuchsia.modular",
     "//topaz/public/lib/app/dart",
   ]
 }
