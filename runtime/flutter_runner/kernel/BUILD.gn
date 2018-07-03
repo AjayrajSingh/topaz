@@ -54,7 +54,11 @@ template("core_snapshot") {
       isolate_snapshot_instructions,
     ]
 
-    script = gen_snapshot
+    if (invoker.product) {
+      script = gen_snapshot_product
+    } else {
+      script = gen_snapshot
+    }
     args = [
       # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
       "--reify_generic_functions",
