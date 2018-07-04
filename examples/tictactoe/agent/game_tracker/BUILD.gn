@@ -1,0 +1,19 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/dart_runner/dart_app.gni")
+
+dart_app("game_tracker_agent") {
+  main_dart = "lib/main.dart"
+
+  deps = [
+    "//peridot/public/fidl/fuchsia.modular",
+    "//topaz/examples/tictactoe/services:game_tracker_dart_impl",
+    "//topaz/examples/tictactoe/services:game_tracker_service",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/dart/fixtures",
+    "//topaz/public/lib/agent/dart",
+    "//topaz/public/lib/app/dart",
+  ]
+}

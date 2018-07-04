@@ -14,6 +14,8 @@ flutter_aot_app("tictactoe_gameboard_mod") {
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/examples/tictactoe/common",
+    "//topaz/examples/tictactoe/services:game_tracker_client",
+    "//topaz/examples/tictactoe/services:game_tracker_service",
     "//topaz/public/dart/config",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app_driver/dart",
