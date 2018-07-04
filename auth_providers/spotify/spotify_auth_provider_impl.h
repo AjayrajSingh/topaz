@@ -13,6 +13,7 @@
 #include <fuchsia/auth/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
+#include <lib/fit/function.h>
 
 #include "lib/app/cpp/startup_context.h"
 #include "lib/callback/cancellable.h"
@@ -46,22 +47,22 @@ class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
   void GetAppAccessToken(const fidl::StringPtr credential,
                          const fidl::StringPtr app_client_id,
                          const fidl::VectorPtr<fidl::StringPtr> app_scopes,
-                         const GetAppAccessTokenCallback callback) override;
+                         GetAppAccessTokenCallback callback) override;
 
   // |AuthProvider|
   void GetAppIdToken(const fidl::StringPtr credential,
                      const fidl::StringPtr audience,
-                     const GetAppIdTokenCallback callback) override;
+                     GetAppIdTokenCallback callback) override;
 
   // |AuthProvider|
   void GetAppFirebaseToken(const fidl::StringPtr id_token,
                            const fidl::StringPtr firebase_api_key,
-                           const GetAppFirebaseTokenCallback callback) override;
+                           GetAppFirebaseTokenCallback callback) override;
 
   // |AuthProvider|
   void RevokeAppOrPersistentCredential(
       const fidl::StringPtr credential,
-      const RevokeAppOrPersistentCredentialCallback callback) override;
+      RevokeAppOrPersistentCredentialCallback callback) override;
 
   // |fuchsia::webview::WebRequestDelegate|
   void WillSendRequest(const fidl::StringPtr incoming_url) override;
@@ -72,14 +73,9 @@ class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
   fuchsia::ui::views_v1_token::ViewOwnerPtr SetupWebView();
 
   void Request(
-      std::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,
-      std::function<void(::fuchsia::net::oldhttp::URLResponse response)>
+      fit::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,
+      fit::function<void(::fuchsia::net::oldhttp::URLResponse response)>
           callback);
-
-  void OnResponse(
-      std::function<void(::fuchsia::net::oldhttp::URLResponse response)>
-          callback,
-      ::fuchsia::net::oldhttp::URLResponse response);
 
   fuchsia::sys::StartupContext* context_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;

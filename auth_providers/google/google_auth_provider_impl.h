@@ -66,14 +66,9 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
   fuchsia::ui::views_v1_token::ViewOwnerPtr SetupWebView();
 
   void Request(
-      std::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,
-      std::function<void(::fuchsia::net::oldhttp::URLResponse response)>
+      fit::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,
+      fit::function<void(::fuchsia::net::oldhttp::URLResponse response)>
           callback);
-
-  void OnResponse(
-      std::function<void(::fuchsia::net::oldhttp::URLResponse response)>
-          callback,
-      ::fuchsia::net::oldhttp::URLResponse response);
 
   async_t* const main_dispatcher_;
   fuchsia::sys::StartupContext* context_;

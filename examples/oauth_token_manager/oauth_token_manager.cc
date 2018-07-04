@@ -31,6 +31,7 @@
 #include "lib/fxl/files/directory.h"
 #include "lib/fxl/files/file.h"
 #include "lib/fxl/files/path.h"
+#include "lib/fxl/functional/make_copyable.h"
 #include "lib/fxl/log_settings_command_line.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/strings/join_strings.h"
@@ -50,10 +51,10 @@ namespace {
 namespace http = ::fuchsia::net::oldhttp;
 
 using ShortLivedTokenCallback =
-    std::function<void(std::string, fuchsia::modular::auth::AuthErr)>;
+    fit::function<void(std::string, fuchsia::modular::auth::AuthErr)>;
 
-using FirebaseTokenCallback =
-    std::function<void(fuchsia::modular::auth::FirebaseTokenPtr, fuchsia::modular::auth::AuthErr)>;
+using FirebaseTokenCallback = fit::function<void(
+    fuchsia::modular::auth::FirebaseTokenPtr, fuchsia::modular::auth::AuthErr)>;
 
 namespace {
 
@@ -522,13 +523,13 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl
   // |TokenProvider|
   void GetAccessToken(GetAccessTokenCallback callback) override {
     FXL_DCHECK(app_);
-    app_->RefreshToken(account_id_, ACCESS_TOKEN, callback);
+    app_->RefreshToken(account_id_, ACCESS_TOKEN, std::move(callback));
   }
 
   // |TokenProvider|
   void GetIdToken(GetIdTokenCallback callback) override {
     FXL_DCHECK(app_);
-    app_->RefreshToken(account_id_, ID_TOKEN, callback);
+    app_->RefreshToken(account_id_, ID_TOKEN, std::move(callback));
   }
 
   // |TokenProvider|
@@ -537,18 +538,19 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl
     FXL_DCHECK(app_);
 
     // Oauth id token is used as input to fetch firebase auth token.
-    GetIdToken(
-        [this, firebase_api_key = firebase_api_key, callback](
-            const std::string id_token, const fuchsia::modular::auth::AuthErr auth_err) {
-          if (auth_err.status != fuchsia::modular::auth::Status::OK) {
-            FXL_LOG(ERROR) << "Error in refreshing Idtoken.";
-            callback(nullptr, std::move(auth_err));
-            return;
-          }
+    GetIdToken([this, firebase_api_key = firebase_api_key,
+                callback = std::move(callback)](
+                   const std::string id_token,
+                   const fuchsia::modular::auth::AuthErr auth_err) mutable {
+      if (auth_err.status != fuchsia::modular::auth::Status::OK) {
+        FXL_LOG(ERROR) << "Error in refreshing Idtoken.";
+        callback(nullptr, std::move(auth_err));
+        return;
+      }
 
-          app_->RefreshFirebaseToken(account_id_, firebase_api_key, id_token,
-                                     callback);
-        });
+      app_->RefreshFirebaseToken(account_id_, firebase_api_key, id_token,
+                                 std::move(callback));
+    });
   }
 
   // |TokenProvider|
@@ -573,7 +575,8 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
                            std::string id_token,
                            OAuthTokenManagerApp* const app,
                            FirebaseTokenCallback callback)
-      : Operation("OAuthTokenManagerApp::GoogleFirebaseTokensCall", callback),
+      : Operation("OAuthTokenManagerApp::GoogleFirebaseTokensCall",
+                  fxl::MakeCopyable(std::move(callback))),
         account_id_(std::move(account_id)),
         firebase_api_key_(std::move(firebase_api_key)),
         id_token_(std::move(id_token)),
@@ -757,7 +760,8 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
   GoogleOAuthTokensCall(std::string account_id, const TokenType& token_type,
                         OAuthTokenManagerApp* const app,
                         ShortLivedTokenCallback callback)
-      : Operation("OAuthTokenManagerApp::GoogleOAuthTokensCall", callback),
+      : Operation("OAuthTokenManagerApp::GoogleOAuthTokensCall",
+                  fxl::MakeCopyable(std::move(callback))),
         account_id_(std::move(account_id)),
         token_type_(token_type),
         app_(app) {}
@@ -1170,14 +1174,15 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
 class OAuthTokenManagerApp::GoogleRevokeTokensCall
     : public modular::Operation<fuchsia::modular::auth::AuthErr> {
  public:
-  GoogleRevokeTokensCall(fuchsia::modular::auth::AccountPtr account, bool revoke_all,
-                         OAuthTokenManagerApp* const app,
+  GoogleRevokeTokensCall(fuchsia::modular::auth::AccountPtr account,
+                         bool revoke_all, OAuthTokenManagerApp* const app,
                          RemoveAccountCallback callback)
-      : Operation("OAuthTokenManagerApp::GoogleRevokeTokensCall", callback),
+      : Operation("OAuthTokenManagerApp::GoogleRevokeTokensCall",
+                  fxl::MakeCopyable(callback.share())),
         account_(std::move(account)),
         revoke_all_(revoke_all),
         app_(app),
-        callback_(callback) {}
+        callback_(callback.share()) {}
 
  private:
   // |Operation|
@@ -1500,15 +1505,16 @@ void OAuthTokenManagerApp::AddAccount(
     case fuchsia::modular::auth::IdentityProvider::GOOGLE:
       operation_queue_.Add(new GoogleUserCredsCall(
           std::move(account), this,
-          [this, callback](fuchsia::modular::auth::AccountPtr account,
-                           const fidl::StringPtr error_msg) {
+          [this, callback = std::move(callback)](
+              fuchsia::modular::auth::AccountPtr account,
+              const fidl::StringPtr error_msg) mutable {
             if (error_msg) {
               callback(nullptr, error_msg);
               return;
             }
 
             operation_queue_.Add(new GoogleProfileAttributesCall(
-                std::move(account), this, callback));
+                std::move(account), this, std::move(callback)));
           }));
       return;
     default:
@@ -1520,8 +1526,9 @@ void OAuthTokenManagerApp::RemoveAccount(fuchsia::modular::auth::Account account
                                          bool revoke_all,
                                          RemoveAccountCallback callback) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::RemoveAccount()";
-  operation_queue_.Add(new GoogleRevokeTokensCall(
-      fidl::MakeOptional(std::move(account)), revoke_all, this, callback));
+  operation_queue_.Add(
+      new GoogleRevokeTokensCall(fidl::MakeOptional(std::move(account)),
+                                 revoke_all, this, std::move(callback)));
 }
 
 void OAuthTokenManagerApp::GetTokenProviderFactory(
@@ -1534,8 +1541,8 @@ void OAuthTokenManagerApp::RefreshToken(const std::string& account_id,
                                         const TokenType& token_type,
                                         ShortLivedTokenCallback callback) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::RefreshToken()";
-  operation_queue_.Add(
-      new GoogleOAuthTokensCall(account_id, token_type, this, callback));
+  operation_queue_.Add(new GoogleOAuthTokensCall(account_id, token_type, this,
+                                                 std::move(callback)));
 }
 
 void OAuthTokenManagerApp::RefreshFirebaseToken(
@@ -1543,7 +1550,7 @@ void OAuthTokenManagerApp::RefreshFirebaseToken(
     const std::string& id_token, FirebaseTokenCallback callback) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::RefreshFirebaseToken()";
   operation_queue_.Add(new GoogleFirebaseTokensCall(
-      account_id, firebase_api_key, id_token, this, callback));
+      account_id, firebase_api_key, id_token, this, std::move(callback)));
 }
 
 }  // namespace
