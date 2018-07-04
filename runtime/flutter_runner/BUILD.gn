@@ -116,7 +116,6 @@ template("flutter_runner") {
              "//garnet/public/lib/ui/scenic/cpp",
              "//garnet/public/fidl/fuchsia.ui.views_v1",
              "//garnet/public/lib/vulkan",
-             "//garnet/public/lib/zip",
              "//peridot/public/fidl/fuchsia.modular",
              "//third_party/rapidjson",
              "//third_party/skia",
