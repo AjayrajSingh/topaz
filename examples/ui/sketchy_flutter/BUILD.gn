@@ -8,9 +8,9 @@ flutter_app("sketchy_flutter") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//garnet/public/lib/ui/gfx/fidl:fidl",
-    "//garnet/public/lib/ui/scenic/fidl:fidl",
-    "//garnet/public/lib/ui/views/fidl:v1",
+    "//garnet/public/fidl/fuchsia.ui.gfx",
+    "//garnet/public/fidl/fuchsia.ui.scenic",
+    "//garnet/public/fidl/fuchsia.ui.views_v1",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/lib/ui/flutter",
   ]

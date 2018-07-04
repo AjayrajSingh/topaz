@@ -18,7 +18,7 @@ flutter_aot_app("device_settings") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//garnet/public/lib/amber/fidl",
+    "//garnet/public/fidl/fuchsia.amber",
     "//topaz/lib/settings:lib.settings",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

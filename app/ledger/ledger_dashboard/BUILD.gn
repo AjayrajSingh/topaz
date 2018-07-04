@@ -11,7 +11,7 @@ dart_app("ledger_dashboard") {
   source_dir = "."
 
   deps = [
-    "//peridot/bin/ledger/fidl:fidl",
+    "//peridot/bin/ledger/fidl",
     "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/pub/http",
     "//topaz/public/dart/fidl",

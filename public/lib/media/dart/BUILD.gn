@@ -16,10 +16,10 @@ dart_library("dart") {
   source_dir = "."
 
   deps = [
-    "//garnet/public/lib/device/fidl",
-    "//garnet/public/lib/media/fidl",
-    "//garnet/public/lib/media/fidl:media_player",
-    "//garnet/public/lib/ui/geometry/fidl",
+    "//garnet/public/fidl/fuchsia.device.display",
+    "//garnet/public/fidl/fuchsia.media",
+    "//garnet/public/fidl/fuchsia.mediaplayer",
+    "//garnet/public/fidl/fuchsia.math",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
   ]

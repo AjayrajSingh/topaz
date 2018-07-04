@@ -13,7 +13,7 @@ source_set("oauth") {
   ]
 
   deps = [
-    "//garnet/public/lib/auth/fidl",
+    "//garnet/public/fidl/fuchsia.auth",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
     "//garnet/public/lib/network_wrapper",

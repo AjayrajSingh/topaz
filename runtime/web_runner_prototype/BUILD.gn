@@ -14,8 +14,8 @@ source_set("lib") {
 
   public_deps = [
     "//garnet/public/lib/app/cpp",
-    "//garnet/public/lib/app/fidl",
-    "//garnet/public/lib/ui/views/fidl:v1",
+    "//garnet/public/fidl/fuchsia.sys",
+    "//garnet/public/fidl/fuchsia.ui.views_v1",
     "//topaz/runtime/web_runner/services",
  ]
 }

@@ -16,9 +16,9 @@ executable("jank") {
   deps = [
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl",
-    "//garnet/public/lib/ui/scenic/fidl",
+    "//garnet/public/fidl/fuchsia.ui.scenic",
     "//garnet/public/lib/ui/view_framework:view_provider",
-    "//garnet/public/lib/ui/views/fidl:v1",
+    "//garnet/public/fidl/fuchsia.ui.views_v1",
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_fonts",
     "//topaz/examples/ui/lib:skia_view",

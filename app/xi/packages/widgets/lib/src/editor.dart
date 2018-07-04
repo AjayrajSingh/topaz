@@ -163,7 +163,7 @@ const int _META_CTRL_LEFT_ON = 0x2000;
 const int _META_CTRL_RIGHT_ON = 0x4000;
 
 // Fuchsia modifier values. See:
-// //garnet/public/lib/ui/input/fidl/input_event_constants.fidl
+// //garnet/public/fidl/fuchsia.ui.input/input_event_constants.fidl
 const int _modifierShiftLeft = 2;
 const int _modifierShiftRight = 4;
 const int _modifierShiftMask = 6;

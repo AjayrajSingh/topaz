@@ -9,8 +9,8 @@ dart_app("hard_kb_ime") {
 
   deps = [
     "//garnet/public/lib/fidl/examples/interfaces:interfaces",
-    "//garnet/public/lib/ui/input/fidl:fidl",
-    "//garnet/public/lib/ui/views/fidl:v1",
+    "//garnet/public/fidl/fuchsia.ui.input",
+    "//garnet/public/fidl/fuchsia.ui.views_v1",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
   ]

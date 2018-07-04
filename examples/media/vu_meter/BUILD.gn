@@ -15,7 +15,7 @@ executable("vu_meter") {
 
   deps = [
     "//garnet/public/lib/media/audio",
-    "//garnet/public/lib/media/fidl",
+    "//garnet/public/fidl/fuchsia.media",
     "//garnet/public/lib/ui/view_framework:view_provider",
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_view",

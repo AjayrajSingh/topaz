@@ -15,7 +15,7 @@ dart_app("chat_content_provider") {
   ]
 
   deps = [
-    "//garnet/public/lib/app/fidl:fidl",
+    "//garnet/public/fidl/fuchsia.sys",
     "//peridot/public/fidl/fuchsia.ledger",
     "//peridot/public/fidl/fuchsia.modular",
     "//peridot/public/fidl/fuchsia.modular.auth",
