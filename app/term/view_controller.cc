@@ -97,7 +97,7 @@ void ViewController::StartCommand() {
 
 void ViewController::Blink() {
   if (focused_) {
-    zx::duration delta = zx::clock::get<ZX_CLOCK_MONOTONIC>() - last_key_;
+    zx::duration delta = zx::clock::get_monotonic() - last_key_;
     if (delta > kBlinkInterval) {
       blink_on_ = !blink_on_;
       InvalidateScene();
@@ -259,7 +259,7 @@ bool ViewController::OnInputEvent(fuchsia::ui::input::InputEvent event) {
 }
 
 void ViewController::OnKeyPressed(fuchsia::ui::input::InputEvent key_event) {
-  last_key_ = zx::clock::get<ZX_CLOCK_MONOTONIC>();
+  last_key_ = zx::clock::get_monotonic();
   blink_on_ = true;
 
   std::string input_sequence =
