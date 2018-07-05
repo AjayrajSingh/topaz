@@ -427,7 +427,7 @@ void DartComponentController::MessageEpilogue(Dart_Handle result) {
     return;
   }
 
-  idle_start_ = zx::clock::get(ZX_CLOCK_MONOTONIC);
+  idle_start_ = zx::clock::get<ZX_CLOCK_MONOTONIC>();
   zx_status_t status =
       idle_timer_.set(idle_start_ + kIdleWaitDuration, kIdleSlack);
   if (status != ZX_OK) {
@@ -445,7 +445,7 @@ void DartComponentController::OnIdleTimer(async_t* async, async::WaitBase* wait,
   }
 
   zx::time deadline = idle_start_ + kIdleWaitDuration;
-  zx::time now = zx::clock::get(ZX_CLOCK_MONOTONIC);
+  zx::time now = zx::clock::get<ZX_CLOCK_MONOTONIC>();
   if (now >= deadline) {
     // No Dart message has been processed for kIdleWaitDuration: assume we'll
     // stay idle for kIdleNotifyDuration.
