@@ -71,12 +71,15 @@ class Fleet<T extends dynamic> {
     _addNode(node, id);
   }
 
-  void testSingleOrder() {
+  void _testSingleOrder(List<Node> order) {
     final fleetState = new FleetState<T>(_fleetSize, _instanceGenerator);
 
-    final order = graph.orders.first;
     for (int i = 0; i < order.length; i++) {
       fleetState.applyNode(order[i], i);
     }
   }
+
+  void testSingleOrder() => _testSingleOrder(graph.orders.first);
+
+  void testAllOrders() => graph.orders.forEach(_testSingleOrder);
 }

@@ -19,6 +19,20 @@ class TestPosNegCounterValue<T extends num> extends PosNegCounterValue<T> {
   }
 }
 
+class PosNegCounterFleetFactory<T extends num> {
+  const PosNegCounterFleetFactory();
+
+  Fleet<PosNegCounterValue<T>> newFleet(int count) {
+    return new Fleet<PosNegCounterValue<T>>(
+        count,
+        (index) =>
+            new TestPosNegCounterValue<T>(new Uint8List.fromList([index])));
+  }
+}
+
+const PosNegCounterFleetFactory<int> integerCounterFleetFactory =
+    const PosNegCounterFleetFactory<int>();
+
 void main() {
   test('PosNegCounterValue with StorageState', () {
     var cnt1 = new TestPosNegCounterValue<int>(new Uint8List.fromList([1])),
@@ -40,15 +54,23 @@ void main() {
     expect(cnt3.value, equals(6));
   });
 
+  test('PosNegCounter with framework. Single run.', () {
+    integerCounterFleetFactory.newFleet(2)
+      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) {
+        cnt0.add(1);
+      })
+      ..runInTransaction(1, (PosNegCounterValue<int> cnt1) {
+        cnt1.add(2);
+      })
+      ..synchronize([0, 1])
+      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) {
+        expect(cnt0.value, equals(3));
+      })
+      ..testSingleOrder();
+  });
+
   test('PosNegCounter with framework', () {
-    // TODO: consider changing generator.
-    // Pass random as an insttanceId is bad because it makes tests non
-    // reproducable.
-    // ignore: unused_local_variable
-    final fleet = new Fleet<PosNegCounterValue<int>>(
-        3,
-        (index) =>
-            new TestPosNegCounterValue<int>(new Uint8List.fromList([index])))
+    integerCounterFleetFactory.newFleet(3)
       ..runInTransaction(0, (PosNegCounterValue<int> cnt0) {
         cnt0.add(1);
       })
@@ -69,6 +91,6 @@ void main() {
       ..runInTransaction(1, (PosNegCounterValue<int> cnt2) {
         expect(cnt2.value, equals(3));
       })
-      ..testSingleOrder();
+      ..testAllOrders();
   });
 }

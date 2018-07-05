@@ -13,35 +13,70 @@ import 'node.dart';
 //
 class ComputationalGraph {
   final List<Node> nodes = <Node>[];
+  final List<List<int>> _allChoices = <List<int>>[];
 
   void addNode(Node v) {
+    if (nodes.contains(v)) {
+      return;
+    }
     nodes.add(v);
   }
 
+  // Specifies that [parent] would be executed before [child].
   void addRelation(Node parent, Node child) {
     child.parentsCount += 1;
     parent.childs.add(child);
   }
 
-  int _countOrders() {
-    // TODO: implement
-    return 1;
+  // Appends zeros to [choices] to contain [nodes.length] elements.
+  void _padLength(List<int> choices) {
+    while (choices.length < nodes.length) {
+      choices.add(0);
+    }
   }
 
-  List<Node> _getNthOrder(int index) {
-    if (index < 0) {
-      throw new ArgumentError.value(
-          index, 'index', 'Index should be non negative.');
+  // Generates lexicographically next list of choices.
+  // Returns true if generation was successful and false otherwise.
+  bool _moveNextChoiceList(List<int> choices) {
+    if (choices.isEmpty) {
+      _padLength(choices);
+      return true;
     }
-    // TODO: implement
-    if (index > 0) {
-      throw new UnimplementedError(
-          '_getNthOrder not implemented for index > 0.');
+    while (choices.isNotEmpty) {
+      choices.last += 1;
+      if (_getOrder(choices) == null) {
+        choices.removeLast();
+      } else {
+        _padLength(choices);
+        return true;
+      }
     }
+    return false;
+  }
 
-    // TODO: should be replaced with general solution.
-    // Get correct topological order.
-    // Each time we take node with 0 in degree.
+  int _countOrders() {
+    _allChoices.clear();
+    List<int> choices = <int>[];
+    while (_moveNextChoiceList(choices)) {
+      _allChoices.add(new List<int>.from(choices));
+    }
+    return _allChoices.length;
+  }
+
+  // To generate a correct topological order, the following algorithm is used:
+  //
+  // Keep a list of nodes with zero input degree - [ready].
+  // On each step:
+  //  Choose an arbitrary [node] from [ready].
+  //  Add [node] to order, and remove [node] from graph.
+  //
+  // List [choices] specifies which node to take from list on each step. Each
+  // [choices[i]] should be greater or equal to 0 and less than the length of [ready]
+  // at the begining of the step [i].
+
+  // Returns [this] ordered topologically based on [choices].
+  // Returns null if [choices] do not correspond to correct topological order.
+  List<Node> _getOrder(List<int> choices) {
     List<Node> order = <Node>[];
     List<Node> ready = <Node>[];
     for (final node in nodes) {
@@ -51,8 +86,15 @@ class ComputationalGraph {
     }
 
     Map<Node, int> known = <Node, int>{};
-    while (ready.isNotEmpty) {
-      Node cur = ready.removeLast();
+    for (int i = 0; i < nodes.length; i++) {
+      if (ready.isEmpty) {
+        throw new StateError('Computational graph should be acyclic');
+      }
+      int curChoice = (i < choices.length) ? choices[i] : 0;
+      if (curChoice >= ready.length) {
+        return null;
+      }
+      Node cur = ready.removeAt(curChoice);
       order.add(cur);
 
       for (final next in cur.childs) {
@@ -68,6 +110,13 @@ class ComputationalGraph {
       }
     }
     return order;
+  }
+
+  List<Node> _getNthOrder(int index) {
+    if (index < 0 || index >= _allChoices.length) {
+      throw new ArgumentError.value(index, 'index', 'Index is out of range.');
+    }
+    return _getOrder(_allChoices[index]);
   }
 
   // Returns all correct topological orders of this graph.
