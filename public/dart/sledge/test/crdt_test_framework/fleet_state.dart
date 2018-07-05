@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'checker.dart';
 import 'node.dart';
 import 'storage_state.dart';
 
@@ -15,6 +16,7 @@ class FleetState<T extends dynamic> {
   int _fleetSize;
   final List<StorageState> _storageStates;
   final List<T> _instances;
+  final List<Checker<T>> _checkers = <Checker<T>>[];
 
   FleetState(int size, T instanceGenerator(int index))
       : _fleetSize = size,
@@ -24,12 +26,22 @@ class FleetState<T extends dynamic> {
         _instances =
             new List<T>.generate(size, instanceGenerator, growable: false);
 
-  void applyNode(Node cur, int timer) {
-    if (cur is ModificationNode) {
-      applyModification(cur.instanceId, cur.modification, timer);
-    } else if (cur is SynchronizationNode) {
-      applySynchronization(cur.instanceId1, cur.instanceId2);
+  void applyNode(Node node, int timer) {
+    if (node is ModificationNode) {
+      applyModification(node.instanceId, node.modification, timer);
+    } else if (node is SynchronizationNode) {
+      applySynchronization(node.instanceId1, node.instanceId2);
     }
+
+    for (final checker in _checkers) {
+      for (final instanceId in node.affectedInstances) {
+        checker.check(_instances[instanceId]);
+      }
+    }
+  }
+
+  void addChecker(Checker<T> checker) {
+    _checkers.add(checker);
   }
 
   void applyModification(int id, void Function(T) modification, int time) {

@@ -2,5 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-export 'checker.dart';
-export 'fleet.dart';
+// ignore: one_member_abstracts
+abstract class Checker<T> {
+  void check(T instance);
+}

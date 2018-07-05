@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'checker.dart';
 import 'computational_graph.dart';
 import 'fleet_state.dart';
 import 'node.dart';
@@ -25,13 +26,17 @@ import 'node.dart';
 // All operations that are related to a single node are ordered. Relation
 // between operations on different nodes based on synchronization operations.
 //
+
+typedef CheckerGenerator<T> = Checker<T> Function();
+
 /// Fleet of instances.
 class Fleet<T extends dynamic> {
   int _fleetSize;
   List<Node> _lastModifications;
   final Node _initialModification = new Node();
   final ComputationalGraph graph = new ComputationalGraph();
-  T Function(int) _instanceGenerator;
+  final T Function(int) _instanceGenerator;
+  final List<CheckerGenerator<T>> _checkerGenerators = <CheckerGenerator<T>>[];
 
   Fleet(this._fleetSize, this._instanceGenerator) {
     _lastModifications =
@@ -71,8 +76,14 @@ class Fleet<T extends dynamic> {
     _addNode(node, id);
   }
 
+  void addChecker(CheckerGenerator<T> checkerGenerator) =>
+      _checkerGenerators.add(checkerGenerator);
+
   void _testSingleOrder(List<Node> order) {
     final fleetState = new FleetState<T>(_fleetSize, _instanceGenerator);
+    for (final newChecker in _checkerGenerators) {
+      fleetState.addChecker(newChecker());
+    }
 
     for (int i = 0; i < order.length; i++) {
       fleetState.applyNode(order[i], i);
