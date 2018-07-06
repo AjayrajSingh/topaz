@@ -5,15 +5,13 @@
 import 'dart:async';
 
 import 'change.dart';
+import 'value.dart';
 import 'value_observer.dart';
 
-/// Interface implemented by all Sledge Values.
-abstract class BaseValue<T> {
-  // TODO: Not all BaseValue need to have an observer.
-  // Create a subclass of BaseValue that contains an observer and
-  // have all values that need to be observable extend this new class.
+/// Interface implemented by all observable Sledge Values.
+abstract class LeafValue implements Value {
   /// Observes events occuring on this value.
-  ValueObserver observer;
+  set observer(ValueObserver observer);
 
   /// Ends the transaction and retrieves its data.
   Change getChange();
@@ -21,6 +19,6 @@ abstract class BaseValue<T> {
   /// Applies external transactions.
   void applyChange(Change input);
 
-  /// Gets Stream of changes.
-  Stream<T> get onChange;
+  /// The Stream of changes.
+  Stream<Object> get onChange;
 }

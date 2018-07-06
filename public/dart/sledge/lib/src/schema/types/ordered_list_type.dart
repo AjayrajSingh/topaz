@@ -4,7 +4,7 @@
 
 import 'dart:typed_data';
 
-import '../../document/base_value.dart';
+import '../../document/value.dart';
 import '../../document/values/ordered_list_value.dart';
 import '../../sledge_connection_id.dart';
 import '../base_type.dart';
@@ -15,6 +15,6 @@ class OrderedList implements BaseType {
   String toJson() => 'OrderedList';
 
   @override
-  BaseValue newValue(ConnectionId connectionId) =>
+  Value newValue(ConnectionId connectionId) =>
       new OrderedListValue<Uint8List>(connectionId.id);
 }

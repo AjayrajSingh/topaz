@@ -4,7 +4,7 @@
 
 import 'dart:typed_data';
 
-import '../../document/base_value.dart';
+import '../../document/value.dart';
 import '../../document/values/map_value.dart';
 import '../../sledge_connection_id.dart';
 import '../base_type.dart';
@@ -16,6 +16,6 @@ class BytelistMap implements BaseType {
   String toJson() => 'BytelistMap';
 
   @override
-  BaseValue newValue(ConnectionId connectionId) =>
+  Value newValue(ConnectionId connectionId) =>
       new MapValue<String, Uint8List>();
 }

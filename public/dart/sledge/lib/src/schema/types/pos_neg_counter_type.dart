@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import '../../document/base_value.dart';
+import '../../document/value.dart';
 import '../../document/values/pos_neg_counter_value.dart';
 import '../../sledge_connection_id.dart';
 import '../base_type.dart';
@@ -13,7 +13,7 @@ class IntCounter implements BaseType {
   String toJson() => 'IntCounter';
 
   @override
-  BaseValue newValue(ConnectionId connectionId) =>
+  Value newValue(ConnectionId connectionId) =>
       new PosNegCounterValue<int>(connectionId.id);
 }
 
@@ -23,6 +23,6 @@ class DoubleCounter implements BaseType {
   String toJson() => 'DoubleCounter';
 
   @override
-  BaseValue newValue(ConnectionId connectionId) =>
+  Value newValue(ConnectionId connectionId) =>
       new PosNegCounterValue<double>(connectionId.id);
 }

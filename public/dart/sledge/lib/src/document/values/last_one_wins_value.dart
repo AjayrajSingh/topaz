@@ -4,8 +4,9 @@
 
 import 'dart:async';
 
-import '../base_value.dart';
 import '../change.dart';
+import '../leaf_value.dart';
+import '../value_observer.dart';
 import 'converted_change.dart';
 import 'converter.dart';
 
@@ -49,9 +50,10 @@ class _LastOneWinsValue<T> {
 }
 
 /// Sledge Last One Wins value.
-class LastOneWinsValue<T> extends BaseValue<T> {
+class LastOneWinsValue<T> implements LeafValue {
   final _LastOneWinsValue _value;
   final DataConverter<int, T> _converter;
+  ValueObserver _observer;
 
   /// Default constructor.
   LastOneWinsValue([Change init])
@@ -67,15 +69,20 @@ class LastOneWinsValue<T> extends BaseValue<T> {
   void applyChange(Change input) =>
       _value.applyChange(_converter.deserialize(input));
 
-  /// Sets value.
-  set value(T value) {
-    _value.value = value;
-    observer.valueWasChanged();
-  }
-
-  /// Gets value.
-  T get value => _value.value;
-
   @override
   Stream<T> get onChange => _value.onChange;
+
+  @override
+  set observer(ValueObserver observer) {
+    _observer = observer;
+  }
+
+  /// Sets the current value.
+  set value(T value) {
+    _value.value = value;
+    _observer.valueWasChanged();
+  }
+
+  /// Returns the current value.
+  T get value => _value.value;
 }

@@ -6,8 +6,9 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
 
-import '../base_value.dart';
 import '../change.dart';
+import '../leaf_value.dart';
+import '../value_observer.dart';
 import 'converted_change.dart';
 import 'converter.dart';
 import 'key_value_storage.dart';
@@ -212,9 +213,10 @@ class _OrderedListValue<E> {
 // thrown errors. Also applicable to other CRDTs.
 
 /// Sledge Value to store Ordered List.
-class OrderedListValue<E> extends BaseValue<OrderedListChange<E>> {
+class OrderedListValue<E> extends LeafValue {
   final _OrderedListValue<E> _list;
   final DataConverter _converter;
+  ValueObserver _observer;
 
   /// Default constructor.
   OrderedListValue(Uint8List currentInstanceId)
@@ -225,13 +227,13 @@ class OrderedListValue<E> extends BaseValue<OrderedListChange<E>> {
   /// Inserts the object at position [index] in the list.
   void insert(int index, E element) {
     _list.insert(index, element);
-    observer.valueWasChanged();
+    _observer.valueWasChanged();
   }
 
   /// Removes the object at position [index] from the list.
   E removeAt(int index) {
     final result = _list.removeAt(index);
-    observer.valueWasChanged();
+    _observer.valueWasChanged();
     return result;
   }
 
@@ -241,6 +243,11 @@ class OrderedListValue<E> extends BaseValue<OrderedListChange<E>> {
 
   /// Gets list of elements.
   List<E> toList() => _list.valuesList();
+
+  @override
+  set observer(ValueObserver observer) {
+    _observer = observer;
+  }
 
   // TODO: consider creating a Sledge serializable and comparable data type.
   // So there would be no need to register converter for new types.

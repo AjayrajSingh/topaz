@@ -5,30 +5,27 @@
 import 'dart:async';
 import 'dart:collection';
 
-import '../base_value.dart';
 import '../change.dart';
+import '../leaf_value.dart';
 import '../value_observer.dart';
 import 'converted_change.dart';
 import 'converter.dart';
 import 'key_value_storage.dart';
 
 /// Sledge Value to store Set.
-class SetValue<E> extends SetBase<E>
-    with SetMixin<E>
-    implements BaseValue<SetChange<E>> {
+class SetValue<E> extends SetBase<E> with SetMixin<E> implements LeafValue {
   // Stores elements of [this]. Each element is stored both in a key and in a
   // value. It's done to provide an appropriate [lookup] method.
   final KeyValueStorage<E, E> _map;
   final DataConverter<E, bool> _converter;
   final StreamController<SetChange<E>> _changeController =
       new StreamController<SetChange<E>>.broadcast();
-  @override
-  ValueObserver observer;
+  ValueObserver _observer;
 
   // TODO: consider Converter as a provider of [equals] and [hashCode] methods.
   /// Creates a SetValue with provided [equals] as equality.
   /// It should be coherent with encoding of [E] done by Converter.
-  SetValue({bool equals(E entry1, E enrtry2), int hashCode(E entry)})
+  SetValue({bool equals(E entry1, E entry2), int hashCode(E entry)})
       : _map = new KeyValueStorage<E, E>(equals: equals, hashCode: hashCode),
         _converter = new DataConverter<E, bool>();
 
@@ -42,6 +39,11 @@ class SetValue<E> extends SetBase<E>
     _changeController.add(new SetChange<E>(change));
   }
 
+  @override
+  set observer(ValueObserver observer) {
+    _observer = observer;
+  }
+
   /// Returns true if [value] is in the set.
   @override
   bool contains(Object value) => _map.containsKey(value);
@@ -53,7 +55,7 @@ class SetValue<E> extends SetBase<E>
   bool add(Object value) {
     final result = !contains(value);
     _map[value] = value;
-    observer.valueWasChanged();
+    _observer.valueWasChanged();
     return result;
   }
 
@@ -74,7 +76,7 @@ class SetValue<E> extends SetBase<E>
   @override
   bool remove(Object value) {
     final result = (_map.remove(value) != null);
-    observer.valueWasChanged();
+    _observer.valueWasChanged();
     return result;
   }
 

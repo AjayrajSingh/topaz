@@ -7,9 +7,10 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 
-import '../base_value.dart';
 import '../change.dart';
+import '../leaf_value.dart';
 import '../uint8list_ops.dart';
+import '../value_observer.dart';
 import 'converted_change.dart';
 import 'converter.dart';
 import 'key_value_storage.dart';
@@ -78,9 +79,10 @@ class _PosNegCounterValue<T extends num> {
 }
 
 /// Sledge Value to store numerical counter.
-class PosNegCounterValue<T extends num> extends BaseValue<T> {
+class PosNegCounterValue<T extends num> implements LeafValue {
   final _PosNegCounterValue<T> _counter;
   final DataConverter<Uint8List, T> _converter;
+  ValueObserver _observer;
 
   /// Constructor.
   PosNegCounterValue(Uint8List id, [Change init])
@@ -90,25 +92,27 @@ class PosNegCounterValue<T extends num> extends BaseValue<T> {
     applyChange(init ?? new Change());
   }
 
-  /// Ends transaction and retrieve its data.
   @override
   Change getChange() => _converter.serialize(_counter.getChange());
 
-  /// Applies external transactions.
   @override
   void applyChange(Change input) =>
       _counter.applyChange(_converter.deserialize(input));
 
+  @override
+  Stream<T> get onChange => _counter.onChange;
+
+  @override
+  set observer(ValueObserver observer) {
+    _observer = observer;
+  }
+
   /// Adds value (possibly negative) to counter.
   void add(final T delta) {
     _counter.add(delta);
-    observer.valueWasChanged();
+    _observer.valueWasChanged();
   }
 
-  /// Gets current value of counter.
+  /// Returns current value of counter.
   T get value => _counter.value;
-
-  /// Gets Stream of changes.
-  @override
-  Stream<T> get onChange => _counter.onChange;
 }

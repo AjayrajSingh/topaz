@@ -9,9 +9,9 @@ import 'package:crypto/crypto.dart';
 import '../sledge.dart';
 import '../sledge_connection_id.dart';
 import '../transaction.dart';
-import 'base_value.dart';
 import 'change.dart';
 import 'document_id.dart';
+import 'leaf_value.dart';
 import 'uint8list_ops.dart';
 import 'value_node.dart';
 import 'value_observer.dart';
@@ -21,17 +21,17 @@ class Document implements ValueObserver {
   final Sledge _sledge;
   final DocumentId _documentId;
   ValueNode _value;
-  final Map<Uint8List, BaseValue> _fields;
+  final Map<Uint8List, LeafValue> _fields;
   final ConnectionId _connectionId;
   static const int _hashLength = 20;
 
   /// Default constructor.
   Document(this._sledge, this._documentId)
-      : _fields = new Uint8ListMapFactory<BaseValue>().newMap(),
+      : _fields = new Uint8ListMapFactory<LeafValue>().newMap(),
         _connectionId = _sledge.connectionId {
     _value = _documentId.schema.newValue(_connectionId);
 
-    _value.collectFields().forEach((final String key, final BaseValue value) {
+    _value.collectFields().forEach((final String key, final LeafValue value) {
       value.observer = this;
 
       // Hash the key

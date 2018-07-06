@@ -6,7 +6,7 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 
-import '../../document/base_value.dart';
+import '../../document/value.dart';
 import '../../document/values/set_value.dart';
 import '../../sledge_connection_id.dart';
 import '../base_type.dart';
@@ -20,6 +20,6 @@ class BytelistSet implements BaseType {
   String toJson() => 'BytelistSet';
 
   @override
-  BaseValue newValue(ConnectionId connectionId) => new SetValue<Uint8List>(
+  Value newValue(ConnectionId connectionId) => new SetValue<Uint8List>(
       equals: _listEquality.equals, hashCode: _listEquality.hash);
 }

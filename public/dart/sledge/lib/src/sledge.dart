@@ -30,7 +30,8 @@ class Sledge {
   final ConnectionId _connectionId = new ConnectionId.random();
 
   // Cache to get document by documentId.prefix.
-  final Map<Uint8List, Future<Document>> _documentByPrefix = _mapFactory.newMap();
+  final Map<Uint8List, Future<Document>> _documentByPrefix =
+      _mapFactory.newMap();
   static final _mapFactory = new Uint8ListMapFactory<Future<Document>>();
 
   // The factories used for fake object injection.
@@ -120,7 +121,8 @@ class Sledge {
       throw new StateError('No transaction started.');
     }
     if (!_documentByPrefix.containsKey(documentId.prefix)) {
-      _documentByPrefix[documentId.prefix] = currentTransaction.getDocument(documentId);
+      _documentByPrefix[documentId.prefix] =
+          currentTransaction.getDocument(documentId);
     }
 
     return _documentByPrefix[documentId.prefix];
