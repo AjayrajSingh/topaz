@@ -17,8 +17,9 @@
 
 namespace flutter {
 
-VulkanSurfaceProducer::VulkanSurfaceProducer(scenic::Session* mozart_session) {
-  valid_ = Initialize(mozart_session);
+VulkanSurfaceProducer::VulkanSurfaceProducer(
+    scenic::Session* scenic_session) {
+  valid_ = Initialize(scenic_session);
 
   if (valid_) {
     FXL_DLOG(INFO)
@@ -36,7 +37,7 @@ VulkanSurfaceProducer::~VulkanSurfaceProducer() {
   FXL_DCHECK(wait_result == VK_SUCCESS);
 };
 
-bool VulkanSurfaceProducer::Initialize(scenic::Session* mozart_session) {
+bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
   vk_ = fxl::MakeRefCounted<vulkan::VulkanProcTable>();
 
   std::vector<std::string> extensions = {
@@ -108,7 +109,7 @@ bool VulkanSurfaceProducer::Initialize(scenic::Session* mozart_session) {
                                    vulkan::kGrCacheMaxByteSize);
 
   surface_pool_ = std::make_unique<VulkanSurfacePool>(
-      *this, context_, mozart_session);
+      *this, context_, scenic_session);
 
   return true;
 }

@@ -13,10 +13,10 @@ namespace flutter {
 
 VulkanSurfacePool::VulkanSurfacePool(vulkan::VulkanProvider& vulkan_provider,
                                      sk_sp<GrContext> context,
-                                     scenic::Session* mozart_session)
+                                     scenic::Session* scenic_session)
     : vulkan_provider_(vulkan_provider),
       context_(std::move(context)),
-      mozart_session_(mozart_session) {}
+      scenic_session_(scenic_session) {}
 
 VulkanSurfacePool::~VulkanSurfacePool() {}
 
@@ -84,7 +84,7 @@ void VulkanSurfacePool::SubmitSurface(
 std::unique_ptr<VulkanSurface> VulkanSurfacePool::CreateSurface(
     const SkISize& size) {
   auto surface = std::make_unique<VulkanSurface>(
-      vulkan_provider_, context_, mozart_session_, size);
+      vulkan_provider_, context_, scenic_session_, size);
   if (!surface->IsValid()) {
     return nullptr;
   }

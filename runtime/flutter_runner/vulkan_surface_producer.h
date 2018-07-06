@@ -22,7 +22,7 @@ class VulkanSurfaceProducer final
     : public flow::SceneUpdateContext::SurfaceProducer,
       public vulkan::VulkanProvider {
  public:
-  VulkanSurfaceProducer(scenic::Session* mozart_session);
+  VulkanSurfaceProducer(scenic::Session* scenic_session);
 
   ~VulkanSurfaceProducer();
 
@@ -64,7 +64,7 @@ class VulkanSurfaceProducer final
   std::unique_ptr<VulkanSurfacePool> surface_pool_;
   bool valid_ = false;
 
-  bool Initialize(scenic::Session* mozart_session);
+  bool Initialize(scenic::Session* scenic_session);
 
   FXL_DISALLOW_COPY_AND_ASSIGN(VulkanSurfaceProducer);
 };
