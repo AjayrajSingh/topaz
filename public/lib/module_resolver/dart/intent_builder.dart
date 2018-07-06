@@ -13,12 +13,12 @@ class IntentBuilder {
   // Creates a new intent builder where the intent's action is set to the
   // provided name.
   IntentBuilder.action(String name)
-      : _intent = new Intent(action: new IntentAction(name: name), parameters: <IntentParameter>[]);
+      : _intent = new Intent(action: name, parameters: <IntentParameter>[]);
 
   // Creates a new intent builder where the intent's handler is set to the
   // provided handler string.
   IntentBuilder.handler(String handler)
-      : _intent = new Intent(action: new IntentAction(name: '', handler: handler), parameters: <IntentParameter>[]);
+      : _intent = new Intent(action: '', handler: handler, parameters: <IntentParameter>[]);
 
   // Converts |value| to a JSON object and adds it to the Intent. For typed
   // data, prefer to use addParameterFromEntityReference().
