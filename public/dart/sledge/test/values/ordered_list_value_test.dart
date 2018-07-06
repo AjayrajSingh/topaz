@@ -6,7 +6,6 @@
 import 'dart:math' show Random;
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:sledge/src/document/values/ordered_list_value.dart';
 import 'package:test/test.dart';
 
@@ -20,58 +19,56 @@ class TestOrderedListValue<E> extends OrderedListValue<E> {
 }
 
 void main() {
-  Equality eq = const ListEquality();
-
   test('Add to end of list and check content.', () {
     var s = new TestOrderedListValue<int>();
-    expect(eq.equals(s.toList(), <int>[]), isTrue);
+    expect(s.toList(), equals([]));
     s.insert(0, 1);
-    expect(eq.equals(s.toList(), <int>[1]), isTrue);
+    expect(s.toList(), equals([1]));
     s.insert(1, 2);
-    expect(eq.equals(s.toList(), <int>[1, 2]), isTrue);
+    expect(s.toList(), equals([1, 2]));
     s.insert(2, 3);
-    expect(eq.equals(s.toList(), <int>[1, 2, 3]), isTrue);
+    expect(s.toList(), equals([1, 2, 3]));
   });
 
   test('Insert into random positions of list and check content.', () {
     var s = new TestOrderedListValue<int>();
-    expect(eq.equals(s.toList(), <int>[]), isTrue);
+    expect(s.toList(), equals([]));
     s.insert(0, 1);
-    expect(eq.equals(s.toList(), <int>[1]), isTrue);
+    expect(s.toList(), equals([1]));
     s.insert(1, 2);
-    expect(eq.equals(s.toList(), <int>[1, 2]), isTrue);
+    expect(s.toList(), equals([1, 2]));
     s.insert(1, 3);
-    expect(eq.equals(s.toList(), <int>[1, 3, 2]), isTrue);
+    expect(s.toList(), equals([1, 3, 2]));
     s.insert(0, 4);
-    expect(eq.equals(s.toList(), <int>[4, 1, 3, 2]), isTrue);
+    expect(s.toList(), equals([4, 1, 3, 2]));
     s.insert(1, 5);
-    expect(eq.equals(s.toList(), <int>[4, 5, 1, 3, 2]), isTrue);
+    expect(s.toList(), equals([4, 5, 1, 3, 2]));
   });
 
   test('Insert into random positions, delete from list and check content.', () {
     var s = new TestOrderedListValue<int>();
-    expect(eq.equals(s.toList(), <int>[]), isTrue);
+    expect(s.toList(), equals([]));
     s.insert(0, 1);
-    expect(eq.equals(s.toList(), <int>[1]), isTrue);
+    expect(s.toList(), equals([1]));
     s.insert(1, 2);
-    expect(eq.equals(s.toList(), <int>[1, 2]), isTrue);
+    expect(s.toList(), equals([1, 2]));
     s.insert(1, 3);
-    expect(eq.equals(s.toList(), <int>[1, 3, 2]), isTrue);
+    expect(s.toList(), equals([1, 3, 2]));
     expect(s.removeAt(2), equals(2));
-    expect(eq.equals(s.toList(), <int>[1, 3]), isTrue);
+    expect(s.toList(), equals([1, 3]));
     expect(s.removeAt(0), equals(1));
-    expect(eq.equals(s.toList(), <int>[3]), isTrue);
+    expect(s.toList(), equals([3]));
     s.insert(1, 2);
-    expect(eq.equals(s.toList(), <int>[3, 2]), isTrue);
+    expect(s.toList(), equals([3, 2]));
     s.insert(1, 4);
-    expect(eq.equals(s.toList(), <int>[3, 4, 2]), isTrue);
+    expect(s.toList(), equals([3, 4, 2]));
     expect(s.removeAt(0), equals(3));
-    expect(eq.equals(s.toList(), <int>[4, 2]), isTrue);
+    expect(s.toList(), equals([4, 2]));
   });
 
   test('Simple operations.', () {
     var s = new TestOrderedListValue<int>();
-    expect(eq.equals(s.toList(), <int>[]), isTrue);
+    expect(s.toList(), equals([]));
     s.insert(0, 1);
     expect(s[0], equals(1));
     s.insert(1, 2);
