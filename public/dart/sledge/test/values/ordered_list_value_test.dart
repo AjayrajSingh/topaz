@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
-import 'dart:async';
+import 'dart:math' show Random;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
@@ -15,7 +15,7 @@ import '../dummies/dummy_value_observer.dart';
 class TestOrderedListValue<E> extends OrderedListValue<E> {
   TestOrderedListValue([Uint8List id])
       : super(id ?? new Uint8List.fromList([1])) {
-    this.observer = new DummyValueObserver();
+    observer = new DummyValueObserver();
   }
 }
 
@@ -33,7 +33,7 @@ void main() {
     expect(eq.equals(s.toList(), <int>[1, 2, 3]), isTrue);
   });
 
-  test('Add to random positions of list and check content.', () {
+  test('Insert into random positions of list and check content.', () {
     var s = new TestOrderedListValue<int>();
     expect(eq.equals(s.toList(), <int>[]), isTrue);
     s.insert(0, 1);
@@ -48,7 +48,7 @@ void main() {
     expect(eq.equals(s.toList(), <int>[4, 5, 1, 3, 2]), isTrue);
   });
 
-  test('Add to random positions, delete from list and check content.', () {
+  test('Insert into random positions, delete from list and check content.', () {
     var s = new TestOrderedListValue<int>();
     expect(eq.equals(s.toList(), <int>[]), isTrue);
     s.insert(0, 1);
@@ -113,5 +113,35 @@ void main() {
       expect(() => s.removeAt(1), throwsRangeError);
       expect(s.removeAt(0), 1);
     });
+  });
+
+  test('Insert into random positions of list and check content. Large test.',
+      () {
+    final random = new Random(1);
+    var s = new TestOrderedListValue<int>();
+    var list = <int>[];
+    expect(s.toList(), equals(<int>[]));
+    for (int value = 0; value < 100; value++) {
+      int pos = random.nextInt(list.length + 1);
+      s.insert(pos, value);
+      list.insert(pos, value);
+      expect(s.toList(), equals(list));
+    }
+  });
+
+  test('Complex example of inserting in the list.', () {
+    var s = new TestOrderedListValue<int>()
+      ..insert(0, 0)
+      ..insert(0, 1)
+      ..insert(1, 2)
+      ..insert(0, 3)
+      ..insert(1, 4)
+      ..insert(4, 5)
+      ..insert(2, 6)
+      ..insert(0, 7)
+      ..insert(7, 8)
+      ..insert(6, 9)
+      ..insert(10, 10);
+    expect(s.toList(), equals([7, 3, 4, 6, 1, 2, 9, 5, 8, 0, 10]));
   });
 }

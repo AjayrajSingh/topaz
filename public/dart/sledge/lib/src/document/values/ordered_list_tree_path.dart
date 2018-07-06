@@ -43,8 +43,8 @@ class OrderedListTreePath implements Comparable<OrderedListTreePath> {
   OrderedListTreePath.root() : this(new Uint8List(_valueNodeSuffixLength));
 
   /// Checks if node is a child of a [parent].
-  bool isChildOf(OrderedListTreePath parent) {
-    if (_data.length > parent._data.length) {
+  bool isDescendant(OrderedListTreePath parent) {
+    if (_data.length <= parent._data.length) {
       return false;
     }
     int prefixLen = parent._data.length - _valueNodeSuffixLength;

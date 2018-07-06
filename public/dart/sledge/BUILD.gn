@@ -35,6 +35,8 @@ dart_test("dart_sledge_tests") {
     "values/map_value_test.dart",
     "values/pos_neg_counter_ss_test.dart",
     "values/pos_neg_counter_test.dart",
+    "values/ordered_list_tree_path_test.dart",
+    "values/ordered_list_value_test.dart",
     "values/set_value_test.dart",
   ]
 

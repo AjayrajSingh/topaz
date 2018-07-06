@@ -145,7 +145,7 @@ class _OrderedListValue<E> {
     } else {
       bool becomeRightChild = (index != 0 &&
           (index == sortedKeys.length ||
-              sortedKeys[index].isChildOf(sortedKeys[index - 1])));
+              !sortedKeys[index].isDescendant(sortedKeys[index - 1])));
 
       if (becomeRightChild) {
         newKey = sortedKeys[index - 1]
