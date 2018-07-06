@@ -109,7 +109,7 @@ class ComponentContextClient {
     return completer.future;
   }
 
-  /// Obtain message queue
+  /// Obtain a named message queue for receiving messages.
   Future<fidl.MessageQueueProxy> obtainMessageQueue(String name) {
     Completer<fidl.MessageQueueProxy> messageQueueCompleter =
         new Completer<fidl.MessageQueueProxy>();
@@ -131,6 +131,30 @@ class ComponentContextClient {
     });
 
     return messageQueueCompleter.future;
+  }
+
+  /// Obtain a message queue sender from a token.
+  Future<fidl.MessageSenderProxy> getMessageSender(String queueToken) {
+    Completer<fidl.MessageSenderProxy> senderCompleter =
+        new Completer<fidl.MessageSenderProxy>();
+    fidl.MessageSenderProxy sender = new fidl.MessageSenderProxy();
+
+    sender.ctrl.error.then((ProxyError err) {
+      if (!senderCompleter.isCompleted) {
+        senderCompleter.completeError(err);
+      }
+    });
+
+    // TODO(meiyili): handle errors MS-1288
+    proxy.getMessageSender(queueToken, sender.ctrl.request());
+
+    scheduleMicrotask(() {
+      if (!senderCompleter.isCompleted) {
+        senderCompleter.complete(sender);
+      }
+    });
+
+    return senderCompleter.future;
   }
 
   /// Connect to an agent
