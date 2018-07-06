@@ -10,6 +10,7 @@ import 'package:sledge/src/document/values/ordered_list_value.dart';
 import 'package:test/test.dart';
 
 import '../dummies/dummy_value_observer.dart';
+import 'list_api_tester.dart';
 
 class TestOrderedListValue<E> extends OrderedListValue<E> {
   TestOrderedListValue([Uint8List id])
@@ -19,6 +20,13 @@ class TestOrderedListValue<E> extends OrderedListValue<E> {
 }
 
 void main() {
+  group('List API coverage', () {
+    final tester = new ListApiTester<OrderedListValue>(
+        () => new TestOrderedListValue<int>());
+    // ignore: cascade_invocations
+    tester.testApi();
+  });
+
   test('Add to end of list and check content.', () {
     var s = new TestOrderedListValue<int>();
     expect(s.toList(), equals([]));

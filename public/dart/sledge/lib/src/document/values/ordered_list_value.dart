@@ -119,7 +119,8 @@ import 'ordered_list_tree_path.dart';
 // at the same time value nodes should get able to have implicit node as a
 // child. And left/right edges should have no id written on them.
 
-class _OrderedListValue<E> {
+// ignore: private_collision_in_mixin_application
+class _OrderedListValue<E> extends ListBase<E> with ListMixin<E> {
   final KeyValueStorage<OrderedListTreePath, E> _storage;
   final Uint8List _instanceId;
   int _incrementalTime = 0;
@@ -132,10 +133,11 @@ class _OrderedListValue<E> {
 
   Stream<OrderedListChange<E>> get onChange => _changeController.stream;
 
-  ConvertedChange<OrderedListTreePath, E> getChange() => _storage.getChange();
+  ConvertedChange<OrderedListTreePath, E> _getChange() => _storage.getChange();
 
+  @override
   void insert(int index, E element) {
-    final sortedKeys = sortedKeysList();
+    final sortedKeys = _sortedKeysList();
     if (index < 0 || index > sortedKeys.length) {
       throw new RangeError.value(index, 'index', 'Index is out of range');
     }
@@ -159,24 +161,105 @@ class _OrderedListValue<E> {
     _storage[newKey] = element;
   }
 
-  E removeAt(int index) {
-    return _storage.remove(sortedKeysList()[index]);
+  @override
+  void insertAll(int index, Iterable<E> iterable) {
+    if (index < 0 || index > length) {
+      throw new RangeError.value(index, 'index', 'Index is out of range');
+    }
+    int insertIndex = index;
+    for (final element in iterable) {
+      insert(insertIndex++, element);
+    }
   }
 
-  List<OrderedListTreePath> sortedKeysList() {
+  @override
+  E removeAt(int index) {
+    return _storage.remove(_sortedKeysList()[index]);
+  }
+
+  @override
+  bool remove(Object element) {
+    final keys = _sortedKeysList();
+    final values = _valuesList();
+    for (int i = 0; i < values.length; i++) {
+      if (values[i] == element) {
+        _storage.remove(keys[i]);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @override
+  E removeLast() => removeAt(length - 1);
+
+  @override
+  void removeRange(int start, int end) {
+    _sortedKeysList().getRange(start, end).forEach(_storage.remove);
+  }
+
+  @override
+  void removeWhere(bool test(E element)) {
+    final keys = _sortedKeysList();
+    final values = _valuesList();
+    for (int i = 0; i < values.length; i++) {
+      if (test(values[i])) {
+        _storage.remove(keys[i]);
+      }
+    }
+  }
+
+  @override
+  void replaceRange(int start, int end, Iterable<E> replacement) {
+    removeRange(start, end);
+    insertAll(start, replacement);
+  }
+
+  @override
+  void retainWhere(bool test(E element)) {
+    removeWhere((element) => !test(element));
+  }
+
+  @override
+  E operator [](int index) {
+    return _valuesList()[index];
+  }
+
+  @override
+  void operator []=(int index, E element) {
+    removeAt(index);
+    insert(index, element);
+  }
+
+  @override
+  int get length => _storage.length;
+
+  @override
+  set length(int newLength) {
+    // This list is not fixed length.
+    // However, it does not support the length setter because [null] cannot be stored.
+    throw new UnsupportedError('length setter is not supported.');
+  }
+
+  @override
+  void add(E element) => insert(length, element);
+
+  @override
+  void addAll(Iterable<E> iterable) => iterable.forEach(add);
+
+  @override
+  void clear() => _storage.clear();
+
+  List<OrderedListTreePath> _sortedKeysList() {
     return _storage.keys.toList()..sort();
   }
 
-  List<E> valuesList() {
-    return sortedKeysList().map((key) => _storage[key]).toList();
+  List<E> _valuesList() {
+    return _sortedKeysList().map((key) => _storage[key]).toList();
   }
 
-  E operator [](int index) {
-    return valuesList()[index];
-  }
-
-  void applyChange(ConvertedChange<OrderedListTreePath, E> change) {
-    final keys = sortedKeysList();
+  void _applyChange(ConvertedChange<OrderedListTreePath, E> change) {
+    final keys = _sortedKeysList();
     // We are add deleted keys in case this change is done on our
     // connection. In other cases deletedKeys should be in keys.
     final startKeys = (new SplayTreeSet<OrderedListTreePath>()
@@ -213,8 +296,7 @@ class _OrderedListValue<E> {
 // thrown errors. Also applicable to other CRDTs.
 
 /// Sledge Value to store Ordered List.
-class OrderedListValue<E> extends LeafValue {
-  final _OrderedListValue<E> _list;
+class OrderedListValue<E> extends _OrderedListValue<E> implements LeafValue {
   final DataConverter _converter;
   ValueObserver _observer;
 
@@ -222,43 +304,37 @@ class OrderedListValue<E> extends LeafValue {
   OrderedListValue(Uint8List currentInstanceId)
       : _converter = new DataConverter<OrderedListTreePath, E>(
             keyConverter: orderedListTreePathConverter),
-        _list = new _OrderedListValue<E>(currentInstanceId);
+        super(currentInstanceId);
 
-  /// Inserts the object at position [index] in the list.
+  @override
   void insert(int index, E element) {
-    _list.insert(index, element);
+    super.insert(index, element);
     _observer.valueWasChanged();
   }
 
-  /// Removes the object at position [index] from the list.
+  @override
+  void operator []=(int index, E element) {
+    super[index] = element;
+    _observer.valueWasChanged();
+  }
+
+  @override
   E removeAt(int index) {
-    final result = _list.removeAt(index);
+    final result = super.removeAt(index);
     _observer.valueWasChanged();
     return result;
   }
-
-  /// Returns the object at the given [index] in the list or throws a RangeError
-  /// if [index] is out of bounds.
-  E operator [](int index) => _list[index];
-
-  /// Gets list of elements.
-  List<E> toList() => _list.valuesList();
 
   @override
   set observer(ValueObserver observer) {
     _observer = observer;
   }
 
-  // TODO: consider creating a Sledge serializable and comparable data type.
-  // So there would be no need to register converter for new types.
   @override
-  Change getChange() => _converter.serialize(_list.getChange());
+  Change getChange() => _converter.serialize(super._getChange());
 
   @override
   void applyChange(Change input) {
-    _list.applyChange(_converter.deserialize(input));
+    super._applyChange(_converter.deserialize(input));
   }
-
-  @override
-  Stream<OrderedListChange<E>> get onChange => _list.onChange;
 }
