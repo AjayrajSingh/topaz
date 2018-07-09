@@ -4,6 +4,6 @@
     <project name="external/skia.googlesource.com/skia"
              path="third_party/skia"
              remote="https://skia.googlesource.com/skia"
-             revision="a391c72a20574053a00e05848aa7460d30d7b649"/>
+             revision="373224c9ab3ae3f13c45f61521e01c282016fde0"/>
   </projects>
 </manifest>
