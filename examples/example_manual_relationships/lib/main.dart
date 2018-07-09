@@ -14,17 +14,21 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';
 
-const String _kModuleUrl = 'example_manual_relationships';
+import 'grouping.dart';
+import 'launch_copresent_button.dart';
+import 'start_module_button.dart';
+
 final StartupContext _context = new StartupContext.fromStartupInfo();
 
 /// This is used for keeping the reference around.
 ModuleImpl _module = new ModuleImpl();
 ModuleContextProxy _moduleContext = new ModuleContextProxy();
-List<_ModuleControllerWrapper> _controllers = <_ModuleControllerWrapper>[];
 int _childId = 0;
 
-/// The key for the child modules list
-final GlobalKey<ChildModulesViewState> kChildModulesKey = new GlobalKey();
+String _generateChildId() {
+  _childId++;
+  return 'C$_childId';
+}
 
 class _ModuleControllerWrapper {
   final ModuleControllerProxy proxy;
@@ -39,30 +43,6 @@ class _ModuleControllerWrapper {
   void defocus() {
     proxy.defocus();
   }
-}
-
-void onStateChange(ModuleState newState) {
-  // NOTE(mesch): There used to be code here that would stop the module when
-  // it's Done(), indicated by the module state being DONE, but this state no
-  // longer exists.
-  log.info('Module state changed to $newState');
-}
-
-/// Starts a new module
-void startChildModule(SurfaceRelation relation) {
-  ModuleControllerProxy moduleController = new ModuleControllerProxy()
-    ..onStateChange = onStateChange;
-
-  _childId++;
-  String name = 'C$_childId';
-
-  IntentBuilder intentBuilder = new IntentBuilder.handler(_kModuleUrl);
-  _moduleContext.startModule(name, intentBuilder.intent,
-      moduleController.ctrl.request(), relation, (StartModuleStatus status) {});
-  log.info('Started sub-module $name');
-
-  _controllers.add(new _ModuleControllerWrapper(moduleController, name));
-  kChildModulesKey.currentState.refresh();
 }
 
 /// Starts a predefined test container
@@ -117,33 +97,6 @@ void startContainerInShell() {
       nodes);
 }
 
-/// Button widget to start module
-class LaunchModuleButton extends StatelessWidget {
-  /// The  relationship to introduce a new surface with
-  final SurfaceRelation _relation;
-
-  /// The display text for the relationship
-  final String _display;
-
-  /// Construct a button [Widget] to add new surface with given relationship
-  const LaunchModuleButton(this._relation, this._display);
-
-  @override
-  Widget build(BuildContext context) {
-    return new Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: new RaisedButton(
-        child: new Center(
-          child: new Text(_display),
-        ),
-        onPressed: () {
-          startChildModule(_relation);
-        },
-      ),
-    );
-  }
-}
-
 /// Launch a (prebaked) Container
 class LaunchContainerButton extends StatelessWidget {
   /// Construct a button [Widget] to add a predefined container to the story
@@ -161,77 +114,6 @@ class LaunchContainerButton extends StatelessWidget {
       ),
     );
   }
-}
-
-/// White box grouping
-class Grouping extends StatelessWidget {
-  /// The children in this grouping
-  final List<Widget> children;
-
-  /// Construct Grouping
-  const Grouping({this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    return new Container(
-      color: const Color(0xFFFFFFFF),
-      margin: const EdgeInsets.all(10.0),
-      padding: const EdgeInsets.all(10.0),
-      child: new Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: children,
-      ),
-    );
-  }
-}
-
-/// Specify an emphasis and launch a copresented surface
-class CopresentLauncher extends StatefulWidget {
-  /// CopresentLauncher
-  const CopresentLauncher({Key key}) : super(key: key);
-
-  @override
-  CopresentLauncherState createState() => new CopresentLauncherState();
-}
-
-/// Copresent Launch State
-class CopresentLauncherState extends State<CopresentLauncher> {
-  double _copresentEmphasisExp = 0.0;
-
-  double get _emphasis =>
-      (math.pow(2, _copresentEmphasisExp) * 10.0).roundToDouble() / 10.0;
-
-  @override
-  Widget build(BuildContext context) => new Container(
-        alignment: FractionalOffset.center,
-        constraints: const BoxConstraints(maxWidth: 200.0),
-        child: new Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            new Slider(
-              min: -1.6,
-              max: 1.6,
-              value: _copresentEmphasisExp,
-              label: 'Emphasis: $_emphasis',
-              onChanged: (double value) =>
-                  setState(() => _copresentEmphasisExp = value),
-            ),
-            new LaunchModuleButton(
-                new SurfaceRelation(
-                  emphasis: _emphasis,
-                  arrangement: SurfaceArrangement.copresent,
-                ),
-                'Copresent'),
-            new LaunchModuleButton(
-                new SurfaceRelation(
-                  emphasis: _emphasis,
-                  arrangement: SurfaceArrangement.copresent,
-                  dependency: SurfaceDependency.dependent,
-                ),
-                'Dependent\nCopresent'),
-          ],
-        ),
-      );
 }
 
 /// Display controls for a child module
@@ -281,38 +163,6 @@ class ChildController extends StatelessWidget {
   }
 }
 
-/// View for currently live child modules
-class ChildModulesView extends StatefulWidget {
-  /// ChildModulesView
-  const ChildModulesView({Key key}) : super(key: key);
-
-  @override
-  ChildModulesViewState createState() => new ChildModulesViewState();
-}
-
-/// Copresent Launch State
-class ChildModulesViewState extends State<ChildModulesView> {
-  /// Reload the child list
-  void refresh() {
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) => new Container(
-        alignment: FractionalOffset.center,
-        height: 60.0,
-        constraints: const BoxConstraints(maxWidth: 200.0),
-        child: new Scrollbar(
-          child: new ListView.builder(
-            itemCount: _controllers.length,
-            itemBuilder: (BuildContext context, int index) {
-              return new ChildController(_controllers[index]);
-            },
-          ),
-        ),
-      );
-}
-
 /// Main UI Widget
 class MainWidget extends StatelessWidget {
   @override
@@ -322,8 +172,7 @@ class MainWidget extends StatelessWidget {
       body: new Center(
         child: new Container(
           constraints: const BoxConstraints(maxWidth: 200.0),
-          child: new Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: new ListView(
             children: <Widget>[
               new Grouping(
                 children: <Widget>[
@@ -343,21 +192,18 @@ class MainWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              const Grouping(
-                children: const <Widget>[
-                  const CopresentLauncher(),
-                  const Divider(),
-                  const LaunchModuleButton(
-                      const SurfaceRelation(
-                          arrangement: SurfaceArrangement.sequential),
-                      'Sequential'),
-                  const LaunchContainerButton(),
-                ],
-              ),
               new Grouping(
                 children: <Widget>[
-                  const Text('Children'),
-                  new ChildModulesView(key: kChildModulesKey),
+                  CopresentLauncher(_moduleContext, _generateChildId),
+                  const Divider(),
+                  StartModuleButton(
+                    _moduleContext,
+                    const SurfaceRelation(
+                        arrangement: SurfaceArrangement.sequential),
+                    'Sequential',
+                    _generateChildId,
+                  ),
+                  const LaunchContainerButton(),
                 ],
               ),
             ],
