@@ -16,6 +16,26 @@ void main() {
     tester.testApi();
   });
 
-  // TODO: add tests to check that all operations continue work as expected with
-  // put, applyChanges and rollback
+  test('getChange', () {
+    KeyValueStorage kv = new KeyValueStorage<int, int>();
+    expect(kv.length, equals(0));
+    kv[0] = 2;
+    expect(kv[0], equals(2));
+    expect(kv.length, equals(1));
+    kv.getChange();
+    expect(kv[0], equals(2));
+    expect(kv.length, equals(1));
+  });
+
+  test('getChange + applyChange', () {
+    KeyValueStorage kv1 = new KeyValueStorage<int, int>(),
+        kv2 = new KeyValueStorage<int, int>();
+    kv1[0] = 2;
+    kv2.applyChange(kv1.getChange());
+    expect(kv2[0], equals(2));
+    expect(kv2.length, equals(1));
+  });
+
+  // TODO: add tests to check that all operations continue working as expected with
+  // getChange, applyChanges and rollback
 }
