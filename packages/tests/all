@@ -9,6 +9,7 @@
         "topaz/packages/tests/fidl_compatibility_test",
         "topaz/packages/tests/fidl_compatibility_test_server_dart",
         "topaz/packages/tests/flutter_screencap_test",
+        "topaz/packages/tests/flutter_screencap_test_app",
         "topaz/packages/tests/web_runner",
         "topaz/packages/tests/web_view"
     ]

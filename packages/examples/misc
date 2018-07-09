@@ -9,7 +9,6 @@
         "//topaz/examples/ledger/todo_list",
         "//topaz/examples/ledger/todo_list_sledge",
         "//topaz/examples/ledger/vote_list_sledge",
-        "//topaz/examples/media/vu_meter:package",
-        "//topaz/examples/screen_test"
+        "//topaz/examples/media/vu_meter:package"
     ]
 }

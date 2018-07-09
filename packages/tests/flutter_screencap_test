@@ -1,8 +1,7 @@
 {
     "imports": [
-        "garnet/packages/prod/scenic_tools",
-        "garnet/packages/prod/test_runner",
-        "topaz/packages/products/dashboard"
+        "peridot/packages/tests/modular_integration_tests",
+        "topaz/packages/tests/flutter_screencap_test_app"
     ],
     "packages": [
         "//topaz/bin/flutter_screencap_test"

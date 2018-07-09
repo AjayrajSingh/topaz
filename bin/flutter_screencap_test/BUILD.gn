@@ -3,6 +3,18 @@
 # found in the LICENSE file.
 
 import("//build/package.gni")
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+flutter_app("flutter_screencap_test_app") {
+  main_dart = "lib/main.dart"
+
+  deps = [
+    "//garnet/public/fidl/fuchsia.sys",
+    "//garnet/public/fidl/fuchsia.testing.runner",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/lib/app/dart",
+  ]
+}
 
 package("flutter_screencap_test") {
   testonly = true
