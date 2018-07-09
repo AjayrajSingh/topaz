@@ -18,7 +18,6 @@
 #include "lib/fxl/macros.h"
 #include "lib/ui/scenic/cpp/resources.h"
 #include "third_party/skia/include/core/SkSurface.h"
-#include "third_party/skia/include/gpu/vk/GrVkBackendContext.h"
 
 namespace flutter {
 
@@ -27,7 +26,6 @@ class VulkanSurface final
  public:
   VulkanSurface(vulkan::VulkanProvider& vulkan_provider,
                 sk_sp<GrContext> context,
-                sk_sp<GrVkBackendContext> backend_context,
                 scenic::Session* session,
                 const SkISize& size);
 
@@ -101,7 +99,6 @@ class VulkanSurface final
       const zx::event& event) const;
 
   vulkan::VulkanProvider& vulkan_provider_;
-  sk_sp<GrVkBackendContext> backend_context_;
   scenic::Session* session_;
   vulkan::VulkanHandle<VkImage> vk_image_;
   vulkan::VulkanHandle<VkDeviceMemory> vk_memory_;

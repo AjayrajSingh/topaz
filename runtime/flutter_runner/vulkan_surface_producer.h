@@ -12,7 +12,6 @@
 #include "lib/fxl/macros.h"
 #include "lib/ui/scenic/cpp/resources.h"
 #include "lib/ui/scenic/cpp/session.h"
-#include "third_party/skia/include/gpu/vk/GrVkBackendContext.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "vulkan_surface.h"
 #include "vulkan_surface_pool.h"
@@ -61,7 +60,6 @@ class VulkanSurfaceProducer final
   fxl::RefPtr<vulkan::VulkanProcTable> vk_;
   std::unique_ptr<vulkan::VulkanApplication> application_;
   std::unique_ptr<vulkan::VulkanDevice> logical_device_;
-  sk_sp<GrVkBackendContext> backend_context_;
   sk_sp<GrContext> context_;
   std::unique_ptr<VulkanSurfacePool> surface_pool_;
   bool valid_ = false;

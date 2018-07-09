@@ -15,11 +15,9 @@ namespace flutter {
 
 VulkanSurface::VulkanSurface(vulkan::VulkanProvider& vulkan_provider,
                              sk_sp<GrContext> context,
-                             sk_sp<GrVkBackendContext> backend_context,
                              scenic::Session* session,
                              const SkISize& size)
     : vulkan_provider_(vulkan_provider),
-      backend_context_(std::move(backend_context)),
       session_(session),
       wait_(this) {
   FXL_DCHECK(session_);
@@ -133,10 +131,6 @@ bool VulkanSurface::AllocateDeviceMemory(sk_sp<GrContext> context,
                                          const SkISize& size,
                                          zx::vmo& exported_vmo) {
   if (size.isEmpty()) {
-    return false;
-  }
-
-  if (backend_context_ == nullptr) {
     return false;
   }
 
