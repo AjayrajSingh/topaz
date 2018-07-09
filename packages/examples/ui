@@ -1,10 +1,6 @@
 {
     "packages": [
         "//topaz/examples/ui/async_hello_mod",
-        "//topaz/examples/ui/hello_material:hello_material_aot",
-        "//topaz/examples/ui/hello_material:hello_material_jit",
-        "//topaz/examples/ui/hello_material:hello_material_aot_product",
-        "//topaz/examples/ui/hello_material:hello_material_jit_product",
         "//topaz/examples/ui/hello_mod",
         "//topaz/examples/ui/jank:package",
         "//topaz/examples/ui/noodles:package",
