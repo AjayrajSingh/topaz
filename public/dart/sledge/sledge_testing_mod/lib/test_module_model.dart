@@ -6,9 +6,8 @@ import 'package:lib.widgets/modular.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:sledge/sledge.dart';
 
-/// Handles the lifecycle of the Todo module.
-class TodoModuleModel extends ModuleModel {
-  // TODO: Move into separate target.
+/// Handles the lifecycle of the Test module.
+class TestModuleModel extends ModuleModel {
   void _runSledgeTest(final ModuleContext moduleContext) async {
     Sledge sledge = new Sledge.fromModule(moduleContext, new SledgePageId('my page'));
 

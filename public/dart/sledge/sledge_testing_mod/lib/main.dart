@@ -5,23 +5,23 @@
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/modular.dart';
-import 'widgets/todo_widget.dart';
+import 'test_module_model.dart';
 
-/// Main entry point to the todo list application.
+/// Main entry point to the testing mod.
 void main() {
   StartupContext startupContext = new StartupContext.fromStartupInfo();
 
-  ModuleModel todoModuleModel = new ModuleModel();
+  TestModuleModel testModuleModel = new TestModuleModel();
 
   MaterialApp materialApp = new MaterialApp(
-      home: new TodoWidget(), theme: new ThemeData(primarySwatch: Colors.red));
+      home: new Text('This mod tests Sledge.'));
 
-  ModuleWidget<ModuleModel> todoWidget = new ModuleWidget<ModuleModel>(
+  ModuleWidget<TestModuleModel> testWidget = new ModuleWidget<TestModuleModel>(
     startupContext: startupContext,
-    moduleModel: todoModuleModel,
+    moduleModel: testModuleModel,
     child: materialApp,
   );
 
-  runApp(todoWidget);
-  todoWidget.advertise();
+  runApp(testWidget);
+  testWidget.advertise();
 }

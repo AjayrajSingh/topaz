@@ -80,7 +80,10 @@ Every `Type` has an associated `Value`, for example:
 Documents wrap values and offer facilities to interact with Sledge.
 
 ## Testing
-To run the tests:
+
+### Host-side tests
+
+These tests run on the host and use a fake Ledger.
 ```
 cd $FUCHSIA_DIR
 # Debug mode should be activated and the topaz test packages should be included, e.g.
@@ -93,3 +96,9 @@ When testing is complete, reset to default packages with:
 ```
 fx set x64 $FUCHSIA_DIR/out/release-x64 --args=is_debug=false
 ```
+
+### Device-side tests
+
+These tests run on a fuchsia and exercise real Ledger instances.
+Require the `topaz/public/dart/sledge/sledge_testing_mod/package` package.
+Running these tests is done by launching the `sledge_testing_mod` mod.
