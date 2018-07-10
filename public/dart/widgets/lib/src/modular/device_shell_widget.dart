@@ -87,19 +87,13 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
     DeviceShellModel deviceShellModel,
     AuthenticationContext authenticationContext,
   ) {
-    DeviceShellImpl deviceShell;
-    void onStop() {
-      deviceShellModel?.onStop?.call();
-      deviceShell.onStop();
-    }
-
-    // ignore: join_return_with_assignment
-    deviceShell = new DeviceShellImpl(
+    return new DeviceShellImpl(
       authenticationContext: authenticationContext,
       onReady: deviceShellModel?.onReady,
-      onStop: onStop,
+      onStop: () {
+        deviceShellModel?.onStop?.call();
+      },
     );
-    return deviceShell;
   }
 
   /// Cancels any authentication flow currently in progress.
