@@ -9,14 +9,15 @@ flutter_app("bluetooth_settings") {
   manifest = "pubspec.yaml"
 
   deps = [
-    "//garnet/public/fidl/fuchsia.bluetooth",
     "//garnet/public/fidl/fuchsia.bluetooth.control",
     "//garnet/public/fidl/fuchsia.bluetooth.gatt",
     "//garnet/public/fidl/fuchsia.bluetooth.le",
+    "//garnet/public/fidl/fuchsia.bluetooth",
     "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
-    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/widgets/dart",
   ]
 }

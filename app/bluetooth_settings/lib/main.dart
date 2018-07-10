@@ -2,25 +2,38 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:lib.widgets/modular.dart';
-import 'src/modular/module_model.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.widgets.dart/model.dart';
+
+import 'src/models/settings_model.dart';
 import 'src/screen.dart';
 
+ModuleDriver _driver;
+
 void main() {
-  setupLogger();
+  setupLogger(name: 'bluetooth_settings');
 
-  StartupContext context = new StartupContext.fromStartupInfo();
+  final model = SettingsModel();
 
-  ModuleWidget<SettingsModuleModel> moduleWidget =
-      new ModuleWidget<SettingsModuleModel>(
-          moduleModel: new SettingsModuleModel(context),
-          startupContext: context,
-          child: const SettingsScreen())
-        ..advertise();
+  _driver = ModuleDriver(onTerminate: model.terminate);
 
-  runApp(new MaterialApp(home: moduleWidget));
+  runApp(
+    MaterialApp(
+      home: ScopedModel<SettingsModel>(
+        model: model,
+        child: const SettingsScreen(),
+      ),
+    ),
+  );
+
+  _driver.start().then((ModuleDriver driver) {
+    model.connect(driver.environmentServices);
+  }, onError: _handleError);
+}
+
+void _handleError(Error error, StackTrace stackTrace) {
+  log.severe('An error ocurred', error, stackTrace);
 }

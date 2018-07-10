@@ -1,16 +1,15 @@
-// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_bluetooth/fidl.dart' as bt;
-import 'package:fidl_bluetooth_control/fidl.dart' as bt_ctl;
+import 'package:fidl_fuchsia_bluetooth_control/fidl.dart' as bt_ctl;
+import 'package:fidl_fuchsia_bluetooth/fidl.dart' as bt;
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets.dart/model.dart';
 
-/// The [ModuleModel] for the Settings example.
-class SettingsModuleModel extends ModuleModel
+/// The [Model] for the Settings example
+class SettingsModel extends Model
     implements bt_ctl.ControlDelegate, bt_ctl.RemoteDeviceDelegate {
   // Members that maintain the FIDL service connections.
   final bt_ctl.ControlProxy _control = new bt_ctl.ControlProxy();
@@ -36,13 +35,6 @@ class SettingsModuleModel extends ModuleModel
   // Devices tracked
   final Map<String, bt_ctl.RemoteDevice> _discoveredDevices =
       <String, bt_ctl.RemoteDevice>{};
-
-  /// Constructor
-  SettingsModuleModel(this.startupContext) : super();
-
-  /// We use the |startupContext| to obtain a handle to the "bluetooth::control::AdapterManager"
-  /// environment service.
-  final StartupContext startupContext;
 
   /// Public accessors for the private fields above.
   Iterable<bt_ctl.AdapterInfo> get adapters => _adapters.values;
@@ -115,14 +107,10 @@ class SettingsModuleModel extends ModuleModel
     notifyListeners();
   }
 
-  @override
-  void onReady(
-    ModuleContext moduleContext,
-    Link link,
-  ) {
-    super.onReady(moduleContext, link);
-
-    connectToService(startupContext.environmentServices, _control.ctrl);
+  /// This method should be called when the module is ready to connect to
+  /// external services
+  void connect(ServiceProviderProxy environmentServices) {
+    connectToService(environmentServices, _control.ctrl);
     _control
       ..setDelegate(_controlBinding.wrap(this))
       ..setRemoteDeviceDelegate(_deviceBinding.wrap(this), true)
@@ -133,10 +121,10 @@ class SettingsModuleModel extends ModuleModel
       });
   }
 
-  @override
-  void onStop() {
+  /// The [terminate] method should be called before the module terminates
+  ///  allowing it to teardown any open connections it may have
+  void terminate() {
     _control.ctrl.close();
-    super.onStop();
   }
 
   // bt_ctl.AdapterManagerDelegate overrides:
