@@ -8,9 +8,9 @@ flutter_app("link_viewer") {
   main_dart = "lib/main.dart"
 
   deps = [
-    "//peridot/public/fidl/fuchsia.ledger",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/widgets/dart",
   ]
 }

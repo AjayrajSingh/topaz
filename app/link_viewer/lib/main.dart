@@ -3,11 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets.dart/model.dart';
 
-import 'src/modular/module_model.dart';
+import 'src/models/link_viewer_model.dart';
 
 const double _kJsonViewerElevation = 1.0;
 const double _kJsonViewerBorderRadius = 8.0;
@@ -20,28 +20,36 @@ const String _kListEntryPrefix = '\u{2022}'; // Unicode bullet point.
 void main() {
   setupLogger();
 
-  ModuleWidget<LinkViewerModuleModel> moduleWidget =
-      new ModuleWidget<LinkViewerModuleModel>(
-    startupContext: new StartupContext.fromStartupInfo(),
-    moduleModel: new LinkViewerModuleModel(),
-    child: new Center(
-      child: new PhysicalModel(
-        color: Colors.black,
-        elevation: _kJsonViewerElevation,
-        borderRadius: new BorderRadius.circular(_kJsonViewerBorderRadius),
-        child: new _JsonViewer(),
+  final driver = ModuleDriver()..start();
+  final model = LinkViewerModel();
+
+  driver.link.watch().listen(
+        model.onData,
+        onError: (err, stack) => log.warning(err, stack),
+      );
+
+  runApp(
+    MaterialApp(
+      home: ScopedModel<LinkViewerModel>(
+        model: model,
+        child: new Center(
+          child: new PhysicalModel(
+            color: Colors.black,
+            elevation: _kJsonViewerElevation,
+            borderRadius: new BorderRadius.circular(_kJsonViewerBorderRadius),
+            child: new _JsonViewer(),
+          ),
+        ),
       ),
     ),
-  )..advertise();
-
-  runApp(moduleWidget);
+  );
 }
 
 class _JsonViewer extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
-      new ScopedModelDescendant<LinkViewerModuleModel>(
-        builder: (_, __, LinkViewerModuleModel model) {
+      new ScopedModelDescendant<LinkViewerModel>(
+        builder: (_, __, LinkViewerModel model) {
           List<_Entry> entries = <_Entry>[];
           _addEntries(0, model.decodedJson, entries);
           if (entries.length > 20) {
