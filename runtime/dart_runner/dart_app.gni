@@ -380,11 +380,21 @@ template("dart_aot_app") {
 #   extra_entry_manifests (optional)
 #     List of AOT entry point manifest files. Most apps do not need this.
 #
+#   aot (optional, dart_app() only)
+#     A boolean. Whether to AOT compile the app. When not specified, the value
+#     of the dart_default_app GN argument is used.
+#
 #   product (optional)
 #     A boolean. Whether to build/run the app in a stripped-down Dart VM.
 #     Defaults to !is_debug.
 template("dart_app") {
-  target(dart_default_app, target_name) {
-    forward_variables_from(invoker, "*")
+  if (defined(invoker.aot) && invoker.aot) {
+    dart_aot_app(target_name) {
+      forward_variables_from(invoker, "*", [ "aot" ])
+    }
+  } else {
+    target(dart_default_app, target_name) {
+      forward_variables_from(invoker, "*", [ "aot" ])
+    }
   }
 }

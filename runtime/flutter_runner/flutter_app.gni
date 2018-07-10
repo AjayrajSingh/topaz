@@ -507,7 +507,8 @@ template("flutter_aot_app") {
 #     Prevents analysis from being run on this target.
 #
 #   aot (optional, flutter_app() only)
-#     A boolean. Whether to AOT compile the app. Default is false.
+#     A boolean. Whether to AOT compile the app. When not specified, the value
+#     of the flutter_default_app GN argument is used.
 #
 #   product (optional)
 #     A boolean. Whether to build/run the app in a stripped-down Dart VM.

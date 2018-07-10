@@ -2,6 +2,8 @@
     "packages": [
         "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart_aot",
         "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart_jit",
+        "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart_app_aot",
+        "//topaz/runtime/dart_runner/examples/goodbye_dart:goodbye_dart_app_noaot",
         "//topaz/runtime/dart_runner/examples/hello_app_dart:hello_app_dart_aot",
         "//topaz/runtime/dart_runner/examples/hello_app_dart:hello_app_dart_jit",
         "//topaz/runtime/dart_runner/examples/hello_dart:hello_dart_aot",
