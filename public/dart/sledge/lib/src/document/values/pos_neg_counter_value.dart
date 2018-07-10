@@ -23,7 +23,7 @@ import 'key_value_storage.dart';
 /// between the positive and negative variable.
 /// Each variable pair may be modified by only one instance, so the
 /// Last One Wins merge strategy works.
-class _PosNegCounterValue<T extends num> {
+class PosNegCounterValue<T extends num> implements LeafValue {
   final KeyValueStorage<Uint8List, T> _storage;
   final Uint8List _currentInstanceId;
   T _sum;
@@ -31,9 +31,13 @@ class _PosNegCounterValue<T extends num> {
   final StreamController<T> _changeController =
       new StreamController<T>.broadcast();
   static final _listEquality = new ListEquality();
+  final DataConverter<Uint8List, T> _converter;
 
-  _PosNegCounterValue(this._currentInstanceId, this._defaultValue)
-      : _storage = new KeyValueStorage<Uint8List, T>(
+  /// Default constructor.
+  PosNegCounterValue(this._currentInstanceId)
+      : _defaultValue = new Converter<T>().defaultValue,
+        _converter = new DataConverter<Uint8List, T>(),
+        _storage = new KeyValueStorage<Uint8List, T>(
             equals: _listEquality.equals, hashCode: _listEquality.hash) {
     _sum = _defaultValue;
   }
@@ -44,8 +48,10 @@ class _PosNegCounterValue<T extends num> {
       concatUint8Lists(new Uint8List.fromList([1]), _currentInstanceId);
   bool _isKeyPositive(Uint8List key) => key[0] == 0;
 
+  @override
   Stream<T> get onChange => _changeController.stream;
 
+  /// Adds the [delta] to this counter. The [delta] can potentially be negative.
   void add(T delta) {
     if (delta > 0) {
       _addPositiveValue(_positiveKey, delta);
@@ -55,6 +61,7 @@ class _PosNegCounterValue<T extends num> {
     _sum += delta;
   }
 
+  /// Returns the current value of this counter.
   T get value => _sum;
 
   void _addPositiveValue(Uint8List key, T delta) {
@@ -62,9 +69,12 @@ class _PosNegCounterValue<T extends num> {
     _storage[key] = cur + delta;
   }
 
-  ConvertedChange<Uint8List, T> getChange() => _storage.getChange();
+  @override
+  Change getChange() => _converter.serialize(_storage.getChange());
 
-  void applyChange(ConvertedChange<Uint8List, T> change) {
+  @override
+  void applyChange(Change input) {
+    final ConvertedChange<Uint8List, T> change = _converter.deserialize(input);
     for (var key in change.changedEntries.keys) {
       var diff = change.changedEntries[key] - (_storage[key] ?? _defaultValue);
       if (_isKeyPositive(key)) {
@@ -76,43 +86,9 @@ class _PosNegCounterValue<T extends num> {
     _storage.applyChange(change);
     _changeController.add(_sum);
   }
-}
-
-/// Sledge Value to store numerical counter.
-class PosNegCounterValue<T extends num> implements LeafValue {
-  final _PosNegCounterValue<T> _counter;
-  final DataConverter<Uint8List, T> _converter;
-  ValueObserver _observer;
-
-  /// Constructor.
-  PosNegCounterValue(Uint8List id, [Change init])
-      : _converter = new DataConverter<Uint8List, T>(),
-        _counter =
-            new _PosNegCounterValue<T>(id, new Converter<T>().defaultValue) {
-    applyChange(init ?? new Change());
-  }
-
-  @override
-  Change getChange() => _converter.serialize(_counter.getChange());
-
-  @override
-  void applyChange(Change input) =>
-      _counter.applyChange(_converter.deserialize(input));
-
-  @override
-  Stream<T> get onChange => _counter.onChange;
 
   @override
   set observer(ValueObserver observer) {
-    _observer = observer;
+    _storage.observer = observer;
   }
-
-  /// Adds value (possibly negative) to counter.
-  void add(final T delta) {
-    _counter.add(delta);
-    _observer.valueWasChanged();
-  }
-
-  /// Returns current value of counter.
-  T get value => _counter.value;
 }

@@ -6,7 +6,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:sledge/src/document/change.dart';
 import 'package:sledge/src/document/uint8list_ops.dart';
 import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/converter.dart';
@@ -16,7 +15,7 @@ import 'package:test/test.dart';
 import '../dummies/dummy_value_observer.dart';
 
 class TestPosNegCounterValue<T extends num> extends PosNegCounterValue<T> {
-  TestPosNegCounterValue(Uint8List id, [Change init]) : super(id, init) {
+  TestPosNegCounterValue(Uint8List id) : super(id) {
     observer = new DummyValueObserver();
   }
 }
@@ -71,35 +70,35 @@ void main() {
 
   test('PosNegCounterValue construction', () {
     DataConverter conv = new DataConverter<Uint8List, int>();
-    var cnt = new TestPosNegCounterValue<int>(
-        new Uint8List.fromList([1]),
-        conv.serialize(new ConvertedChange<Uint8List, int>(intMF.newMap()
-          ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4)
-          ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 3))));
+    var cnt = new TestPosNegCounterValue<int>(new Uint8List.fromList([1]))
+      ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
+          intMF.newMap()
+            ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4)
+            ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 3))));
     expect(cnt.value, equals(1));
   });
 
   test('PosNegCounterValue construction 2', () {
     DataConverter conv = new DataConverter<Uint8List, int>();
-    var cnt = new TestPosNegCounterValue<int>(
-        new Uint8List.fromList([1]),
-        conv.serialize(new ConvertedChange<Uint8List, int>(intMF.newMap()
-          ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4)
-          ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 3)
-          ..putIfAbsent(new Uint8List.fromList([0, 3]), () => 5)
-          ..putIfAbsent(new Uint8List.fromList([1, 3]), () => 2))));
+    var cnt = new TestPosNegCounterValue<int>(new Uint8List.fromList([1]))
+      ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
+          intMF.newMap()
+            ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4)
+            ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 3)
+            ..putIfAbsent(new Uint8List.fromList([0, 3]), () => 5)
+            ..putIfAbsent(new Uint8List.fromList([1, 3]), () => 2))));
     expect(cnt.value, equals(4));
   });
 
   test('PosNegCounterValue construction double', () {
     DataConverter conv = new DataConverter<Uint8List, double>();
-    var cnt = new TestPosNegCounterValue<double>(
-        new Uint8List.fromList([1]),
-        conv.serialize(new ConvertedChange<Uint8List, double>(doubleMF.newMap()
-          ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4.25)
-          ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 3.0)
-          ..putIfAbsent(new Uint8List.fromList([0, 3]), () => 2.5)
-          ..putIfAbsent(new Uint8List.fromList([1, 4]), () => 4.125))));
+    var cnt = new TestPosNegCounterValue<double>(new Uint8List.fromList([1]))
+      ..applyChange(conv.serialize(new ConvertedChange<Uint8List, double>(
+          doubleMF.newMap()
+            ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4.25)
+            ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 3.0)
+            ..putIfAbsent(new Uint8List.fromList([0, 3]), () => 2.5)
+            ..putIfAbsent(new Uint8List.fromList([1, 4]), () => 4.125))));
     expect(cnt.value, equals(-0.375));
   });
 
@@ -120,11 +119,11 @@ void main() {
 
   test('PosNegCounterValue onChange stream', () {
     DataConverter conv = new DataConverter<Uint8List, int>();
-    var cnt = new TestPosNegCounterValue<int>(
-        new Uint8List.fromList([1]),
-        conv.serialize(new ConvertedChange<Uint8List, int>(intMF.newMap()
-          ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 1)
-          ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 2))));
+    var cnt = new TestPosNegCounterValue<int>(new Uint8List.fromList([1]))
+      ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
+          intMF.newMap()
+            ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 1)
+            ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 2))));
     Stream<int> changeStream = cnt.onChange;
     expect(changeStream, emitsInOrder([2, 4, -3]));
     cnt

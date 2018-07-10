@@ -4,6 +4,7 @@
 
 import 'dart:collection';
 
+import '../value_observer.dart';
 import 'converted_change.dart';
 
 /// Sledge DataTypes internal storage.
@@ -14,6 +15,7 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
   bool Function(K, K) _equals;
   int Function(K) _hashCode;
   int _localLength = 0;
+  ValueObserver _observer;
 
   /// Creates a storage using the provided [equals] as equality.
   KeyValueStorage({bool equals(K key1, K key2), int hashCode(K key)})
@@ -34,6 +36,7 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
 
   @override
   void operator []=(K key, V value) {
+    _observer?.valueWasChanged();
     if (this[key] == null) {
       _localLength += 1;
     }
@@ -43,6 +46,7 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
 
   @override
   V remove(Object key) {
+    _observer?.valueWasChanged();
     V result = this[key];
     if (result != null) {
       _localLength -= 1;
@@ -54,6 +58,7 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
 
   @override
   void clear() {
+    _observer?.valueWasChanged();
     _localChange.changedEntries.clear();
     _localLength = 0;
     _localChange.deletedKeys.addAll(_storage.keys);
@@ -90,5 +95,10 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
   void rollback() {
     _localChange.clear();
     _localLength = _storage.length;
+  }
+
+  /// Sets the observer.
+  set observer(ValueObserver observer) {
+    _observer = observer;
   }
 }

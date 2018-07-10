@@ -14,12 +14,12 @@ import 'converter.dart';
 import 'key_value_storage.dart';
 import 'ordered_list_tree_path.dart';
 
-// Implementation of Ordered List CRDT.
-//
-// The ordered List CRDT can be changed concurrently by multiple instances, each
-// associated with an instance ID. Changes from other instances are applied when
-// calling [applyChange], while changes from this instance can be retrieved by
-// calling [getChange].
+/// Implementation of Ordered List CRDT.
+///
+/// The ordered List CRDT can be changed concurrently by multiple instances, each
+/// associated with an instance ID. Changes from other instances are applied when
+/// calling [applyChange], while changes from this instance can be retrieved by
+/// calling [getChange].
 //
 // The contents of the list are stored using a KeyValueStorage. The values of
 // the KeyValueStorage are the elements of the list, while the keys are created
@@ -118,22 +118,28 @@ import 'ordered_list_tree_path.dart';
 // Now each implicit node have only one value child. It should be changed. And
 // at the same time value nodes should get able to have implicit node as a
 // child. And left/right edges should have no id written on them.
+//
+// TODO: handle null values in CRDT methods.
 
 // ignore: private_collision_in_mixin_application
-class _OrderedListValue<E> extends ListBase<E> with ListMixin<E> {
+class OrderedListValue<E> extends ListBase<E> implements LeafValue {
+  //with ListMixin<E> {
   final KeyValueStorage<OrderedListTreePath, E> _storage;
   final Uint8List _instanceId;
   int _incrementalTime = 0;
   final OrderedListTreePath _root = new OrderedListTreePath.root();
   final StreamController<OrderedListChange<E>> _changeController =
       new StreamController<OrderedListChange<E>>.broadcast();
+  final DataConverter _converter;
 
-  _OrderedListValue(this._instanceId)
-      : _storage = new KeyValueStorage<OrderedListTreePath, E>();
+  /// Default constructor.
+  OrderedListValue(this._instanceId)
+      : _converter = new DataConverter<OrderedListTreePath, E>(
+            keyConverter: orderedListTreePathConverter),
+        _storage = new KeyValueStorage<OrderedListTreePath, E>();
 
+  @override
   Stream<OrderedListChange<E>> get onChange => _changeController.stream;
-
-  ConvertedChange<OrderedListTreePath, E> _getChange() => _storage.getChange();
 
   @override
   void insert(int index, E element) {
@@ -144,7 +150,7 @@ class _OrderedListValue<E> extends ListBase<E> with ListMixin<E> {
 
     OrderedListTreePath newKey;
     if (sortedKeys.isEmpty) {
-      newKey = _root.getChild(ChildType.value, _instanceId, timestamp);
+      newKey = _root.getChild(ChildType.value, _instanceId, _timestamp);
     } else {
       bool becomeRightChild = (index != 0 &&
           (index == sortedKeys.length ||
@@ -152,10 +158,10 @@ class _OrderedListValue<E> extends ListBase<E> with ListMixin<E> {
 
       if (becomeRightChild) {
         newKey = sortedKeys[index - 1]
-            .getChild(ChildType.right, _instanceId, timestamp);
+            .getChild(ChildType.right, _instanceId, _timestamp);
       } else {
         newKey =
-            sortedKeys[index].getChild(ChildType.left, _instanceId, timestamp);
+            sortedKeys[index].getChild(ChildType.left, _instanceId, _timestamp);
       }
     }
     _storage[newKey] = element;
@@ -258,7 +264,13 @@ class _OrderedListValue<E> extends ListBase<E> with ListMixin<E> {
     return _sortedKeysList().map((key) => _storage[key]).toList();
   }
 
-  void _applyChange(ConvertedChange<OrderedListTreePath, E> change) {
+  @override
+  Change getChange() => _converter.serialize(_storage.getChange());
+
+  @override
+  void applyChange(Change input) {
+    final ConvertedChange<OrderedListTreePath, E> change =
+        _converter.deserialize(input);
     final keys = _sortedKeysList();
     // We are add deleted keys in case this change is done on our
     // connection. In other cases deletedKeys should be in keys.
@@ -284,57 +296,13 @@ class _OrderedListValue<E> extends ListBase<E> with ListMixin<E> {
         .add(new OrderedListChange(deletedPositions, insertedElements));
   }
 
-  Uint8List get timestamp {
-    _incrementalTime += 1;
-    return new Uint8List(8)..buffer.asByteData().setUint64(0, _incrementalTime);
-  }
-}
-
-// TODO: handle null values in CRDT methods.
-
-// TODO: introduce multiline comments to CRDT methods, describing restrictions,
-// thrown errors. Also applicable to other CRDTs.
-
-/// Sledge Value to store Ordered List.
-class OrderedListValue<E> extends _OrderedListValue<E> implements LeafValue {
-  final DataConverter _converter;
-  ValueObserver _observer;
-
-  /// Default constructor.
-  OrderedListValue(Uint8List currentInstanceId)
-      : _converter = new DataConverter<OrderedListTreePath, E>(
-            keyConverter: orderedListTreePathConverter),
-        super(currentInstanceId);
-
-  @override
-  void insert(int index, E element) {
-    super.insert(index, element);
-    _observer.valueWasChanged();
-  }
-
-  @override
-  void operator []=(int index, E element) {
-    super[index] = element;
-    _observer.valueWasChanged();
-  }
-
-  @override
-  E removeAt(int index) {
-    final result = super.removeAt(index);
-    _observer.valueWasChanged();
-    return result;
-  }
-
   @override
   set observer(ValueObserver observer) {
-    _observer = observer;
+    _storage.observer = observer;
   }
 
-  @override
-  Change getChange() => _converter.serialize(super._getChange());
-
-  @override
-  void applyChange(Change input) {
-    super._applyChange(_converter.deserialize(input));
+  Uint8List get _timestamp {
+    _incrementalTime += 1;
+    return new Uint8List(8)..buffer.asByteData().setUint64(0, _incrementalTime);
   }
 }

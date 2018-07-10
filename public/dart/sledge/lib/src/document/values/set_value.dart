@@ -13,14 +13,13 @@ import 'converter.dart';
 import 'key_value_storage.dart';
 
 /// Sledge Value to store Set.
-class SetValue<E> extends SetBase<E> with SetMixin<E> implements LeafValue {
+class SetValue<E> extends SetBase<E> implements LeafValue {
   // Stores elements of [this]. Each element is stored both in a key and in a
   // value. It's done to provide an appropriate [lookup] method.
   final KeyValueStorage<E, E> _map;
   final DataConverter<E, bool> _converter;
   final StreamController<SetChange<E>> _changeController =
       new StreamController<SetChange<E>>.broadcast();
-  ValueObserver _observer;
 
   // TODO: consider Converter as a provider of [equals] and [hashCode] methods.
   /// Creates a SetValue with provided [equals] as equality.
@@ -41,7 +40,7 @@ class SetValue<E> extends SetBase<E> with SetMixin<E> implements LeafValue {
 
   @override
   set observer(ValueObserver observer) {
-    _observer = observer;
+    _map.observer = observer;
   }
 
   /// Returns true if [value] is in the set.
@@ -55,7 +54,6 @@ class SetValue<E> extends SetBase<E> with SetMixin<E> implements LeafValue {
   bool add(Object value) {
     final result = !contains(value);
     _map[value] = value;
-    _observer.valueWasChanged();
     return result;
   }
 
@@ -76,7 +74,6 @@ class SetValue<E> extends SetBase<E> with SetMixin<E> implements LeafValue {
   @override
   bool remove(Object value) {
     final result = (_map.remove(value) != null);
-    _observer.valueWasChanged();
     return result;
   }
 

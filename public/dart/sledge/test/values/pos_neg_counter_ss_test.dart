@@ -5,7 +5,6 @@
 // ignore_for_file: implementation_imports
 import 'dart:typed_data';
 
-import 'package:sledge/src/document/change.dart';
 import 'package:sledge/src/document/values/pos_neg_counter_value.dart';
 import 'package:test/test.dart';
 
@@ -14,7 +13,7 @@ import '../crdt_test_framework/storage_state.dart';
 import '../dummies/dummy_value_observer.dart';
 
 class TestPosNegCounterValue<T extends num> extends PosNegCounterValue<T> {
-  TestPosNegCounterValue(Uint8List id, [Change init]) : super(id, init) {
+  TestPosNegCounterValue(Uint8List id) : super(id) {
     observer = new DummyValueObserver();
   }
 }
