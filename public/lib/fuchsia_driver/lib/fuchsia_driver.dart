@@ -11,6 +11,7 @@ import 'dart:async';
 import 'dart:core';
 import 'dart:io';
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:fuchsia_remote_debug_protocol/fuchsia_remote_debug_protocol.dart';
 
@@ -139,6 +140,9 @@ class FuchsiaDriver {
   /// [FuchsiaRemoteConnection.stop].
   static Future<FuchsiaRemoteConnection> connect() async {
     if (Platform.isFuchsia) {
+      // TODO(FL-74): This is a workaround for flutter driver code that
+      // writes directly to `stderr`, which causes an error in Fuchsia.
+      flutterDriverLog.listen(log.info);
       await FuchsiaDriver._init();
       return FuchsiaRemoteConnection
           // ignore: invalid_use_of_visible_for_testing_member
