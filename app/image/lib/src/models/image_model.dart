@@ -1,22 +1,21 @@
-// Copyright 2017 The Fuchsia Authors. All rights reserved.
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'dart:convert' show json;
 
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets.dart/model.dart';
 
 /// The model for the color module.
-class ImageModuleModel extends ModuleModel {
+class ImageModel extends Model {
   /// Gets the image uri.
   Uri get imageUri => _imageUri;
   Uri _imageUri;
 
   // TODO(vardhan): Deprecate 'image_url' in favour proper typing (eg.,
   // http://schema.org/image).
-  @override
-  void onNotify(String encoded) {
+  void onData(String encoded) {
     log.fine('JSON: $encoded');
     // Expects Link to look something like this:
     // { "image_url" : "http:///www.example.com/image.gif" } or

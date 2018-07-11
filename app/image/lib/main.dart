@@ -4,43 +4,64 @@
 
 import 'dart:io';
 
-import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:flutter/material.dart';
 
-import 'src/modular/module_model.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.widgets.dart/model.dart';
+
+import 'src/models/image_model.dart';
+
+ModuleDriver _driver;
 
 /// Main entry point to the image module.
 void main() {
   setupLogger();
 
-  ModuleWidget<ImageModuleModel> moduleWidget =
-      new ModuleWidget<ImageModuleModel>(
-    startupContext: new StartupContext.fromStartupInfo(),
-    moduleModel: new ImageModuleModel(),
-    child: new ScopedModelDescendant<ImageModuleModel>(
-      builder: (_, __, ImageModuleModel model) => new Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              const Placeholder(),
-              model.imageUri != null
-                  ? model.imageUri.scheme.startsWith('http')
-                      ? new Image.network(
-                          model.imageUri.toString(),
-                          fit: BoxFit.cover,
-                          alignment: FractionalOffset.topCenter,
-                        )
-                      : new Image.file(
-                          new File(model.imageUri.toString()),
-                          fit: BoxFit.cover,
-                          alignment: FractionalOffset.topCenter,
-                        )
-                  : new Container(),
-            ],
-          ),
-    ),
-  )..advertise();
+  _driver = ModuleDriver()
+    ..start().then((_) {
+      log.fine('started image module');
+    }, onError: _handleError);
 
-  runApp(moduleWidget);
+  final model = ImageModel();
+
+  _driver.link.watch().listen(
+        model.onData,
+        onError: _handleError,
+      );
+
+  runApp(
+    MaterialApp(
+      home: ScopedModel<ImageModel>(
+        model: model,
+        child: Scaffold(
+          body: ScopedModelDescendant<ImageModel>(
+            builder: (_, __, ImageModel model) => new Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    const Placeholder(),
+                    model.imageUri != null
+                        ? model.imageUri.scheme.startsWith('http')
+                            ? new Image.network(
+                                model.imageUri.toString(),
+                                fit: BoxFit.cover,
+                                alignment: FractionalOffset.topCenter,
+                              )
+                            : new Image.file(
+                                new File(model.imageUri.toString()),
+                                fit: BoxFit.cover,
+                                alignment: FractionalOffset.topCenter,
+                              )
+                        : new Container(),
+                  ],
+                ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+void _handleError(Object error, StackTrace stackTrace) {
+  log.severe('An error ocurred', error, stackTrace);
 }
