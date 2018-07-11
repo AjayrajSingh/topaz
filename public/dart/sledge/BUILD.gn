@@ -40,6 +40,7 @@ dart_test("dart_sledge_tests") {
     "values/ordered_list_value_test.dart",
     "values/set_value_test.dart",
     "crdt_test_framework/crdt_test_framework.dart",
+    "crdt_test_framework_test/checker_test.dart",
     "crdt_test_framework_test/computational_graph_test.dart"
   ]
 
