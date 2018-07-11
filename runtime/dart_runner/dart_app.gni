@@ -116,7 +116,7 @@ template("dart_jit_app") {
       {
         path = rebase_path(
                 "//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime")
-        dest = "runtime"
+        dest = "deprecated_runtime"
       },
     ]
 
@@ -333,7 +333,7 @@ template("dart_aot_app") {
       {
         path = rebase_path(
                 "//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime")
-        dest = "runtime"
+        dest = "deprecated_runtime"
       },
     ]
 

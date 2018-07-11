@@ -166,7 +166,7 @@ template("flutter_jit_app") {
     meta = [
       {
         path = rebase_path("//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime")
-        dest = "runtime"
+        dest = "deprecated_runtime"
       },
     ]
 
@@ -452,7 +452,7 @@ template("flutter_aot_app") {
     meta = [
       {
         path = rebase_path("//topaz/runtime/flutter_runner/meta/aot${product_suffix}_runtime")
-        dest = "runtime"
+        dest = "deprecated_runtime"
       },
     ]
 
