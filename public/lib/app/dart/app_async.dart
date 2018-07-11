@@ -49,6 +49,16 @@ class StartupContext {
     return context;
   }
 
+  /// Provide an alternative startup context that will then be provided on
+  /// through [StartupContext.fromStartupInfo].
+  ///
+  /// This is primarily used to provide alternative environment services for
+  /// testing purposes.
+  static void provideStartupContext(StartupContext context) {
+    assert(_context != null, 'StartupContext should never be overwritten.');
+    _context = context;
+  }
+
   void close() {
     environment.ctrl.close();
     launcher.ctrl.close();
