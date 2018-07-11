@@ -24,6 +24,7 @@ dart_library("sledge") {
 dart_test("dart_sledge_tests") {
   sources = [
     "document_id_test.dart",
+    "document_ss_test.dart",
     "document_test.dart",
     "ledger_helpers_test.dart",
     "schema_test.dart",

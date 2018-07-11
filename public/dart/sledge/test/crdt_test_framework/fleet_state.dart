@@ -2,6 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// ignore_for_file: implementation_imports
+
+import 'package:sledge/src/document/document.dart';
+
 import 'checker.dart';
 import 'node.dart';
 import 'storage_state.dart';
@@ -46,14 +50,32 @@ class FleetState<T extends dynamic> {
 
   void applyModification(int id, void Function(T) modification, int time) {
     modification(_instances[id]);
-    _storageStates[id].applyChange(_instances[id].getChange(), time);
-    _instances[id].completeTransaction();
+    if (T == Document) {
+      // ignore: argument_type_not_assignable
+      _storageStates[id].applyChange(Document.getChange(_instances[id]), time);
+      // ignore: argument_type_not_assignable
+      Document.completeTransaction(_instances[id]);
+    } else {
+      _storageStates[id].applyChange(_instances[id].getChange(), time);
+      _instances[id].completeTransaction();
+    }
   }
 
   void applySynchronization(int id1, int id2) {
-    _instances[id1]
-        .applyChange(_storageStates[id1].updateWith(_storageStates[id2]));
-    _instances[id2]
-        .applyChange(_storageStates[id2].updateWith(_storageStates[id1]));
+    if (T == Document) {
+      Document.applyChange(
+          // ignore: argument_type_not_assignable
+          _instances[id1],
+          _storageStates[id1].updateWith(_storageStates[id2]));
+      Document.applyChange(
+          // ignore: argument_type_not_assignable
+          _instances[id2],
+          _storageStates[id2].updateWith(_storageStates[id1]));
+    } else {
+      _instances[id1]
+          .applyChange(_storageStates[id1].updateWith(_storageStates[id2]));
+      _instances[id2]
+          .applyChange(_storageStates[id2].updateWith(_storageStates[id1]));
+    }
   }
 }
