@@ -10,7 +10,6 @@ import 'converted_change.dart';
 /// Sledge DataTypes internal storage.
 class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
   final Map<K, V> _storage;
-  // TODO: rename this field.
   final ConvertedChange<K, V> _localChange;
   bool Function(K, K) _equals;
   int Function(K) _hashCode;

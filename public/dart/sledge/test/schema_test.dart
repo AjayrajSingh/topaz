@@ -286,8 +286,6 @@ void main() {
     });
 
     Document.applyChange(docB, c1);
-
-    // TODO: use docB.names.single
-    expect(docB.names.contains(largeList), isTrue);
+    expect(docB.names.single, equals(largeList));
   });
 }
