@@ -28,7 +28,6 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   final DateTime _startTime = new DateTime.now();
   DateTime _lastRefreshed;
   List<String> _devices;
-  ModuleWatcherBinding _webviewModuleWatcherBinding;
   ModuleControllerProxy _webviewModuleControllerProxy;
   Timer _deviceMapTimer;
 
@@ -92,7 +91,8 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
     IntentBuilder intentBuilder = new IntentBuilder.handler(url);
 
     _webviewModuleControllerProxy?.ctrl?.close();
-    _webviewModuleControllerProxy = new ModuleControllerProxy();
+    _webviewModuleControllerProxy = new ModuleControllerProxy()
+      ..onStateChange = onStateChange;
 
     moduleContext.startModule(
         'module:web_view',
@@ -100,20 +100,19 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
         _webviewModuleControllerProxy.ctrl.request(),
         const SurfaceRelation(arrangement: SurfaceArrangement.copresent),
         (StartModuleStatus status) {});
-    _webviewModuleWatcherBinding = new ModuleWatcherBinding();
-    _webviewModuleControllerProxy.watch(
-      _webviewModuleWatcherBinding.wrap(
-        new _ModuleWatcherImpl(onStop: closeWebView),
-      ),
-    );
+  }
+
+  void onStateChange(ModuleState newState) {
+    /// If our module was stopped by the framework, notify this.
+    if (newState == ModuleState.stopped) {
+      onStop();
+    }
   }
 
   /// Closes a previously launched web view.
   void closeWebView() {
     _webviewModuleControllerProxy?.ctrl?.close();
     _webviewModuleControllerProxy = null;
-    _webviewModuleWatcherBinding?.close();
-    _webviewModuleWatcherBinding = null;
   }
 
   void _updatePassFailTime() {
@@ -125,18 +124,4 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   /// details.
   static DashboardModuleModel of(BuildContext context) =>
       new ModelFinder<DashboardModuleModel>().of(context);
-}
-
-class _ModuleWatcherImpl extends ModuleWatcher {
-  final VoidCallback onStop;
-
-  _ModuleWatcherImpl({this.onStop});
-
-  @override
-  void onStateChange(ModuleState newState) {
-    /// If our module was stopped by the framework, notify this.
-    if (newState == ModuleState.stopped) {
-      onStop();
-    }
-  }
 }

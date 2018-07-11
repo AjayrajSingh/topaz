@@ -20,40 +20,38 @@ final StartupContext _context = new StartupContext.fromStartupInfo();
 /// This is used for keeping the reference around.
 ModuleImpl _module = new ModuleImpl();
 ModuleContextProxy _moduleContext = new ModuleContextProxy();
-List<_ModuleStopperWatcher> _watchers = <_ModuleStopperWatcher>[];
+List<_ModuleControllerWrapper> _controllers = <_ModuleControllerWrapper>[];
 int _childId = 0;
 
 /// The key for the child modules list
 final GlobalKey<ChildModulesViewState> kChildModulesKey = new GlobalKey();
 
-class _ModuleStopperWatcher extends ModuleWatcher {
-  final ModuleControllerProxy _moduleController;
-  final ModuleWatcherBinding _binding = new ModuleWatcherBinding();
+class _ModuleControllerWrapper {
+  final ModuleControllerProxy proxy;
   final String name;
 
-  _ModuleStopperWatcher(this._moduleController, this.name) {
-    _moduleController.watch(_binding.wrap(this));
-  }
-  @override
-  void onStateChange(ModuleState newState) {
-    // NOTE(mesch): There used to be code here that would stop the module when
-    // it's Done(), indicated by the module state being DONE, but this state no
-    // longer exists.
-    log.info('Module state changed to $newState');
-  }
+  _ModuleControllerWrapper(this.proxy, this.name);
 
   void focus() {
-    _moduleController.focus();
+    proxy.focus();
   }
 
   void defocus() {
-    _moduleController.defocus();
+    proxy.defocus();
   }
+}
+
+void onStateChange(ModuleState newState) {
+  // NOTE(mesch): There used to be code here that would stop the module when
+  // it's Done(), indicated by the module state being DONE, but this state no
+  // longer exists.
+  log.info('Module state changed to $newState');
 }
 
 /// Starts a new module
 void startChildModule(SurfaceRelation relation) {
-  ModuleControllerProxy moduleController = new ModuleControllerProxy();
+  ModuleControllerProxy moduleController = new ModuleControllerProxy()
+    ..onStateChange = onStateChange;
 
   _childId++;
   String name = 'C$_childId';
@@ -63,7 +61,7 @@ void startChildModule(SurfaceRelation relation) {
       moduleController.ctrl.request(), relation, (StartModuleStatus status) {});
   log.info('Started sub-module $name');
 
-  _watchers.add(new _ModuleStopperWatcher(moduleController, name));
+  _controllers.add(new _ModuleControllerWrapper(moduleController, name));
   kChildModulesKey.currentState.refresh();
 }
 
@@ -239,15 +237,15 @@ class CopresentLauncherState extends State<CopresentLauncher> {
 /// Display controls for a child module
 class ChildController extends StatelessWidget {
   /// Constructor
-  const ChildController(this._watcher);
+  const ChildController(this._controller);
 
-  final _ModuleStopperWatcher _watcher;
+  final _ModuleControllerWrapper _controller;
 
   @override
   Widget build(BuildContext context) {
     return new Row(
       children: <Widget>[
-        new Text('${_watcher.name} '),
+        new Text('${_controller.name} '),
         new Expanded(
           child: new Padding(
             padding: const EdgeInsets.all(2.0),
@@ -258,7 +256,7 @@ class ChildController extends StatelessWidget {
                   'Focus',
                   style: const TextStyle(fontSize: 10.0),
                 ),
-                onPressed: _watcher.focus,
+                onPressed: _controller.focus,
               ),
             ),
           ),
@@ -273,7 +271,7 @@ class ChildController extends StatelessWidget {
                   'Dismiss',
                   style: const TextStyle(fontSize: 10.0),
                 ),
-                onPressed: _watcher.defocus,
+                onPressed: _controller.defocus,
               ),
             ),
           ),
@@ -306,9 +304,9 @@ class ChildModulesViewState extends State<ChildModulesView> {
         constraints: const BoxConstraints(maxWidth: 200.0),
         child: new Scrollbar(
           child: new ListView.builder(
-            itemCount: _watchers.length,
+            itemCount: _controllers.length,
             itemBuilder: (BuildContext context, int index) {
-              return new ChildController(_watchers[index]);
+              return new ChildController(_controllers[index]);
             },
           ),
         ),

@@ -20,7 +20,7 @@ const double _kMaxHeight = 500.0;
 
 /// The actual [Embedder] class that interacts with Fuchsia APIs to resolve,
 /// start, and embed a module.
-class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
+class Embedder extends EmbedderModel implements LinkWatcher {
   /// Height of the box the module will be rendered in.
   double _height;
 
@@ -45,16 +45,12 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
   /// A [ModuleControllerProxy].
   ModuleControllerProxy moduleController;
 
-  /// A [ModuleWatcherBinding] used to watch for [ModuleState] changes.
-  ModuleWatcherBinding watcherBinding;
-
   /// The [Embedder] constructor.
   Embedder({
     String uri,
     @required double height,
     @required this.moduleContext,
-  })
-      : assert(height != null),
+  })  : assert(height != null),
         _height = height,
         super();
 
@@ -66,8 +62,7 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
   @override
   double get height => _height;
 
-  /// Implementation for [ModuleWatcher].
-  @override
+  /// Handles ModuleController.OnStateChange FIDL event.
   void onStateChange(ModuleState state) {
     log.info('ModuleState chaged: $state');
     switch (state) {
@@ -121,9 +116,6 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
     moduleController?.ctrl?.close();
     moduleController = null;
 
-    watcherBinding?.close();
-    watcherBinding = null;
-
     _intentStarted = false;
   }
 
@@ -156,7 +148,8 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
 
     log..info('Starting Intent: $intent')..info('=> name: $name');
 
-    moduleController = new ModuleControllerProxy();
+    moduleController = new ModuleControllerProxy()
+      ..onStateChange = onStateChange;
     InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
 
     moduleContext.embedModule(
@@ -190,9 +183,6 @@ class Embedder extends EmbedderModel implements LinkWatcher, ModuleWatcher {
 
     linkWatcherBinding = new LinkWatcherBinding();
     link.watch(linkWatcherBinding.wrap(this));
-
-    watcherBinding = new ModuleWatcherBinding();
-    moduleController.watch(watcherBinding.wrap(this));
   }
 
   @override
