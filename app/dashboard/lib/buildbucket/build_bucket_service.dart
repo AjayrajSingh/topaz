@@ -5,11 +5,11 @@
 import 'dart:async';
 
 import 'package:buildbucket/buildbucket.dart';
-import 'package:dashboard/enums.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:dashboard/service/build_info.dart';
-import 'package:dashboard/service/build_service.dart';
+import '../enums.dart';
+import '../service/build_info.dart';
+import '../service/build_service.dart';
 
 /// Provides a [BuildbucketApi].
 typedef _ApiProvider = BuildbucketApi Function(http.Client client);

@@ -4,11 +4,12 @@
 
 import 'dart:async';
 
-import 'package:dashboard/enums.dart';
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/modular.dart';
-import 'package:dashboard/service/build_info.dart';
-import 'package:dashboard/service/build_service.dart';
+import 'package:lib.widgets.dart/model.dart';
+
+import 'enums.dart';
+import 'service/build_info.dart';
+import 'service/build_service.dart';
 
 final DateTime _kHalloween = new DateTime.utc(
   2018,
@@ -18,7 +19,7 @@ final DateTime _kHalloween = new DateTime.utc(
 );
 
 /// Manages a build status and associated metadata.
-class BuildStatusModel extends ModuleModel {
+class BuildStatusModel extends Model {
   /// The build type.
   final String type;
 

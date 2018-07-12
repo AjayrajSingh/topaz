@@ -4,8 +4,8 @@
 
 import 'dart:async';
 
-import 'package:dashboard/buildbucket/build_bucket_service.dart';
-import 'package:dashboard/service/build_info.dart';
+import '../buildbucket/build_bucket_service.dart';
+import 'build_info.dart';
 
 /// Used to fetch build information.
 abstract class BuildService {

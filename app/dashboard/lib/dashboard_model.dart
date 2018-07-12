@@ -4,23 +4,24 @@
 
 import 'dart:async';
 
-import 'package:lib.app.dart/app.dart';
-import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:lib.module_resolver.dart/intent_builder.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/model.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
+import 'package:lib.widgets.dart/model.dart';
+import 'package:lib.module.dart/module.dart';
+import 'package:meta/meta.dart';
 
-import 'package:dashboard/build_status_model.dart';
+import 'build_status_model.dart';
 
 /// Manages the framework FIDL services for this module.
-class DashboardModuleModel extends ModuleModel implements TickerProvider {
-  final DeviceMapProxy _deviceMapProxy = new DeviceMapProxy();
+class DashboardModel extends Model implements TickerProvider {
+  final Future<ModuleControllerClient> Function(Intent intent) launchWebview;
 
-  /// The application context for this module.
-  final StartupContext startupContext;
+  final DeviceMapProxy _deviceMapProxy = new DeviceMapProxy();
 
   /// The models that get the various build statuses.
   final List<List<BuildStatusModel>> buildStatusModels;
@@ -28,11 +29,14 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   final DateTime _startTime = new DateTime.now();
   DateTime _lastRefreshed;
   List<String> _devices;
-  ModuleControllerProxy _webviewModuleControllerProxy;
+  ModuleControllerClient _webviewModuleControllerClient;
   Timer _deviceMapTimer;
 
   /// Constructor.
-  DashboardModuleModel({this.startupContext, this.buildStatusModels}) {
+  DashboardModel({
+    @required this.launchWebview,
+    this.buildStatusModels,
+  }) : assert(launchWebview != null) {
     // ignore: avoid_function_literals_in_foreach_calls
     buildStatusModels.expand((List<BuildStatusModel> models) => models).forEach(
           (BuildStatusModel buildStatusModel) =>
@@ -40,13 +44,11 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
         );
   }
 
-  @override
   void onStop() {
     closeWebView();
     _deviceMapProxy.ctrl.close();
     _deviceMapTimer?.cancel();
     _deviceMapTimer = null;
-    super.onStop();
   }
 
   @override
@@ -62,7 +64,7 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
   List<String> get devices => _devices;
 
   /// Starts loading the device map from the environment.
-  void loadDeviceMap() {
+  void loadDeviceMap(StartupContext startupContext) {
     connectToService(
       startupContext.environmentServices,
       _deviceMapProxy.ctrl,
@@ -88,18 +90,13 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
     final String url =
         'https://luci-scheduler.appspot.com/jobs/fuchsia/$buildName';
 
-    IntentBuilder intentBuilder = new IntentBuilder.handler(url);
+    final intentBuilder = new IntentBuilder.handler(url);
 
-    _webviewModuleControllerProxy?.ctrl?.close();
-    _webviewModuleControllerProxy = new ModuleControllerProxy()
-      ..onStateChange = onStateChange;
-
-    moduleContext.startModule(
-        'module:web_view',
-        intentBuilder.intent,
-        _webviewModuleControllerProxy.ctrl.request(),
-        const SurfaceRelation(arrangement: SurfaceArrangement.copresent),
-        (StartModuleStatus status) {});
+    _webviewModuleControllerClient?.proxy?.ctrl?.close();
+    launchWebview(intentBuilder.intent).then((ModuleControllerClient client) {
+      _webviewModuleControllerClient = client;
+      client.proxy.onStateChange = onStateChange;
+    }).catchError((err) => log.warning('Error launching webview: $err'));
   }
 
   void onStateChange(ModuleState newState) {
@@ -111,8 +108,8 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
 
   /// Closes a previously launched web view.
   void closeWebView() {
-    _webviewModuleControllerProxy?.ctrl?.close();
-    _webviewModuleControllerProxy = null;
+    _webviewModuleControllerClient?.proxy?.ctrl?.close();
+    _webviewModuleControllerClient = null;
   }
 
   void _updatePassFailTime() {
@@ -122,6 +119,6 @@ class DashboardModuleModel extends ModuleModel implements TickerProvider {
 
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
-  static DashboardModuleModel of(BuildContext context) =>
-      new ModelFinder<DashboardModuleModel>().of(context);
+  static DashboardModel of(BuildContext context) =>
+      new ModelFinder<DashboardModel>().of(context);
 }

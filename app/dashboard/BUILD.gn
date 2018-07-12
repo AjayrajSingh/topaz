@@ -14,7 +14,7 @@ flutter_aot_app("dashboard") {
     "build_status_widget.dart",
     "buildbucket/build_bucket_service.dart",
     "dashboard_app.dart",
-    "dashboard_module_model.dart",
+    "dashboard_model.dart",
     "enums.dart",
     "info_text.dart",
     "service/build_info.dart",
@@ -39,8 +39,11 @@ flutter_aot_app("dashboard") {
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/module/dart",
     "//topaz/public/lib/module_resolver/dart",
     "//topaz/public/lib/ui/flutter",
+    "//topaz/public/lib/widgets/dart",
   ]
 }
 

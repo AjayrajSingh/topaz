@@ -5,16 +5,19 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:dashboard/build_status_model.dart';
-import 'package:dashboard/dashboard_app.dart';
-import 'package:dashboard/dashboard_module_model.dart';
-import 'package:dashboard/service/build_service.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_testing_runner/fidl.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.widgets.dart/model.dart';
+
+import 'build_status_model.dart';
+import 'dashboard_app.dart';
+import 'dashboard_model.dart';
+import 'service/build_service.dart';
 
 const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   const <List<String>>[
@@ -155,6 +158,8 @@ LauncherProxy launcherProxy;
 final List<List<BuildStatusModel>> _buildStatusModels =
     <List<BuildStatusModel>>[];
 
+ModuleDriver _driver;
+
 void main() {
   setupLogger();
 
@@ -188,28 +193,31 @@ void main() {
 
   StartupContext startupContext = new StartupContext.fromStartupInfo();
 
-  DashboardModuleModel dashboardModuleModel = new DashboardModuleModel(
-    startupContext: startupContext,
+  final dashboardModel = new DashboardModel(
     buildStatusModels: _buildStatusModels,
+    launchWebview: _launchWebview,
   );
 
-  ModuleWidget<DashboardModuleModel> moduleWidget =
-      new ModuleWidget<DashboardModuleModel>(
-    startupContext: startupContext,
-    moduleModel: dashboardModuleModel,
-    child: new DashboardApp(
-      buildService: buildService,
-      buildStatusModels: _buildStatusModels,
-      buildTimestamp: buildTimestamp,
-      onRefresh: onRefresh,
-      onLaunchUrl: dashboardModuleModel.launchWebView,
+  _driver = new ModuleDriver(onTerminate: dashboardModel.onStop);
+
+  runApp(
+    MaterialApp(
+      home: new ScopedModel<DashboardModel>(
+        model: dashboardModel,
+        child: new DashboardApp(
+          buildService: buildService,
+          buildStatusModels: _buildStatusModels,
+          buildTimestamp: buildTimestamp,
+          onRefresh: onRefresh,
+          onLaunchUrl: dashboardModel.launchWebView,
+        ),
+      ),
     ),
   );
 
-  runApp(moduleWidget);
-
-  moduleWidget.advertise();
-  dashboardModuleModel.loadDeviceMap();
+  _driver.start().then((_) {
+    dashboardModel.loadDeviceMap(startupContext);
+  }).catchError(log.severe);
 
   _reportTestResultsIfInTestHarness(startupContext.environmentServices);
 }
@@ -219,6 +227,15 @@ void onRefresh() {
       .expand((List<BuildStatusModel> models) => models)
       // ignore: avoid_function_literals_in_foreach_calls
       .forEach((BuildStatusModel model) => model.refresh());
+}
+
+Future<ModuleControllerClient> _launchWebview(Intent intent) async {
+  return _driver.startModule(
+    intent: intent,
+    name: 'module:web_view',
+    surfaceRelation:
+        const SurfaceRelation(arrangement: SurfaceArrangement.copresent),
+  );
 }
 
 void _reportTestResultsIfInTestHarness(

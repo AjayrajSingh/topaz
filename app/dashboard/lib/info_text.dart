@@ -7,10 +7,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets.dart/model.dart';
 import 'package:intl/intl.dart';
 
-import 'package:dashboard/dashboard_module_model.dart';
+import 'dashboard_model.dart';
 
 const double _kFontSize = 20.0;
 
@@ -85,10 +85,10 @@ class _InfoTextState extends State<InfoText> {
 
   @override
   Widget build(BuildContext context) =>
-      new ScopedModelDescendant<DashboardModuleModel>(builder: (
+      new ScopedModelDescendant<DashboardModel>(builder: (
         BuildContext context,
         Widget child,
-        DashboardModuleModel model,
+        DashboardModel model,
       ) {
         List<Widget> rowChildren = <Widget>[
           new RichText(

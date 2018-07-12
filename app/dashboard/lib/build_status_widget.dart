@@ -4,12 +4,12 @@
 
 import 'dart:async';
 
-import 'package:dashboard/enums.dart';
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets.dart/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
-import 'package:dashboard/build_status_model.dart';
+import 'build_status_model.dart';
+import 'enums.dart';
 
 /// Displays a build status using its ancestor [BuildStatusModel].
 class BuildStatusWidget extends StatefulWidget {
@@ -50,9 +50,9 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
         return new ScopedModelDescendant<BuildStatusModel>(
           builder:
               (BuildContext context, Widget child, BuildStatusModel model) {
-            Color backgroundColor = _colorFromBuildStatus(model);
-            bool hasError = model.errorMessage?.isNotEmpty ?? false;
-            List<Widget> columnChildren = <Widget>[
+            final backgroundColor = _colorFromBuildStatus(model);
+            final hasError = model.errorMessage?.isNotEmpty ?? false;
+            final columnChildren = <Widget>[
               new Text(
                 model.type,
                 textAlign: TextAlign.center,

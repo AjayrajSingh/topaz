@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:dashboard/service/build_service.dart';
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets.dart/model.dart';
 
-import 'package:dashboard/build_status_model.dart';
-import 'package:dashboard/build_status_widget.dart';
-import 'package:dashboard/info_text.dart';
+import 'build_status_model.dart';
+import 'build_status_widget.dart';
+import 'info_text.dart';
+import 'service/build_service.dart';
 
 const Color _kFuchsiaColor = const Color(0xFFFF0080);
 
