@@ -659,22 +659,21 @@ Future<Proposal> _createProposal({
   String iconUrl,
   int color,
   AnnoyanceType annoyanceType = AnnoyanceType.none,
-}) async =>
-    createProposal(
-      id: id,
-      headline: headline,
-      subheadline: subheadline,
-      color: color,
-      iconUrls: iconUrl == null ? null : <String>[iconUrl],
-      imageUrl: imageUrl,
-      imageType: imageType,
-      annoyanceType: annoyanceType,
-      actions: <Action>[
-        new Action.withCreateStory(
-          new CreateStory(
-              intent: (new IntentBuilder.handler(appUrl)
-                    ..addParameter(null, initialData))
-                  .intent),
-        )
-      ],
-    );
+}) async {
+  var intentBuilder = IntentBuilder.handler(appUrl)
+    ..addParameter(null, initialData);
+  var proposalBuilder = ProposalBuilder(
+    id: id,
+    headline: headline,
+  )
+    ..subheadline = subheadline
+    ..color = color
+    ..iconUrls = iconUrl == null ? null : <String>[iconUrl]
+    ..imageUrl = imageUrl
+    ..imageType = imageType
+    ..annoyanceType = annoyanceType
+    ..addAction(
+        Action.withCreateStory(CreateStory(intent: intentBuilder.intent)));
+
+  return proposalBuilder.build();
+}

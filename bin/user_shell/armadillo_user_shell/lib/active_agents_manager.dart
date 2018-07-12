@@ -118,19 +118,14 @@ class _QueryHandlerImpl extends QueryHandler {
         (query.text?.toLowerCase()?.contains('active') ?? false)) {
       CustomActionBinding binding = new CustomActionBinding();
       _bindings.add(binding);
-      proposals.add(
-        await createProposal(
-          id: 'View Active Agents',
-          headline: 'View Active Agents',
-          color: 0xFFA5A700,
-          iconUrls: <String>[
-            '/system/data/sysui/AgentIcon.png',
-          ],
-          actions: <Action>[
-            new Action.withCustomAction(binding.wrap(customAction))
-          ],
-        ),
-      );
+      proposals.add(await (ProposalBuilder(
+        id: 'View Active Agents',
+        headline: 'View Active Agents',
+      )
+            ..color = 0xFFA5A700
+            ..addIconUrl('/system/data/sysui/AgentIcon.png')
+            ..addAction(Action.withCustomAction(binding.wrap(customAction))))
+          .build());
     }
     callback(new QueryResponse(proposals: proposals));
   }

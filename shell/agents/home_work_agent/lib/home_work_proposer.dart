@@ -360,45 +360,50 @@ class _QueryHandlerImpl extends QueryHandler {
     callback(new QueryResponse(proposals: proposals));
   }
 
-  Future<Proposal> get _launchEverythingProposal async => createProposal(
-        id: _kLaunchEverythingProposalId,
-        headline: 'Launch everything',
-        color: 0xFFFF0080,
-        actions: askProposals
-            .map(
-              (Map<String, String> proposal) => new Action.withCreateStory(
-                    new CreateStory(
-                        intent: (new IntentBuilder.handler(
-                                proposal['module_url'] ?? '')
-                              ..addParameter(null, proposal['module_data']))
-                            .intent),
-                  ),
-            )
-            .toList(),
-      );
+  Future<Proposal> get _launchEverythingProposal async {
+    var proposalBuilder = ProposalBuilder(
+      id: _kLaunchEverythingProposalId,
+      headline: 'Launch everything',
+    )
+      ..color = 0xFFFF0080
+      ..actions = askProposals
+          .map(
+            (Map<String, String> proposal) => new Action.withCreateStory(
+                  new CreateStory(
+                      intent: (new IntentBuilder.handler(
+                              proposal['module_url'] ?? '')
+                            ..addParameter(null, proposal['module_data']))
+                          .intent),
+                ),
+          )
+          .toList();
+    return proposalBuilder.build();
+  }
 }
 
 Future<Proposal> _createProposal(Map<String, String> proposal) async {
-  return createProposal(
+  var intentBuilder = IntentBuilder.handler(proposal['module_url'] ?? '')
+    ..addParameter(null, proposal['module_data']);
+
+  var proposalBuilder = ProposalBuilder(
     id: proposal['id'],
     headline: proposal['headline'] ?? '',
-    subheadline: proposal['subheadline'],
-    color: (proposal['color'] != null && proposal['color'].isNotEmpty)
+  )
+    ..subheadline = proposal['subheadline']
+    ..color = (proposal['color'] != null && proposal['color'].isNotEmpty)
         ? (int.tryParse(proposal['color']) ?? 0xFFFF0080)
-        : 0xFFFF0080,
-    iconUrls:
-        proposal['icon_url'] == null ? null : <String>[proposal['icon_url']],
-    imageUrl: proposal['image_url'],
-    imageType: 'person' == proposal['type']
+        : 0xFFFF0080
+    ..iconUrls =
+        proposal['icon_url'] == null ? null : <String>[proposal['icon_url']]
+    ..imageUrl = proposal['image_url']
+    ..imageType = 'person' == proposal['type']
         ? SuggestionImageType.person
-        : SuggestionImageType.other,
-    actions: <Action>[
-      new Action.withCreateStory(new CreateStory(
-          intent: (new IntentBuilder.handler(proposal['module_url'] ?? '')
-                ..addParameter(null, proposal['module_data']))
-              .intent))
-    ],
-  );
+        : SuggestionImageType.other
+    ..actions = <Action>[
+      Action.withCreateStory(new CreateStory(intent: intentBuilder.intent))
+    ];
+
+  return proposalBuilder.build();
 }
 
 Future<Proposal> _createAppProposal({
@@ -413,18 +418,14 @@ Future<Proposal> _createAppProposal({
   double confidence = 0.0,
   AnnoyanceType annoyanceType = AnnoyanceType.none,
 }) async {
-  return createProposal(
-    id: id,
-    confidence: confidence,
-    headline: headline,
-    subheadline: subheadline,
-    color: color,
-    imageUrl: imageUrl,
-    imageType: imageType,
-    annoyanceType: annoyanceType,
-    actions: <Action>[
-      new Action.withCreateStory(
-          new CreateStory(intent: (new IntentBuilder.handler(appUrl)).intent))
-    ],
-  );
+  var proposalBuilder = ProposalBuilder(id: id, headline: headline)
+    ..confidence = confidence
+    ..subheadline = subheadline
+    ..color = color
+    ..imageUrl = imageUrl
+    ..imageType = imageType
+    ..annoyanceType = annoyanceType
+    ..addAction(new Action.withCreateStory(
+        new CreateStory(intent: (new IntentBuilder.handler(appUrl)).intent)));
+  return proposalBuilder.build();
 }

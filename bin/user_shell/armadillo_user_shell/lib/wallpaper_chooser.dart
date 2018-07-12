@@ -18,8 +18,9 @@ const String _kImageSelectorLinkName = 'selection';
 const String _kImageSelectorRootKey = 'image selection';
 const String _kImageSelectorImageListKey = 'selected images';
 const List<StoryInfoExtraEntry> _kImageSelectorStoryExtraInfo =
-    const <StoryInfoExtraEntry>[const StoryInfoExtraEntry(
-        key: 'color', value: '0xFFA5A700')];
+    const <StoryInfoExtraEntry>[
+  const StoryInfoExtraEntry(key: 'color', value: '0xFFA5A700'),
+];
 const int _kChooseWallpaperSuggestionColor = 0xFFA5A700;
 const String _kChooseWallpaperSuggestionHeadline = 'Change Wallpaper';
 const String _kChooseWallpaperSuggestionImageUrl =
@@ -121,17 +122,14 @@ class _QueryHandlerImpl extends QueryHandler {
         (query.text?.toLowerCase()?.contains('change') ?? false)) {
       CustomActionBinding binding = new CustomActionBinding();
       _bindings.add(binding);
-      proposals.add(
-        await createProposal(
-          id: _kChooseWallpaperSuggestionHeadline,
-          headline: _kChooseWallpaperSuggestionHeadline,
-          color: _kChooseWallpaperSuggestionColor,
-          imageUrl: _kChooseWallpaperSuggestionImageUrl,
-          actions: <Action>[
-            new Action.withCustomAction(binding.wrap(customAction))
-          ],
-        ),
-      );
+      proposals.add(await (ProposalBuilder(
+        id: _kChooseWallpaperSuggestionHeadline,
+        headline: _kChooseWallpaperSuggestionHeadline,
+      )
+            ..color = _kChooseWallpaperSuggestionColor
+            ..imageUrl = _kChooseWallpaperSuggestionImageUrl
+            ..addAction(Action.withCustomAction(binding.wrap(customAction))))
+          .build());
     }
 
     callback(new QueryResponse(proposals: proposals));
