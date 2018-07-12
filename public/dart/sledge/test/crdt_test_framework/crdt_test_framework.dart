@@ -4,3 +4,4 @@
 
 export 'checker.dart';
 export 'fleet.dart';
+export 'single_order_test_failure.dart';

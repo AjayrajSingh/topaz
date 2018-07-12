@@ -2,11 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:test/test.dart';
+
 import 'checker.dart';
 import 'computational_graph.dart';
 import 'evaluation_order.dart';
 import 'fleet_state.dart';
 import 'node.dart';
+import 'single_order_test_failure.dart';
 
 // Sledge is supposed to work with multiple connections, and order of operations
 // and synchronization is unpredictable. It’s hard to cover all cases by tests
@@ -80,25 +83,33 @@ class Fleet<T extends dynamic> {
     _addNode(node, id);
   }
 
-  void addChecker(CheckerGenerator<T> checkerGenerator) =>
-      _checkerGenerators.add(checkerGenerator);
+  void addChecker(CheckerGenerator<T> checkerGenerator) {
+    _checkerGenerators.add(checkerGenerator);
+  }
 
-  void _testSingleOrder(EvaluationOrder order) {
+  void testSingleOrder([EvaluationOrder order]) {
+    order ??= graph.orders.first;
     final fleetState = new FleetState<T>(_fleetSize, _instanceGenerator);
     for (final newChecker in _checkerGenerators) {
       fleetState.addChecker(newChecker());
     }
 
     for (int i = 0; i < order.nodes.length; i++) {
-      fleetState.applyNode(order.nodes[i], i);
+      try {
+        fleetState.applyNode(order.nodes[i], i);
+      } on TestFailure catch (failure) {
+        // ignore: only_throw_errors
+        throw new SingleOrderTestFailure(failure, order, order.nodes[i]);
+      }
     }
   }
 
-  void testFixedOrder(List<String> nodeIds, {bool allowPartial = false}) =>
-      _testSingleOrder(new EvaluationOrder.fromIds(nodeIds, graph.nodes,
-          allowPartial: allowPartial));
+  void testFixedOrder(List<String> nodeIds, {bool allowPartial = false}) {
+    testSingleOrder(new EvaluationOrder.fromIds(nodeIds, graph.nodes,
+        allowPartial: allowPartial));
+  }
 
-  void testSingleOrder() => _testSingleOrder(graph.orders.first);
-
-  void testAllOrders() => graph.orders.forEach(_testSingleOrder);
+  void testAllOrders() {
+    graph.orders.forEach(testSingleOrder);
+  }
 }

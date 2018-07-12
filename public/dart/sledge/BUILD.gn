@@ -46,6 +46,7 @@ dart_test("dart_sledge_tests") {
     "crdt_test_framework_test/checker_test.dart",
     "crdt_test_framework_test/computational_graph_test.dart",
     "crdt_test_framework_test/evaluation_order_test.dart",
+    "crdt_test_framework_test/thrown_error_test.dart",
   ]
 
   deps = [

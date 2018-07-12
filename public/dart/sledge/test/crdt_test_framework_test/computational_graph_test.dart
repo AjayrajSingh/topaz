@@ -26,10 +26,9 @@ void main() {
       ..addRelation(n2, n4);
 
     final orders = G.orders.toList();
-    expect(orders.length, equals(2));
     expect(
         orders,
-        containsAll([
+        unorderedEquals([
           new EvaluationOrder([n1, n2, n3, n4]),
           new EvaluationOrder([n1, n2, n4, n3])
         ]));
@@ -47,13 +46,41 @@ void main() {
       ..addRelation(n2, n3);
 
     final orders = G.orders.toList();
-    expect(orders.length, equals(3));
     expect(
         orders,
-        containsAll([
+        unorderedEquals([
           new EvaluationOrder([n1, n2, n3]),
           new EvaluationOrder([n2, n1, n3]),
           new EvaluationOrder([n2, n3, n1])
+        ]));
+  });
+
+  test('Build and get orders.', () {
+    ComputationalGraph G = new ComputationalGraph();
+    final n1 = new Node('n 1');
+    final n2 = new Node('n 2');
+    final n3 = new Node('n 3');
+    final n4 = new Node('n 4');
+    final n5 = new Node('n 5');
+    G
+      ..addNode(n1)
+      ..addNode(n2)
+      ..addNode(n3)
+      ..addNode(n4)
+      ..addNode(n5)
+      ..addRelation(n1, n2)
+      ..addRelation(n2, n3)
+      ..addRelation(n1, n4)
+      ..addRelation(n3, n5)
+      ..addRelation(n4, n5);
+
+    final orders = G.orders.toList();
+    expect(
+        orders,
+        unorderedEquals([
+          new EvaluationOrder([n1, n2, n3, n4, n5]),
+          new EvaluationOrder([n1, n2, n4, n3, n5]),
+          new EvaluationOrder([n1, n4, n2, n3, n5])
         ]));
   });
 
