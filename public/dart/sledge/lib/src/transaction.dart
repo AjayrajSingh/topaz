@@ -57,14 +57,15 @@ class Transaction {
 
     // Iterate through all the documents modified by this transaction and
     // forward the changes to Ledger.
-    // TODO: Don't await individual ledger operations, await the aggregation
-    // of all the ledger operations.
+
+    final updateLedgerFutures = <Future<ledger.Status>>[];
+
     for (final document in _documents) {
       final Change change = Document.getChange(document);
 
       final Uint8List documentPrefix = document.documentId.prefix;
 
-      // Foward the "deletes".
+      // Forward the "deletes".
       for (Uint8List deletedKey in change.deletedKeys) {
         completer = new Completer<ledger.Status>();
         final Uint8List keyWithDocumentPrefix =
@@ -73,11 +74,7 @@ class Transaction {
           keyWithDocumentPrefix,
           (ledger.Status status) => completer.complete(status),
         );
-        bool deleteOk = (await completer.future) == ledger.Status.ok;
-        if (!deleteOk) {
-          rollbackModification(pageProxy);
-          return false;
-        }
+        updateLedgerFutures.add(completer.future);
       }
       // Forward the "puts".
       for (KeyValue kv in change.changedEntries) {
@@ -90,12 +87,15 @@ class Transaction {
           kv.value,
           (ledger.Status status) => completer.complete(status),
         );
+        updateLedgerFutures.add(completer.future);
+      }
+    }
 
-        bool putOk = (await completer.future) == ledger.Status.ok;
-        if (!putOk) {
-          rollbackModification(pageProxy);
-          return false;
-        }
+    final List<ledger.Status> statuses = await Future.wait(updateLedgerFutures);
+    for (final status in statuses) {
+      if (status != ledger.Status.ok) {
+        rollbackModification(pageProxy);
+        return false;
       }
     }
 
