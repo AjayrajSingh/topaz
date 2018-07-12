@@ -595,28 +595,25 @@ class TimezonePicker extends StatelessWidget {
         _onTap = onTap;
 
   @override
-  Widget build(BuildContext context) => new Container(
-        padding: const EdgeInsets.all(16.0),
-        child: new ListView.builder(
-          physics: const BouncingScrollPhysics(),
-          itemCount: _kTimeZones.length,
-          itemBuilder: (BuildContext context, int index) => new Material(
-                color: _currentTimezoneId == _kTimeZones[index].zoneId
-                    ? Colors.grey[500]
-                    : Colors.transparent,
-                child: new InkWell(
-                  onTap: () {
-                    _onTap?.call(_kTimeZones[index].zoneId);
-                  },
-                  child: new Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: new Text(
-                      '${_kTimeZones[index].zoneId}',
-                      style: const TextStyle(color: Colors.black),
-                    ),
+  Widget build(BuildContext context) => new ListView.builder(
+        physics: const BouncingScrollPhysics(),
+        itemCount: _kTimeZones.length,
+        itemBuilder: (BuildContext context, int index) => new Material(
+              color: _currentTimezoneId == _kTimeZones[index].zoneId
+                  ? Colors.grey[500]
+                  : Colors.transparent,
+              child: new InkWell(
+                onTap: () {
+                  _onTap?.call(_kTimeZones[index].zoneId);
+                },
+                child: new Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: new Text(
+                    '${_kTimeZones[index].zoneId}',
+                    style: const TextStyle(color: Colors.black),
                   ),
                 ),
               ),
-        ),
+            ),
       );
 }
