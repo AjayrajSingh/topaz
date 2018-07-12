@@ -24,7 +24,7 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
                                fuchsia::webview::WebRequestDelegate {
  public:
   GoogleAuthProviderImpl(
-      async_t* main_dispatcher, fuchsia::sys::StartupContext* context,
+      async_dispatcher_t* main_dispatcher, fuchsia::sys::StartupContext* context,
       network_wrapper::NetworkWrapper* network_wrapper,
       fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request);
 
@@ -71,7 +71,7 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
       fit::function<void(::fuchsia::net::oldhttp::URLResponse response)>
           callback);
 
-  async_t* const main_dispatcher_;
+  async_dispatcher_t* const main_dispatcher_;
   fuchsia::sys::StartupContext* context_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
   fuchsia::auth::AuthenticationUIContextPtr auth_ui_context_;

@@ -38,7 +38,7 @@ class FXL_EXPORT MessageLoop : private internal::TaskQueueDelegate {
 
   // Gets the underlying libasync dispatcher.
   // See <async/dispatcher.h> for details on how to use this.
-  async_t* async() const { return loop_.async(); }
+  async_dispatcher_t* dispatcher() const { return loop_.dispatcher(); }
 
   // Return an interface for posting tasks to this message loop.
   const fxl::RefPtr<fxl::TaskRunner>& task_runner() const {

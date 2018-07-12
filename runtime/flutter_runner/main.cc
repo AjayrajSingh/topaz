@@ -11,7 +11,7 @@
 int main(int argc, char const* argv[]) {
   deprecated_loop::MessageLoop loop;
 
-  trace::TraceProvider provider(loop.async());
+  trace::TraceProvider provider(loop.dispatcher());
   FXL_DCHECK(provider.is_valid()) << "Trace provider must be valid.";
 
   FXL_DLOG(INFO) << "Flutter application services initialized.";

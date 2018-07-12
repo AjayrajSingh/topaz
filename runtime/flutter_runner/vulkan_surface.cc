@@ -382,7 +382,7 @@ void VulkanSurface::Reset() {
     FXL_DLOG(ERROR) << "failed to create acquire semaphore";
   }
 
-  wait_.Begin(async_get_default());
+  wait_.Begin(async_get_default_dispatcher());
 
   // It is safe for the caller to collect the surface in the callback.
   auto callback = pending_on_writes_committed_;
@@ -392,7 +392,7 @@ void VulkanSurface::Reset() {
   }
 }
 
-void VulkanSurface::OnHandleReady(async_t* async,
+void VulkanSurface::OnHandleReady(async_dispatcher_t* dispatcher,
                                   async::WaitBase* wait,
                                   zx_status_t status,
                                   const zx_packet_signal_t* signal) {

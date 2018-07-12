@@ -28,14 +28,14 @@ class GoogleAuthProviderApp {
   GoogleAuthProviderApp()
       : loop_(&kAsyncLoopConfigMakeDefault),
         startup_context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()),
-        trace_provider_(loop_.async()),
+        trace_provider_(loop_.dispatcher()),
         network_wrapper_(
-            loop_.async(), std::make_unique<backoff::ExponentialBackoff>(),
+            loop_.dispatcher(), std::make_unique<backoff::ExponentialBackoff>(),
             [this] {
               return startup_context_
                   ->ConnectToEnvironmentService<http::HttpService>();
             }),
-        factory_impl_(loop_.async(), startup_context_.get(),
+        factory_impl_(loop_.dispatcher(), startup_context_.get(),
                       &network_wrapper_) {
     FXL_DCHECK(startup_context_);
   }

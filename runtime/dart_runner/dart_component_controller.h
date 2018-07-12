@@ -51,7 +51,7 @@ class DartComponentController : public fuchsia::sys::ComponentController {
 
   // Idle notification.
   void MessageEpilogue(Dart_Handle result);
-  void OnIdleTimer(async_t* async, async::WaitBase* wait, zx_status_t status,
+  void OnIdleTimer(async_dispatcher_t* dispatcher, async::WaitBase* wait, zx_status_t status,
                    const zx_packet_signal* signal);
 
   std::string label_;

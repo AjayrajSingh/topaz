@@ -42,7 +42,7 @@ class HandleWaiter : public fxl::RefCountedThreadSafe<HandleWaiter>,
                         Dart_Handle callback);
   ~HandleWaiter();
 
-  void OnWaitComplete(async_t* async, async::WaitBase* wait,
+  void OnWaitComplete(async_dispatcher_t* dispatcher, async::WaitBase* wait,
                       zx_status_t status, const zx_packet_signal_t* signal);
 
   async::WaitMethod<HandleWaiter, &HandleWaiter::OnWaitComplete> wait_;

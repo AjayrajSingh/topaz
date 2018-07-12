@@ -29,9 +29,9 @@ class SpotifyAuthProviderApp {
   SpotifyAuthProviderApp()
       : loop_(&kAsyncLoopConfigMakeDefault),
         startup_context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()),
-        trace_provider_(loop_.async()),
+        trace_provider_(loop_.dispatcher()),
         network_wrapper_(
-            loop_.async(), std::make_unique<backoff::ExponentialBackoff>(),
+            loop_.dispatcher(), std::make_unique<backoff::ExponentialBackoff>(),
             [this] {
               return startup_context_
                   ->ConnectToEnvironmentService<http::HttpService>();

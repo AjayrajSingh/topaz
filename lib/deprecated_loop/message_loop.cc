@@ -49,7 +49,7 @@ MessageLoop* MessageLoop::GetCurrent() { return g_current; }
 
 void MessageLoop::PostTask(fxl::Closure task, fxl::TimePoint target_time) {
   zx_status_t status = async::PostTaskForTime(
-      loop_.async(), [task = std::move(task)] { task(); },
+      loop_.dispatcher(), [task = std::move(task)] { task(); },
       zx::time(target_time.ToEpochDelta().ToNanoseconds()));
   FXL_CHECK(status == ZX_OK || status == ZX_ERR_BAD_STATE)
       << "Failed to post task: status=" << status;

@@ -9,7 +9,7 @@
 
 int main(int argc, const char** argv) {
   deprecated_loop::MessageLoop loop;
-  trace::TraceProvider provider(loop.async());
+  trace::TraceProvider provider(loop.dispatcher());
   dart_runner::DartRunner runner;
   loop.Run();
   return 0;

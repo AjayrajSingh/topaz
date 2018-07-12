@@ -93,7 +93,7 @@ WebViewImpl::WebViewImpl(
     outgoing_services_.AddBinding(std::move(outgoing_services_request));
   }
 
-  async::PostTask(async_get_default(), ([weak = weak_factory_.GetWeakPtr()]() {
+  async::PostTask(async_get_default_dispatcher(), ([weak = weak_factory_.GetWeakPtr()]() {
                     if (weak)
                       weak->CallIdle();
                   }));
@@ -287,7 +287,7 @@ void WebViewImpl::OnSceneInvalidated(
 void WebViewImpl::CallIdle() {
   web_view_.iterateEventLoop();
   InvalidateScene();
-  async::PostTask(async_get_default(), ([weak = weak_factory_.GetWeakPtr()]() {
+  async::PostTask(async_get_default_dispatcher(), ([weak = weak_factory_.GetWeakPtr()]() {
                     if (weak)
                       weak->CallIdle();
                   }));

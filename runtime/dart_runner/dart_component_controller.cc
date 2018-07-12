@@ -64,7 +64,7 @@ DartComponentController::DartComponentController(
   } else {
     idle_wait_.set_object(idle_timer_.get());
     idle_wait_.set_trigger(ZX_TIMER_SIGNALED);
-    idle_wait_.Begin(async_get_default());
+    idle_wait_.Begin(async_get_default_dispatcher());
   }
 }
 
@@ -435,7 +435,7 @@ void DartComponentController::MessageEpilogue(Dart_Handle result) {
   }
 }
 
-void DartComponentController::OnIdleTimer(async_t* async, async::WaitBase* wait,
+void DartComponentController::OnIdleTimer(async_dispatcher_t* dispatcher, async::WaitBase* wait,
                                           zx_status_t status,
                                           const zx_packet_signal* signal) {
   if ((status != ZX_OK) || !(signal->observed & ZX_TIMER_SIGNALED) ||
@@ -460,7 +460,7 @@ void DartComponentController::OnIdleTimer(async_t* async, async::WaitBase* wait,
                     << zx_status_get_string(status);
     }
   }
-  wait->Begin(async);  // ignore errors
+  wait->Begin(dispatcher);  // ignore errors
 }
 
 }  // namespace dart_runner

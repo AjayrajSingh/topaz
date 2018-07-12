@@ -103,7 +103,7 @@ void ViewController::Blink() {
       InvalidateScene();
     }
     blink_task_.Cancel();
-    blink_task_.PostDelayed(async_get_default(), kBlinkInterval);
+    blink_task_.PostDelayed(async_get_default_dispatcher(), kBlinkInterval);
   }
 }
 

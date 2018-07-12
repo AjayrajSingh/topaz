@@ -189,7 +189,7 @@ void ViewController::RequestBeginFrame() {
   needs_begin_frame_ = true;
   if (present_pending_ || begin_frame_task_.is_pending())
     return;
-  zx_status_t status = begin_frame_task_.Post(async_get_default());
+  zx_status_t status = begin_frame_task_.Post(async_get_default_dispatcher());
   ZX_DEBUG_ASSERT(status == ZX_OK);
 }
 

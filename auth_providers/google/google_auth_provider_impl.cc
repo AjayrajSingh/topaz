@@ -51,7 +51,7 @@ using auth_providers::oauth::ParseOAuthResponse;
 using modular::JsonValueToPrettyString;
 
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
-    async_t* const main_dispatcher, fuchsia::sys::StartupContext* context,
+    async_dispatcher_t* const main_dispatcher, fuchsia::sys::StartupContext* context,
     network_wrapper::NetworkWrapper* network_wrapper,
     fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request)
     : main_dispatcher_(main_dispatcher),

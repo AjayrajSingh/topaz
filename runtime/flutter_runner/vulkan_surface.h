@@ -73,7 +73,7 @@ class VulkanSurface final
   }
 
  private:
-  void OnHandleReady(async_t* async,
+  void OnHandleReady(async_dispatcher_t* dispatcher,
                      async::WaitBase* wait,
                      zx_status_t status,
                      const zx_packet_signal_t* signal);

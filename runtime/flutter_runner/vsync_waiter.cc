@@ -16,7 +16,7 @@ VsyncWaiter::VsyncWaiter(std::string debug_label,
       session_wait_(session_present_handle, SessionPresentSignal),
       phase_(fxl::TimePoint::Now()),
       weak_factory_(this) {
-  auto wait_handler = [&](async_t* async,                   //
+  auto wait_handler = [&](async_dispatcher_t* dispatcher,                   //
                           async::Wait* wait,                //
                           zx_status_t status,               //
                           const zx_packet_signal_t* signal  //
@@ -63,7 +63,7 @@ void VsyncWaiter::AwaitVSync() {
 
 void VsyncWaiter::FireCallbackWhenSessionAvailable() {
   FXL_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
-  if (session_wait_.Begin(deprecated_loop::MessageLoop::GetCurrent()->async()) != ZX_OK) {
+  if (session_wait_.Begin(deprecated_loop::MessageLoop::GetCurrent()->dispatcher()) != ZX_OK) {
     FXL_LOG(ERROR) << "Could not begin wait for Vsync.";
   }
 }

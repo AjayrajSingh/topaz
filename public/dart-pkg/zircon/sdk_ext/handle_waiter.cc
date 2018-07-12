@@ -47,7 +47,7 @@ HandleWaiter::HandleWaiter(Handle* handle,
   FXL_CHECK(handle_ != nullptr);
   FXL_CHECK(handle_->is_valid());
 
-  zx_status_t status = wait_.Begin(async_get_default());
+  zx_status_t status = wait_.Begin(async_get_default_dispatcher());
   FXL_DCHECK(status == ZX_OK);
 }
 
@@ -68,7 +68,7 @@ void HandleWaiter::Cancel() {
   FXL_DCHECK(!wait_.is_pending());
 }
 
-void HandleWaiter::OnWaitComplete(async_t* async,
+void HandleWaiter::OnWaitComplete(async_dispatcher_t* dispatcher,
                                   async::WaitBase* wait,
                                   zx_status_t status,
                                   const zx_packet_signal_t* signal) {
