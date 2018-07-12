@@ -20,7 +20,6 @@ class MapValue<K, V> extends MapBase<K, V>
   final StreamController<MapChange<K, V>> _changeController =
       new StreamController<MapChange<K, V>>.broadcast();
   final DataConverter _converter;
-  ValueObserver _observer;
 
   /// Creates a MapValue with provided [equals] as equality.
   MapValue({bool equals(K key1, K key2), int hashCode(K key)})
@@ -42,14 +41,13 @@ class MapValue<K, V> extends MapBase<K, V>
 
   @override
   set observer(ValueObserver observer) {
-    _observer = observer;
+    _map.observer = observer;
   }
 
   /// Associates the [key] with the given [value].
   @override
   void operator []=(K key, V value) {
     _map[key] = value;
-    _observer.valueWasChanged();
   }
 
   /// Returns the value for the given [key] or null if [key] is not in the map.
@@ -62,7 +60,6 @@ class MapValue<K, V> extends MapBase<K, V>
   @override
   V remove(Object key) {
     final result = _map.remove(key);
-    _observer.valueWasChanged();
     return result;
   }
 

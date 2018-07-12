@@ -10,22 +10,13 @@ import 'package:test/test.dart';
 
 import '../crdt_test_framework/crdt_test_framework.dart';
 import '../crdt_test_framework/storage_state.dart';
-import '../dummies/dummy_value_observer.dart';
-
-class TestPosNegCounterValue<T extends num> extends PosNegCounterValue<T> {
-  TestPosNegCounterValue(Uint8List id) : super(id) {
-    observer = new DummyValueObserver();
-  }
-}
 
 class PosNegCounterFleetFactory<T extends num> {
   const PosNegCounterFleetFactory();
 
   Fleet<PosNegCounterValue<T>> newFleet(int count) {
-    return new Fleet<PosNegCounterValue<T>>(
-        count,
-        (index) =>
-            new TestPosNegCounterValue<T>(new Uint8List.fromList([index])));
+    return new Fleet<PosNegCounterValue<T>>(count,
+        (index) => new PosNegCounterValue<T>(new Uint8List.fromList([index])));
   }
 }
 
@@ -34,9 +25,9 @@ const PosNegCounterFleetFactory<int> integerCounterFleetFactory =
 
 void main() {
   test('PosNegCounterValue with StorageState', () {
-    var cnt1 = new TestPosNegCounterValue<int>(new Uint8List.fromList([1])),
-        cnt2 = new TestPosNegCounterValue<int>(new Uint8List.fromList([2])),
-        cnt3 = new TestPosNegCounterValue<int>(new Uint8List.fromList([3]));
+    var cnt1 = new PosNegCounterValue<int>(new Uint8List.fromList([1])),
+        cnt2 = new PosNegCounterValue<int>(new Uint8List.fromList([2])),
+        cnt3 = new PosNegCounterValue<int>(new Uint8List.fromList([3]));
     var ss1 = new StorageState(),
         ss2 = new StorageState(),
         ss3 = new StorageState();

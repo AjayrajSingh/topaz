@@ -80,7 +80,7 @@ class LastOneWinsValue<T> implements LeafValue {
   /// Sets the current value.
   set value(T value) {
     _value.value = value;
-    _observer.valueWasChanged();
+    _observer?.valueWasChanged();
   }
 
   /// Returns the current value.

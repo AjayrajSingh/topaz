@@ -6,25 +6,17 @@
 import 'package:sledge/src/document/values/map_value.dart';
 import 'package:test/test.dart';
 
-import '../dummies/dummy_value_observer.dart';
 import 'map_api_tester.dart';
-
-class TestMapValue<K, V> extends MapValue<K, V> {
-  TestMapValue() : super() {
-    observer = new DummyValueObserver();
-  }
-}
 
 void main() {
   group('Map API coverage', () {
-    final tester =
-        new MapApiTester<TestMapValue>(() => new TestMapValue<int, int>());
+    final tester = new MapApiTester<MapValue>(() => new MapValue<int, int>());
     // ignore: cascade_invocations
     tester.testApi();
   });
 
   test('MapValue get and set.', () {
-    var m = new TestMapValue<int, int>();
+    var m = new MapValue<int, int>();
     expect(m[0], equals(null));
     expect(m[3], equals(null));
     m[2] = 1;
@@ -37,7 +29,7 @@ void main() {
   });
 
   test('MapValue get, set and remove.', () {
-    var m = new TestMapValue<int, int>();
+    var m = new MapValue<int, int>();
     expect(m[0], equals(null));
     m[0] = 3;
     expect(m[0], equals(3));

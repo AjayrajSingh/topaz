@@ -11,13 +11,6 @@ import 'package:sledge/src/document/values/ordered_list_value.dart';
 import 'package:test/test.dart';
 
 import '../crdt_test_framework/crdt_test_framework.dart';
-import '../dummies/dummy_value_observer.dart';
-
-class TestOrderedListValue<T> extends OrderedListValue<T> {
-  TestOrderedListValue(Uint8List id) : super(id) {
-    observer = new DummyValueObserver();
-  }
-}
 
 // Wraps construction of Fleet of OrderedListValues.
 class OrderedListFleetFactory<T> {
@@ -26,10 +19,8 @@ class OrderedListFleetFactory<T> {
   // Returns Fleet of [count] OrderedListValues with pairwise different
   // instanceIds.
   Fleet<OrderedListValue<T>> newFleet(int count) {
-    return new Fleet<OrderedListValue<T>>(
-        count,
-        (index) =>
-            new TestOrderedListValue<T>(new Uint8List.fromList([index])));
+    return new Fleet<OrderedListValue<T>>(count,
+        (index) => new OrderedListValue<T>(new Uint8List.fromList([index])));
   }
 }
 

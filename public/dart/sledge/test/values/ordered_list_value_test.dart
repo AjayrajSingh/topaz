@@ -9,26 +9,20 @@ import 'dart:typed_data';
 import 'package:sledge/src/document/values/ordered_list_value.dart';
 import 'package:test/test.dart';
 
-import '../dummies/dummy_value_observer.dart';
 import 'list_api_tester.dart';
 
-class TestOrderedListValue<E> extends OrderedListValue<E> {
-  TestOrderedListValue([Uint8List id])
-      : super(id ?? new Uint8List.fromList([1])) {
-    observer = new DummyValueObserver();
-  }
-}
-
 void main() {
+  final id1 = new Uint8List.fromList([1]);
+
   group('List API coverage', () {
     final tester = new ListApiTester<OrderedListValue>(
-        () => new TestOrderedListValue<int>());
+        () => new OrderedListValue<int>(id1));
     // ignore: cascade_invocations
     tester.testApi();
   });
 
   test('Add to end of list and check content.', () {
-    var s = new TestOrderedListValue<int>();
+    var s = new OrderedListValue<int>(id1);
     expect(s.toList(), equals([]));
     s.insert(0, 1);
     expect(s.toList(), equals([1]));
@@ -39,7 +33,7 @@ void main() {
   });
 
   test('Insert into random positions of list and check content.', () {
-    var s = new TestOrderedListValue<int>();
+    var s = new OrderedListValue<int>(id1);
     expect(s.toList(), equals([]));
     s.insert(0, 1);
     expect(s.toList(), equals([1]));
@@ -54,7 +48,7 @@ void main() {
   });
 
   test('Insert into random positions, delete from list and check content.', () {
-    var s = new TestOrderedListValue<int>();
+    var s = new OrderedListValue<int>(id1);
     expect(s.toList(), equals([]));
     s.insert(0, 1);
     expect(s.toList(), equals([1]));
@@ -75,7 +69,7 @@ void main() {
   });
 
   test('Simple operations.', () {
-    var s = new TestOrderedListValue<int>();
+    var s = new OrderedListValue<int>(id1);
     expect(s.toList(), equals([]));
     s.insert(0, 1);
     expect(s[0], equals(1));
@@ -93,7 +87,7 @@ void main() {
 
   group('Exceptions', () {
     test('Insert out of range', () {
-      var s = new TestOrderedListValue<int>();
+      var s = new OrderedListValue<int>(id1);
       expect(() => s.insert(1, 1), throwsRangeError);
       s.insert(0, 1);
       expect(() => s.insert(2, 0), throwsRangeError);
@@ -101,7 +95,7 @@ void main() {
     });
 
     test('[] out of range', () {
-      var s = new TestOrderedListValue<int>();
+      var s = new OrderedListValue<int>(id1);
       expect(() => s[1], throwsRangeError);
       expect(() => s[4], throwsRangeError);
       s.insert(0, 1);
@@ -110,7 +104,7 @@ void main() {
     });
 
     test('Remove out of range', () {
-      var s = new TestOrderedListValue<int>();
+      var s = new OrderedListValue<int>(id1);
       expect(() => s.removeAt(0), throwsRangeError);
       expect(() => s.removeAt(1), throwsRangeError);
       s.insert(0, 1);
@@ -123,7 +117,7 @@ void main() {
   test('Insert into random positions of list and check content. Large test.',
       () {
     final random = new Random(1);
-    var s = new TestOrderedListValue<int>();
+    var s = new OrderedListValue<int>(id1);
     var list = <int>[];
     expect(s.toList(), equals(<int>[]));
     for (int value = 0; value < 100; value++) {
@@ -135,7 +129,7 @@ void main() {
   });
 
   test('Complex example of inserting in the list.', () {
-    var s = new TestOrderedListValue<int>()
+    var s = new OrderedListValue<int>(id1)
       ..insert(0, 0)
       ..insert(0, 1)
       ..insert(1, 2)
