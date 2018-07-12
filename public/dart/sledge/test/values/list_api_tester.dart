@@ -6,6 +6,8 @@ import 'dart:math' show Random;
 
 import 'package:test/test.dart';
 
+import '../dummies/dummy_value_observer.dart';
+
 // TODO: make tests generic.
 // typedef ListCreator = List<K, V> Function<K, V>();
 // issue: template arguments of generic function have dynamic runtime type, so
@@ -333,6 +335,97 @@ class ListApiTester<TestingList extends List> {
     test('toString()', () {
       final list = _listCreator()..add(2)..add(0);
       expect(list.toString(), equals('[2, 0]'));
+    });
+  }
+
+  void testObserver() {
+    test('Observer calls.', () {
+      final dynamic list = _listCreator();
+      final observer = new DummyValueObserver();
+      list.observer = observer;
+      expect(list.length, equals(0));
+      observer.expectNotChanged();
+
+      // Check that each modification method calls observer.valueWasChanged():
+      list.add(1);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.addAll([3, 2, 1, 5, 5, 5, 5, 5]);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.sort();
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.insert(2, 5);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.insertAll(1, [6, 7]);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.shuffle(new Random(1));
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.remove(1);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.removeAt(2);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.removeLast();
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.removeRange(1, 2);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.removeWhere((x) => x < 5);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.replaceRange(0, 2, [1, 2]);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.retainWhere((x) => x == 5);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.setAll(0, [1, 2]);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.setRange(0, 2, [1, 2]);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      list.clear();
+      observer
+        ..expectChanged()
+        ..reset();
     });
   }
 }

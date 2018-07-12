@@ -4,6 +4,8 @@
 
 import 'package:test/test.dart';
 
+import '../dummies/dummy_value_observer.dart';
+
 // TODO: make tests generic.
 // typedef SetCreator = Set<K, V> Function<K, V>();
 // issue: template arguments of generic function have dynamic runtime type, so
@@ -213,5 +215,51 @@ class SetApiTester<TestingSet extends Set> {
     });
 
     // TODO: add tests for inherited methods.
+  }
+
+  void testObserver() {
+    test('Observer calls.', () {
+      final dynamic s = _setCreator();
+      final observer = new DummyValueObserver();
+      s.observer = observer;
+      expect(s.contains(0), equals(false));
+      observer.expectNotChanged();
+
+      // Check that each modification method calls observer.valueWasChanged():
+      s.add(2);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      s.addAll([1, 2, 3, 4, 5]);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      s.remove(1);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      s.removeAll([1, 2]);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      s.removeWhere((x) => x.isEven);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      s.retainWhere((x) => x == 3);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      s.clear();
+      observer
+        ..expectChanged()
+        ..reset();
+    });
   }
 }

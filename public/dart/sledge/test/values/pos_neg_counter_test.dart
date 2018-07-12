@@ -12,12 +12,15 @@ import 'package:sledge/src/document/values/converter.dart';
 import 'package:sledge/src/document/values/pos_neg_counter_value.dart';
 import 'package:test/test.dart';
 
+import '../dummies/dummy_value_observer.dart';
+
 void main() {
   final intMF = new Uint8ListMapFactory<int>();
   final doubleMF = new Uint8ListMapFactory<double>();
+  final id1 = new Uint8List.fromList([1]);
 
   test('PosNegCounterValue accumulate additions', () {
-    var cnt = new PosNegCounterValue<int>(new Uint8List.fromList([1]));
+    final cnt = new PosNegCounterValue<int>(id1);
     expect(cnt.value, equals(0));
     cnt.add(1);
     expect(cnt.value, equals(1));
@@ -28,7 +31,7 @@ void main() {
   });
 
   test('PosNegCounterValue accumulate subtractions', () {
-    var cnt = new PosNegCounterValue<int>(new Uint8List.fromList([1]));
+    final cnt = new PosNegCounterValue<int>(id1);
     expect(cnt.value, equals(0));
     cnt.add(-1);
     expect(cnt.value, equals(-1));
@@ -39,7 +42,7 @@ void main() {
   });
 
   test('PosNegCounterValue accumulate', () {
-    var cnt = new PosNegCounterValue<int>(new Uint8List.fromList([1]));
+    final cnt = new PosNegCounterValue<int>(id1);
     expect(cnt.value, equals(0));
     cnt.add(-3);
     expect(cnt.value, equals(-3));
@@ -50,7 +53,7 @@ void main() {
   });
 
   test('PosNegCounterValue accumulate', () {
-    var cnt = new PosNegCounterValue<double>(new Uint8List.fromList([1]));
+    final cnt = new PosNegCounterValue<double>(id1);
     expect(cnt.value, equals(0.0));
     cnt.add(-3.2);
     expect(cnt.value, equals(-3.2));
@@ -62,7 +65,7 @@ void main() {
 
   test('PosNegCounterValue construction', () {
     DataConverter conv = new DataConverter<Uint8List, int>();
-    var cnt = new PosNegCounterValue<int>(new Uint8List.fromList([1]))
+    final cnt = new PosNegCounterValue<int>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
           intMF.newMap()
             ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4)
@@ -72,7 +75,7 @@ void main() {
 
   test('PosNegCounterValue construction 2', () {
     DataConverter conv = new DataConverter<Uint8List, int>();
-    var cnt = new PosNegCounterValue<int>(new Uint8List.fromList([1]))
+    final cnt = new PosNegCounterValue<int>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
           intMF.newMap()
             ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4)
@@ -84,7 +87,7 @@ void main() {
 
   test('PosNegCounterValue construction double', () {
     DataConverter conv = new DataConverter<Uint8List, double>();
-    var cnt = new PosNegCounterValue<double>(new Uint8List.fromList([1]))
+    final cnt = new PosNegCounterValue<double>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, double>(
           doubleMF.newMap()
             ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4.25)
@@ -96,7 +99,7 @@ void main() {
 
   test('PosNegCounterValue applyChange', () {
     DataConverter conv = new DataConverter<Uint8List, int>();
-    var cnt = new PosNegCounterValue<int>(new Uint8List.fromList([1]));
+    final cnt = new PosNegCounterValue<int>(id1);
     expect(cnt.value, equals(0));
     cnt.applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
         intMF.newMap()..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4))));
@@ -111,7 +114,7 @@ void main() {
 
   test('PosNegCounterValue onChange stream', () {
     DataConverter conv = new DataConverter<Uint8List, int>();
-    var cnt = new PosNegCounterValue<int>(new Uint8List.fromList([1]))
+    final cnt = new PosNegCounterValue<int>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
           intMF.newMap()
             ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 1)
@@ -128,5 +131,17 @@ void main() {
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
           intMF.newMap()
             ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 9))));
+  });
+
+  test('Observer calls.', () {
+    final cnt = new PosNegCounterValue<int>(id1);
+    final observer = new DummyValueObserver();
+    cnt.observer = observer;
+    expect(cnt.value, equals(0));
+    observer.expectNotChanged();
+    cnt.add(3);
+    observer
+      ..expectChanged()
+      ..reset();
   });
 }

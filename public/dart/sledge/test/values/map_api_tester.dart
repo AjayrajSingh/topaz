@@ -4,6 +4,8 @@
 
 import 'package:test/test.dart';
 
+import '../dummies/dummy_value_observer.dart';
+
 // TODO: make tests generic.
 // typedef MapCreator = Map<K, V> Function<K, V>();
 // issue: template arguments of generic function have dynamic runtime type, so
@@ -155,6 +157,44 @@ class MapApiTester<TestingMap extends Map> {
       final map = _mapCreator();
       map[0] = 1;
       expect(map.toString(), equals('{0: 1}'));
+    });
+  }
+
+  void testObserver() {
+    test('Observer calls.', () {
+      final dynamic map = _mapCreator();
+      final observer = new DummyValueObserver();
+      map.observer = observer;
+      expect(map.containsKey(0), equals(false));
+      observer.expectNotChanged();
+
+      // Check that each modification method calls observer.valueWasChanged():
+      map[0] = 1;
+      observer
+        ..expectChanged()
+        ..reset();
+      expect(map[0], equals(1));
+      observer.expectNotChanged();
+
+      map.putIfAbsent(2, () => 1);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      map.remove(0);
+      observer
+        ..expectChanged()
+        ..reset();
+
+      map.addAll({0: 1, 2: 4, -1: 0});
+      observer
+        ..expectChanged()
+        ..reset();
+
+      map.clear();
+      observer
+        ..expectChanged()
+        ..reset();
     });
   }
 }

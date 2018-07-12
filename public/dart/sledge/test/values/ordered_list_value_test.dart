@@ -15,10 +15,9 @@ void main() {
   final id1 = new Uint8List.fromList([1]);
 
   group('List API coverage', () {
-    final tester = new ListApiTester<OrderedListValue>(
-        () => new OrderedListValue<int>(id1));
-    // ignore: cascade_invocations
-    tester.testApi();
+    new ListApiTester<OrderedListValue>(() => new OrderedListValue<int>(id1))
+      ..testApi()
+      ..testObserver();
   });
 
   test('Add to end of list and check content.', () {

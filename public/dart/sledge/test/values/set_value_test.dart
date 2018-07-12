@@ -10,9 +10,9 @@ import 'set_api_tester.dart';
 
 void main() {
   group('Set API coverage', () {
-    final tester = new SetApiTester<SetValue>(() => new SetValue<int>());
-    // ignore: cascade_invocations
-    tester.testApi();
+    new SetApiTester<SetValue>(() => new SetValue<int>())
+      ..testApi()
+      ..testObserver();
   });
 
   test('SetValue add and contains.', () {

@@ -10,10 +10,9 @@ import 'map_api_tester.dart';
 
 void main() {
   group('Map API coverage', () {
-    final tester = new MapApiTester<KeyValueStorage>(
-        () => new KeyValueStorage<int, int>());
-    // ignore: cascade_invocations
-    tester.testApi();
+    new MapApiTester<KeyValueStorage>(() => new KeyValueStorage<int, int>())
+      ..testApi()
+      ..testObserver();
   });
 
   test('getChange', () {

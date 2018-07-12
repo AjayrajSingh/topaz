@@ -10,9 +10,9 @@ import 'map_api_tester.dart';
 
 void main() {
   group('Map API coverage', () {
-    final tester = new MapApiTester<MapValue>(() => new MapValue<int, int>());
-    // ignore: cascade_invocations
-    tester.testApi();
+    new MapApiTester<MapValue>(() => new MapValue<int, int>())
+      ..testApi()
+      ..testObserver();
   });
 
   test('MapValue get and set.', () {
