@@ -29,6 +29,25 @@ dart_library("dart") {
   ]
 }
 
+dart_library("testing") {
+  package_name = "lib.app.dart.testing"
+
+  sdk_category = "partner"
+
+  source_dir = "."
+
+  sources = [
+    "testing/app_test.dart"
+  ]
+
+  deps = [
+    "//topaz/public/dart/fidl",
+    "//topaz/public/lib/app/dart",
+    "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}
+
 dart_test("dart_app_tests") {
   source_dir = "."
 
@@ -45,6 +64,7 @@ dart_test("dart_app_tests") {
     "test/stdout_test.dart",
     "test/stdout_with_exception.dart",
     "test/stdout_with_location.dart",
+    "test/test_startup_context_test.dart",
   ]
 
   deps = [

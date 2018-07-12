@@ -54,7 +54,7 @@ class StartupContext {
   /// This is primarily used to provide alternative environment services for
   /// testing purposes.
   static void provideStartupContext(StartupContext context) {
-    assert(_context != null, 'StartupContext should never be overwritten.');
+    assert(_context == null, 'StartupContext should never be overwritten.');
     _context = context;
   }
 
