@@ -10,6 +10,11 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 class IntentBuilder {
   final Intent _intent;
 
+  // Creates a new intent builder with both an action and a handler.
+  IntentBuilder({String action, String handler})
+      : _intent = new Intent(
+            action: action, handler: handler, parameters: <IntentParameter>[]);
+
   // Creates a new intent builder where the intent's action is set to the
   // provided name.
   IntentBuilder.action(String name)
@@ -18,7 +23,8 @@ class IntentBuilder {
   // Creates a new intent builder where the intent's handler is set to the
   // provided handler string.
   IntentBuilder.handler(String handler)
-      : _intent = new Intent(action: '', handler: handler, parameters: <IntentParameter>[]);
+      : _intent = new Intent(
+            action: '', handler: handler, parameters: <IntentParameter>[]);
 
   // Converts |value| to a JSON object and adds it to the Intent. For typed
   // data, prefer to use addParameterFromEntityReference().
@@ -36,7 +42,7 @@ class IntentBuilder {
     _addParameter(name, new IntentParameterData.withLinkName(linkName));
   }
 
-  // The intent being built. 
+  // The intent being built.
   Intent get intent => _intent;
 
   void _addParameterFromIntentParameter(IntentParameter parameter) {
@@ -44,6 +50,7 @@ class IntentBuilder {
   }
 
   void _addParameter(String name, IntentParameterData parameterData) {
-    _addParameterFromIntentParameter(new IntentParameter(name: name, data: parameterData));
+    _addParameterFromIntentParameter(
+        new IntentParameter(name: name, data: parameterData));
   }
 }
