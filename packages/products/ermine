@@ -1,13 +1,14 @@
 {
     "imports": [
-        "garnet/packages/prod/netstack_tools",
         "garnet/packages/prod/scenic_tools",
-        "garnet/packages/prod/timezone",
         "garnet/packages/prod/wlan",
+        "garnet/packages/products/devtools",
         "garnet/packages/products/graphical",
-        "topaz/packages/config/ermine_user_shell",
+        "garnet/packages/tools/tiles",
+        "topaz/packages/config/ermine",
         "topaz/packages/examples/noodles",
-        "topaz/packages/prod/flutter",
-        "topaz/packages/tools/ermine_user_shell"
+        "topaz/packages/prod/dashboard",
+        "topaz/packages/prod/term",
+        "topaz/packages/prod/web_runner_prototype"
     ]
 }

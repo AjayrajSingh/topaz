@@ -1,7 +1,7 @@
 {
     "imports": [
-        "peridot/packages/config/device_runner",
         "peridot/packages/peridot",
-        "topaz/packages/all"
+        "topaz/packages/all",
+        "topaz/packages/products/ermine"
     ]
 }

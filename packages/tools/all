@@ -2,7 +2,6 @@
     "imports": [
         "topaz/packages/tools/dart",
         "topaz/packages/tools/doc_checker",
-        "topaz/packages/tools/ermine_user_shell",
         "topaz/packages/tools/fidlgen_dart",
         "topaz/packages/tools/ledger",
         "topaz/packages/tools/link_viewer"
