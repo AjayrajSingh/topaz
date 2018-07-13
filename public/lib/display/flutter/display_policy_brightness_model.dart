@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.widgets/model.dart';
+import 'dart:math';
+
 import 'package:lib.display.dart/display.dart';
+import 'package:lib.widgets/model.dart';
 
 export 'package:lib.display.dart/display.dart' show Display;
 
@@ -19,7 +21,7 @@ class DisplayPolicyBrightnessModel extends Model {
   Display _display;
 
   DisplayPolicyBrightnessModel(this._display) {
-    _display.brightnessStream.listen((double brightness) {
+    _display.addListener((double brightness) {
       notifyListeners();
     });
 
@@ -37,9 +39,6 @@ class DisplayPolicyBrightnessModel extends Model {
   }
 
   /// Returns the display brightness.
-  double get brightness => _display.brightness != null &&
-          _display.brightness <= maxLevel &&
-          _display.brightness >= minLevel
-      ? _display.brightness
-      : 0.0;
+  double get brightness =>
+      max(minLevel, min(maxLevel, _display.brightness ?? minLevel));
 }

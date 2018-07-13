@@ -10,6 +10,7 @@
       "//topaz/public/dart/fixtures:dart_fixture_tests",
       "//topaz/public/dart/sledge:dart_sledge_tests",
       "//topaz/public/lib/app/dart:dart_app_tests",
+      "//topaz/public/lib/display/test:display_test",
       "//topaz/public/lib/schemas/dart:dart_schema_tests",
       "//topaz/shell/mondrian_story_shell:mondrian_story_shell_tests",
       "//topaz/tools/dartfmt_extras:dartfmt_extras_tests"

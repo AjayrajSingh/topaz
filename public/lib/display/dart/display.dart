@@ -5,9 +5,9 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_device_display/fidl.dart';
 import 'package:fidl_fuchsia_devicesettings/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 
@@ -72,8 +72,9 @@ class Display extends DeviceSettingsWatcher {
     });
   }
 
-  // Stream for listening to changes in brightness.
-  Stream<double> get brightnessStream => _brightnessStreamController.stream;
+  void addListener(void onEvent(double brightness)) {
+    _brightnessStreamController.stream.listen(onEvent);
+  }
 
   // Cache the brightness so callers can retrieve it without reading the
   // device settings or display.
