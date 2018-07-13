@@ -106,6 +106,7 @@ class Transaction {
       rollbackModification(pageProxy);
       return false;
     }
+    _documents.clear();
     return true;
   }
 
