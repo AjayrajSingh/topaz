@@ -4,8 +4,8 @@
 
 import("//build/package.gni")
 
-executable("noodles") {
-  output_name = "noodles_view"
+executable("bin") {
+  output_name = "noodles"
 
   sources = [
     "main.cc",
@@ -27,17 +27,11 @@ executable("noodles") {
   ]
 }
 
-package("package") {
-  deprecated_system_image = true
-  package_name = "noodles"
+package("noodles") {
 
   deps = [
-    ":noodles",
+    ":bin",
   ]
 
-  binaries = [
-    {
-      name = "noodles_view"
-    },
-  ]
+  binary = "noodles"
 }

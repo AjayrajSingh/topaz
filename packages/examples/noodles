@@ -1,5 +1,5 @@
 {
     "packages": [
-        "//topaz/examples/ui/noodles:package"
+        "//topaz/examples/ui/noodles"
     ]
 }
