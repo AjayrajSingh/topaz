@@ -58,7 +58,7 @@ class SetValue<E> extends SetBase<E> implements LeafValue {
   }
 
   @override
-  Set<E> toSet() => _map.keys;
+  Set<E> toSet() => _map.keys.toSet();
 
   @override
   E lookup(Object object) {

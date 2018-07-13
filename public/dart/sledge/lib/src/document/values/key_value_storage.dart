@@ -10,94 +10,120 @@ import 'converted_change.dart';
 /// Sledge DataTypes internal storage.
 class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
   final Map<K, V> _storage;
-  final ConvertedChange<K, V> _localChange;
-  bool Function(K, K) _equals;
-  int Function(K) _hashCode;
-  int _localLength = 0;
+  // [_changesToRollback] stores the ConvertedChange that should be applied to
+  // roll back the transaction that is in progress. For each key that was
+  // affected in this transaction:
+  // - it stores the key and the old value in [changedKeys], if key was in [_storage]
+  // - it stores the key in [deletedKeys], if key wasn't in [_storage]
+  final ConvertedChange<K, V> _changeToRollback;
   ValueObserver _observer;
 
   /// Creates a storage using the provided [equals] as equality.
   KeyValueStorage({bool equals(K key1, K key2), int hashCode(K key)})
-      : _equals = equals,
-        _hashCode = hashCode,
-        _storage = new HashMap<K, V>(equals: equals, hashCode: hashCode),
-        _localChange = new ConvertedChange(
+      : _storage = new HashMap<K, V>(equals: equals, hashCode: hashCode),
+        _changeToRollback = new ConvertedChange(
             new HashMap<K, V>(equals: equals, hashCode: hashCode),
             new HashSet<K>(equals: equals, hashCode: hashCode));
 
   @override
-  V operator [](Object key) {
-    if (_localChange.deletedKeys.contains(key)) {
-      return null;
-    }
-    return _localChange.changedEntries[key] ?? _storage[key];
-  }
+  V operator [](Object key) => _storage[key];
 
   @override
   void operator []=(K key, V value) {
-    _observer?.valueWasChanged();
-    if (this[key] == null) {
-      _localLength += 1;
-    }
-    _localChange.deletedKeys.remove(key);
-    _localChange.changedEntries[key] = value;
+    _backupStateOfKeyValue(key);
+    _storage[key] = value;
+    _valueWasChanged();
   }
 
   @override
   V remove(Object key) {
-    _observer?.valueWasChanged();
+    _backupStateOfKeyValue(key);
     V result = this[key];
-    if (result != null) {
-      _localLength -= 1;
-    }
-    _localChange.deletedKeys.add(key);
-    _localChange.changedEntries.remove(key);
+    _storage.remove(key);
+    _valueWasChanged();
     return result;
   }
 
   @override
   void clear() {
-    _observer?.valueWasChanged();
-    _localChange.changedEntries.clear();
-    _localLength = 0;
-    _localChange.deletedKeys.addAll(_storage.keys);
-  }
-
-  // TODO: return lazy iterable
-  @override
-  Set<K> get keys {
-    return new HashSet<K>(equals: _equals, hashCode: _hashCode)
-      ..addAll(_storage.keys)
-      ..addAll(_localChange.changedEntries.keys)
-      ..removeAll(_localChange.deletedKeys);
+    _storage.keys.forEach(_backupStateOfKeyValue);
+    _storage.clear();
+    _valueWasChanged();
   }
 
   @override
-  int get length => _localLength;
+  Iterable<K> get keys => _storage.keys;
 
-  /// Ends transaction and retrieve it's data.
+  @override
+  int get length => _storage.length;
+
+  /// Retrieves the current transaction's data.
   ConvertedChange<K, V> getChange() {
-    var change = new ConvertedChange.from(_localChange);
-    _localChange.clear();
-    applyChange(change);
+    final change = new ConvertedChange();
+    // [_changeToRollback.deletedKeys] is a collection of keys that were not in
+    // [_storage] when the transaction started, but were affected by this
+    // transaction.
+    for (final key in _changeToRollback.deletedKeys) {
+      // When we add a key-value pair in a transaction, we add the corresponding
+      // key in [_changeToRollback.deletedKeys]. It is valid however, to remove
+      // that key in the same transaction. In that case, [deletedKeys] will not
+      // be updated (to remove the key), and _storage will not contain the given
+      // value. We thus need to check whether the key exists, and only add it in
+      // the list of [change.changedEntries] if it does.
+      if (_storage.containsKey(key)) {
+        change.changedEntries[key] = _storage[key];
+      }
+    }
+    // [_changeToRollback.changedEntries] is a collection of keys that were in
+    // [_storage] when transaction started and were affected by this transaction.
+    for (final key in _changeToRollback.changedEntries.keys) {
+      final previousValue = _storage[key];
+      if (previousValue != null) {
+        change.changedEntries[key] = previousValue;
+      } else {
+        change.deletedKeys.add(key);
+      }
+    }
     return change;
+  }
+
+  /// Completes the current transaction and starts the next one.
+  void completeTransaction() {
+    _changeToRollback.clear();
   }
 
   /// Applies external transaction.
   void applyChange(ConvertedChange<K, V> change) {
     _storage.addAll(change.changedEntries);
     change.deletedKeys.forEach(_storage.remove);
-    _localLength = _storage.length;
   }
 
-  /// Rollbacks current transaction.
-  void rollback() {
-    _localChange.clear();
-    _localLength = _storage.length;
+  /// Rolls back all local modifications.
+  void rollbackChange() {
+    applyChange(_changeToRollback);
+    _changeToRollback.clear();
   }
 
   /// Sets the observer.
   set observer(ValueObserver observer) {
     _observer = observer;
+  }
+
+  /// Backs up info for [key] to enable rollback on it.
+  void _backupStateOfKeyValue(K key) {
+    if (_changeToRollback.deletedKeys.contains(key) ||
+        _changeToRollback.changedEntries.containsKey(key)) {
+      return;
+    }
+    final previousValue = this[key];
+    if (previousValue == null) {
+      _changeToRollback.deletedKeys.add(key);
+    } else {
+      _changeToRollback.changedEntries[key] = previousValue;
+    }
+  }
+
+  void _valueWasChanged() {
+    _observer?.valueWasChanged();
   }
 }
