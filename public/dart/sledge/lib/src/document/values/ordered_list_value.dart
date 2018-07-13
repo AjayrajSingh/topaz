@@ -248,13 +248,19 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   }
 
   @override
-  void add(E element) => insert(length, element);
+  void add(E element) {
+    insert(length, element);
+  }
 
   @override
-  void addAll(Iterable<E> iterable) => iterable.forEach(add);
+  void addAll(Iterable<E> iterable) {
+    iterable.forEach(add);
+  }
 
   @override
-  void clear() => _storage.clear();
+  void clear() {
+    _storage.clear();
+  }
 
   List<OrderedListTreePath> _sortedKeysList() {
     return _storage.keys.toList()..sort();
@@ -266,6 +272,11 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
 
   @override
   Change getChange() => _converter.serialize(_storage.getChange());
+
+  @override
+  void completeTransaction() {
+    _storage.completeTransaction();
+  }
 
   @override
   void applyChange(Change input) {
@@ -294,6 +305,11 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
     }
     _changeController
         .add(new OrderedListChange(deletedPositions, insertedElements));
+  }
+
+  @override
+  void rollbackChange() {
+    _storage.rollbackChange();
   }
 
   @override

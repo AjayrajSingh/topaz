@@ -32,10 +32,20 @@ class SetValue<E> extends SetBase<E> implements LeafValue {
   Change getChange() => _converter.serialize(_removeValue(_map.getChange()));
 
   @override
+  void completeTransaction() {
+    _map.completeTransaction();
+  }
+
+  @override
   void applyChange(Change input) {
     final change = _copyKeyToValue(_converter.deserialize(input));
     _map.applyChange(change);
     _changeController.add(new SetChange<E>(change));
+  }
+
+  @override
+  void rollbackChange() {
+    _map.rollbackChange();
   }
 
   @override

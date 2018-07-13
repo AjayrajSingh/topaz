@@ -78,8 +78,19 @@ class LastOneWinsValue<T> implements LeafValue {
   Change getChange() => _converter.serialize(_value.getChange());
 
   @override
-  void applyChange(Change input) =>
-      _value.applyChange(_converter.deserialize(input));
+  void completeTransaction() {
+    _value.completeTransaction();
+  }
+
+  @override
+  void applyChange(Change input) {
+    _value.applyChange(_converter.deserialize(input));
+  }
+
+  @override
+  void rollbackChange() {
+    _value.rollbackChange();
+  }
 
   @override
   Stream<T> get onChange => _value.onChange;

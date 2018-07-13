@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 // TODO: investigate whether we can get rid of the implementation_imports.
 // ignore_for_file: implementation_imports
+import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:sledge/sledge.dart';
 import 'package:sledge/src/document/change.dart';
 import 'package:sledge/src/utils_random.dart';
@@ -287,5 +288,94 @@ void main() {
 
     Document.applyChange(docB, c1);
     expect(docB.names.single, equals(largeList));
+  });
+
+  group('Rollback', () {
+    test('rollback LastOneWinsValue', () async {
+      // Create schemas.
+      Map<String, BaseType> schemaDescription = <String, BaseType>{
+        'someBool': new Boolean(),
+        'someInteger': new Integer()
+      };
+      Schema schema = new Schema(schemaDescription);
+
+      // Create a new Sledge document.
+      SledgeForTesting sledge = newSledgeForTesting();
+      dynamic doc;
+      await sledge.runInTransaction(() async {
+        doc = await sledge.getDocument(new DocumentId(schema));
+      });
+      // Read and write properties of a Sledge document.
+      bool transactionSucceed = await sledge.runInTransaction(() {
+        doc.someInteger.value = 14;
+      });
+      expect(transactionSucceed, true);
+      expect(doc.someInteger.value, equals(14));
+
+      // Test case when commit fails.
+      sledge.fakeLedgerPage.commitCallback = ledger.Status.ioError;
+      transactionSucceed = await sledge.runInTransaction(() {
+        doc.someBool.value = true;
+        doc.someInteger.value = 42;
+      });
+      expect(transactionSucceed, false);
+      expect(doc.someBool.value, equals(false));
+      expect(doc.someInteger.value, equals(14));
+
+      // Check that after failed transaction we can get successful one.
+      sledge.fakeLedgerPage.resetAllCallbacks();
+      transactionSucceed = await sledge.runInTransaction(() {
+        doc.someInteger.value = 8;
+      });
+      expect(transactionSucceed, true);
+      expect(doc.someInteger.value, equals(8));
+    });
+
+    test('rollback BytelistMap', () async {
+      // Create schemas.
+      Map<String, BaseType> schemaDescription = <String, BaseType>{
+        'map': new BytelistMap(),
+      };
+      Schema schema = new Schema(schemaDescription);
+
+      // Create a new Sledge document.
+      SledgeForTesting sledge = newSledgeForTesting();
+      dynamic doc;
+      await sledge.runInTransaction(() async {
+        doc = await sledge.getDocument(new DocumentId(schema));
+      });
+      // Read and write properties of a Sledge document.
+      bool transactionSucceed = await sledge.runInTransaction(() {
+        doc.map['a'] = new Uint8List.fromList([1, 2, 3]);
+      });
+      expect(transactionSucceed, true);
+      expect(doc.map.length, equals(1));
+
+      // Test case when commit fails.
+      sledge.fakeLedgerPage.commitCallback = ledger.Status.ioError;
+      transactionSucceed = await sledge.runInTransaction(() {
+        doc.map['a'] = new Uint8List.fromList([4]);
+        doc.map['foo'] = new Uint8List.fromList([1, 3]);
+      });
+      expect(transactionSucceed, false);
+      expect(doc.map.length, equals(1));
+      expect(doc.map['a'], equals([1, 2, 3]));
+
+      // Check that after failed transaction we can get successful one.
+      sledge.fakeLedgerPage.resetAllCallbacks();
+      transactionSucceed = await sledge.runInTransaction(() {
+        doc.map['foo'] = new Uint8List.fromList([1, 3]);
+      });
+      expect(transactionSucceed, true);
+      expect(doc.map.length, equals(2));
+      expect(doc.map['a'], equals([1, 2, 3]));
+      expect(doc.map['foo'], equals([1, 3]));
+
+      transactionSucceed = await sledge.runInTransaction(() {
+        doc.map['a'] = new Uint8List.fromList([3, 4]);
+      });
+      expect(transactionSucceed, true);
+      expect(doc.map['a'], equals([3, 4]));
+    });
   });
 }

@@ -73,6 +73,11 @@ class PosNegCounterValue<T extends num> implements LeafValue {
   Change getChange() => _converter.serialize(_storage.getChange());
 
   @override
+  void completeTransaction() {
+    _storage.completeTransaction();
+  }
+
+  @override
   void applyChange(Change input) {
     final ConvertedChange<Uint8List, T> change = _converter.deserialize(input);
     for (var key in change.changedEntries.keys) {
@@ -85,6 +90,22 @@ class PosNegCounterValue<T extends num> implements LeafValue {
     }
     _storage.applyChange(change);
     _changeController.add(_sum);
+  }
+
+  @override
+  void rollbackChange() {
+    // Rolls back [_storage] state, and [_sum] value.
+    // Only values for "local keys" ([_positiveKey] and [_negatieKey]) might be
+    // affected in the current transaction.
+    // To roll back and restore the value of [_sum] from before the transaction,
+    // undo adding the [_positiveKey] and subtracting [_negativeKey], roll back
+    // in [_storage], and then update [_sum] with the reverted values from the
+    // "local keys".
+    _sum -= _storage[_positiveKey];
+    _sum += _storage[_negativeKey];
+    _storage.rollbackChange();
+    _sum += _storage[_positiveKey];
+    _sum -= _storage[_negativeKey];
   }
 
   @override

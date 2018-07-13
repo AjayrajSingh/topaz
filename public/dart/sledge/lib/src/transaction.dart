@@ -74,7 +74,6 @@ class Transaction {
           keyWithDocumentPrefix,
           completer.complete,
         );
-        updateLedgerFutures.add(completer.future);
       }
       // Forward the "puts".
       for (KeyValue kv in change.changedEntries) {
@@ -94,7 +93,7 @@ class Transaction {
     final List<ledger.Status> statuses = await Future.wait(updateLedgerFutures);
     for (final status in statuses) {
       if (status != ledger.Status.ok) {
-        rollbackModification(pageProxy);
+        await rollbackModification(pageProxy);
         return false;
       }
     }
@@ -103,10 +102,13 @@ class Transaction {
     pageProxy.commit(commitCompleter.complete);
     bool commitOk = (await commitCompleter.future) == ledger.Status.ok;
     if (!commitOk) {
-      rollbackModification(pageProxy);
+      await rollbackModification(pageProxy);
       return false;
     }
-    _documents.clear();
+
+    _documents
+      ..forEach(Document.completeTransaction)
+      ..clear();
     return true;
   }
 
@@ -139,7 +141,15 @@ class Transaction {
   }
 
   /// Rollback the documents that were modified during the transaction.
-  void rollbackModification(ledger.PageProxy pageProxy) {
-    // TODO: implement.
+  Future rollbackModification(ledger.PageProxy pageProxy) async {
+    _documents
+      ..forEach(Document.rollbackChange)
+      ..clear();
+    final completer = new Completer<ledger.Status>();
+    pageProxy.rollback(completer.complete);
+    bool commitOk = (await completer.future) == ledger.Status.ok;
+    if (!commitOk) {
+      throw new Exception('Transaction failed. Unable to rollback.');
+    }
   }
 }

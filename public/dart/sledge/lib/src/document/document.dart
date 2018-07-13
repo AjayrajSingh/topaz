@@ -51,17 +51,27 @@ class Document implements ValueObserver {
   /// Returns this document's documentId.
   DocumentId get documentId => _documentId;
 
-  /// Get the change for all fields of doc.
+  /// Get the change for all fields of [doc].
   static Change getChange(final Document doc) {
     return doc._getChange();
   }
 
-  /// Applies change to fields of document.
+  /// Ends the transaction for all fields of [doc].
+  static void completeTransaction(final Document doc) {
+    doc._completeTransaction();
+  }
+
+  /// Applies [change] to fields of [doc].
   static void applyChange(final Document doc, final Change change) {
     doc._applyChange(change);
   }
 
-  /// Gets the change for all fields of document.
+  /// Rolls back all local modifications on all fields of [doc].
+  static void rollbackChange(final Document doc) {
+    doc._rollbackChange();
+  }
+
+  /// Gets the change for all fields of this document.
   Change _getChange() {
     Change result = new Change();
     for (final prefix in _fields.keys) {
@@ -70,7 +80,14 @@ class Document implements ValueObserver {
     return result;
   }
 
-  /// Applies change to fields of document.
+  /// Ends the transaction for all fields of this document.
+  void _completeTransaction() {
+    for (final leafValue in _fields.values) {
+      leafValue.completeTransaction();
+    }
+  }
+
+  /// Applies change to fields of this document.
   void _applyChange(final Change change) {
     Map<Uint8List, Change> splittedChanges = change.splitByPrefix(_hashLength);
     for (final prefix in splittedChanges.keys) {
@@ -83,6 +100,13 @@ class Document implements ValueObserver {
 
   /// Returns a stream, generating an event each time a document changes.
   static Stream<void> getOnChangeStream(final Document doc) => doc._onChange;
+  
+  /// Rolls back all local modifications on all fields of this document.
+  void _rollbackChange() {
+    for (final leafValue in _fields.values) {
+      leafValue.rollbackChange();
+    }
+  }
 
   @override
   void valueWasChanged() {

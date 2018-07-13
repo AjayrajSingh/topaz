@@ -19,6 +19,12 @@ abstract class LeafValue implements Value {
   /// Applies external transactions.
   void applyChange(Change input);
 
+  /// Rolls back all local modifications.
+  void rollbackChange();
+
+  /// Ends the transaction in progress and deletes the rollback data.
+  void completeTransaction();
+
   /// The Stream of changes.
   Stream<Object> get onChange;
 }

@@ -30,10 +30,20 @@ class MapValue<K, V> extends MapBase<K, V>
   Change getChange() => _converter.serialize(_map.getChange());
 
   @override
+  void completeTransaction() {
+    _map.completeTransaction();
+  }
+
+  @override
   void applyChange(Change input) {
     final change = _converter.deserialize(input);
     _map.applyChange(change);
     _changeController.add(new MapChange<K, V>(change));
+  }
+
+  @override
+  void rollbackChange() {
+    _map.rollbackChange();
   }
 
   @override
