@@ -57,7 +57,10 @@ void main() {
     log.fine('Creating message queue');
     String messageQueueToken = await initializedDriver.createMessageQueue(
       name: _kContactsUpdateQueue,
-      onReceive: contactsService.handleUpdate,
+      onMessage: contactsService.handleUpdate,
+      onConnectionError: (MessageQueueError code, String msg) {
+        log.severe('MessageQueue down for $_kContactsUpdateQueue: $msg');
+      },
     );
 
     log.fine('Message queue token received: $messageQueueToken');

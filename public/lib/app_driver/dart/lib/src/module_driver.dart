@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_cobalt/fidl.dart';
@@ -20,6 +21,8 @@ import 'package:meta/meta.dart';
 
 import 'service_client.dart';
 
+export 'package:lib.component.dart/component.dart'
+    show MessageQueueError, MessageSenderError;
 export 'package:fidl_fuchsia_modular/fidl.dart' show Intent;
 export 'package:lib.module_resolver.dart/intent_builder.dart'
     show IntentBuilder;
@@ -30,7 +33,7 @@ export 'package:lib.ui.flutter/child_view.dart'
     show ChildView, ChildViewConnection;
 
 /// Function definition to handle [data] that is received from a message queue.
-typedef OnReceiveMessage = void Function(String data, void Function() ack);
+typedef OnReceiveMessage = void Function(Uint8List data, void Function() ack);
 
 /// Function to run when the module terminates
 typedef OnTerminate = void Function();
@@ -75,12 +78,9 @@ class ModuleDriver {
 
   // Message queue proxies for receiving updates from the content provider
   // TODO(meiyili): update to handle creating to multiple message queues MS-1288
-  MessageQueueProxy _messageQueue;
-  MessageReceiverImpl _messageQueueReceiver;
+  MessageQueueClient _messageQueue;
 
   /// Message queue token completer
-  final Completer<String> _tokenCompleter = new Completer<String>();
-
   final CobaltEncoderProxy _encoder = new CobaltEncoderProxy();
   final DateTime _initializationTime;
   final Set<String> _firstObservationSent = new Set<String>();
@@ -214,35 +214,27 @@ class ModuleDriver {
   /// Creates a message queue and returns a [Future] with the message queue
   /// token that should be passed to agents we want to connect to. If a
   /// message queue has already been created, it will return the token for the
-  /// token for the already created queue and ignore the new [onReceive] method.
+  /// token for the already created queue and ignore the new [onMessage] method.
   ///
   /// [name] is the name of the message queue.
-  /// [onReceive] should be supplied to handle the data from the message queue.
+  /// [onMessage] should be supplied to handle the data from the message queue.
   // TODO(meiyili): Update to allow creating multiple message queues MS-1288
   Future<String> createMessageQueue({
     @required String name,
-    @required OnReceiveMessage onReceive,
+    @required OnReceiveMessage onMessage,
+    @required MessageQueueErrorCallback onConnectionError,
   }) async {
     assert(name != null && name.isNotEmpty);
-    assert(onReceive != null);
-    log.fine('#createMessageQueue(...)');
+    assert(onMessage != null);
+    log.fine('#createMessageQueue($name)');
 
     // Create a message queue that the module can pass to agents only if we
     // haven't already created one
-    if (!_tokenCompleter.isCompleted) {
-      ComponentContextClient componentContext =
-          await moduleContext.getComponentContext();
-      _messageQueue = await componentContext.obtainMessageQueue(name)
-        ..getToken(_tokenCompleter.complete);
-
-      // TODO(jasoncampbell): create MessageReceiverHost around the impl MS-1301
-      _messageQueueReceiver = new MessageReceiverImpl(
-        messageQueue: _messageQueue,
-        onReceiveMessage: onReceive,
-      );
-    }
-
-    return _tokenCompleter.future;
+    ComponentContextClient componentContext =
+        await moduleContext.getComponentContext();
+    _messageQueue = componentContext.obtainMessageQueue(
+        name: name, onMessage: onMessage, onConnectionError: onConnectionError);
+    return _messageQueue.getToken();
   }
 
   /// Connect to the service specified by [client] and implemented by the
@@ -304,8 +296,7 @@ class ModuleDriver {
   Future<Null> _handleTerminate() {
     log.info('closing service connections');
 
-    _messageQueueReceiver?.close();
-    _messageQueue?.ctrl?.close();
+    _messageQueue?.close();
     _encoder.ctrl.close();
 
     List<Future<Null>> futures = <Future<Null>>[

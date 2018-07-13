@@ -3,4 +3,5 @@
 // found in the LICENSE file.
 
 export 'src/component_context_client.dart';
-export 'src/message_receiver_impl.dart';
+export 'src/message_queue_client.dart';
+export 'src/message_sender_client.dart';

@@ -3,7 +3,8 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show json;
+import 'dart:convert' show json, utf8;
+import 'dart:typed_data';
 
 import 'package:contacts_services/client.dart';
 import 'package:fidl_fuchsia_contacts_contentprovider/fidl.dart'
@@ -144,10 +145,10 @@ class ContactsService {
       );
 
   /// Handle messages received on the message queue
-  void handleUpdate(String data, void ack()) {
+  void handleUpdate(Uint8List data, void ack()) {
     ack();
 
-    Map<String, dynamic> updates = json.decode(data);
+    Map<String, dynamic> updates = json.decode(utf8.decode(data));
     log.fine('Decoded contact updates = $updates');
 
     if (updates.containsKey('contact_list')) {

@@ -15,6 +15,7 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
+import 'package:lib.component.dart/component.dart';
 import 'package:lib.ledger.dart/ledger.dart';
 import 'package:lib.schemas.dart/com.fuchsia.contact.dart' as entities;
 import 'package:meta/meta.dart';
@@ -81,9 +82,9 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   ContactsWatcher _contactsWatcher;
 
   /// Keep track of subscribers via a map of message queue tokens to the
-  /// message sender proxies
-  final Map<String, MessageSenderProxy> _messageSenders =
-      <String, MessageSenderProxy>{};
+  /// message sender clients
+  final Map<String, MessageSenderClient> _messageSenders =
+      <String, MessageSenderClient>{};
 
   /// Constructor
   ContactsContentProviderImpl({
@@ -206,12 +207,15 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     if (!_messageSenders.containsKey(messageQueueToken)) {
       // TODO: handle getMessageSender failures and somehow propagate that back
       // to the callers SO-1040
-      MessageSenderProxy messageSender = new MessageSenderProxy();
+      var sender = new MessageSenderClient(onConnectionError:
+          (MessageSenderError code, String msg) {
+        log.severe('Message sender down for $messageQueueToken: $msg');
+      });
       _componentContext.getMessageSender(
         messageQueueToken,
-        messageSender.ctrl.request(),
+        sender.newRequest(),
       );
-      _messageSenders[messageQueueToken] = messageSender;
+      _messageSenders[messageQueueToken] = sender;
       log.fine('Added subscription for token $messageQueueToken');
     }
   }
@@ -219,9 +223,9 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   @override
   void unsubscribe(String messageQueueToken) {
     log.fine('Unsubscribe called');
-    MessageSenderProxy messageSender = _messageSenders[messageQueueToken];
+    MessageSenderClient messageSender = _messageSenders[messageQueueToken];
     if (messageSender != null) {
-      messageSender.ctrl.close();
+      messageSender.close();
       _messageSenders.remove(messageSender);
     }
   }
@@ -381,10 +385,11 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
               .map(_convertContactToJsonEncodable)
               .toList()
         };
-        String encoded = json.encode(message);
+
+        var encoded = Uint8List.fromList(utf8.encode(json.encode(message)));
         log.fine('Sending update to ${_messageSenders.length} subscribers');
-        for (MessageSenderProxy ms in _messageSenders.values) {
-          ms.send(encoded);
+        for (MessageSenderClient ms in _messageSenders.values) {
+          ms.sendUint8List(encoded);
         }
       },
     );

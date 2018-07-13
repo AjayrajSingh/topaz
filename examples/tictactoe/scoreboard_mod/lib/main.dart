@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert' show utf8;
+import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_tictactoe/fidl_async.dart';
 import 'package:flutter/material.dart';
@@ -31,12 +33,15 @@ void main() {
   Future<String> messageQueueToken = moduleDriver
       .createMessageQueue(
         name: scoreQueueName,
-        onReceive: (data, ack) {
-          Score score = scoreCodec.decode(data);
+        onMessage: (Uint8List data, void ack()) {
+          Score score = scoreCodec.decode(utf8.decode(data));
           if (score != null) {
             model.setScore(score.xScore, score.oScore);
           }
           ack();
+        },
+        onConnectionError: (code, errMsg) {
+          log.severe('Message Queue down: $errMsg');
         },
       )
       .catchError(

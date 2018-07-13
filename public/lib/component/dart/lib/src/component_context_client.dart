@@ -5,10 +5,12 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart' as fidl;
 import 'package:fidl_fuchsia_modular/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_sys/fidl.dart' as fidl;
 import 'package:lib.app.dart/logging.dart';
+import 'package:lib.component.dart/component.dart';
 import 'package:lib.entity.dart/entity.dart';
+import 'package:meta/meta.dart';
 
 /// A client wrapper for [fidl.ComponentContext].
 class ComponentContextClient {
@@ -110,51 +112,23 @@ class ComponentContextClient {
   }
 
   /// Obtain a named message queue for receiving messages.
-  Future<fidl.MessageQueueProxy> obtainMessageQueue(String name) {
-    Completer<fidl.MessageQueueProxy> messageQueueCompleter =
-        new Completer<fidl.MessageQueueProxy>();
-
-    fidl.MessageQueueProxy queue = new fidl.MessageQueueProxy();
-    queue.ctrl.error.then((ProxyError err) {
-      if (!messageQueueCompleter.isCompleted) {
-        messageQueueCompleter.completeError(err);
-      }
-    });
-
-    // TODO(meiyili): handle errors MS-1288
-    proxy.obtainMessageQueue(name, queue.ctrl.request());
-
-    scheduleMicrotask(() {
-      if (!messageQueueCompleter.isCompleted) {
-        messageQueueCompleter.complete(queue);
-      }
-    });
-
-    return messageQueueCompleter.future;
+  MessageQueueClient obtainMessageQueue(
+      {@required String name,
+      @required MessageReceiverCallback onMessage,
+      @required MessageQueueErrorCallback onConnectionError}) {
+    var mq = new MessageQueueClient(
+        onMessage: onMessage, onConnectionError: onConnectionError);
+    proxy.obtainMessageQueue(name, mq.newRequest());
+    return mq;
   }
 
   /// Obtain a message queue sender from a token.
-  Future<fidl.MessageSenderProxy> getMessageSender(String queueToken) {
-    Completer<fidl.MessageSenderProxy> senderCompleter =
-        new Completer<fidl.MessageSenderProxy>();
-    fidl.MessageSenderProxy sender = new fidl.MessageSenderProxy();
-
-    sender.ctrl.error.then((ProxyError err) {
-      if (!senderCompleter.isCompleted) {
-        senderCompleter.completeError(err);
-      }
-    });
-
-    // TODO(meiyili): handle errors MS-1288
-    proxy.getMessageSender(queueToken, sender.ctrl.request());
-
-    scheduleMicrotask(() {
-      if (!senderCompleter.isCompleted) {
-        senderCompleter.complete(sender);
-      }
-    });
-
-    return senderCompleter.future;
+  MessageSenderClient getMessageSender(
+      {@required String queueToken,
+      @required MessageSenderErrorCallback onConnectionError}) {
+    var sender = new MessageSenderClient(onConnectionError: onConnectionError);
+    proxy.getMessageSender(queueToken, sender.newRequest());
+    return sender;
   }
 
   /// Connect to an agent
