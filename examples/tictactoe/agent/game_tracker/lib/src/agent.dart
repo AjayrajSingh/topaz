@@ -29,8 +29,8 @@ class GameTrackerAgent extends AgentImpl {
     // Adds this agent's service to the outgoingServices so that it can accessed
     // from elsewhere and saves the binding for disconnecting in [onStop].
     outgoingServices.addServiceForName(
-        (request) => _bindings.add(
-            (new GameTrackerBinding())..bind(new GameTrackerImpl(), request)),
+        (request) => _bindings.add((new GameTrackerBinding())
+          ..bind(new GameTrackerImpl(componentContext), request)),
         GameTracker.$serviceName);
   }
 
