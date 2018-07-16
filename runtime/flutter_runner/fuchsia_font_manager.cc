@@ -30,7 +30,7 @@ namespace {
 void UnmapMemory(const void* buffer, void* context) {
   static_assert(sizeof(void*) == sizeof(uint64_t), "pointers aren't 64-bit");
   const uint64_t size = reinterpret_cast<uint64_t>(context);
-  zx::vmar::root_self().unmap(reinterpret_cast<uintptr_t>(buffer), size);
+  zx::vmar::root_self()->unmap(reinterpret_cast<uintptr_t>(buffer), size);
 }
 
 sk_sp<SkData> MakeSkDataFromBuffer(const fuchsia::mem::Buffer& data) {
@@ -40,7 +40,7 @@ sk_sp<SkData> MakeSkDataFromBuffer(const fuchsia::mem::Buffer& data) {
   }
   uint64_t size = data.size;
   uintptr_t buffer = 0;
-  zx_status_t status = zx::vmar::root_self().map(0, data.vmo, 0, size,
+  zx_status_t status = zx::vmar::root_self()->map(0, data.vmo, 0, size,
                                                  ZX_VM_FLAG_PERM_READ, &buffer);
   if (status != ZX_OK)
     return nullptr;

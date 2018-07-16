@@ -27,7 +27,7 @@ void TraceCount(int32_t delta) {
 void UnmapMemory(const void* buffer, void* context) {
   const uint64_t size = reinterpret_cast<uint64_t>(context);
   zx_status_t status =
-      zx::vmar::root_self().unmap(reinterpret_cast<uintptr_t>(buffer), size);
+      zx::vmar::root_self()->unmap(reinterpret_cast<uintptr_t>(buffer), size);
   FXL_CHECK(status == ZX_OK);
   TraceCount(-1);
 }
@@ -37,7 +37,7 @@ void UnmapMemory(const void* buffer, void* context) {
 sk_sp<SkData> MakeSkDataFromVMO(const fsl::SizedVmo& vmo) {
   uint64_t size = vmo.size();
   uintptr_t buffer = 0u;
-  zx_status_t status = zx::vmar::root_self().map(0, vmo.vmo(), 0u, size,
+  zx_status_t status = zx::vmar::root_self()->map(0, vmo.vmo(), 0u, size,
                                                  ZX_VM_FLAG_PERM_READ, &buffer);
   if (status != ZX_OK)
     return nullptr;
@@ -47,7 +47,7 @@ sk_sp<SkData> MakeSkDataFromVMO(const fsl::SizedVmo& vmo) {
                            reinterpret_cast<void*>(size));
   if (!data) {
     FXL_LOG(ERROR) << "Could not create SkData";
-    status = zx::vmar::root_self().unmap(buffer, size);
+    status = zx::vmar::root_self()->unmap(buffer, size);
     FXL_CHECK(status == ZX_OK);
     return nullptr;
   }

@@ -26,7 +26,7 @@ static void UpdateNativeThreadLabelNames(const std::string& label,
       return;
     }
     fml::TaskRunner::RunNowOrPostTask(runner, [name = prefix + suffix]() {
-      zx::thread::self().set_property(ZX_PROP_NAME, name.c_str(), name.size());
+      zx::thread::self()->set_property(ZX_PROP_NAME, name.c_str(), name.size());
     });
   };
   set_thread_name(runners.GetPlatformTaskRunner(), label, ".platform");

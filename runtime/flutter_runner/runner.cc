@@ -27,11 +27,11 @@ static void SetProcessName() {
     stream << "jit";
   }
   const auto name = stream.str();
-  zx::process::self().set_property(ZX_PROP_NAME, name.c_str(), name.size());
+  zx::process::self()->set_property(ZX_PROP_NAME, name.c_str(), name.size());
 }
 
 static void SetThreadName(const std::string& thread_name) {
-  zx::thread::self().set_property(ZX_PROP_NAME, thread_name.c_str(),
+  zx::thread::self()->set_property(ZX_PROP_NAME, thread_name.c_str(),
                                   thread_name.size());
 }
 

@@ -55,7 +55,7 @@ bool MappedResource::LoadFromVmo(const std::string& path,
     flags |= ZX_VM_FLAG_PERM_EXECUTE;
   }
   uintptr_t addr;
-  zx_status_t status = zx::vmar::root_self().map(
+  zx_status_t status = zx::vmar::root_self()->map(
       0, resource_vmo.vmo(), 0, resource_vmo.size(), flags, &addr);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to map " << path << ": "
@@ -70,7 +70,7 @@ bool MappedResource::LoadFromVmo(const std::string& path,
 
 MappedResource::~MappedResource() {
   if (address_ != nullptr) {
-    zx::vmar::root_self().unmap(reinterpret_cast<uintptr_t>(address_), size_);
+    zx::vmar::root_self()->unmap(reinterpret_cast<uintptr_t>(address_), size_);
     address_ = nullptr;
     size_ = 0;
   }

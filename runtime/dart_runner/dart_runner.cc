@@ -240,7 +240,7 @@ void DartRunner::UpdateProcessLabel() {
       }
     }
   }
-  zx::process::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
+  zx::process::self()->set_property(ZX_PROP_NAME, label.c_str(), label.size());
 }
 
 }  // namespace dart_runner

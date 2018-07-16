@@ -80,7 +80,7 @@ DartComponentController::~DartComponentController() {
 bool DartComponentController::Setup() {
   // Name the thread after the url of the component being launched.
   std::string label = "dart:" + label_;
-  zx::thread::self().set_property(ZX_PROP_NAME, label.c_str(), label.size());
+  zx::thread::self()->set_property(ZX_PROP_NAME, label.c_str(), label.size());
   Dart_SetThreadName(label.c_str());
 
   if (!SetupNamespace()) {
