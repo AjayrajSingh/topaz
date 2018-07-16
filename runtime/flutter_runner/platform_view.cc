@@ -9,7 +9,7 @@
 #include <sstream>
 
 #include "flutter/lib/ui/window/pointer_data.h"
-#include "lib/app/cpp/connect.h"
+#include "lib/component/cpp/connect.h"
 #include "third_party/rapidjson/rapidjson/document.h"
 #include "third_party/rapidjson/rapidjson/stringbuffer.h"
 #include "third_party/rapidjson/rapidjson/writer.h"
@@ -74,7 +74,7 @@ PlatformView::PlatformView(
   view_->GetContainer(view_container_.NewRequest());
 
   // Get the input connection from the services of the view.
-  fuchsia::sys::ConnectToService(service_provider_.get(),
+  component::ConnectToService(service_provider_.get(),
                               input_connection_.NewRequest());
 
   // Set the input listener on the input connection.
@@ -83,7 +83,7 @@ PlatformView::PlatformView(
   // Access the clipboard.
   parent_environment_service_provider_ =
       parent_environment_service_provider_handle.Bind();
-  fuchsia::sys::ConnectToService(parent_environment_service_provider_.get(),
+  component::ConnectToService(parent_environment_service_provider_.get(),
                               clipboard_.NewRequest());
 
   // Finally! Register the native platform message handlers.

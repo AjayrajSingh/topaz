@@ -119,7 +119,7 @@ Application::Application(
   }
 
   startup_context_ =
-      fuchsia::sys::StartupContext::CreateFrom(std::move(startup_info));
+      component::StartupContext::CreateFrom(std::move(startup_info));
 
   // Compare flutter_jit_runner in BUILD.gn.
   settings_.vm_snapshot_data_path = "pkg/data/vm_snapshot_data.bin";

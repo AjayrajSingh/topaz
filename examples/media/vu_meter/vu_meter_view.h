@@ -13,7 +13,7 @@
 #include <lib/vmo-utils/vmo_mapper.h>
 
 #include "examples/ui/lib/skia_view.h"
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/fxl/macros.h"
 #include "topaz/examples/media/vu_meter/vu_meter_params.h"
 
@@ -25,7 +25,7 @@ class VuMeterView : public mozart::SkiaView {
               fuchsia::ui::views_v1::ViewManagerPtr view_manager,
               fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
                   view_owner_request,
-              fuchsia::sys::StartupContext* startup_context,
+              component::StartupContext* startup_context,
               const VuMeterParams& params);
 
   ~VuMeterView() override;

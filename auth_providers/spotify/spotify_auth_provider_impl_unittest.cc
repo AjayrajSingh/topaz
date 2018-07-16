@@ -22,7 +22,7 @@ class SpotifyAuthProviderImplTest : public gtest::TestLoopFixture {
  public:
   SpotifyAuthProviderImplTest()
       : network_wrapper_(dispatcher()),
-        context_(fuchsia::sys::StartupContext::CreateFromStartupInfo().get()),
+        context_(component::StartupContext::CreateFromStartupInfo().get()),
         spotify_auth_provider_impl_(context_, &network_wrapper_,
                                     auth_provider_.NewRequest()) {}
 
@@ -30,7 +30,7 @@ class SpotifyAuthProviderImplTest : public gtest::TestLoopFixture {
 
  protected:
   network_wrapper::FakeNetworkWrapper network_wrapper_;
-  fuchsia::sys::StartupContext* context_;
+  component::StartupContext* context_;
   fuchsia::auth::AuthProviderPtr auth_provider_;
   SpotifyAuthProviderImpl spotify_auth_provider_impl_;
 

@@ -44,7 +44,7 @@ class ComponentController : public fuchsia::sys::ComponentController,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> services) final;
 
   Runner* runner_;
-  fuchsia::sys::ServiceProviderBridge service_provider_;
+  component::ServiceProviderBridge service_provider_;
   fidl::Binding<fuchsia::sys::ComponentController> binding_;
   fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> view_provider_bindings_;
   std::vector<WaitCallback> wait_callbacks_;

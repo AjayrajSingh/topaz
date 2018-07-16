@@ -8,7 +8,7 @@
 
 #include <iomanip>
 
-#include "lib/app/cpp/connect.h"
+#include "lib/component/cpp/connect.h"
 #include "lib/fxl/logging.h"
 #include "lib/media/audio/types.h"
 #include "third_party/skia/include/core/SkColor.h"
@@ -24,7 +24,7 @@ VuMeterView::VuMeterView(
     async::Loop* loop, fuchsia::ui::views_v1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
         view_owner_request,
-    fuchsia::sys::StartupContext* startup_context, const VuMeterParams& params)
+    component::StartupContext* startup_context, const VuMeterParams& params)
     : mozart::SkiaView(std::move(view_manager), std::move(view_owner_request),
                        "VU Meter"),
       loop_(loop),

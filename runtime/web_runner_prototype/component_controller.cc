@@ -4,7 +4,7 @@
 
 #include "topaz/runtime/web_runner_prototype/component_controller.h"
 
-#include "lib/app/cpp/connect.h"
+#include "lib/component/cpp/connect.h"
 #include "topaz/runtime/web_runner_prototype/runner.h"
 
 namespace web {
@@ -40,7 +40,7 @@ void ComponentController::Start(
 
   url_ = package.resolved_url;
 
-  fuchsia::sys::Services services;
+  component::Services services;
   fuchsia::sys::LaunchInfo launch_info;
   launch_info.url = kWebView;
   launch_info.directory_request = services.NewRequest();
@@ -57,7 +57,7 @@ void ComponentController::CreateView(
   web_view_provider_->CreateView(std::move(view_owner),
                                  view_services.NewRequest());
   fuchsia::webview::WebViewPtr web_view;
-  ConnectToService(view_services.get(), web_view.NewRequest());
+  component::ConnectToService(view_services.get(), web_view.NewRequest());
   web_view->SetUrl(url_);
   web_views_.AddInterfacePtr(std::move(web_view));
 }

@@ -8,14 +8,14 @@
 #include <memory>
 #include <set>
 
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/startup_context.h"
 
 namespace web {
 class ComponentController;
 
 class Runner : public fuchsia::sys::Runner {
  public:
-  explicit Runner(std::unique_ptr<fuchsia::sys::StartupContext> context);
+  explicit Runner(std::unique_ptr<component::StartupContext> context);
   virtual ~Runner();
 
   Runner(const Runner&) = delete;
@@ -34,7 +34,7 @@ class Runner : public fuchsia::sys::Runner {
                           controller) final;
 
  private:
-  std::unique_ptr<fuchsia::sys::StartupContext> context_;
+  std::unique_ptr<component::StartupContext> context_;
   fidl::BindingSet<fuchsia::sys::Runner> bindings_;
   std::set<ComponentController*> components_;
 };

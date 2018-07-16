@@ -10,7 +10,7 @@
 
 namespace web {
 
-Runner::Runner(std::unique_ptr<fuchsia::sys::StartupContext> context)
+Runner::Runner(std::unique_ptr<component::StartupContext> context)
     : context_(std::move(context)) {
   context_->outgoing().AddPublicService<fuchsia::sys::Runner>(
       [this](fidl::InterfaceRequest<fuchsia::sys::Runner> request) {

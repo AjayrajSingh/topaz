@@ -16,7 +16,7 @@
 
 #include "engine.h"
 #include "flutter/common/settings.h"
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fxl/files/unique_fd.h"
@@ -60,8 +60,8 @@ class Application final : public Engine::Delegate,
   fidl::Binding<fuchsia::sys::ComponentController> application_controller_;
   fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
       outgoing_services_request_;
-  fuchsia::sys::ServiceProviderBridge service_provider_bridge_;
-  std::unique_ptr<fuchsia::sys::StartupContext> startup_context_;
+  component::ServiceProviderBridge service_provider_bridge_;
+  std::unique_ptr<component::StartupContext> startup_context_;
   fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> shells_bindings_;
   fxl::RefPtr<blink::DartSnapshot> isolate_snapshot_;
   fxl::RefPtr<blink::DartSnapshot> shared_snapshot_;

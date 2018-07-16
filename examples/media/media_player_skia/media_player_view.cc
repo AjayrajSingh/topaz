@@ -9,7 +9,7 @@
 
 #include <iomanip>
 
-#include "lib/app/cpp/connect.h"
+#include "lib/component/cpp/connect.h"
 #include "lib/fidl/cpp/clone.h"
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fsl/io/fd.h"
@@ -57,7 +57,7 @@ MediaPlayerView::MediaPlayerView(
     async::Loop* loop, fuchsia::ui::views_v1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
         view_owner_request,
-    fuchsia::sys::StartupContext* startup_context,
+    component::StartupContext* startup_context,
     const MediaPlayerParams& params)
     : mozart::BaseView(std::move(view_manager), std::move(view_owner_request),
                        "Media Player"),

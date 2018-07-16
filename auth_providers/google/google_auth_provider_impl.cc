@@ -8,8 +8,8 @@
 #include <fuchsia/ui/views_v1_token/cpp/fidl.h>
 #include <lib/fit/function.h>
 
-#include "lib/app/cpp/connect.h"
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/connect.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fxl/functional/make_copyable.h"
 #include "lib/fxl/logging.h"
@@ -51,7 +51,7 @@ using auth_providers::oauth::ParseOAuthResponse;
 using modular::JsonValueToPrettyString;
 
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
-    async_dispatcher_t* const main_dispatcher, fuchsia::sys::StartupContext* context,
+    async_dispatcher_t* const main_dispatcher, component::StartupContext* context,
     network_wrapper::NetworkWrapper* network_wrapper,
     fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request)
     : main_dispatcher_(main_dispatcher),
@@ -385,7 +385,7 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
 
 fuchsia::ui::views_v1_token::ViewOwnerPtr
 GoogleAuthProviderImpl::SetupWebView() {
-  fuchsia::sys::Services web_view_services;
+  component::Services web_view_services;
   fuchsia::sys::LaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
   web_view_launch_info.directory_request = web_view_services.NewRequest();
@@ -402,7 +402,7 @@ GoogleAuthProviderImpl::SetupWebView() {
   view_provider->CreateView(view_owner.NewRequest(),
                             web_view_moz_services.NewRequest());
 
-  ConnectToService(web_view_moz_services.get(), web_view_.NewRequest());
+  component::ConnectToService(web_view_moz_services.get(), web_view_.NewRequest());
 
   return view_owner;
 }

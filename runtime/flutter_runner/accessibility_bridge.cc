@@ -6,7 +6,7 @@
 
 #include <unordered_set>
 
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/startup_context.h"
 #include "third_party/rapidjson/rapidjson/document.h"
 #include "third_party/rapidjson/rapidjson/stringbuffer.h"
 #include "third_party/rapidjson/rapidjson/writer.h"

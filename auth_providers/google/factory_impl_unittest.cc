@@ -17,7 +17,7 @@ class GoogleFactoryImplTest : public gtest::TestLoopFixture {
  public:
   GoogleFactoryImplTest()
       : network_wrapper_(dispatcher()),
-        context_(fuchsia::sys::StartupContext::CreateFromStartupInfo().get()),
+        context_(component::StartupContext::CreateFromStartupInfo().get()),
         factory_impl_(dispatcher(), context_, &network_wrapper_) {
     factory_impl_.Bind(factory_.NewRequest());
   }
@@ -26,7 +26,7 @@ class GoogleFactoryImplTest : public gtest::TestLoopFixture {
 
  protected:
   network_wrapper::FakeNetworkWrapper network_wrapper_;
-  fuchsia::sys::StartupContext* context_;
+  component::StartupContext* context_;
   fuchsia::auth::AuthProviderPtr auth_provider_;
   fuchsia::auth::AuthProviderFactoryPtr factory_;
 

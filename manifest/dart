@@ -9,7 +9,7 @@
              path="third_party/dart"
              remote="https://dart.googlesource.com/sdk"
              gerrithost="https://dart-review.googlesource.com"
-             revision="c9ba6a9709fa6a6ea13d9e5e466b67c2e0667a98"/>
+             revision="7a5e49e4e49303c509ca2667323fc93883f78969"/>
     <project name="dart/observatory_pub_packages"
              path="third_party/dart/third_party/observatory_pub_packages"
              remote="https://dart.googlesource.com/observatory_pub_packages/"

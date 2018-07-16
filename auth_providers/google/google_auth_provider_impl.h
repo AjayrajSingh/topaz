@@ -12,7 +12,7 @@
 #include <fuchsia/webview/cpp/fidl.h>
 #include <lib/fit/function.h>
 
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/callback/cancellable.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
@@ -24,7 +24,7 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
                                fuchsia::webview::WebRequestDelegate {
  public:
   GoogleAuthProviderImpl(
-      async_dispatcher_t* main_dispatcher, fuchsia::sys::StartupContext* context,
+      async_dispatcher_t* main_dispatcher, component::StartupContext* context,
       network_wrapper::NetworkWrapper* network_wrapper,
       fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request);
 
@@ -72,7 +72,7 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
           callback);
 
   async_dispatcher_t* const main_dispatcher_;
-  fuchsia::sys::StartupContext* context_;
+  component::StartupContext* context_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
   fuchsia::auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;

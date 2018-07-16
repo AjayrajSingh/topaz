@@ -6,7 +6,7 @@
 
 #include <hid/usages.h>
 
-#include "lib/app/cpp/connect.h"
+#include "lib/component/cpp/connect.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkColor.h"

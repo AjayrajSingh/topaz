@@ -36,7 +36,7 @@ static void SetThreadName(const std::string& thread_name) {
 }
 
 Runner::Runner()
-    : host_context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()) {
+    : host_context_(component::StartupContext::CreateFromStartupInfo()) {
   SkGraphics::Init();
 
   SetupICU();

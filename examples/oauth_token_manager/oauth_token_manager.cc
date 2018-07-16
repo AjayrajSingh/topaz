@@ -19,8 +19,8 @@
 #include <fuchsia/modular/auth/cpp/fidl.h>
 #include <trace-provider/provider.h>
 
-#include "lib/app/cpp/connect.h"
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/connect.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/async/cpp/operation.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fidl/cpp/optional.h"
@@ -442,7 +442,7 @@ class OAuthTokenManagerApp : fuchsia::modular::auth::AccountProvider {
                             FirebaseTokenCallback callback);
   async::Loop* const loop_;
 
-  std::shared_ptr<fuchsia::sys::StartupContext> startup_context_;
+  std::shared_ptr<component::StartupContext> startup_context_;
 
   fuchsia::modular::auth::AccountProviderContextPtr account_provider_context_;
 
@@ -1131,7 +1131,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
   }
 
   fuchsia::ui::views_v1_token::ViewOwnerPtr SetupWebView() {
-    fuchsia::sys::Services web_view_services;
+    component::Services web_view_services;
     fuchsia::sys::LaunchInfo web_view_launch_info;
     web_view_launch_info.url = kWebViewUrl;
     web_view_launch_info.directory_request = web_view_services.NewRequest();
@@ -1148,7 +1148,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
     view_provider->CreateView(view_owner.NewRequest(),
                               web_view_moz_services.NewRequest());
 
-    ConnectToService(web_view_moz_services.get(), web_view_.NewRequest());
+    component::ConnectToService(web_view_moz_services.get(), web_view_.NewRequest());
 
     return view_owner;
   }
@@ -1453,7 +1453,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall
 
 OAuthTokenManagerApp::OAuthTokenManagerApp(async::Loop* loop)
     : loop_(loop),
-      startup_context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()),
+      startup_context_(component::StartupContext::CreateFromStartupInfo()),
       binding_(this) {
   startup_context_->outgoing().AddPublicService<AccountProvider>(
       [this](fidl::InterfaceRequest<AccountProvider> request) {

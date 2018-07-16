@@ -10,7 +10,7 @@
 
 #include "examples/ui/lib/skia_font_loader.h"
 #include "examples/ui/lib/skia_view.h"
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/startup_context.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 #include "topaz/app/term/pty_server.h"
@@ -26,7 +26,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   ViewController(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
                  fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
                      view_owner_request,
-                 fuchsia::sys::StartupContext* context,
+                 component::StartupContext* context,
                  const TermParams& term_params,
                  DisconnectCallback disconnect_handler);
   ~ViewController() override;
@@ -69,7 +69,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   // If we skip drawing despite being forced to, we should force the next draw.
   bool force_next_draw_;
 
-  fuchsia::sys::StartupContext* context_;
+  component::StartupContext* context_;
   mozart::SkiaFontLoader font_loader_;
   sk_sp<SkTypeface> regular_typeface_;
 

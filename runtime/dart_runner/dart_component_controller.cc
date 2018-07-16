@@ -14,7 +14,7 @@
 #include <zx/time.h>
 #include <utility>
 
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fidl/cpp/string.h"
 #include "lib/fsl/vmo/file.h"
@@ -324,7 +324,7 @@ bool DartComponentController::Main() {
 
   InitBuiltinLibrariesForIsolate(
       url_, namespace_, stdoutfd_, stderrfd_,
-      fuchsia::sys::StartupContext::CreateFrom(std::move(startup_info_)),
+      component::StartupContext::CreateFrom(std::move(startup_info_)),
       std::move(outgoing_services), false /* service_isolate */);
   namespace_ = nullptr;
 

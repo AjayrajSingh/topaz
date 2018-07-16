@@ -22,7 +22,7 @@ Iter FindUniquePtr(Iter begin, Iter end, T* object) {
 
 App::App(TermParams params)
     : params_(std::move(params)),
-      context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()) {
+      context_(component::StartupContext::CreateFromStartupInfo()) {
   context_->outgoing().AddPublicService<fuchsia::ui::views_v1::ViewProvider>(
       [this](
           fidl::InterfaceRequest<fuchsia::ui::views_v1::ViewProvider> request) {

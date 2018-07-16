@@ -10,7 +10,7 @@
 WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
     : loop_(loop),
       url_(url),
-      context_(fuchsia::sys::StartupContext::CreateFromStartupInfo()),
+      context_(component::StartupContext::CreateFromStartupInfo()),
       view_provider_binding_(this),
       lifecycle_binding_(this),
       main_link_watcher_binding_(this) {

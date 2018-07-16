@@ -27,7 +27,7 @@ class App : public fuchsia::ui::views_v1::ViewProvider {
   App& operator=(const App&) = delete;
 
   TermParams params_;
-  std::unique_ptr<fuchsia::sys::StartupContext> context_;
+  std::unique_ptr<component::StartupContext> context_;
   fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> bindings_;
   std::vector<std::unique_ptr<ViewController>> controllers_;
 };

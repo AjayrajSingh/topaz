@@ -20,7 +20,7 @@ using fuchsia::auth::AuthProviderFactory;
 
 class FactoryImpl : public fuchsia::auth::AuthProviderFactory {
  public:
-  FactoryImpl(fuchsia::sys::StartupContext* context,
+  FactoryImpl(component::StartupContext* context,
               network_wrapper::NetworkWrapper* network_wrapper);
 
   ~FactoryImpl() override;
@@ -32,7 +32,7 @@ class FactoryImpl : public fuchsia::auth::AuthProviderFactory {
   void GetAuthProvider(fidl::InterfaceRequest<AuthProvider> auth_provider,
                        GetAuthProviderCallback callback) override;
 
-  fuchsia::sys::StartupContext* const context_;
+  component::StartupContext* const context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
 
   callback::AutoCleanableSet<SpotifyAuthProviderImpl> providers_;

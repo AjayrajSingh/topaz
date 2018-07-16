@@ -37,7 +37,7 @@ static void UpdateNativeThreadLabelNames(const std::string& label,
 
 Engine::Engine(
     Delegate& delegate, std::string thread_label,
-    fuchsia::sys::StartupContext& startup_context, blink::Settings settings,
+    component::StartupContext& startup_context, blink::Settings settings,
     fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
     fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
     fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,

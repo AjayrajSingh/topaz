@@ -6,8 +6,8 @@
 #define TOPAZ_RUNTIME_DART_RUNNER_DART_RUNNER_H_
 
 #include <fuchsia/sys/cpp/fidl.h>
-#include "lib/app/cpp/connect.h"
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/connect.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
@@ -44,7 +44,7 @@ class DartRunner : public fuchsia::sys::Runner {
   void RemoveController(ControllerToken* token);
   void UpdateProcessLabel();
 
-  std::unique_ptr<fuchsia::sys::StartupContext> context_;
+  std::unique_ptr<component::StartupContext> context_;
   deprecated_loop::MessageLoop* loop_;
   fidl::BindingSet<fuchsia::sys::Runner> bindings_;
   std::vector<ControllerToken*> controllers_;

@@ -91,7 +91,7 @@ void ScheduleMicrotask(Dart_NativeArguments args) {
 
 void InitBuiltinLibrariesForIsolate(
     const std::string& script_uri, fdio_ns_t* namespc, int stdoutfd,
-    int stderrfd, std::unique_ptr<fuchsia::sys::StartupContext> context,
+    int stderrfd, std::unique_ptr<component::StartupContext> context,
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services,
     bool service_isolate) {
   // dart:fuchsia --------------------------------------------------------------

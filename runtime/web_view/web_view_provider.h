@@ -9,7 +9,7 @@
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/startup_context.h"
 #include "topaz/runtime/web_view/web_view_impl.h"
 
 class WebViewProvider : fuchsia::ui::views_v1::ViewProvider,
@@ -33,7 +33,7 @@ class WebViewProvider : fuchsia::ui::views_v1::ViewProvider,
 
   async::Loop* const loop_;
   std::string url_;
-  std::unique_ptr<fuchsia::sys::StartupContext> context_;
+  std::unique_ptr<component::StartupContext> context_;
   std::unique_ptr<WebViewImpl> view_;
   // Link state, used to gather URL updates for the story
   fuchsia::modular::LinkPtr main_link_;

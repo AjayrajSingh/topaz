@@ -11,7 +11,7 @@
 
 #include "flutter/shell/common/shell.h"
 #include "isolate_configurator.h"
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
 #include "lib/ui/flutter/sdk_ext/src/natives.h"
@@ -30,7 +30,7 @@ class Engine final : public mozart::NativesDelegate {
 
   Engine(
       Delegate& delegate, std::string thread_label,
-      fuchsia::sys::StartupContext& startup_context, blink::Settings settings,
+      component::StartupContext& startup_context, blink::Settings settings,
       fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
       fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
       fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,

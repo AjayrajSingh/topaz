@@ -8,7 +8,7 @@
 
 int main(int argc, const char** argv) {
   async::Loop loop(&kAsyncLoopConfigMakeDefault);
-  web::Runner runner(fuchsia::sys::StartupContext::CreateFromStartupInfo());
+  web::Runner runner(component::StartupContext::CreateFromStartupInfo());
   loop.Run();
   return 0;
 }

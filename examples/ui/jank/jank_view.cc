@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "lib/app/cpp/connect.h"
+#include "lib/component/cpp/connect.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/time/time_delta.h"

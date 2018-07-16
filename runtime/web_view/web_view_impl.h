@@ -7,7 +7,7 @@
 
 #include <fuchsia/webview/cpp/fidl.h>
 
-#include "lib/app/cpp/service_provider_impl.h"
+#include "lib/component/cpp/service_provider_impl.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
@@ -102,7 +102,7 @@ class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView {
 
   // We use this |ServiceProvider| to expose the |WebView| interface to
   // others.
-  fuchsia::sys::ServiceProviderImpl outgoing_services_;
+  component::ServiceProviderImpl outgoing_services_;
 
   fidl::BindingSet<WebView> web_view_interface_bindings_;
 

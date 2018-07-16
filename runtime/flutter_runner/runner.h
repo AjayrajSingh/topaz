@@ -11,7 +11,7 @@
 #include <fuchsia/sys/cpp/fidl.h>
 
 #include "component.h"
-#include "lib/app/cpp/startup_context.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fxl/macros.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
@@ -39,7 +39,7 @@ class Runner final : public fuchsia::sys::Runner {
     ActiveApplication() = default;
   };
 
-  std::unique_ptr<fuchsia::sys::StartupContext> host_context_;
+  std::unique_ptr<component::StartupContext> host_context_;
   fidl::BindingSet<fuchsia::sys::Runner> active_applications_bindings_;
   std::unordered_map<const Application*, ActiveApplication>
       active_applications_;

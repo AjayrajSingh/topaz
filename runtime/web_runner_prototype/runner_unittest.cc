@@ -5,8 +5,8 @@
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 
-#include "lib/app/cpp/testing/fake_component.h"
-#include "lib/app/cpp/testing/test_with_context.h"
+#include "lib/component/cpp/testing/fake_component.h"
+#include "lib/component/cpp/testing/test_with_context.h"
 #include "topaz/runtime/web_runner_prototype/runner.h"
 
 namespace web {
@@ -20,7 +20,7 @@ class FakeWebView : public fuchsia::ui::views_v1::ViewProvider,
     service_provider_.AddService(web_view_bindings_.GetHandler(this));
   }
 
-  void Register(fuchsia::sys::testing::FakeLauncher& fake_launcher) {
+  void Register(component::testing::FakeLauncher& fake_launcher) {
     component_.Register("web_view", fake_launcher);
   }
 
@@ -45,13 +45,13 @@ class FakeWebView : public fuchsia::ui::views_v1::ViewProvider,
   std::string last_url_;
 
  private:
-  fuchsia::sys::testing::FakeComponent component_;
+  component::testing::FakeComponent component_;
   fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> view_provider_bindings_;
   fidl::BindingSet<fuchsia::webview::WebView> web_view_bindings_;
-  fuchsia::sys::ServiceProviderImpl service_provider_;
+  component::ServiceProviderImpl service_provider_;
 };
 
-class RunnerTest : public fuchsia::sys::testing::TestWithContext {
+class RunnerTest : public component::testing::TestWithContext {
  public:
   void SetUp() final {
     TestWithContext::SetUp();
@@ -77,7 +77,7 @@ class RunnerTest : public fuchsia::sys::testing::TestWithContext {
 TEST_F(RunnerTest, Trivial) {}
 
 TEST_F(RunnerTest, CreatesWebView) {
-  fuchsia::sys::Services runner_services;
+  component::Services runner_services;
 
   fuchsia::sys::Package package;
   package.resolved_url = "http://example.com/resolved_url.html";
