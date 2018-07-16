@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets.dart/model.dart';
 
+import '../models/todo_list_model.dart';
 import '../widgets/new_item_input.dart';
-import 'todo_list_module_model.dart';
 
 /// Widget rendering a single todo item.
 class _TodoItem extends StatelessWidget {
@@ -59,10 +59,10 @@ class TodoListModuleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: new ScopedModelDescendant<TodoListModuleModel>(builder: (
+      body: new ScopedModelDescendant<TodoListModel>(builder: (
         BuildContext context,
         Widget child,
-        TodoListModuleModel model,
+        TodoListModel model,
       ) {
         List<Widget> listItems = <Widget>[];
         model.items.forEach((List<int> key, String value) {

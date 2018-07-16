@@ -9,15 +9,13 @@ import 'dart:typed_data' show Uint8List;
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets.dart/model.dart';
 
 import '../ledger_helpers.dart';
 
 /// The model for the todo list module.
-class TodoListModuleModel extends ModuleModel implements ledger.PageWatcher {
+class TodoListModel extends Model implements ledger.PageWatcher {
   final Random _random = new Random(new DateTime.now().millisecondsSinceEpoch);
-
-  final ComponentContextProxy _componentContext = new ComponentContextProxy();
 
   final ledger.PageWatcherBinding _pageWatcherBinding =
       new ledger.PageWatcherBinding();
@@ -33,11 +31,9 @@ class TodoListModuleModel extends ModuleModel implements ledger.PageWatcher {
   /// Retrieves the todo items.
   Map<List<int>, String> get items => _items;
 
-  /// Implementation of ModuleModel.onReady():
-  @override
-  void onReady(ModuleContext moduleContext, Link link) {
-    moduleContext.getComponentContext(_componentContext.ctrl.request());
-    _componentContext.getLedger(
+  /// Call this method to connect the model
+  void connect(ComponentContextProxy componentContext) {
+    componentContext.getLedger(
       _ledger.ctrl.request(),
       handleLedgerResponse('getLedger'),
     );
@@ -55,14 +51,11 @@ class TodoListModuleModel extends ModuleModel implements ledger.PageWatcher {
     );
 
     _readItems(snapshot);
-    super.onReady(moduleContext, link);
   }
 
-  /// Implementation of ModuleModel.onStop():
-  @override
-  void onStop() {
+  /// Call when the module should be terminated.
+  void onTerminate() {
     _pageWatcherBinding.close();
-    _componentContext.ctrl.close();
     _ledger.ctrl.close();
     _page.ctrl.close();
   }

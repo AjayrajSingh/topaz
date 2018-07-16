@@ -2,30 +2,37 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:flutter/material.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.component.dart/component.dart';
+import 'package:lib.widgets.dart/model.dart';
 
-import 'src/modular/todo_list_module_model.dart';
-import 'src/modular/todo_list_module_screen.dart';
+import 'src/models/todo_list_model.dart';
+import 'src/widgets/todo_list_module_screen.dart';
 
 /// Main entry point to the todo list module.
 void main() {
   setupLogger();
-  StartupContext startupContext = new StartupContext.fromStartupInfo();
 
-  TodoListModuleModel todoListModuleModel = new TodoListModuleModel();
+  final model = new TodoListModel();
+  final driver = ModuleDriver(onTerminate: model.onTerminate);
 
-  ModuleWidget<TodoListModuleModel> moduleWidget =
-      new ModuleWidget<TodoListModuleModel>(
-    startupContext: startupContext,
-    moduleModel: todoListModuleModel,
-    child: new TodoListModuleScreen(
-        onNewItem: (String content) => todoListModuleModel.addItem(content),
-        onItemDone: (List<int> id) => todoListModuleModel.markItemDone(id)),
+  driver.getComponentContext().then((ComponentContextClient client) {
+    model.connect(client.proxy);
+  }).catchError(log.severe);
+
+  runApp(
+    MaterialApp(
+      home: new ScopedModel<TodoListModel>(
+        model: model,
+        child: TodoListModuleScreen(
+          onNewItem: model.addItem,
+          onItemDone: model.markItemDone,
+        ),
+      ),
+    ),
   );
 
-  runApp(moduleWidget);
-  moduleWidget.advertise();
+  driver.start().catchError(log.severe);
 }
