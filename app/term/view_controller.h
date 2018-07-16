@@ -55,7 +55,7 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   void SendData(const void* bytes, size_t num_bytes);
 
   void ComputeMetrics();
-  void StartCommand();
+  void StartCommandIfNeeded();
   void Blink();
   void Resize();
   void OnCommandTerminated();

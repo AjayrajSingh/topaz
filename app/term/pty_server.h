@@ -32,6 +32,8 @@ class PTYServer {
 
   void Write(const void* bytes, size_t num_bytes);
 
+  const zx::process& process() const { return process_; }
+
  private:
   void Wait();
 

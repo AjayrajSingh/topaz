@@ -36,7 +36,8 @@ ViewController::ViewController(
       model_(TermModel::Size(24, 80), this),
       context_(context),
       font_loader_(
-          context_->ConnectToEnvironmentService<fuchsia::fonts::FontProvider>()),
+          context_
+              ->ConnectToEnvironmentService<fuchsia::fonts::FontProvider>()),
       params_(term_params) {
   FXL_DCHECK(context_);
 
@@ -49,7 +50,7 @@ ViewController::ViewController(
         FXL_CHECK(typeface);  // TODO(jpoichet): Fail gracefully.
         regular_typeface_ = std::move(typeface);
         ComputeMetrics();
-        StartCommand();
+        StartCommandIfNeeded();
       });
 }
 
@@ -75,7 +76,14 @@ void ViewController::ComputeMetrics() {
   FXL_DCHECK(advance_width_ > 0);
 }
 
-void ViewController::StartCommand() {
+void ViewController::StartCommandIfNeeded() {
+  if (!regular_typeface_)
+    return;
+  if (!has_logical_size())
+    return;
+  if (pty_.process())
+    return;
+
   std::vector<std::string> argv = params_.command;
   if (argv.empty())
     argv = {kShell};
@@ -136,6 +144,7 @@ void ViewController::Resize() {
     model_.SetSize(TermModel::Size(rows, columns), false);
     pty_.SetWindowSize(columns, rows);
   }
+  StartCommandIfNeeded();
   InvalidateScene();
 }
 
