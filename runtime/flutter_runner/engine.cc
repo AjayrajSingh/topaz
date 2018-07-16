@@ -242,7 +242,7 @@ Engine::Engine(
       };
 
   // Connect to the system font provider.
-  fuchsia::fonts::FontProviderSync2Ptr sync_font_provider;
+  fuchsia::fonts::FontProviderSyncPtr sync_font_provider;
   startup_context.ConnectToEnvironmentService(sync_font_provider.NewRequest());
 
   shell_->GetTaskRunners().GetUITaskRunner()->PostTask(

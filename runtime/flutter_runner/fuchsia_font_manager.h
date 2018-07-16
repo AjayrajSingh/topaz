@@ -28,7 +28,7 @@ namespace txt {
 
 class FuchsiaFontManager final : public SkFontMgr {
  public:
-  FuchsiaFontManager(fuchsia::fonts::FontProviderSync2Ptr provider);
+  FuchsiaFontManager(fuchsia::fonts::FontProviderSyncPtr provider);
 
   ~FuchsiaFontManager() override;
 
@@ -52,8 +52,7 @@ class FuchsiaFontManager final : public SkFontMgr {
   // |SkFontMgr|
   SkTypeface* onMatchFamilyStyleCharacter(const char familyName[],
                                           const SkFontStyle&,
-                                          const char* bcp47[],
-                                          int bcp47Count,
+                                          const char* bcp47[], int bcp47Count,
                                           SkUnichar character) const override;
   // |SkFontMgr|
   SkTypeface* onMatchFaceStyle(const SkTypeface*,
@@ -81,7 +80,7 @@ class FuchsiaFontManager final : public SkFontMgr {
   FXL_DISALLOW_COPY_AND_ASSIGN(FuchsiaFontManager);
 
  private:
-  mutable fuchsia::fonts::FontProviderSync2Ptr font_provider_;
+  mutable fuchsia::fonts::FontProviderSyncPtr font_provider_;
 };
 
 }  // namespace txt

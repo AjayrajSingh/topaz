@@ -49,13 +49,15 @@ sk_sp<SkData> MakeSkDataFromBuffer(const fuchsia::mem::Buffer& data) {
 }
 
 fuchsia::fonts::FontSlant ToFontSlant(SkFontStyle::Slant slant) {
-  return (slant == SkFontStyle::kItalic_Slant) ? fuchsia::fonts::FontSlant::ITALIC
-                                               : fuchsia::fonts::FontSlant::UPRIGHT;
+  return (slant == SkFontStyle::kItalic_Slant)
+             ? fuchsia::fonts::FontSlant::ITALIC
+             : fuchsia::fonts::FontSlant::UPRIGHT;
 }
 
 }  // anonymous namespace
 
-FuchsiaFontManager::FuchsiaFontManager(fuchsia::fonts::FontProviderSync2Ptr provider)
+FuchsiaFontManager::FuchsiaFontManager(
+    fuchsia::fonts::FontProviderSyncPtr provider)
     : font_provider_(std::move(provider)) {}
 
 FuchsiaFontManager::~FuchsiaFontManager() = default;
@@ -89,8 +91,7 @@ SkFontStyleSet* FuchsiaFontManager::onMatchFamily(
 }
 
 SkTypeface* FuchsiaFontManager::onMatchFamilyStyle(
-    const char family_name[],
-    const SkFontStyle& style) const {
+    const char family_name[], const SkFontStyle& style) const {
   fuchsia::fonts::FontRequest request;
   request.family = family_name;
   request.weight = style.weight();
@@ -98,7 +99,7 @@ SkTypeface* FuchsiaFontManager::onMatchFamilyStyle(
   request.slant = ToFontSlant(style.slant());
 
   fuchsia::fonts::FontResponsePtr response;
-  if (font_provider_->GetFont(std::move(request), &response).statvs != ZX_OK) {
+  if (font_provider_->GetFont(std::move(request), &response) != ZX_OK) {
     FXL_DLOG(ERROR) << "Unable to contact the font provider. Did you run "
                        "Flutter in an environment that has a font manager?";
     return nullptr;
@@ -115,11 +116,8 @@ SkTypeface* FuchsiaFontManager::onMatchFamilyStyle(
 }
 
 SkTypeface* FuchsiaFontManager::onMatchFamilyStyleCharacter(
-    const char familyName[],
-    const SkFontStyle& style,
-    const char* bcp47[],
-    int bcp47Count,
-    SkUnichar character) const {
+    const char familyName[], const SkFontStyle& style, const char* bcp47[],
+    int bcp47Count, SkUnichar character) const {
   if (u_hasBinaryProperty(character, UCHAR_EMOJI)) {
     return onMatchFamilyStyle("Noto Color Emoji", style);
   } else if (character == 8242 || character == 8243) {
@@ -144,15 +142,13 @@ sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromData(sk_sp<SkData>,
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromStreamIndex(
-    std::unique_ptr<SkStreamAsset>,
-    int ttcIndex) const {
+    std::unique_ptr<SkStreamAsset>, int ttcIndex) const {
   FXL_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromStreamArgs(
-    std::unique_ptr<SkStreamAsset>,
-    const SkFontArguments&) const {
+    std::unique_ptr<SkStreamAsset>, const SkFontArguments&) const {
   FXL_DCHECK(false);
   return nullptr;
 }
@@ -164,8 +160,7 @@ sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromFile(const char path[],
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onLegacyMakeTypeface(
-    const char familyName[],
-    SkFontStyle) const {
+    const char familyName[], SkFontStyle) const {
   FXL_DCHECK(false);
   return nullptr;
 }
