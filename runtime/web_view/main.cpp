@@ -58,7 +58,7 @@ int main(int argc, const char** argv) {
     url = urls.front();
   }
 
-  async::Loop loop(&kAsyncLoopConfigMakeDefault);
+  async::Loop loop(&kAsyncLoopConfigAttachToThread);
 
   WebViewProvider view_provider(&loop, url);
 

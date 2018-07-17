@@ -15,7 +15,7 @@ int main(int argc, const char** argv) {
     return 1;
   }
 
-  async::Loop loop(&kAsyncLoopConfigMakeDefault);
+  async::Loop loop(&kAsyncLoopConfigAttachToThread);
 
   mozart::ViewProviderApp app(
       [&loop, &params](mozart::ViewContext view_context) {

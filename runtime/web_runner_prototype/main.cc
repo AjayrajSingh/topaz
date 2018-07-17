@@ -7,7 +7,7 @@
 #include "topaz/runtime/web_runner_prototype/runner.h"
 
 int main(int argc, const char** argv) {
-  async::Loop loop(&kAsyncLoopConfigMakeDefault);
+  async::Loop loop(&kAsyncLoopConfigAttachToThread);
   web::Runner runner(component::StartupContext::CreateFromStartupInfo());
   loop.Run();
   return 0;
