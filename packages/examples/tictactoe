@@ -1,6 +1,7 @@
 {
     "packages": [
         "//topaz/examples/tictactoe/agent/game_tracker:game_tracker_agent",
-        "//topaz/examples/tictactoe/gameboard_mod:tictactoe_gameboard_mod"        
+        "//topaz/examples/tictactoe/gameboard_mod:tictactoe_gameboard_mod",     
+        "//topaz/examples/tictactoe/scoreboard_mod:tictactoe_scoreboard_mod"
     ]
 }

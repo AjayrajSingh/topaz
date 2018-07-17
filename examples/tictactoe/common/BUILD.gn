@@ -11,6 +11,10 @@ dart_library("common") {
   sources = [
     "common.dart"
   ]
+
+  deps = [
+    "//topaz/public/lib/schemas/dart",
+  ]
 }
 
 dart_test("tictactoe_game_test") {

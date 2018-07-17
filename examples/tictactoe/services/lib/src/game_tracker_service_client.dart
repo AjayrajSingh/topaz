@@ -13,6 +13,17 @@ class GameTrackerServiceClient extends ServiceClient<GameTracker> {
   }
 
   void recordWin(Player player) {
+    // TODO(MS-1858): Handle errors from service.
     _proxy.recordWin(player);
+  }
+
+  void subscribeToScore(String queueToken) {
+    // TODO(MS-1858): Handle errors from service.
+    _proxy.subscribeToScore(queueToken);
+  }
+
+  void unsubscribeFromScore(String queueToken) {
+    // TODO(MS-1858): Handle errors from service.
+    _proxy.unsubscribeFromScore(queueToken);
   }
 }

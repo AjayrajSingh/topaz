@@ -35,6 +35,7 @@ dart_library("game_tracker_dart_impl") {
   ]
 
   deps = [
+    "//topaz/examples/tictactoe/common",
     "//topaz/examples/tictactoe/services:game_tracker_service",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/sledge",

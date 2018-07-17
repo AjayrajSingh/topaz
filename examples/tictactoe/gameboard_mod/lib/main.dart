@@ -21,14 +21,14 @@ void main() {
   setupLogger(name: 'tictactoe gameboard');
 
   // The ModuleDriver is a dart-idomatic interfacer to the Fuchsia system.
-  Future<ModuleDriver> driver = new ModuleDriver()
+  Future<ModuleDriver> moduleDriver = new ModuleDriver()
       .start()
       .catchError((e, t) => log.severe('Error starting module driver.', e, t));
 
   // A ServiceClient is a temporary construct for providing idiomatic,
   // async Dart APIs for clients of a FIDL service.  ServiceClients will be
   // removed when the new dart FIDL bindings are available.
-  Future<GameTrackerServiceClient> gameTrackerServiceClient = driver
+  Future<GameTrackerServiceClient> gameTrackerServiceClient = moduleDriver
       .then(_createGameTrackerServiceClient)
       .catchError((e, t) =>
           log.severe('Error constructing GameTrackerServiceClient.', e, t));

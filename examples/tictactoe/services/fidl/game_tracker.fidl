@@ -12,4 +12,15 @@ enum Player : uint8 {
 [Discoverable]
 interface GameTracker {
   1: RecordWin(Player player);
+
+  // Request that the game tracker start sending score updates to the message
+  // queue identified by [queue_token].  This method will send an update
+  // immediately when this method is called and then each time the score 
+  // changes.
+  2: SubscribeToScore(string queue_token);
+
+  // Request that the game tracker stop sending score updates to the message
+  // queue identified by [queue_token].  If a queue identified by [queue_token]
+  // is not set up, this method will do nothing.
+  3: UnsubscribeFromScore(string queue_token);
 };
