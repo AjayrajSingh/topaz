@@ -22,13 +22,13 @@ flutter_app("chat_conversation_list") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",
     "//topaz/app/chat/services:services",
-    "//topaz/public/dart/config",
     "//topaz/public/dart/entity_schemas",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fixtures",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
+    "//topaz/public/lib/config/dart",
     "//topaz/public/lib/module_resolver/dart",
   ]
 }
