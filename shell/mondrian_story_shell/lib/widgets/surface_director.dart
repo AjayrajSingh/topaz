@@ -9,17 +9,18 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'container_layout.dart' as container;
-import 'copresent_layout.dart' as copresent;
-import 'inset_manager.dart';
-import 'layout_model.dart';
+import '../layout/container_layout.dart' as container;
+import '../layout/copresent_layout.dart' as copresent;
+import '../layout/pattern_layout.dart' as pattern;
+import '../models/inset_manager.dart';
+import '../models/layout_model.dart';
+import '../models/surface/positioned_surface.dart';
+import '../models/surface/surface.dart';
+import '../models/surface/surface_form.dart';
+import '../models/tree.dart';
 import 'mondrian_child_view.dart';
-import 'pattern_layout.dart' as pattern;
-import 'positioned_surface.dart';
-import 'surface.dart';
-import 'surface_form.dart';
+
 import 'surface_stage.dart';
-import 'tree.dart';
 
 /// Directs the layout of the SurfaceSpace
 class SurfaceDirector extends StatefulWidget {

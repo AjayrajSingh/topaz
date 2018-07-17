@@ -12,11 +12,11 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
-import 'inset_manager.dart';
-import 'layout_model.dart';
-import 'mondrian.dart';
+import 'models/inset_manager.dart';
+import 'models/layout_model.dart';
+import 'models/surface/surface.dart';
 import 'story_shell_impl.dart';
-import 'surface.dart';
+import 'widgets/mondrian.dart';
 
 /// This is used for keeping the reference around.
 // ignore: unused_element

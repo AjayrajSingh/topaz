@@ -10,11 +10,11 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'inset_manager.dart';
+import '../models/inset_manager.dart';
+import '../models/surface/surface.dart';
+import '../story_shell_impl.dart';
 import 'mondrian_logo.dart';
 import 'overview.dart';
-import 'story_shell_impl.dart';
-import 'surface.dart';
 import 'surface_director.dart';
 
 /// This is used for keeping the reference around.

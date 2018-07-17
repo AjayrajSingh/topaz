@@ -9,12 +9,12 @@ import 'package:flutter/physics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
-import 'flux.dart';
-import 'gestures.dart';
-import 'sim.dart';
-import 'surface_form.dart';
+import '../anim/flux.dart';
+import '../anim/sim.dart';
+import '../models/surface/surface_form.dart';
+import '../models/tree.dart';
+import '../widgets/gestures.dart';
 import 'surface_frame.dart';
-import 'tree.dart';
 
 const SpringDescription _kSimSpringDescription = const SpringDescription(
   mass: 1.0,

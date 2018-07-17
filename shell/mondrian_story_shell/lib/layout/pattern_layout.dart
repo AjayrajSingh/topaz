@@ -7,9 +7,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/logging.dart';
 
-import 'layout_model.dart';
-import 'positioned_surface.dart';
-import 'surface.dart';
+import '../models/layout_model.dart';
+import '../models/surface/positioned_surface.dart';
+import '../models/surface/surface.dart';
 
 const String _parentId = 'parent';
 const String _tickerPattern = 'ticker';

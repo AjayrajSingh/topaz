@@ -7,10 +7,10 @@ import 'dart:math';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/widgets.dart';
 
-import 'layout_model.dart';
-import 'positioned_surface.dart';
-import 'surface.dart';
-import 'tree.dart';
+import '../models/layout_model.dart';
+import '../models/surface/positioned_surface.dart';
+import '../models/surface/surface.dart';
+import '../models/tree.dart';
 
 // Convenience comparator used to ensure more focused items get higher priority
 int _compareByOtherList(Surface l, Surface r, List<Surface> otherList) {

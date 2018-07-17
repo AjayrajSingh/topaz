@@ -10,21 +10,21 @@ flutter_aot_app("mondrian") {
   main_dart = "lib/main.dart"
 
   sources = [
-    "copresent_layout.dart",
-    "flux.dart",
-    "isometric_widget.dart",
-    "layout_model.dart",
-    "mondrian_child_view.dart",
-    "mondrian_logo.dart",
-    "overview.dart",
-    "sim.dart",
-    "surface.dart",
-    "surface_director.dart",
-    "surface_form.dart",
-    "surface_frame.dart",
-    "surface_properties.dart",
-    "surface_stage.dart",
-    "tree.dart",
+    "anim/flux.dart",
+    "anim/sim.dart",
+    "layout/copresent_layout.dart",
+    "models/layout_model.dart",
+    "models/tree.dart",
+    "models/surface/surface.dart",
+    "models/surface/surface_form.dart",
+    "models/surface/surface_properties.dart",
+    "widgets/isometric_widget.dart",
+    "widgets/mondrian_child_view.dart",
+    "widgets/mondrian_logo.dart",
+    "widgets/overview.dart",
+    "widgets/surface_director.dart",
+    "widgets/surface_frame.dart",
+    "widgets/surface_stage.dart",
   ]
 
   deps = [

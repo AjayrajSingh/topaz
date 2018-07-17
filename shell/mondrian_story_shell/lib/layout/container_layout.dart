@@ -6,10 +6,10 @@ import 'package:flutter/widgets.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 
-import 'layout_model.dart';
-import 'positioned_surface.dart';
-import 'surface.dart';
-import 'tree.dart';
+import '../models/layout_model.dart';
+import '../models/surface/positioned_surface.dart';
+import '../models/surface/surface.dart';
+import '../models/tree.dart';
 
 /// Returns in the order they should stacked
 List<PositionedSurface> layoutSurfaces(

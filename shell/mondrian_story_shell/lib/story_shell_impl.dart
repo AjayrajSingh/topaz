@@ -11,8 +11,8 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/utils.dart';
 
-import 'surface.dart';
-import 'surface_properties.dart';
+import 'models/surface/surface.dart';
+import 'models/surface/surface_properties.dart';
 
 /// An implementation of the [StoryShell] interface.
 class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
