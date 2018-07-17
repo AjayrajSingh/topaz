@@ -48,7 +48,11 @@ class CheckerBoard extends StatelessWidget {
 }
 
 void main() {
-  setupLogger();
+  setupLogger(
+    name: 'flutter_screencap_test',
+    logToStdoutForTest: true,
+  );
+  log.info('starting flutter screencap test');
   StartupContext startupContext = new StartupContext.fromStartupInfo();
   runApp(new MaterialApp(
     home: new CheckerBoard(),
