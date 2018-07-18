@@ -40,21 +40,16 @@ class DankUserShellWidget extends StatelessWidget {
   /// passes the [UserShellContext]
   final OnDankUserShellReady onReady;
 
-  /// Callback that is fired when the [DankUserShellImpl] is stopped.
-  final VoidCallback onStop;
-
   /// Constructor.
   factory DankUserShellWidget({
     StartupContext startupContext,
     Widget child,
     OnDankUserShellReady onReady,
-    VoidCallback onStop,
   }) {
     return new DankUserShellWidget._create(
       startupContext: startupContext,
       child: child,
       onReady: onReady,
-      onStop: onStop,
       userShellBinding: new UserShellBinding(),
       lifecycleBinding: new LifecycleBinding(),
       presentationProviderBindings:
@@ -69,18 +64,11 @@ class DankUserShellWidget extends StatelessWidget {
     _UserShellPresentationProviderBindings presentationProviderBindings,
     this.child,
     this.onReady,
-    this.onStop,
   })  : _startupContext = startupContext,
         _userShellBinding = userShellBinding,
         _lifecycleBinding = lifecycleBinding,
         _presentationProviderBindings = presentationProviderBindings,
         _userShell = new DankUserShellImpl(
-          onStop: () {
-            userShellBinding.close();
-            lifecycleBinding.close();
-            presentationProviderBindings.close();
-            onStop?.call();
-          },
           onReady: (UserShellContext userShellContext) {
             onReady?.call(userShellContext);
           },
@@ -120,13 +108,5 @@ class _UserShellPresentationProviderBindings {
       InterfaceRequest<UserShellPresentationProvider> request) {
     _presentationProviderBindings.add(
         new UserShellPresentationProviderBinding()..bind(userShell, request));
-  }
-
-  void close() {
-    for (UserShellPresentationProviderBinding binding
-        in _presentationProviderBindings) {
-      binding.close();
-    }
-    _presentationProviderBindings.clear();
   }
 }

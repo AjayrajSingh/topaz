@@ -7,8 +7,6 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:fidl/fidl.dart';
 
-import 'user_shell_impl.dart';
-
 /// Called when [UserShell.initialize] occurs.
 typedef OnDankUserShellReady = void Function(
   UserShellContext userShellContext,
@@ -26,7 +24,6 @@ class DankUserShellImpl
   /// Constructor.
   DankUserShellImpl({
     this.onReady,
-    this.onStop,
   });
 
   /// Binding for the actual UserShell interface object.
@@ -46,9 +43,6 @@ class DankUserShellImpl
   /// Called when [initialize] occurs.
   final OnDankUserShellReady onReady;
 
-  /// Called at the conclusion of [Lifecycle.terminate].
-  final OnUserShellStop onStop;
-
   @override
   void initialize(
     InterfaceHandle<UserShellContext> userShellContextHandle,
@@ -64,17 +58,7 @@ class DankUserShellImpl
   }
 
   @override
-  void terminate() {
-    _focusWatcherBinding.close();
-    for (StoryVisualStateWatcherProxy watcher
-        in _visualStateWatchers.values.toList()) {
-      watcher.ctrl.close();
-    }
-    _focusProviderProxy.ctrl.close();
-    _userShellContextProxy.ctrl.close();
-    onStop?.call();
-    fuchsia.exit(0);
-  }
+  void terminate() => fuchsia.exit(0);
 
   @override
   void getPresentation(String storyId, InterfaceRequest<Presentation> request) {

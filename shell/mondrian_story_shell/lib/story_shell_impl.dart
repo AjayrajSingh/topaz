@@ -157,16 +157,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
 
   /// Terminate the StoryShell.
   @override
-  void terminate() {
-    trace('terminating');
-    log.info('StoryShellImpl::terminate call');
-    _pointerEventsListener.stop();
-    _visualStateWatcherBinding.close();
-    _storyContext.ctrl.close();
-    _storyShellBinding.close();
-    _lifecycleBinding.close();
-    exit(0);
-  }
+  void terminate() => exit(0);
 
   @override
   void onVisualStateChange(StoryVisualState visualState) {
