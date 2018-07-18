@@ -1,9 +1,9 @@
 {
     "labels": [
-        "//topaz/app/xi"
+        "//topaz/bin/xi"
     ],
     "packages": [
-        "//topaz/app/xi/modules/xi_app",
+        "//topaz/bin/xi/xi_mod",
         "//garnet/bin/xi_core"
     ]
 }

@@ -13,7 +13,7 @@ dart_library("xi_widgets") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/app/xi/packages/xi_client",
+    "//topaz/lib/xi/client:xi_client",
     "//topaz/public/lib/app/dart",
   ]
 }

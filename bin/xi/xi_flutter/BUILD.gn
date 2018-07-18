@@ -16,7 +16,7 @@ dart_library("xi_flutter") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/path",
     "//third_party/dart-pkg/pub/path_provider",
-    "//topaz/app/xi/packages/widgets:xi_widgets",
-    "//topaz/app/xi/packages/xi_client",
+    "//topaz/lib/xi/widgets:xi_widgets",
+    "//topaz/lib/xi/client:xi_client",
   ]
 }

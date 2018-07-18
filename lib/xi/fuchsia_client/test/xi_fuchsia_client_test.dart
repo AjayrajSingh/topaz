@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:test/test.dart';
-import 'package:xi_app.testlib/_src_under_test.dart';
+import 'package:xi_fuchsia_client/client.dart';
 
 void main() {
   test('XiFuchsiaClient constructor', () {

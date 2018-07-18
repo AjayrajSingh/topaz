@@ -10,8 +10,7 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:xi_widgets/widgets.dart';
-
-import 'src/xi_fuchsia_client.dart';
+import 'package:xi_fuchsia_client/client.dart';
 
 /// ignore_for_file: avoid_annotating_with_dynamic
 
@@ -61,7 +60,7 @@ class ModuleImpl implements Lifecycle {
 
 /// Main entry point to the example parent module.
 void main() {
-  setupLogger(name: '[xi_app]');
+  setupLogger(name: '[xi_mod]');
   log.info('Module main called');
 
   InterfacePair<Ledger> pair = new InterfacePair<Ledger>();

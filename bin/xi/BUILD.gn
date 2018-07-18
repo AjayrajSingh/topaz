@@ -2,10 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("modules") {
-  public_deps = [
-    # TODO(plaligand): reenable once //third_party/xi-editor compiles again.
-    # "xi-core",
-    "xi_app",
+group("xi") {
+  deps = [
+    "//topaz/bin/xi/xi_mod",
   ]
 }
