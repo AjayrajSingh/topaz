@@ -3,28 +3,29 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets.dart/model.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
 
-import 'src/modular/module_model.dart';
+import 'src/models/ble_rect_model.dart';
 import 'src/screen.dart';
 
 void main() {
   setupLogger();
 
-  StartupContext context = new StartupContext.fromStartupInfo();
+  final model = BLERectModel();
+  final driver = ModuleDriver(onTerminate: model.onTerminate);
 
-  BLERectModuleModel model = new BLERectModuleModel(context);
+  runApp(
+    MaterialApp(
+      home: ScopedModel<BLERectModel>(
+        model: model,
+        child: BLERectScreen(),
+      ),
+    ),
+  );
 
-  ModuleWidget<BLERectModuleModel> moduleWidget =
-      new ModuleWidget<BLERectModuleModel>(
-          moduleModel: model,
-          startupContext: context,
-          child: new BLERectScreen());
-
-  model.start();
-
-  runApp(new MaterialApp(home: moduleWidget));
+  driver.start().then((_) {
+    model.start(driver.environmentServices);
+  }).catchError(log.severe);
 }

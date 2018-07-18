@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../manufacturer_names.dart';
-import '../modular/module_model.dart' as model;
+import '../models/ble_scanner_model.dart' as model;
 
 /// A scrollable view that displays BLE scan results
 class ScanResultsWidget extends StatefulWidget {
@@ -54,10 +54,10 @@ class ScanResultsState extends State<ScanResultsWidget> {
   }
 
   Widget _buildHeader(ble.RemoteDevice device) {
-    return new ScopedModelDescendant<model.BLEScannerModuleModel>(builder: (
+    return new ScopedModelDescendant<model.BLEScannerModel>(builder: (
       BuildContext context,
       Widget child,
-      model.BLEScannerModuleModel moduleModel,
+      model.BLEScannerModel moduleModel,
     ) {
       final model.ConnectionState connState =
           moduleModel.getPeripheralState(device.identifier);
@@ -178,10 +178,10 @@ class ScanResultsState extends State<ScanResultsWidget> {
   }
 
   Widget _buildConnectionWidget(ble.RemoteDevice device) {
-    return new ScopedModelDescendant<model.BLEScannerModuleModel>(builder: (
+    return new ScopedModelDescendant<model.BLEScannerModel>(builder: (
       BuildContext context,
       Widget child,
-      model.BLEScannerModuleModel moduleModel,
+      model.BLEScannerModel moduleModel,
     ) {
       if (!device.connectable) {
         return const Text('Not connectable');
@@ -224,10 +224,10 @@ class ScanResultsState extends State<ScanResultsWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<model.BLEScannerModuleModel>(builder: (
+    return new ScopedModelDescendant<model.BLEScannerModel>(builder: (
       BuildContext context,
       Widget child,
-      model.BLEScannerModuleModel moduleModel,
+      model.BLEScannerModel moduleModel,
     ) {
       if (moduleModel.discoveredDevices.isEmpty) {
         return const Center(child: const Text('No devices found'));

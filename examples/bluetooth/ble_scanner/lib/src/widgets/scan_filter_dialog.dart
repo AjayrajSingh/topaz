@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import '../manufacturer_names.dart';
-import '../modular/module_model.dart';
+import '../models/ble_scanner_model.dart';
 
 // ignore_for_file: public_member_api_docs
 
@@ -25,7 +25,7 @@ enum DismissDialogAction {
 
 /// Widget that contains entry fields to build a BLE scan filter
 class ScanFilterDialog extends StatefulWidget {
-  final BLEScannerModuleModel moduleModel;
+  final BLEScannerModel moduleModel;
 
   const ScanFilterDialog({@required this.moduleModel, Key key})
       : super(key: key);

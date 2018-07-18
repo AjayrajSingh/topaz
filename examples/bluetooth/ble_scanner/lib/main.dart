@@ -4,9 +4,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.widgets.dart/model.dart';
 
 import 'src/modular/module_model.dart';
 import 'src/screen.dart';
@@ -14,14 +14,19 @@ import 'src/screen.dart';
 void main() {
   setupLogger();
 
-  StartupContext context = new StartupContext.fromStartupInfo();
+  final model = BLEScannerModel();
+  final driver = ModuleDriver();
 
-  ModuleWidget<BLEScannerModuleModel> moduleWidget =
-      new ModuleWidget<BLEScannerModuleModel>(
-          moduleModel: new BLEScannerModuleModel(context),
-          startupContext: context,
-          child: new BLEScannerScreen())
-        ..advertise();
+  runApp(
+    MaterialApp(
+      home: ScopedModel<BLEScannerModel>(
+        model: model,
+        child: BLEScannerScreen(),
+      ),
+    ),
+  );
 
-  runApp(new MaterialApp(home: moduleWidget));
+  driver.start((_) {
+    model.connect(driver.environmentServices);
+  }).catchError(log.severe);
 }

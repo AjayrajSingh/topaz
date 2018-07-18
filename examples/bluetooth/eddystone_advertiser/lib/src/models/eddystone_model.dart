@@ -8,12 +8,12 @@ import 'package:fidl_fuchsia_bluetooth_le/fidl.dart' as ble;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets.dart/model.dart';
 
 // ignore_for_file: public_member_api_docs
 
-/// The [ModuleModel] for the Eddystone advertiser example.
-class EddystoneModuleModel extends ModuleModel {
+/// The [Model] for the Eddystone advertiser example.
+class EddystoneModel extends Model {
   // Members that maintain the FIDL service connections.
   final ble.PeripheralProxy _peripheral = new ble.PeripheralProxy();
 
@@ -21,13 +21,6 @@ class EddystoneModuleModel extends ModuleModel {
   final Map<String, String> _activeAdvertisements = <String, String>{};
 
   static const String kEddystoneUuid = '0000feaa-0000-1000-8000-00805f9b34fb';
-
-  /// Constructor
-  EddystoneModuleModel(this.startupContext) : super();
-
-  /// We use the |startupContext| to obtain a handle to the "bluetooth::low_energy::Central"
-  /// environment service.
-  final StartupContext startupContext;
 
   /// True if we have an active scan session.
   bool get isAdvertising => _activeAdvertisements.isNotEmpty;
@@ -72,22 +65,12 @@ class EddystoneModuleModel extends ModuleModel {
     notifyListeners();
   }
 
-  // ModuleModel overrides:
-
-  @override
-  void onReady(
-    ModuleContext moduleContext,
-    Link link,
-  ) {
-    super.onReady(moduleContext, link);
-
+  void connect(ServiceProviderProxy environmentServices) {
     connectToService(startupContext.environmentServices, _peripheral.ctrl);
   }
 
-  @override
-  void onStop() {
+  void onTerminate() {
     _activeAdvertisements.values.forEach(stopAdvertising);
-    super.onStop();
   }
 
   final Map<String, int> _schemes = const <String, int>{

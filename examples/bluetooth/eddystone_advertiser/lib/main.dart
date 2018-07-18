@@ -6,24 +6,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.widgets.dart/model.dart';
 
-import 'src/modular/module_model.dart';
+import 'src/models/eddystone_model.dart';
 import 'src/screen.dart';
 
 void main() {
   setupLogger();
 
-  StartupContext context = new StartupContext.fromStartupInfo();
-
-  EddystoneModuleModel model = new EddystoneModuleModel(context);
-
-  ModuleWidget<EddystoneModuleModel> moduleWidget =
-      new ModuleWidget<EddystoneModuleModel>(
-          moduleModel: model,
-          startupContext: context,
-          child: new EddystoneScreen(moduleModel: model))
-        ..advertise();
-
   runApp(new MaterialApp(home: moduleWidget));
+
+  final model = EddystoneModel();
+  final driver = ModuleDriver(onTerminate: model.onTerminate);
+
+  runApp(
+    MaterialApp(
+      home: ScopedModel<EddystoneModel>(
+        model: model,
+        child: EddystoneScreen(),
+      ),
+    ),
+  );
+
+  driver.start((_) {
+    model.connect(driver.environmentServices);
+  }).catchError(log.severe);
 }

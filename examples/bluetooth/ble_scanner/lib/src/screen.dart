@@ -5,8 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 
-import 'modular/module_model.dart';
-
+import 'models/ble_rect_model.dart';
 import 'widgets/scan_filter_button.dart';
 import 'widgets/scan_results_widget.dart';
 
@@ -14,10 +13,10 @@ import 'widgets/scan_results_widget.dart';
 class BLEScannerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<BLEScannerModuleModel>(builder: (
+    return new ScopedModelDescendant<BLEScannerModel>(builder: (
       BuildContext context,
       Widget child,
-      BLEScannerModuleModel moduleModel,
+      BLEScannerModel moduleModel,
     ) {
       return new Scaffold(
           appBar: new AppBar(

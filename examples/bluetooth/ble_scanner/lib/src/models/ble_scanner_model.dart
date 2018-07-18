@@ -2,21 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/app.dart';
-
 import 'package:fidl_fuchsia_bluetooth/fidl.dart' as bt;
 import 'package:fidl_fuchsia_bluetooth_gatt/fidl.dart' as gatt;
 import 'package:fidl_fuchsia_bluetooth_le/fidl.dart' as ble;
 import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets.dart/model.dart';
 
 // ignore_for_file: public_member_api_docs
 
 enum ConnectionState { notConnected, connecting, connected }
 
-/// The [ModuleModel] for the BLE Scanner example.
-class BLEScannerModuleModel extends ModuleModel implements ble.CentralDelegate {
+/// The [Model] for the BLE Scanner example.
+class BLEScannerModel extends Model implements ble.CentralDelegate {
   // Members that maintain the FIDL service connections.
   final ble.CentralProxy _central = new ble.CentralProxy();
   final ble.CentralDelegateBinding _delegateBinding =
@@ -41,13 +40,6 @@ class BLEScannerModuleModel extends ModuleModel implements ble.CentralDelegate {
   // Devices that are connected.
   final Map<String, ConnectionState> _connectedDevices =
       <String, ConnectionState>{};
-
-  /// Constructor
-  BLEScannerModuleModel(this.startupContext) : super();
-
-  /// We use the |startupContext| to obtain a handle to the "bluetooth::low_energy::Central"
-  /// environment service.
-  final StartupContext startupContext;
 
   /// True if we have an active scan session.
   bool get isScanning => _isScanning;
@@ -136,16 +128,11 @@ class BLEScannerModuleModel extends ModuleModel implements ble.CentralDelegate {
     });
   }
 
-  // ModuleModel overrides:
-
-  @override
-  void onReady(
-    ModuleContext moduleContext,
-    Link link,
+  /// Connects the model to the bluetooth services
+  void connect(
+    ServiceProviderProxy environmentServices,
   ) {
-    super.onReady(moduleContext, link);
-
-    connectToService(startupContext.environmentServices, _central.ctrl);
+    connectToService(environmentServices, _central.ctrl);
     _central.setDelegate(_delegateBinding.wrap(this));
   }
 

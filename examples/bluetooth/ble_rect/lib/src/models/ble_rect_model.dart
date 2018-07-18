@@ -11,10 +11,10 @@ import 'package:fidl_fuchsia_bluetooth_gatt/fidl.dart' as gatt;
 import 'package:fidl_fuchsia_bluetooth_le/fidl.dart' as ble;
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets.dart/model.dart';
 
-/// The [ModuleModel] for the GATT Server example.
-class BLERectModuleModel extends ModuleModel
+/// The [Model] for the GATT Server example.
+class BLERectModel extends Model
     implements ble.PeripheralDelegate, gatt.LocalServiceDelegate {
   // Custom UUID for our service.
   static const String _serviceUuid = '548c2932-f58c-4c0b-9a4d-92110695a591';
@@ -40,12 +40,6 @@ class BLERectModuleModel extends ModuleModel
 
   // UUID for the "Characteristic User Description" descriptor.
   static const String _descUuid = '00002901-0000-1000-8000-00805F9B34FB';
-
-  /// Constructor.
-  BLERectModuleModel(this.startupContext) : super();
-
-  /// We use the |startupContext| to obtain handles to environment services.
-  final StartupContext startupContext;
 
   /// Returns the last FIDL status.
   bt.Status get lastStatus => _lastStatus;
@@ -197,25 +191,23 @@ class BLERectModuleModel extends ModuleModel
   }
 
   /// Connect to the BLE environment services and bootstrap the GATT service.
-  void start() {
-    connectToService(startupContext.environmentServices, _server.ctrl);
-    connectToService(startupContext.environmentServices, _peripheral.ctrl);
+  void start(ServiceProviderProxy environmentServices) {
+    connectToService(environmentServices, _server.ctrl);
+    connectToService(environmentServices, _peripheral.ctrl);
 
     _publishService();
     _startAdvertising();
   }
 
-  // ModuleModel override:
-  @override
-  void onStop() {
+  /// Call this method when the model needs to terminate to allow it to close
+  /// any open connections
+  void onTerminate() {
     _peripheral.ctrl.close();
     _server.ctrl.close();
     _service.ctrl.close();
 
     _peripheralDelegate.close();
     _serviceDelegate.close();
-
-    super.onStop();
   }
 
   // ble.PeripheralDelegate overrides:
