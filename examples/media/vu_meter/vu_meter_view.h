@@ -75,7 +75,7 @@ class VuMeterView : public mozart::SkiaView {
   // Shutdown the app
   void Shutdown();
 
-  void OnDefaultFormatFetched(fuchsia::media::MediaType default_type);
+  void OnDefaultFormatFetched(fuchsia::media::StreamType default_type);
   void OnPacketCaptured(fuchsia::media::MediaPacket packet);
 
   async::Loop* const loop_;

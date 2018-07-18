@@ -44,7 +44,7 @@ VuMeterView::VuMeterView(
     Shutdown();
   });
 
-  capturer_->GetMediaType([this](fuchsia::media::MediaType type) {
+  capturer_->GetStreamType([this](fuchsia::media::StreamType type) {
     OnDefaultFormatFetched(std::move(type));
   });
 }
@@ -130,14 +130,21 @@ void VuMeterView::SendCaptureRequest() {
 }
 
 void VuMeterView::OnDefaultFormatFetched(
-    fuchsia::media::MediaType default_type) {
+    fuchsia::media::StreamType default_type) {
   // Set the media type, keep the default sample rate but make sure that we
   // normalize to stereo 16-bit LPCM.
-  FXL_DCHECK(default_type.details.is_audio());
-  const auto& audio_details = default_type.details.audio();
-  capturer_->SetMediaType(
-      ::media::CreateLpcmMediaType(fuchsia::media::AudioSampleFormat::SIGNED_16,
+  FXL_DCHECK(default_type.medium_specific.is_audio());
+  const auto& audio_details = default_type.medium_specific.audio();
+
+  fuchsia::media::MediumSpecificStreamType medium_specific_stream_type;
+  medium_specific_stream_type.set_audio(
+      media::CreateAudioStreamType(fuchsia::media::AudioSampleFormat::SIGNED_16,
                                    2, audio_details.frames_per_second));
+
+  fuchsia::media::StreamType stream_type;
+  stream_type.medium_specific = std::move(medium_specific_stream_type);
+  stream_type.encoding = fuchsia::media::AUDIO_ENCODING_LPCM;
+  capturer_->SetStreamType(std::move(stream_type));
 
   uint64_t payload_buffer_size =
       kBytesPerFrame *
