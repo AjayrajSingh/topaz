@@ -196,7 +196,8 @@ class FileInNamespaceBuffer final : public blink::DartSnapshotBuffer {
 
   ~FileInNamespaceBuffer() {
     if (address_ != nullptr) {
-      zx::vmar::root_self()->unmap(reinterpret_cast<uintptr_t>(address_), size_);
+      zx::vmar::root_self()->unmap(reinterpret_cast<uintptr_t>(address_),
+                                   size_);
       address_ = nullptr;
       size_ = 0;
     }
@@ -274,6 +275,8 @@ void Application::Kill() {
     }
   }
   wait_callbacks_.clear();
+  application_controller_.events().OnTerminated(
+      last_return_code_.second, fuchsia::sys::TerminationReason::EXITED);
 
   termination_callback_(this);
   // WARNING: Don't do anything past this point as this instance may have been

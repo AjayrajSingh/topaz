@@ -403,6 +403,8 @@ void DartComponentController::SendReturnCode() {
   for (const auto& iter : wait_callbacks_) {
     iter(return_code_);
   }
+  binding_.events().OnTerminated(return_code_,
+                                 fuchsia::sys::TerminationReason::EXITED);
   wait_callbacks_.clear();
 }
 
@@ -435,7 +437,8 @@ void DartComponentController::MessageEpilogue(Dart_Handle result) {
   }
 }
 
-void DartComponentController::OnIdleTimer(async_dispatcher_t* dispatcher, async::WaitBase* wait,
+void DartComponentController::OnIdleTimer(async_dispatcher_t* dispatcher,
+                                          async::WaitBase* wait,
                                           zx_status_t status,
                                           const zx_packet_signal* signal) {
   if ((status != ZX_OK) || !(signal->observed & ZX_TIMER_SIGNALED) ||

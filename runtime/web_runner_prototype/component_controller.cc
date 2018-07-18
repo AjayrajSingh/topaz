@@ -22,8 +22,10 @@ ComponentController::ComponentController(Runner* runner)
 ComponentController::~ComponentController() {
   if (binding_.is_bound()) {
     auto callbacks = std::move(wait_callbacks_);
-    for (const auto& callback : callbacks)
+    for (const auto& callback : callbacks) {
       callback(0);
+    }
+    binding_.events().OnTerminated(0, fuchsia::sys::TerminationReason::EXITED);
   }
 }
 
