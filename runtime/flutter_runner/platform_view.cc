@@ -423,7 +423,9 @@ void PlatformView::HandlePlatformMessage(
 }
 
 // |shell::PlatformView|
-void PlatformView::UpdateSemantics(blink::SemanticsNodeUpdates update) {
+void PlatformView::UpdateSemantics(
+    blink::SemanticsNodeUpdates update,
+    blink::CustomAccessibilityActionUpdates actions) {
   accessibility_bridge_.UpdateSemantics(update);
 }
 

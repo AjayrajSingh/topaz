@@ -9,7 +9,7 @@
              path="third_party/dart"
              remote="https://dart.googlesource.com/sdk"
              gerrithost="https://dart-review.googlesource.com"
-             revision="7a5e49e4e49303c509ca2667323fc93883f78969"/>
+             revision="8ed9345ccd65eb0b3312f326f219d8ba2f0d310c"/>
     <project name="dart/observatory_pub_packages"
              path="third_party/dart/third_party/observatory_pub_packages"
              remote="https://dart.googlesource.com/observatory_pub_packages/"
@@ -20,6 +20,6 @@
              path="third_party/dart-pkg/pub"
              remote="https://fuchsia.googlesource.com/third_party/dart-pkg"
              gerrithost="https://fuchsia-review.googlesource.com"
-             revision="3bb6a433facfb014e3602130b695ace008a8e6e4"/>
+             revision="ca032bde072b23609239da67b58a6602b767faf1"/>
   </projects>
 </manifest>

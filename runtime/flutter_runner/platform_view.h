@@ -117,7 +117,9 @@ class PlatformView final : public shell::PlatformView,
       fxl::RefPtr<blink::PlatformMessage> message) override;
 
   // |shell::PlatformView|
-  void UpdateSemantics(blink::SemanticsNodeUpdates update) override;
+  void UpdateSemantics(
+      blink::SemanticsNodeUpdates update,
+      blink::CustomAccessibilityActionUpdates actions) override;
 
   // Channel handler for kFlutterPlatformChannel
   void HandleFlutterPlatformChannelPlatformMessage(
