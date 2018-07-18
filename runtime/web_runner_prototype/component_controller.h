@@ -36,7 +36,6 @@ class ComponentController : public fuchsia::sys::ComponentController,
   // |fuchsia::sys::ComponentController|:
   void Kill() final;
   void Detach() final;
-  void Wait(WaitCallback callback) final;
 
   // |fuchsia::ui::viewsv1::ViewProvider|:
   void CreateView(
@@ -47,7 +46,6 @@ class ComponentController : public fuchsia::sys::ComponentController,
   component::ServiceProviderBridge service_provider_;
   fidl::Binding<fuchsia::sys::ComponentController> binding_;
   fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider> view_provider_bindings_;
-  std::vector<WaitCallback> wait_callbacks_;
   std::string url_;
 
   fuchsia::sys::ComponentControllerPtr web_view_controller_;

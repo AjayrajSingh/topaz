@@ -293,12 +293,6 @@ void Application::AttemptVMLaunchWithCurrentSettings(
 
 // |fuchsia::sys::ComponentController|
 void Application::Kill() {
-  if (last_return_code_.first) {
-    for (auto wait_callback : wait_callbacks_) {
-      wait_callback(last_return_code_.second);
-    }
-  }
-  wait_callbacks_.clear();
   application_controller_.events().OnTerminated(
       last_return_code_.second, fuchsia::sys::TerminationReason::EXITED);
 
@@ -310,11 +304,6 @@ void Application::Kill() {
 // |fuchsia::sys::ComponentController|
 void Application::Detach() {
   application_controller_.set_error_handler(nullptr);
-}
-
-// |fuchsia::sys::ComponentController|
-void Application::Wait(WaitCallback callback) {
-  wait_callbacks_.emplace_back(std::move(callback));
 }
 
 // |flutter::Engine::Delegate|

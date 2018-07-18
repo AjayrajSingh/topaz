@@ -79,7 +79,6 @@ class Application final : public Engine::Delegate,
   fml::RefPtr<blink::DartSnapshot> isolate_snapshot_;
   fml::RefPtr<blink::DartSnapshot> shared_snapshot_;
   std::set<std::unique_ptr<Engine>> shell_holders_;
-  std::vector<WaitCallback> wait_callbacks_;
   std::pair<bool, uint32_t> last_return_code_;
 
   // TODO(CP-19): Remove once we propagate component name
@@ -96,9 +95,6 @@ class Application final : public Engine::Delegate,
 
   // |fuchsia::sys::ComponentController|
   void Detach() override;
-
-  // |fuchsia::sys::ComponentController|
-  void Wait(WaitCallback callback) override;
 
 #ifndef SCENIC_VIEWS2
   // |fuchsia::ui::viewsv1::ViewProvider|

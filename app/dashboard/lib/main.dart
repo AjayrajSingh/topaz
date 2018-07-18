@@ -285,7 +285,7 @@ void runTestIterations() {
         new LaunchInfo(url: 'screencap', arguments: ['-histogram']);
     final ComponentControllerProxy controller = new ComponentControllerProxy();
     launcherProxy.createComponent(launchInfo, controller.ctrl.request());
-    controller.wait((int r) {
+    controller.onTerminated = (int r, _) {
       if (r == 0) {
         log.info('elapsed: ${stopWatch.elapsedMilliseconds}');
         TestResult testResult = new TestResult(
@@ -323,6 +323,6 @@ void runTestIterations() {
         onRefresh();
         runTestIterations();
       }
-    });
+    };
   });
 }

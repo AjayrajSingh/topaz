@@ -64,13 +64,12 @@ Future<int> runTest(String server, void ready(Echo echo, void complete())) {
       echo.ctrl.close();
       controller.ctrl.onConnectionError = complete;
       controller.ctrl.onClose = complete;
-      controller
-        ..kill()
-        ..wait((_) {
-          // Now we're done...
-          complete();
-          controller.ctrl.close();
-        });
+      controller..kill()
+        ..onTerminated = (unusedReturnCode, unusedTerminationReason) {
+            // Now we're done...
+            complete();
+            controller.ctrl.close();
+        };
     }
 
     try {

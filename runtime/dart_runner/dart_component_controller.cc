@@ -401,17 +401,8 @@ void DartComponentController::Detach() {
   binding_.set_error_handler(fit::closure());
 }
 
-void DartComponentController::Wait(WaitCallback callback) {
-  wait_callbacks_.push_back(callback);
-}
-
 void DartComponentController::SendReturnCode() {
-  for (const auto& iter : wait_callbacks_) {
-    iter(return_code_);
-  }
-  binding_.events().OnTerminated(return_code_,
-                                 fuchsia::sys::TerminationReason::EXITED);
-  wait_callbacks_.clear();
+  binding_.events().OnTerminated(return_code_, fuchsia::sys::TerminationReason::EXITED);
 }
 
 const zx::duration kIdleWaitDuration = zx::sec(2);

@@ -99,8 +99,7 @@ void runTestIterations() {
     log.info('attempting to launch screencap');
     launcherProxy.createComponent(launchInfo, controller.ctrl.request());
     log.info('waiting for launch response');
-    controller.wait((int r) {
-      log.info('launch result = $r');
+    controller.onTerminated = (int r, _) {
       if (r == 0) {
         TestResult testResult = new TestResult(
           name: _testName,
@@ -140,6 +139,6 @@ void runTestIterations() {
         log.info('try again');
         runTestIterations();
       }
-    });
+    };
   });
 }

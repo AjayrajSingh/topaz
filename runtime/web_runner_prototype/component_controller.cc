@@ -21,10 +21,6 @@ ComponentController::ComponentController(Runner* runner)
 
 ComponentController::~ComponentController() {
   if (binding_.is_bound()) {
-    auto callbacks = std::move(wait_callbacks_);
-    for (const auto& callback : callbacks) {
-      callback(0);
-    }
     binding_.events().OnTerminated(0, fuchsia::sys::TerminationReason::EXITED);
   }
 }
@@ -67,9 +63,5 @@ void ComponentController::CreateView(
 void ComponentController::Kill() { runner_->DestroyComponent(this); }
 
 void ComponentController::Detach() { binding_.set_error_handler(nullptr); }
-
-void ComponentController::Wait(WaitCallback callback) {
-  wait_callbacks_.push_back(std::move(callback));
-}
 
 }  // namespace web

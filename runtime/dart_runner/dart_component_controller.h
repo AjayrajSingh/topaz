@@ -47,7 +47,6 @@ class DartComponentController : public fuchsia::sys::ComponentController {
   // |ComponentController|
   void Kill() override;
   void Detach() override;
-  void Wait(WaitCallback callback) override;
 
   // Idle notification.
   void MessageEpilogue(Dart_Handle result);
@@ -77,7 +76,6 @@ class DartComponentController : public fuchsia::sys::ComponentController {
 
   Dart_Isolate isolate_;
   int32_t return_code_ = 0;
-  std::vector<WaitCallback> wait_callbacks_;
 
   zx::time idle_start_{0};
   zx::timer idle_timer_;
