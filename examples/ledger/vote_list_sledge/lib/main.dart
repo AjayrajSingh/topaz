@@ -3,26 +3,25 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.widgets/modular.dart';
-import 'vote_module_model.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+
+import 'widgets/vote_list_widget.dart';
 import 'widgets/vote_widget.dart';
 
 /// Main entry point to the vote list application.
 void main() {
-  StartupContext startupContext = new StartupContext.fromStartupInfo();
+  setupLogger();
 
-  VoteModuleModel voteModuleModel = new VoteModuleModel();
+  final driver = ModuleDriver();
+  VoteListWidgetState.moduleContext = driver.moduleContext.proxy;
 
-  MaterialApp materialApp = new MaterialApp(
-      home: new VoteWidget(), theme: new ThemeData(primarySwatch: Colors.red));
-
-  ModuleWidget<VoteModuleModel> voteWidget = new ModuleWidget<VoteModuleModel>(
-    startupContext: startupContext,
-    moduleModel: voteModuleModel,
-    child: materialApp,
+  runApp(
+    MaterialApp(
+      home: VoteWidget(),
+      theme: ThemeData(primarySwatch: Colors.red),
+    ),
   );
 
-  runApp(voteWidget);
-  voteWidget.advertise();
+  driver.start().catchError(log.severe);
 }

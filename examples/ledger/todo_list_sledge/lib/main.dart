@@ -3,25 +3,21 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+
 import 'widgets/todo_widget.dart';
 
 /// Main entry point to the todo list application.
 void main() {
-  StartupContext startupContext = new StartupContext.fromStartupInfo();
+  setupLogger();
 
-  ModuleModel todoModuleModel = new ModuleModel();
+  ModuleDriver().start().catchError(log.severe);
 
-  MaterialApp materialApp = new MaterialApp(
-      home: new TodoWidget(), theme: new ThemeData(primarySwatch: Colors.red));
-
-  ModuleWidget<ModuleModel> todoWidget = new ModuleWidget<ModuleModel>(
-    startupContext: startupContext,
-    moduleModel: todoModuleModel,
-    child: materialApp,
+  runApp(
+    MaterialApp(
+      home: new TodoWidget(),
+      theme: new ThemeData(primarySwatch: Colors.red),
+    ),
   );
-
-  runApp(todoWidget);
-  todoWidget.advertise();
 }

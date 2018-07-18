@@ -4,16 +4,14 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_app("vote_list_sledge") {
+flutter_aot_app("vote_list_sledge") {
   main_dart = "lib/main.dart"
-
-  sources = [
-    "vote_module_model.dart"
-  ]
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/sledge:sledge",
-    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/widgets/dart",
   ]
 }
