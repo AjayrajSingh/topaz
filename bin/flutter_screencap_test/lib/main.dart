@@ -90,16 +90,18 @@ const int kDelayBeforeCaptureSeconds = 7;
 int _iterationAttempt = 0;
 
 void runTestIterations() {
-  log.warning('runTestIterations()');
+  log.info('runTestIterations()');
   Stopwatch stopWatch = new Stopwatch()..start();
   new Timer(const Duration(seconds: kDelayBeforeCaptureSeconds), () {
     LaunchInfo launchInfo =
         new LaunchInfo(url: 'screencap', arguments: ['-histogram']);
     final ComponentControllerProxy controller = new ComponentControllerProxy();
+    log.info('attempting to launch screencap');
     launcherProxy.createComponent(launchInfo, controller.ctrl.request());
+    log.info('waiting for launch response');
     controller.wait((int r) {
+      log.info('launch result = $r');
       if (r == 0) {
-        log.info('elapsed: ${stopWatch.elapsedMilliseconds}');
         TestResult testResult = new TestResult(
           name: _testName,
           elapsed: stopWatch.elapsedMilliseconds,
@@ -107,6 +109,7 @@ void runTestIterations() {
           message: 'success',
         );
         launcherProxy.ctrl.close();
+        log.info('sending success test result');
         runnerProxy
           ..reportResult(testResult)
           ..teardown(() {
@@ -116,13 +119,15 @@ void runTestIterations() {
       } else {
         _iterationAttempt++;
         if (_iterationAttempt >= kMaxAttempts) {
-          log.info('elapsed: ${stopWatch.elapsedMilliseconds}');
+          log.info(
+              'iteration attempts exceeded elapsed: ${stopWatch.elapsedMilliseconds}');
           TestResult testResult = new TestResult(
               name: _testName,
               elapsed: stopWatch.elapsedMilliseconds,
               failed: true,
               message: 'failed: See log for more info');
           launcherProxy.ctrl.close();
+          log.info('sending failed test result');
           runnerProxy
             ..reportResult(testResult)
             ..teardown(() {
@@ -132,6 +137,7 @@ void runTestIterations() {
         }
 
         // Try again
+        log.info('try again');
         runTestIterations();
       }
     });
