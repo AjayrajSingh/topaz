@@ -3,25 +3,25 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.widgets/modular.dart';
-import 'test_module_model.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+
+import 'test_model.dart';
 
 /// Main entry point to the testing mod.
 void main() {
-  StartupContext startupContext = new StartupContext.fromStartupInfo();
+  setupLogger();
 
-  TestModuleModel testModuleModel = new TestModuleModel();
+  final testModel = new TestModel();
+  final driver = ModuleDriver();
 
-  MaterialApp materialApp = new MaterialApp(
-      home: new Text('This mod tests Sledge.'));
-
-  ModuleWidget<TestModuleModel> testWidget = new ModuleWidget<TestModuleModel>(
-    startupContext: startupContext,
-    moduleModel: testModuleModel,
-    child: materialApp,
+  runApp(
+    MaterialApp(
+      home: new Text('This mod tests Sledge.'),
+    ),
   );
 
-  runApp(testWidget);
-  testWidget.advertise();
+  driver.start().then((_) {
+    testModel.onReady(driver.moduleContext.proxy);
+  }).catchError(log.severe);
 }

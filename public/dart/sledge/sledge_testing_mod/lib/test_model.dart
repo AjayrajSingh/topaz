@@ -2,14 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.widgets/modular.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:sledge/sledge.dart';
 
 /// Handles the lifecycle of the Test module.
-class TestModuleModel extends ModuleModel {
+class TestModel {
   void _runSledgeTest(final ModuleContext moduleContext) async {
-    Sledge sledge = new Sledge.fromModule(moduleContext, new SledgePageId('my page'));
+    Sledge sledge =
+        new Sledge.fromModule(moduleContext, new SledgePageId('my page'));
 
     Map<String, BaseType> schemaDescription = <String, BaseType>{
       'someBool': new Boolean(),
@@ -35,9 +35,6 @@ class TestModuleModel extends ModuleModel {
     });
   }
 
-  @override
-  void onReady(final ModuleContext moduleContext, final Link link) {
-    _runSledgeTest(moduleContext);
-    super.onReady(moduleContext, link);
-  }
+  void onReady(final ModuleContext moduleContext) =>
+      _runSledgeTest(moduleContext);
 }

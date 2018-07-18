@@ -4,16 +4,16 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_app("sledge_testing_mod") {
+flutter_aot_app("sledge_testing_mod") {
   main_dart = "lib/main.dart"
 
   sources = [
-    "test_module_model.dart"
+    "test_model.dart"
   ]
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/sledge:sledge",
-    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app_driver/dart",
   ]
 }
