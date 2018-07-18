@@ -29,7 +29,7 @@ void _testlogToSocket() {
 
   ByteData byteData = verify(mockSocket.write(captureAny)).captured.single;
   List<int> logged = byteData.buffer.asInt8List(0, byteData.lengthInBytes);
-  validateFixedBlock(logged, Level.INFO);
+  validateFixedBlock(logged, 0);
   expect(logged[32], equals(4));
   expect(utf8.decode(logged.sublist(33, 37)), equals('TEST'));
   expect(utf8.decode(logged.sublist(38, 41)), equals('foo'));

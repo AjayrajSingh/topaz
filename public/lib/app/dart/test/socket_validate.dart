@@ -4,8 +4,8 @@
 
 import 'dart:io';
 import 'dart:isolate';
+import 'dart:typed_data';
 
-import 'package:lib.app.dart/logging.dart';
 import 'package:test/test.dart';
 import 'package:zircon/zircon.dart';
 
@@ -13,31 +13,39 @@ const int _lookBackTimeGap = 15 * 1000 * 1000 * 1000; // 15 sec in nanoseconds
 
 const int _zxClockMonotonic = 0;
 
-/// Convert from little endian format bytes to an integer of specified length.
-int bytesToInt(List<int> bytes, int byteCount) {
-  int result = 0;
-  for (int i = 0; i < byteCount; i++) {
-    int byte = bytes[i] >= 0 ? bytes[i] : 256 + bytes[i];
-    result += byte << (8 * i);
+/// Convert from little endian format bytes to an unsiged 32 bit int.
+int bytesToInt32(List<int> bytes) {
+  ByteData byteData = new ByteData(4);
+  for (int i = 0; i < 4; i++) {
+    byteData.setInt8(i, bytes[i]);
   }
-  return result;
+  return byteData.getInt32(0, Endian.little);
+}
+
+/// Convert from little endian format bytes to an unsiged 64 bit int.
+int bytesToUint64(List<int> bytes) {
+  ByteData byteData = new ByteData(8);
+  for (int i = 0; i < 8; i++) {
+    byteData.setInt8(i, bytes[i]);
+  }
+  return byteData.getUint64(0, Endian.little);
 }
 
 /// Validate the primary contents of the fixed location portion of a log
 /// record on the logging Socket.
-void validateFixedBlock(List<int> data, Level level) {
+void validateFixedBlock(List<int> data, int level) {
   // Process ID
-  expect(bytesToInt(data, 8), equals(pid));
+  expect(bytesToUint64(data), equals(pid));
   // Thread ID
-  expect(bytesToInt(data.sublist(8, 16), 8), equals(Isolate.current.hashCode));
+  expect(bytesToUint64(data.sublist(8, 16)), equals(Isolate.current.hashCode));
 
   // Log time should be within the last 30 seconds
   int nowNanos = Platform.isFuchsia
       ? System.clockGet(_zxClockMonotonic)
       : new DateTime.now().microsecondsSinceEpoch * 1000;
-  int logNanos = bytesToInt(data.sublist(16, 24), 8);
+  int logNanos = bytesToUint64(data.sublist(16, 24));
   expect(logNanos, lessThanOrEqualTo(nowNanos));
   expect(logNanos + _lookBackTimeGap, greaterThan(nowNanos));
 
-  expect(bytesToInt(data.sublist(24, 28), 4), equals(level.value));
+  expect(bytesToInt32(data.sublist(24, 28)), equals(level));
 }

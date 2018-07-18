@@ -24,6 +24,18 @@ const int _maxTagLength = 63;
 
 const int _socketBufferLength = 2032;
 
+final Map<Level, int> _enumToFuchsiaLevelMap = <Level, int>{
+  Level.FINEST: -4,
+  Level.FINER: -3,
+  Level.FINE: -2,
+  Level.CONFIG: -1,
+  Level.INFO: 0,
+  Level.WARNING: 1,
+  Level.SEVERE: 2,
+  Level.SHOUT: 3,
+};
+const int _unexpectedLoggingLevel = 100;
+
 /// Method to write a single log message to a single output medium.
 /// Solutions are provided to write to stdout and a fuchsia Socket.
 typedef LogWriter = void Function(LogWriterMessage message);
@@ -209,13 +221,16 @@ void writeLogToStdout(LogWriterMessage message) {
   }
 }
 
+int _convertLogLevel(Level logLevel) =>
+    _enumToFuchsiaLevelMap[logLevel] ?? _unexpectedLoggingLevel;
+
 /// Format log message zircon socket connected to Log Viewer
 void writeLogToSocket(LogWriterMessage message) {
   ByteData bytes = new ByteData(_socketBufferLength)
     ..setUint64(0, pid, Endian.little)
     ..setUint64(8, Isolate.current.hashCode, Endian.little)
     ..setUint64(16, message.logRecord.systemTime, Endian.little)
-    ..setUint32(24, message.logRecord.level.value, Endian.little)
+    ..setUint32(24, _convertLogLevel(message.logRecord.level), Endian.little)
     ..setUint32(28, 0, Endian.little); // TODO droppedLogs
   int byteOffset = 32;
 

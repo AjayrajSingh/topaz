@@ -32,7 +32,7 @@ void _testLogToSocketWithLocation() {
 
   ByteData byteData = verify(mockSocket.write(captureAny)).captured.single;
   List<int> logged = byteData.buffer.asInt8List(0, byteData.lengthInBytes);
-  validateFixedBlock(logged, Level.FINEST);
+  validateFixedBlock(logged, -4);
 
   expect(logged[32], equals(4));
   expect(utf8.decode(logged.sublist(33, 37)), equals('TEST'));
