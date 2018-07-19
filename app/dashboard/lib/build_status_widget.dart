@@ -25,7 +25,7 @@ class BuildStatusWidget extends StatefulWidget {
 
 class _BuildStatusWidgetState extends State<BuildStatusWidget> {
   Timer _timer;
-  Size _size;
+  double _height;
 
   @override
   void initState() {
@@ -44,96 +44,94 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => new LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-        _size = constraints.biggest;
-        return new ScopedModelDescendant<BuildStatusModel>(
-          builder:
-              (BuildContext context, Widget child, BuildStatusModel model) {
-            final backgroundColor = _colorFromBuildStatus(model);
-            final hasError = model.errorMessage?.isNotEmpty ?? false;
-            final columnChildren = <Widget>[
-              new Text(
-                model.type,
-                textAlign: TextAlign.center,
-                style: hasError
-                    ? _getUnimportantStyle(backgroundColor)
-                        .copyWith(fontSize: _errorFontSize)
-                    : _getUnimportantStyle(backgroundColor),
-              ),
-              new Container(height: 4.0),
-              new Text(
-                model.name,
-                textAlign: TextAlign.center,
-                style: hasError
-                    ? _getImportantStyle(backgroundColor)
-                        .copyWith(fontSize: _errorFontSize)
-                    : _getImportantStyle(backgroundColor),
-              ),
-            ];
-            if (hasError) {
-              columnChildren.addAll(<Widget>[
-                new Container(height: 4.0),
-                new Text(
-                  model.errorMessage,
-                  textAlign: TextAlign.left,
-                  style: _errorStyle,
-                ),
-              ]);
-            }
+  Widget build(BuildContext context) {
+    return new ScopedModelDescendant<BuildStatusModel>(
+      builder: (BuildContext context, Widget child, BuildStatusModel model) {
+        _height = model.buildStatusSize.height;
+        final backgroundColor = _colorFromBuildStatus(model);
+        final hasError = model.errorMessage?.isNotEmpty ?? false;
+        final columnChildren = <Widget>[
+          new Text(
+            model.type,
+            textAlign: TextAlign.center,
+            style: hasError
+                ? _getUnimportantStyle(backgroundColor)
+                    .copyWith(fontSize: _errorFontSize)
+                : _getUnimportantStyle(backgroundColor),
+          ),
+          new Container(height: 4.0),
+          new Text(
+            model.name,
+            textAlign: TextAlign.center,
+            style: hasError
+                ? _getImportantStyle(backgroundColor)
+                    .copyWith(fontSize: _errorFontSize)
+                : _getImportantStyle(backgroundColor),
+          ),
+        ];
+        if (hasError) {
+          columnChildren.addAll(<Widget>[
+            new Container(height: 4.0),
+            new Text(
+              model.errorMessage,
+              textAlign: TextAlign.left,
+              style: _errorStyle,
+            ),
+          ]);
+        }
 
-            List<Widget> stackChildren = <Widget>[
-              new Center(
-                child: new Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: columnChildren,
-                ),
-              ),
-            ];
+        List<Widget> stackChildren = <Widget>[
+          new Center(
+            child: new Column(
+              mainAxisSize: MainAxisSize.min,
+              children: columnChildren,
+            ),
+          ),
+        ];
 
-            if (model.lastRefreshEnded == null) {
-              stackChildren.add(
-                new Align(
-                  alignment: FractionalOffset.bottomCenter,
-                  child: new Container(
-                    margin: const EdgeInsets.only(bottom: 8.0),
-                    width: 16.0,
-                    height: 16.0,
-                    child: const FuchsiaSpinner(),
-                  ),
-                ),
-              );
-            }
-
-            stackChildren.add(
-              new Align(
-                alignment: FractionalOffset.topLeft,
-                child: new Container(
-                  margin: const EdgeInsets.only(top: 8.0),
-                  child: new Text(
-                    _statusTextFromBuildStatus(model),
-                    style: _getStatusStyle(backgroundColor),
-                  ),
-                ),
+        if (model.lastRefreshEnded == null) {
+          stackChildren.add(
+            new Align(
+              alignment: FractionalOffset.bottomCenter,
+              child: new Container(
+                margin: const EdgeInsets.only(bottom: 8.0),
+                width: 16.0,
+                height: 16.0,
+                child: const FuchsiaSpinner(),
               ),
-            );
+            ),
+          );
+        }
 
-            return new Material(
-              color: backgroundColor,
-              child: new InkWell(
-                onTap: () => widget.onTap?.call(),
-                child: new Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: new Stack(
-                    fit: StackFit.passthrough,
-                    children: stackChildren,
-                  ),
-                ),
+        stackChildren.add(
+          new Align(
+            alignment: FractionalOffset.topLeft,
+            child: new Container(
+              margin: const EdgeInsets.only(top: 8.0),
+              child: new Text(
+                _statusTextFromBuildStatus(model),
+                style: _getStatusStyle(backgroundColor),
               ),
-            );
-          },
+            ),
+          ),
         );
-      });
+
+        return new Material(
+          color: backgroundColor,
+          child: new InkWell(
+            onTap: () => widget.onTap?.call(),
+            child: new Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: new Stack(
+                fit: StackFit.passthrough,
+                children: stackChildren,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   Color _colorFromBuildStatus(BuildStatusModel model) {
     if (model.buildResult == BuildResultEnum.success) {
@@ -167,9 +165,9 @@ class _BuildStatusWidgetState extends State<BuildStatusWidget> {
     return (brightness > 125) ? Colors.black : Colors.white;
   }
 
-  double get _fontSize => _size.height / 6.0;
-  double get _errorFontSize => _size.height / 10.0;
-  double get _statusFontSize => _size.height / 6.0;
+  double get _fontSize => _height / 6.0;
+  double get _errorFontSize => _height / 10.0;
+  double get _statusFontSize => _height / 6.0;
   TextStyle _getImportantStyle(Color backgroundColor) => new TextStyle(
         color: _getTextColor(backgroundColor),
         fontSize: _fontSize,

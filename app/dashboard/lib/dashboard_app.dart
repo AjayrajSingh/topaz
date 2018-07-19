@@ -10,7 +10,7 @@ import 'build_status_widget.dart';
 import 'info_text.dart';
 import 'service/build_service.dart';
 
-const Color _kFuchsiaColor = const Color(0xFFFF0080);
+const Color kFuchsiaColor = const Color(0xFFFF0080);
 
 /// Callback to launch a module that displays the [url].
 typedef OnLaunchUrl = void Function(String url);
@@ -41,14 +41,7 @@ class DashboardApp extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) => new LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) =>
-            constraints.maxHeight == 0.0 || constraints.maxWidth == 0.0
-                ? const Offstage()
-                : _buildWidget(context),
-      );
-
-  Widget _buildWidget(BuildContext context) {
+  Widget build(BuildContext context) {
     List<Widget> rows = <Widget>[];
 
     // Get the max number of children a row can have.
@@ -103,35 +96,31 @@ class DashboardApp extends StatelessWidget {
       ),
     );
 
-    return new MaterialApp(
-      title: 'Fuchsia Build Status',
-      theme: new ThemeData(primaryColor: _kFuchsiaColor),
-      home: new Container(
-        color: Colors.grey[200],
-        child: new Stack(children: <Widget>[
-          new Column(children: rows),
-          new Align(
-            alignment: FractionalOffset.bottomRight,
-            child: new Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                new Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 16.0,
-                    right: 16.0,
-                  ),
-                  child: new FloatingActionButton(
-                    backgroundColor: _kFuchsiaColor,
-                    onPressed: () => onRefresh?.call(),
-                    tooltip: 'Refresh',
-                    child: const Icon(Icons.refresh),
-                  ),
+    return new Container(
+      color: Colors.grey[200],
+      child: new Stack(children: <Widget>[
+        new Column(children: rows),
+        new Align(
+          alignment: FractionalOffset.bottomRight,
+          child: new Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              new Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 16.0,
+                  right: 16.0,
                 ),
-              ],
-            ),
+                child: new FloatingActionButton(
+                  backgroundColor: kFuchsiaColor,
+                  onPressed: () => onRefresh?.call(),
+                  tooltip: 'Refresh',
+                  child: const Icon(Icons.refresh),
+                ),
+              ),
+            ],
           ),
-        ]),
-      ),
+        ),
+      ]),
     );
   }
 }

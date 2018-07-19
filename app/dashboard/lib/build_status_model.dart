@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:lib.widgets.dart/model.dart';
@@ -17,6 +18,11 @@ final DateTime _kHalloween = new DateTime.utc(
   31,
   12,
 );
+
+Size _computeBuildStatusSize(int modelRowsCount) =>
+    ui.window.physicalSize /
+    ui.window.devicePixelRatio /
+    (modelRowsCount.toDouble() + 1);
 
 /// Manages a build status and associated metadata.
 class BuildStatusModel extends Model {
@@ -41,9 +47,17 @@ class BuildStatusModel extends Model {
   BuildResultEnum _buildResult;
   String _errorMessage;
 
+  Size buildStatusSize;
+
   /// Constructor.
-  BuildStatusModel({this.type, this.name, this.url, BuildService buildService})
-      : _buildService = buildService;
+  BuildStatusModel(
+      {this.type,
+      this.name,
+      this.url,
+      BuildService buildService,
+      int modelRowsCount})
+      : _buildService = buildService,
+        buildStatusSize = _computeBuildStatusSize(modelRowsCount);
 
   /// Returns the time when the status was refreshed.
   DateTime get lastRefreshed => _lastRefreshed;
@@ -103,7 +117,14 @@ class BuildStatusModel extends Model {
   /// Initiates a refresh of the build status.
   void refresh() {
     _fetchConfigStatus();
-    notifyListeners();
+  }
+
+  void onWindowMetricsChanged(int modelRowsCount) {
+    Size previousSize = buildStatusSize;
+    buildStatusSize = _computeBuildStatusSize(modelRowsCount);
+    if (buildStatusSize.height != previousSize.height) {
+      notifyListeners();
+    }
   }
 
   Future<Null> _fetchConfigStatus() async {

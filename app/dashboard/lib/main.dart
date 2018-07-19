@@ -13,6 +13,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.widgets.dart/model.dart';
+import 'package:lib.widgets/widgets.dart';
 
 import 'build_status_model.dart';
 import 'dashboard_app.dart';
@@ -185,6 +186,7 @@ void main() {
         name: config[1],
         url: config[0],
         buildService: buildService,
+        modelRowsCount: _buildStatusModels.length,
       )..start();
       categoryModels.add(buildStatusModel);
     }
@@ -202,14 +204,25 @@ void main() {
 
   runApp(
     MaterialApp(
-      home: new ScopedModel<DashboardModel>(
-        model: dashboardModel,
-        child: new DashboardApp(
-          buildService: buildService,
-          buildStatusModels: _buildStatusModels,
-          buildTimestamp: buildTimestamp,
-          onRefresh: onRefresh,
-          onLaunchUrl: dashboardModel.launchWebView,
+      title: 'Fuchsia Build Status',
+      theme: new ThemeData(primaryColor: kFuchsiaColor),
+      home: new WindowMediaQuery(
+        onWindowMetricsChanged: () {
+          _buildStatusModels
+              .expand((List<BuildStatusModel> models) => models)
+              // ignore: avoid_function_literals_in_foreach_calls
+              .forEach((BuildStatusModel model) =>
+                  model.onWindowMetricsChanged(_buildStatusModels.length));
+        },
+        child: new ScopedModel<DashboardModel>(
+          model: dashboardModel,
+          child: new DashboardApp(
+            buildService: buildService,
+            buildStatusModels: _buildStatusModels,
+            buildTimestamp: buildTimestamp,
+            onRefresh: onRefresh,
+            onLaunchUrl: dashboardModel.launchWebView,
+          ),
         ),
       ),
     ),
