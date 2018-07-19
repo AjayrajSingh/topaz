@@ -11,9 +11,7 @@ import 'package:fuchsia_remote_debug_protocol/fuchsia_remote_debug_protocol.dart
 import 'package:fuchsia_remote_debug_protocol/logging.dart';
 import 'package:test/test.dart';
 
-// Args are unused in this function, but it is currently required in order to
-// run tests on a Fuchsia device.
-void main(List<String> _unusedArgs) {
+void main() {
   group('driver example tests', () {
     FlutterDriver driver;
     FuchsiaRemoteConnection connection;
@@ -68,7 +66,4 @@ void main(List<String> _unusedArgs) {
       await driver.tap(textFinder);
     });
   });
-
-  // TODO(US-511): This fails to exit when run on the Fuchsia device. Behavior
-  // is normal on the host.
 }
