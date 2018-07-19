@@ -91,7 +91,15 @@ void Runner::StartComponent(
 }
 
 void Runner::OnApplicationTerminate(const Application* application) {
-  auto& active_application = active_applications_.at(application);
+  auto app = active_applications_.find(application);
+  if (app == active_applications_.end()) {
+    FXL_LOG(INFO) <<
+        "The remote end of the application runner tried to terminate an "
+        "application that has already been terminated, possibly because we "
+        "initiated the termination";
+    return;
+  }
+  auto& active_application = app->second;
 
   // Grab the items out of the entry because we will have to rethread the
   // destruction.
