@@ -19,6 +19,7 @@ flutter_aot_app("tictactoe_gameboard_mod") {
     "//topaz/examples/tictactoe/services:game_tracker_service",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/proposal/dart",
   ]
 }
 

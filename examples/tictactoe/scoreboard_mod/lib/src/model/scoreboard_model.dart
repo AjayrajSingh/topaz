@@ -7,7 +7,6 @@ class ScoreBoardModel extends Model {
   ScoreBoardModel();
 
   void setScore(int xScore, int oScore) {
-    print('Update score: $xScore, $oScore');
     _xScore = xScore;
     _oScore = oScore;
     notifyListeners();
