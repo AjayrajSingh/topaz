@@ -76,10 +76,10 @@ bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
     return false;
   }
 
-  auto interface = vk_->CreateSkiaInterface();
+  auto getProc = vk_->CreateSkiaGetProc();
 
-  if (interface == nullptr || !interface->validate(0)) {
-    FXL_LOG(ERROR) << "Skia interface invalid.";
+  if (getProc == nullptr) {
+    FXL_LOG(ERROR) << "Failed to create skia getProc.";
     return false;
   }
 
@@ -100,7 +100,7 @@ bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
       logical_device_->GetGraphicsQueueIndex();
   backend_context.fMinAPIVersion = application_->GetAPIVersion();
   backend_context.fFeatures = skia_features;
-  backend_context.fInterface.reset(interface.release());
+  backend_context.fGetProc = std::move(getProc);
   backend_context.fOwnsInstanceAndDevice = false;
 
   context_ = GrContext::MakeVulkan(backend_context);
