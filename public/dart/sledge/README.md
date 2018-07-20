@@ -6,6 +6,15 @@ functionalities including:
 * Primitives with automatic conflicts resolution strategies.
 * Ability to run efficient queries. (WIP)
 
+## Assumptions
+
+To speed up the implementation of Sledge, the following assumptions were made:
+
+* Only Sledge uses Ledger.
+* Only one Ledger instance is used per process.
+
+These assumptions will be fixed later on.
+
 ## User guide
 
 ### Creating a sledge instance
