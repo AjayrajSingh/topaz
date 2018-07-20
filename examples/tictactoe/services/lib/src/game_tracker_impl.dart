@@ -15,7 +15,9 @@ import 'package:tictactoe_common/common.dart';
 
 class GameTrackerImpl extends GameTracker {
   final ComponentContext _componentContext;
-  final Map<String, Future<fidl.MessageSenderProxy>> _messageQueues = {};
+  final Map<String, fidl.MessageSenderProxy> _messageQueues = {};
+  final Map<String, StreamSubscription> _xSubscriptions = {};
+  final Map<String, StreamSubscription> _oSubscriptions = {};
   // TODO(MS-1868) watch for score changes from sledge and put those changes
   // on the message queues.
   final Sledge _sledge;
@@ -52,14 +54,17 @@ class GameTrackerImpl extends GameTracker {
   }
 
   @override
-  void subscribeToScore(String queueToken) {
-    _messageQueues[queueToken] = _createMessageSenderProxy(queueToken);
+  void subscribeToScore(String queueToken) async {
+    _messageQueues[queueToken] = await _createMessageSenderProxy(queueToken);
+    _setupScoreListeners(queueToken);
     _sendScoreToQueue(queueToken);
   }
 
   @override
   void unsubscribeFromScore(String queueToken) {
     _messageQueues.remove(queueToken);
+    _xSubscriptions.remove(queueToken)?.cancel();
+    _oSubscriptions.remove(queueToken)?.cancel();
   }
 
   Future<Score> _getScore() async {
@@ -77,10 +82,33 @@ class GameTrackerImpl extends GameTracker {
     return score.future;
   }
 
+  void _setupScoreListeners(String queueToken) async {
+    await _sledge.runInTransaction(() async {
+      dynamic doc = await _sledge.getDocument(_sledgeDocumentId);
+      if (doc != null) {
+        // TODO: With the completion of LE-529, we should be able to listen to
+        // the whole document for changes rather than individual fields;
+        // however, curently we can only listen to individual fields for
+        // changes. The parameters to the listen functions on the individual
+        // fields provide the updated values for the individual updated fields,
+        // number of x or o wins. However, since on each update from ledger we
+        // need to put a complete score, x and o wins, on the message queue,
+        // we do a read of the complete score from ledger as part of
+        // [_sendScoreToQueue] rather that relying on the parameters to the
+        // listen functions.
+        _xSubscriptions[queueToken] =
+            doc.xScore.onChange.listen((_) => _sendScoreToQueue(queueToken));
+        _oSubscriptions[queueToken] =
+            doc.oScore.onChange.listen((_) => _sendScoreToQueue(queueToken));
+      }
+    });
+  }
+
   void _sendScoreToQueue(String queueToken) {
-    // TODO(MS-1858): Handle sending errors.
-    _getScore().then((score) => _messageQueues[queueToken]
-        .then((proxy) => proxy.send(_scoreCodec.encode(score))));
+    // TODO(MS-1858): Handle sending errors, including null a non-present
+    // message queue.
+    _getScore().then(
+        (score) => _messageQueues[queueToken].send(_scoreCodec.encode(score)));
   }
 
   Future<fidl.MessageSenderProxy> _createMessageSenderProxy(String queueToken) {
