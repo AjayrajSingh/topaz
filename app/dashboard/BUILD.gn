@@ -35,7 +35,6 @@ flutter_aot_app("dashboard") {
     "//third_party/dart-pkg/pub/buildbucket",
     "//third_party/dart-pkg/pub/html",
     "//third_party/dart-pkg/pub/http",
-    "//topaz/app/chat/services:services",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

@@ -1,9 +1,0 @@
-{
-    "packages": [
-        "//topaz/app/chat/agents/content_provider:chat_content_provider",
-        "//topaz/app/chat/modules/conversation_info:chat_conversation_info",
-        "//topaz/app/chat/modules/conversation_list:chat_conversation_list",
-        "//topaz/app/chat/modules/conversation:chat_conversation",
-        "//topaz/app/chat/agents/firebase_db_client"
-    ]
-}
