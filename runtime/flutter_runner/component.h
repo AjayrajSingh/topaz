@@ -22,7 +22,7 @@
 #include "lib/fxl/files/unique_fd.h"
 #include "lib/fxl/macros.h"
 #include "lib/svc/cpp/service_provider_bridge.h"
-#include "flutter/fml/thread.h"
+#include "topaz/lib/deprecated_loop/thread.h"
 #include "unique_fdio_ns.h"
 
 namespace flutter {
@@ -38,7 +38,7 @@ class Application final : public Engine::Delegate,
   // Creates a dedicated thread to run the application and constructions the
   // application on it. The application can be accessed only on this thread.
   // This is a synchronous operation.
-  static std::pair<std::unique_ptr<fml::Thread>,
+  static std::pair<std::unique_ptr<deprecated_loop::Thread>,
                    std::unique_ptr<Application>>
   Create(TerminationCallback termination_callback,
          fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,

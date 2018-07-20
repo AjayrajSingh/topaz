@@ -10,6 +10,10 @@ source_set("deprecated_loop") {
     "incoming_task_queue.h",
     "message_loop.cc",
     "message_loop.h",
+    "thread.cc",
+    "thread.h",
+    "waitable_event.h",
+    "waitable_event.cc",
   ]
   public_deps = [
     "//garnet/public/lib/fxl",
@@ -25,6 +29,7 @@ executable("deprecated_loop_unittests") {
   testonly = true
   sources = [
     "message_loop_unittest.cc",
+    "thread_unittest.cc",
   ]
 
   deps = [

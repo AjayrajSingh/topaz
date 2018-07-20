@@ -9,13 +9,13 @@
 #include <fuchsia/ui/views_v1_token/cpp/fidl.h>
 #include <zx/event.h>
 
-#include "flutter/fml/thread.h"
 #include "flutter/shell/common/shell.h"
 #include "isolate_configurator.h"
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
 #include "lib/ui/flutter/sdk_ext/src/natives.h"
+#include "topaz/lib/deprecated_loop/thread.h"
 
 namespace flutter {
 
@@ -48,8 +48,7 @@ class Engine final : public mozart::NativesDelegate {
   Delegate& delegate_;
   const std::string thread_label_;
   blink::Settings settings_;
-  // These threads will be joined in the destructor.
-  std::array<fml::Thread, 3> host_threads_;
+  std::array<deprecated_loop::Thread, 3> host_threads_;
   std::unique_ptr<IsolateConfigurator> isolate_configurator_;
   std::unique_ptr<shell::Shell> shell_;
   zx::event vsync_event_;

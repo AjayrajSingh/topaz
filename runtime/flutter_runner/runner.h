@@ -28,11 +28,11 @@ class Runner final : public fuchsia::sys::Runner {
 
  private:
   struct ActiveApplication {
-    std::unique_ptr<fml::Thread> thread;
+    std::unique_ptr<deprecated_loop::Thread> thread;
     std::unique_ptr<Application> application;
 
     ActiveApplication(
-        std::pair<std::unique_ptr<fml::Thread>, std::unique_ptr<Application>>
+        std::pair<std::unique_ptr<deprecated_loop::Thread>, std::unique_ptr<Application>>
             pair)
         : thread(std::move(pair.first)), application(std::move(pair.second)) {}
 

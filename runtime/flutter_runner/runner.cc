@@ -110,7 +110,7 @@ void Runner::OnApplicationTerminate(const Application* application) {
   active_applications_.erase(application);
 
   // Post the task to destroy the application and quit its message loop.
-  auto runner = application_destruction_thread->GetTaskRunner();
+  auto runner = application_destruction_thread->TaskRunner();
   runner->PostTask(fxl::MakeCopyable(
       [instance = std::move(application_to_destroy)]() mutable {
         instance.reset();
