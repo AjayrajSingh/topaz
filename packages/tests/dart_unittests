@@ -4,6 +4,7 @@
       "//topaz/app/contacts/agents/content_provider:contacts_content_provider_tests",
       "//topaz/app/documents/packages/utils:document_util_tests",
       "//topaz/app/xi/modules/xi_app:xi_app_tests",
+      "//topaz/bin/blackjack:blackjack_mod_test",
       "//topaz/examples/test/flutter_widget_test",
       "//topaz/examples/tictactoe/common:tictactoe_game_test",
       "//topaz/examples/tictactoe/gameboard_mod:tictactoe_gameboard_mod_test",
