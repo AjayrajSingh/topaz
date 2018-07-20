@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <memory>
+#include <unistd.h>
 #include <utility>
 
 #include "lib/fxl/files/directory.h"
@@ -13,7 +14,6 @@
 #include "lib/fxl/files/path.h"
 #include "lib/fxl/files/symlink.h"
 #include "lib/fxl/logging.h"
-#include "lib/fxl/portable_unistd.h"
 #include "lib/tonic/converter/dart_converter.h"
 #include "lib/tonic/parsers/packages_map.h"
 #include "lib/tonic/platform/platform_utils.h"
