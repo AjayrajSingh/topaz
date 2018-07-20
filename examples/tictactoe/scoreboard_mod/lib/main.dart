@@ -19,7 +19,8 @@ void main() {
   // The ModuleDriver is a dart-idomatic interfacer to the Fuchsia system.
   ModuleDriver moduleDriver = new ModuleDriver()
     ..start().then((_) => trace('module is ready')).catchError(
-        (e, t) => log.severe('Error starting module driver.', e, t));
+        (error, stackTrace) =>
+            log.severe('Error starting module driver.', error, stackTrace));
 
   ScoreBoardModel model = ScoreBoardModel();
   ScoreCodec scoreCodec = ScoreCodec();
@@ -30,7 +31,8 @@ void main() {
   // ignore: unused_local_variable
   Future<GameTrackerServiceClient> gameTrackerServiceClient =
       _createGameTrackerServiceClient(moduleDriver).catchError(
-    (e, t) => log.severe('Error constructing GameTrackerServiceClient.', e, t),
+    (error, stackTrace) => log.severe(
+        'Error constructing GameTrackerServiceClient.', error, stackTrace),
   );
 
   // Set up message queue to get score updates from.
@@ -46,7 +48,8 @@ void main() {
         },
       )
       .catchError(
-        (e, t) => log.severe('Error creating message queue', e, t),
+        (error, stackTrace) =>
+            log.severe('Error creating message queue', error, stackTrace),
       );
 
   // Subcribe to score updates.
@@ -54,13 +57,16 @@ void main() {
     (gameTrackerServiceClient) async {
       return gameTrackerServiceClient.subscribeToScore(await messageQueueToken);
     },
-  ).catchError((e, t) => log.severe('Error subscribing to score', e, t));
+  ).catchError((error, stackTrace) =>
+      log.severe('Error subscribing to score', error, stackTrace));
 
   // Terminate connection to tracker service when the mod terminates.
   moduleDriver.addOnTerminateHandler(
     () => gameTrackerServiceClient.then((gameTrackerServiceClient) async {
           gameTrackerServiceClient
-            ..unsubscribeFromScore(await messageQueueToken)
+            ..unsubscribeFromScore(await messageQueueToken).catchError((error,
+                    stackTrace) =>
+                log.severe('Error unsubscribing from score', error, stackTrace))
             ..terminate();
         }),
   );

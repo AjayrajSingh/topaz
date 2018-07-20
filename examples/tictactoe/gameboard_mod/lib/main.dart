@@ -26,14 +26,16 @@ void main() {
   // The ModuleDriver is a dart-idomatic interfacer to the Fuchsia system.
   ModuleDriver moduleDriver = new ModuleDriver()
     ..start().then((_) => trace('module is ready')).catchError(
-        (e, t) => log.severe('Error starting module driver.', e, t));
+        (error, stackTrace) =>
+            log.severe('Error starting module driver.', error, stackTrace));
 
   // A ServiceClient is a temporary construct for providing idiomatic,
   // async Dart APIs for clients of a FIDL service.  ServiceClients will be
   // removed when the new dart FIDL bindings are available.
   Future<GameTrackerServiceClient> gameTrackerServiceClient =
-      _createGameTrackerServiceClient(moduleDriver).catchError((e, t) =>
-          log.severe('Error constructing GameTrackerServiceClient.', e, t));
+      _createGameTrackerServiceClient(moduleDriver).catchError(
+          (error, stackTrace) => log.severe(
+              'Error constructing GameTrackerServiceClient.', error, stackTrace));
 
   TicTacToeModel model = new TicTacToeModel(
     winListener: (gameState) async =>
@@ -71,9 +73,11 @@ void _recordWinner(
   GameState gameState,
 ) {
   if (gameState == GameState.xWin) {
-    gameTrackerServiceClient.recordWin(Player.x);
+    gameTrackerServiceClient.recordWin(Player.x).catchError(
+        (error, stackTrace) => log.severe('Error recording win', error, stackTrace));
   } else if (gameState == GameState.oWin) {
-    gameTrackerServiceClient.recordWin(Player.o);
+    gameTrackerServiceClient.recordWin(Player.o).catchError(
+        (error, stackTrace) => log.severe('Error recording win', error, stackTrace));
   }
 }
 

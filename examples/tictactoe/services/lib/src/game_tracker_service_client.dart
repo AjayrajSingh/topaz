@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:fidl_fuchsia_tictactoe/fidl.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 
@@ -12,18 +14,32 @@ class GameTrackerServiceClient extends ServiceClient<GameTracker> {
     _proxy = super.proxy;
   }
 
-  void recordWin(Player player) {
-    // TODO(MS-1858): Handle errors from service.
-    _proxy.recordWin(player);
+  Future<void> recordWin(Player player) {
+    Completer completer = new Completer();
+    _proxy.recordWin(
+        player, (executeResult) => _complete(completer, executeResult));
+    return completer.future;
   }
 
-  void subscribeToScore(String queueToken) {
-    // TODO(MS-1858): Handle errors from service.
-    _proxy.subscribeToScore(queueToken);
+  Future<void> subscribeToScore(String queueToken) {
+    Completer completer = new Completer();
+    _proxy.subscribeToScore(
+        queueToken, (executeResult) => _complete(completer, executeResult));
+    return completer.future;
   }
 
-  void unsubscribeFromScore(String queueToken) {
-    // TODO(MS-1858): Handle errors from service.
-    _proxy.unsubscribeFromScore(queueToken);
+  Future<void> unsubscribeFromScore(String queueToken) {
+    Completer completer = new Completer();
+    _proxy.unsubscribeFromScore(
+        queueToken, (executeResult) => _complete(completer, executeResult));
+    return completer.future;
+  }
+
+  void _complete(Completer completer, ExecuteResult executeResult) {
+    if (executeResult.status == Status.ok) {
+      completer.complete(null);
+    } else {
+      completer.completeError(Exception(executeResult.errorMessage));
+    }
   }
 }
