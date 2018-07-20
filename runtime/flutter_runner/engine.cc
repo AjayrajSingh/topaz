@@ -14,7 +14,7 @@
 #include "lib/fxl/functional/make_copyable.h"
 #include "platform_view.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
-#include "topaz/lib/deprecated_loop/waitable_event.h"
+#include "flutter/fml/synchronization/waitable_event.h"
 
 namespace flutter {
 
@@ -51,12 +51,6 @@ Engine::Engine(
   if (zx::event::create(0, &vsync_event_) != ZX_OK) {
     FXL_DLOG(ERROR) << "Could not create the vsync event.";
     return;
-  }
-
-  // Launch the threads that will be used to run the shell. These threads will
-  // be joined in the destructor.
-  for (auto& thread : host_threads_) {
-    thread.Run();
   }
 
   fuchsia::ui::views_v1::ViewManagerPtr view_manager;
@@ -157,9 +151,9 @@ Engine::Engine(
   blink::TaskRunners task_runners(
       thread_label_,  // Dart thread labels
       deprecated_loop::MessageLoop::GetCurrent()->task_runner(),  // platform
-      host_threads_[0].TaskRunner(),                              // gpu
-      host_threads_[1].TaskRunner(),                              // ui
-      host_threads_[2].TaskRunner()                               // io
+      host_threads_[0].GetTaskRunner(),                              // gpu
+      host_threads_[1].GetTaskRunner(),                              // ui
+      host_threads_[2].GetTaskRunner()                               // io
   );
 
   UpdateNativeThreadLabelNames(thread_label_, task_runners);
@@ -268,7 +262,7 @@ Engine::Engine(
 Engine::~Engine() {
   shell_.reset();
   for (const auto& thread : host_threads_) {
-    thread.TaskRunner()->PostTask(
+    thread.GetTaskRunner()->PostTask(
         []() { deprecated_loop::MessageLoop::GetCurrent()->PostQuitTask(); });
   }
 }
@@ -278,7 +272,7 @@ std::pair<bool, uint32_t> Engine::GetEngineReturnCode() const {
   if (!shell_) {
     return code;
   }
-  deprecated_loop::AutoResetWaitableEvent latch;
+  fml::AutoResetWaitableEvent latch;
   fml::TaskRunner::RunNowOrPostTask(
       shell_->GetTaskRunners().GetUITaskRunner(),
       [&latch, &code, engine = shell_->GetEngine()]() {

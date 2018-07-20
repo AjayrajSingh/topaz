@@ -10,32 +10,31 @@
 
 #include <sstream>
 
+#include "flutter/fml/synchronization/waitable_event.h"
 #include "flutter/shell/common/switches.h"
 #include "lib/fsl/vmo/file.h"
 #include "lib/fsl/vmo/vector.h"
 #include "lib/fxl/command_line.h"
 #include "task_observers.h"
-#include "topaz/lib/deprecated_loop/waitable_event.h"
 
 namespace flutter {
 
-std::pair<std::unique_ptr<deprecated_loop::Thread>,
+std::pair<std::unique_ptr<fml::Thread>,
           std::unique_ptr<Application>>
 Application::Create(
     TerminationCallback termination_callback, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
     fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
-  auto thread = std::make_unique<deprecated_loop::Thread>();
+  auto thread = std::make_unique<fml::Thread>();
   std::unique_ptr<Application> application;
 
-  deprecated_loop::AutoResetWaitableEvent latch;
-  thread->TaskRunner()->PostTask([&]() mutable {
+  fml::AutoResetWaitableEvent latch;
+  thread->GetTaskRunner()->PostTask([&]() mutable {
     application.reset(
         new Application(std::move(termination_callback), std::move(package),
                         std::move(startup_info), std::move(controller)));
     latch.Signal();
   });
-  thread->Run();
   latch.Wait();
   return {std::move(thread), std::move(application)};
 }
