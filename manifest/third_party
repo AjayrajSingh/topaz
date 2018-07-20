@@ -56,7 +56,7 @@
              path="third_party/tonic"
              remote="https://fuchsia.googlesource.com/tonic"
              gerrithost="https://fuchsia-review.googlesource.com"
-             revision="311cdcca24443cdea4658ca32e09b5330973013d"/>
+             revision="e586d2975fedec0aa6c3ec87de287789172a0948"/>
     <project name="third_party/webkit"
              path="third_party/webkit"
              remote="https://fuchsia.googlesource.com/third_party/webkit"
