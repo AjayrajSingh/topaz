@@ -23,6 +23,7 @@ dart_test("blackjack_mod_test") {
   sources = [
     "test/deck_test.dart",
     "test/face_test.dart",
+    "test/hand_test.dart",
     "test/playing_card_test.dart",
     "test/suit_test.dart",
   ]
