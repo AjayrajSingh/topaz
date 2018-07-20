@@ -106,7 +106,11 @@ Application::Application(
   // final settings configuration. The next call will be to create a view
   // for this application.
 
+#ifndef SCENIC_VIEWS2
   service_provider_bridge_.AddService<fuchsia::ui::viewsv1::ViewProvider>(
+#else
+  service_provider_bridge_.AddService<fuchsia::ui::app::ViewProvider>(
+#endif
       std::bind(&Application::CreateShellForView, this, std::placeholders::_1));
 
   fuchsia::sys::ServiceProviderPtr outgoing_services;
@@ -322,15 +326,27 @@ void Application::OnEngineTerminate(const Engine* shell_holder) {
 }
 
 void Application::CreateShellForView(
+#ifndef SCENIC_VIEWS2
     fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider>
+#else
+    fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider>
+#endif
         view_provider_request) {
   shells_bindings_.AddBinding(this, std::move(view_provider_request));
 }
 
+#ifndef SCENIC_VIEWS2
 // |fuchsia::ui::viewsv1::ViewProvider|
 void Application::CreateView(
     fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>) {
+#else
+// |fuchsia::ui::app::ViewProvider|
+void Application::CreateView(
+    zx::eventpair view_token,
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> incoming_services,
+    fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> outgoing_services) {
+#endif
   if (!startup_context_) {
     FXL_DLOG(ERROR) << "Application context was invalid when attempting to "
                        "create a shell for a view provider request.";
@@ -338,13 +354,17 @@ void Application::CreateView(
   }
 
   shell_holders_.emplace(std::make_unique<Engine>(
-      *this,                                 // delegate
-      debug_label_,                          // thread label
-      *startup_context_,                     // application context
-      settings_,                             // settings
-      std::move(isolate_snapshot_),          // isolate snapshot
-      std::move(shared_snapshot_),           // shared snapshot
-      std::move(view_owner),                 // view owner
+      *this,                         // delegate
+      debug_label_,                  // thread label
+      *startup_context_,             // application context
+      settings_,                     // settings
+      std::move(isolate_snapshot_),  // isolate snapshot
+      std::move(shared_snapshot_),   // shared snapshot
+#ifndef SCENIC_VIEWS2
+      std::move(view_owner),  // view owner
+#else
+      std::move(view_token),  // view token
+#endif
       std::move(fdio_ns_),                   // FDIO namespace
       std::move(outgoing_services_request_)  // outgoing request
       ));

@@ -10,8 +10,12 @@
 #include <set>
 
 #include <fuchsia/sys/cpp/fidl.h>
+#ifndef SCENIC_VIEWS2
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/ui/viewsv1token/cpp/fidl.h>
+#else
+#include <fuchsia/ui/app/cpp/fidl.h>
+#endif
 #include <lib/fit/function.h>
 
 #include "engine.h"
@@ -31,7 +35,11 @@ namespace flutter {
 // Flutter engine instances.
 class Application final : public Engine::Delegate,
                           public fuchsia::sys::ComponentController,
+#ifndef SCENIC_VIEWS2
                           public fuchsia::ui::viewsv1::ViewProvider {
+#else
+                          private fuchsia::ui::app::ViewProvider {
+#endif
  public:
   using TerminationCallback = fit::function<void(const Application*)>;
 
@@ -62,7 +70,11 @@ class Application final : public Engine::Delegate,
       outgoing_services_request_;
   component::ServiceProviderBridge service_provider_bridge_;
   std::unique_ptr<component::StartupContext> startup_context_;
+#ifndef SCENIC_VIEWS2
   fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider> shells_bindings_;
+#else
+  fidl::BindingSet<fuchsia::ui::app::ViewProvider> shells_bindings_;
+#endif
   fxl::RefPtr<blink::DartSnapshot> isolate_snapshot_;
   fxl::RefPtr<blink::DartSnapshot> shared_snapshot_;
   std::set<std::unique_ptr<Engine>> shell_holders_;
@@ -83,17 +95,31 @@ class Application final : public Engine::Delegate,
   // |fuchsia::sys::ComponentController|
   void Wait(WaitCallback callback) override;
 
+#ifndef SCENIC_VIEWS2
   // |fuchsia::ui::viewsv1::ViewProvider|
   void CreateView(
       fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> services) override;
+#else
+  // |fuchsia::ui::app::ViewProvider|
+  void CreateView(
+      zx::eventpair view_token,
+      fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> incoming_services,
+      fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> outgoing_services)
+      override;
+#endif
 
   // |flutter::Engine::Delegate|
   void OnEngineTerminate(const Engine* holder) override;
 
+#ifndef SCENIC_VIEWS2
   void CreateShellForView(
       fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider>
           view_provider_request);
+#else
+  void CreateShellForView(fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider>
+                              view_provider_request);
+#endif
 
   void AttemptVMLaunchWithCurrentSettings(const blink::Settings& settings);
 

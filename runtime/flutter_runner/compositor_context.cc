@@ -54,14 +54,34 @@ class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
 
 CompositorContext::CompositorContext(
     fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic,
+#ifndef SCENIC_VIEWS2
     std::string debug_label, zx::eventpair import_token,
     OnMetricsUpdate session_metrics_did_change_callback,
+#else
+    fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session,
+    zx::eventpair view_token, std::string debug_label,
+#endif
     fit::closure session_error_callback, zx_handle_t vsync_event_handle)
     : debug_label_(std::move(debug_label)),
+#ifndef SCENIC_VIEWS2
       session_connection_(
           std::move(scenic), debug_label_, std::move(import_token),
           std::move(session_metrics_did_change_callback),
-          std::move(session_error_callback), vsync_event_handle) {}
+          std::move(session_error_callback), vsync_event_handle) {
+}
+#else
+      session_connection_(
+          std::move(scenic), std::move(session), std::move(view_token),
+          debug_label_, std::move(session_error_callback), vsync_event_handle) {
+}
+#endif
+
+#ifdef SCENIC_VIEWS2
+void CompositorContext::OnSessionMetricsDidChange(
+    const fuchsia::ui::gfx::Metrics& metrics) {
+  session_connection_.set_metrics(metrics);
+}
+#endif
 
 CompositorContext::~CompositorContext() = default;
 

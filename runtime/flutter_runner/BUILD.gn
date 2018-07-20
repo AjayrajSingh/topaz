@@ -6,6 +6,7 @@ assert(is_fuchsia)
 
 import("//build/vulkan/config.gni")
 import("$flutter_root/shell/gpu/gpu.gni")
+import("//garnet/bin/ui/scenic/config.gni")
 
 shell_gpu_configuration("fuchsia_gpu_configuration") {
   enable_software = false
@@ -118,7 +119,6 @@ template("flutter_runner") {
              "//garnet/public/lib/svc/cpp",
              "//garnet/public/fidl/fuchsia.ui.input",
              "//garnet/public/lib/ui/scenic/cpp",
-             "//garnet/public/fidl/fuchsia.ui.viewsv1",
              "//garnet/public/lib/vulkan",
              "//peridot/public/fidl/fuchsia.modular",
              "//third_party/rapidjson",
@@ -131,6 +131,13 @@ template("flutter_runner") {
              "//third_party/zlib:minizip",
              "//zircon/public/lib/trace-provider",
            ] + extra_deps + flutter_deps
+
+    if (scenic_use_views2) {
+      defines += [ "SCENIC_VIEWS2" ]
+      deps += [ "//garnet/public/fidl/fuchsia.ui.app" ]
+    } else {
+      deps += [ "//garnet/public/fidl/fuchsia.ui.viewsv1" ]
+    }
 
     # The flags below are needed so that Dart's CPU profiler can walk the
     # C++ stack.

@@ -16,15 +16,21 @@ namespace flutter {
 
 IsolateConfigurator::IsolateConfigurator(
     UniqueFDIONS fdio_ns,
+#ifndef SCENIC_VIEWS2
     fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer> view_container,
-    fidl::InterfaceHandle<fuchsia::sys::Environment>
-        environment,
+    fidl::InterfaceHandle<fuchsia::sys::Environment> environment,
+#else
+    fidl::InterfaceHandle<fuchsia::sys::Environment> environment,
+#endif
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
         outgoing_services_request)
     : fdio_ns_(std::move(fdio_ns)),
+#ifndef SCENIC_VIEWS2
       view_container_(std::move(view_container)),
+#endif
       environment_(std::move(environment)),
-      outgoing_services_request_(std::move(outgoing_services_request)) {}
+      outgoing_services_request_(std::move(outgoing_services_request)) {
+}
 
 IsolateConfigurator::~IsolateConfigurator() = default;
 
@@ -104,11 +110,15 @@ void IsolateConfigurator::BindScenic(
       tonic::ToDart("_context"),  //
       tonic::DartConverter<uint64_t>::ToDart(reinterpret_cast<intptr_t>(
           static_cast<mozart::NativesDelegate*>(natives_delegate)))));
+#ifndef SCENIC_VIEWS2
   DART_CHECK_VALID(
       Dart_SetField(mozart_internal,                  //
                     tonic::ToDart("_viewContainer"),  //
                     tonic::ToDart(zircon::dart::Handle::Create(
                         view_container_.TakeChannel().release()))));
+#else
+  // TODO(SCN-840): Remove remaining references to _viewContainer.
+#endif
 }
 
 }  // namespace flutter

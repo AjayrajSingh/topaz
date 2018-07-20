@@ -13,26 +13,52 @@ namespace flutter {
 
 SessionConnection::SessionConnection(
     fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic_handle,
+#ifndef SCENIC_VIEWS2
     std::string debug_label, zx::eventpair import_token,
     OnMetricsUpdate session_metrics_did_change_callback,
     fit::closure session_error_callback, zx_handle_t vsync_event_handle)
+#else
+    fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session,
+    zx::eventpair view_token, std::string debug_label,
+    fit::closure session_error_callback, zx_handle_t vsync_event_handle)
+#endif
     : debug_label_(std::move(debug_label)),
       scenic_(scenic_handle.Bind()),
-      session_(scenic_.get()),
-      root_node_(&session_),
-      surface_producer_(std::make_unique<VulkanSurfaceProducer>(&session_)),
-      scene_update_context_(&session_, surface_producer_.get()),
+#ifndef SCENIC_VIEWS2
+      session_wrapper_(scenic_.get()),
+#else
+      session_wrapper_(session.Bind(), nullptr),
+      root_view_(&session_wrapper_, std::move(view_token), debug_label),
+#endif
+      root_node_(&session_wrapper_),
+      surface_producer_(
+          std::make_unique<VulkanSurfaceProducer>(&session_wrapper_)),
+      scene_update_context_(&session_wrapper_, surface_producer_.get()),
+#ifndef SCENIC_VIEWS2
       metrics_changed_callback_(std::move(session_metrics_did_change_callback)),
+#endif
       vsync_event_handle_(vsync_event_handle) {
-  session_.set_error_handler(
+#ifndef SCENIC_VIEWS2
+  session_wrapper_.set_error_handler(
       fxl::MakeCopyable(std::move(session_error_callback)));
-  session_.set_event_handler(std::bind(&SessionConnection::OnSessionEvents,
-                                       this, std::placeholders::_1));
+  session_wrapper_.set_event_handler(std::bind(
+      &SessionConnection::OnSessionEvents, this, std::placeholders::_1));
+#else
+  session_wrapper_.set_error_handler(std::move(session_error_callback));
+#endif
 
+#ifndef SCENIC_VIEWS2
   root_node_.Bind(std::move(import_token));
+#else
+  root_view_.AddChild(root_node_);
+#endif
   root_node_.SetEventMask(fuchsia::ui::gfx::kMetricsEventMask);
 
-  // Signal is initially high inidicating availability of the session.
+#ifdef SCENIC_VIEWS2
+  // TODO: move this into BaseView or ChildView
+  root_node_.SetTranslation(0.f, 0.f, 0.1f);
+#endif
+  // Signal is initially high indicating availability of the session.
   ToggleSignal(vsync_event_handle_, true);
 
   PresentSession();
@@ -40,6 +66,7 @@ SessionConnection::SessionConnection(
 
 SessionConnection::~SessionConnection() = default;
 
+#ifndef SCENIC_VIEWS2
 void SessionConnection::OnSessionEvents(
     fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
   using Type = fuchsia::ui::gfx::Event::Tag;
@@ -69,6 +96,7 @@ void SessionConnection::OnSessionEvents(
   }
 }
 
+#endif
 void SessionConnection::Present(flow::CompositorContext::ScopedFrame& frame) {
   // Flush all session ops. Paint tasks have not yet executed but those are
   // fenced. The compositor can start processing ops while we finalize paint
@@ -90,15 +118,15 @@ void SessionConnection::Present(flow::CompositorContext::ScopedFrame& frame) {
 void SessionConnection::EnqueueClearOps() {
   // We are going to be sending down a fresh node hierarchy every frame. So just
   // enqueue a detach op on the imported root node.
-  session_.Enqueue(scenic::NewDetachChildrenCmd(root_node_.id()));
+  session_wrapper_.Enqueue(scenic::NewDetachChildrenCmd(root_node_.id()));
 }
 
 void SessionConnection::PresentSession() {
   ToggleSignal(vsync_event_handle_, false);
-  session_.Present(0,  // presentation_time. (placeholder).
-                   [handle = vsync_event_handle_](auto) {
-                     ToggleSignal(handle, true);
-                   }  // callback
+  session_wrapper_.Present(0,  // presentation_time. (placeholder).
+                           [handle = vsync_event_handle_](auto) {
+                             ToggleSignal(handle, true);
+                           }  // callback
   );
 }
 

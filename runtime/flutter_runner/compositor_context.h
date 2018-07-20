@@ -19,13 +19,21 @@ namespace flutter {
 class CompositorContext final : public flow::CompositorContext {
  public:
   CompositorContext(fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic,
+#ifndef SCENIC_VIEWS2
                     std::string debug_label, zx::eventpair import_token,
                     OnMetricsUpdate session_metrics_did_change_callback,
+#else
+                    fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session,
+                    zx::eventpair view_token, std::string debug_label,
+#endif
                     fit::closure session_error_callback,
                     zx_handle_t vsync_event_handle);
 
   ~CompositorContext() override;
 
+#ifdef SCENIC_VIEWS2
+  void OnSessionMetricsDidChange(const fuchsia::ui::gfx::Metrics& metrics);
+#endif
  private:
   const std::string debug_label_;
   SessionConnection session_connection_;

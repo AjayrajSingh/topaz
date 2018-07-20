@@ -5,8 +5,10 @@
 #ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_
 #define TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_
 
+#ifndef SCENIC_VIEWS2
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/ui/viewsv1token/cpp/fidl.h>
+#endif
 #include <zx/event.h>
 
 #include "flutter/shell/common/shell.h"
@@ -19,8 +21,8 @@
 
 namespace flutter {
 
-// Represents an instance of running Flutter engine along with the threads that
-// host the same.
+// Represents an instance of running Flutter engine along with the threads
+// that host the same.
 class Engine final : public mozart::NativesDelegate {
  public:
   class Delegate {
@@ -28,6 +30,7 @@ class Engine final : public mozart::NativesDelegate {
     virtual void OnEngineTerminate(const Engine* holder) = 0;
   };
 
+#ifndef SCENIC_VIEWS2
   Engine(
       Delegate& delegate, std::string thread_label,
       component::StartupContext& startup_context, blink::Settings settings,
@@ -37,6 +40,15 @@ class Engine final : public mozart::NativesDelegate {
       UniqueFDIONS fdio_ns,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
           outgoing_services_request);
+#else
+  Engine(Delegate& delegate, std::string thread_label,
+         component::StartupContext& startup_context, blink::Settings settings,
+         fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
+         fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
+         zx::eventpair view_token, UniqueFDIONS fdio_ns,
+         fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
+             outgoing_services_request);
+#endif
 
   ~Engine();
 
@@ -60,7 +72,11 @@ class Engine final : public mozart::NativesDelegate {
 
   void Terminate();
 
+#ifndef SCENIC_VIEWS2
   void OnSessionMetricsDidChange(double device_pixel_ratio);
+#else
+  void OnSessionMetricsDidChange(const fuchsia::ui::gfx::Metrics& metrics);
+#endif
 
   // |mozart::NativesDelegate|
   void OfferServiceProvider(

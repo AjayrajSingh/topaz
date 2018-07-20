@@ -10,8 +10,10 @@
 
 #include <fuchsia/modular/cpp/fidl.h>
 #include <fuchsia/ui/input/cpp/fidl.h>
+#ifndef SCENIC_VIEWS2
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/ui/viewsv1token/cpp/fidl.h>
+#endif
 #include <lib/fit/function.h>
 
 #include "accessibility_bridge.h"
@@ -25,11 +27,20 @@ namespace flutter {
 
 // The per engine component residing on the platform thread is responsible for
 // all platform specific integrations.
+//
+// The PlatformView implements SessionListener and gets Session events but it
+// does *not* actually own the Session itself; that is owned by the Compositor
+// thread.
 class PlatformView final : public shell::PlatformView,
+#ifndef SCENIC_VIEWS2
                            public fuchsia::ui::viewsv1::ViewListener,
+#else
+                           private fuchsia::ui::scenic::SessionListener,
+#endif
                            public fuchsia::ui::input::InputMethodEditorClient,
                            public fuchsia::ui::input::InputListener {
  public:
+#ifndef SCENIC_VIEWS2
   PlatformView(
       PlatformView::Delegate& delegate, std::string debug_label,
       blink::TaskRunners task_runners,
@@ -41,25 +52,54 @@ class PlatformView final : public shell::PlatformView,
       fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
           accessibility_context_writer,
       zx_handle_t vsync_event_handle);
+#else
+  PlatformView(PlatformView::Delegate& delegate, std::string debug_label,
+               blink::TaskRunners task_runners,
+               fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
+                   parent_environment_service_provider,
+               fidl::InterfaceRequest<fuchsia::ui::scenic::SessionListener>
+                   session_listener,
+               fit::closure on_session_listener_error_callback,
+               OnMetricsUpdate session_metrics_did_change_callback,
+               fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
+                   accessibility_context_writer,
+               zx_handle_t vsync_event_handle);
+#endif
 
   ~PlatformView();
 
+#ifndef SCENIC_VIEWS2
   void UpdateViewportMetrics(double pixel_ratio);
+#endif
 
   fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer>
   TakeViewContainer();
 
+#ifndef SCENIC_VIEWS2
   void OfferServiceProvider(
       fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
       fidl::VectorPtr<fidl::StringPtr> services);
+#endif
 
  private:
   const std::string debug_label_;
+#ifndef SCENIC_VIEWS2
   fuchsia::ui::viewsv1::ViewManagerPtr view_manager_;
   fuchsia::ui::viewsv1::ViewPtr view_;
   fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer> view_container_;
+#else
+
+  fidl::Binding<fuchsia::ui::scenic::SessionListener> session_listener_binding_;
+  fit::closure session_listener_error_callback_;
+  OnMetricsUpdate metrics_changed_callback_;
+
+#endif
   fuchsia::sys::ServiceProviderPtr service_provider_;
+#ifndef SCENIC_VIEWS2
   fidl::Binding<fuchsia::ui::viewsv1::ViewListener> view_listener_;
+#else
+
+#endif
   fuchsia::ui::input::InputConnectionPtr input_connection_;
   fidl::Binding<fuchsia::ui::input::InputListener> input_listener_;
   int current_text_input_client_ = 0;
@@ -70,6 +110,11 @@ class PlatformView final : public shell::PlatformView,
   AccessibilityBridge accessibility_bridge_;
   std::unique_ptr<Surface> surface_;
   blink::LogicalMetrics metrics_;
+#ifdef SCENIC_VIEWS2
+
+  fuchsia::ui::gfx::Metrics scenic_metrics_;
+
+#endif
   std::set<int> down_pointers_;
   std::map<
       std::string /* channel */,
@@ -80,13 +125,23 @@ class PlatformView final : public shell::PlatformView,
 
   void RegisterPlatformMessageHandlers();
 
+#ifndef SCENIC_VIEWS2
   void UpdateViewportMetrics(const fuchsia::ui::viewsv1::ViewLayout& layout);
+#else
+  void UpdateViewportMetrics(const fuchsia::ui::gfx::Metrics& metrics);
+#endif
 
   void FlushViewportMetrics();
 
+#ifndef SCENIC_VIEWS2
   // |fuchsia::ui::viewsv1::ViewListener|
   void OnPropertiesChanged(fuchsia::ui::viewsv1::ViewProperties properties,
                            OnPropertiesChangedCallback callback) override;
+#else
+  // Called when the view's properties have changed.
+  void OnPropertiesChanged(
+      const fuchsia::ui::gfx::ViewProperties& view_properties);
+#endif
 
   // |fuchsia::ui::input::InputMethodEditorClient|
   void DidUpdateState(
@@ -100,6 +155,12 @@ class PlatformView final : public shell::PlatformView,
   void OnEvent(fuchsia::ui::input::InputEvent event,
                OnEventCallback callback) override;
 
+#ifdef SCENIC_VIEWS2
+  // |fuchsia::ui::scenic::SessionListener|
+  void OnError(fidl::StringPtr error) override;
+  void OnEvent(fidl::VectorPtr<fuchsia::ui::scenic::Event> events) override;
+
+#endif
   bool OnHandlePointerEvent(const fuchsia::ui::input::PointerEvent& pointer);
 
   bool OnHandleKeyboardEvent(const fuchsia::ui::input::KeyboardEvent& keyboard);

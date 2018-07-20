@@ -10,6 +10,9 @@
 
 #include "flutter/lib/ui/window/pointer_data.h"
 #include "lib/component/cpp/connect.h"
+#ifdef SCENIC_VIEWS2
+#include "lib/ui/scenic/cpp/fidl_math.h"
+#endif
 #include "third_party/rapidjson/rapidjson/document.h"
 #include "third_party/rapidjson/rapidjson/stringbuffer.h"
 #include "third_party/rapidjson/rapidjson/writer.h"
@@ -21,6 +24,7 @@ constexpr char kFlutterPlatformChannel[] = "flutter/platform";
 constexpr char kTextInputChannel[] = "flutter/textinput";
 constexpr char kKeyEventChannel[] = "flutter/keyevent";
 
+// FL(77): Terminate engine if Fuchsia system FIDL connections have error.
 template <class T>
 void SetInterfaceErrorHandler(fidl::InterfacePtr<T>& interface,
                               std::string name) {
@@ -33,24 +37,44 @@ PlatformView::PlatformView(
     blink::TaskRunners task_runners,
     fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
         parent_environment_service_provider_handle,
-    fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewManager> view_manager_handle,
+#ifndef SCENIC_VIEWS2
+    fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewManager>
+        view_manager_handle,
     fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
     zx::eventpair export_token,
+#else
+    fidl::InterfaceRequest<fuchsia::ui::scenic::SessionListener>
+        session_listener_request,
+    fit::closure session_listener_error_callback,
+    OnMetricsUpdate session_metrics_did_change_callback,
+#endif
     fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
         accessibility_context_writer,
     zx_handle_t vsync_event_handle)
     : shell::PlatformView(delegate, std::move(task_runners)),
       debug_label_(std::move(debug_label)),
+#ifndef SCENIC_VIEWS2
       view_manager_(view_manager_handle.Bind()),
       view_listener_(this),
+#else
+      session_listener_binding_(this, std::move(session_listener_request)),
+      session_listener_error_callback_(
+          std::move(session_listener_error_callback)),
+      metrics_changed_callback_(std::move(session_metrics_did_change_callback)),
+#endif
       input_listener_(this),
       ime_client_(this),
       accessibility_bridge_(std::move(accessibility_context_writer)),
       surface_(std::make_unique<Surface>(debug_label_)),
       vsync_event_handle_(vsync_event_handle) {
   // Register all error handlers.
+#ifndef SCENIC_VIEWS2
   SetInterfaceErrorHandler(view_manager_, "View Manager");
   SetInterfaceErrorHandler(view_, "View");
+#else
+  session_listener_binding_.set_error_handler(
+      []() { FXL_LOG(ERROR) << "Interface error on: Session Listener"; });
+#endif
   SetInterfaceErrorHandler(input_connection_, "Input Connection");
   SetInterfaceErrorHandler(ime_, "Input Method Editor");
   SetInterfaceErrorHandler(clipboard_, "Clipboard");
@@ -58,6 +82,7 @@ PlatformView::PlatformView(
   SetInterfaceErrorHandler(parent_environment_service_provider_,
                            "Parent Environment Service Provider");
 
+#ifndef SCENIC_VIEWS2
   // Create the view.
   view_manager_->CreateView(view_.NewRequest(),           // view
                             std::move(view_owner),        // view owner
@@ -69,11 +94,13 @@ PlatformView::PlatformView(
   // Get the services from the created view.
   view_->GetServiceProvider(service_provider_.NewRequest());
 
-  // Get the view conatiner. This will need to be returned to the isolate
+  // Get the view container. This will need to be returned to the isolate
   // configurator so that it can setup Mozart bindings later.
   view_->GetContainer(view_container_.NewRequest());
 
+#endif
   // Get the input connection from the services of the view.
+  // SCN(840): Get input wired up with view2.
   component::ConnectToService(service_provider_.get(),
                               input_connection_.NewRequest());
 
@@ -92,12 +119,14 @@ PlatformView::PlatformView(
 
 PlatformView::~PlatformView() = default;
 
+#ifndef SCENIC_VIEWS2
 void PlatformView::OfferServiceProvider(
     fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
     fidl::VectorPtr<fidl::StringPtr> services) {
   view_->OfferServiceProvider(std::move(service_provider), std::move(services));
 }
 
+#endif
 void PlatformView::RegisterPlatformMessageHandlers() {
   platform_message_handlers_[kFlutterPlatformChannel] =
       std::bind(&PlatformView::HandleFlutterPlatformChannelPlatformMessage,  //
@@ -109,21 +138,47 @@ void PlatformView::RegisterPlatformMessageHandlers() {
                 std::placeholders::_1);
 }
 
+#ifndef SCENIC_VIEWS2
 fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer>
 PlatformView::TakeViewContainer() {
   return std::move(view_container_);
 }
+#endif
 
+#ifndef SCENIC_VIEWS2
 // |fuchsia::ui::viewsv1::ViewListener|
-void PlatformView::OnPropertiesChanged(fuchsia::ui::viewsv1::ViewProperties properties,
-                                       OnPropertiesChangedCallback callback) {
+void PlatformView::OnPropertiesChanged(
+    fuchsia::ui::viewsv1::ViewProperties properties,
+    OnPropertiesChangedCallback callback) {
   if (properties.view_layout) {
     UpdateViewportMetrics(*properties.view_layout);
   }
   callback();
 }
+#else
 
-void PlatformView::UpdateViewportMetrics(const fuchsia::ui::viewsv1::ViewLayout& layout) {
+void PlatformView::OnPropertiesChanged(
+    const fuchsia::ui::gfx::ViewProperties& view_properties) {
+  fuchsia::ui::gfx::BoundingBox layout_box =
+      scenic::ViewPropertiesLayoutBox(view_properties);
+
+  fuchsia::ui::gfx::vec3 logical_size =
+      scenic::Max(layout_box.max - layout_box.min, 0.f);
+
+  metrics_.size.width = logical_size.x;
+  metrics_.size.height = logical_size.y;
+  metrics_.padding.left = view_properties.inset_from_min.x;
+  metrics_.padding.top = view_properties.inset_from_min.y;
+  metrics_.padding.right = view_properties.inset_from_max.x;
+  metrics_.padding.bottom = view_properties.inset_from_max.y;
+
+  FlushViewportMetrics();
+}
+#endif
+
+#ifndef SCENIC_VIEWS2
+void PlatformView::UpdateViewportMetrics(
+    const fuchsia::ui::viewsv1::ViewLayout& layout) {
   metrics_.size.width = layout.size.width;
   metrics_.size.height = layout.size.height;
   metrics_.padding.left = layout.inset.left;
@@ -133,9 +188,16 @@ void PlatformView::UpdateViewportMetrics(const fuchsia::ui::viewsv1::ViewLayout&
 
   FlushViewportMetrics();
 }
+#endif
 
+#ifndef SCENIC_VIEWS2
 void PlatformView::UpdateViewportMetrics(double pixel_ratio) {
   metrics_.scale = pixel_ratio;
+#else
+void PlatformView::UpdateViewportMetrics(
+    const fuchsia::ui::gfx::Metrics& metrics) {
+  metrics_.scale = metrics.scale_x;
+#endif
 
   FlushViewportMetrics();
 }
@@ -163,8 +225,9 @@ void PlatformView::FlushViewportMetrics() {
 }
 
 // |fuchsia::ui::input::InputMethodEditorClient|
-void PlatformView::DidUpdateState(fuchsia::ui::input::TextInputState state,
-                                  std::unique_ptr<fuchsia::ui::input::InputEvent>) {
+void PlatformView::DidUpdateState(
+    fuchsia::ui::input::TextInputState state,
+    std::unique_ptr<fuchsia::ui::input::InputEvent>) {
   rapidjson::Document document;
   auto& allocator = document.GetAllocator();
   rapidjson::Value encoded_state(rapidjson::kObjectType);
@@ -238,7 +301,8 @@ void PlatformView::OnAction(fuchsia::ui::input::InputMethodAction action) {
 }
 
 // |fuchsia::ui::input::InputListener|
-void PlatformView::OnEvent(fuchsia::ui::input::InputEvent event, OnEventCallback callback) {
+void PlatformView::OnEvent(fuchsia::ui::input::InputEvent event,
+                           OnEventCallback callback) {
   using Type = fuchsia::ui::input::InputEvent::Tag;
   switch (event.Which()) {
     case Type::kPointer:
@@ -257,6 +321,45 @@ void PlatformView::OnEvent(fuchsia::ui::input::InputEvent event, OnEventCallback
   callback(false);
 }
 
+#ifdef SCENIC_VIEWS2
+void PlatformView::OnError(fidl::StringPtr error) {
+  FXL_LOG(ERROR) << "Session error: " << error;
+  session_listener_error_callback_();
+}
+
+void PlatformView::OnEvent(fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
+  for (const auto& event : *events) {
+    switch (event.Which()) {
+      case fuchsia::ui::scenic::Event::Tag::kGfx:
+        switch (event.gfx().Which()) {
+          case fuchsia::ui::gfx::Event::Tag::kMetrics: {
+            if (event.gfx().metrics().metrics != scenic_metrics_) {
+              scenic_metrics_ = std::move(event.gfx().metrics().metrics);
+              metrics_changed_callback_(scenic_metrics_);
+              UpdateViewportMetrics(scenic_metrics_);
+            }
+            break;
+          }
+          case fuchsia::ui::gfx::Event::Tag::kViewPropertiesChanged: {
+            OnPropertiesChanged(
+                std::move(event.gfx().view_properties_changed().properties));
+            break;
+          }
+          default: {
+            FXL_LOG(WARNING)
+                << "Flutter PlatformView::OnEvent: unhandled Scenic Gfx event.";
+          }
+        }
+        break;
+      default: {
+        FXL_LOG(WARNING)
+            << "Flutter PlatformView::OnEvent: unhandled Scenic event.";
+      }
+    }
+  }
+}
+
+#endif
 static blink::PointerData::Change GetChangeFromPointerEventPhase(
     fuchsia::ui::input::PointerEventPhase phase) {
   switch (phase) {
@@ -291,7 +394,8 @@ static blink::PointerData::DeviceKind GetKindFromPointerType(
   }
 }
 
-bool PlatformView::OnHandlePointerEvent(const fuchsia::ui::input::PointerEvent& pointer) {
+bool PlatformView::OnHandlePointerEvent(
+    const fuchsia::ui::input::PointerEvent& pointer) {
   blink::PointerData pointer_data;
   pointer_data.time_stamp = pointer.event_time / 1000;
   pointer_data.change = GetChangeFromPointerEventPhase(pointer.phase);
@@ -338,13 +442,15 @@ bool PlatformView::OnHandlePointerEvent(const fuchsia::ui::input::PointerEvent& 
   return true;
 }
 
-bool PlatformView::OnHandleKeyboardEvent(const fuchsia::ui::input::KeyboardEvent& keyboard) {
+bool PlatformView::OnHandleKeyboardEvent(
+    const fuchsia::ui::input::KeyboardEvent& keyboard) {
   const char* type = nullptr;
   if (keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::PRESSED) {
     type = "keydown";
   } else if (keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::REPEAT) {
     type = "keydown";  // TODO change this to keyrepeat
-  } else if (keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::RELEASED) {
+  } else if (keyboard.phase ==
+             fuchsia::ui::input::KeyboardEventPhase::RELEASED) {
     type = "keyup";
   }
 
@@ -375,7 +481,8 @@ bool PlatformView::OnHandleKeyboardEvent(const fuchsia::ui::input::KeyboardEvent
   return true;
 }
 
-bool PlatformView::OnHandleFocusEvent(const fuchsia::ui::input::FocusEvent& focus) {
+bool PlatformView::OnHandleFocusEvent(
+    const fuchsia::ui::input::FocusEvent& focus) {
   if (!focus.focused && current_text_input_client_ != 0) {
     current_text_input_client_ = 0;
     if (ime_) {
@@ -516,9 +623,9 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
     input_connection_->GetInputMethodEditor(
         fuchsia::ui::input::KeyboardType::TEXT,       // keyboard type
         fuchsia::ui::input::InputMethodAction::DONE,  // input method action
-        initial_text_input_state,        // initial state
-        ime_client_.NewBinding(),        // client
-        ime_.NewRequest()                // editor
+        initial_text_input_state,                     // initial state
+        ime_client_.NewBinding(),                     // client
+        ime_.NewRequest()                             // editor
     );
   } else if (method->value == "TextInput.setEditingState") {
     if (ime_) {
