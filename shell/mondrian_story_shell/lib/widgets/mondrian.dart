@@ -8,14 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/model.dart';
 
-import '../models/inset_manager.dart';
-import '../models/surface/surface_graph.dart';
 import '../story_shell_impl.dart';
-import 'mondrian_logo.dart';
 import 'surface_director.dart';
-import 'surface_relationships.dart';
 
 /// This is used for keeping the reference around.
 // ignore: unused_element
@@ -23,10 +18,9 @@ StoryShellImpl _storyShellImpl;
 
 /// High level class for choosing between presentations
 class Mondrian extends StatefulWidget {
-  final SurfaceGraph surfaceGraph;
 
   /// Constructor
-  const Mondrian({@required this.surfaceGraph, Key key}) : super(key: key);
+  const Mondrian({Key key}) : super(key: key);
 
   @override
   MondrianState createState() => new MondrianState();
@@ -34,38 +28,10 @@ class Mondrian extends StatefulWidget {
 
 /// State
 class MondrianState extends State<Mondrian> {
-  bool _showOverview = false;
-
   @override
   Widget build(BuildContext context) {
     _traceFrame();
-    return ScopedModel<SurfaceGraph>(
-      model: widget.surfaceGraph,
-      child: Stack(
-        children: <Widget>[
-          _showOverview
-              ? SurfaceRelationships()
-              : Positioned.fill(child: SurfaceDirector()),
-          Positioned(
-            left: 0.0,
-            bottom: 0.0,
-            child: GestureDetector(
-              child: Container(
-                width: 40.0,
-                height: 40.0,
-                child: _showOverview ? const MondrianLogo() : null,
-              ),
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                setState(() {
-                  _showOverview = !_showOverview;
-                });
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+    return new SurfaceDirector();
   }
 }
 

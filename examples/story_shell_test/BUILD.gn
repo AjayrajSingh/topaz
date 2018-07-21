@@ -1,0 +1,25 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_fuchsia_test.gni")
+import("//build/dart/dart_library.gni")
+
+dart_fuchsia_test("key_listener_device_tests") {
+
+  package_only = true
+
+  deps = [
+    "//topaz/lib/story_shell:lib.story_shell",
+    "//peridot/public/fidl/fuchsia.modular",
+    "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
+  ]
+
+  meta = [
+    {
+      path = "//topaz/runtime/dart_runner/meta/dart_zircon_test.cmx"
+      dest = "device_side_mondrian_tests.cmx"
+    },
+  ]
+}

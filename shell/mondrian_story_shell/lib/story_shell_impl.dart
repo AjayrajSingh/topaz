@@ -8,11 +8,13 @@ import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:fuchsia/fuchsia.dart' show exit;
 import 'package:lib.app.dart/logging.dart';
+import 'package:lib.story_shell/common.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/utils.dart';
 
 import 'models/surface/surface_graph.dart';
 import 'models/surface/surface_properties.dart';
+
 
 /// An implementation of the [StoryShell] interface.
 class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
@@ -21,12 +23,13 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   final StoryContextProxy _storyContext = new StoryContextProxy();
   final PointerEventsListener _pointerEventsListener =
       new PointerEventsListener();
+  final KeyListener keyListener;
   final StoryVisualStateWatcherBinding _visualStateWatcherBinding =
       new StoryVisualStateWatcherBinding();
   final SurfaceGraph surfaceGraph;
   StoryVisualState _visualState;
 
-  StoryShellImpl(this.surfaceGraph);
+  StoryShellImpl({this.surfaceGraph, this.keyListener});
 
   /// StoryShell
   @override
@@ -172,6 +175,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
       PresentationProxy presentationProxy = new PresentationProxy();
       _storyContext.getPresentation(presentationProxy.ctrl.request());
       _pointerEventsListener.listen(presentationProxy);
+      keyListener?.listen(presentationProxy);
       presentationProxy.ctrl.close();
     }
   }

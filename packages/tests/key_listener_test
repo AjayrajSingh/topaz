@@ -1,0 +1,5 @@
+{
+    "packages": [
+        "//topaz/examples/story_shell_test:key_listener_device_tests"
+    ]
+}
