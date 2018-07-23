@@ -22,5 +22,6 @@ dart_library("dart") {
     "//garnet/public/fidl/fuchsia.math",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/settings:settings_protos",
   ]
 }

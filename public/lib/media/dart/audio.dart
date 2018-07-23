@@ -3,10 +3,13 @@
 // found in the LICENSE file.
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_media/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
+import 'package:settings_protos/audio.pb.dart' as stored_audio;
+import 'package:settings_protos/setting_store.dart';
+import 'package:settings_protos/setting_store_factory.dart';
 
 /// Type for |Audio| update callbacks.
 typedef UpdateCallback = void Function();
@@ -28,6 +31,8 @@ class Audio {
   bool _systemAudioMuted = false;
   double _systemAudioPerceivedLevel = gainToLevel(_initialGain);
 
+  SettingStore<stored_audio.Audio> _store;
+
   /// Constructs an Audio object.
   Audio(ServiceProvider services) {
     connectToService(services, _audioService.ctrl);
@@ -35,10 +40,18 @@ class Audio {
     _audioService.ctrl.error
         .then((ProxyError error) => _handleConnectionError(error: error));
     _audioService.systemGainMuteChanged = _handleGainMuteChanged;
+    _store = new SettingStoreFactory(services).createAudioStore()
+      ..addlistener(_onSettingChanged)
+      ..connect();
   }
 
   /// Called when properties have changed significantly.
   UpdateCallback updateCallback;
+
+  void _onSettingChanged(stored_audio.Audio value) {
+    systemAudioGainDb = value.gain;
+    systemAudioMuted = value.muted;
+  }
 
   /// Disposes this object.
   void dispose() {
@@ -83,6 +96,16 @@ class Audio {
 
     _systemAudioMuted = muted;
     _audioService.setSystemMute(_systemAudioMuted);
+
+    _persistUserSetting();
+  }
+
+  void _persistUserSetting() {
+    final stored_audio.Audio audio = new stored_audio.Audio()
+      ..clear()
+      ..muted = _systemAudioMuted
+      ..gain = _systemAudioGainDb;
+    _store.commit(audio);
   }
 
   /// Gets the perceived system-wide audio level in the range [0,1]. This value
@@ -96,6 +119,8 @@ class Audio {
   set systemAudioPerceivedLevel(double value) {
     _systemAudioPerceivedLevel = value.clamp(0.0, 1.0);
     _systemAudioGainDb = levelToGain(_systemAudioPerceivedLevel);
+
+    _persistUserSetting();
     _audioService.setSystemGain(_systemAudioGainDb);
   }
 

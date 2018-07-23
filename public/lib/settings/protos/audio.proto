@@ -1,0 +1,4 @@
+message Audio {
+    optional double gain = 1;
+    optional bool muted = 2;
+}
