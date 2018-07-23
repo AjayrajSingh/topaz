@@ -12,16 +12,16 @@
 #include <memory>
 #include <utility>
 
+#include <fuchsia/modular/auth/cpp/fidl.h>
 #include <fuchsia/net/oldhttp/cpp/fidl.h>
 #include <fuchsia/ui/views_v1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
-#include <fuchsia/modular/auth/cpp/fidl.h>
 #include <trace-provider/provider.h>
 
+#include "lib/async/cpp/operation.h"
 #include "lib/component/cpp/connect.h"
 #include "lib/component/cpp/startup_context.h"
-#include "lib/async/cpp/operation.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fidl/cpp/string.h"
@@ -221,8 +221,8 @@ std::string GetRefreshTokenFromCredsFile(const std::string& account_id) {
 // Exactly one of success_callback and failure_callback is ever invoked.
 void Post(const std::string& request_body, http::URLLoader* const url_loader,
           const std::string& url, const std::function<void()>& success_callback,
-          const std::function<void(fuchsia::modular::auth::Status, std::string)>&
-              failure_callback,
+          const std::function<void(fuchsia::modular::auth::Status,
+                                   std::string)>& failure_callback,
           const std::function<bool(rapidjson::Document)>& set_token_callback) {
   std::string encoded_request_body(request_body);
   if (url.find(kFirebaseAuthEndpoint) == std::string::npos) {
@@ -324,8 +324,8 @@ void Post(const std::string& request_body, http::URLLoader* const url_loader,
 void Get(http::URLLoader* const url_loader, const std::string& url,
          const std::string& access_token,
          const std::function<void()>& success_callback,
-         const std::function<void(fuchsia::modular::auth::Status status, std::string)>&
-             failure_callback,
+         const std::function<void(fuchsia::modular::auth::Status status,
+                                  std::string)>& failure_callback,
          const std::function<bool(rapidjson::Document)>& set_token_callback) {
   http::URLRequest request;
   request.url = url;
@@ -408,8 +408,9 @@ class OAuthTokenManagerApp : fuchsia::modular::auth::AccountProvider {
 
  private:
   // |AccountProvider|
-  void Initialize(fidl::InterfaceHandle<fuchsia::modular::auth::AccountProviderContext>
-                      provider) override;
+  void Initialize(
+      fidl::InterfaceHandle<fuchsia::modular::auth::AccountProviderContext>
+          provider) override;
 
   // |AccountProvider|
   void Terminate() override;
@@ -425,8 +426,8 @@ class OAuthTokenManagerApp : fuchsia::modular::auth::AccountProvider {
   // |AccountProvider|
   void GetTokenProviderFactory(
       fidl::StringPtr account_id,
-      fidl::InterfaceRequest<fuchsia::modular::auth::TokenProviderFactory> request)
-      override;
+      fidl::InterfaceRequest<fuchsia::modular::auth::TokenProviderFactory>
+          request) override;
 
   // Generate a random account id.
   std::string GenerateAccountId();
@@ -504,7 +505,8 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl
  public:
   TokenProviderFactoryImpl(
       const fidl::StringPtr& account_id, OAuthTokenManagerApp* const app,
-      fidl::InterfaceRequest<fuchsia::modular::auth::TokenProviderFactory> request)
+      fidl::InterfaceRequest<fuchsia::modular::auth::TokenProviderFactory>
+          request)
       : account_id_(account_id), binding_(this, std::move(request)), app_(app) {
     binding_.set_error_handler(
         [this] { app_->token_provider_factory_impls_.erase(account_id_); });
@@ -514,7 +516,8 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl
   // |TokenProviderFactory|
   void GetTokenProvider(
       fidl::StringPtr /*application_url*/,
-      fidl::InterfaceRequest<fuchsia::modular::auth::TokenProvider> request) override {
+      fidl::InterfaceRequest<fuchsia::modular::auth::TokenProvider> request)
+      override {
     // TODO(alhaad/ukode): Current implementation is agnostic about which
     // agent is requesting what token. Fix this.
     token_provider_bindings_.AddBinding(this, std::move(request));
@@ -560,7 +563,8 @@ class OAuthTokenManagerApp::TokenProviderFactoryImpl
 
   std::string account_id_;
   fidl::Binding<fuchsia::modular::auth::TokenProviderFactory> binding_;
-  fidl::BindingSet<fuchsia::modular::auth::TokenProvider> token_provider_bindings_;
+  fidl::BindingSet<fuchsia::modular::auth::TokenProvider>
+      token_provider_bindings_;
 
   OAuthTokenManagerApp* const app_;
 
@@ -587,7 +591,8 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
     FlowToken flow{this, &firebase_token_, &auth_err_};
 
     if (account_id_.empty()) {
-      Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST, "Account id is empty");
+      Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST,
+              "Account id is empty");
       return;
     }
 
@@ -733,7 +738,7 @@ class OAuthTokenManagerApp::GoogleFirebaseTokensCall
 
   void Failure(FlowToken /*flow*/, const fuchsia::modular::auth::Status& status,
                const std::string& error_message) {
-    FXL_LOG(ERROR) << "Failed with error status:" << status
+    FXL_LOG(ERROR) << "Failed with error status:" << fidl::ToUnderlying(status)
                    << " ,and message:" << error_message;
     auth_err_.status = status;
     auth_err_.message = error_message;
@@ -771,7 +776,8 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
     FlowToken flow{this, &result_, &auth_err_};
 
     if (account_id_.empty()) {
-      Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST, "Account id is empty.");
+      Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST,
+              "Account id is empty.");
       return;
     }
 
@@ -908,7 +914,7 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
 
   void Failure(FlowToken /*flow*/, const fuchsia::modular::auth::Status& status,
                const std::string& error_message) {
-    FXL_LOG(ERROR) << "Failed with error status:" << status
+    FXL_LOG(ERROR) << "Failed with error status:" << fidl::ToUnderlying(status)
                    << " ,and message:" << error_message;
     auth_err_.status = status;
     auth_err_.message = error_message;
@@ -1122,7 +1128,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
 
   void Failure(const fuchsia::modular::auth::Status& status,
                const std::string& error_message) {
-    FXL_LOG(ERROR) << "Failed with error status:" << status
+    FXL_LOG(ERROR) << "Failed with error status:" << fidl::ToUnderlying(status)
                    << " ,and message:" << error_message;
     callback_(nullptr, error_message);
     auth_context_.set_error_handler([] {});
@@ -1148,7 +1154,8 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
     view_provider->CreateView(view_owner.NewRequest(),
                               web_view_moz_services.NewRequest());
 
-    component::ConnectToService(web_view_moz_services.get(), web_view_.NewRequest());
+    component::ConnectToService(web_view_moz_services.get(),
+                                web_view_.NewRequest());
 
     return view_owner;
   }
@@ -1190,7 +1197,8 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
     FlowToken flow{this, &auth_err_};
 
     if (!account_) {
-      Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST, "Account is null.");
+      Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST,
+              "Account is null.");
       return;
     }
 
@@ -1201,7 +1209,8 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
       case fuchsia::modular::auth::IdentityProvider::GOOGLE:
         break;
       default:
-        Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST, "Unsupported IDP.");
+        Failure(flow, fuchsia::modular::auth::Status::BAD_REQUEST,
+                "Unsupported IDP.");
         return;
     }
 
@@ -1330,7 +1339,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
 
   void Failure(FlowToken /*flow*/, const fuchsia::modular::auth::Status& status,
                const std::string& error_message) {
-    FXL_LOG(ERROR) << "Failed with error status:" << status
+    FXL_LOG(ERROR) << "Failed with error status:" << fidl::ToUnderlying(status)
                    << " ,and message:" << error_message;
     auth_err_.status = status;
     auth_err_.message = error_message;
@@ -1433,7 +1442,7 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall
 
   void Failure(const fuchsia::modular::auth::Status& status,
                const std::string& error_message) {
-    FXL_LOG(ERROR) << "Failed with error status:" << status
+    FXL_LOG(ERROR) << "Failed with error status:" << fidl::ToUnderlying(status)
                    << " ,and message:" << error_message;
 
     // Account is missing profile attributes, but still valid.
@@ -1470,7 +1479,8 @@ OAuthTokenManagerApp::OAuthTokenManagerApp(async::Loop* loop)
 }
 
 void OAuthTokenManagerApp::Initialize(
-    fidl::InterfaceHandle<fuchsia::modular::auth::AccountProviderContext> provider) {
+    fidl::InterfaceHandle<fuchsia::modular::auth::AccountProviderContext>
+        provider) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::Initialize()";
   account_provider_context_.Bind(std::move(provider));
 }
@@ -1522,9 +1532,9 @@ void OAuthTokenManagerApp::AddAccount(
   }
 }
 
-void OAuthTokenManagerApp::RemoveAccount(fuchsia::modular::auth::Account account,
-                                         bool revoke_all,
-                                         RemoveAccountCallback callback) {
+void OAuthTokenManagerApp::RemoveAccount(
+    fuchsia::modular::auth::Account account, bool revoke_all,
+    RemoveAccountCallback callback) {
   FXL_VLOG(1) << "OAuthTokenManagerApp::RemoveAccount()";
   operation_queue_.Add(
       new GoogleRevokeTokensCall(fidl::MakeOptional(std::move(account)),
@@ -1533,7 +1543,8 @@ void OAuthTokenManagerApp::RemoveAccount(fuchsia::modular::auth::Account account
 
 void OAuthTokenManagerApp::GetTokenProviderFactory(
     fidl::StringPtr account_id,
-    fidl::InterfaceRequest<fuchsia::modular::auth::TokenProviderFactory> request) {
+    fidl::InterfaceRequest<fuchsia::modular::auth::TokenProviderFactory>
+        request) {
   new TokenProviderFactoryImpl(account_id, this, std::move(request));
 }
 
