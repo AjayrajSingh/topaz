@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
@@ -24,6 +25,8 @@ class Document implements ValueObserver {
   final Map<Uint8List, LeafValue> _fields;
   final ConnectionId _connectionId;
   static const int _hashLength = 20;
+  final StreamController<void> _changeController =
+      new StreamController<void>.broadcast();
 
   /// Default constructor.
   Document(this._sledge, this._documentId)
@@ -73,7 +76,13 @@ class Document implements ValueObserver {
     for (final prefix in splittedChanges.keys) {
       _fields[prefix].applyChange(splittedChanges[prefix]);
     }
+    _changeController.add(null);
   }
+
+  Stream<void> get _onChange => _changeController.stream;
+
+  /// Returns a stream, generating an event each time a document changes.
+  static Stream<void> getOnChangeStream(final Document doc) => doc._onChange;
 
   @override
   void valueWasChanged() {

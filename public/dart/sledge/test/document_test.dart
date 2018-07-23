@@ -15,7 +15,7 @@ Schema newSchema() {
   return new Schema(schemaDescription);
 }
 
-void main() {
+void main() async {
   test('Verify that document can be created.', () async {
     Schema schema = newSchema();
     final id = new DocumentId(schema);
