@@ -1,0 +1,6 @@
+{
+    "packages": [
+		"//topaz/bin/system_dashboard"
+	]
+}
+

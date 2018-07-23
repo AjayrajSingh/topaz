@@ -1,0 +1,19 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+flutter_aot_app("system_dashboard") {
+  main_dart = "lib/main.dart"
+
+  manifest = "pubspec.yaml"
+
+  deps = [
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/schemas/dart",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//third_party/dart-pkg/pub/flutter_staggered_grid_view",
+  ]
+}
