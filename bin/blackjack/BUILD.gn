@@ -11,8 +11,8 @@ flutter_aot_app("blackjack_mod") {
   fuchsia_package_name = "blackjack_mod"
 
   deps = [
-    # "//third_party/dart-pkg/git/flutter/packages/flutter",
-    # "//topaz/public/dart/widgets:lib.widgets",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app_driver/dart",
   ]
 }
@@ -23,7 +23,8 @@ dart_test("blackjack_mod_test") {
   sources = [
     "test/deck_test.dart",
     "test/face_test.dart",
-    "test/hand_test.dart",
+    "test/hand_model_test.dart",
+    "test/player_model_test.dart",
     "test/playing_card_test.dart",
     "test/suit_test.dart",
   ]
@@ -32,5 +33,6 @@ dart_test("blackjack_mod_test") {
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/public/dart/widgets:lib.widgets",
   ]
 }
