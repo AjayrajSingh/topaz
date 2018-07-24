@@ -51,7 +51,7 @@ def read_header(header):
   assert continuation == ''
 
 
-def extract_defines(header):
+def extract_defines(header, guard):
   """Extract the C macro defines from a header file."""
   defines = []
   for line in read_header(header):
@@ -63,6 +63,9 @@ def extract_defines(header):
     if match:
       defines.append((match.groupdict()['symbol'], match.groupdict()['value']))
     else:
+      # ignore the header guard
+      if line.startswith('#define %s' % guard):
+        continue
       # ignore function-like macros
       if not re.match(r'#define\s+[A-Za-z0-9_]+\(', line):
         print 'Unrecognized line: %s in %s' % (line, header)
@@ -119,8 +122,10 @@ class DartWriter(object):
 
 def write_constants():
   path = os.path.join(source_dir, 'lib/src/constants.dart')
-  error_defines = extract_defines(os.path.join(zircon_include_dir, 'errors.h'))
-  type_defines = extract_defines(os.path.join(zircon_include_dir, 'types.h'))
+  error_defines = extract_defines(os.path.join(zircon_include_dir, 'errors.h'),
+                                  'ZIRCON_ERRORS_')
+  type_defines = extract_defines(os.path.join(zircon_include_dir, 'types.h'),
+                                 'ZIRCON_TYPES_')
   with DartWriter(path) as f:
     f.write(file_header)
     f.write('abstract class ZX {\n')
