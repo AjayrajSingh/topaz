@@ -9,6 +9,7 @@ import 'dart:async';
 
 import 'package:lib.app.dart/app_async.dart';
 import 'package:fidl_fuchsia_sys/fidl_async.dart';
+import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_images/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart' as gfx;
 import 'package:fidl_fuchsia_ui_scenic/fidl_async.dart' as ui_scenic;
@@ -29,6 +30,10 @@ class Session {
     scenic.createSession(_session.ctrl.request(), null);
   }
 
+  Session.fromInterfaceHandle(InterfaceHandle<ui_scenic.Session> handle) {
+    _session.ctrl.bind(handle);
+  }
+
   factory Session.fromServiceProvider(ServiceProvider serviceProvider) {
     final ui_scenic.ScenicProxy scenic = new ui_scenic.ScenicProxy();
     connectToService(serviceProvider, scenic.ctrl);
@@ -44,7 +49,7 @@ class Session {
   Future<PresentationInfo> present(int presentationTime) async {
     if (_commands.isNotEmpty) {
       await _session.enqueue(_commands);
-      _commands = const <ui_scenic.Command>[];
+      _commands = <ui_scenic.Command>[];
     }
     return _session
         .present(presentationTime, <zircon.Handle>[], <zircon.Handle>[]);

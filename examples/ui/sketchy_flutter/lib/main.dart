@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app_async.dart';
 import 'package:zircon/zircon.dart';
 
-import 'scenic.dart' as scenic;
+import 'package:lib.ui.scenic/scenic.dart' as scenic;
 import 'scenic_widget.dart';
 
 // ignore_for_file: public_member_api_docs

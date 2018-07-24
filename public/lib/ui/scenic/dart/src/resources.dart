@@ -28,6 +28,20 @@ class Resource {
 
 ui_gfx.Value vector1(double val) => new ui_gfx.Value.withVector1(val);
 
+class ViewHolder extends Resource {
+  ViewHolder(Session session, Handle token, String debugName)
+      : super._create(
+            session,
+             ui_gfx.ResourceArgs.withViewHolder(
+                 ui_gfx.ViewHolderArgs(token: token, debugName: debugName)));
+
+  void setViewProperties(ui_gfx.ViewProperties viewProperties) {
+    session.enqueue(new ui_gfx.Command.withSetViewProperties(
+        new ui_gfx.SetViewPropertiesCmd(
+            viewHolderId: id, properties: viewProperties)));
+  }
+}
+
 class Node extends Resource {
   Node._create(Session session, ui_gfx.ResourceArgs resource)
       : super._create(session, resource);
@@ -70,6 +84,11 @@ class ContainerNode extends Node {
         new ui_gfx.AddChildCmd(nodeId: id, childId: child.id)));
   }
 
+  void addViewHolderAsChild(ViewHolder child) {
+    session.enqueue(new ui_gfx.Command.withAddChild(
+        new ui_gfx.AddChildCmd(nodeId: id, childId: child.id)));
+  }
+
   void addPart(Node part) {
     session.enqueue(new ui_gfx.Command.withAddPart(
         new ui_gfx.AddPartCmd(nodeId: id, partId: part.id)));
@@ -79,6 +98,14 @@ class ContainerNode extends Node {
 class ImportNode extends ContainerNode {
   ImportNode(Session session, Handle token)
       : super._import(session, token, ui_gfx.ImportSpec.node);
+}
+
+class EntityNode extends ContainerNode {
+  EntityNode(Session session)
+      : super._create(
+            session,
+            const ui_gfx.ResourceArgs.withEntityNode(
+                const ui_gfx.EntityNodeArgs(unused: 0)));
 }
 
 class ShapeNode extends Node {
