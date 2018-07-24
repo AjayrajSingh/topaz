@@ -33,22 +33,22 @@ class Transaction {
   Future<bool> saveModification(
       Modification modification, ledger.PageProxy pageProxy) async {
     // Start Ledger transaction.
-    Completer<ledger.Status> completer = new Completer<ledger.Status>();
-    pageProxy.startTransaction(completer.complete);
-    bool startTransactionOk = (await completer.future) == ledger.Status.ok;
+    final startTransactionCompleter = new Completer<ledger.Status>();
+    pageProxy.startTransaction(startTransactionCompleter.complete);
+    bool startTransactionOk = (await startTransactionCompleter.future) == ledger.Status.ok;
     if (!startTransactionOk) {
       return false;
     }
 
     // Obtain the snapshot.
-    completer = new Completer<ledger.Status>();
+    final snapshotCompleter = new Completer<ledger.Status>();
     pageProxy.getSnapshot(
       _pageSnapshotProxy.ctrl.request(),
       new Uint8List(0),
       null,
-      completer.complete,
+      snapshotCompleter.complete,
     );
-    bool getSnapshotOk = (await completer.future) == ledger.Status.ok;
+    bool getSnapshotOk = (await snapshotCompleter.future) == ledger.Status.ok;
     if (!getSnapshotOk) {
       return false;
     }
@@ -67,25 +67,25 @@ class Transaction {
 
       // Forward the "deletes".
       for (Uint8List deletedKey in change.deletedKeys) {
-        completer = new Completer<ledger.Status>();
+        final completer = new Completer<ledger.Status>();
         final Uint8List keyWithDocumentPrefix =
             concatUint8Lists(documentPrefix, deletedKey);
         pageProxy.delete(
           keyWithDocumentPrefix,
-          (ledger.Status status) => completer.complete(status),
+          completer.complete,
         );
         updateLedgerFutures.add(completer.future);
       }
       // Forward the "puts".
       for (KeyValue kv in change.changedEntries) {
-        completer = new Completer<ledger.Status>();
+        final completer = new Completer<ledger.Status>();
 
         final Uint8List keyWithDocumentPrefix =
             concatUint8Lists(documentPrefix, kv.key);
         pageProxy.put(
           keyWithDocumentPrefix,
           kv.value,
-          (ledger.Status status) => completer.complete(status),
+          completer.complete,
         );
         updateLedgerFutures.add(completer.future);
       }
@@ -99,9 +99,9 @@ class Transaction {
       }
     }
 
-    completer = new Completer<ledger.Status>();
-    pageProxy.commit(completer.complete);
-    bool commitOk = (await completer.future) == ledger.Status.ok;
+    final commitCompleter = new Completer<ledger.Status>();
+    pageProxy.commit(commitCompleter.complete);
+    bool commitOk = (await commitCompleter.future) == ledger.Status.ok;
     if (!commitOk) {
       rollbackModification(pageProxy);
       return false;
