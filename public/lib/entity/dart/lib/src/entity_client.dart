@@ -6,9 +6,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart' as fidl;
 import 'package:json_schema/json_schema.dart' as json_schema;
 import 'package:lib.app.dart/logging.dart';
+import 'package:zircon/zircon.dart';
 
 /// Provides an idiomatic way to access and type-validate data from an [fidl.Entity].
 class EntityClient {
@@ -48,11 +50,18 @@ class EntityClient {
     return null;
   }
 
-  /// Returns the data associated with the given type without validating it.
-  Future<String> getData(String type) {
-    Completer<String> result = new Completer<String>();
+  Future<fuchsia_mem.Buffer> _getVmoData(String type) {
+    Completer<fuchsia_mem.Buffer> result = new Completer<fuchsia_mem.Buffer>();
     proxy.getData(type, result.complete);
     return result.future;
+  }
+
+  /// Returns the data associated with the given type without validating it.
+  Future<String> getData(String type) async {
+    var buffer = await _getVmoData(type);
+    var dataVmo = new SizedVmo(buffer.vmo.handle, buffer.size);
+    var data = dataVmo.map();
+    return utf8.decode(data.sublist(0, dataVmo.size));
   }
 
   /// Closes the underlying proxy connection, should be called as a response to

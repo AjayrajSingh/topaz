@@ -64,6 +64,15 @@ class SizedVmo extends Vmo {
 
   SizedVmo(Handle handle, this._size) : super(handle);
 
+  factory SizedVmo.fromUint8List(Uint8List bytes) {
+    HandleResult r = System.vmoCreate(bytes.length);
+    if (r.status != ZX.OK) {
+      throw new ZxStatusException(r.status, getStringForStatus(r.status));
+    }
+    return new SizedVmo(r.handle, bytes.length)
+      ..write(bytes.buffer.asByteData());
+  }
+
   /// Uses fdio_get_vmo_clone() to get a VMO for the file at `path` in the
   /// current Isolate's namespace.
   ///

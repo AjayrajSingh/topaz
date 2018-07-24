@@ -3,14 +3,18 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert' show utf8;
+import 'dart:typed_data';
 
 import 'package:entity_schemas/entities.dart' as entities;
 import 'package:fidl_fuchsia_documents/fidl.dart' as doc_fidl;
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
+import 'package:zircon/zircon.dart';
 
 /// This is a concrete implementation of the generic Document FIDL interface
 /// Currently, it can only take in one hardcoded Document Provider.
@@ -40,8 +44,7 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface
   DocumentsContentProviderImpl({
     @required ComponentContext componentContext,
     @required AgentContext agentContext,
-  })
-      : assert(componentContext != null),
+  })  : assert(componentContext != null),
         assert(agentContext != null),
         _componentContext = componentContext,
         _agentContext = agentContext;
@@ -133,7 +136,8 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface
   /// because we can't play the video from the source URL. See SO-1084
   /// TODO(maryxia) SO-1088 determine why this cannot play long videos
   @override
-  void getData(String cookie, String type, void callback(String data)) {
+  void getData(
+      String cookie, String type, void callback(fuchsia_mem.Buffer data)) {
     String data;
     get(cookie, (doc_fidl.Document doc) {
       // TODO(maryxia) SO-913: a doc_fidl.Error object would be returned here
@@ -147,9 +151,12 @@ class DocumentsContentProviderImpl extends doc_fidl.DocumentInterface
         name: entityDoc.name,
         description: entityDoc.description,
         thumbnailLocation: entityDoc.thumbnailLocation,
-      )
-          .toJson();
-      callback(data);
+      ).toJson();
+      var serializedData = Uint8List.fromList(utf8.encode(data));
+      callback(fuchsia_mem.Buffer(
+        vmo: SizedVmo.fromUint8List(serializedData),
+        size: data.length,
+      ));
     });
   }
 

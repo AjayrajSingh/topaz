@@ -3,12 +3,14 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert' show utf8;
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_contacts_contentprovider/fidl.dart' as fidl;
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/app.dart';
@@ -16,6 +18,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ledger.dart/ledger.dart';
 import 'package:lib.schemas.dart/com.fuchsia.contact.dart' as entities;
 import 'package:meta/meta.dart';
+import 'package:zircon/zircon.dart';
 
 import '../store/contacts_store.dart';
 import 'contacts_watcher.dart';
@@ -283,7 +286,8 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   /// Get the data for the entity specified by [type].
   /// For contacts, [cookie] maps to a contact's contactId
   @override
-  void getData(String cookie, String type, void callback(String data)) {
+  void getData(
+      String cookie, String type, void callback(fuchsia_mem.Buffer data)) {
     log.fine('getData called with cookie = $cookie and type = $type');
 
     String data;
@@ -293,7 +297,11 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     }
 
     log.fine('Retrieved contact = $contact');
-    callback(data);
+    var serializedData = Uint8List.fromList(utf8.encode(data));
+    callback(fuchsia_mem.Buffer(
+      vmo: SizedVmo.fromUint8List(serializedData),
+      size: data.length,
+    ));
   }
 
   /// Close all connections
