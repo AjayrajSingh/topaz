@@ -5,8 +5,8 @@
 #ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_
 #define TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_
 
-#include <fuchsia/ui/views_v1/cpp/fidl.h>
-#include <fuchsia/ui/views_v1_token/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1token/cpp/fidl.h>
 #include <zx/event.h>
 
 #include "flutter/shell/common/shell.h"
@@ -33,7 +33,7 @@ class Engine final : public mozart::NativesDelegate {
       component::StartupContext& startup_context, blink::Settings settings,
       fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
       fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
-      fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
+      fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
       UniqueFDIONS fdio_ns,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
           outgoing_services_request);

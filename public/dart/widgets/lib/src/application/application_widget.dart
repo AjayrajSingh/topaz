@@ -5,7 +5,7 @@
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:fidl_fuchsia_ui_views_v1/fidl.dart';
+import 'package:fidl_fuchsia_ui_viewsv1/fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';

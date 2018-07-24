@@ -17,8 +17,8 @@ class Rasterizer;
 
 class NoodlesView : public mozart::SkiaView {
  public:
-  NoodlesView(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-              fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request);
+  NoodlesView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
+              fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request);
 
   ~NoodlesView() override;
 

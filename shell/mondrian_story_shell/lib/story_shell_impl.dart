@@ -5,7 +5,7 @@
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
-import 'package:fidl_fuchsia_ui_views_v1_token/fidl.dart';
+import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:fuchsia/fuchsia.dart' show exit;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';

@@ -23,9 +23,9 @@ Iter FindUniquePtr(Iter begin, Iter end, T* object) {
 App::App(TermParams params)
     : params_(std::move(params)),
       context_(component::StartupContext::CreateFromStartupInfo()) {
-  context_->outgoing().AddPublicService<fuchsia::ui::views_v1::ViewProvider>(
+  context_->outgoing().AddPublicService<fuchsia::ui::viewsv1::ViewProvider>(
       [this](
-          fidl::InterfaceRequest<fuchsia::ui::views_v1::ViewProvider> request) {
+          fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider> request) {
         bindings_.AddBinding(this, std::move(request));
       });
 }
@@ -33,12 +33,12 @@ App::App(TermParams params)
 App::~App() = default;
 
 void App::CreateView(
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
         view_owner_request,
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> view_services) {
   controllers_.push_back(std::make_unique<ViewController>(
       context_
-          ->ConnectToEnvironmentService<fuchsia::ui::views_v1::ViewManager>(),
+          ->ConnectToEnvironmentService<fuchsia::ui::viewsv1::ViewManager>(),
       std::move(view_owner_request), context_.get(), params_,
       [this](ViewController* controller) { DestroyController(controller); }));
 }

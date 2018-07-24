@@ -44,7 +44,7 @@ source_set("lib") {
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl",
     "//garnet/public/lib/network_wrapper",
-    "//garnet/public/fidl/fuchsia.ui.views_v1",
+    "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//peridot/lib/rapidjson",
     "//topaz/auth_providers/oauth",
     "//topaz/runtime/web_runner/services",

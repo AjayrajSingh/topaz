@@ -10,8 +10,8 @@
 #include <set>
 
 #include <fuchsia/sys/cpp/fidl.h>
-#include <fuchsia/ui/views_v1/cpp/fidl.h>
-#include <fuchsia/ui/views_v1_token/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1token/cpp/fidl.h>
 #include <lib/fit/function.h>
 
 #include "engine.h"
@@ -31,7 +31,7 @@ namespace flutter {
 // Flutter engine instances.
 class Application final : public Engine::Delegate,
                           public fuchsia::sys::ComponentController,
-                          public fuchsia::ui::views_v1::ViewProvider {
+                          public fuchsia::ui::viewsv1::ViewProvider {
  public:
   using TerminationCallback = fit::function<void(const Application*)>;
 
@@ -62,7 +62,7 @@ class Application final : public Engine::Delegate,
       outgoing_services_request_;
   component::ServiceProviderBridge service_provider_bridge_;
   std::unique_ptr<component::StartupContext> startup_context_;
-  fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> shells_bindings_;
+  fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider> shells_bindings_;
   fxl::RefPtr<blink::DartSnapshot> isolate_snapshot_;
   fxl::RefPtr<blink::DartSnapshot> shared_snapshot_;
   std::set<std::unique_ptr<Engine>> shell_holders_;
@@ -83,16 +83,16 @@ class Application final : public Engine::Delegate,
   // |fuchsia::sys::ComponentController|
   void Wait(WaitCallback callback) override;
 
-  // |fuchsia::ui::views_v1::ViewProvider|
+  // |fuchsia::ui::viewsv1::ViewProvider|
   void CreateView(
-      fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
+      fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> services) override;
 
   // |flutter::Engine::Delegate|
   void OnEngineTerminate(const Engine* holder) override;
 
   void CreateShellForView(
-      fidl::InterfaceRequest<fuchsia::ui::views_v1::ViewProvider>
+      fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider>
           view_provider_request);
 
   void AttemptVMLaunchWithCurrentSettings(const blink::Settings& settings);

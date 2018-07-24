@@ -18,8 +18,8 @@ namespace examples {
 
 class JankView : public mozart::SkiaView {
  public:
-  JankView(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-           fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
+  JankView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
+           fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request,
            fuchsia::fonts::FontProviderPtr font_provider);
   ~JankView() override;
 

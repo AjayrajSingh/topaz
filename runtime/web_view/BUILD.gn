@@ -23,7 +23,7 @@ executable("web_view_bin") {
     "//garnet/public/lib/icu_data/cpp",
     "//garnet/public/fidl/fuchsia.math",
     "//garnet/public/lib/ui/view_framework:view_provider",
-    "//garnet/public/fidl/fuchsia.ui.views_v1",
+    "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//garnet/public/lib/url",
     "//peridot/lib/rapidjson",
     "//peridot/public/fidl/fuchsia.modular",

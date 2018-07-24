@@ -6,13 +6,13 @@
 #define TOPAZ_RUNTIME_WEB_VIEW_WEB_VIEW_PROVIDER_H_
 
 #include <fuchsia/modular/cpp/fidl.h>
-#include <fuchsia/ui/views_v1/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 
 #include "lib/component/cpp/startup_context.h"
 #include "topaz/runtime/web_view/web_view_impl.h"
 
-class WebViewProvider : fuchsia::ui::views_v1::ViewProvider,
+class WebViewProvider : fuchsia::ui::viewsv1::ViewProvider,
                         fuchsia::modular::Lifecycle,
                         fuchsia::modular::LinkWatcher {
  public:
@@ -20,7 +20,7 @@ class WebViewProvider : fuchsia::ui::views_v1::ViewProvider,
 
  private:
   // |ViewProvider|
-  void CreateView(fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+  void CreateView(fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
                       view_owner_request,
                   fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
                       view_services) override;

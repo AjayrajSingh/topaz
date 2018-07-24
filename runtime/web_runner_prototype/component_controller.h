@@ -6,7 +6,7 @@
 #define TOPAZ_RUNTIME_WEB_RUNNER_PROTOTYPE_COMPONENT_CONTROLLER_H_
 
 #include <fuchsia/sys/cpp/fidl.h>
-#include <fuchsia/ui/views_v1/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 
 #include <memory>
@@ -20,7 +20,7 @@ namespace web {
 class Runner;
 
 class ComponentController : public fuchsia::sys::ComponentController,
-                            public fuchsia::ui::views_v1::ViewProvider {
+                            public fuchsia::ui::viewsv1::ViewProvider {
  public:
   explicit ComponentController(Runner* runner);
   ~ComponentController();
@@ -38,20 +38,20 @@ class ComponentController : public fuchsia::sys::ComponentController,
   void Detach() final;
   void Wait(WaitCallback callback) final;
 
-  // |fuchsia::ui::views_v1::ViewProvider|:
+  // |fuchsia::ui::viewsv1::ViewProvider|:
   void CreateView(
-      fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
+      fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> services) final;
 
   Runner* runner_;
   component::ServiceProviderBridge service_provider_;
   fidl::Binding<fuchsia::sys::ComponentController> binding_;
-  fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> view_provider_bindings_;
+  fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider> view_provider_bindings_;
   std::vector<WaitCallback> wait_callbacks_;
   std::string url_;
 
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
-  fuchsia::ui::views_v1::ViewProviderPtr web_view_provider_;
+  fuchsia::ui::viewsv1::ViewProviderPtr web_view_provider_;
   fidl::InterfacePtrSet<fuchsia::webview::WebView> web_views_;
 };
 

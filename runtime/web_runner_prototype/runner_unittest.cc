@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include <fuchsia/ui/views_v1/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 
 #include "lib/component/cpp/testing/fake_component.h"
@@ -12,7 +12,7 @@
 namespace web {
 namespace testing {
 
-class FakeWebView : public fuchsia::ui::views_v1::ViewProvider,
+class FakeWebView : public fuchsia::ui::viewsv1::ViewProvider,
                     public fuchsia::webview::WebView {
  public:
   FakeWebView() {
@@ -24,9 +24,9 @@ class FakeWebView : public fuchsia::ui::views_v1::ViewProvider,
     component_.Register("web_view", fake_launcher);
   }
 
-  // |fuchsia::ui::views_v1::ViewProvider|:
+  // |fuchsia::ui::viewsv1::ViewProvider|:
   void CreateView(
-      fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
+      fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> services) final {
     ++create_view_count_;
     service_provider_.AddBinding(std::move(services));
@@ -46,7 +46,7 @@ class FakeWebView : public fuchsia::ui::views_v1::ViewProvider,
 
  private:
   component::testing::FakeComponent component_;
-  fidl::BindingSet<fuchsia::ui::views_v1::ViewProvider> view_provider_bindings_;
+  fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider> view_provider_bindings_;
   fidl::BindingSet<fuchsia::webview::WebView> web_view_bindings_;
   component::ServiceProviderImpl service_provider_;
 };
@@ -89,10 +89,10 @@ TEST_F(RunnerTest, CreatesWebView) {
   runner()->StartComponent(std::move(package), std::move(startup_info),
                            controller.NewRequest());
 
-  fuchsia::ui::views_v1::ViewProviderPtr view_provider;
+  fuchsia::ui::viewsv1::ViewProviderPtr view_provider;
   runner_services.ConnectToService(view_provider.NewRequest());
 
-  fuchsia::ui::views_v1_token::ViewOwnerPtr view_owner;
+  fuchsia::ui::viewsv1token::ViewOwnerPtr view_owner;
   fuchsia::sys::ServiceProviderPtr services;
   view_provider->CreateView(view_owner.NewRequest(), services.NewRequest());
 

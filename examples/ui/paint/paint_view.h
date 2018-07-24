@@ -17,8 +17,8 @@ namespace examples {
 
 class PaintView : public mozart::SkiaView {
  public:
-  PaintView(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-            fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request);
+  PaintView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
+            fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request);
   ~PaintView() override;
 
  private:

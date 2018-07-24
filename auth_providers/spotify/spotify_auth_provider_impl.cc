@@ -5,7 +5,7 @@
 #include "topaz/auth_providers/spotify/spotify_auth_provider_impl.h"
 
 #include <fuchsia/net/oldhttp/cpp/fidl.h>
-#include <fuchsia/ui/views_v1_token/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1token/cpp/fidl.h>
 
 #include "lib/component/cpp/connect.h"
 #include "lib/component/cpp/startup_context.h"
@@ -282,7 +282,7 @@ void SpotifyAuthProviderImpl::GetUserProfile(
   });
 }
 
-fuchsia::ui::views_v1_token::ViewOwnerPtr
+fuchsia::ui::viewsv1token::ViewOwnerPtr
 SpotifyAuthProviderImpl::SetupWebView() {
   component::Services web_view_services;
   fuchsia::sys::LaunchInfo web_view_launch_info;
@@ -294,8 +294,8 @@ SpotifyAuthProviderImpl::SetupWebView() {
     FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
   });
 
-  fuchsia::ui::views_v1_token::ViewOwnerPtr view_owner;
-  fuchsia::ui::views_v1::ViewProviderPtr view_provider;
+  fuchsia::ui::viewsv1token::ViewOwnerPtr view_owner;
+  fuchsia::ui::viewsv1::ViewProviderPtr view_provider;
   web_view_services.ConnectToService(view_provider.NewRequest());
   fuchsia::sys::ServiceProviderPtr web_view_moz_services;
   view_provider->CreateView(view_owner.NewRequest(),

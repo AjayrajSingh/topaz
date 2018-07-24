@@ -38,8 +38,8 @@ void Lissajous(SkPath* path, double ax, double ay, int wx, int wy, double p) {
 }  // namespace
 
 NoodlesView::NoodlesView(
-    fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request)
+    fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
+    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request)
     : SkiaView(std::move(view_manager),
                std::move(view_owner_request),
                "Noodles") {}

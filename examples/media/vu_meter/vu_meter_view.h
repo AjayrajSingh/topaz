@@ -22,8 +22,8 @@ namespace examples {
 class VuMeterView : public mozart::SkiaView {
  public:
   VuMeterView(async::Loop* loop,
-              fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-              fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+              fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
+              fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
                   view_owner_request,
               component::StartupContext* startup_context,
               const VuMeterParams& params);

@@ -14,7 +14,7 @@
 
 #include <fuchsia/modular/auth/cpp/fidl.h>
 #include <fuchsia/net/oldhttp/cpp/fidl.h>
-#include <fuchsia/ui/views_v1/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 #include <trace-provider/provider.h>
@@ -1136,7 +1136,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
     Done();
   }
 
-  fuchsia::ui::views_v1_token::ViewOwnerPtr SetupWebView() {
+  fuchsia::ui::viewsv1token::ViewOwnerPtr SetupWebView() {
     component::Services web_view_services;
     fuchsia::sys::LaunchInfo web_view_launch_info;
     web_view_launch_info.url = kWebViewUrl;
@@ -1147,8 +1147,8 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
       FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
     });
 
-    fuchsia::ui::views_v1_token::ViewOwnerPtr view_owner;
-    fuchsia::ui::views_v1::ViewProviderPtr view_provider;
+    fuchsia::ui::viewsv1token::ViewOwnerPtr view_owner;
+    fuchsia::ui::viewsv1::ViewProviderPtr view_provider;
     web_view_services.ConnectToService(view_provider.NewRequest());
     fuchsia::sys::ServiceProviderPtr web_view_moz_services;
     view_provider->CreateView(view_owner.NewRequest(),

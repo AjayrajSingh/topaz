@@ -26,8 +26,8 @@ constexpr char kShell[] = "/boot/bin/sh";
 }  // namespace
 
 ViewController::ViewController(
-    fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+    fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
+    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
         view_owner_request,
     component::StartupContext* context, const TermParams& term_params,
     DisconnectCallback disconnect_handler)
@@ -128,7 +128,7 @@ void ViewController::OnSceneInvalidated(
 }
 
 void ViewController::OnPropertiesChanged(
-    fuchsia::ui::views_v1::ViewProperties old_properties) {
+    fuchsia::ui::viewsv1::ViewProperties old_properties) {
   ComputeMetrics();
   Resize();
 }

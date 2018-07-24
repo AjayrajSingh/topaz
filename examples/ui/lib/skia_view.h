@@ -15,8 +15,8 @@ namespace mozart {
 // single full-size surface.
 class SkiaView : public BaseView {
  public:
-  SkiaView(fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-           fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner_request,
+  SkiaView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
+           fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request,
            const std::string& label);
   ~SkiaView() override;
 

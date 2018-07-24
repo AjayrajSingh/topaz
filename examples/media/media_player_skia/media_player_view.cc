@@ -54,8 +54,8 @@ bool Contains(const fuchsia::math::RectF& rect, float x, float y) {
 }  // namespace
 
 MediaPlayerView::MediaPlayerView(
-    async::Loop* loop, fuchsia::ui::views_v1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner>
+    async::Loop* loop, fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
+    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
         view_owner_request,
     component::StartupContext* startup_context,
     const MediaPlayerParams& params)
@@ -90,10 +90,10 @@ MediaPlayerView::MediaPlayerView(
           HandleStatusChanged(status);
         };
 
-    fuchsia::ui::views_v1_token::ViewOwnerPtr video_view_owner;
+    fuchsia::ui::viewsv1token::ViewOwnerPtr video_view_owner;
     media_player_->CreateView(
         startup_context
-            ->ConnectToEnvironmentService<fuchsia::ui::views_v1::ViewManager>()
+            ->ConnectToEnvironmentService<fuchsia::ui::viewsv1::ViewManager>()
             .Unbind(),
         video_view_owner.NewRequest());
 
@@ -184,7 +184,7 @@ bool MediaPlayerView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
 }
 
 void MediaPlayerView::OnPropertiesChanged(
-    fuchsia::ui::views_v1::ViewProperties old_properties) {
+    fuchsia::ui::viewsv1::ViewProperties old_properties) {
   Layout();
 }
 
@@ -249,8 +249,8 @@ void MediaPlayerView::Layout() {
   progress_bar_rect_.height = controls_rect_.height;
 
   // Ask the view to fill the space.
-  fuchsia::ui::views_v1::ViewProperties view_properties;
-  view_properties.view_layout = fuchsia::ui::views_v1::ViewLayout::New();
+  fuchsia::ui::viewsv1::ViewProperties view_properties;
+  view_properties.view_layout = fuchsia::ui::viewsv1::ViewLayout::New();
   view_properties.view_layout->size.width = content_rect_.width;
   view_properties.view_layout->size.height = content_rect_.height;
   GetViewContainer()->SetChildProperties(
@@ -299,7 +299,7 @@ void MediaPlayerView::OnSceneInvalidated(
 }
 
 void MediaPlayerView::OnChildAttached(
-    uint32_t child_key, fuchsia::ui::views_v1::ViewInfo child_view_info) {
+    uint32_t child_key, fuchsia::ui::viewsv1::ViewInfo child_view_info) {
   FXL_DCHECK(child_key == kVideoChildKey);
 
   parent_node().AddChild(*video_host_node_);

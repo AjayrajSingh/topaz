@@ -6,7 +6,7 @@
 
 #include <fuchsia/sys/cpp/fidl.h>
 #include <fuchsia/ui/scenic/cpp/fidl.h>
-#include <fuchsia/ui/views_v1/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1/cpp/fidl.h>
 
 #include "lib/fxl/macros.h"
 #include "lib/ui/flutter/sdk_ext/src/natives.h"
@@ -21,7 +21,7 @@ class IsolateConfigurator final {
  public:
   IsolateConfigurator(
       UniqueFDIONS fdio_ns,
-      fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer> view_container,
+      fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer> view_container,
       fidl::InterfaceHandle<fuchsia::sys::Environment>
           environment,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
@@ -36,7 +36,7 @@ class IsolateConfigurator final {
  private:
   bool used_ = false;
   UniqueFDIONS fdio_ns_;
-  fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer> view_container_;
+  fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer> view_container_;
   fidl::InterfaceHandle<fuchsia::sys::Environment>
       environment_;
   fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services_request_;

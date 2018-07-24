@@ -106,7 +106,7 @@ Application::Application(
   // final settings configuration. The next call will be to create a view
   // for this application.
 
-  service_provider_bridge_.AddService<fuchsia::ui::views_v1::ViewProvider>(
+  service_provider_bridge_.AddService<fuchsia::ui::viewsv1::ViewProvider>(
       std::bind(&Application::CreateShellForView, this, std::placeholders::_1));
 
   fuchsia::sys::ServiceProviderPtr outgoing_services;
@@ -322,14 +322,14 @@ void Application::OnEngineTerminate(const Engine* shell_holder) {
 }
 
 void Application::CreateShellForView(
-    fidl::InterfaceRequest<fuchsia::ui::views_v1::ViewProvider>
+    fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider>
         view_provider_request) {
   shells_bindings_.AddBinding(this, std::move(view_provider_request));
 }
 
-// |fuchsia::ui::views_v1::ViewProvider|
+// |fuchsia::ui::viewsv1::ViewProvider|
 void Application::CreateView(
-    fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
+    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>) {
   if (!startup_context_) {
     FXL_DLOG(ERROR) << "Application context was invalid when attempting to "

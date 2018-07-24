@@ -10,8 +10,8 @@
 
 #include <fuchsia/modular/cpp/fidl.h>
 #include <fuchsia/ui/input/cpp/fidl.h>
-#include <fuchsia/ui/views_v1/cpp/fidl.h>
-#include <fuchsia/ui/views_v1_token/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1token/cpp/fidl.h>
 #include <lib/fit/function.h>
 
 #include "accessibility_bridge.h"
@@ -26,7 +26,7 @@ namespace flutter {
 // The per engine component residing on the platform thread is responsible for
 // all platform specific integrations.
 class PlatformView final : public shell::PlatformView,
-                           public fuchsia::ui::views_v1::ViewListener,
+                           public fuchsia::ui::viewsv1::ViewListener,
                            public fuchsia::ui::input::InputMethodEditorClient,
                            public fuchsia::ui::input::InputListener {
  public:
@@ -35,8 +35,8 @@ class PlatformView final : public shell::PlatformView,
       blink::TaskRunners task_runners,
       fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
           parent_environment_service_provider,
-      fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewManager> view_manager,
-      fidl::InterfaceRequest<fuchsia::ui::views_v1_token::ViewOwner> view_owner,
+      fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewManager> view_manager,
+      fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
       zx::eventpair export_token,
       fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
           accessibility_context_writer,
@@ -46,7 +46,7 @@ class PlatformView final : public shell::PlatformView,
 
   void UpdateViewportMetrics(double pixel_ratio);
 
-  fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer>
+  fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer>
   TakeViewContainer();
 
   void OfferServiceProvider(
@@ -55,11 +55,11 @@ class PlatformView final : public shell::PlatformView,
 
  private:
   const std::string debug_label_;
-  fuchsia::ui::views_v1::ViewManagerPtr view_manager_;
-  fuchsia::ui::views_v1::ViewPtr view_;
-  fidl::InterfaceHandle<fuchsia::ui::views_v1::ViewContainer> view_container_;
+  fuchsia::ui::viewsv1::ViewManagerPtr view_manager_;
+  fuchsia::ui::viewsv1::ViewPtr view_;
+  fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer> view_container_;
   fuchsia::sys::ServiceProviderPtr service_provider_;
-  fidl::Binding<fuchsia::ui::views_v1::ViewListener> view_listener_;
+  fidl::Binding<fuchsia::ui::viewsv1::ViewListener> view_listener_;
   fuchsia::ui::input::InputConnectionPtr input_connection_;
   fidl::Binding<fuchsia::ui::input::InputListener> input_listener_;
   int current_text_input_client_ = 0;
@@ -80,12 +80,12 @@ class PlatformView final : public shell::PlatformView,
 
   void RegisterPlatformMessageHandlers();
 
-  void UpdateViewportMetrics(const fuchsia::ui::views_v1::ViewLayout& layout);
+  void UpdateViewportMetrics(const fuchsia::ui::viewsv1::ViewLayout& layout);
 
   void FlushViewportMetrics();
 
-  // |fuchsia::ui::views_v1::ViewListener|
-  void OnPropertiesChanged(fuchsia::ui::views_v1::ViewProperties properties,
+  // |fuchsia::ui::viewsv1::ViewListener|
+  void OnPropertiesChanged(fuchsia::ui::viewsv1::ViewProperties properties,
                            OnPropertiesChangedCallback callback) override;
 
   // |fuchsia::ui::input::InputMethodEditorClient|
