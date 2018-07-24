@@ -1,6 +1,6 @@
 {
   "imports": [
-    "garnet/packages/sdk/garnet"
+    "garnet/packages/sdk/base"
   ],
   "labels": [
     "//topaz/public/sdk:topaz"
