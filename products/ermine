@@ -1,0 +1,11 @@
+{
+  "monolith": [
+    "topaz/packages/products/ermine"
+  ],
+  "preinstall": [
+
+  ],
+  "available": [
+
+  ]
+}

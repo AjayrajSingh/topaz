@@ -1,0 +1,11 @@
+{
+  "monolith": [
+    "topaz/packages/products/term"
+  ],
+  "preinstall": [
+
+  ],
+  "available": [
+
+  ]
+}
