@@ -20,12 +20,12 @@
 #include "lib/fsl/vmo/file.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
-#include "lib/tonic/converter/dart_converter.h"
-#include "lib/tonic/dart_message_handler.h"
-#include "lib/tonic/dart_microtask_queue.h"
-#include "lib/tonic/dart_state.h"
-#include "lib/tonic/logging/dart_error.h"
 #include "third_party/dart/runtime/include/dart_tools_api.h"
+#include "third_party/tonic/converter/dart_converter.h"
+#include "third_party/tonic/dart_message_handler.h"
+#include "third_party/tonic/dart_microtask_queue.h"
+#include "third_party/tonic/dart_state.h"
+#include "third_party/tonic/logging/dart_error.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 
@@ -276,8 +276,8 @@ bool DartComponentController::CreateIsolate(
   // TODO(dart_runner): Pass if we start using tonic's loader.
   intptr_t namespace_fd = -1;
   // Freed in IsolateShutdownCallback.
-  auto state = new tonic::DartState(
-      namespace_fd, [this](Dart_Handle result) { MessageEpilogue(result); });
+  auto state = new std::shared_ptr<tonic::DartState>(new tonic::DartState(
+      namespace_fd, [this](Dart_Handle result) { MessageEpilogue(result); }));
 
   isolate_ = Dart_CreateIsolate(
       url_.c_str(), label_.c_str(), isolate_snapshot_data,
@@ -288,13 +288,17 @@ bool DartComponentController::CreateIsolate(
     return false;
   }
 
-  state->SetIsolate(isolate_);
+  state->get()->SetIsolate(isolate_);
 
-  state->message_handler().Initialize(
-      deprecated_loop::MessageLoop::GetCurrent()->task_runner());
+  auto task_runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner();
+  tonic::DartMessageHandler::TaskDispatcher dispatcher = [task_runner](auto callback) {
+    task_runner->PostTask(std::move(callback));
+  };
+  state->get()->message_handler().Initialize(dispatcher);
 
-  state->SetReturnCodeCallback(
-      [this](uint32_t return_code) { return_code_ = return_code; });
+  state->get()->SetReturnCodeCallback([this](uint32_t return_code) {
+    return_code_ = return_code;
+  });
 
   return true;
 }

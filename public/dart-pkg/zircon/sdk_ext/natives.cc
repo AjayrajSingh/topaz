@@ -19,13 +19,13 @@
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/macros.h"
-#include "lib/tonic/dart_binding_macros.h"
-#include "lib/tonic/dart_class_library.h"
-#include "lib/tonic/dart_class_provider.h"
-#include "lib/tonic/dart_library_natives.h"
-#include "lib/tonic/dart_state.h"
-#include "lib/tonic/logging/dart_invoke.h"
-#include "lib/tonic/typed_data/uint8_list.h"
+#include "third_party/tonic/dart_binding_macros.h"
+#include "third_party/tonic/dart_class_library.h"
+#include "third_party/tonic/dart_class_provider.h"
+#include "third_party/tonic/dart_library_natives.h"
+#include "third_party/tonic/dart_state.h"
+#include "third_party/tonic/logging/dart_invoke.h"
+#include "third_party/tonic/typed_data/uint8_list.h"
 
 using tonic::ToDart;
 

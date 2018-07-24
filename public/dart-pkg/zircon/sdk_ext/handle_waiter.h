@@ -5,10 +5,11 @@
 #ifndef DART_PKG_ZIRCON_SDK_EXT_HANDLE_WAITER_H_
 #define DART_PKG_ZIRCON_SDK_EXT_HANDLE_WAITER_H_
 
-#include <zx/handle.h>
 #include <lib/async/cpp/wait.h>
+#include <zx/handle.h>
 
-#include "lib/tonic/dart_wrappable.h"
+#include "lib/fxl/memory/ref_counted.h"
+#include "third_party/tonic/dart_wrappable.h"
 
 namespace tonic {
 class DartLibraryNatives;
@@ -26,8 +27,7 @@ class HandleWaiter : public fxl::RefCountedThreadSafe<HandleWaiter>,
   FRIEND_MAKE_REF_COUNTED(HandleWaiter);
 
  public:
-  static fxl::RefPtr<HandleWaiter> Create(Handle* handle,
-                                          zx_signals_t signals,
+  static fxl::RefPtr<HandleWaiter> Create(Handle* handle, zx_signals_t signals,
                                           Dart_Handle callback);
 
   void Cancel();
@@ -37,13 +37,16 @@ class HandleWaiter : public fxl::RefCountedThreadSafe<HandleWaiter>,
   static void RegisterNatives(tonic::DartLibraryNatives* natives);
 
  private:
-  explicit HandleWaiter(Handle* handle,
-                        zx_signals_t signals,
+  explicit HandleWaiter(Handle* handle, zx_signals_t signals,
                         Dart_Handle callback);
   ~HandleWaiter();
 
   void OnWaitComplete(async_dispatcher_t* dispatcher, async::WaitBase* wait,
                       zx_status_t status, const zx_packet_signal_t* signal);
+
+  void RetainDartWrappableReference() const override { AddRef(); }
+
+  void ReleaseDartWrappableReference() const override { Release(); }
 
   async::WaitMethod<HandleWaiter, &HandleWaiter::OnWaitComplete> wait_;
   Handle* handle_;

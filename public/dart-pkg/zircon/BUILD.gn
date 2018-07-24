@@ -38,7 +38,7 @@ source_set("sdk_ext") {
   ]
 
   public_deps = [
-    "//topaz/lib/tonic",
+    "//third_party/tonic",
     "//zircon/public/lib/async-cpp",
     "//zircon/public/lib/fdio",
   ]

@@ -6,9 +6,9 @@
 
 #include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"
 #include "dart-pkg/zircon/sdk_ext/handle.h"
-#include "lib/tonic/converter/dart_converter.h"
-#include "lib/tonic/dart_state.h"
-#include "lib/tonic/logging/dart_error.h"
+#include "third_party/tonic/converter/dart_converter.h"
+#include "third_party/tonic/dart_state.h"
+#include "third_party/tonic/logging/dart_error.h"
 #include "lib/ui/flutter/sdk_ext/src/natives.h"
 #include "third_party/dart/runtime/include/dart_api.h"
 

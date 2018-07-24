@@ -8,9 +8,9 @@
 #include <zircon/syscalls.h>
 
 #include "dart-pkg/zircon/sdk_ext/handle.h"
-#include "lib/tonic/dart_library_natives.h"
-#include "lib/tonic/dart_wrappable.h"
-#include "lib/tonic/typed_data/dart_byte_data.h"
+#include "third_party/tonic/dart_library_natives.h"
+#include "third_party/tonic/dart_wrappable.h"
+#include "third_party/tonic/typed_data/dart_byte_data.h"
 #include "third_party/dart/runtime/include/dart_api.h"
 
 namespace zircon {

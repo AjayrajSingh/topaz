@@ -7,12 +7,13 @@
 #include <lib/async/default.h>
 
 #include "dart-pkg/zircon/sdk_ext/handle.h"
-#include "lib/tonic/converter/dart_converter.h"
-#include "lib/tonic/dart_args.h"
-#include "lib/tonic/dart_binding_macros.h"
-#include "lib/tonic/dart_library_natives.h"
-#include "lib/tonic/dart_message_handler.h"
-#include "lib/tonic/logging/dart_invoke.h"
+#include "lib/fxl/logging.h"
+#include "third_party/tonic/converter/dart_converter.h"
+#include "third_party/tonic/dart_args.h"
+#include "third_party/tonic/dart_binding_macros.h"
+#include "third_party/tonic/dart_library_natives.h"
+#include "third_party/tonic/dart_message_handler.h"
+#include "third_party/tonic/logging/dart_invoke.h"
 
 using tonic::DartInvokeField;
 using tonic::DartState;
@@ -23,8 +24,7 @@ namespace dart {
 
 IMPLEMENT_WRAPPERTYPEINFO(zircon, HandleWaiter);
 
-#define FOR_EACH_BINDING(V) \
-  V(HandleWaiter, Cancel)
+#define FOR_EACH_BINDING(V) V(HandleWaiter, Cancel)
 
 FOR_EACH_BINDING(DART_NATIVE_CALLBACK)
 
@@ -38,8 +38,7 @@ fxl::RefPtr<HandleWaiter> HandleWaiter::Create(Handle* handle,
   return fxl::MakeRefCounted<HandleWaiter>(handle, signals, callback);
 }
 
-HandleWaiter::HandleWaiter(Handle* handle,
-                           zx_signals_t signals,
+HandleWaiter::HandleWaiter(Handle* handle, zx_signals_t signals,
                            Dart_Handle callback)
     : wait_(this, handle->handle(), signals),
       handle_(handle),
@@ -51,9 +50,7 @@ HandleWaiter::HandleWaiter(Handle* handle,
   FXL_DCHECK(status == ZX_OK);
 }
 
-HandleWaiter::~HandleWaiter() {
-  Cancel();
-}
+HandleWaiter::~HandleWaiter() { Cancel(); }
 
 void HandleWaiter::Cancel() {
   FXL_DCHECK(wait_.is_pending() == !!handle_);
@@ -69,13 +66,11 @@ void HandleWaiter::Cancel() {
 }
 
 void HandleWaiter::OnWaitComplete(async_dispatcher_t* dispatcher,
-                                  async::WaitBase* wait,
-                                  zx_status_t status,
+                                  async::WaitBase* wait, zx_status_t status,
                                   const zx_packet_signal_t* signal) {
   FXL_DCHECK(handle_);
 
   FXL_DCHECK(!callback_.is_empty());
-  FXL_DCHECK(callback_.dart_state());
 
   // Hold a reference to this object.
   fxl::RefPtr<HandleWaiter> ref(this);
@@ -86,7 +81,8 @@ void HandleWaiter::OnWaitComplete(async_dispatcher_t* dispatcher,
   // Clear handle_.
   handle_ = nullptr;
 
-  DartState* state = callback_.dart_state().get();
+  auto state = callback_.dart_state().lock();
+  FXL_DCHECK(state);
   DartState::Scope scope(state);
 
   std::vector<Dart_Handle> args{ToDart(status), ToDart(signal->observed)};

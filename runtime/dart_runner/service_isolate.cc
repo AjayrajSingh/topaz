@@ -5,11 +5,11 @@
 #include "topaz/runtime/dart_runner/service_isolate.h"
 
 #include "lib/fsl/vmo/file.h"
-#include "lib/tonic/converter/dart_converter.h"
-#include "lib/tonic/dart_library_natives.h"
-#include "lib/tonic/dart_microtask_queue.h"
-#include "lib/tonic/dart_state.h"
-#include "lib/tonic/typed_data/uint8_list.h"
+#include "third_party/tonic/converter/dart_converter.h"
+#include "third_party/tonic/dart_library_natives.h"
+#include "third_party/tonic/dart_microtask_queue.h"
+#include "third_party/tonic/dart_state.h"
+#include "third_party/tonic/typed_data/uint8_list.h"
 #include "third_party/dart/runtime/bin/embedded_dart_io.h"
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
@@ -118,7 +118,7 @@ Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
   }
 #endif
 
-  auto state = new tonic::DartState();
+  auto state = new std::shared_ptr<tonic::DartState>(new tonic::DartState());
   Dart_Isolate isolate =
       Dart_CreateIsolate(uri, "main", mapped_isolate_snapshot_data.address(),
                          mapped_isolate_snapshot_instructions.address(),
@@ -130,7 +130,7 @@ Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
     return nullptr;
   }
 
-  state->SetIsolate(isolate);
+  state->get()->SetIsolate(isolate);
 
   // Setup native entries.
   service_natives = new tonic::DartLibraryNatives();

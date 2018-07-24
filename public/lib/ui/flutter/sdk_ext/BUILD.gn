@@ -12,7 +12,7 @@ source_set("sdk_ext") {
     "//garnet/public/lib/fxl",
     "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//third_party/dart/runtime:dart_api",
-    "//topaz/lib/tonic",
+    "//third_party/tonic",
     "//topaz/public/dart-pkg/zircon",
     "//zircon/public/lib/zx",
   ]

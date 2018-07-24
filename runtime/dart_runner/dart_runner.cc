@@ -10,8 +10,8 @@
 #include <zircon/syscalls.h>
 
 #include "lib/fxl/arraysize.h"
-#include "lib/tonic/dart_microtask_queue.h"
-#include "lib/tonic/dart_state.h"
+#include "third_party/tonic/dart_microtask_queue.h"
+#include "third_party/tonic/dart_state.h"
 #include "third_party/dart/runtime/bin/embedded_dart_io.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
@@ -80,8 +80,7 @@ void IsolateShutdownCallback(void* callback_data) {
 }
 
 void IsolateCleanupCallback(void* callback_data) {
-  tonic::DartState* dart_state = static_cast<tonic::DartState*>(callback_data);
-  delete dart_state;
+  delete static_cast<std::shared_ptr<tonic::DartState>*>(callback_data);
 }
 
 void RunApplication(

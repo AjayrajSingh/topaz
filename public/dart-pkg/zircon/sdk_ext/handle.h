@@ -9,11 +9,12 @@
 
 #include <vector>
 
-#include "third_party/dart/runtime/include/dart_api.h"
 #include "dart-pkg/zircon/sdk_ext/handle_waiter.h"
-#include "lib/tonic/dart_library_natives.h"
-#include "lib/tonic/dart_wrappable.h"
-#include "lib/tonic/typed_data/dart_byte_data.h"
+#include "lib/fxl/memory/ref_counted.h"
+#include "third_party/dart/runtime/include/dart_api.h"
+#include "third_party/tonic/dart_library_natives.h"
+#include "third_party/tonic/dart_wrappable.h"
+#include "third_party/tonic/typed_data/dart_byte_data.h"
 
 namespace zircon {
 namespace dart {
@@ -59,6 +60,10 @@ class Handle : public fxl::RefCountedThreadSafe<Handle>,
 
  private:
   explicit Handle(zx_handle_t handle);
+
+  void RetainDartWrappableReference() const override { AddRef(); }
+
+  void ReleaseDartWrappableReference() const override { Release(); }
 
   zx_handle_t handle_;
 

@@ -18,8 +18,8 @@
 
 #include "lib/fsl/io/fd.h"
 #include "lib/fxl/files/unique_fd.h"
-#include "lib/tonic/dart_binding_macros.h"
-#include "lib/tonic/dart_class_library.h"
+#include "third_party/tonic/dart_binding_macros.h"
+#include "third_party/tonic/dart_class_library.h"
 
 using tonic::ToDart;
 

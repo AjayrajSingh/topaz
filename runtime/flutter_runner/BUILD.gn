@@ -124,7 +124,7 @@ template("flutter_runner") {
              "//third_party/rapidjson",
              "//third_party/skia",
              "//topaz/lib/deprecated_loop",
-             "//topaz/lib/tonic",
+             "//third_party/tonic",
              "//topaz/public/dart-pkg/fuchsia",
              "//topaz/public/lib/ui/flutter/sdk_ext",
              "//third_party/skia:gpu",
