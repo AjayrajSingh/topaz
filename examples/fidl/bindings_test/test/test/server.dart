@@ -29,6 +29,8 @@ class TestServerInstance {
 
   Future<void> stop() async {
     proxy.ctrl.close();
-    await controller.kill();
+    if (controller.ctrl.isBound) {
+      await controller.kill();
+    }
   }
 }
