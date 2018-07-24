@@ -19,7 +19,6 @@ import 'package:mozart/mozart.dart';
 import 'package:zircon/zircon.dart';
 
 export 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart' show ViewOwner;
-export 'child_view2.dart';
 
 ViewContainerProxy _initViewContainer() {
   // Analyzer doesn't know Handle must be dart:zircon's Handle
@@ -29,7 +28,7 @@ ViewContainerProxy _initViewContainer() {
   }
   final ViewContainerProxy proxy = new ViewContainerProxy()
     ..ctrl.bind(new InterfaceHandle<ViewContainer>(new Channel(handle)))
-    ..setListener(_ViewContainerListenerImpl.instance.createInterfaceHandle());
+    ..setListener(_ViewContainerListenerImpl2.instance.createInterfaceHandle());
 
   assert(() {
     proxy.ctrl.error.then((ProxyError error) {
@@ -43,7 +42,7 @@ ViewContainerProxy _initViewContainer() {
 
 final ViewContainerProxy _viewContainer = _initViewContainer();
 
-class _ViewContainerListenerImpl extends ViewContainerListener {
+class _ViewContainerListenerImpl2 extends ViewContainerListener {
   final ViewContainerListenerBinding _binding =
       new ViewContainerListenerBinding();
 
@@ -51,53 +50,53 @@ class _ViewContainerListenerImpl extends ViewContainerListener {
     return _binding.wrap(this);
   }
 
-  static final _ViewContainerListenerImpl instance =
-      new _ViewContainerListenerImpl();
+  static final _ViewContainerListenerImpl2 instance =
+      new _ViewContainerListenerImpl2();
 
   @override
   void onChildAttached(int childKey, ViewInfo childViewInfo, void callback()) {
-    ChildViewConnection connection = _connections[childKey];
+    ChildViewConnection2 connection = _connections[childKey];
     connection?._onAttachedToContainer(childViewInfo);
     callback();
   }
 
   @override
   void onChildUnavailable(int childKey, void callback()) {
-    ChildViewConnection connection = _connections[childKey];
+    ChildViewConnection2 connection = _connections[childKey];
     connection?._onUnavailable();
     callback();
   }
 
-  final Map<int, ChildViewConnection> _connections =
-      new HashMap<int, ChildViewConnection>();
+  final Map<int, ChildViewConnection2> _connections =
+      new HashMap<int, ChildViewConnection2>();
 }
 
-typedef ChildViewConnectionCallback = void Function(
-    ChildViewConnection connection);
-void _emptyConnectionCallback(ChildViewConnection c) {}
+typedef ChildViewConnection2Callback = void Function(
+    ChildViewConnection2 connection);
+void _emptyConnectionCallback(ChildViewConnection2 c) {}
 
 /// A connection with a child view.
 ///
-/// Used with the [ChildView] widget to display a child view.
-class ChildViewConnection {
-  ChildViewConnection(this._viewOwner,
-      {ChildViewConnectionCallback onAvailable,
-      ChildViewConnectionCallback onUnavailable})
+/// Used with the [ChildView2] widget to display a child view.
+class ChildViewConnection2 {
+  ChildViewConnection2(this._viewOwner,
+      {ChildViewConnection2Callback onAvailable,
+      ChildViewConnection2Callback onUnavailable})
       : _onAvailableCallback = onAvailable ?? _emptyConnectionCallback,
         _onUnavailableCallback = onUnavailable ?? _emptyConnectionCallback,
         assert(_viewOwner != null);
 
-  factory ChildViewConnection.launch(String url, Launcher launcher,
+  factory ChildViewConnection2.launch(String url, Launcher launcher,
       {InterfaceRequest<ComponentController> controller,
       InterfaceRequest<ServiceProvider> childServices,
-      ChildViewConnectionCallback onAvailable,
-      ChildViewConnectionCallback onUnavailable}) {
+      ChildViewConnection2Callback onAvailable,
+      ChildViewConnection2Callback onUnavailable}) {
     final Services services = new Services();
     final LaunchInfo launchInfo =
         new LaunchInfo(url: url, directoryRequest: services.request());
     try {
       launcher.createComponent(launchInfo, controller);
-      return new ChildViewConnection.connect(services,
+      return new ChildViewConnection2.connect(services,
           childServices: childServices,
           onAvailable: onAvailable,
           onUnavailable: onUnavailable);
@@ -106,24 +105,24 @@ class ChildViewConnection {
     }
   }
 
-  factory ChildViewConnection.connect(Services services,
+  factory ChildViewConnection2.connect(Services services,
       {InterfaceRequest<ServiceProvider> childServices,
-      ChildViewConnectionCallback onAvailable,
-      ChildViewConnectionCallback onUnavailable}) {
+      ChildViewConnection2Callback onAvailable,
+      ChildViewConnection2Callback onUnavailable}) {
     final ViewProviderProxy viewProvider = new ViewProviderProxy();
     services.connectToService(viewProvider.ctrl);
     try {
       final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
       viewProvider.createView(viewOwner.passRequest(), childServices);
-      return new ChildViewConnection(viewOwner.passHandle(),
+      return new ChildViewConnection2(viewOwner.passHandle(),
           onAvailable: onAvailable, onUnavailable: onUnavailable);
     } finally {
       viewProvider.ctrl.close();
     }
   }
 
-  final ChildViewConnectionCallback _onAvailableCallback;
-  final ChildViewConnectionCallback _onUnavailableCallback;
+  final ChildViewConnection2Callback _onAvailableCallback;
+  final ChildViewConnection2Callback _onUnavailableCallback;
   InterfaceHandle<ViewOwner> _viewOwner;
 
   static int _nextViewKey = 1;
@@ -164,9 +163,9 @@ class ChildViewConnection {
     _viewKey = _nextViewKey++;
     _viewContainer.addChild(_viewKey, _viewOwner, pair.second);
     _viewOwner = null;
-    assert(!_ViewContainerListenerImpl.instance._connections
+    assert(!_ViewContainerListenerImpl2.instance._connections
         .containsKey(_viewKey));
-    _ViewContainerListenerImpl.instance._connections[_viewKey] = this;
+    _ViewContainerListenerImpl2.instance._connections[_viewKey] = this;
   }
 
   void _removeChildFromViewHost() {
@@ -177,10 +176,10 @@ class ChildViewConnection {
     assert(_viewOwner == null);
     assert(_viewKey != null);
     assert(_sceneHost != null);
-    assert(_ViewContainerListenerImpl.instance._connections[_viewKey] == this);
+    assert(_ViewContainerListenerImpl2.instance._connections[_viewKey] == this);
     final ChannelPair pair = new ChannelPair();
     assert(pair.status == ZX.OK);
-    _ViewContainerListenerImpl.instance._connections.remove(_viewKey);
+    _ViewContainerListenerImpl2.instance._connections.remove(_viewKey);
     _viewOwner = new InterfaceHandle<ViewOwner>(pair.first);
     _viewContainer.removeChild(
         _viewKey, new InterfaceRequest<ViewOwner>(pair.second));
@@ -275,19 +274,19 @@ class ChildViewConnection {
   }
 }
 
-class _RenderChildView extends RenderBox {
+class _RenderChildView2 extends RenderBox {
   /// Creates a child view render object.
-  _RenderChildView({
-    ChildViewConnection connection,
+  _RenderChildView2({
+    ChildViewConnection2 connection,
     bool hitTestable = true,
   })  : _connection = connection,
         _hitTestable = hitTestable,
         assert(hitTestable != null);
 
   /// The child to display.
-  ChildViewConnection get connection => _connection;
-  ChildViewConnection _connection;
-  set connection(ChildViewConnection value) {
+  ChildViewConnection2 get connection => _connection;
+  ChildViewConnection2 _connection;
+  set connection(ChildViewConnection2 value) {
     if (value == _connection) {
       return;
     }
@@ -414,7 +413,7 @@ class _RenderChildView extends RenderBox {
   void debugFillProperties(DiagnosticPropertiesBuilder description) {
     super.debugFillProperties(description);
     description.add(
-      new DiagnosticsProperty<ChildViewConnection>(
+      new DiagnosticsProperty<ChildViewConnection2>(
         'connection',
         connection,
       ),
@@ -483,13 +482,13 @@ class ChildSceneLayer extends Layer {
 /// Requires a [MediaQuery] ancestor to provide appropriate media information to
 /// the child.
 @immutable
-class ChildView extends LeafRenderObjectWidget {
+class ChildView2 extends LeafRenderObjectWidget {
   /// Creates a widget that is replaced by content from another process.
-  ChildView({this.connection, this.hitTestable = true})
+  ChildView2({this.connection, this.hitTestable = true})
       : super(key: new GlobalObjectKey(connection));
 
   /// A connection to the child whose content will replace this widget.
-  final ChildViewConnection connection;
+  final ChildViewConnection2 connection;
 
   /// Whether this child should be included during hit testing.
   ///
@@ -497,22 +496,22 @@ class ChildView extends LeafRenderObjectWidget {
   final bool hitTestable;
 
   @override
-  _RenderChildView createRenderObject(BuildContext context) {
-    return new _RenderChildView(
+  _RenderChildView2 createRenderObject(BuildContext context) {
+    return new _RenderChildView2(
       connection: connection,
       hitTestable: hitTestable,
     );
   }
 
   @override
-  void updateRenderObject(BuildContext context, _RenderChildView renderObject) {
+  void updateRenderObject(BuildContext context, _RenderChildView2 renderObject) {
     renderObject
       ..connection = connection
       ..hitTestable = hitTestable;
   }
 }
 
-class View {
+class View2 {
   /// Provide services to Scenic throught |provider|.
   ///
   /// |services| should contain the list of service names offered by the
