@@ -4,6 +4,7 @@
 
 import 'checker.dart';
 import 'computational_graph.dart';
+import 'evaluation_order.dart';
 import 'fleet_state.dart';
 import 'node.dart';
 
@@ -83,14 +84,14 @@ class Fleet<T extends dynamic> {
   void addChecker(CheckerGenerator<T> checkerGenerator) =>
       _checkerGenerators.add(checkerGenerator);
 
-  void _testSingleOrder(List<Node> order) {
+  void _testSingleOrder(EvaluationOrder order) {
     final fleetState = new FleetState<T>(_fleetSize, _instanceGenerator);
     for (final newChecker in _checkerGenerators) {
       fleetState.addChecker(newChecker());
     }
 
-    for (int i = 0; i < order.length; i++) {
-      fleetState.applyNode(order[i], i);
+    for (int i = 0; i < order.nodes.length; i++) {
+      fleetState.applyNode(order.nodes[i], i);
     }
   }
 

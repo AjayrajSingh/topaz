@@ -6,6 +6,7 @@
 import 'package:test/test.dart';
 
 import '../crdt_test_framework/computational_graph.dart';
+import '../crdt_test_framework/evaluation_order.dart';
 import '../crdt_test_framework/node.dart';
 
 void main() {
@@ -29,8 +30,8 @@ void main() {
     expect(
         orders,
         containsAll([
-          [n1, n2, n3, n4],
-          [n1, n2, n4, n3]
+          new EvaluationOrder([n1, n2, n3, n4]),
+          new EvaluationOrder([n1, n2, n4, n3])
         ]));
   });
 
@@ -50,9 +51,9 @@ void main() {
     expect(
         orders,
         containsAll([
-          [n1, n2, n3],
-          [n2, n1, n3],
-          [n2, n3, n1]
+          new EvaluationOrder([n1, n2, n3]),
+          new EvaluationOrder([n2, n1, n3]),
+          new EvaluationOrder([n2, n3, n1])
         ]));
   });
 

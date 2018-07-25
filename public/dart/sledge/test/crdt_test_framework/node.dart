@@ -8,7 +8,11 @@ class Node {
   // [nodeId] must be unique among nodes in one computational graph.
   final String nodeId;
 
-  Node(this.nodeId);
+  Node(this.nodeId) {
+    if (nodeId.contains("'")) {
+      throw new FormatException("[nodeId] should not contain character <'>");
+    }
+  }
 
   List<int> get affectedInstances => <int>[];
 

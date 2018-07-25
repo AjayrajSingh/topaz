@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'evaluation_order.dart';
 import 'node.dart';
 
 // Computational graph.
@@ -79,7 +80,7 @@ class ComputationalGraph {
 
   // Returns [this] ordered topologically based on [choices].
   // Returns null if [choices] do not correspond to correct topological order.
-  List<Node> _getOrder(List<int> choices) {
+  EvaluationOrder _getOrder(List<int> choices) {
     List<Node> order = <Node>[];
     List<Node> ready = <Node>[];
     for (final node in nodes) {
@@ -112,10 +113,10 @@ class ComputationalGraph {
         }
       }
     }
-    return order;
+    return new EvaluationOrder(order);
   }
 
-  List<Node> _getNthOrder(int index) {
+  EvaluationOrder _getNthOrder(int index) {
     if (index < 0 || index >= _allChoices.length) {
       throw new ArgumentError.value(index, 'index', 'Index is out of range.');
     }
@@ -123,6 +124,6 @@ class ComputationalGraph {
   }
 
   // Returns all correct topological orders of this graph.
-  Iterable<List<Node>> get orders =>
-      new Iterable<List<Node>>.generate(_countOrders(), _getNthOrder);
+  Iterable<EvaluationOrder> get orders =>
+      new Iterable<EvaluationOrder>.generate(_countOrders(), _getNthOrder);
 }
