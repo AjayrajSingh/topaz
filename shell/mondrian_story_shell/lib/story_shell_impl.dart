@@ -11,7 +11,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/utils.dart';
 
-import 'models/surface/surface.dart';
+import 'models/surface/surface_graph.dart';
 import 'models/surface/surface_properties.dart';
 
 /// An implementation of the [StoryShell] interface.

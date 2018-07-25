@@ -14,7 +14,7 @@ import 'package:lib.widgets/widgets.dart';
 
 import 'models/inset_manager.dart';
 import 'models/layout_model.dart';
-import 'models/surface/surface.dart';
+import 'models/surface/surface_graph.dart';
 import 'story_shell_impl.dart';
 import 'widgets/mondrian.dart';
 

@@ -4,14 +4,13 @@
 
 import 'dart:math' as math;
 
-import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../tree.dart';
+import 'surface_graph.dart';
 import 'surface_properties.dart';
 
 /// The parentId that means no parent
@@ -20,17 +19,14 @@ const String kNoParent = '';
 /// Details of a surface child view
 class Surface extends Model {
   /// Public constructor
-  Surface(this._graph, this._node, this.properties, this.relation,
+  Surface(this._graph, this.node, this.properties, this.relation,
       this.compositionPattern);
 
   final SurfaceGraph _graph;
-  final Tree<String> _node;
+  final Tree<String> node;
 
   /// Connection to underlying view
-  ChildViewConnection _connection;
-
-  /// The ChildViewConnection that can be used to create ChildViews
-  ChildViewConnection get connection => _connection;
+  ChildViewConnection connection;
 
   /// The properties of this surface
   final SurfaceProperties properties;
@@ -42,7 +38,7 @@ class Surface extends Model {
   final String compositionPattern;
 
   /// Whether or not this surface is currently dismissed
-  bool get dismissed => _graph.isDismissed(_node.value);
+  bool get dismissed => _graph.isDismissed(node.value);
 
   /// Return the min width of this Surface
   double minWidth({double min = 0.0}) => math.max(0.0, min);
@@ -66,30 +62,30 @@ class Surface extends Model {
   }
 
   /// The parent of this node
-  Surface get parent => _surface(_node.parent);
+  Surface get parent => _surface(node.parent);
 
   /// The parentId of this node
-  String get parentId => _node.parent.value;
+  String get parentId => node.parent.value;
 
   /// The root surface
   Surface get root {
-    List<Tree<String>> nodeAncestors = _node.ancestors;
+    List<Tree<String>> nodeAncestors = node.ancestors;
     return _surface(nodeAncestors.length > 1
         ? nodeAncestors[nodeAncestors.length - 2]
-        : _node);
+        : node);
   }
 
   /// The children of this node
-  Iterable<Surface> get children => _surfaces(_node.children);
+  Iterable<Surface> get children => _surfaces(node.children);
 
   /// The siblings of this node
-  Iterable<Surface> get siblings => _surfaces(_node.siblings);
+  Iterable<Surface> get siblings => _surfaces(node.siblings);
 
   /// The ancestors of this node
-  Iterable<Surface> get ancestors => _surfaces(_node.ancestors);
+  Iterable<Surface> get ancestors => _surfaces(node.ancestors);
 
   /// This node and its descendents flattened into an Iterable
-  Iterable<Surface> get flattened => _surfaces(_node);
+  Iterable<Surface> get flattened => _surfaces(node);
 
   /// Returns a Tree for this surface
   Tree<Surface> get tree {
@@ -102,7 +98,7 @@ class Surface extends Model {
 
   /// Gets the dependent spanning tree the current widget is part of
   Tree<Surface> get dependentSpanningTree {
-    Tree<Surface> root = new Tree<Surface>(value: _surface(_node));
+    Tree<Surface> root = new Tree<Surface>(value: _surface(node));
     while (root.ancestors.isNotEmpty &&
         root.value.relation.dependency == SurfaceDependency.dependent) {
       root = root.ancestors.first;
@@ -116,7 +112,7 @@ class Surface extends Model {
   /// Spans the full tree of all copresenting surfaces starting with this
   Tree<Surface> get copresentSpanningTree => _spanningTree(
       null,
-      _surface(_node), // default to co-present if no opinion presented
+      _surface(node), // default to co-present if no opinion presented
       (Surface s) =>
           s.relation.arrangement == SurfaceArrangement.copresent ||
           s.relation.arrangement == SurfaceArrangement.none);
@@ -141,7 +137,7 @@ class Surface extends Model {
 
   /// Gets the pattern spanning tree the current widget is part of
   Tree<Surface> patternSpanningTree(String pattern) {
-    Tree<Surface> root = new Tree<Surface>(value: _surface(_node));
+    Tree<Surface> root = new Tree<Surface>(value: _surface(node));
     while (
         root.ancestors.isNotEmpty && root.value.compositionPattern == pattern) {
       root = root.ancestors.first;
@@ -154,9 +150,9 @@ class Surface extends Model {
   /// identified by containerId
   Tree<Surface> containerSpanningTree(String containerId) {
     log.info('looking for container: $containerId');
-    Tree<String> node = _node.root.find(containerId);
+    Tree<String> containerNode = node.root.find(containerId);
     log.info('found: $node');
-    Tree<Surface> root = new Tree<Surface>(value: _surface(node));
+    Tree<Surface> root = new Tree<Surface>(value: _surface(containerNode));
     log.info('root: $root');
     if (root.value is SurfaceContainer) {
       return _spanningTree(
@@ -173,26 +169,25 @@ class Surface extends Model {
   }
 
   /// Dismiss this node hiding it from layouts
-  bool dismiss() => _graph.dismissSurface(_node.value);
+  bool dismiss() => _graph.dismissSurface(node.value);
 
   /// Returns true if this surface can be dismissed
-  bool canDismiss() => _graph.canDismissSurface(_node.value);
+  bool canDismiss() => _graph.canDismissSurface(node.value);
 
   /// Remove this node from graph
   /// Returns true if this was removed
   bool remove() {
     // Only allow non-root surfaces to be removed
-    if (_node.parent?.value != null) {
-      _graph.removeSurface(_node.value);
+    if (node.parent?.value != null) {
+      _graph.removeSurface(node.value);
       return true;
     }
     return false;
   }
 
   // Get the surface for this node
-  Surface _surface(Tree<String> node) => (node == null || node.value == null)
-      ? null
-      : _graph._surfaces[node.value];
+  Surface _surface(Tree<String> node) =>
+      (node == null || node.value == null) ? null : _graph.getNode(node.value);
 
   Iterable<Surface> _surfaces(Iterable<Tree<String>> nodes) => nodes
       .where((Tree<String> node) => node != null && node.value != null)
@@ -202,8 +197,8 @@ class Surface extends Model {
   String toString() {
     String edgeLabel = relation?.arrangement?.toString() ?? '';
     String edgeArrow = '$edgeLabel->'.padLeft(6, '-');
-    String disconnected = _connection == null ? '[DISCONNECTED]' : '';
-    return '${edgeArrow}Surface ${_node.value} $disconnected';
+    String disconnected = connection == null ? '[DISCONNECTED]' : '';
+    return '${edgeArrow}Surface ${node.value} $disconnected';
   }
 
   List<Tree<Surface>> _endsOfChain({Tree<Surface> current}) {
@@ -224,7 +219,7 @@ class Surface extends Model {
     Forest<Surface> forest = new Forest<Surface>();
 
     Tree<Surface> tree =
-        _spanningTree(null, _surface(_node), (Surface s) => true);
+        _spanningTree(null, _surface(node), (Surface s) => true);
 
     queue.add(tree);
     while (queue.isNotEmpty) {
@@ -242,7 +237,7 @@ class Surface extends Model {
 
 /// Defines a Container root in the [Surface Graph], holds the layout description
 class SurfaceContainer extends Surface {
-  SurfaceContainer._internal(
+  SurfaceContainer(
       SurfaceGraph graph,
       Tree<String> node,
       SurfaceProperties properties,
@@ -250,11 +245,11 @@ class SurfaceContainer extends Surface {
       String compositionPattern,
       this._layouts)
       : super(graph, node, properties, relation, compositionPattern) {
-    super._connection = null;
+    super.connection = null;
   }
 
   @override
-  set _connection(ChildViewConnection value) {
+  set connection(ChildViewConnection value) {
     log.warning('Cannot set a child view connection on a Container');
   }
 
@@ -262,234 +257,4 @@ class SurfaceContainer extends Surface {
   List<ContainerLayout> get layouts => _layouts;
 
   List<ContainerLayout> _layouts;
-}
-
-/// Data structure to manage the relationships and relative focus of surfaces
-class SurfaceGraph extends Model {
-  /// Cache of surfaces
-  final Map<String, Surface> _surfaces = <String, Surface>{};
-
-  /// Surface relationship tree
-  final Tree<String> _tree = new Tree<String>(value: null);
-
-  /// The stack of previous focusedSurfaces, most focused at end
-  final List<String> _focusedSurfaces = <String>[];
-
-  /// The stack of previous focusedSurfaces, most focused at end
-  final Set<String> _dismissedSurfaces = new Set<String>();
-
-  /// The last focused surface.
-  Surface _lastFocusedSurface;
-
-  /// The currently most focused [Surface]
-  Surface get focused =>
-      _focusedSurfaces.isEmpty ? null : _surfaces[_focusedSurfaces.last];
-
-  /// The history of focused [Surface]s
-  Iterable<Surface> get focusStack => _focusedSurfaces
-      .where(_surfaces.containsKey)
-      .map((String id) => _surfaces[id]);
-
-  /// Add a [Surface] to the graph with the given parameters.
-  ///
-  /// Returns the surface that was added to the graph.
-  Surface addSurface(
-    String id,
-    SurfaceProperties properties,
-    String parentId,
-    SurfaceRelation relation,
-    String pattern,
-  ) {
-    Tree<String> node = _tree.find(id) ?? new Tree<String>(value: id);
-    Tree<String> parent =
-        (parentId == kNoParent) ? _tree : _tree.find(parentId);
-    assert(parent != null);
-    assert(relation != null);
-    parent.add(node);
-    Surface oldSurface = _surfaces[id];
-    Surface updatedSurface =
-        new Surface(this, node, properties, relation, pattern);
-    _surfaces[id] = updatedSurface;
-    oldSurface?.notifyListeners();
-    notifyListeners();
-    return updatedSurface;
-  }
-
-  /// Removes [Surface] from graph
-  void removeSurface(String id) {
-    // TODO(alangardner): Remap edges to transitive nodes appropriately
-    if (_surfaces.keys.contains(id)) {
-      Tree<String> node = _tree.find(id);
-      Tree<String> parent = node.parent;
-      node.detach();
-      node.children.forEach(parent.add);
-      _focusedSurfaces.remove(id);
-      _dismissedSurfaces.remove(id);
-      _surfaces.remove(id);
-      notifyListeners();
-    }
-  }
-
-  /// Move the surface up in the focus stack, undismissing it if needed.
-  ///
-  /// If relativeId is null, the surface is re-inserted  at the top of the stack
-  /// If relativeId is provided, the surface is re-inserted at the higher of
-  /// above the relative surface or any of its direct children, or its original
-  /// position.
-  void focusSurface(String id, String relativeId) {
-    if (!_surfaces.containsKey(id)) {
-      log.warning('Invalid surface id "$id"');
-      return;
-    }
-    int currentIndex = _focusedSurfaces.indexOf(id);
-    _dismissedSurfaces.remove(id);
-    _focusedSurfaces.remove(id);
-    if (relativeId == null || relativeId == kNoParent) {
-      _focusedSurfaces.add(id);
-    } else {
-      int relativeIndex = -1;
-      final Tree<String> relative = _tree.find(relativeId);
-      if (relative != null) {
-        relativeIndex = _focusedSurfaces.indexOf(relative.value);
-        // Use the highest index of relative or its children
-        for (Tree<String> childNode in relative.children) {
-          String childId = childNode.value;
-          relativeIndex =
-              math.max(relativeIndex, _focusedSurfaces.indexOf(childId));
-        }
-        // If none of those are focused, find the closest ancestor that is focused
-        Tree<String> ancestor = relative.parent;
-        while (relativeIndex < 0 && ancestor.value != null) {
-          relativeIndex = _focusedSurfaces.indexOf(ancestor.value);
-          ancestor = ancestor.parent;
-        }
-      }
-      // Insert to the highest of one past relative index, or the original index
-      int index =
-          math.max(relativeIndex < 0 ? -1 : relativeIndex + 1, currentIndex);
-      if (index >= 0) {
-        _focusedSurfaces.insert(index, id);
-      }
-    }
-
-    // Also request the input focus through the child view connection.
-    _surfaces[id].connection.requestFocus();
-    _lastFocusedSurface = _surfaces[id];
-
-    notifyListeners();
-  }
-
-  /// Add a container root to the surface graph
-  void addContainer(
-    String id,
-    SurfaceProperties properties,
-    String parentId,
-    SurfaceRelation relation,
-    List<ContainerLayout> layouts,
-  ) {
-    // TODO (djurphy): collisions/pathing - partial fix if we
-    // make the changes so container IDs are paths.
-    log.info('addContainer: $id');
-    Tree<String> node = _tree.find(id) ?? new Tree<String>(value: id);
-    log.info('found or made node: $node');
-    Tree<String> parent =
-        (parentId == kNoParent) ? _tree : _tree.find(parentId);
-    assert(parent != null);
-    assert(relation != null);
-    parent.add(node);
-    Surface oldSurface = _surfaces[id];
-    _surfaces[id] = new SurfaceContainer._internal(
-        this, node, properties, relation, '' /*pattern*/, layouts);
-    oldSurface?.notifyListeners();
-    log.info('_surfaces[id]: ${_surfaces[id]}');
-    notifyListeners();
-  }
-
-  /// Returns the list of surfaces that would be dismissed if this surface
-  /// were dismissed - e.g. as a result of dependency - including this surface
-  List<String> dismissedSet(String id) {
-    Surface dismissed = _surfaces[id];
-    List<Surface> ancestors = dismissed.ancestors.toList();
-    List<Surface> dependentTree = dismissed.dependentSpanningTree
-        .map((Tree<Surface> t) => t.value)
-        .toList()
-          // TODO(djmurphy) - when codependent comes in this needs to change
-          // this only removes down the tree, codependents would remove their
-          // ancestors
-          ..removeWhere((Surface s) => ancestors.contains(s));
-    List<String> depIds =
-        dependentTree.map((Surface s) => s._node.value).toList();
-    return depIds;
-  }
-
-  /// Check if given surface can be dismissed
-  bool canDismissSurface(String id) {
-    List<String> wouldDismiss = dismissedSet(id);
-    return _focusedSurfaces
-        .where((String fid) => !wouldDismiss.contains(fid))
-        .isNotEmpty;
-  }
-
-  /// When called surface is no longer displayed
-  bool dismissSurface(String id) {
-    if (!canDismissSurface(id)) {
-      return false;
-    }
-    List<String> depIds = dismissedSet(id);
-    _focusedSurfaces.removeWhere((String fid) => depIds.contains(fid));
-    _dismissedSurfaces.addAll(depIds);
-    notifyListeners();
-    return true;
-  }
-
-  /// True if surface has been dismissed and not subsequently focused
-  bool isDismissed(String id) => _dismissedSurfaces.contains(id);
-
-  /// Used to update a [Surface] with a live ChildViewConnection
-  void connectView(String id, InterfaceHandle<ViewOwner> viewOwner) {
-    final Surface surface = _surfaces[id];
-    if (surface != null) {
-      log.fine('connectView $surface');
-      surface
-        .._connection = new ChildViewConnection(
-          viewOwner,
-          onAvailable: (ChildViewConnection connection) {
-            trace('surface $id available');
-
-            // If this surface is the last focused one, also request input focus
-            if (_lastFocusedSurface == surface) {
-              connection.requestFocus();
-            }
-
-            surface.notifyListeners();
-          },
-          onUnavailable: (ChildViewConnection connection) {
-            trace('surface $id unavailable');
-            surface._connection = null;
-            if (_surfaces.containsValue(surface)) {
-              removeSurface(id);
-              notifyListeners();
-            }
-            // Also any existing listener
-            surface.notifyListeners();
-          },
-        )
-        ..notifyListeners();
-    }
-  }
-
-  /// Returns the amount of [Surface]s in the graph
-  int get size => _surfaces.length;
-
-  @override
-  String toString() => 'Tree:\n${_tree.children.map(_toString).join('\n')}';
-
-  String _toString(Tree<String> node, {String prefix = ''}) {
-    String nodeString = '$prefix${_surfaces[node.value]}';
-    if (node.children.isNotEmpty) {
-      nodeString =
-          '$nodeString\n${node.children.map((Tree<String> node) => _toString(node, prefix: '$prefix  ')).join('\n')}';
-    }
-    return '$nodeString';
-  }
 }

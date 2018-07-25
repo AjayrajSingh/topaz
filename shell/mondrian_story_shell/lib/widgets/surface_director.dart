@@ -17,6 +17,7 @@ import '../models/layout_model.dart';
 import '../models/surface/positioned_surface.dart';
 import '../models/surface/surface.dart';
 import '../models/surface/surface_form.dart';
+import '../models/surface/surface_graph.dart';
 import '../models/tree.dart';
 import 'mondrian_child_view.dart';
 

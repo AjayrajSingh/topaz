@@ -11,7 +11,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../models/inset_manager.dart';
-import '../models/surface/surface.dart';
+import '../models/surface/surface_graph.dart';
 import '../story_shell_impl.dart';
 import 'mondrian_logo.dart';
 import 'overview.dart';

@@ -9,6 +9,7 @@ import 'package:mondrian/models/layout_model.dart';
 import 'package:mondrian/layout/copresent_layout.dart' as copresent_layout;
 import 'package:mondrian/models/surface/positioned_surface.dart';
 import 'package:mondrian/models/surface/surface.dart';
+import 'package:mondrian/models/surface/surface_graph.dart';
 import 'package:mondrian/models/surface/surface_properties.dart';
 
 import '../layout_test_utils.dart' as test_util;
