@@ -5,7 +5,6 @@
 import 'package:fidl_fuchsia_bluetooth/fidl.dart' as bt;
 import 'package:fidl_fuchsia_bluetooth_gatt/fidl.dart' as gatt;
 import 'package:fidl_fuchsia_bluetooth_le/fidl.dart' as ble;
-import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets.dart/model.dart';
@@ -15,11 +14,9 @@ import 'package:lib.widgets.dart/model.dart';
 enum ConnectionState { notConnected, connecting, connected }
 
 /// The [Model] for the BLE Scanner example.
-class BLEScannerModel extends Model implements ble.CentralDelegate {
+class BLEScannerModel extends Model {
   // Members that maintain the FIDL service connections.
   final ble.CentralProxy _central = new ble.CentralProxy();
-  final ble.CentralDelegateBinding _delegateBinding =
-      new ble.CentralDelegateBinding();
 
   // GATT client proxy to the currently connected peripheral.
   final gatt.ClientProxy _gattClient = new gatt.ClientProxy();
@@ -40,6 +37,10 @@ class BLEScannerModel extends Model implements ble.CentralDelegate {
   // Devices that are connected.
   final Map<String, ConnectionState> _connectedDevices =
       <String, ConnectionState>{};
+
+  BLEScannerModel() {
+    _onStart();
+  }
 
   /// True if we have an active scan session.
   bool get isScanning => _isScanning;
@@ -128,31 +129,34 @@ class BLEScannerModel extends Model implements ble.CentralDelegate {
     });
   }
 
-  /// Connects the model to the bluetooth services
-  void connect(
-    ServiceProviderProxy environmentServices,
-  ) {
-    connectToService(environmentServices, _central.ctrl);
-    _central.setDelegate(_delegateBinding.wrap(this));
+  /// Connects the model to the Bluetooth LE service.
+  void _onStart() {
+    final startupContext = StartupContext.fromStartupInfo();
+    connectToService(startupContext.environmentServices, _central.ctrl);
+    _central
+        ..onScanStateChanged = _onScanStateChanged
+        ..onDeviceDiscovered = _onDeviceDiscovered
+        ..onPeripheralDisconnected = _onPeripheralDisconnected;
   }
 
-  // ble.CentralDelegate overrides:
+  /// The [terminate] method should be called before the module terminates
+  ///  allowing it to teardown any open connections it may have
+  void terminate() {
+    _central.ctrl.close();
+  }
 
-  @override
   // ignore: avoid_positional_boolean_parameters
-  void onScanStateChanged(bool scanning) {
+  void _onScanStateChanged(bool scanning) {
     _isScanning = scanning;
     notifyListeners();
   }
 
-  @override
-  void onDeviceDiscovered(ble.RemoteDevice device) {
+  void _onDeviceDiscovered(ble.RemoteDevice device) {
     _discoveredDevices[device.identifier] = device;
     notifyListeners();
   }
 
-  @override
-  void onPeripheralDisconnected(String id) {
+  void _onPeripheralDisconnected(String id) {
     _connectedDevices.remove(id);
     notifyListeners();
   }

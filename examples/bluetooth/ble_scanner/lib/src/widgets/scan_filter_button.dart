@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets.dart/model.dart';
 
-import '../model/ble_scanner_model.dart';
+import '../models/ble_scanner_model.dart';
 import 'scan_filter_dialog.dart';
 
 /// Button that brings up the scan filter dialog

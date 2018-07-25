@@ -7,7 +7,7 @@ import 'dart:math';
 import 'package:fidl_fuchsia_bluetooth_le/fidl.dart' as ble;
 
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets.dart/model.dart';
 
 import '../manufacturer_names.dart';
 import '../models/ble_scanner_model.dart' as model;

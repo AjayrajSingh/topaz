@@ -3,9 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets.dart/model.dart';
 
-import 'models/ble_rect_model.dart';
+import 'models/ble_scanner_model.dart';
 import 'widgets/scan_filter_button.dart';
 import 'widgets/scan_results_widget.dart';
 
