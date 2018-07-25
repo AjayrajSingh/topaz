@@ -5,8 +5,8 @@
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:crypto/crypto.dart';
 
+import '../../utils_hash.dart';
 import '../uint8list_ops.dart';
 import 'key_value.dart';
 
@@ -68,10 +68,10 @@ class Compressor {
     return result;
   }
 
-  /// Returns sha1 hash of key, and adds (hash, key) pair to caching map.
+  /// Returns hash of key, and adds (hash, key) pair to caching map.
   Uint8List _getAndSaveHashOfKey(Uint8List key) {
     // TODO: consider using more efficient hash function.
-    Uint8List result = new Uint8List.fromList(sha1.convert(key).bytes);
+    Uint8List result = hash(key);
     if (_keyByHash.containsKey(key)) {
       if (_keyByHash[key] != result) {
         throw new FormatException('Collision appears.');

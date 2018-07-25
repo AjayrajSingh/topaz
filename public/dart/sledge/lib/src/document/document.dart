@@ -5,11 +5,10 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
-
 import '../sledge.dart';
 import '../sledge_connection_id.dart';
 import '../transaction.dart';
+import '../utils_hash.dart';
 import 'change.dart';
 import 'document_id.dart';
 import 'leaf_value.dart';
@@ -40,8 +39,7 @@ class Document implements ValueObserver {
       // Hash the key
       final keyBytes =
           new Uint16List.fromList(key.codeUnits).buffer.asUint8List();
-      Uint8List hashBytes =
-          new Uint8List.fromList(sha1.convert(keyBytes).bytes);
+      Uint8List hashBytes = hash(keyBytes);
       assert(hashBytes.length == _hashLength);
       // Insert [value] with the hashed key in [_fields].
       _fields[hashBytes] = value;
@@ -100,7 +98,7 @@ class Document implements ValueObserver {
 
   /// Returns a stream, generating an event each time a document changes.
   static Stream<void> getOnChangeStream(final Document doc) => doc._onChange;
-  
+
   /// Rolls back all local modifications on all fields of this document.
   void _rollbackChange() {
     for (final leafValue in _fields.values) {

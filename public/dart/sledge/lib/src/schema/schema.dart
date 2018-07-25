@@ -6,11 +6,10 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
-
 import '../document/value.dart';
 import '../document/value_node.dart';
 import '../sledge_connection_id.dart';
+import '../utils_hash.dart' as utils;
 import 'base_type.dart';
 import 'types/map_type.dart';
 import 'types/ordered_list_type.dart';
@@ -93,7 +92,7 @@ class Schema implements BaseType {
     // TODO: Compute a hash not based on the JSON representation.
     String jsonString = json.encode(this);
     Uint8List bytes = utf8.encode(jsonString);
-    Uint8List digest = sha1.convert(bytes).bytes;
+    Uint8List digest = utils.hash(bytes);
     assert(digest.length == 20);
     return digest;
   }

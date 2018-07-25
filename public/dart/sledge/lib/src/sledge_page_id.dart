@@ -5,27 +5,48 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+
+import 'document/uint8list_ops.dart';
+import 'utils_hash.dart';
+import 'version.dart';
 
 /// Convenience wrapper of Ledger's page id.
 class SledgePageId {
-  /// The Ledger's PageId.
-  ledger.PageId id;
+  ledger.PageId _id;
+
+  /// The prefix of the Ledger page managed by Sledge.
+  static final Uint8List prefix = utf8.encode(_sledgePageIdPrefix());
 
   /// Convenience constructor that takes an optional string.
   SledgePageId([String pageName = '']) {
     pageName ??= '';
 
-    // TODO: use the hash of [pageName] and then add unittests.
-    List<int> encodedPageName =
-        new List<int>.from(utf8.encode('sledge_$pageName'));
-    if (encodedPageName.length > 16) {
-      throw new FormatException('page name too long');
-    }
-    while (encodedPageName.length < 16) {
-      encodedPageName.add(0);
-    }
+    final Uint8List hashedPageName = hash(new Utf8Encoder().convert(pageName));
 
-    id = new ledger.PageId(id: new Uint8List.fromList(encodedPageName));
+    final encodedPageName = concatUint8Lists(prefix, hashedPageName);
+
+    final trimmedEncodedPageName = encodedPageName.sublist(0, 16);
+    assert(trimmedEncodedPageName.length == 16);
+
+    _id = new ledger.PageId(id: trimmedEncodedPageName);
+  }
+
+  /// The Ledger's PageId.
+  // TODO: rename into ledgePageId.
+  ledger.PageId get id => _id;
+
+  /// Returns the prefix of a ledger PageId managed by the current version of
+  /// Sledge.
+  static String _sledgePageIdPrefix() {
+    return 'sledge${sledgeVersion}_';
+  }
+
+  /// Returns true if the page identified with [pageId] is managed by this
+  /// version of Sledge.
+  static bool pageIsManagedBySledge(ledger.PageId pageId) {
+    final pageIdPrefix = getUint8ListPrefix(pageId.id, prefix.length);
+    return new ListEquality<int>().equals(pageIdPrefix, prefix);
   }
 }

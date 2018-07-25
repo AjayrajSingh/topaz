@@ -67,7 +67,7 @@ class Fleet<T extends dynamic> {
       ..addAll(group.reversed);
     for (int i = 0; i < list.length - 1; i++) {
       Node node = new SynchronizationNode(
-          's${list[i]}_${list[i+1]}_n${graph.nodes.length}',
+          's${list[i]}_${list[i + 1]}_n${graph.nodes.length}',
           list[i],
           list[i + 1]);
       _addNode(node, list[i]);

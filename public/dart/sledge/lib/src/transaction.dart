@@ -35,7 +35,8 @@ class Transaction {
     // Start Ledger transaction.
     final startTransactionCompleter = new Completer<ledger.Status>();
     pageProxy.startTransaction(startTransactionCompleter.complete);
-    bool startTransactionOk = (await startTransactionCompleter.future) == ledger.Status.ok;
+    bool startTransactionOk =
+        (await startTransactionCompleter.future) == ledger.Status.ok;
     if (!startTransactionOk) {
       return false;
     }
