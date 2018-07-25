@@ -21,6 +21,7 @@ dart_tool("kernel_compiler") {
 sdk_atom("kernel_compiler_sdk") {
   domain = "dart"
   name = "kernel_compiler"
+  id = "sdk://tools/dart"
   category = "partner"
 
   tags = [ "type:tool" ]
