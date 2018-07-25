@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:fidl_fidl_examples_bindings_test/fidl_async.dart';
+import 'package:fidl_fidl_examples_bindingstest/fidl_async.dart';
 import 'package:lib.app.dart/app_async.dart';
 import 'package:fidl_fuchsia_sys/fidl_async.dart'
     show ComponentControllerProxy, LaunchInfo;

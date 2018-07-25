@@ -4,7 +4,7 @@
 
 import 'dart:collection';
 
-import 'package:fidl_fuchsia_contacts_content_provider/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_contacts_contentprovider/fidl.dart' as fidl;
 import 'package:flutter_flux/flutter_flux.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.schemas.dart/com.fuchsia.contact.dart';

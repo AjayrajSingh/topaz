@@ -6,7 +6,7 @@ import("//build/dart/dart_library.gni")
 import("//build/fidl/fidl.gni")
 
 fidl("services") {
-  name = "fuchsia.contacts.content_provider"
+  name = "fuchsia.contacts.contentprovider"
   sources = [
     "fidl/contacts_content_provider.fidl",
   ]

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fidl_examples_bindings_test/fidl_async.dart';
+import 'package:fidl_fidl_examples_bindingstest/fidl_async.dart';
 import 'package:test/test.dart';
 
 import './server.dart';

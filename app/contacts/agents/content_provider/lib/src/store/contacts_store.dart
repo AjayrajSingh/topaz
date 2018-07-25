@@ -4,7 +4,7 @@
 
 import 'dart:collection';
 
-import 'package:fidl_fuchsia_contacts_content_provider/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_contacts_contentprovider/fidl.dart' as fidl;
 
 import 'prefix_tree.dart';
 

@@ -5,7 +5,7 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_contacts_content_provider/fidl.dart';
+import 'package:fidl_fuchsia_contacts_contentprovider/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.agent.dart/agent.dart';
 import 'package:lib.app.dart/app.dart';

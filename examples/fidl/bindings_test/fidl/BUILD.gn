@@ -5,7 +5,7 @@
 import("//build/fidl/fidl.gni")
 
 fidl("bindings_test") {
-  name = "fidl.examples.bindings_test"
+  name = "fidl.examples.bindingstest"
 
   sources = [
     "bindings_test.fidl",

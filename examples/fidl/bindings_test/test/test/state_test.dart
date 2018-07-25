@@ -5,7 +5,7 @@
 import 'package:zircon/zircon.dart';
 import 'package:test/test.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fidl_examples_bindings_test/fidl_async.dart';
+import 'package:fidl_fidl_examples_bindingstest/fidl_async.dart';
 
 void main() async {
   group('proxy state', () {

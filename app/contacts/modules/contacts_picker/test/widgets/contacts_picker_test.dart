@@ -5,7 +5,7 @@
 import 'package:collection/collection.dart';
 import 'package:contacts_picker/stores.dart';
 import 'package:contacts_picker/widgets.dart';
-import 'package:fidl_fuchsia_contacts_content_provider/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_contacts_contentprovider/fidl.dart' as fidl;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
