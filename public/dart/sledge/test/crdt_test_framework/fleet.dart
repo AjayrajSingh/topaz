@@ -33,7 +33,7 @@ typedef CheckerGenerator<T> = Checker<T> Function();
 class Fleet<T extends dynamic> {
   int _fleetSize;
   List<Node> _lastModifications;
-  final Node _initialModification = new Node();
+  final Node _initialModification = new Node('init');
   final ComputationalGraph graph = new ComputationalGraph();
   final T Function(int) _instanceGenerator;
   final List<CheckerGenerator<T>> _checkerGenerators = <CheckerGenerator<T>>[];
@@ -65,14 +65,18 @@ class Fleet<T extends dynamic> {
       ..removeLast()
       ..addAll(group.reversed);
     for (int i = 0; i < list.length - 1; i++) {
-      Node node = new SynchronizationNode(list[i], list[i + 1]);
+      Node node = new SynchronizationNode(
+          's${list[i]}_${list[i+1]}_n${graph.nodes.length}',
+          list[i],
+          list[i + 1]);
       _addNode(node, list[i]);
       _addNode(node, list[i + 1]);
     }
   }
 
   void runInTransaction(int id, void Function(T) modification) {
-    final node = new ModificationNode<T>(id, modification);
+    final node = new ModificationNode<T>(
+        'm${id}_n${graph.nodes.length}', id, modification);
     _addNode(node, id);
   }
 

@@ -16,6 +16,9 @@ class ComputationalGraph {
   final List<List<int>> _allChoices = <List<int>>[];
 
   void addNode(Node v) {
+    // TODO: remove O(n) part.
+    // TODO: check that there is no insertions of different Nodes with the same
+    // nodeId.
     if (nodes.contains(v)) {
       return;
     }

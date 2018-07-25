@@ -8,22 +8,13 @@ import 'package:test/test.dart';
 import '../crdt_test_framework/computational_graph.dart';
 import '../crdt_test_framework/node.dart';
 
-class NamedNode extends Node {
-  String name = '';
-
-  NamedNode(this.name);
-
-  @override
-  String toString() => name;
-}
-
 void main() {
   test('Build and get orders.', () {
     ComputationalGraph G = new ComputationalGraph();
-    final n1 = new NamedNode('n 1');
-    final n2 = new NamedNode('n 2');
-    final n3 = new NamedNode('n 3');
-    final n4 = new NamedNode('n 4');
+    final n1 = new Node('n 1');
+    final n2 = new Node('n 2');
+    final n3 = new Node('n 3');
+    final n4 = new Node('n 4');
     G
       ..addNode(n1)
       ..addNode(n2)
@@ -45,9 +36,9 @@ void main() {
 
   test('Build and get orders not connected.', () {
     ComputationalGraph G = new ComputationalGraph();
-    final n1 = new NamedNode('n 1');
-    final n2 = new NamedNode('n 2');
-    final n3 = new NamedNode('n 3');
+    final n1 = new Node('n 1');
+    final n2 = new Node('n 2');
+    final n3 = new Node('n 3');
     G
       ..addNode(n1)
       ..addNode(n2)
@@ -67,9 +58,9 @@ void main() {
 
   test('Build and get orders, cyclic graph.', () {
     ComputationalGraph G = new ComputationalGraph();
-    final n1 = new NamedNode('n 1');
-    final n2 = new NamedNode('n 2');
-    final n3 = new NamedNode('n 3');
+    final n1 = new Node('n 1');
+    final n2 = new Node('n 2');
+    final n3 = new Node('n 3');
     G
       ..addNode(n1)
       ..addNode(n2)
