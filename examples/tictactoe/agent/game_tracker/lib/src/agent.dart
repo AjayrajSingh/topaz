@@ -4,10 +4,10 @@
 
 import 'dart:async';
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_tictactoe/fidl.dart';
+import 'package:fidl_fuchsia_tictactoe/fidl_async.dart';
 import 'package:game_tracker_impl/impl.dart';
-import 'package:lib.agent.dart/agent.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:lib.agent.dart/agent_async.dart';
+import 'package:lib.app.dart/app_async.dart';
 import 'package:meta/meta.dart';
 
 /// An implementation of the [Agent] interface for tracking game wins.
@@ -16,7 +16,7 @@ class GameTrackerAgent extends AgentImpl {
       : super(startupContext: startupContext);
 
   /// Store of the request bindings to the impl
-  final List<Binding<Object>> _bindings = <Binding<Object>>[];
+  final List<AsyncBinding<Object>> _bindings = <AsyncBinding<Object>>[];
 
   @override
   Future<Null> onReady(
@@ -28,7 +28,7 @@ class GameTrackerAgent extends AgentImpl {
   ) async {
     // Adds this agent's service to the outgoingServices so that it can accessed
     // from elsewhere and saves the binding for disconnecting in [onStop].
-    outgoingServices.addServiceForName(
+    outgoingServices.addServiceForName<GameTracker>(
         (request) => _bindings.add((new GameTrackerBinding())
           ..bind(new GameTrackerImpl(componentContext), request)),
         GameTracker.$serviceName);
@@ -36,7 +36,7 @@ class GameTrackerAgent extends AgentImpl {
 
   @override
   Future<Null> onStop() async {
-    for (Binding binding in _bindings) {
+    for (final binding in _bindings) {
       binding.close();
     }
   }

@@ -4,9 +4,8 @@
 
 import 'dart:async';
 
-import 'package:fidl_fuchsia_tictactoe/fidl.dart';
+import 'package:fidl_fuchsia_tictactoe/fidl_async.dart';
 import 'package:flutter/material.dart';
-import 'package:game_tracker_client/client.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.proposal.dart/proposal.dart';
@@ -29,17 +28,11 @@ void main() {
         (error, stackTrace) =>
             log.severe('Error starting module driver.', error, stackTrace));
 
-  // A ServiceClient is a temporary construct for providing idiomatic,
-  // async Dart APIs for clients of a FIDL service.  ServiceClients will be
-  // removed when the new dart FIDL bindings are available.
-  Future<GameTrackerServiceClient> gameTrackerServiceClient =
-      _createGameTrackerServiceClient(moduleDriver).catchError(
-          (error, stackTrace) => log.severe(
-              'Error constructing GameTrackerServiceClient.', error, stackTrace));
+  Future<GameTracker> futureGameTracker = _createGameTracker(moduleDriver);
 
   TicTacToeModel model = new TicTacToeModel(
     winListener: (gameState) async =>
-        _recordWinner(await gameTrackerServiceClient, gameState),
+        _recordWinner(await futureGameTracker, gameState),
   );
 
   _proposeScore(moduleDriver);
@@ -56,63 +49,66 @@ void main() {
   );
 }
 
-Future<GameTrackerServiceClient> _createGameTrackerServiceClient(
-    ModuleDriver moduleDriver) async {
-  GameTrackerServiceClient gameTrackerServiceClient =
-      new GameTrackerServiceClient();
-  moduleDriver.addOnTerminateHandler(() => gameTrackerServiceClient.terminate);
-  await moduleDriver.connectToAgentService(
-    gameTrackerAgentUrl,
-    gameTrackerServiceClient,
-  );
-  return gameTrackerServiceClient;
+Future<GameTracker> _createGameTracker(ModuleDriver moduleDriver) async {
+  GameTrackerProxy gameTrackerProxy = new GameTrackerProxy();
+  return moduleDriver
+      .connectToAgentServiceWithAsyncProxy(
+        gameTrackerAgentUrl,
+        gameTrackerProxy,
+      )
+      .then((_) => gameTrackerProxy)
+      .catchError(
+        (error, stackTrace) =>
+            log.severe('Error constructing GameTracker.', error, stackTrace),
+      );
 }
 
 void _recordWinner(
-  GameTrackerServiceClient gameTrackerServiceClient,
+  GameTracker gameTracker,
   GameState gameState,
-) {
-  if (gameState == GameState.xWin) {
-    gameTrackerServiceClient.recordWin(Player.x).catchError(
-        (error, stackTrace) => log.severe('Error recording win', error, stackTrace));
-  } else if (gameState == GameState.oWin) {
-    gameTrackerServiceClient.recordWin(Player.o).catchError(
-        (error, stackTrace) => log.severe('Error recording win', error, stackTrace));
+) async {
+  try {
+    if (gameState == GameState.xWin) {
+      await gameTracker.recordWin(Player.x);
+    } else if (gameState == GameState.oWin) {
+      await gameTracker.recordWin(Player.o);
+    }
+    // ignore: avoid_catches_without_on_clauses
+  } catch (error, stackTrace) {
+    log.severe('Error recording win', error, stackTrace);
   }
 }
 
-void _proposeScore(ModuleDriver moduleDriver) {
-  moduleDriver.getStoryId().then((storyId) {
-    Intent intent = Intent(handler: scoreBoardModUrl);
+Future<void> _proposeScore(ModuleDriver moduleDriver) async {
+  final storyId = await moduleDriver.getStoryId();
 
-    AddModule addModule = AddModule(
-      storyId: storyId,
-      moduleName: 'ScoreBoard',
-      surfaceRelation: const SurfaceRelation(
-        arrangement: SurfaceArrangement.copresent,
-        dependency: SurfaceDependency.dependent,
-        emphasis: 0.3,
-      ),
-      intent: intent,
-      // This parameter is the parent module. In our case, it would be
-      // gameboard mod. We would use 'root' to denote that.
-      surfaceParentModulePath: ['root'],
-    );
+  final Intent intent = Intent(handler: scoreBoardModUrl);
 
-    ProposalBuilder proposal =
-        ProposalBuilder(id: 'showScore', headline: 'Show Score')
-          ..storyId = storyId
-          ..color = suggestionColor
-          ..storyAffinity = true
-          ..addAction(Action.withAddModule(addModule));
+  final AddModule addModule = AddModule(
+    storyId: storyId,
+    moduleName: 'ScoreBoard',
+    surfaceRelation: const SurfaceRelation(
+      arrangement: SurfaceArrangement.copresent,
+      dependency: SurfaceDependency.dependent,
+      emphasis: 0.3,
+    ),
+    intent: intent,
+    // This parameter is the parent module. In our case, it would be
+    // gameboard mod. We would use 'root' to denote that.
+    surfaceParentModulePath: ['root'],
+  );
 
-    moduleDriver.moduleContext
-        .getIntelligenceServices()
-        .then((final intelligenceServices) {
-      final ProposalPublisherProxy proposalPublisher = ProposalPublisherProxy();
-      intelligenceServices
-          .getProposalPublisher(proposalPublisher.ctrl.request());
-      proposal.build().then(proposalPublisher.propose);
-    });
-  });
+  final proposalBuilder =
+      ProposalBuilder(id: 'showScore', headline: 'Show Score')
+        ..storyId = storyId
+        ..color = suggestionColor
+        ..storyAffinity = true
+        ..addAction(Action.withAddModule(addModule));
+
+  final intelligenceServices =
+      await moduleDriver.moduleContext.getIntelligenceServices();
+
+  final ProposalPublisherProxy proposalPublisher = ProposalPublisherProxy();
+  intelligenceServices.getProposalPublisher(proposalPublisher.ctrl.request());
+  proposalPublisher.propose(await proposalBuilder.build());
 }

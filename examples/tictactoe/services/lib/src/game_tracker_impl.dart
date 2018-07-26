@@ -5,10 +5,10 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart' as fidl;
-import 'package:fidl_fuchsia_sys/fidl.dart' as fidl;
-import 'package:fidl_fuchsia_modular/fidl.dart' as fidl;
-import 'package:fidl_fuchsia_tictactoe/fidl.dart' as tictactoe_fidl;
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl;
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
+import 'package:fidl_fuchsia_tictactoe/fidl_async.dart' as tictactoe_fidl;
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/sledge.dart';
 import 'package:tictactoe_common/common.dart';
@@ -18,7 +18,7 @@ typedef ExecuteResultFunction = void Function(
 
 class GameTrackerImpl extends tictactoe_fidl.GameTracker {
   final ComponentContext _componentContext;
-  final Map<String, fidl.MessageSenderProxy> _messageQueues = {};
+  final Map<String, fidl.MessageSender> _messageQueues = {};
   final Map<String, StreamSubscription> _xSubscriptions = {};
   final Map<String, StreamSubscription> _oSubscriptions = {};
   final Sledge _sledge;
@@ -27,7 +27,7 @@ class GameTrackerImpl extends tictactoe_fidl.GameTracker {
   DocumentId _sledgeDocumentId;
 
   GameTrackerImpl(this._componentContext)
-      : _sledge = new Sledge(_componentContext) {
+      : _sledge = new Sledge.forAsync(_componentContext) {
     Map<String, BaseType> schemaDescription = <String, BaseType>{
       'xScore': new Integer(),
       'oScore': new Integer()
@@ -38,8 +38,8 @@ class GameTrackerImpl extends tictactoe_fidl.GameTracker {
   }
 
   @override
-  void recordWin(tictactoe_fidl.Player player,
-      ExecuteResultFunction resultFunction) async {
+  Future<tictactoe_fidl.ExecuteResult> recordWin(
+      tictactoe_fidl.Player player) async {
     try {
       bool transactionResult = await _sledge.runInTransaction(() async {
         dynamic doc = await _sledge.getDocument(_sledgeDocumentId);
@@ -61,41 +61,40 @@ class GameTrackerImpl extends tictactoe_fidl.GameTracker {
       if (transactionResult == false) {
         throw Exception('Error writing result to sledge.');
       }
-      resultFunction(
-          tictactoe_fidl.ExecuteResult(status: tictactoe_fidl.Status.ok));
+      return tictactoe_fidl.ExecuteResult(status: tictactoe_fidl.Status.ok);
     } on Exception catch (e) {
-      resultFunction(tictactoe_fidl.ExecuteResult(
-          status: tictactoe_fidl.Status.error, errorMessage: e.toString()));
+      return tictactoe_fidl.ExecuteResult(
+          status: tictactoe_fidl.Status.error, errorMessage: e.toString());
     }
   }
 
   @override
-  void subscribeToScore(
-      String queueToken, ExecuteResultFunction resultFunction) async {
+  Future<tictactoe_fidl.ExecuteResult> subscribeToScore(
+      String queueToken) async {
     try {
-      _messageQueues[queueToken] = await _createMessageSenderProxy(queueToken);
+      _messageQueues[queueToken] = await _createMessageSender(queueToken);
       _setupScoreListeners(queueToken);
       _sendScoreToQueue(queueToken);
-      resultFunction(
-          tictactoe_fidl.ExecuteResult(status: tictactoe_fidl.Status.ok));
+      return tictactoe_fidl.ExecuteResult(status: tictactoe_fidl.Status.ok);
     } on Exception catch (e) {
-      resultFunction(tictactoe_fidl.ExecuteResult(
-          status: tictactoe_fidl.Status.error, errorMessage: e.toString()));
+      return tictactoe_fidl.ExecuteResult(
+          status: tictactoe_fidl.Status.error, errorMessage: e.toString());
     }
   }
 
   @override
-  void unsubscribeFromScore(
-      String queueToken, ExecuteResultFunction resultFunction) {
+  Future<tictactoe_fidl.ExecuteResult> unsubscribeFromScore(
+      String queueToken) async {
     try {
       _messageQueues.remove(queueToken);
-      _xSubscriptions.remove(queueToken)?.cancel();
-      _oSubscriptions.remove(queueToken)?.cancel();
-      resultFunction(
-          tictactoe_fidl.ExecuteResult(status: tictactoe_fidl.Status.ok));
+      await Future.wait([
+        _xSubscriptions.remove(queueToken)?.cancel(),
+        _oSubscriptions.remove(queueToken)?.cancel(),
+      ]);
+      return tictactoe_fidl.ExecuteResult(status: tictactoe_fidl.Status.ok);
     } on Exception catch (e) {
-      resultFunction(tictactoe_fidl.ExecuteResult(
-          status: tictactoe_fidl.Status.error, errorMessage: e.toString()));
+      return tictactoe_fidl.ExecuteResult(
+          status: tictactoe_fidl.Status.error, errorMessage: e.toString());
     }
   }
 
@@ -149,25 +148,9 @@ class GameTrackerImpl extends tictactoe_fidl.GameTracker {
             log.shout('Error sending score to message queue: ${e.toString()}'));
   }
 
-  Future<fidl.MessageSenderProxy> _createMessageSenderProxy(String queueToken) {
-    Completer<fidl.MessageSenderProxy> senderCompleter =
-        new Completer<fidl.MessageSenderProxy>();
-    fidl.MessageSenderProxy sender = new fidl.MessageSenderProxy();
-
-    sender.ctrl.error.then((fidl.ProxyError err) {
-      if (!senderCompleter.isCompleted) {
-        senderCompleter.completeError(err);
-      }
-    });
-
-    _componentContext.getMessageSender(queueToken, sender.ctrl.request());
-
-    scheduleMicrotask(() {
-      if (!senderCompleter.isCompleted) {
-        senderCompleter.complete(sender);
-      }
-    });
-
-    return senderCompleter.future;
+  Future<fidl.MessageSender> _createMessageSender(String queueToken) async {
+    final sender = new fidl.MessageSenderProxy();
+    await _componentContext.getMessageSender(queueToken, sender.ctrl.request());
+    return sender;
   }
 }

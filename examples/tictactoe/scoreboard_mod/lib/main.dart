@@ -1,11 +1,11 @@
 import 'dart:async';
 
+import 'package:fidl_fuchsia_tictactoe/fidl_async.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:tictactoe_common/common.dart';
-import 'package:game_tracker_client/client.dart';
 
 import 'src/model/scoreboard_model.dart';
 import 'src/widget/scoreboard_widget.dart';
@@ -25,15 +25,7 @@ void main() {
   ScoreBoardModel model = ScoreBoardModel();
   ScoreCodec scoreCodec = ScoreCodec();
 
-  // A ServiceClient is a temporary construct for providing idiomatic,
-  // async Dart APIs for clients of a FIDL service.  ServiceClients will be
-  // removed when the new dart FIDL bindings are available.
-  // ignore: unused_local_variable
-  Future<GameTrackerServiceClient> gameTrackerServiceClient =
-      _createGameTrackerServiceClient(moduleDriver).catchError(
-    (error, stackTrace) => log.severe(
-        'Error constructing GameTrackerServiceClient.', error, stackTrace),
-  );
+  Future<GameTracker> futureGameTracker = _createGameTracker(moduleDriver);
 
   // Set up message queue to get score updates from.
   Future<String> messageQueueToken = moduleDriver
@@ -53,21 +45,20 @@ void main() {
       );
 
   // Subcribe to score updates.
-  gameTrackerServiceClient.then(
-    (gameTrackerServiceClient) async {
-      return gameTrackerServiceClient.subscribeToScore(await messageQueueToken);
+  futureGameTracker.then(
+    (gameTracker) async {
+      return gameTracker.subscribeToScore(await messageQueueToken);
     },
   ).catchError((error, stackTrace) =>
       log.severe('Error subscribing to score', error, stackTrace));
 
   // Terminate connection to tracker service when the mod terminates.
   moduleDriver.addOnTerminateHandler(
-    () => gameTrackerServiceClient.then((gameTrackerServiceClient) async {
-          gameTrackerServiceClient
-            ..unsubscribeFromScore(await messageQueueToken).catchError((error,
-                    stackTrace) =>
-                log.severe('Error unsubscribing from score', error, stackTrace))
-            ..terminate();
+    () => futureGameTracker.then((gameTracker) async {
+          await gameTracker
+              .unsubscribeFromScore(await messageQueueToken)
+              .catchError((error, stackTrace) => log.severe(
+                  'Error unsubscribing from score', error, stackTrace));
         }),
   );
 
@@ -83,14 +74,16 @@ void main() {
   );
 }
 
-Future<GameTrackerServiceClient> _createGameTrackerServiceClient(
-    ModuleDriver moduleDriver) {
-  GameTrackerServiceClient gameTrackerServiceClient =
-      new GameTrackerServiceClient();
+Future<GameTracker> _createGameTracker(ModuleDriver moduleDriver) async {
+  GameTrackerProxy gameTrackerProxy = new GameTrackerProxy();
   return moduleDriver
-      .connectToAgentService(
+      .connectToAgentServiceWithAsyncProxy(
         gameTrackerAgentUrl,
-        gameTrackerServiceClient,
+        gameTrackerProxy,
       )
-      .then((_) => gameTrackerServiceClient);
+      .then((_) => gameTrackerProxy)
+      .catchError(
+        (error, stackTrace) =>
+            log.severe('Error constructing GameTracker.', error, stackTrace),
+      );
 }
