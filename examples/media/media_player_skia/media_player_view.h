@@ -40,9 +40,8 @@ class MediaPlayerView : public mozart::BaseView {
       fuchsia::ui::viewsv1::ViewProperties old_properties) override;
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
-  void OnChildAttached(
-      uint32_t child_key,
-      fuchsia::ui::viewsv1::ViewInfo child_view_info) override;
+  void OnChildAttached(uint32_t child_key,
+                       fuchsia::ui::viewsv1::ViewInfo child_view_info) override;
   void OnChildUnavailable(uint32_t child_key) override;
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 
@@ -84,7 +83,7 @@ class MediaPlayerView : public mozart::BaseView {
   State previous_state_ = State::kPaused;
   State state_ = State::kPaused;
   media::TimelineFunction timeline_function_;
-  fuchsia::mediaplayer::MediaMetadataPtr metadata_;
+  int64_t duration_ns_ = 0;
   fuchsia::math::RectF content_rect_;
   fuchsia::math::RectF controls_rect_;
   fuchsia::math::RectF progress_bar_rect_;

@@ -32,7 +32,7 @@ class AudioPlayerController {
   TimelineFunction _timelineFunction;
   Problem _problem;
 
-  MediaMetadata _metadata;
+  Map<String, String> _metadata;
 
   bool _progressBarReady = false;
   int _progressBarMicrosecondsSinceEpoch;
@@ -174,6 +174,9 @@ class AudioPlayerController {
   bool get openOrConnected => _active;
 
   /// Indicates whether the player is in the process of loading content.
+  /// A transition to false signals that the content is viable and has a
+  /// duration. Metadata may arrive before or after loading transitions to
+  /// false.
   bool get loading => _loading;
 
   /// Indicates whether the content has a video stream.
@@ -194,7 +197,7 @@ class AudioPlayerController {
   Problem get problem => _problem;
 
   /// Gets the current content metadata, if any.
-  MediaMetadata get metadata => _metadata;
+  Map<String, String> get metadata => _metadata;
 
   /// Gets the duration of the content.
   Duration get duration =>
@@ -315,11 +318,19 @@ class AudioPlayerController {
         _timelineFunction.subjectDelta != 0;
 
     _problem = status.problem;
-    _metadata = status.metadata;
 
-    if (_metadata != null) {
+    if (status.metadata != null) {
+      _metadata = new Map.fromIterable(status.metadata.properties,
+                                       key: (property) => property.label,
+                                       value: (property) => property.value);
+    } else {
+      _metadata = null;
+    }
+
+    _durationNanoseconds = status.durationNs;
+
+    if (status.durationNs != 0) {
       _loading = false;
-      _durationNanoseconds = _metadata.duration;
     }
 
     if (_progressBarReady && _progressNanoseconds < 0) {

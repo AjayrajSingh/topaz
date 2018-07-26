@@ -57,8 +57,7 @@ MediaPlayerView::MediaPlayerView(
     async::Loop* loop, fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
         view_owner_request,
-    component::StartupContext* startup_context,
-    const MediaPlayerParams& params)
+    component::StartupContext* startup_context, const MediaPlayerParams& params)
     : mozart::BaseView(std::move(view_manager), std::move(view_owner_request),
                        "Media Player"),
 
@@ -150,17 +149,18 @@ bool MediaPlayerView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   if (event.is_pointer()) {
     const auto& pointer = event.pointer();
     if (pointer.phase == fuchsia::ui::input::PointerEventPhase::DOWN) {
-      if (metadata_ && Contains(progress_bar_rect_, pointer.x, pointer.y)) {
-        // User poked the progress bar...seek.
-        media_player_->Seek((pointer.x - progress_bar_rect_.x) *
-                            metadata_->duration / progress_bar_rect_.width);
+      if (!Contains(progress_bar_rect_, pointer.x, pointer.y)) {
+        // User poked outside the progress bar.
+        TogglePlayPause();
+      } else if (duration_ns_ != 0) {
+        // User poked the progress bar and we have duration...seek.
+        media_player_->Seek((pointer.x - progress_bar_rect_.x) * duration_ns_ /
+                            progress_bar_rect_.width);
         if (state_ != State::kPlaying) {
           media_player_->Play();
         }
-      } else {
-        // User poked elsewhere.
-        TogglePlayPause();
       }
+
       handled = true;
     }
   } else if (event.is_keyboard()) {
@@ -180,6 +180,7 @@ bool MediaPlayerView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
       }
     }
   }
+
   return handled;
 }
 
@@ -194,7 +195,7 @@ void MediaPlayerView::Layout() {
 
   // Make the background fill the space.
   scenic::Rectangle background_shape(session(), logical_size().width,
-                                         logical_size().height);
+                                     logical_size().height);
   background_node_.SetShape(background_shape);
   background_node_.SetTranslation(logical_size().width * .5f,
                                   logical_size().height * .5f,
@@ -400,28 +401,18 @@ void MediaPlayerView::HandleStatusChanged(
     Layout();
   }
 
-  metadata_ = fidl::Clone(status.metadata);
+  duration_ns_ = status.duration_ns;
 
   // TODO(dalesat): Display metadata on the screen.
-  if (metadata_ && !metadata_shown_) {
+  if (status.metadata && !metadata_shown_) {
     FXL_DLOG(INFO) << "duration   " << std::fixed << std::setprecision(1)
-                   << double(metadata_->duration) / 1000000000.0 << " seconds";
-    FXL_DLOG(INFO) << "title      "
-                   << (metadata_->title ? metadata_->title : "<none>");
-    FXL_DLOG(INFO) << "artist     "
-                   << (metadata_->artist ? metadata_->artist : "<none>");
-    FXL_DLOG(INFO) << "album      "
-                   << (metadata_->album ? metadata_->album : "<none>");
-    FXL_DLOG(INFO) << "publisher  "
-                   << (metadata_->publisher ? metadata_->publisher : "<none>");
-    FXL_DLOG(INFO) << "genre      "
-                   << (metadata_->genre ? metadata_->genre : "<none>");
-    FXL_DLOG(INFO) << "composer   "
-                   << (metadata_->composer ? metadata_->composer : "<none>");
+                   << double(duration_ns_) / 1000000000.0 << " seconds";
+    for (auto& property : *status.metadata->properties) {
+      FXL_DLOG(INFO) << property.label << ": " << property.value;
+    }
+
     metadata_shown_ = true;
   }
-
-  // TODO(dalesat): Display frame rate on the screen.
 
   InvalidateScene();
 }
@@ -444,7 +435,7 @@ void MediaPlayerView::TogglePlayPause() {
 }
 
 float MediaPlayerView::progress() const {
-  if (!metadata_ || metadata_->duration == 0) {
+  if (duration_ns_ == 0) {
     return 0.0f;
   }
 
@@ -455,11 +446,11 @@ float MediaPlayerView::progress() const {
     position = 0;
   }
 
-  if (metadata_ && static_cast<uint64_t>(position) > metadata_->duration) {
-    position = metadata_->duration;
+  if (position > duration_ns_) {
+    position = duration_ns_;
   }
 
-  return position / static_cast<float>(metadata_->duration);
+  return position / static_cast<float>(duration_ns_);
 }
 
 }  // namespace examples
