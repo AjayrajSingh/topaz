@@ -6,7 +6,11 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger_async;
 import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular_async;
+import 'package:fidl/fidl.dart' as fidl;
+import 'package:zircon/zircon.dart' show ChannelPair;
 
 import 'document/change.dart';
 import 'document/document.dart';
@@ -24,7 +28,6 @@ import 'transaction.dart';
 
 /// The interface to the Sledge library.
 class Sledge {
-  final ComponentContext _componentContext;
   final ledger.LedgerProxy _ledgerProxy = new ledger.LedgerProxy();
   final ledger.PageProxy _pageProxy;
   final ConnectionId _connectionId = new ConnectionId.random();
@@ -44,17 +47,26 @@ class Sledge {
   ModificationQueue _modificationQueue;
 
   /// Default constructor.
-  Sledge(this._componentContext, [SledgePageId pageId])
-      : _pageProxy = new ledger.PageProxy(),
-        _pageSnapshotFactory = new LedgerPageSnapshotFactoryImpl() {
-    pageId ??= new SledgePageId();
-
-    _componentContext.getLedger(_ledgerProxy.ctrl.request(),
+  factory Sledge(ComponentContext componentContext, [SledgePageId pageId]) {
+    fidl.InterfacePair<ledger.Ledger> ledgerPair = new fidl.InterfacePair();
+    componentContext.getLedger(ledgerPair.passRequest(),
         (ledger.Status status) {
       if (status != ledger.Status.ok) {
         print('Sledge failed to connect to Ledger: $status');
       }
     });
+
+    return new Sledge._(ledgerPair.passHandle(), pageId);
+  }
+
+  /// Internal contructor
+  Sledge._(fidl.InterfaceHandle<ledger.Ledger> ledgerHandle,
+      [SledgePageId pageId])
+      : _pageProxy = new ledger.PageProxy(),
+        _pageSnapshotFactory = new LedgerPageSnapshotFactoryImpl() {
+    pageId ??= new SledgePageId();
+
+    _ledgerProxy.ctrl.bind(ledgerHandle);
 
     Completer<bool> initializationCompleter = new Completer<bool>();
 
@@ -77,6 +89,21 @@ class Sledge {
     _initializationSucceeded = initializationCompleter.future;
   }
 
+  /// Contructor that takes a new-style binding of ComponentContext
+  factory Sledge.forAsync(modular_async.ComponentContext componentContext,
+      [SledgePageId pageId]) {
+    final pair = new ChannelPair();
+    componentContext
+        .getLedger(new fidl.InterfaceRequest(pair.first))
+        .then((status) async {
+      if (status != ledger_async.Status.ok) {
+        print('Sledge failed to connect to Ledger: $status');
+      }
+    });
+
+    return new Sledge._(new fidl.InterfaceHandle(pair.second), pageId);
+  }
+
   /// Convenience factory for modules.
   factory Sledge.fromModule(final ModuleContext moduleContext,
       [SledgePageId pageId]) {
@@ -86,8 +113,7 @@ class Sledge {
   }
 
   /// Convenience constructor for tests.
-  Sledge.testing(this._pageProxy, this._pageSnapshotFactory)
-      : _componentContext = null {
+  Sledge.testing(this._pageProxy, this._pageSnapshotFactory) {
     _modificationQueue =
         new ModificationQueue(this, _pageSnapshotFactory, _pageProxy);
     _initializationSucceeded = new Future.value(true);
