@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_ui_gfx/fidl.dart' as ui_gfx;
+import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart' as ui_gfx;
 import 'package:zircon/zircon.dart';
 
 import 'session.dart';
@@ -83,8 +83,10 @@ class ImportNode extends ContainerNode {
 
 class ShapeNode extends Node {
   ShapeNode(Session session)
-      : super._create(session,
-            const ui_gfx.ResourceArgs.withShapeNode(const ui_gfx.ShapeNodeArgs()));
+      : super._create(
+            session,
+            const ui_gfx.ResourceArgs.withShapeNode(
+                const ui_gfx.ShapeNodeArgs()));
 
   void setMaterial(Material material) {
     session.enqueue(new ui_gfx.Command.withSetMaterial(
@@ -99,8 +101,10 @@ class ShapeNode extends Node {
 
 class Material extends Resource {
   Material(Session session)
-      : super._create(session,
-            const ui_gfx.ResourceArgs.withMaterial(const ui_gfx.MaterialArgs()));
+      : super._create(
+            session,
+            const ui_gfx.ResourceArgs.withMaterial(
+                const ui_gfx.MaterialArgs()));
 
   void setColor(double red, double green, double blue, double alpha) {
     final ui_gfx.ColorRgba color = new ui_gfx.ColorRgba(

@@ -5,7 +5,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/app_async.dart';
 import 'package:zircon/zircon.dart';
 
 import 'scenic.dart' as scenic;
@@ -83,7 +83,7 @@ class _SketchyExampleState extends State<SketchyExample> {
     rootNode.addChild(shapeNode);
 
     // TODO: don't present immediately; trigger an invalidation.
-    session.present(0, (scenic.PresentationInfo info) {});
+    session.present(0).then((info) {});
   }
 
   @override

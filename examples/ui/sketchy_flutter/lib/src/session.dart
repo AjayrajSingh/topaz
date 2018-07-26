@@ -5,14 +5,16 @@
 // TODO(SCN-617): Fix 'commands_fidl' colliding dart library names.
 // ignore_for_file: import_duplicated_library_named
 
-import 'package:lib.app.dart/app.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
-import 'package:fidl_fuchsia_images/fidl.dart';
-import 'package:fidl_fuchsia_ui_gfx/fidl.dart' as gfx;
-import 'package:fidl_fuchsia_ui_scenic/fidl.dart' as ui_scenic;
+import 'dart:async';
+
+import 'package:lib.app.dart/app_async.dart';
+import 'package:fidl_fuchsia_sys/fidl_async.dart';
+import 'package:fidl_fuchsia_images/fidl_async.dart';
+import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart' as gfx;
+import 'package:fidl_fuchsia_ui_scenic/fidl_async.dart' as ui_scenic;
 import 'package:zircon/zircon.dart' as zircon;
 
-export 'package:fidl_fuchsia_images/fidl.dart' show PresentationInfo;
+export 'package:fidl_fuchsia_images/fidl_async.dart' show PresentationInfo;
 
 // ignore_for_file: public_member_api_docs
 
@@ -39,13 +41,13 @@ class Session {
     _commands.add(new ui_scenic.Command.withGfx(command));
   }
 
-  void present(int presentationTime, SessionPresentCallback callback) {
+  Future<PresentationInfo> present(int presentationTime) async {
     if (_commands.isNotEmpty) {
-      _session.enqueue(_commands);
+      await _session.enqueue(_commands);
       _commands = const <ui_scenic.Command>[];
     }
-    _session.present(
-        presentationTime, <zircon.Handle>[], <zircon.Handle>[], callback);
+    return _session
+        .present(presentationTime, <zircon.Handle>[], <zircon.Handle>[]);
   }
 
   int nextResourceId() => _nextResourceId++;
