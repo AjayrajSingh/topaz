@@ -4,10 +4,13 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart' as fidl;
 import 'package:lib.app.dart/logging.dart';
+import 'package:zircon/zircon.dart';
 
 import 'link_watcher_host.dart';
 
@@ -113,7 +116,12 @@ class LinkClient {
       return completer.future;
     }
 
-    String data = json.encode(jsonData);
+    String jsonString = json.encode(jsonData);
+    var jsonList = Uint8List.fromList(utf8.encode(jsonString));
+    var data = fuchsia_mem.Buffer(
+      vmo: new SizedVmo.fromUint8List(jsonList),
+      size: jsonList.length,
+    );
 
     // ignore: unawaited_futures
     proxy.ctrl.error.then((ProxyError err) {

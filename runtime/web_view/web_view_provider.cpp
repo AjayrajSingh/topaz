@@ -4,6 +4,8 @@
 
 #include "topaz/runtime/web_view/web_view_provider.h"
 
+#include <lib/fsl/vmo/strings.h>
+
 #include "lib/icu_data/cpp/icu_data.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
 
@@ -74,9 +76,11 @@ void WebViewProvider::CreateView(
 
 void WebViewProvider::Terminate() { loop_->Quit(); }
 
-void WebViewProvider::Notify(fidl::StringPtr json) {
+void WebViewProvider::Notify(fuchsia::mem::Buffer json) {
+  std::string json_string;
+  FXL_CHECK(fsl::StringFromVmo(json, &json_string));
   modular::JsonDoc parsed_json;
-  parsed_json.Parse(json);
+  parsed_json.Parse(json_string);
 
   if (!parsed_json.IsObject()) {
     FXL_LOG(WARNING) << "Not an object: "
@@ -89,7 +93,7 @@ void WebViewProvider::Notify(fidl::StringPtr json) {
     const auto& contract = contract_it->value;
     auto url_it = contract.FindMember("uri");
     if (url_it == contract.MemberEnd() || !url_it->value.IsString()) {
-      FXL_LOG(WARNING) << "/view/uri must be a string in " << json;
+      FXL_LOG(WARNING) << "/view/uri must be a string in " << json_string;
     } else {
       url_ = url_it->value.GetString();
       if (view_) {

@@ -5,14 +5,17 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:armadillo/recent.dart';
 import 'package:fidl/fidl.dart' as bindings;
 import 'package:flutter/material.dart';
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
+import 'package:zircon/zircon.dart';
 
 import 'hit_test_model.dart';
 import 'story_provider_watcher_impl.dart';
@@ -552,7 +555,12 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
 
     if (encoded != _lastLinkJson) {
       log.fine('Writing to link!');
-      _link.set(<String>[_kStoryClustersLinkKey], encoded);
+      var jsonList = Uint8List.fromList(utf8.encode(encoded));
+      var data = fuchsia_mem.Buffer(
+        vmo: new SizedVmo.fromUint8List(jsonList),
+        size: jsonList.length,
+      );
+      _link.set(<String>[_kStoryClustersLinkKey], data);
       _lastLinkJson = encoded;
     }
   }
@@ -596,8 +604,7 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
     if (extraTitle != null) {
       storyTitle = extraTitle;
     } else if (storyInfo.url != null) {
-      storyTitle = Uri
-          .parse(storyInfo.url)
+      storyTitle = Uri.parse(storyInfo.url)
           .pathSegments[Uri.parse(storyInfo.url).pathSegments.length - 1]
           ?.toUpperCase();
     } else {

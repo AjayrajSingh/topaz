@@ -4,10 +4,13 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.proposal.dart/proposal.dart';
+import 'package:zircon/zircon.dart';
 
 /// Manages the list of active agents and the proposals for showing them.
 class ActiveAgentsManager {
@@ -72,7 +75,13 @@ class _AgentProviderWatcherImpl extends AgentProviderWatcher {
       ..clear()
       ..addAll(agentUrls);
     log.fine('agent urls: $agentUrls');
-    link.set(null, json.encode(agentUrls));
+    String jsonString = json.encode(agentUrls);
+    var jsonList = Uint8List.fromList(utf8.encode(jsonString));
+    var data = fuchsia_mem.Buffer(
+      vmo: new SizedVmo.fromUint8List(jsonList),
+      size: jsonList.length,
+    );
+    link.set(null, data);
   }
 }
 

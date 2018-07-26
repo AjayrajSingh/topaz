@@ -4,12 +4,15 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.proposal.dart/proposal.dart';
 import 'package:lib.story.dart/story.dart';
+import 'package:zircon/zircon.dart';
 
 const String _kWallpapersLinkKey = 'wallpapers';
 const String _kImageSelectorModulePath = 'gallery';
@@ -53,7 +56,13 @@ class WallpaperChooser {
       focusProvider: focusProvider,
       onWallpaperChosen: (List<String> images) {
         log.info('wallpaper chosen: $images');
-        link.set(<String>[_kWallpapersLinkKey], json.encode(images));
+        var jsonString = json.encode(images);
+        var jsonList = Uint8List.fromList(utf8.encode(jsonString));
+        var data = fuchsia_mem.Buffer(
+          vmo: new SizedVmo.fromUint8List(jsonList),
+          size: jsonList.length,
+        );
+        link.set(<String>[_kWallpapersLinkKey], data);
         onWallpaperChosen(images);
       },
     );

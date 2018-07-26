@@ -2,8 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:convert';
+
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:meta/meta.dart';
+import 'package:zircon/zircon.dart';
 
 /// Handler for when [LinkWatcher#notify] is called by the framework.
 typedef LinkWatcherNotifyCallback = void Function(String data);
@@ -19,7 +23,9 @@ class LinkWatcherImpl extends LinkWatcher {
   }) : assert(onNotify != null);
 
   @override
-  void notify(String data) {
-    onNotify(data);
+  void notify(fuchsia_mem.Buffer buffer) {
+    var dataVmo = new SizedVmo(buffer.vmo.handle, buffer.size);
+    var data = dataVmo.map();
+    onNotify(utf8.decode(data.sublist(0, dataVmo.size)));
   }
 }

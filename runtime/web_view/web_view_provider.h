@@ -29,7 +29,7 @@ class WebViewProvider : fuchsia::ui::viewsv1::ViewProvider,
   void Terminate() final;
 
   // fuchsia::modular::LinkWatcher
-  void Notify(fidl::StringPtr json) final;
+  void Notify(fuchsia::mem::Buffer json) final;
 
   async::Loop* const loop_;
   std::string url_;
