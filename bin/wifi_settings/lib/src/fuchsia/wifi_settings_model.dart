@@ -18,7 +18,7 @@ const int _kConnectionScanInterval = 3;
 /// The model for the wifi settings module.
 ///
 /// All subclasses must connect the [WlanProxy] in their constructor
-class WifiSettingsModel extends Model implements net.NotificationListener {
+class WifiSettingsModel extends Model {
   /// How often to poll the wlan for wifi information.
   final Duration _updatePeriod = const Duration(seconds: 3);
 
@@ -28,7 +28,6 @@ class WifiSettingsModel extends Model implements net.NotificationListener {
   final wlan.WlanProxy _wlanProxy = wlan.WlanProxy();
 
   final net.NetstackProxy _netstackProxy = net.NetstackProxy();
-  net.NotificationListenerBinding _netstackListenerBinding;
 
   /// Whether or not we've ever gotten the wifi status. Before this,
   /// we show the loading screen.
@@ -63,8 +62,8 @@ class WifiSettingsModel extends Model implements net.NotificationListener {
     connectToService(startupContext.environmentServices, _netstackProxy.ctrl);
 
     _initStatusUpdater();
-    _initInterfaceListener();
-
+    _netstackProxy.onInterfacesChanged = interfacesChanged;
+    
     _scan();
     _updateTimer = new Timer.periodic(_updatePeriod, (_) {
       _update();
@@ -196,14 +195,12 @@ class WifiSettingsModel extends Model implements net.NotificationListener {
     _updateTimer.cancel();
     _scanTimer.cancel();
     _wlanProxy.ctrl.close();
-    _netstackListenerBinding?.close();
   }
 
   /// Listens for any changes to network interfaces.
   ///
   /// Sets whether or not there exists a wlan interface
-  @override
-  void onInterfacesChanged(List<net.NetInterface> interfaces) {
+  void interfacesChanged(List<net.NetInterface> interfaces) {
     _hasWlanInterface =
         interfaces.any((interface) => interface.name.contains('wlan'));
     notifyListeners();
@@ -265,15 +262,6 @@ class WifiSettingsModel extends Model implements net.NotificationListener {
       }
     }
     return aps;
-  }
-
-  /// Starts listening for netstack interfaces.
-  void _initInterfaceListener() {
-    _netstackListenerBinding?.close();
-    _netstackListenerBinding = new net.NotificationListenerBinding();
-    _netstackProxy
-      ..registerListener(_netstackListenerBinding.wrap(this))
-      ..getInterfaces(onInterfacesChanged);
   }
 
   /// Broadcasts settings as a mod.

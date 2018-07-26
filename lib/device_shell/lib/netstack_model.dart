@@ -116,14 +116,11 @@ class InterfaceInfo {
 
 /// Provides netstack information.
 class NetstackModel extends Model
-    with TickerProviderModelMixin
-    implements net.NotificationListener {
+    with TickerProviderModelMixin {
   /// The netstack containing networking information for the device.
-  final net.Netstack netstack;
+  final net.NetstackProxy netstack;
 
   final Map<int, InterfaceInfo> _interfaces = <int, InterfaceInfo>{};
-
-  net.NotificationListenerBinding _binding;
 
   /// Constructor.
   NetstackModel({this.netstack});
@@ -144,8 +141,7 @@ class NetstackModel extends Model
   /// The current interfaces on the device.
   List<InterfaceInfo> get interfaces => _interfaces.values.toList();
 
-  @override
-  void onInterfacesChanged(List<net.NetInterface> interfaces) {
+  void interfacesChanged(List<net.NetInterface> interfaces) {
     List<net.NetInterface> filteredInterfaces = interfaces
         .where((net.NetInterface interface) =>
             interface.name != _kLoopbackInterfaceName)
@@ -181,15 +177,12 @@ class NetstackModel extends Model
 
   /// Starts listening for netstack interfaces.
   void start() {
-    _binding?.close();
-    _binding = new net.NotificationListenerBinding();
-    netstack
-      ..registerListener(_binding.wrap(this))
-      ..getInterfaces(onInterfacesChanged);
+    netstack.onInterfacesChanged = interfacesChanged;
+
   }
 
   /// Stops listening for netstack interfaces.
-  void stop() {
-    _binding?.close();
+  void stop(){
+    netstack.onInterfacesChanged = null;
   }
 }
