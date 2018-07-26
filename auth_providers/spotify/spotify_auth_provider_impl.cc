@@ -26,6 +26,8 @@ namespace http = ::fuchsia::net::oldhttp;
 
 using auth_providers::oauth::OAuthRequestBuilder;
 using auth_providers::oauth::ParseOAuthResponse;
+using fuchsia::auth::AssertionJWTParams;
+using fuchsia::auth::AttestationJWTParams;
 using fuchsia::auth::AuthProviderStatus;
 using fuchsia::auth::AuthTokenPtr;
 using modular::JsonValueToPrettyString;
@@ -52,6 +54,7 @@ SpotifyAuthProviderImpl::~SpotifyAuthProviderImpl() {}
 void SpotifyAuthProviderImpl::GetPersistentCredential(
     fidl::InterfaceHandle<fuchsia::auth::AuthenticationUIContext>
         auth_ui_context,
+    const fidl::StringPtr user_profile_id,
     GetPersistentCredentialCallback callback) {
   FXL_DCHECK(auth_ui_context);
   get_persistent_credential_callback_ = std::move(callback);
@@ -66,6 +69,7 @@ void SpotifyAuthProviderImpl::GetPersistentCredential(
 
   web_view_->ClearCookies();
 
+  // TODO(ukode): use app_scopes instead of |kScopes|
   const std::vector<std::string> scopes(kScopes.begin(), kScopes.end());
   std::string scopes_str = fxl::JoinStrings(scopes, "+");
 
@@ -163,6 +167,25 @@ void SpotifyAuthProviderImpl::RevokeAppOrPersistentCredential(
   // to manually revoke access from this page here:
   // <https://www.spotify.com/account/>
   callback(AuthProviderStatus::BAD_REQUEST);
+}
+
+void SpotifyAuthProviderImpl::GetPersistentCredentialFromAttestationJWT(
+    fidl::InterfaceHandle<AttestationSigner> attestation_signer,
+    AttestationJWTParams jwt_params,
+    fidl::InterfaceHandle<AuthenticationUIContext> auth_ui_context,
+    fidl::StringPtr user_profile_id,
+    GetPersistentCredentialFromAttestationJWTCallback callback) {
+  // Remote attestation flow not supported.
+  callback(AuthProviderStatus::BAD_REQUEST, nullptr, nullptr, nullptr, nullptr);
+}
+
+void SpotifyAuthProviderImpl::GetAppAccessTokenFromAssertionJWT(
+    fidl::InterfaceHandle<AttestationSigner> attestation_signer,
+    AssertionJWTParams jwt_params, fidl::StringPtr credential,
+    const fidl::VectorPtr<fidl::StringPtr> app_scopes,
+    GetAppAccessTokenFromAssertionJWTCallback callback) {
+  // Remote attestation flow not supported.
+  callback(AuthProviderStatus::BAD_REQUEST, nullptr, nullptr, nullptr);
 }
 
 void SpotifyAuthProviderImpl::WillSendRequest(

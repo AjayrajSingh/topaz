@@ -23,6 +23,11 @@
 
 namespace spotify_auth_provider {
 
+using fuchsia::auth::AssertionJWTParams;
+using fuchsia::auth::AttestationJWTParams;
+using fuchsia::auth::AttestationSigner;
+using fuchsia::auth::AuthenticationUIContext;
+
 class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
                                 fuchsia::webview::WebRequestDelegate {
  public:
@@ -40,6 +45,7 @@ class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
   void GetPersistentCredential(
       fidl::InterfaceHandle<fuchsia::auth::AuthenticationUIContext>
           auth_ui_context,
+      const fidl::StringPtr user_profile_id,
       GetPersistentCredentialCallback callback) override;
 
   // |AuthProvider|
@@ -62,6 +68,21 @@ class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
   void RevokeAppOrPersistentCredential(
       const fidl::StringPtr credential,
       RevokeAppOrPersistentCredentialCallback callback) override;
+
+  // |AuthProvider|
+  void GetPersistentCredentialFromAttestationJWT(
+      fidl::InterfaceHandle<AttestationSigner> attestation_signer,
+      AttestationJWTParams jwt_params,
+      fidl::InterfaceHandle<AuthenticationUIContext> auth_ui_context,
+      fidl::StringPtr user_profile_id,
+      GetPersistentCredentialFromAttestationJWTCallback callback) override;
+
+  // |AuthProvider|
+  void GetAppAccessTokenFromAssertionJWT(
+      fidl::InterfaceHandle<AttestationSigner> attestation_signer,
+      AssertionJWTParams jwt_params, const fidl::StringPtr credential,
+      const fidl::VectorPtr<fidl::StringPtr> app_scopes,
+      GetAppAccessTokenFromAssertionJWTCallback callback) override;
 
   // |fuchsia::webview::WebRequestDelegate|
   void WillSendRequest(const fidl::StringPtr incoming_url) override;

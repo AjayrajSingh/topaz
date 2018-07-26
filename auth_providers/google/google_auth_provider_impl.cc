@@ -73,7 +73,7 @@ GoogleAuthProviderImpl::~GoogleAuthProviderImpl() {}
 
 void GoogleAuthProviderImpl::GetPersistentCredential(
     fidl::InterfaceHandle<AuthenticationUIContext> auth_ui_context,
-    GetPersistentCredentialCallback callback) {
+    fidl::StringPtr user_profile_id, GetPersistentCredentialCallback callback) {
   FXL_DCHECK(auth_ui_context);
   get_persistent_credential_callback_ = std::move(callback);
 
@@ -87,6 +87,7 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
 
   web_view_->ClearCookies();
 
+  // TODO: use app_scopes instead of |kScopes|.
   const std::vector<std::string> scopes(kScopes.begin(), kScopes.end());
   std::string scopes_str = fxl::JoinStrings(scopes, "+");
 
@@ -96,6 +97,7 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
   url += kRedirectUri;
   url += "&client_id=";
   url += kFuchsiaClientId;
+  // TODO(ukode): Set user_profile_id in the state query arg for re-auth
 
   web_view_->SetUrl(url);
 
@@ -265,6 +267,25 @@ void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
 
     callback(AuthProviderStatus::OK);
   });
+}
+
+void GoogleAuthProviderImpl::GetPersistentCredentialFromAttestationJWT(
+    fidl::InterfaceHandle<AttestationSigner> attestation_signer,
+    AttestationJWTParams jwt_params,
+    fidl::InterfaceHandle<AuthenticationUIContext> auth_ui_context,
+    fidl::StringPtr user_profile_id,
+    GetPersistentCredentialFromAttestationJWTCallback callback) {
+  // Remote attestation flow not supported for traditional OAuth.
+  callback(AuthProviderStatus::BAD_REQUEST, nullptr, nullptr, nullptr, nullptr);
+}
+
+void GoogleAuthProviderImpl::GetAppAccessTokenFromAssertionJWT(
+    fidl::InterfaceHandle<AttestationSigner> attestation_signer,
+    AssertionJWTParams jwt_params, fidl::StringPtr credential,
+    const fidl::VectorPtr<fidl::StringPtr> scopes,
+    GetAppAccessTokenFromAssertionJWTCallback callback) {
+  // Remote attestation flow not supported for traditional OAuth.
+  callback(AuthProviderStatus::BAD_REQUEST, nullptr, nullptr, nullptr);
 }
 
 void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
