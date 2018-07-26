@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'src/dashboard.dart';
 import 'src/system_info_model.dart';
 
-void main() => runApp(SystemDashboard());
+void main() {
+  SystemInfoModel model = SystemInfoModel();
+  runApp(SystemDashboard(model));
+}
 
 /// System Dashboard display the following information to the user
 ///
@@ -16,13 +19,17 @@ void main() => runApp(SystemDashboard());
 /// - Fan Speed
 
 class SystemDashboard extends StatelessWidget {
+  final SystemInfoModel _model;
+
+  const SystemDashboard(this._model);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'System Dashboard',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: ScopedModel<SystemInfoModel>(
-        model: SystemInfoModel(),
+        model: _model,
         child: Dashboard(),
       ),
     );

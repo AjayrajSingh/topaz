@@ -4,34 +4,52 @@
 
 import 'dart:async';
 import 'package:lib.widgets/model.dart';
-import 'package:meta/meta.dart';
+import 'package:fidl_fuchsia_scpi/fidl.dart' as scpi;
+import 'package:lib.app.dart/app.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
 class SystemInfoModel extends Model {
-  int _temperature = 50;
-  int _fanLevel = 1;
-  int _cpuUtilization = 30;
-  double _bigClusterFrequency = 1.2;
-  double _littleClusterFrequency = 1.0;
-  double _bigClusterVoltage = 1.29;
-  double _littleClusterVoltage = 0.91;
+  int _temperature = 0;
+  int _fanLevel = 0;
+  int _cpuUtilization = 0;
+  int _memoryUtilization = 0;
+  double _bigClusterFrequency = 0.0;
+  double _littleClusterFrequency = 0.0;
+  double _bigClusterVoltage = 0.0;
+  double _littleClusterVoltage = 0.0;
 
-  static const Duration _systemInformationUpdatePeriod = const Duration(seconds: 5);
-  static const Duration _cpuUtilizationUpdatePeriod = const Duration(seconds: 2);
+  List<scpi.DvfsOpp> _bigClusterOpps;
+  List<scpi.DvfsOpp> _smallClusterOpps;
+
+  static const Duration _systemInformationUpdatePeriod = const Duration(seconds: 4);
+
+  final scpi.SystemControllerProxy _systemControllerProxy = scpi.SystemControllerProxy();
 
   SystemInfoModel() {
+    StartupContext startupContext = StartupContext.fromStartupInfo();
+    connectToService(startupContext.environmentServices, _systemControllerProxy.ctrl);
+
+    int powerDomain = 0;
+    _systemControllerProxy.getDvfsInfo(powerDomain, (scpi.Status status, List<scpi.DvfsOpp> opps) {
+      _bigClusterOpps = opps;
+    });
+
+    powerDomain = 1;
+    _systemControllerProxy.getDvfsInfo(powerDomain, (scpi.Status status, List<scpi.DvfsOpp> opps) {
+      _smallClusterOpps = opps;
+    });
+
+    _updateSysInformation();
+
     Timer.periodic(_systemInformationUpdatePeriod, (_) {
       _updateSysInformation();
     });
-
-    Timer.periodic(_cpuUtilizationUpdatePeriod, (_) {
-      _updateCpuUtilization();
-    });
   }
 
-  int get cpuUtil => _cpuUtilization;
+  int get cpuUtilization => _cpuUtilization;
+  int get memoryUtilization => _memoryUtilization;
   int get fanLevel => _fanLevel;
   int get temperature => _temperature;
   double get bigClusterFrequency => _bigClusterFrequency;
@@ -39,43 +57,26 @@ class SystemInfoModel extends Model {
   double get bigClusterVoltage => _bigClusterVoltage;
   double get littleClusterVoltage => _littleClusterVoltage;
 
-  void _setSysInfo(
-      {@required double bigClusterFrequency,
-      @required double littleClusterFrequency,
-      @required double bigClusterVoltage,
-      @required double littleClusterVoltage,
-      @required int temperature,
-      @required int fanLevel}) {
-
-    _bigClusterFrequency = bigClusterFrequency;
-    _littleClusterFrequency = littleClusterFrequency;
-    _bigClusterVoltage = bigClusterVoltage;
-    _littleClusterVoltage = littleClusterVoltage;
-    _temperature = temperature;
-    _fanLevel = fanLevel;
-    notifyListeners();
-  }
-
-  void _setCpuUtilization(int utilization) {
-    _cpuUtilization = utilization;
+  void _update() {
     notifyListeners();
   }
 
   void _updateSysInformation() {
-    // TODO: (braval) READ system info using FIDL interface
-    _temperature++;
-    _setSysInfo(
-        bigClusterFrequency: _bigClusterFrequency,
-        littleClusterFrequency: _littleClusterFrequency,
-        bigClusterVoltage: _bigClusterVoltage,
-        littleClusterVoltage: _littleClusterVoltage,
-        temperature: _temperature,
-        fanLevel: _fanLevel);
+    _systemControllerProxy.getSystemStatus((scpi.Status status, scpi.SystemStatus systemStatus) {
+      _temperature = systemStatus.temperature;
+      _fanLevel = systemStatus.fanLevel;
+      _bigClusterFrequency =
+        (_bigClusterOpps[systemStatus.bigClusterOpIndex].freqHz)/1000000000;
+      _littleClusterFrequency =
+        (_smallClusterOpps[systemStatus.smallClusterOpIndex].freqHz)/1000000000;
+      _bigClusterVoltage =
+        (_bigClusterOpps[systemStatus.bigClusterOpIndex].voltMv)/1000;
+      _littleClusterVoltage =
+        (_smallClusterOpps[systemStatus.smallClusterOpIndex].voltMv)/1000;
+      _cpuUtilization = systemStatus.cpuUtilization;
+      _memoryUtilization = systemStatus.memoryUtilization;
+      _update();
+    });
   }
 
-  void _updateCpuUtilization() {
-    // TODO: (braval) READ the CPU Utilization and display here
-    _cpuUtilization = (_cpuUtilization + 6) % 100;
-    _setCpuUtilization(_cpuUtilization);
-  }
 }
