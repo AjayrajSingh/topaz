@@ -9,6 +9,12 @@ dart_tool("doc_checker") {
 
   main_dart = "bin/main.dart"
 
+  sources = [
+    "graph.dart",
+    "link_scraper.dart",
+    "projects.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/pub/args",
     "//third_party/dart-pkg/pub/http",

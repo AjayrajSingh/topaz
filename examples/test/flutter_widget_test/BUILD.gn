@@ -6,7 +6,7 @@ import("//topaz/runtime/dart/dart_test.gni")
 
 dart_test("flutter_widget_test") {
   sources = [
-    "flutter_widget_test.dart",
+    "../test/flutter_widget_test.dart",
   ]
 
   deps = [

@@ -49,11 +49,20 @@ dart_library("package_for_analysis") {
   infer_package_name = true
 
   sources = [
+    "src/handle.dart",
+    "src/handle_waiter.dart",
+    "src/system.dart",
     "zircon.dart",
   ]
 }
 
 dart_fuchsia_test("dart_zircon_test") {
+  sources = [
+    "../test/channel_test.dart",
+    "../test/socket_test.dart",
+    "../test/vmo_test.dart",
+  ]
+
   deps = [
     "//topaz/public/dart/fidl",
   ]

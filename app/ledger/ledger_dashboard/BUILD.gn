@@ -9,6 +9,10 @@ dart_app("ledger_dashboard") {
   main_dart = "main.dart"
 
   source_dir = "."
+  sources = [
+    "src/data_handler.dart",
+    "src/ledger_debug_data_handler.dart",
+  ]
 
   deps = [
     "//peridot/bin/ledger/fidl",

@@ -13,6 +13,9 @@ dart_library("dart") {
 
   sources = [
     "run_mod.dart",
+    "src/run_mod.dart",
+    "src/widgets/mod_failure_widget.dart",
+    "src/widgets/mod_loading_widget.dart",
   ]
 
   deps = [

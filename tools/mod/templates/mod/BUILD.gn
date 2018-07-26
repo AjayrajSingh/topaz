@@ -9,6 +9,7 @@ flutter_app("__project_name__") {
 
   package_name = "__project_name__"
 
+  sources = []
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/widgets:lib.widgets",

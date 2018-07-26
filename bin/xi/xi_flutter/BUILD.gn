@@ -9,7 +9,7 @@ dart_library("xi_flutter") {
   package_name = "xi_flutter"
 
   sources = [
-    "main.dart",
+    "src/xi_flutter_client.dart",
   ]
 
   deps = [

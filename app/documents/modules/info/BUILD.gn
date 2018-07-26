@@ -10,6 +10,10 @@ flutter_app("documents_info") {
 
   module_manifest = "meta/manifest.json"
 
+  sources = [
+    "src/widgets/info.dart",
+  ]
+
   deps = [
     "//topaz/app/documents/packages/utils:utils",
     "//topaz/app/documents/services:services",

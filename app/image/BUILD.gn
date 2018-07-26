@@ -9,6 +9,10 @@ flutter_app("image") {
 
   module_manifest = "manifest.json"
 
+  sources = [
+    "src/models/image_model.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/lib/app_driver/dart",

@@ -8,6 +8,7 @@ flutter_app("mondrian_test") {
   package_name = "mondrian_test"
   main_dart = "lib/main.dart"
 
+  sources = []
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/lib/app/dart",

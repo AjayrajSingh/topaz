@@ -12,6 +12,12 @@ flutter_aot_app("tictactoe_gameboard_mod") {
   fuchsia_package_name = "tictactoe_gameboard_mod"
   module_manifest = "manifest.json"
 
+  sources = [
+    "src/model/tictactoe_model.dart",
+    "src/widget/square.dart",
+    "src/widget/tictactoe_board.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/examples/tictactoe/common",
@@ -24,10 +30,13 @@ flutter_aot_app("tictactoe_gameboard_mod") {
 
 dart_test("tictactoe_gameboard_mod_test") {
   source_dir = "."
-
   sources = [
+    "lib/src/model/tictactoe_model.dart",
+    "lib/src/widget/square.dart",
+    "lib/src/widget/tictactoe_board.dart",
     "test/mod_test.dart",
   ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",

@@ -9,6 +9,12 @@ flutter_aot_app("wifi_settings") {
 
   manifest = "pubspec.yaml"
 
+  sources = [
+    "src/fuchsia/access_point.dart",
+    "src/fuchsia/wifi_settings_model.dart",
+    "src/wlan_manager.dart",
+  ]
+
   deps = [
     "//garnet/public/fidl/fuchsia.netstack",
     "//garnet/public/fidl/fuchsia.wlan.service",

@@ -16,6 +16,11 @@ flutter_aot_app("device_settings") {
     },
   ]
 
+  sources = [
+    "src/model.dart",
+    "src/widget.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//garnet/public/fidl/fuchsia.amber",

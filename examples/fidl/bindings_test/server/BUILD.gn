@@ -9,6 +9,7 @@ dart_app("bindings_test_server") {
 
   main_dart = "lib/main.dart"
 
+  sources = []
   deps = [
     "//topaz/examples/fidl/bindings_test/fidl:bindings_test",
     "//topaz/public/dart/fidl",

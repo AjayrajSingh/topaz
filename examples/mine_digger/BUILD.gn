@@ -8,7 +8,7 @@ flutter_app("mine_digger") {
   main_dart = "main.dart"
 
   source_dir = "."
-
+  sources = []
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]

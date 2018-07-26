@@ -10,6 +10,13 @@ dart_library("widget_explorer_meta") {
   sdk_category = "partner"
 
   sources = [
+    "src/config_key.dart",
+    "src/example_size.dart",
+    "src/example_value.dart",
+    "src/generator.dart",
+    "src/height_param.dart",
+    "src/size_param.dart",
+    "src/width_param.dart",
     "widgets_meta.dart",
   ]
 }

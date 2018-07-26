@@ -16,7 +16,8 @@ dart_library("contacts_services") {
   package_name = "contacts_services"
 
   sources = [
-    "client.dart"
+    "client.dart",
+    "src/contacts_content_provider_service_client.dart",
   ]
 
   deps = [

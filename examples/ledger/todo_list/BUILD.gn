@@ -7,6 +7,13 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_aot_app("todo_list") {
   main_dart = "lib/main.dart"
 
+  sources = [
+    "src/ledger_helpers.dart",
+    "src/models/todo_list_model.dart",
+    "src/widgets/new_item_input.dart",
+    "src/widgets/todo_list_module_screen.dart",
+  ]
+
   deps = [
     "//peridot/public/fidl/fuchsia.ledger",
     "//third_party/dart-pkg/git/flutter/packages/flutter",

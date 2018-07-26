@@ -7,6 +7,10 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("color") {
   main_dart = "lib/main.dart"
 
+  sources = [
+    "src/color_model.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/lib/app/dart",

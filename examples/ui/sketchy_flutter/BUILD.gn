@@ -7,6 +7,10 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("sketchy_flutter") {
   main_dart = "lib/main.dart"
 
+  sources = [
+    "scenic_widget.dart",
+  ]
+
   deps = [
     "//garnet/public/fidl/fuchsia.ui.gfx",
     "//garnet/public/fidl/fuchsia.ui.scenic",

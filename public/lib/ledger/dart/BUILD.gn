@@ -10,6 +10,8 @@ dart_library("dart") {
 
   sources = [
     "ledger.dart",
+    "src/helpers.dart",
+    "src/utils.dart",
   ]
 
   deps = [
@@ -21,7 +23,7 @@ dart_library("dart") {
 
 dart_test("dart_tests") {
   sources = [
-    "utils_test.dart",
+    "../test/utils_test.dart",
   ]
 
   deps = [

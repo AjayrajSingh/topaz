@@ -10,7 +10,7 @@ flutter_app("hello_mod") {
 
   fuchsia_package_name = "hello_mod"
 
-
+  sources = []
   deps = [
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app_driver/dart",

@@ -7,7 +7,11 @@ import("//build/dart/dart_tool.gni")
 
 dart_tool("kernel_compiler") {
   main_dart = "compiler.dart"
+
   source_dir = "."
+  sources = [
+    "compiler.dart",
+  ]
 
   deps = [
     "//third_party/dart-pkg/pub/args",

@@ -9,8 +9,8 @@ dart_library("lib.settings") {
 
   sources = [
     "device_info.dart",
-    "widgets.dart",
     "timezone_picker.dart",
+    "widgets.dart",
   ]
 
   deps = [

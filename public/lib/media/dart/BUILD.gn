@@ -8,8 +8,8 @@ dart_library("dart") {
   infer_package_name = true
 
   sources = [
-    "audio_player_controller.dart",
     "audio.dart",
+    "audio_player_controller.dart",
     "timeline.dart",
   ]
 

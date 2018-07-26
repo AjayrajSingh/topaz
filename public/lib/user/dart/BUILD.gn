@@ -10,6 +10,8 @@ dart_library("dart") {
   sdk_category = "partner"
 
   sources = [
+    "src/dank_user_shell_impl.dart",
+    "src/user_shell_impl.dart",
     "user.dart",
   ]
 

@@ -13,11 +13,27 @@ fidl("game_tracker_service") {
   ]
 }
 
+dart_library("game_tracker_client") {
+  package_name = "game_tracker_client"
+
+   sources = [
+    "client.dart",
+    "src/game_tracker_service_client.dart",
+  ]
+
+  deps = [
+    "//topaz/examples/tictactoe/services:game_tracker_service",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/lib/app_driver/dart",
+  ]
+}
+
 dart_library("game_tracker_dart_impl") {
   package_name = "game_tracker_impl"
 
   sources = [
     "impl.dart",
+    "src/game_tracker_impl.dart",
   ]
 
   deps = [

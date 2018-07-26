@@ -19,7 +19,7 @@ dart_library("utils") {
 
 dart_test("document_util_tests") {
   sources = [
-    "utils_test.dart",
+    "../test/utils_test.dart",
   ]
 
   deps = [

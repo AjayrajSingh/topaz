@@ -11,6 +11,7 @@ dart_library("mozart") {
 
   sources = [
     "mozart.dart",
+    "src/fakes/mozart_fakes.dart",
   ]
 
   deps = [

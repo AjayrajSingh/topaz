@@ -12,6 +12,11 @@ flutter_aot_app("tictactoe_scoreboard_mod") {
   fuchsia_package_name = "tictactoe_scoreboard_mod"
   module_manifest = "manifest.json"
 
+  sources = [
+    "src/model/scoreboard_model.dart",
+    "src/widget/scoreboard_widget.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/examples/tictactoe/common",

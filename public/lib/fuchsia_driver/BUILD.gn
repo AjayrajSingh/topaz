@@ -7,7 +7,9 @@ import("//build/dart/dart_library.gni")
 dart_library("fuchsia_driver") {
   package_name = "fuchsia_driver"
 
-  sources = [ "fuchsia_driver.dart" ]
+  sources = [
+    "fuchsia_driver.dart",
+  ]
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",

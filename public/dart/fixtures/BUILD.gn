@@ -10,6 +10,11 @@ dart_library("fixtures") {
 
   sources = [
     "fixtures.dart",
+    "src/fixtures.dart",
+    "src/name.dart",
+    "src/names.dart",
+    "src/namespace.dart",
+    "src/sequence.dart",
   ]
 
   deps = [
@@ -21,8 +26,8 @@ dart_library("fixtures") {
 
 dart_test("dart_fixture_tests") {
   sources = [
-    "fixtures_name_test.dart",
-    "namespace_test.dart",
+    "../test/fixtures_name_test.dart",
+    "../test/namespace_test.dart",
   ]
 
   deps = [

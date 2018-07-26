@@ -8,7 +8,7 @@ dart_app("fidl_compatibility_test_server_dart") {
   main_dart = "main.dart"
 
   source_dir = "."
-
+  sources = []
   deps = [
     "//garnet/public/lib/fidl/compatibility_test:compatibility_test_service",
     "//topaz/public/lib/app/dart",

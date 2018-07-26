@@ -12,6 +12,20 @@ flutter_aot_app("capybara_user_shell") {
 
   manifest = "pubspec.yaml"
 
+  sources = [
+    "launcher.dart",
+    "launcher_toggle.dart",
+    "root.dart",
+    "status_panel.dart",
+    "status_tray.dart",
+    "widgets/animated_content_builder.dart",
+    "widgets/system_overlay.dart",
+    "widgets/toggle.dart",
+    "window/model.dart",
+    "window/window.dart",
+    "window_playground.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",

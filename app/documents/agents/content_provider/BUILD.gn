@@ -7,6 +7,10 @@ import("//topaz/runtime/dart_runner/dart_app.gni")
 dart_app("documents_content_provider") {
   main_dart = "lib/main.dart"
 
+  sources = [
+    "src/documents_content_provider_impl.dart",
+  ]
+
   deps = [
     "//peridot/public/fidl/fuchsia.modular",
     "//topaz/app/documents/services:services",

@@ -8,6 +8,7 @@ import("//topaz/runtime/dart/dart_test.gni")
 flutter_app("xi_mod") {
   main_dart = "lib/main.dart"
 
+  sources = []
   deps = [
     "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//garnet/public/fidl/fuchsia.xi",

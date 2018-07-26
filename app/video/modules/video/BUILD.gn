@@ -12,6 +12,7 @@ flutter_aot_app("video") {
   manifest = "pubspec.yaml"
   module_manifest = "manifest.json"
 
+  sources = []
   deps = [
     "//garnet/public/fidl/fuchsia.netconnector",
     "//garnet/public/fidl/fuchsia.ui.viewsv1",

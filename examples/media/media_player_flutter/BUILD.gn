@@ -7,6 +7,11 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("media_player_flutter") {
   main_dart = "lib/main.dart"
 
+  sources = [
+    "asset.dart",
+    "config.dart",
+  ]
+
   deps = [
     "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//peridot/public/fidl/fuchsia.modular",

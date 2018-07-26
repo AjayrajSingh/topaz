@@ -14,20 +14,39 @@ dart_library("dart") {
     "com.fuchsia.color.dart",
     "com.fuchsia.contact.dart",
     "com.fuchsia.documents.dart",
+    "com.fuchsia.intent.dart",
+    "com.fuchsia.status.dart",
     "com/fuchsia/codelab/codelab.dart",
     "com/fuchsia/codelab/finance/finance_entity_codec.dart",
     "com/fuchsia/codelab/lyrics/lyrics_entity_codec.dart",
     "com/fuchsia/codelab/recipe/recipe_entity_codec.dart",
-    "com.fuchsia.intent.dart",
     "com/fuchsia/media/asset_specifier/asset_specifier_entity_codec.dart",
     "com/fuchsia/media/asset_specifier/asset_specifier_entity_data.dart",
     "com/fuchsia/media/captions/captions_entity_codec.dart",
     "com/fuchsia/media/media.dart",
     "com/fuchsia/media/progress/media_progress_entity_codec.dart",
     "com/fuchsia/media/progress/media_progress_entity_data.dart",
-    "com.fuchsia.status.dart",
     "com/google/youtube/video_id_entity_codec.dart",
     "entity_codec.dart",
+    "src/com.fuchsia.color/color_entity_codec.dart",
+    "src/com.fuchsia.color/color_entity_data.dart",
+    "src/com.fuchsia.contact/contact_entity_codec.dart",
+    "src/com.fuchsia.contact/contact_entity_data.dart",
+    "src/com.fuchsia.contact/email_entity_codec.dart",
+    "src/com.fuchsia.contact/email_entity_data.dart",
+    "src/com.fuchsia.contact/filter_entity_codec.dart",
+    "src/com.fuchsia.contact/filter_entity_data.dart",
+    "src/com.fuchsia.contact/phone_number_entity_codec.dart",
+    "src/com.fuchsia.contact/phone_number_entity_data.dart",
+    "src/com.fuchsia.documents/documents_id_codec.dart",
+    "src/com.fuchsia.documents/documents_id_entity_data.dart",
+    "src/com.fuchsia.intent/intent_entity_codec.dart",
+    "src/com.fuchsia.intent/intent_entity_data.dart",
+    "src/com.fuchsia.status/status_entity_codec.dart",
+    "src/com.fuchsia.status/status_entity_data.dart",
+    "src/entity_codec.dart",
+    "src/parse_int.dart",
+    "src/string_list_entity_codec.dart",
   ]
 
   deps = [
@@ -38,7 +57,7 @@ dart_library("dart") {
 
 dart_test("dart_schema_tests") {
   sources = [
-    "entity_codec_test.dart",
+    "../test/entity_codec_test.dart",
   ]
 
   deps = [

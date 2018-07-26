@@ -8,6 +8,17 @@ flutter_app("documents_browser") {
   package_name = "browser"
   main_dart = "lib/main.dart"
 
+  sources = [
+    "src/models/browser_model.dart",
+    "src/widgets/browser.dart",
+    "src/widgets/doc_list_item.dart",
+    "src/widgets/header.dart",
+    "src/widgets/image_viewer.dart",
+    "src/widgets/multi_select_header.dart",
+    "src/widgets/selectable_item.dart",
+    "src/widgets/thumbnail.dart",
+  ]
+
   deps = [
     "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//peridot/public/fidl/fuchsia.modular",

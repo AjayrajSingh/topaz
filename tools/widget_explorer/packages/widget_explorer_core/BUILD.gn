@@ -9,6 +9,9 @@ dart_library("widget_explorer_core") {
   package_name = "widget_explorer_core"
 
   sources = [
+    "src/extract.dart",
+    "src/utils.dart",
+    "src/widget_specs.dart",
     "widget_specs.dart",
   ]
 
@@ -24,7 +27,8 @@ dart_library("widget_explorer_core") {
 
 dart_test("widget_explorer_core_tests") {
   sources = [
-    "extract_test.dart",
+    "../test/extract_test.dart",
+    "../test/util.dart",
   ]
 
   deps = [

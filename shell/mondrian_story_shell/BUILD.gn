@@ -12,13 +12,21 @@ flutter_aot_app("mondrian") {
   sources = [
     "anim/flux.dart",
     "anim/sim.dart",
+    "layout/container_layout.dart",
     "layout/copresent_layout.dart",
+    "layout/pattern_layout.dart",
+    "models/inset_manager.dart",
     "models/layout_model.dart",
-    "models/tree.dart",
+    "models/surface/positioned_surface.dart",
     "models/surface/surface.dart",
     "models/surface/surface_form.dart",
+    "models/surface/surface_graph.dart",
     "models/surface/surface_properties.dart",
+    "models/tree.dart",
+    "story_shell_impl.dart",
+    "widgets/gestures.dart",
     "widgets/isometric_widget.dart",
+    "widgets/mondrian.dart",
     "widgets/mondrian_child_view.dart",
     "widgets/mondrian_logo.dart",
     "widgets/overview.dart",
@@ -43,9 +51,10 @@ flutter_aot_app("mondrian") {
 
 dart_test("mondrian_story_shell_tests") {
   sources = [
-    "layout/pattern_layout_test.dart",
-    "layout/surface_relationship_test.dart",
-    "tree_test.dart",
+    "../test/layout/pattern_layout_test.dart",
+    "../test/layout/surface_relationship_test.dart",
+    "../test/layout_test_utils.dart",
+    "../test/tree_test.dart",
   ]
 
   deps = [

@@ -9,6 +9,7 @@ dart_app("eddystone_agent") {
 
   source_dir = "."
 
+  sources = []
   deps = [
     "//garnet/public/fidl/fuchsia.bluetooth",
     "//garnet/public/fidl/fuchsia.bluetooth.le",

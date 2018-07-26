@@ -15,6 +15,11 @@ dart_library("dart") {
   sources = [
     "app.dart",
     "logging.dart",
+    "src/frame_rate_tracer.dart",
+    "src/fuchsia_log_record.dart",
+    "src/fuchsia_logger.dart",
+    "src/logging.dart",
+    "src/rio.dart",
   ]
 
   deps = [
@@ -52,19 +57,28 @@ dart_test("dart_app_tests") {
   source_dir = "."
 
   sources = [
+    "app.dart",
+    "logging.dart",
+    "src/frame_rate_tracer.dart",
+    "src/fuchsia_log_record.dart",
+    "src/fuchsia_logger.dart",
+    "src/logging.dart",
+    "src/rio.dart",
     "test/fuchsia_log_record_test.dart",
+    "test/legacy_code.dart",
     "test/legacy_logger_test.dart",
     "test/log_writer_test.dart",
-    "test/socket_validate.dart",
-    "test/socket_with_location_test.dart",
-    "test/socket_with_tags_test.dart",
-    "test/socket_with_exception_test.dart",
-    "test/socket_with_stacktrace_test.dart",
     "test/socket_test.dart",
+    "test/socket_validate.dart",
+    "test/socket_with_exception_test.dart",
+    "test/socket_with_location_test.dart",
+    "test/socket_with_stacktrace_test.dart",
+    "test/socket_with_tags_test.dart",
     "test/stdout_test.dart",
     "test/stdout_with_exception.dart",
     "test/stdout_with_location.dart",
     "test/test_startup_context_test.dart",
+    "testing/test_startup_context.dart",
   ]
 
   deps = [

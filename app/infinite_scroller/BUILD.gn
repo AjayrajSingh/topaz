@@ -7,6 +7,7 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("infinite_scroller") {
   main_dart = "lib/main.dart"
 
+  sources = []
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]

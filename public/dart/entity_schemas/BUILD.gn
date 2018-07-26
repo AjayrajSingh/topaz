@@ -9,6 +9,10 @@ dart_library("entity_schemas") {
 
   sources = [
     "entities.dart",
+    "src/contact.dart",
+    "src/email.dart",
+    "src/phone_number.dart",
+    "src/video.dart",
   ]
 
   deps = [

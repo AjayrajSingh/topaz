@@ -8,6 +8,8 @@ dart_library("widget_explorer_widgets") {
   package_name = "widget_explorer_widgets"
 
   sources = [
+    "src/helper_widgets.dart",
+    "src/widget_explorer.dart",
     "widget_explorer_widgets.dart",
   ]
 

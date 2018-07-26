@@ -9,6 +9,7 @@ flutter_aot_app("image_grid_benchmark_flutter") {
 
   fuchsia_package_name = "image_grid_benchmark_flutter"
 
+  sources = []
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/widgets:lib.widgets",

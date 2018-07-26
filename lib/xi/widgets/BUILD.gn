@@ -8,6 +8,10 @@ dart_library("xi_widgets") {
   package_name = "xi_widgets"
 
   sources = [
+    "src/editor.dart",
+    "src/line_cache.dart",
+    "src/text_line.dart",
+    "src/xi_app.dart",
     "widgets.dart",
   ]
 

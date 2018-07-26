@@ -7,6 +7,10 @@ import("//topaz/runtime/dart_runner/dart_app.gni")
 dart_app("game_tracker_agent") {
   main_dart = "lib/main.dart"
 
+  sources = [
+    "src/agent.dart",
+  ]
+
   deps = [
     "//peridot/public/fidl/fuchsia.modular",
     "//topaz/examples/tictactoe/services:game_tracker_dart_impl",

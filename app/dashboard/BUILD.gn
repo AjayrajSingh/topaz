@@ -48,8 +48,8 @@ flutter_aot_app("dashboard") {
 
 dart_test("dashboard_tests") {
   sources = [
-    "build_bucket_service_test.dart",
-    "enums_test.dart",
+    "../test/build_bucket_service_test.dart",
+    "../test/enums_test.dart",
   ]
 
   deps = [

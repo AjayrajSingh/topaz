@@ -11,6 +11,10 @@ dart_tool("dartfmt_extras") {
 
   main_dart = "bin/main.dart"
 
+  sources = [
+    "dartfmt_extras.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/pub/path",
     "//third_party/dart-pkg/pub/source_span",
@@ -35,6 +39,7 @@ dart_test("dartfmt_extras_tests") {
   sources = [
     "directives_test.dart",
     "double_quotes_test.dart",
+    "../test/util.dart",
   ]
 
   deps = [

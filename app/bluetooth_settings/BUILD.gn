@@ -8,6 +8,7 @@ flutter_app("bluetooth_settings") {
   main_dart = "lib/main.dart"
   manifest = "pubspec.yaml"
 
+  sources = []
   deps = [
     "//garnet/public/fidl/fuchsia.bluetooth.control",
     "//garnet/public/fidl/fuchsia.bluetooth.gatt",

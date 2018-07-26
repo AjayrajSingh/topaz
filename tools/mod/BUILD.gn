@@ -11,7 +11,10 @@ dart_tool("mod") {
   main_dart = "bin/mod.dart"
 
   sources = [
+    "../bin/mod.dart",
     "commands.dart",
+    "src/commands/command_runner.dart",
+    "src/commands/create.dart",
   ]
 
   deps = [

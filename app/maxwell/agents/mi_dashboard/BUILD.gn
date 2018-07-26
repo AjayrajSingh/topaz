@@ -9,6 +9,12 @@ dart_app("mi_dashboard") {
   main_dart = "main.dart"
 
   source_dir = "."
+  sources = [
+    "src/action_log.dart",
+    "src/context.dart",
+    "src/data_handler.dart",
+    "src/proposal_subscribers.dart",
+  ]
 
   deps = [
     "//peridot/public/fidl/fuchsia.modular",

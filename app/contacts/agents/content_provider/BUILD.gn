@@ -10,15 +10,20 @@ dart_app("contacts_content_provider") {
 
   package_name = "contacts_content_provider"
 
-  sources = [
-    "store.dart",
-  ]
-
   meta = [
     {
       path = rebase_path("meta/contacts_content_provider.cmx")
       dest = "contacts_content_provider.cmx"
     },
+  ]
+
+  sources = [
+    "src/modular/contacts_content_provider_impl.dart",
+    "src/modular/contacts_watcher.dart",
+    "src/modular/entity_helpers.dart",
+    "src/store/contacts_store.dart",
+    "src/store/prefix_tree.dart",
+    "store.dart",
   ]
 
   deps = [
@@ -32,8 +37,8 @@ dart_app("contacts_content_provider") {
 
 dart_test("contacts_content_provider_tests") {
   sources = [
-    "contacts_store_test.dart",
-    "prefix_tree_test.dart",
+    "../test/contacts_store_test.dart",
+    "../test/prefix_tree_test.dart",
   ]
 
   deps = [

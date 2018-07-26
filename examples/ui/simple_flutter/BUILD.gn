@@ -7,6 +7,8 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("simple_flutter") {
   main_dart = "lib/main.dart"
 
+  sources = []
+
   deps = [
     "//garnet/public/fidl/fuchsia.ui.gfx",
     "//garnet/public/fidl/fuchsia.ui.scenic",
@@ -18,6 +20,9 @@ flutter_app("simple_flutter") {
 }
 
 flutter_app("leaf_flutter") {
+  sources = [
+    "leaf.dart",
+  ]
   main_dart = "lib/leaf.dart"
 
   deps = [

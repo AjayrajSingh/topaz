@@ -7,6 +7,7 @@ import("//topaz/runtime/dart_runner/dart_app.gni")
 dart_app("echo_client_async_dart") {
   main_dart = "lib/main.dart"
 
+  sources = []
   deps = [
     "//garnet/examples/fidl/services:echo2",
     "//garnet/public/fidl/fuchsia.sys",

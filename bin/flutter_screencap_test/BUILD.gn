@@ -8,6 +8,8 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("flutter_screencap_test_app") {
   main_dart = "lib/main.dart"
 
+  sources = []
+
   deps = [
     "//garnet/public/fidl/fuchsia.sys",
     "//garnet/public/fidl/fuchsia.testing.runner",

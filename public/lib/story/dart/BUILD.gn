@@ -10,6 +10,9 @@ dart_library("dart") {
   sdk_category = "partner"
 
   sources = [
+    "src/link_client.dart",
+    "src/link_watcher_host.dart",
+    "src/link_watcher_impl.dart",
     "story.dart",
   ]
 

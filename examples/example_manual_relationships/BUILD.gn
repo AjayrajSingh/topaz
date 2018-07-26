@@ -8,6 +8,12 @@ flutter_app("example_manual_relationships") {
   package_name = "example_manual_relationships"
   main_dart = "lib/main.dart"
 
+  sources = [
+    "grouping.dart",
+    "launch_copresent_button.dart",
+    "start_module_button.dart",
+  ]
+
   deps = [
     "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//peridot/public/fidl/fuchsia.modular",

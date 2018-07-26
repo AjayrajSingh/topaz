@@ -8,6 +8,14 @@ flutter_app("contact_card") {
   package_name = "contact_card"
   main_dart = "lib/main.dart"
 
+  sources = [
+    "src/models/contact_card_model.dart",
+    "src/widgets/contact_activity.dart",
+    "src/widgets/contact_card.dart",
+    "src/widgets/contact_details.dart",
+    "src/widgets/header.dart",
+  ]
+
   deps = [
     "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",

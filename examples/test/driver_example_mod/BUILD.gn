@@ -28,9 +28,14 @@ flutter_aot_app("driver_example_mod_wrapper") {
 
   main_dart = "lib/main_driver_wrapper.dart"
 
+  sources = [
+    "src/driver_example_model.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
+    "//third_party/dart-pkg/git/flutter/packages/fuchsia_remote_debug_protocol",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/widgets/dart",
@@ -61,6 +66,7 @@ dart_fuchsia_test("driver_example_mod_target_tests") {
 
   package_only = true
 
+  sources = []
   deps = [
     ":driver_example_mod_wrapper_dart_library",
     "//topaz/public/lib/fuchsia_driver",

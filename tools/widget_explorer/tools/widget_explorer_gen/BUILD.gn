@@ -11,6 +11,9 @@ dart_tool("widget_explorer_gen") {
   main_dart = "bin/widget_explorer_gen.dart"
 
   source_dir = "bin"
+  sources = [
+    "widget_explorer_gen.dart",
+  ]
 
   deps = [
     "../../packages/widget_explorer_core",

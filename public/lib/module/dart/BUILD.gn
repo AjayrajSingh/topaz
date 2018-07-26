@@ -11,6 +11,8 @@ dart_library("dart") {
 
   sources = [
     "module.dart",
+    "src/module_context_client.dart",
+    "src/module_controller_client.dart",
   ]
 
   deps = [

@@ -9,6 +9,7 @@ flutter_aot_app("system_dashboard") {
 
   manifest = "pubspec.yaml"
 
+  sources = []
   deps = [
     "//garnet/public/fidl/fuchsia.scpi",
     "//topaz/public/lib/app/dart",

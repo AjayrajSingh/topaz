@@ -11,6 +11,7 @@ dart_jit_app("hello_dart_jit") {
 
   product = false
 
+  sources = []
   deps = [
     "//topaz/public/dart/zircon",
     "//topaz/runtime/dart_runner/examples/greeting",
@@ -26,6 +27,7 @@ dart_jit_app("hello_dart_dbc") {
 
   dbc = true
 
+  sources = []
   deps = [
     "//topaz/public/dart/zircon",
     "//topaz/runtime/dart_runner/examples/greeting",
@@ -39,6 +41,7 @@ dart_aot_app("hello_dart_aot") {
 
   product = false
 
+  sources = []
   deps = [
     "//topaz/public/dart/zircon",
     "//topaz/runtime/dart_runner/examples/greeting",
@@ -52,6 +55,7 @@ dart_jit_app("hello_dart_jit_product") {
 
   product = true
 
+  sources = []
   deps = [
     "//topaz/public/dart/zircon",
     "//topaz/runtime/dart_runner/examples/greeting",
@@ -65,6 +69,7 @@ dart_aot_app("hello_dart_aot_product") {
 
   product = true
 
+  sources = []
   deps = [
     "//topaz/public/dart/zircon",
     "//topaz/runtime/dart_runner/examples/greeting",

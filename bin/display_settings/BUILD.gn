@@ -9,6 +9,10 @@ flutter_aot_app("display_settings") {
 
   manifest = "pubspec.yaml"
 
+  sources = [
+    "src/widget.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//garnet/public/fidl/fuchsia.amber",

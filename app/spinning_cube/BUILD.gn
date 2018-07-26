@@ -9,6 +9,10 @@ flutter_app("spinning_cube") {
 
   manifest = "pubspec.yaml"
 
+  sources = [
+    "spinning_cube_gem.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
   ]

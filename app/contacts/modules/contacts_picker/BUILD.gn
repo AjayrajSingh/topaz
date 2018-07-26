@@ -11,6 +11,10 @@ flutter_app("contacts_picker") {
   module_manifest = "manifest.json"
 
   sources = [
+    "src/stores/contact_item_store.dart",
+    "src/stores/contacts_picker_store.dart",
+    "src/widgets/contact_item.dart",
+    "src/widgets/contacts_picker.dart",
     "stores.dart",
     "widgets.dart",
   ]
