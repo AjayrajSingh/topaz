@@ -67,15 +67,15 @@ class StartupContext {
   }
 }
 
-void connectToService<T>(
-    ServiceProvider serviceProvider, AsyncProxyController<T> controller) {
+Future<void> connectToService<T>(
+    ServiceProvider serviceProvider, AsyncProxyController<T> controller) async {
   final String serviceName = controller.$serviceName;
   if (serviceName == null) {
     throw new Exception(
         "${controller.$interfaceName}'s controller.\$serviceName"
         ' must not be null. Check the FIDL file for a missing [Discoverable]');
   }
-  serviceProvider.connectToService(
+  await serviceProvider.connectToService(
       serviceName, controller.request().passChannel());
 }
 
