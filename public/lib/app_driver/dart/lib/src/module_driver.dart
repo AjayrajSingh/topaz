@@ -277,6 +277,24 @@ class ModuleDriver {
     serviceProviderProxy.ctrl.close();
   }
 
+  /// Connect to an agent using a new-style async proxy.
+  Future<void> connectToAgentServiceWithAsyncProxy(
+    String url,
+    AsyncProxy<dynamic> proxy,
+  ) async {
+    log.fine('#connectToAgentService(...)');
+    assert(proxy.ctrl.$serviceName != null,
+        'controller.\$serviceName must not be null. Check the FIDL file for a missing [Discoverable]');
+
+    ComponentContextClient componentContext = await getComponentContext();
+
+    await componentContext.connectToAgent(url)
+      ..connectToService(
+          proxy.ctrl.$serviceName, proxy.ctrl.request().passChannel())
+      // Close all unnecessary bindings
+      ..ctrl.close();
+  }
+
   /// Retrieve the story id of the story this module lives in
   Future<String> getStoryId() {
     log.fine('#getStoryId(...)');
