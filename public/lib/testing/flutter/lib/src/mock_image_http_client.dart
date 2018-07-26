@@ -21,10 +21,10 @@ MockHttpClient createMockImageHttpClient(SecurityContext _) {
   final MockHttpClientRequest request = new MockHttpClientRequest();
   final MockHttpClientResponse response = new MockHttpClientResponse();
   final MockHttpHeaders headers = new MockHttpHeaders();
-  when(client.getUrl(any)).thenReturn(new Future<HttpClientRequest>
+  when(client.getUrl(any)).thenAnswer((_) => new Future<HttpClientRequest>
                                  .value(request));
   when(request.headers).thenReturn(headers);
-  when(request.close()).thenReturn(new Future<HttpClientResponse>
+  when(request.close()).thenAnswer((_) => new Future<HttpClientResponse>
                        .value(response));
   when(response.contentLength).thenReturn(_kTransparentImageBytes.length);
   when(response.statusCode).thenReturn(HttpStatus.ok);
