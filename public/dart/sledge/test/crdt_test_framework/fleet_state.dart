@@ -47,6 +47,7 @@ class FleetState<T extends dynamic> {
   void applyModification(int id, void Function(T) modification, int time) {
     modification(_instances[id]);
     _storageStates[id].applyChange(_instances[id].getChange(), time);
+    _instances[id].completeTransaction();
   }
 
   void applySynchronization(int id1, int id2) {

@@ -34,6 +34,7 @@ dart_test("dart_sledge_tests") {
     "values/key_value_storage_test.dart",
     "values/last_one_wins_values_test.dart",
     "values/map_value_test.dart",
+    "values/map_value_ss_test.dart",
     "values/pos_neg_counter_ss_test.dart",
     "values/pos_neg_counter_test.dart",
     "values/ordered_list_ss_test.dart",

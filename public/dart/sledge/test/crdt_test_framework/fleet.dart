@@ -94,6 +94,10 @@ class Fleet<T extends dynamic> {
     }
   }
 
+  void testFixedOrder(List<String> nodeIds, {bool allowPartial = false}) =>
+      _testSingleOrder(new EvaluationOrder.fromIds(nodeIds, graph.nodes,
+          allowPartial: allowPartial));
+
   void testSingleOrder() => _testSingleOrder(graph.orders.first);
 
   void testAllOrders() => graph.orders.forEach(_testSingleOrder);
