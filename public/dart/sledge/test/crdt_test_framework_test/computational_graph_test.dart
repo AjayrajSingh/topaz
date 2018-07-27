@@ -12,10 +12,10 @@ import '../crdt_test_framework/node.dart';
 void main() {
   test('Build and get orders.', () {
     ComputationalGraph G = new ComputationalGraph();
-    final n1 = new Node('n 1');
-    final n2 = new Node('n 2');
-    final n3 = new Node('n 3');
-    final n4 = new Node('n 4');
+    final n1 = new Node('1');
+    final n2 = new Node('2');
+    final n3 = new Node('3');
+    final n4 = new Node('4');
     G
       ..addNode(n1)
       ..addNode(n2)
@@ -36,9 +36,9 @@ void main() {
 
   test('Build and get orders not connected.', () {
     ComputationalGraph G = new ComputationalGraph();
-    final n1 = new Node('n 1');
-    final n2 = new Node('n 2');
-    final n3 = new Node('n 3');
+    final n1 = new Node('1');
+    final n2 = new Node('2');
+    final n3 = new Node('3');
     G
       ..addNode(n1)
       ..addNode(n2)
@@ -57,11 +57,11 @@ void main() {
 
   test('Build and get orders.', () {
     ComputationalGraph G = new ComputationalGraph();
-    final n1 = new Node('n 1');
-    final n2 = new Node('n 2');
-    final n3 = new Node('n 3');
-    final n4 = new Node('n 4');
-    final n5 = new Node('n 5');
+    final n1 = new Node('1');
+    final n2 = new Node('2');
+    final n3 = new Node('3');
+    final n4 = new Node('4');
+    final n5 = new Node('5');
     G
       ..addNode(n1)
       ..addNode(n2)
@@ -86,9 +86,9 @@ void main() {
 
   test('Build and get orders, cyclic graph.', () {
     ComputationalGraph G = new ComputationalGraph();
-    final n1 = new Node('n 1');
-    final n2 = new Node('n 2');
-    final n3 = new Node('n 3');
+    final n1 = new Node('1');
+    final n2 = new Node('2');
+    final n3 = new Node('3');
     G
       ..addNode(n1)
       ..addNode(n2)
@@ -98,5 +98,24 @@ void main() {
       ..addRelation(n3, n1);
 
     expect(() => G.orders, throwsStateError);
+  });
+
+  test('Check that random orders differs.', () {
+    ComputationalGraph G = new ComputationalGraph();
+    final n1 = new Node('1');
+    final n2 = new Node('2');
+    G..addNode(n1)..addNode(n2);
+    final orders = <EvaluationOrder>[];
+    for (int i = 0; i < 31; i++) {
+      orders.add(G.getRandomOrder());
+    }
+    // Probability of each order is 1/2. So probability that in 31 cases orders
+    // would be the same is 2(1/2)^31 = (1/2)^30 < 1e-9.
+    expect(
+        orders,
+        containsAll([
+          new EvaluationOrder([n1, n2]),
+          new EvaluationOrder([n2, n1])
+        ]));
   });
 }

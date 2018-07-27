@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:math' show Random;
+
 import 'evaluation_order.dart';
 import 'node.dart';
 
@@ -9,12 +11,12 @@ import 'node.dart';
 //
 // This framework allows users to first specify a set of operations, and then run
 // those operations in different orders. ComputationalGraph is used to specify
-// this order relations between those operations, and to get correct orders of
-// execution.
+// the order between those operations, and to get correct orders of execution.
 //
 class ComputationalGraph {
   final List<Node> nodes = <Node>[];
   final List<List<int>> _allChoices = <List<int>>[];
+  final Random random = new Random(0);
 
   void addNode(Node v) {
     // TODO: remove O(n) part.
@@ -80,7 +82,11 @@ class ComputationalGraph {
 
   // Returns [this] ordered topologically based on [choices].
   // Returns null if [choices] do not correspond to correct topological order.
-  EvaluationOrder _getOrder(List<int> choices) {
+  //
+  // If [completeWithRandomChoices] is false, the first node will be used as a
+  // choice when [choices] is over. Otherwise, nodes will be chosen randomly.
+  EvaluationOrder _getOrder(List<int> choices,
+      {bool completeWithRandomChoices = false}) {
     List<Node> order = <Node>[];
     List<Node> ready = <Node>[];
     for (final node in nodes) {
@@ -94,7 +100,12 @@ class ComputationalGraph {
       if (ready.isEmpty) {
         throw new StateError('Computational graph should be acyclic');
       }
-      int curChoice = (i < choices.length) ? choices[i] : 0;
+      int curChoice = 0;
+      if (i < choices.length) {
+        curChoice = choices[i];
+      } else if (completeWithRandomChoices) {
+        curChoice = random.nextInt(nodes.length);
+      }
       if (curChoice >= ready.length) {
         return null;
       }
@@ -122,6 +133,9 @@ class ComputationalGraph {
     }
     return _getOrder(_allChoices[index]);
   }
+
+  EvaluationOrder getRandomOrder() =>
+      _getOrder([], completeWithRandomChoices: true);
 
   // Returns all correct topological orders of this graph.
   Iterable<EvaluationOrder> get orders =>

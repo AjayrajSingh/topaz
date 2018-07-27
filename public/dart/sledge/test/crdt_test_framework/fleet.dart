@@ -87,6 +87,9 @@ class Fleet<T extends dynamic> {
     _checkerGenerators.add(checkerGenerator);
   }
 
+  /// Executes the operations in all nodes in a given [order]. If [order] is not
+  /// specified, execute all nodes in some fixed order, that would be same over
+  /// all calls.
   void testSingleOrder([EvaluationOrder order]) {
     order ??= graph.orders.first;
     final fleetState = new FleetState<T>(_fleetSize, _instanceGenerator);
@@ -104,6 +107,12 @@ class Fleet<T extends dynamic> {
     }
   }
 
+  /// Executes the operations in all nodes in an order specified by [nodeIds].
+  /// If [allowPartial] is false, checks that all [graph] nodes are present in
+  /// [nodeIds].
+  ///
+  /// It can be used to reproduce previous execution order with an information
+  /// from TestFailure message.
   void testFixedOrder(List<String> nodeIds, {bool allowPartial = false}) {
     testSingleOrder(new EvaluationOrder.fromIds(nodeIds, graph.nodes,
         allowPartial: allowPartial));
