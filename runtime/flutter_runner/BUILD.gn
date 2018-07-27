@@ -79,6 +79,8 @@ template("flutter_runner") {
       "task_observers.cc",
       "task_observers.h",
       "unique_fdio_ns.h",
+      "vsync_recorder.cc",
+      "vsync_recorder.h",
       "vsync_waiter.cc",
       "vsync_waiter.h",
       "vulkan_surface.cc",

@@ -7,6 +7,7 @@
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fxl/functional/make_copyable.h"
 #include "lib/ui/scenic/fidl_helpers.h"
+#include "vsync_recorder.h"
 #include "vsync_waiter.h"
 
 namespace flutter {
@@ -123,10 +124,13 @@ void SessionConnection::EnqueueClearOps() {
 
 void SessionConnection::PresentSession() {
   ToggleSignal(vsync_event_handle_, false);
-  session_wrapper_.Present(0,  // presentation_time. (placeholder).
-                           [handle = vsync_event_handle_](auto) {
-                             ToggleSignal(handle, true);
-                           }  // callback
+  session_wrapper_.Present(
+      0,  // presentation_time. (placeholder).
+      [handle = vsync_event_handle_](
+          fuchsia::images::PresentationInfo presentation_info) {
+        VsyncRecorder::GetInstance().UpdateVsyncInfo(presentation_info);
+        ToggleSignal(handle, true);
+      }  // callback
   );
 }
 

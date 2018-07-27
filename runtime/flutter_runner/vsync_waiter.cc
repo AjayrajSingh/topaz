@@ -5,6 +5,7 @@
 #include "vsync_waiter.h"
 
 #include "topaz/lib/deprecated_loop/message_loop.h"
+#include "vsync_recorder.h"
 
 namespace flutter {
 
@@ -14,9 +15,8 @@ VsyncWaiter::VsyncWaiter(std::string debug_label,
     : shell::VsyncWaiter(task_runners),
       debug_label_(std::move(debug_label)),
       session_wait_(session_present_handle, SessionPresentSignal),
-      phase_(fxl::TimePoint::Now()),
       weak_factory_(this) {
-  auto wait_handler = [&](async_dispatcher_t* dispatcher,                   //
+  auto wait_handler = [&](async_dispatcher_t* dispatcher,   //
                           async::Wait* wait,                //
                           zx_status_t status,               //
                           const zx_packet_signal_t* signal  //
@@ -36,9 +36,6 @@ VsyncWaiter::VsyncWaiter(std::string debug_label,
 
 VsyncWaiter::~VsyncWaiter() { session_wait_.Cancel(); }
 
-static constexpr fxl::TimeDelta kFrameInterval =
-    fxl::TimeDelta::FromSecondsF(1.0 / 60.0);
-
 static fxl::TimePoint SnapToNextPhase(fxl::TimePoint value,
                                       fxl::TimePoint phase,
                                       fxl::TimeDelta interval) {
@@ -50,20 +47,25 @@ static fxl::TimePoint SnapToNextPhase(fxl::TimePoint value,
 }
 
 void VsyncWaiter::AwaitVSync() {
+  VsyncInfo vsync_info = VsyncRecorder::GetInstance().GetCurrentVsyncInfo();
+
   fxl::TimePoint now = fxl::TimePoint::Now();
-  fxl::TimePoint next = SnapToNextPhase(now, phase_, kFrameInterval);
+  fxl::TimePoint next_vsync = SnapToNextPhase(now, vsync_info.presentation_time,
+                                              vsync_info.presentation_interval);
+
   task_runners_.GetUITaskRunner()->PostDelayedTask(
       [self = weak_factory_.GetWeakPtr()] {
         if (self) {
           self->FireCallbackWhenSessionAvailable();
         }
       },
-      next - now);
+      next_vsync - now);
 }
 
 void VsyncWaiter::FireCallbackWhenSessionAvailable() {
   FXL_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
-  if (session_wait_.Begin(deprecated_loop::MessageLoop::GetCurrent()->dispatcher()) != ZX_OK) {
+  if (session_wait_.Begin(
+          deprecated_loop::MessageLoop::GetCurrent()->dispatcher()) != ZX_OK) {
     FXL_LOG(ERROR) << "Could not begin wait for Vsync.";
   }
 }
@@ -71,15 +73,14 @@ void VsyncWaiter::FireCallbackWhenSessionAvailable() {
 void VsyncWaiter::FireCallbackNow() {
   FXL_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
 
-  auto now = fxl::TimePoint::Now();
+  VsyncInfo vsync_info = VsyncRecorder::GetInstance().GetCurrentVsyncInfo();
 
-  // We don't know the display refresh rate on this platform. Since the target
-  // time is advisory, assume kFrameInterval.
-  auto next = now + kFrameInterval;
+  fxl::TimePoint now = fxl::TimePoint::Now();
+  fxl::TimePoint next_vsync = SnapToNextPhase(now, vsync_info.presentation_time,
+                                              vsync_info.presentation_interval);
+  fxl::TimePoint previous_vsync = next_vsync - vsync_info.presentation_interval;
 
-  phase_ = now;
-
-  FireCallback(now, next);
+  FireCallback(previous_vsync, next_vsync);
 }
 
 }  // namespace flutter
