@@ -199,7 +199,8 @@ class SettingsSection extends StatelessWidget {
         Container(
             padding: EdgeInsets.only(
                 top: topSection ? 0.0 : _listPadding * scale,
-                left: _listPadding * scale, right: _listPadding * scale),
+                left: _listPadding * scale,
+                right: _listPadding * scale),
             child: Text(title, style: _titleTextStyle(scale))),
         child
       ]);
@@ -215,6 +216,8 @@ typedef OnSwitch = void Function(bool value);
 ///
 /// Can be used for all on and off settings.
 class SettingsSwitchTile extends SettingsItem {
+  static const double maxSwitchWidth = 600.0;
+
   /// Whether the switch is on or off.
   final bool state;
 
@@ -223,16 +226,20 @@ class SettingsSwitchTile extends SettingsItem {
   /// Function called when user toggles the switch.
   final OnSwitch onSwitch;
 
-  const SettingsSwitchTile({this.state, this.text, this.onSwitch, double scale})
+  const SettingsSwitchTile(
+      {@required double scale, this.state, this.text, this.onSwitch})
       : super(scale);
 
   @override
   Widget build(BuildContext context) {
-    return SwitchListTile(
-      title: SettingsText(text: text, scale: scale),
-      value: state,
-      onChanged: onSwitch,
-    );
+    return Container(
+        constraints:
+            BoxConstraints(minHeight: height, maxWidth: maxSwitchWidth),
+        child: SwitchListTile(
+          title: SettingsText(text: text, scale: scale),
+          value: state,
+          onChanged: onSwitch,
+        ));
   }
 }
 
@@ -263,7 +270,7 @@ class SettingsButton extends SettingsItem {
 class SettingsText extends SettingsItem {
   final String text;
 
-  const SettingsText({this.text, double scale}) : super(scale);
+  const SettingsText({@required double scale, this.text}) : super(scale);
 
   @override
   Widget build(BuildContext context) => _applyStartPadding(

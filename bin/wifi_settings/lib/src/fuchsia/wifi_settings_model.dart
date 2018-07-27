@@ -6,9 +6,9 @@ import 'dart:async';
 
 import 'package:fidl_fuchsia_netstack/fidl.dart' as net;
 import 'package:fidl_fuchsia_wlan_service/fidl.dart' as wlan;
+import 'package:flutter/foundation.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.app_driver.dart/module_driver.dart';
-import 'package:lib.schemas.dart/com.fuchsia.status.dart';
+import 'package:lib.settings/debug.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'access_point.dart';
@@ -38,6 +38,11 @@ class WifiSettingsModel extends Model {
   /// right now.
   bool _hasWlanInterface = true;
 
+  /// Controlled by the toggle switch to determine if debug info is shown
+  final ValueNotifier<bool> showDebugInfo = ValueNotifier<bool>(false);
+
+  final _WifiDebugInfo _debugInfo = _WifiDebugInfo();
+
   wlan.WlanStatus _status;
   List<wlan.Ap> _scannedAps;
 
@@ -49,9 +54,6 @@ class WifiSettingsModel extends Model {
   Timer _updateTimer;
   Timer _scanTimer;
 
-  final StatusEntityCodec _statusCodec = new StatusEntityCodec();
-  ModuleDriver _moduleDriver;
-
   /// Constructor.
   WifiSettingsModel()
       : _loading = true,
@@ -61,9 +63,8 @@ class WifiSettingsModel extends Model {
     connectToService(startupContext.environmentServices, _wlanProxy.ctrl);
     connectToService(startupContext.environmentServices, _netstackProxy.ctrl);
 
-    _initStatusUpdater();
     _netstackProxy.onInterfacesChanged = interfacesChanged;
-    
+
     _scan();
     _updateTimer = new Timer.periodic(_updatePeriod, (_) {
       _update();
@@ -71,6 +72,8 @@ class WifiSettingsModel extends Model {
     _scanTimer = new Timer.periodic(_scanPeriod, (_) {
       _scan();
     });
+
+    showDebugInfo.addListener(notifyListeners);
   }
 
   /// The current list of available access points.
@@ -152,34 +155,7 @@ class WifiSettingsModel extends Model {
   /// The current state of the network
   wlan.State get state => _status?.state;
 
-  /// Returns either the currently connected wifi network, or the current wifi status.
-  String get _statusLabel {
-    if (state == null) {
-      return null;
-    }
-
-    String value;
-    switch (state) {
-      case wlan.State.associated:
-        value = connectedAccessPoint.name;
-        break;
-      case wlan.State.associating:
-      case wlan.State.joining:
-        value = 'Connecting to ${connectedAccessPoint.name}';
-        break;
-      case wlan.State.authenticating:
-        value = 'Authenticating...';
-        break;
-      case wlan.State.bss:
-      case wlan.State.querying:
-      case wlan.State.scanning:
-        value = 'Scanning...';
-        break;
-      default:
-        value = 'Off';
-    }
-    return value;
-  }
+  DebugStatus get debugStatus => _debugInfo;
 
   /// Disconnects from the current network.
   void disconnect() {
@@ -204,6 +180,8 @@ class WifiSettingsModel extends Model {
     _hasWlanInterface =
         interfaces.any((interface) => interface.name.contains('wlan'));
     notifyListeners();
+
+    _debugInfo.interfaceUpdate(interfaces);
   }
 
   /// Called when the user dismisses the password dialog
@@ -221,12 +199,14 @@ class WifiSettingsModel extends Model {
     _connecting = true;
     _scannedAps = null;
 
+    final config = wlan.ConnectConfig(
+        ssid: accessPoint.name,
+        passPhrase: password ?? '',
+        scanInterval: _kConnectionScanInterval,
+        bssid: '');
+
     _wlanProxy.connect(
-      new wlan.ConnectConfig(
-          ssid: accessPoint.name,
-          passPhrase: password ?? '',
-          scanInterval: _kConnectionScanInterval,
-          bssid: ''),
+      config,
       (wlan.Error error) {
         if (error.code == wlan.ErrCode.ok) {
           _connectionResultMessage = null;
@@ -237,10 +217,12 @@ class WifiSettingsModel extends Model {
           _selectedAccessPoint = null;
           _connecting = false;
         }
+        _debugInfo.connectComplete(error);
         _update();
       },
     );
     notifyListeners();
+    _debugInfo.connectStart(config);
   }
 
   /// Remove duplicate and incompatible networks
@@ -264,27 +246,15 @@ class WifiSettingsModel extends Model {
     return aps;
   }
 
-  /// Broadcasts settings as a mod.
-  ///
-  /// Will be replaced with an agent.
-  Future<void> _initStatusUpdater() async {
-    try {
-      _moduleDriver = new ModuleDriver(onTerminate: dispose);
-      await _moduleDriver.start();
-      _updateStatus();
-      addListener(_updateStatus);
-      // If the device shell runs this, then there will be an exception, which we ignore
-      // TODO: remove mod specific code and move to an agent instead
-    } on Exception catch (_) {}
-  }
-
   void _scan() {
     if (!_connecting) {
       _wlanProxy.scan(const wlan.ScanRequest(timeout: 25),
           (wlan.ScanResult scanResult) {
         _scannedAps = _dedupeAndRemoveIncompatible(scanResult);
         notifyListeners();
+        _debugInfo.scanComplete(scanResult);
       });
+      _debugInfo.scanStart();
     }
   }
 
@@ -300,11 +270,45 @@ class WifiSettingsModel extends Model {
       }
 
       notifyListeners();
+      _debugInfo.updateComplete(status);
     });
+    _debugInfo.updateStart();
+  }
+}
+
+class _WifiDebugInfo extends DebugStatus {
+  _WifiDebugInfo();
+
+  void scanStart() {
+    timestamp('[scan] begin');
   }
 
-  void _updateStatus() {
-    _moduleDriver.put(
-        'status', new StatusEntityData(value: _statusLabel), _statusCodec);
+  void scanComplete(wlan.ScanResult result) {
+    timestamp('[scan] complete');
+    write('[scan] result', result.toString());
+  }
+
+  void updateStart() {
+    timestamp('[status] begin');
+  }
+
+  void updateComplete(wlan.WlanStatus status) {
+    timestamp('[status] complete');
+    write('[status] result', status.toString());
+  }
+
+  void connectStart(wlan.ConnectConfig connectConfig) {
+    timestamp('[connection] begin');
+    write('[connection] begin config', connectConfig.toString());
+  }
+
+  void connectComplete(wlan.Error error) {
+    timestamp('[connection] complete');
+    write('[connection] result', error.toString());
+  }
+
+  void interfaceUpdate(List<net.NetInterface> interfaces) {
+    timestamp('[interface] updated');
+    write('[interace] list', interfaces.toString());
   }
 }

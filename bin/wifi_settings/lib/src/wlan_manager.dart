@@ -4,6 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.settings/debug.dart';
 import 'package:lib.settings/widgets.dart';
 import 'package:lib.widgets/model.dart';
 
@@ -50,11 +51,12 @@ class WlanManager extends StatelessWidget {
         sections: [
           SettingsSection.error(
               description: 'No wireless adapters are available on this device',
-              scale: scale)
+              scale: scale),
+          _buildDebugSection(model, scale)
         ],
       );
     } else if (model.loading) {
-      widget = SettingsPage(scale: scale, isLoading: true);
+      widget = _buildLoading(model, scale);
     } else if (model.connecting || model.connectedAccessPoint != null) {
       widget = _buildCurrentNetwork(model, scale);
     } else if ((model.selectedAccessPoint?.isSecure ?? false) &&
@@ -99,22 +101,34 @@ class WlanManager extends StatelessWidget {
       scale: scale,
       sections: [
         SettingsSection(
-            scale: scale,
-            child: Column(
-              children: widgets,
-              crossAxisAlignment: CrossAxisAlignment.start,
-            ))
+          scale: scale,
+          child: Column(
+            children: widgets,
+            crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+        ),
+        _buildDebugSection(model, scale)
       ],
     );
   }
 
+  Widget _buildLoading(WifiSettingsModel model, double scale, {String title}) {
+    return Stack(alignment: Alignment.bottomCenter, children: [
+      SettingsPage(
+        scale: scale,
+        title: title,
+        isLoading: true,
+      ),
+      FractionallySizedBox(
+        heightFactor: 0.4,
+        child: ListView(children: [_buildDebugSection(model, scale)]),
+      )
+    ]);
+  }
+
   Widget _buildAvailableNetworks(WifiSettingsModel model, double scale) {
     if (model.accessPoints == null || model.accessPoints.isEmpty) {
-      return SettingsPage(
-        scale: scale,
-        title: 'Scanning...',
-        isLoading: true,
-      );
+      return _buildLoading(model, scale, title: 'Scanning');
     }
 
     return SettingsPage(
@@ -135,7 +149,8 @@ class WlanManager extends StatelessWidget {
                       model.selectedAccessPoint = ap;
                     },
                   ))),
-        )
+        ),
+        _buildDebugSection(model, scale)
       ],
     );
   }
@@ -171,5 +186,22 @@ class WlanManager extends StatelessWidget {
                 ],
               ),
             )));
+  }
+
+  SettingsSection _buildDebugSection(WifiSettingsModel model, double scale) {
+    final children = <Widget>[
+      SettingsSwitchTile(
+        scale: scale,
+        onSwitch: (enabled) => model.showDebugInfo.value = enabled,
+        text: 'Show debug info',
+        state: model.showDebugInfo.value,
+      )
+    ];
+
+    if (model.showDebugInfo.value) {
+      children.add(DebugStatusWidget(model.debugStatus));
+    }
+
+    return SettingsSection(scale: scale, child: Column(children: children));
   }
 }
