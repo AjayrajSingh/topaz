@@ -54,17 +54,16 @@ class Fleet<T extends dynamic> {
 
   // Perform synchronization of [group] of instances, specified by ids.
   // It builds a chain of pairwise synchronization:
-  // (1, 2) (2, 3) ... (k-1, k) (k, k-1) ... (3, 2) (2, 1)
+  // (1, 2) (2, 3) ... (k-1, k) (k, k-2) (k-2, k-3) ... (3, 2) (2, 1)
   // And adds them into the computational graph. Each two consecutive
   // synchronizations share a node. So their order is fixed in the graph.
+  // (k, k-2) (k-2, k-3) ... (3, 2) (2, 1) are necessary to back propagate the
+  // changes made in `k`.
   void synchronize(List<int> group) {
-    if (group.isEmpty) {
+    if (group.length <= 1) {
       return;
     }
-    final list = <int>[]
-      ..addAll(group)
-      ..removeLast()
-      ..addAll(group.reversed);
+    final list = <int>[]..addAll(group)..addAll(group.reversed.skip(2));
     for (int i = 0; i < list.length - 1; i++) {
       Node node = new SynchronizationNode(
           's${list[i]}_${list[i + 1]}_n${graph.nodes.length}',
