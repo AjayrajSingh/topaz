@@ -29,18 +29,22 @@ void main() {
   });
 
   test('make sure PageIds are not accidentely updated', () {
+    // The goal of this test is to detect accidental changes in the encoding of
+    // the SledgePageId, because if the encoding changes then clients of Sledge
+    // won't be able to read their data back.
+    // The format of the expected value is described in SledgePageId.
     final sledgePageId = new SledgePageId('foo');
     expect(
         sledgePageId.id.id,
         equals([
-          115,
-          108,
-          101,
-          100,
-          103,
-          101,
-          48,
-          95,
+          115, // 's'
+          108, // 'l'
+          101, // 'e'
+          100, // 'd'
+          103, // 'g'
+          101, // 'e'
+          49, // '1'
+          95, // '_'
           44,
           38,
           180,

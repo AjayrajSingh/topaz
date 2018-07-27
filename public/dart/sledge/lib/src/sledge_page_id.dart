@@ -13,6 +13,8 @@ import 'utils_hash.dart';
 import 'version.dart';
 
 /// Convenience wrapper of Ledger's page id.
+/// For a given `pageName`, SledgePageId will generate a ledger.PageId with the
+/// following format: sledge${sledgeVersion}_${hash(pageName)}.
 class SledgePageId {
   ledger.PageId _id;
 

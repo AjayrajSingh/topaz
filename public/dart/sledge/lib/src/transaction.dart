@@ -14,6 +14,7 @@ import 'document/uint8list_ops.dart';
 import 'document/values/key_value.dart';
 import 'ledger_helpers.dart';
 import 'sledge.dart';
+import 'storage/document_storage.dart';
 
 typedef Modification = Future Function();
 
@@ -56,39 +57,11 @@ class Transaction {
 
     await modification();
 
+    final updateLedgerFutures = <Future<ledger.Status>>[];
     // Iterate through all the documents modified by this transaction and
     // forward the changes to Ledger.
-
-    final updateLedgerFutures = <Future<ledger.Status>>[];
-
     for (final document in _documents) {
-      final Change change = Document.getChange(document);
-
-      final Uint8List documentPrefix = document.documentId.prefix;
-
-      // Forward the "deletes".
-      for (Uint8List deletedKey in change.deletedKeys) {
-        final completer = new Completer<ledger.Status>();
-        final Uint8List keyWithDocumentPrefix =
-            concatUint8Lists(documentPrefix, deletedKey);
-        pageProxy.delete(
-          keyWithDocumentPrefix,
-          completer.complete,
-        );
-      }
-      // Forward the "puts".
-      for (KeyValue kv in change.changedEntries) {
-        final completer = new Completer<ledger.Status>();
-
-        final Uint8List keyWithDocumentPrefix =
-            concatUint8Lists(documentPrefix, kv.key);
-        pageProxy.put(
-          keyWithDocumentPrefix,
-          kv.value,
-          completer.complete,
-        );
-        updateLedgerFutures.add(completer.future);
-      }
+      updateLedgerFutures.addAll(saveDocumentToPage(document, pageProxy));
     }
 
     final List<ledger.Status> statuses = await Future.wait(updateLedgerFutures);

@@ -20,6 +20,7 @@ import 'ledger_helpers.dart';
 import 'modification_queue.dart';
 import 'sledge_connection_id.dart';
 import 'sledge_page_id.dart';
+import 'storage/kv_encoding.dart' as sledge_storage;
 import 'subscription/subscription.dart';
 import 'transaction.dart';
 
@@ -165,11 +166,19 @@ class Sledge {
 
   /// Calls applyChange for all registered documents.
   void _applyChange(Change change) {
-    final splittedChange = change.splitByPrefix(DocumentId.prefixLength);
-    for (final prefix in splittedChange.keys) {
+    // Split the changes according to their type.
+    final splittedChange =
+        change.splitByPrefix(sledge_storage.typePrefixLength);
+    // Select the changes that concern documents.
+    final documentChange = splittedChange[
+        sledge_storage.prefixForType(sledge_storage.KeyValueType.document)];
+    // Split the changes according to the document they belong to.
+    final splittedDocumentChange =
+        documentChange.splitByPrefix(DocumentId.prefixLength);
+    for (final prefix in splittedDocumentChange.keys) {
       assert(_documentByPrefix.containsKey(prefix));
       _documentByPrefix[prefix].then((document) {
-        Document.applyChange(document, splittedChange[prefix]);
+        Document.applyChange(document, splittedDocumentChange[prefix]);
       });
     }
   }
