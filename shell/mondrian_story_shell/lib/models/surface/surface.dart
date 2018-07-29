@@ -12,6 +12,7 @@ import 'package:lib.widgets/model.dart';
 import '../tree.dart';
 import 'surface_graph.dart';
 import 'surface_properties.dart';
+import 'surface_relation_util.dart';
 
 /// The parentId that means no parent
 const String kNoParent = '';
@@ -21,6 +22,14 @@ class Surface extends Model {
   /// Public constructor
   Surface(this._graph, this.node, this.properties, this.relation,
       this.compositionPattern);
+
+  Surface.fromJson(Map<String, dynamic> json)
+      : node = new Tree<String>(value: json['id']),
+        _graph = new SurfaceGraph(),
+        compositionPattern = json['compositionPattern'],
+        properties = new SurfaceProperties(),
+        relation = SurfaceRelationUtil
+            .decode(json['surfaceRelation'].cast<String, String>());
 
   final SurfaceGraph _graph;
   final Tree<String> node;
@@ -232,6 +241,25 @@ class Surface extends Model {
       forest.add(t);
     }
     return forest;
+  }
+
+  List<String> _children() {
+    List<String> ids = [];
+    for (Tree<String> child in node.children) {
+      ids.add(child.value);
+    }
+    return ids;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': node.value,
+      'parentId': parentId,
+      'surfaceRelation': SurfaceRelationUtil.toMap(relation),
+      'compositionPattern': compositionPattern,
+      'isDismissed': dismissed ? 'true' : 'false',
+      'children': _children(),
+    };
   }
 }
 
