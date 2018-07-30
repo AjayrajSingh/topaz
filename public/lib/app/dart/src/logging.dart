@@ -10,7 +10,11 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_logger/fidl.dart' show LogSinkProxy;
+import 'package:fidl_fuchsia_logger/fidl_async.dart' as logger_async
+    show LogSinkProxy;
 import 'package:lib.app.dart/app.dart' show connectToService, StartupContext;
+import 'package:lib.app.dart/app_async.dart' as app_async
+    show connectToService, StartupContext;
 import 'package:logging/logging.dart' show Level;
 import 'package:stack_trace/stack_trace.dart';
 import 'package:zircon/zircon.dart' as zircon;
@@ -39,6 +43,37 @@ const int _unexpectedLoggingLevel = 100;
 /// Method to write a single log message to a single output medium.
 /// Solutions are provided to write to stdout and a fuchsia Socket.
 typedef LogWriter = void Function(LogWriterMessage message);
+
+/// Interim method that sets up the logger using the new-style bindings for service resolution.
+void setupLoggerAsync({
+  String name,
+  Level level,
+  bool forceShowCodeLocation,
+  bool logToStdoutForTest,
+  List<String> globalTags,
+  zircon.Socket logSocket,
+  LogWriter logWriter,
+}) {
+  zircon.Socket sock = logSocket;
+  if (logSocket == null) {
+    final socketPair = zircon.SocketPair(zircon.Socket.DATAGRAM);
+    final logSinkProxy = new logger_async.LogSinkProxy();
+    app_async.connectToService(
+      new app_async.StartupContext.fromStartupInfo().environmentServices,
+      logSinkProxy.ctrl,
+    );
+    logSinkProxy.connect(socketPair.second);
+    sock = socketPair.first;
+  }
+  setupLogger(
+      name: name,
+      level: level,
+      forceShowCodeLocation: forceShowCodeLocation,
+      logToStdoutForTest: logToStdoutForTest,
+      globalTags: globalTags,
+      logSocket: sock,
+      logWriter: logWriter);
+}
 
 /// Sets up the default logger for the current Dart application.
 ///

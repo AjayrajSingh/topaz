@@ -501,42 +501,35 @@ class ModuleDriver {
   }
 
   /// Cache for [getComponentContext].
-  final Completer<ComponentContextClient> _componentContext =
-      new Completer<ComponentContextClient>();
+  Completer<ComponentContextClient> _componentContext;
 
   /// Async access to the [ComponentContextClient].
   Future<ComponentContextClient> getComponentContext() async {
-    if (_componentContext.isCompleted) {
-      return _componentContext.future;
-    }
-
-    try {
-      ComponentContextClient componentContext =
-          await moduleContext.getComponentContext();
-      _componentContext.complete(componentContext);
-    } on Exception catch (err, stackTrace) {
-      _componentContext.completeError(err, stackTrace);
+    if (_componentContext == null) {
+      _componentContext = new Completer<ComponentContextClient>();
+      try {
+        _componentContext.complete(await moduleContext.getComponentContext());
+      } on Exception catch (err, stackTrace) {
+        _componentContext.completeError(err, stackTrace);
+      }
     }
 
     return _componentContext.future;
   }
 
   /// Shadow cache for [getResolver].
-  final Completer<EntityResolverClient> _resolver =
-      new Completer<EntityResolverClient>();
+  Completer<EntityResolverClient> _resolver;
 
   /// Async access to the [EntityResolverClient].
   Future<EntityResolverClient> getResolver() async {
-    if (_resolver.isCompleted) {
-      return _resolver.future;
-    }
-
-    try {
-      ComponentContextClient context = await getComponentContext();
-      EntityResolverClient resolver = await context.getEntityResolver();
-      _resolver.complete(resolver);
-    } on Exception catch (err, stackTrace) {
-      _resolver.completeError(err, stackTrace);
+    if (_resolver == null) {
+      _resolver = new Completer<EntityResolverClient>();
+      try {
+        ComponentContextClient context = await getComponentContext();
+        _resolver.complete(await context.getEntityResolver());
+      } on Exception catch (err, stackTrace) {
+        _resolver.completeError(err, stackTrace);
+      }
     }
 
     return _resolver.future;

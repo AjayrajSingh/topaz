@@ -10,6 +10,7 @@ import 'package:fuchsia/fuchsia.dart';
 import 'package:fidl_fuchsia_sys/fidl_async.dart';
 import 'package:zircon/zircon.dart';
 
+import 'app.dart' as sync_app;
 import 'src/rio.dart';
 
 class StartupContext {
@@ -25,6 +26,11 @@ class StartupContext {
   factory StartupContext.fromStartupInfo() {
     if (_context != null) {
       return _context;
+    }
+
+    if (sync_app.StartupContext.initialTrace != null) {
+      print(
+          "WARNING: app.dart's StartupContext was created at:\n${sync_app.StartupContext.initialTrace}");
     }
 
     final StartupContext context = new StartupContext();

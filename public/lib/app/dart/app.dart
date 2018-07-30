@@ -14,6 +14,11 @@ import 'src/rio.dart';
 class StartupContext {
   static StartupContext _context;
 
+  /// Holds the stack trace for the when the startup info is retrieved.
+  /// It's useful for tracking down why the async StartupInfo is missing
+  /// during the port.
+  static StackTrace initialTrace;
+
   StartupContext();
 
   final EnvironmentProxy environment = new EnvironmentProxy();
@@ -25,6 +30,7 @@ class StartupContext {
     if (_context != null) {
       return _context;
     }
+    initialTrace = StackTrace.current;
 
     final StartupContext context = new StartupContext();
 
