@@ -23,6 +23,5 @@ dart_library("settings_protos") {
     "//third_party/dart-pkg/pub/protobuf",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/app/dart",
   ]
 }
