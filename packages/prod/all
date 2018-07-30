@@ -1,6 +1,5 @@
 {
     "imports": [
-        "topaz/packages/prod/blackjack",
         "topaz/packages/prod/bluetooth_settings",
         "topaz/packages/prod/color",
         "topaz/packages/prod/device_settings",
