@@ -13,8 +13,18 @@ import 'package:lib.app.dart/logging.dart';
 /// TODO(jasoncampbell): Allow typed structures to be sent instead of strings.
 typedef XiClientListener = void Function(dynamic data);
 
-/// Callback for receiving result from a json-rpc request
-typedef XiRpcCallback = void Function(dynamic data);
+/// An error received from core in response to an RPC.
+class CoreError {
+  int code;
+  String message;
+  dynamic data;
+
+  CoreError(Map<String, dynamic> errorJson) {
+    code = errorJson['code'];
+    message = errorJson['message'];
+    data = errorJson['data'];
+  }
+}
 
 /// Handler, for handling requests (both notification and RPC) from core
 abstract class XiRpcHandler {
@@ -32,7 +42,7 @@ abstract class XiClient {
   /// Flag marking wether the client has been initialized or not.
   bool initialized = false;
   int _id = 0;
-  final Map<int, XiRpcCallback> _pending = <int, XiRpcCallback>{};
+  final Map<int, Completer<dynamic>> _pending = <int, Completer<dynamic>>{};
   XiRpcHandler _handler;
 
   /// Callbacks fired whenever a message from xi-core is received. Add with
@@ -87,32 +97,24 @@ abstract class XiClient {
   /// Classes that extend [XiClient] should use this method to trigger any
   /// [listeners].
   void handleData(String data) {
-    //print(data);
     Map<String, dynamic> decoded = json.decode(data);
-    //TODO: plumb errors back through to caller
     if (decoded.containsKey('error')) {
-      throw new UnimplementedError("xi client doesn't handle errors");
-    }
-    if (decoded.containsKey('result')) {
-      int id = decoded['id'];
-      XiRpcCallback callback = _pending.remove(id);
-      if (callback != null) {
-        callback(decoded['result']);
-      } else {
-        log.warning('missing callback for id=$id');
-      }
+      handleErrorResponse(decoded);
+    } else if (decoded.containsKey('result')) {
+      handleResponse(decoded);
     } else if (_handler == null) {
       // not a response, so it must be a request
       log.warning('no handler registered for request');
     } else {
       String method = decoded['method'];
       dynamic params = decoded['params'];
+      // a request with an id must get a response
       if (decoded.containsKey('id')) {
-        Map<String, dynamic> response = <String, dynamic>{
-          'result': _handler.handleRpc(method, params),
-          'id': decoded['id']
-        };
-        _sendJson(response);
+        _handler.handleRpc(method, params).then((dynamic result) {
+          sendResponse(decoded['id'], result);
+        }).catchError((err) {
+          sendErrorResponse(decoded['id'], err);
+        });
       } else {
         _handler.handleNotification(method, params);
       }
@@ -122,6 +124,45 @@ abstract class XiClient {
         callback(decoded);
       }
     }
+  }
+
+  void handleErrorResponse(Map<String, dynamic> error) {
+    log.warning('Received error response', error);
+    int id = error['id'];
+    Completer<dynamic> completer = _pending.remove(id);
+    CoreError coreError = CoreError(error['error']);
+    if (completer != null) {
+      completer.completeError(coreError);
+    }
+  }
+
+  void handleResponse(Map<String, dynamic> response) {
+    int id = response['id'];
+    Completer<dynamic> completer = _pending.remove(id);
+    if (completer != null) {
+      completer.complete(response['result']);
+    }
+  }
+
+  void sendResponse(int id, dynamic payload) {
+    Map<String, dynamic> response = <String, dynamic>{
+      'result': payload,
+      'id': id,
+    };
+    _sendJson(response);
+  }
+
+  void sendErrorResponse(int id, dynamic payload) {
+    //TODO: have some real type for errors originating in the client
+    Map<String, dynamic> error = <String, dynamic>{
+      'code': 1,
+      'msg': '$payload',
+    };
+    Map<String, dynamic> response = <String, dynamic>{
+      'error': error,
+      'id': id,
+    };
+    _sendJson(response);
   }
 
   void _sendJson(dynamic decoded) {
@@ -137,10 +178,10 @@ abstract class XiClient {
     _sendJson(json);
   }
 
-  /// Send an RPC request to the core. The callback will be invoked when there
-  /// is a response.
-  void sendRpc(String method, dynamic params, XiRpcCallback callback) {
-    _pending[_id] = callback;
+  /// Send an RPC request to the core.
+  Future<dynamic> sendRpc(String method, dynamic params) {
+    Completer<dynamic> completer = Completer<dynamic>();
+    _pending[_id] = completer;
     Map<String, dynamic> json = <String, dynamic>{
       'method': method,
       'params': params,
@@ -148,6 +189,7 @@ abstract class XiClient {
     };
     _sendJson(json);
     _id++;
+    return completer.future;
   }
 
   /// Generic error handler that can be used or everyone by implementations of [XiClient].

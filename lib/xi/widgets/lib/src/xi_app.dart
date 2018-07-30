@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
@@ -64,7 +65,7 @@ class XiAppHandler extends XiRpcHandler {
   }
 
   @override
-  dynamic handleRpc(String method, dynamic params) {
+  Future<dynamic> handleRpc(String method, dynamic params) {
     switch (method) {
       case 'measure_width':
         return _editorState.measureWidths(params);
@@ -129,16 +130,17 @@ class XiAppState extends State<XiApp> {
       // Arguably new_view should be sent by the editor (and the editor should plumb
       // the view id through to the connectEditor call). However, that would require holding
       // a pending queue of new_view requests, waiting for init to complete. This is easier.
-      return widget.xi.sendRpc('new_view', <String, dynamic>{}, (dynamic id) {
+      return widget.xi
+          .sendRpc('new_view', <String, dynamic>{}).then((dynamic id) {
         _viewId = id;
-        log.info('view_id = $id');
+        log.info('setting view_id = $id');
         if (_pendingReqs != null) {
           for (_PendingNotification pending in _pendingReqs) {
             sendNotification(pending.method, pending.params);
           }
           _pendingReqs = null;
         }
-      });
+      }).catchError((err) => log.warning('RPC returned error', err));
     });
   }
 
