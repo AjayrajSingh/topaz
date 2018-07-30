@@ -41,7 +41,7 @@ class WlanManager extends StatelessWidget {
 
   Widget _getCurrentWidget(
       WifiSettingsModel model, BoxConstraints constraints) {
-    double scale = constraints.maxHeight > 360.0 ? 1.0 : 0.5;
+    double scale = constraints.maxHeight > 480.0 ? 1.0 : 0.5;
 
     Widget widget;
     if (!model.hasWifiAdapter) {
