@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:math' show Random;
 
 import 'package:test/test.dart';
 
@@ -43,6 +44,8 @@ class Fleet<T extends dynamic> {
   final ComputationalGraph graph = new ComputationalGraph();
   final T Function(int) _instanceGenerator;
   final List<CheckerGenerator<T>> _checkerGenerators = <CheckerGenerator<T>>[];
+  double _expectedSyncsPerAction = 0.0;
+  final Random random = new Random(1);
 
   Fleet(this._fleetSize, this._instanceGenerator) {
     _lastModifications =
@@ -71,7 +74,7 @@ class Fleet<T extends dynamic> {
     final list = <int>[]..addAll(group)..addAll(group.reversed.skip(2));
     for (int i = 0; i < list.length - 1; i++) {
       Node node = new SynchronizationNode(
-          's${list[i]}_${list[i + 1]}_n${graph.nodes.length}',
+          '${list[i]}_${list[i + 1]}-n${graph.nodes.length}',
           list[i],
           list[i + 1]);
       _addNode(node, list[i]);
@@ -80,31 +83,78 @@ class Fleet<T extends dynamic> {
   }
 
   void runInTransaction(int id, Future Function(T) modification) {
-    final node = new ModificationNode<T>(
-        'm${id}_n${graph.nodes.length}', id, modification);
+    final node =
+        new ModificationNode<T>('$id-n${graph.nodes.length}', id, modification);
     _addNode(node, id);
   }
 
+  /// Adds checker that would be called after execution of each node, including
+  /// randomly generated synchronization nodes.
   void addChecker(CheckerGenerator<T> checkerGenerator) {
     _checkerGenerators.add(checkerGenerator);
+  }
+
+  /// Sets the expected amount of random synchronizations after execution of
+  /// each node, excluding randomly generated synchronization nodes, to
+  /// [expectedSyncsPerAction].
+  void setRandomSynchronizationsRate(double expectedSyncsPerAction) {
+    if (expectedSyncsPerAction < 0) {
+      throw new FormatException(
+          'Expected number of synchronizations is negative ',
+          expectedSyncsPerAction);
+    }
+    _expectedSyncsPerAction = expectedSyncsPerAction;
   }
 
   /// Executes the operations in all nodes in a given [order]. If [order] is not
   /// specified, execute all nodes in some fixed order, that would be same over
   /// all calls.
-  Future testSingleOrder([EvaluationOrder order]) async {
+  Future testSingleOrder(
+      {EvaluationOrder order, bool enableRandomSyncronization = true}) async {
     order ??= graph.orders.first;
     final fleetState = new FleetState<T>(_fleetSize, _instanceGenerator);
     for (final newChecker in _checkerGenerators) {
       fleetState.addChecker(newChecker());
     }
 
-    for (int i = 0; i < order.nodes.length; i++) {
+    // [completedOrder] contains all nodes from [order] in the same order, and
+    // additional randomly generated synchronization nodes.
+    EvaluationOrder completedOrder = order;
+    if (enableRandomSyncronization &&
+        _fleetSize > 1 &&
+        _expectedSyncsPerAction > 0) {
+      completedOrder = new EvaluationOrder([]);
+      for (final node in order.nodes) {
+        completedOrder.nodes.add(node);
+        // Geometric distribution (the probability distribution of the number Y
+        // of failures before the first success) is used to generate a number of
+        // synchronization nodes:
+        //    E(Y) = (1 - p) / p
+        // So for fixed E(Y):
+        //    p = 1 / (1 + E(Y))
+        while (random.nextDouble() >= 1.0 / (1.0 + _expectedSyncsPerAction)) {
+          // To generate equiprobably a pair of different ids from
+          // range [0, _fleetSize):
+          //  - generate equiprobably id1 from [0, _fleetSize)
+          //  - generate equiprobably id2 from [0, _fleetSize)\{id1}
+          int instanceId1 = random.nextInt(_fleetSize);
+          int instanceId2 = random.nextInt(_fleetSize - 1);
+          if (instanceId2 >= instanceId1) {
+            instanceId2++;
+          }
+          completedOrder.nodes.add(new SynchronizationNode.generated(
+              '${completedOrder.nodes.length}', instanceId1, instanceId2));
+        }
+      }
+    }
+
+    for (int i = 0; i < completedOrder.nodes.length; i++) {
       try {
-        await fleetState.applyNode(order.nodes[i], i);
+        await fleetState.applyNode(completedOrder.nodes[i], i);
       } on TestFailure catch (failure) {
         // ignore: only_throw_errors
-        throw new SingleOrderTestFailure(failure, order, order.nodes[i]);
+        throw new SingleOrderTestFailure(
+            failure, completedOrder, completedOrder.nodes[i]);
       }
     }
   }
@@ -112,18 +162,33 @@ class Fleet<T extends dynamic> {
   /// Executes the operations in all nodes in an order specified by [nodeIds].
   /// If [allowPartial] is false, checks that all [graph] nodes are present in
   /// [nodeIds].
+  /// If [allowGenerated] is false, throws an Error when [nodeIds] contains id
+  /// of randomly generated synchronization node.
   ///
   /// It can be used to reproduce previous execution order with an information
   /// from TestFailure message.
-  Future testFixedOrder(List<String> nodeIds,
-      {bool allowPartial = false}) async {
-    await testSingleOrder(new EvaluationOrder.fromIds(nodeIds, graph.nodes,
-        allowPartial: allowPartial));
+  Future testFixedOrder(Iterable<String> nodeIds,
+      {bool allowPartial = false, bool allowGenerated = true}) async {
+    await testSingleOrder(
+        order: new EvaluationOrder.fromIds(nodeIds, graph.nodes,
+            allowPartial: allowPartial, allowGenerated: allowGenerated),
+        enableRandomSyncronization: false);
+  }
+
+  /// Executes the operations in all nodes in [count] random orders.
+  ///
+  /// On each step a random node is chosen to be executed equiprobably from
+  /// nodes available to execution. Note that this algorithm does not provide
+  /// equiprobable distribution over all correct execution orders.
+  Future testRandomOrders(int count) async {
+    for (int i = 0; i < count; i++) {
+      await testSingleOrder(order: graph.getRandomOrder());
+    }
   }
 
   Future testAllOrders() async {
     for (final order in graph.orders) {
-      await testSingleOrder(order);
+      await testSingleOrder(order: order);
     }
   }
 }

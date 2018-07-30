@@ -10,9 +10,17 @@ class Node {
   // [nodeId] must be unique among nodes in one computational graph.
   final String nodeId;
 
-  Node(this.nodeId) {
+  /// Manual Node constructor. Adds prefix 'n-' to [nodeId].
+  Node(String nodeId) : this._internal('n-$nodeId');
+
+  /// Constructor, doesn't modify [nodeId]. It's expected that [nodeId]
+  /// already contains type prefix.
+  Node._internal(this.nodeId) {
     if (nodeId.contains("'")) {
       throw new FormatException("[nodeId] should not contain character <'>");
+    }
+    if (nodeId.startsWith(r'[\w]+-')) {
+      throw new FormatException('[nodeId] should start with the type prefix.');
     }
   }
 
@@ -22,11 +30,13 @@ class Node {
   String toString() => nodeId;
 }
 
+// ignore_for_file: prefer_initializing_formals
 class ModificationNode<T> extends Node {
   final int instanceId;
   final Future Function(T) modification;
 
-  ModificationNode(nodeId, this.instanceId, this.modification) : super(nodeId);
+  ModificationNode(String nodeId, this.instanceId, this.modification)
+      : super._internal('m-$nodeId');
 
   @override
   List<int> get affectedInstances => [instanceId];
@@ -36,8 +46,13 @@ class ModificationNode<T> extends Node {
 class SynchronizationNode extends Node {
   final int instanceId1, instanceId2;
 
-  SynchronizationNode(nodeId, this.instanceId1, this.instanceId2)
-      : super(nodeId);
+  SynchronizationNode(String nodeId, this.instanceId1, this.instanceId2)
+      : super._internal('s-$nodeId');
+
+  SynchronizationNode.generated(String nodeId, instanceId1, instanceId2)
+      : instanceId1 = instanceId1,
+        instanceId2 = instanceId2,
+        super._internal('g-${instanceId1}_$instanceId2-$nodeId');
 
   @override
   List<int> get affectedInstances => [instanceId1, instanceId2];

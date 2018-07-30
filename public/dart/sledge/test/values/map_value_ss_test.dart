@@ -45,6 +45,6 @@ void main() async {
       });
     // TODO: enable manual node names, and replace names here
     await fleet.testFixedOrder(
-        ['init', 'm0_n1', 'm1_n2', 'm0_n3', 's0_1_n4', 'm0_n5']);
+        ['n-init', 'm-0-n1', 'm-1-n2', 'm-0-n3', 's-0_1-n4', 'm-0-n5']);
   });
 }

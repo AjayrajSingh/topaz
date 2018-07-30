@@ -17,7 +17,7 @@ class EvaluationOrder {
   /// nodeIds of [graphNodes]. If [allowPartial] is false, [ids] must contain
   /// nodeId for each node from [graphNodes].
   EvaluationOrder.fromIds(Iterable<String> ids, Iterable<Node> graphNodes,
-      {bool allowPartial = false})
+      {bool allowPartial = false, allowGenerated = false})
       : nodes = <Node>[] {
     final idToNode = new Map<String, Node>.fromIterable(graphNodes,
         key: (node) => node.nodeId);
@@ -27,16 +27,30 @@ class EvaluationOrder {
       throw new FormatException('Elements of $ids should be unique');
     }
 
-    if (!allowPartial && ids.length != graphNodes.length) {
-      throw new FormatException(
-          '$ids should contain all nodes from $graphNodes');
+    if (!allowPartial) {
+      for (final node in graphNodes) {
+        if (!setIds.contains(node.nodeId)) {
+          throw new FormatException(
+              '$ids should contain all nodes from $graphNodes');
+        }
+      }
     }
 
     for (final id in ids) {
-      final node = idToNode[id];
+      Node node = idToNode[id];
       if (node == null) {
-        throw new FormatException(
-            '$id is not an id of any node from $graphNodes');
+        if (!allowGenerated || !id.startsWith('g-')) {
+          throw new FormatException(
+              '$id is not an id of a node from $graphNodes');
+        }
+        // Can throw FormatException
+        int firstDash = 1;
+        int underscore = id.indexOf('_');
+        int secondDash = id.indexOf('-', underscore + 1);
+        int id1 = int.parse(id.substring(firstDash + 1, underscore));
+        int id2 = int.parse(id.substring(underscore + 1, secondDash));
+        node = new SynchronizationNode.generated(
+            id.substring(secondDash + 1), id1, id2);
       }
       nodes.add(node);
     }
