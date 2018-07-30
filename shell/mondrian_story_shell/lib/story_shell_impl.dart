@@ -52,7 +52,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   /// @params parentId The ID of the parent view
   /// @params surfaceRelation The relationship between this view and its parent
   @override
-  void connectView(
+  void addView(
     InterfaceHandle<ViewOwner> view,
     String viewId,
     String parentId,

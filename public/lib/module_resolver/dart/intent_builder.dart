@@ -2,9 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:convert' show json;
+import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:zircon/zircon.dart';
 
 /// Dart-idiomatic wrapper to create a modular.Intent.
 class IntentBuilder {
@@ -29,7 +32,13 @@ class IntentBuilder {
   // Converts |value| to a JSON object and adds it to the Intent. For typed
   // data, prefer to use addParameterFromEntityReference().
   void addParameter<T>(String name, T value) {
-    _addParameter(name, new IntentParameterData.withJson(json.encode(value)));
+    String jsonString = json.encode(value);
+    var jsonList = Uint8List.fromList(utf8.encode(jsonString));
+    var data = fuchsia_mem.Buffer(
+      vmo: new SizedVmo.fromUint8List(jsonList),
+      size: jsonList.length,
+    );
+    _addParameter(name, new IntentParameterData.withJson(data));
   }
 
   // Adds a parameter that containts an entity reference to the intent.
