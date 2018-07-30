@@ -9,7 +9,7 @@ import 'package:sledge/src/document/uint8list_ops.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('Concatentaion of Uint8Lists', () {
+  test('Concatenation of Uint8Lists', () {
     final l1 = [1, 2], l2 = [3, 4, 5], l3 = [6];
     final uint8lConcat = concatListOfUint8Lists([
       new Uint8List.fromList(l1),
@@ -19,7 +19,7 @@ void main() {
     expect(uint8lConcat.toList(), equals([1, 2, 3, 4, 5, 6]));
   });
 
-  test('Concatentaion of Uint8Lists #2', () {
+  test('Concatenation of Uint8Lists #2', () {
     final l1 = [1], l2 = [10], l3 = [3], l4 = [6];
     final uint8lConcat = concatListOfUint8Lists([
       new Uint8List.fromList(l1),
@@ -28,5 +28,12 @@ void main() {
       new Uint8List.fromList(l4)
     ]);
     expect(uint8lConcat.toList(), equals([1, 10, 3, 6]));
+  });
+
+  test('Conversion from String to Uint8List', () {
+    expect(getUint8ListFromString(""), equals([]));
+    expect(getUint8ListFromString(" "), equals([32]));
+    expect(getUint8ListFromString(" @"), equals([32, 64]));
+    expect(getUint8ListFromString("🌸"), equals([0xf0, 0x9f, 0x8c, 0xb8]));
   });
 }

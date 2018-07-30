@@ -12,7 +12,11 @@ import 'dart:typed_data';
 /// * DO NOT re-order entries.
 enum KeyValueType {
   /// The type used to identify KVs that store Documents data.
-  document
+  document,
+
+  /// The type used to identify KVs that store the Schemas used
+  /// in Sledge.
+  schema
 }
 
 /// The length of the prefix storing the Type of data.

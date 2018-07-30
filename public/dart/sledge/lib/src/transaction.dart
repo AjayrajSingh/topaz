@@ -15,6 +15,7 @@ import 'document/values/key_value.dart';
 import 'ledger_helpers.dart';
 import 'sledge.dart';
 import 'storage/document_storage.dart';
+import 'storage/schema_storage.dart';
 
 typedef Modification = Future Function();
 
@@ -67,7 +68,9 @@ class Transaction {
     // forward the updates (puts and deletes) to Ledger.
     final updateLedgerFutures = <Future<ledger.Status>>[];
     for (final document in _documents) {
-      updateLedgerFutures.addAll(saveDocumentToPage(document, _pageProxy));
+      updateLedgerFutures
+        ..addAll(saveDocumentToPage(document, _pageProxy))
+        ..add(saveSchemaToPage(document.documentId.schema, _pageProxy));
     }
 
     // Await until all updates have been succesfully executed.

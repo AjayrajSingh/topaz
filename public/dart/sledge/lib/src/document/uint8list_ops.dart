@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
@@ -39,6 +40,14 @@ Uint8List getUint8ListPrefix(Uint8List x, int prefixLen) {
 Uint8List getUint8ListSuffix(Uint8List x, int prefixLen) {
   return new Uint8List(x.length - prefixLen)
     ..setAll(0, x.getRange(prefixLen, x.length));
+}
+
+/// Returns a Uint8List created from the utf8 encoding of [string].
+/// [string] must be non-null.
+Uint8List getUint8ListFromString(String string) {
+  assert(string != null);
+  List<int> encodedString = new List<int>.from(utf8.encode(string));
+  return new Uint8List.fromList(encodedString);
 }
 
 /// HashMap with Uint8Lists as a keys, and content equality comparator.

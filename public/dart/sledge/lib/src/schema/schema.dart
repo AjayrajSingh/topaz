@@ -52,6 +52,9 @@ class Schema implements BaseType {
     new OrderedList()
   ]);
 
+  /// The length of the hash of Schema, as returned by the hash getter.
+  static const int hashLength = 20;
+
   /// Default constructor. Note that the values of the map can be other
   /// schemas.
   Schema(Map<String, BaseType> schemaDescription)
@@ -93,7 +96,7 @@ class Schema implements BaseType {
     String jsonString = json.encode(this);
     Uint8List bytes = utf8.encode(jsonString);
     Uint8List digest = utils.hash(bytes);
-    assert(digest.length == 20);
+    assert(digest.length == hashLength);
     return digest;
   }
 
