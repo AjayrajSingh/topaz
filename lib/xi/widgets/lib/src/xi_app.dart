@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
@@ -65,7 +64,7 @@ class XiAppHandler extends XiRpcHandler {
   }
 
   @override
-  Future<dynamic> handleRpc(String method, dynamic params) {
+  dynamic handleRpc(String method, dynamic params) {
     switch (method) {
       case 'measure_width':
         return _editorState.measureWidths(params);
