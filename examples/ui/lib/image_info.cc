@@ -17,10 +17,7 @@ SkImageInfo MakeSkImageInfo(const fuchsia::images::ImageInfo& image_info) {
       return SkImageInfo::Make(image_info.width, image_info.height,
                                kBGRA_8888_SkColorType, kOpaque_SkAlphaType);
     case fuchsia::images::PixelFormat::YUY2:
-    // The default case here is intended to be temporary - this will go back to
-    // not having a default once garnet's NV12 value can be explicitly
-    // referenced here.
-    default:
+    case fuchsia::images::PixelFormat::NV12:
       FXL_CHECK(false) << "Not implemented: "
                        << static_cast<int>(image_info.pixel_format);
       return SkImageInfo();
