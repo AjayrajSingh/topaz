@@ -21,7 +21,7 @@
              path="third_party/harfbuzz"
              remote="https://fuchsia.googlesource.com/third_party/harfbuzz"
              gerrithost="https://fuchsia-review.googlesource.com"
-             revision="2eed78c0bb5f2b12ace17d03cfa68b9f1535c85d"/>
+             revision="d837034f09a957faf2814002e8ebd81da6151d1b"/>
     <project name="third_party/libjpeg-turbo"
              path="third_party/libjpeg-turbo"
              remote="https://fuchsia.googlesource.com/third_party/libjpeg-turbo"
