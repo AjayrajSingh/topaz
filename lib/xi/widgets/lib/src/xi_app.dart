@@ -31,48 +31,28 @@ class XiApp extends StatefulWidget {
       new XiAppState(debugBackground: drawDebugBackground);
 }
 
-/// A handler for RPC's and notifications from core, dispatching to
-/// an [EditorState] object.
+/// A temporary [XiHandler] that just wraps a single [EditorState] object.
 // TODO: dispatch to multiple editor tabs
-class XiAppHandler extends XiRpcHandler {
+// TODO (crothfels) implement XiHandler on [XiAppState] and get rid of this
+class XiAppHandler extends XiHandler {
   EditorState _editorState;
 
   /// Constructor
   XiAppHandler(this._editorState);
 
   @override
-  void handleNotification(String method, dynamic params) {
-    switch (method) {
-      case 'update':
-        Map<String, dynamic> update = params['update'];
-        //print('update, update=$update');
-        List<dynamic> opsList = update['ops'];
-        List<Map<String, dynamic>> ops = opsList.cast();
-        _editorState.update(ops);
-        break;
-      case 'scroll_to':
-        Map<String, dynamic> scrollInfo = params;
-        int line = scrollInfo['line'];
-        int col = scrollInfo['col'];
-        // TODO: dispatch based on tab
-        _editorState.scrollTo(line, col);
-        //print('scroll_to: $params');
-        break;
-      default:
-        log.warning('notification, unknown method $method, params=$params');
-    }
+  void alert(String text) {
+    log.warning('received alert: $text');
   }
 
   @override
-  dynamic handleRpc(String method, dynamic params) {
-    switch (method) {
-      case 'measure_width':
-        return _editorState.measureWidths(params);
-        break;
-      default:
-        log.warning('rpc request, unknown method $method, params=$params');
-    }
-    return null;
+  XiViewHandler getView(String viewId) {
+    return _editorState;
+  }
+
+  @override
+  List<double> measureWidths(List<Map<String, dynamic>> args) {
+    return _editorState.measureWidths(args);
   }
 }
 
@@ -92,7 +72,6 @@ class XiAppState extends State<XiApp> {
   bool debugBackground = false;
   String _viewId;
   List<_PendingNotification> _pendingReqs;
-  EditorState _editorState;
 
   XiAppState({@required this.debugBackground});
 
@@ -115,7 +94,7 @@ class XiAppState extends State<XiApp> {
   /// Connect editor state, so that notifications from the core are routed to
   /// the editor. Called by [Editor] widget.
   void connectEditor(EditorState editorState) {
-    widget.xi.handler = new XiAppHandler(editorState);
+    widget.xi.handler = new XiHandlerAdapter(XiAppHandler(editorState));
   }
 
   @override

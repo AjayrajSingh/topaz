@@ -9,6 +9,7 @@ import 'dart:ui' as ui
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lib.app.dart/logging.dart';
+import 'package:xi_client/client.dart';
 
 import 'line_cache.dart';
 import 'text_line.dart';
@@ -195,7 +196,7 @@ class LineCol {
 const String _zeroWidthSpace = '\u{200b}';
 
 /// State for editor tab
-class EditorState extends State<Editor> {
+class EditorState extends State<Editor> implements XiViewHandler {
   LineCache _lines;
   final ScrollController _controller = new ScrollController();
   // Height of lines (currently fixed, all lines have the same height)
@@ -242,11 +243,13 @@ class EditorState extends State<Editor> {
   }
 
   /// Handler for "update" method from core
+  @override
   void update(List<Map<String, dynamic>> ops) {
     setState(() => _lines.applyUpdate(ops));
   }
 
   /// Handler for "scroll_to" method from core
+  @override
   void scrollTo(int line, int col) {
     if (_controller.hasClients) {
       ScrollPosition pos = _controller.position;
