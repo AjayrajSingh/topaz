@@ -58,7 +58,7 @@ class BaseDeviceShellModel extends DeviceShellModel
   NetstackModel _netstackModel;
 
   /// Encodes metrics into cobalt.
-  final cobalt.CobaltEncoder encoder;
+  final cobalt.Encoder encoder;
 
   /// A list of accounts that are already logged in on the device.
   ///

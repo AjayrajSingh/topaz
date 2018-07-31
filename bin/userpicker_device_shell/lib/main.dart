@@ -33,9 +33,9 @@ void main() {
   StartupContext startupContext = new StartupContext.fromStartupInfo();
 
   // Connect to Cobalt
-  CobaltEncoderProxy encoder = new CobaltEncoderProxy();
+  EncoderProxy encoder = new EncoderProxy();
 
-  CobaltEncoderFactoryProxy encoderFactory = new CobaltEncoderFactoryProxy();
+  EncoderFactoryProxy encoderFactory = new EncoderFactoryProxy();
   connectToService(startupContext.environmentServices, encoderFactory.ctrl);
   encoderFactory.getEncoder(_kCobaltProjectId, encoder.ctrl.request());
   encoderFactory.ctrl.close();

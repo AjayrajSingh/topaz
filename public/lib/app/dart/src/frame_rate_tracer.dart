@@ -16,7 +16,7 @@ class FrameRateTracer {
 
   /// Optional cobalt encoder.  If not null the frame rate will be logged as
   /// an observation to cobalt.
-  final CobaltEncoder cobaltEncoder;
+  final Encoder cobaltEncoder;
 
   DateTime _animationStart = new DateTime.now();
   int _frames = 0;

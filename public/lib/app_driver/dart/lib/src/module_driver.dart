@@ -81,7 +81,7 @@ class ModuleDriver {
   MessageQueueClient _messageQueue;
 
   /// Message queue token completer
-  final CobaltEncoderProxy _encoder = new CobaltEncoderProxy();
+  final EncoderProxy _encoder = new EncoderProxy();
   final DateTime _initializationTime;
   final Set<String> _firstObservationSent = new Set<String>();
   LifecycleHost _lifecycle;
@@ -127,7 +127,7 @@ class ModuleDriver {
     );
 
     // Connect to Cobalt
-    CobaltEncoderFactoryProxy encoderFactory = new CobaltEncoderFactoryProxy();
+    EncoderFactoryProxy encoderFactory = new EncoderFactoryProxy();
     connectToService(
       environmentServices,
       encoderFactory.ctrl,
@@ -598,8 +598,8 @@ class ModuleDriver {
   ServiceProviderProxy get environmentServices =>
       _startupContext.environmentServices;
 
-  /// The [CobaltEncoderProxy] for sending Cobalt metrics
-  CobaltEncoderProxy get cobaltEncoder => _encoder;
+  /// The [EncoderProxy] for sending Cobalt metrics
+  EncoderProxy get cobaltEncoder => _encoder;
 }
 
 /// [app-driver]: https://fuchsia.googlesource.com/peridot/+/master/public/lib/app_driver/cpp?autodive=0/

@@ -61,7 +61,7 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
     this.onDeviceShellStopped,
     this.onWifiTapped,
     this.onLogin,
-    cobalt.CobaltEncoder encoder,
+    cobalt.Encoder encoder,
     this.onSetup,
   }) : super(encoder);
 

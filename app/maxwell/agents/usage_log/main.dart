@@ -42,7 +42,7 @@ final ContextReaderProxy _contextReader = new ContextReaderProxy();
 ContextListenerImpl _contextListener;
 
 // connection to Cobalt
-final CobaltEncoderProxy _encoder = new CobaltEncoderProxy();
+final EncoderProxy _encoder = new EncoderProxy();
 
 // Deduplication Map
 final Map<String, LinkedHashSet<String>> _storyModules =
@@ -132,8 +132,7 @@ void main(List<String> args) {
   _contextReader.subscribe(query, _contextListener.getHandle());
 
   // Connect to Cobalt
-  final CobaltEncoderFactoryProxy encoderFactory =
-      new CobaltEncoderFactoryProxy();
+  final EncoderFactoryProxy encoderFactory = new EncoderFactoryProxy();
   connectToService(context.environmentServices, encoderFactory.ctrl);
   assert(encoderFactory.ctrl.isBound);
 
