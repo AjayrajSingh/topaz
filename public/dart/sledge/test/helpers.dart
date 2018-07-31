@@ -31,7 +31,8 @@ class SledgeForTesting extends Sledge {
   }
 
   void startInfiniteTransaction() {
-    _fakeTransaction = new Transaction(null, null);
+    _fakeTransaction =
+        new Transaction(null, null, new FakeLedgerPageSnapshotFactory());
   }
 }
 

@@ -24,18 +24,19 @@ class Transaction {
   // List of Documents modified during the transaction.
   final Set<Document> _documents = new Set<Document>();
   final Sledge _sledge;
-
+  final ledger.PageProxy _pageProxy;
   final ledger.PageSnapshotProxy _pageSnapshotProxy;
 
   /// Default constructor.
-  Transaction(this._sledge, this._pageSnapshotProxy);
+  Transaction(this._sledge, this._pageProxy,
+      LedgerPageSnapshotFactory pageSnapshotFactory)
+      : _pageSnapshotProxy = pageSnapshotFactory.newInstance();
 
-  /// Runs [modification] and saves the resulting changes to [pageProxy].
-  Future<bool> saveModification(
-      Modification modification, ledger.PageProxy pageProxy) async {
+  /// Runs [modification].
+  Future<bool> saveModification(Modification modification) async {
     // Start Ledger transaction.
     final startTransactionCompleter = new Completer<ledger.Status>();
-    pageProxy.startTransaction(startTransactionCompleter.complete);
+    _pageProxy.startTransaction(startTransactionCompleter.complete);
     bool startTransactionOk =
         (await startTransactionCompleter.future) == ledger.Status.ok;
     if (!startTransactionOk) {
@@ -43,8 +44,9 @@ class Transaction {
     }
 
     // Obtain the snapshot.
+    // All the read operations in |modification| will read from that snapshot.
     final snapshotCompleter = new Completer<ledger.Status>();
-    pageProxy.getSnapshot(
+    _pageProxy.getSnapshot(
       _pageSnapshotProxy.ctrl.request(),
       new Uint8List(0),
       null,
@@ -55,31 +57,39 @@ class Transaction {
       return false;
     }
 
+    // Execute the modifications.
+    // The modifications may:
+    // - obtain a handle to a document, which would trigger a call to |getDocument|.
+    // - modify a document. This would result in |documentWasModified| being called.
     await modification();
 
-    final updateLedgerFutures = <Future<ledger.Status>>[];
     // Iterate through all the documents modified by this transaction and
-    // forward the changes to Ledger.
+    // forward the updates (puts and deletes) to Ledger.
+    final updateLedgerFutures = <Future<ledger.Status>>[];
     for (final document in _documents) {
-      updateLedgerFutures.addAll(saveDocumentToPage(document, pageProxy));
+      updateLedgerFutures.addAll(saveDocumentToPage(document, _pageProxy));
     }
 
+    // Await until all updates have been succesfully executed.
+    // If some updates have failed, rollback.
     final List<ledger.Status> statuses = await Future.wait(updateLedgerFutures);
     for (final status in statuses) {
       if (status != ledger.Status.ok) {
-        await rollbackModification(pageProxy);
+        await _rollbackModification();
         return false;
       }
     }
 
+    // Finish the transaction by commiting. If the commit fails, rollback.
     final commitCompleter = new Completer<ledger.Status>();
-    pageProxy.commit(commitCompleter.complete);
+    _pageProxy.commit(commitCompleter.complete);
     bool commitOk = (await commitCompleter.future) == ledger.Status.ok;
     if (!commitOk) {
-      await rollbackModification(pageProxy);
+      await _rollbackModification();
       return false;
     }
 
+    // Notify the documents that the transaction has been completed.
     _documents
       ..forEach(Document.completeTransaction)
       ..clear();
@@ -115,12 +125,12 @@ class Transaction {
   }
 
   /// Rollback the documents that were modified during the transaction.
-  Future rollbackModification(ledger.PageProxy pageProxy) async {
+  Future _rollbackModification() async {
     _documents
       ..forEach(Document.rollbackChange)
       ..clear();
     final completer = new Completer<ledger.Status>();
-    pageProxy.rollback(completer.complete);
+    _pageProxy.rollback(completer.complete);
     bool commitOk = (await completer.future) == ledger.Status.ok;
     if (!commitOk) {
       throw new Exception('Transaction failed. Unable to rollback.');

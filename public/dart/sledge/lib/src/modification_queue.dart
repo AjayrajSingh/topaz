@@ -54,9 +54,9 @@ class ModificationQueue {
 
     // Create a transaction from [modifications], run it, and await its end.
     _currentTransaction =
-        new Transaction(_sledge, _pageSnapshotFactory.newInstance());
+        new Transaction(_sledge, _pageProxy, _pageSnapshotFactory);
     bool savingModificationWasSuccesfull =
-        await _currentTransaction.saveModification(modification, _pageProxy);
+        await _currentTransaction.saveModification(modification);
 
     _currentTransaction = null;
     _tasks.removeFirst();
