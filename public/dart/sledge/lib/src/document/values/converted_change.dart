@@ -49,7 +49,7 @@ class OrderedListChange<E> {
   OrderedListChange(this.deletedPositions, this.insertedElements);
 }
 
-/// Change in inner represention of Sledge data types.
+/// Change in inner representation of Sledge data types.
 class ConvertedChange<K, V> {
   /// Collection of key value pairs to be set.
   final Map<K, V> changedEntries;

@@ -34,7 +34,7 @@ class ModificationQueue {
   ///
   /// Will run [modification] once the previously queued modification
   /// has ran.
-  /// Returns true if [modification] was succesfully ran.
+  /// Returns true if [modification] was successfully ran.
   Future<bool> queueModification(Modification modification) async {
     // The last task from the queue.
     _Task taskToAwait;

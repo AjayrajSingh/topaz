@@ -24,8 +24,8 @@ import 'storage/kv_encoding.dart' as sledge_storage;
 import 'subscription/subscription.dart';
 import 'transaction.dart';
 
-// TODO: consider throwing exceptions when inintialization or transaction fails.
-// Insted of current approach to return false.
+// TODO: consider throwing exceptions when initialization or transaction fails.
+// Instead of current approach to return false.
 
 /// The interface to the Sledge library.
 class Sledge {
@@ -60,7 +60,7 @@ class Sledge {
     return new Sledge._(ledgerPair.passHandle(), pageId);
   }
 
-  /// Internal contructor
+  /// Internal constructor
   Sledge._(fidl.InterfaceHandle<ledger.Ledger> ledgerHandle,
       [SledgePageId pageId])
       : _pageProxy = new ledger.PageProxy(),
@@ -90,7 +90,7 @@ class Sledge {
     _initializationSucceeded = initializationCompleter.future;
   }
 
-  /// Contructor that takes a new-style binding of ComponentContext
+  /// Constructor that takes a new-style binding of ComponentContext
   factory Sledge.forAsync(modular_async.ComponentContext componentContext,
       [SledgePageId pageId]) {
     final pair = new ChannelPair();
@@ -127,8 +127,8 @@ class Sledge {
   }
 
   /// Transactionally save modification.
-  /// Returns false if an error occured and the modification couldn't be
-  /// commited.
+  /// Returns false if an error occurred and the modification couldn't be
+  /// committed.
   /// Returns true otherwise.
   Future<bool> runInTransaction(Modification modification) async {
     bool initializationSucceeded = await _initializationSucceeded;
@@ -161,7 +161,7 @@ class Sledge {
     return _modificationQueue.currentTransaction;
   }
 
-  /// Returns an ID, unique among active connections accross devices.
+  /// Returns an ID, unique among active connections across devices.
   ConnectionId get connectionId => _connectionId;
 
   /// Calls applyChange for all registered documents.

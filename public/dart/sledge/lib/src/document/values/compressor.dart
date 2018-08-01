@@ -10,7 +10,7 @@ import '../../utils_hash.dart';
 import '../uint8list_ops.dart';
 import 'key_value.dart';
 
-// Insted of storing (key, value) pair in Ledger we do modification:
+// Instead of storing (key, value) pair in Ledger we do modification:
 // We store ({hash_of_key}, {|key|}{key}{value}).
 // [key] is an Uint64 and takes 8 bytes to store.
 

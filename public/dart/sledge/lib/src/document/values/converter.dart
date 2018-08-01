@@ -80,7 +80,7 @@ class DataConverter<K, V> {
     return result;
   }
 
-  /// Prepares (key, value)s to store in Ledger. (geting rid of long keys)
+  /// Prepares (key, value)s to store in Ledger. (getting rid of long keys)
   Change _compressKeysInChange(final Change input) {
     Change result = new Change();
     for (final entry in input.changedEntries) {

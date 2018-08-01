@@ -18,7 +18,7 @@ class ConnectionId {
   /// Default constructor.
   ConnectionId(this._id);
 
-  /// Creates a completely random conncection ID.
+  /// Creates a completely random connection ID.
   ConnectionId.random() : _id = random.randomUint8List(20);
 
   /// Returns byte representation of ID.

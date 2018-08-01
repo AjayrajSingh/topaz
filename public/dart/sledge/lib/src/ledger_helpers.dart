@@ -53,7 +53,7 @@ Future<List<KeyValue>> getEntriesFromSnapshotWithPrefix(
     Uint8List v = readBuffer(entry.value);
     keyValues.add(new KeyValue(k, v));
   }
-  print('Succesfully read ${keyValues.length} entries');
+  print('Successfully read ${keyValues.length} entries');
   return keyValues;
 }
 
