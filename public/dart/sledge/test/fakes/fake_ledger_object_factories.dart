@@ -6,16 +6,21 @@ import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 // ignore: implementation_imports
 import 'package:sledge/src/ledger_helpers.dart';
 
+import 'fake_ledger_page.dart';
 import 'fake_ledger_page_snapshot.dart';
 import 'fake_ledger_page_watcher_binding.dart';
 
 /// Fake implementation of LedgerObjectsFactory.
 class FakeLedgerObjectsFactory implements LedgerObjectsFactory {
+  final FakeLedgerPage _fakeLedgerPage;
+
+  FakeLedgerObjectsFactory(this._fakeLedgerPage);
+
   @override
   ledger.PageWatcherBinding newPageWatcherBinding() =>
       new FakePageWatcherBinding();
 
   @override
   ledger.PageSnapshotProxy newPageSnapshotProxy() =>
-      new FakeLedgerPageSnapshot();
+      new FakeLedgerPageSnapshot(_fakeLedgerPage);
 }

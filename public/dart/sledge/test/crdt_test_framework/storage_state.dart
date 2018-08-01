@@ -8,6 +8,7 @@ import 'dart:typed_data';
 import 'package:sledge/src/document/change.dart';
 import 'package:sledge/src/uint8list_ops.dart';
 import 'package:sledge/src/document/values/key_value.dart';
+import 'package:lib.ledger.dart/src/helpers.dart' as ledger_helpers;
 
 import 'entry.dart';
 
@@ -16,9 +17,11 @@ import 'entry.dart';
 /// Used to fake Ledger's KeyValue storage.
 class StorageState {
   final Map<Uint8List, Entry> _storage = newUint8ListMap<Entry>();
+  static int globalIncrementalTimer = 0;
 
   /// Applies [change] to storage. Uses [timestamp] as a time of update.
-  void applyChange(Change change, int timestamp) {
+  void applyChange(Change change, [int timestamp]) {
+    timestamp ??= globalIncrementalTimer++;
     for (final entry in change.changedEntries) {
       _storage[entry.key] = new Entry(entry.value, timestamp);
     }
@@ -58,5 +61,16 @@ class StorageState {
       }
     }
     return new Change(changedEntries, deletedKeys);
+  }
+
+  List<KeyValue> getEntries(Uint8List keyPrefix) {
+    final entries = <KeyValue>[];
+    for (final key in _storage.keys) {
+      Entry value = _storage[key];
+      if (!value.isDeleted && ledger_helpers.hasPrefix(key, keyPrefix)) {
+        entries.add(new KeyValue(key, value.value));
+      }
+    }
+    return entries;
   }
 }

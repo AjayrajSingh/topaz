@@ -28,7 +28,13 @@ class FleetState<T extends dynamic> {
             size, (index) => new StorageState(),
             growable: false),
         _instances =
-            new List<T>.generate(size, instanceGenerator, growable: false);
+            new List<T>.generate(size, instanceGenerator, growable: false) {
+    if (T == Sledge) {
+      for (int i = 0; i < size; i++) {
+        _storageStates[i] = _instances[i].fakeLedgerPage.storageState;
+      }
+    }
+  }
 
   Future applyNode(Node node, int timer) async {
     if (node is ModificationNode) {
@@ -50,21 +56,28 @@ class FleetState<T extends dynamic> {
 
   Future applyModification(
       int id, Future Function(T) modification, int time) async {
-    await modification(_instances[id]);
-    if (T == Document) {
-      _storageStates[id]
-          // ignore: argument_type_not_assignable
-          .applyChange(Document.getChange(_instances[id]), time);
-      // ignore: argument_type_not_assignable
-      Document.completeTransaction(_instances[id]);
+    if (T == Sledge) {
+      await _instances[id].runInTransaction(() => modification(_instances[id]));
     } else {
-      _storageStates[id].applyChange(_instances[id].getChange(), time);
-      _instances[id].completeTransaction();
+      await modification(_instances[id]);
+      if (T == Document) {
+        _storageStates[id]
+            // ignore: argument_type_not_assignable
+            .applyChange(Document.getChange(_instances[id]), time);
+        // ignore: argument_type_not_assignable
+        Document.completeTransaction(_instances[id]);
+      } else {
+        _storageStates[id].applyChange(_instances[id].getChange(), time);
+        _instances[id].completeTransaction();
+      }
     }
   }
 
   void applySynchronization(int id1, int id2) {
-    if (T == Document) {
+    if (T == Sledge) {
+      _storageStates[id1].updateWith(_storageStates[id2]);
+      _storageStates[id2].updateWith(_storageStates[id1]);
+    } else if (T == Document) {
       Document.applyChange(
           // ignore: argument_type_not_assignable
           _instances[id1],

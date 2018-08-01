@@ -7,6 +7,8 @@ import 'dart:typed_data';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 
+import 'fake_ledger_page.dart';
+
 class _FakeProxyController<T> extends ProxyController<T> {
   @override
   InterfaceRequest<T> request() {
@@ -16,6 +18,10 @@ class _FakeProxyController<T> extends ProxyController<T> {
 
 /// Fake implementation of a PageSnapshot.
 class FakeLedgerPageSnapshot extends ledger.PageSnapshotProxy {
+  FakeLedgerPage _fakeLedgerPage;
+
+  FakeLedgerPageSnapshot(this._fakeLedgerPage);
+
   @override
   ProxyController<FakeLedgerPageSnapshot> get ctrl =>
       new _FakeProxyController<FakeLedgerPageSnapshot>();
@@ -26,6 +32,6 @@ class FakeLedgerPageSnapshot extends ledger.PageSnapshotProxy {
       ledger.Token token,
       void callback(ledger.Status status, List<ledger.Entry> entriesResult,
           ledger.Token nextTokenResult)) {
-    callback(ledger.Status.ok, <ledger.Entry>[], token);
+    callback(ledger.Status.ok, _fakeLedgerPage.getEntries(keyPrefix), token);
   }
 }

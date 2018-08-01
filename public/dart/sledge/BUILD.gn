@@ -77,6 +77,7 @@ dart_test("dart_sledge_tests") {
     "schema_test.dart",
     "schemas_obtainer_test.dart",
     "sledge_page_id_test.dart",
+    "sledge_ss_test.dart",
     "transaction_test.dart",
     "values/compressor_test.dart",
     "values/converter_test.dart",

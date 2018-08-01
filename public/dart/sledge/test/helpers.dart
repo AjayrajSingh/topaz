@@ -13,13 +13,13 @@ import 'fakes/fake_ledger_object_factories.dart';
 import 'fakes/fake_ledger_page.dart';
 
 class SledgeForTesting extends Sledge {
-  FakeLedgerPage fakeLedgerPage;
+  final FakeLedgerPage fakeLedgerPage;
   Transaction _fakeTransaction;
 
-  SledgeForTesting(FakeLedgerPage fakeLedgerPage,
-      FakeLedgerObjectsFactory fakeLedgerObjectsFactory)
+  SledgeForTesting(FakeLedgerPage fakeLedgerPage)
       : fakeLedgerPage = fakeLedgerPage,
-        super.testing(fakeLedgerPage, fakeLedgerObjectsFactory);
+        super.testing(
+            fakeLedgerPage, new FakeLedgerObjectsFactory(fakeLedgerPage));
 
   Document fakeGetDocument(DocumentId documentId) {
     return new Document(this, documentId);
@@ -32,11 +32,10 @@ class SledgeForTesting extends Sledge {
 
   void startInfiniteTransaction() {
     _fakeTransaction =
-        new Transaction(null, null, new FakeLedgerObjectsFactory());
+        new Transaction(null, null, new FakeLedgerObjectsFactory(null));
   }
 }
 
 SledgeForTesting newSledgeForTesting() {
-  return new SledgeForTesting(
-      new FakeLedgerPage(), new FakeLedgerObjectsFactory());
+  return new SledgeForTesting(new FakeLedgerPage());
 }
