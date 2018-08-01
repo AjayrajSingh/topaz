@@ -117,7 +117,7 @@ void main() {
     // Read and write properties of a Sledge document.
     expect(doc.foo.someBool.value, equals(false));
     expect(doc.foo.someInteger.value, equals(0));
-    await sledge.runInTransaction(() {
+    await sledge.runInTransaction(() async {
       doc.foo.someBool.value = true;
       doc.foo.someInteger.value = 42;
     });
@@ -147,7 +147,7 @@ void main() {
     expect(doc.someInteger.value, equals(0));
     expect(doc.someDouble.value, equals(0.0));
     expect(doc.someString.value, equals(''));
-    await sledge.runInTransaction(() {
+    await sledge.runInTransaction(() async {
       doc.someBool.value = true;
       doc.someInteger.value = 42;
       doc.someDouble.value = 10.5;
@@ -177,17 +177,17 @@ void main() {
     // Modify and get value of PosNegCounter.
     expect(doc.cnt.value, equals(0));
     expect(doc.cnt_d.value, equals(0.0));
-    await sledge.runInTransaction(() {
+    await sledge.runInTransaction(() async {
       doc.cnt.add(5);
     });
     expect(doc.cnt.value, equals(5));
-    await sledge.runInTransaction(() {
+    await sledge.runInTransaction(() async {
       doc.cnt.add(-3);
       doc.cnt_d.add(-5.2);
     });
     expect(doc.cnt.value, equals(2));
     expect(doc.cnt_d.value, equals(-5.2));
-    await sledge.runInTransaction(() {
+    await sledge.runInTransaction(() async {
       doc.cnt_d.add(3.12);
     });
     expect(doc.cnt_d.value, equals(-2.08));
@@ -210,12 +210,12 @@ void main() {
 
     // Apply modifications to OrderedList.
     expect(doc.list.toList(), equals([]));
-    await sledge.runInTransaction(() {
+    await sledge.runInTransaction(() async {
       doc.list.insert(0, new Uint8List.fromList([1]));
     });
     expect(doc.list.toList().length, equals(1));
     expect(doc.list[0].toList(), equals([1]));
-    await sledge.runInTransaction(() {
+    await sledge.runInTransaction(() async {
       doc.list.insert(1, new Uint8List.fromList([3]));
       doc.list.insert(1, new Uint8List.fromList([2]));
     });
@@ -245,7 +245,7 @@ void main() {
     });
 
     Change c1;
-    await sledgeA.runInTransaction(() {
+    await sledgeA.runInTransaction(() async {
       docA
         ..name.value = 'value + counter'
         ..number.value = 5
@@ -281,7 +281,7 @@ void main() {
     final largeList = randomUint8List(10000);
 
     Change c1;
-    await sledgeA.runInTransaction(() {
+    await sledgeA.runInTransaction(() async {
       docA.names.add(largeList);
       c1 = Document.getChange(docA);
     });
@@ -306,7 +306,7 @@ void main() {
         doc = await sledge.getDocument(new DocumentId(schema));
       });
       // Read and write properties of a Sledge document.
-      bool transactionSucceed = await sledge.runInTransaction(() {
+      bool transactionSucceed = await sledge.runInTransaction(() async {
         doc.someInteger.value = 14;
       });
       expect(transactionSucceed, true);
@@ -314,7 +314,7 @@ void main() {
 
       // Test case when commit fails.
       sledge.fakeLedgerPage.commitStatus = ledger.Status.ioError;
-      transactionSucceed = await sledge.runInTransaction(() {
+      transactionSucceed = await sledge.runInTransaction(() async {
         doc.someBool.value = true;
         doc.someInteger.value = 42;
       });
@@ -324,7 +324,7 @@ void main() {
 
       // Check that after failed transaction we can get successful one.
       sledge.fakeLedgerPage.resetAllStatus();
-      transactionSucceed = await sledge.runInTransaction(() {
+      transactionSucceed = await sledge.runInTransaction(() async {
         doc.someInteger.value = 8;
       });
       expect(transactionSucceed, true);
@@ -345,7 +345,7 @@ void main() {
         doc = await sledge.getDocument(new DocumentId(schema));
       });
       // Read and write properties of a Sledge document.
-      bool transactionSucceed = await sledge.runInTransaction(() {
+      bool transactionSucceed = await sledge.runInTransaction(() async {
         doc.map['a'] = new Uint8List.fromList([1, 2, 3]);
       });
       expect(transactionSucceed, true);
@@ -353,7 +353,7 @@ void main() {
 
       // Test case when commit fails.
       sledge.fakeLedgerPage.commitStatus = ledger.Status.ioError;
-      transactionSucceed = await sledge.runInTransaction(() {
+      transactionSucceed = await sledge.runInTransaction(() async {
         doc.map['a'] = new Uint8List.fromList([4]);
         doc.map['foo'] = new Uint8List.fromList([1, 3]);
       });
@@ -363,7 +363,7 @@ void main() {
 
       // Check that after failed transaction we can get successful one.
       sledge.fakeLedgerPage.resetAllStatus();
-      transactionSucceed = await sledge.runInTransaction(() {
+      transactionSucceed = await sledge.runInTransaction(() async {
         doc.map['foo'] = new Uint8List.fromList([1, 3]);
       });
       expect(transactionSucceed, true);
@@ -371,7 +371,7 @@ void main() {
       expect(doc.map['a'], equals([1, 2, 3]));
       expect(doc.map['foo'], equals([1, 3]));
 
-      transactionSucceed = await sledge.runInTransaction(() {
+      transactionSucceed = await sledge.runInTransaction(() async {
         doc.map['a'] = new Uint8List.fromList([3, 4]);
       });
       expect(transactionSucceed, true);

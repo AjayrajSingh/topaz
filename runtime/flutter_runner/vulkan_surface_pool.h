@@ -7,7 +7,7 @@
 #include <list>
 #include <unordered_map>
 
-#include "lib/fxl/macros.h"
+#include "flutter/fml/macros.h"
 #include "vulkan_surface.h"
 
 namespace flutter {
@@ -18,8 +18,7 @@ class VulkanSurfacePool final {
   static const size_t kMaxSurfaceAge = 3;
 
   VulkanSurfacePool(vulkan::VulkanProvider& vulkan_provider,
-                    sk_sp<GrContext> context,
-                    scenic::Session* scenic_session);
+                    sk_sp<GrContext> context, scenic::Session* scenic_session);
 
   ~VulkanSurfacePool();
 
@@ -70,7 +69,7 @@ class VulkanSurfacePool final {
 
   void TraceStats();
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(VulkanSurfacePool);
+  FML_DISALLOW_COPY_AND_ASSIGN(VulkanSurfacePool);
 };
 
 }  // namespace flutter

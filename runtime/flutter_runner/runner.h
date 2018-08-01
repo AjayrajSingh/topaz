@@ -11,9 +11,9 @@
 #include <fuchsia/sys/cpp/fidl.h>
 
 #include "component.h"
+#include "flutter/fml/macros.h"
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
-#include "lib/fxl/macros.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 
 namespace flutter {
@@ -31,9 +31,9 @@ class Runner final : public fuchsia::sys::Runner {
     std::unique_ptr<deprecated_loop::Thread> thread;
     std::unique_ptr<Application> application;
 
-    ActiveApplication(
-        std::pair<std::unique_ptr<deprecated_loop::Thread>, std::unique_ptr<Application>>
-            pair)
+    ActiveApplication(std::pair<std::unique_ptr<deprecated_loop::Thread>,
+                                std::unique_ptr<Application>>
+                          pair)
         : thread(std::move(pair.first)), application(std::move(pair.second)) {}
 
     ActiveApplication() = default;
@@ -50,7 +50,8 @@ class Runner final : public fuchsia::sys::Runner {
                       fidl::InterfaceRequest<fuchsia::sys::ComponentController>
                           controller) override;
 
-  void RegisterApplication(fidl::InterfaceRequest<fuchsia::sys::Runner> request);
+  void RegisterApplication(
+      fidl::InterfaceRequest<fuchsia::sys::Runner> request);
 
   void UnregisterApplication(const Application* application);
 
@@ -58,7 +59,7 @@ class Runner final : public fuchsia::sys::Runner {
 
   void SetupICU();
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(Runner);
+  FML_DISALLOW_COPY_AND_ASSIGN(Runner);
 };
 
 }  // namespace flutter

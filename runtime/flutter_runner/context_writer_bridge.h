@@ -8,8 +8,8 @@
 
 #include <fuchsia/modular/cpp/fidl.h>
 
+#include "flutter/fml/macros.h"
 #include "flutter/lib/ui/semantics/semantics_node.h"
-#include "lib/fxl/macros.h"
 
 namespace flutter {
 
@@ -39,7 +39,7 @@ class ContextWriterBridge final {
   // |visited_nodes|.
   void EraseUnvisitedNodes(const std::vector<int>& visited_nodes);
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(ContextWriterBridge);
+  FML_DISALLOW_COPY_AND_ASSIGN(ContextWriterBridge);
 };
 
 }  // namespace flutter

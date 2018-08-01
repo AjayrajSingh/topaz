@@ -9,7 +9,7 @@
 #include <lib/fit/function.h>
 
 #include "flutter/flow/compositor_context.h"
-#include "lib/fxl/macros.h"
+#include "flutter/fml/macros.h"
 #include "session_connection.h"
 
 namespace flutter {
@@ -43,7 +43,7 @@ class CompositorContext final : public flow::CompositorContext {
       GrContext* gr_context, SkCanvas* canvas,
       bool instrumentation_enabled) override;
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(CompositorContext);
+  FML_DISALLOW_COPY_AND_ASSIGN(CompositorContext);
 };
 
 }  // namespace flutter

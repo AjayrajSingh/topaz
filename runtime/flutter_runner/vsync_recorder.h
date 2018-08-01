@@ -5,15 +5,15 @@
 #ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_VSYNC_RECORDER_H_
 #define TOPAZ_RUNTIME_FLUTTER_RUNNER_VSYNC_RECORDER_H_
 
-#include "lib/fxl/time/time_delta.h"
-#include "lib/fxl/time/time_point.h"
+#include "flutter/fml/time/time_delta.h"
+#include "flutter/fml/time/time_point.h"
 #include "lib/ui/scenic/cpp/session.h"
 
 namespace flutter {
 
 struct VsyncInfo {
-  fxl::TimePoint presentation_time;
-  fxl::TimeDelta presentation_interval;
+  fml::TimePoint presentation_time;
+  fml::TimeDelta presentation_interval;
 };
 
 class VsyncRecorder {

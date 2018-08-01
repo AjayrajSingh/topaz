@@ -5,9 +5,9 @@
 #pragma once
 
 #include "compositor_context.h"
+#include "flutter/fml/macros.h"
 #include "flutter/fml/memory/weak_ptr.h"
 #include "flutter/shell/common/surface.h"
-#include "lib/fxl/macros.h"
 
 namespace flutter {
 
@@ -36,7 +36,7 @@ class Surface final : public shell::Surface {
 
   static bool CanConnectToDisplay();
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(Surface);
+  FML_DISALLOW_COPY_AND_ASSIGN(Surface);
 };
 
 }  // namespace flutter

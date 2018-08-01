@@ -10,7 +10,7 @@
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #endif
 
-#include "lib/fxl/macros.h"
+#include "flutter/fml/macros.h"
 #include "lib/ui/flutter/sdk_ext/src/natives.h"
 #include "unique_fdio_ns.h"
 
@@ -54,7 +54,7 @@ class IsolateConfigurator final {
 
   void BindScenic(mozart::NativesDelegate* natives_delegate);
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(IsolateConfigurator);
+  FML_DISALLOW_COPY_AND_ASSIGN(IsolateConfigurator);
 };
 
 }  // namespace flutter

@@ -32,13 +32,13 @@ class ValuesAreUniqueChecker<K, V> extends Checker<MapValue<K, V>> {
 void main() async {
   test('Checker fails.', () async {
     final fleet = intMapFleetFactory.newFleet(2)
-      ..runInTransaction(0, (MapValue<int, int> m0) {
+      ..runInTransaction(0, (MapValue<int, int> m0) async {
         m0[1] = 2;
       })
-      ..runInTransaction(0, (MapValue<int, int> m0) {
+      ..runInTransaction(0, (MapValue<int, int> m0) async {
         m0[2] = 4;
       })
-      ..runInTransaction(1, (MapValue<int, int> m1) {
+      ..runInTransaction(1, (MapValue<int, int> m1) async {
         m1[1] = 4;
         m1[2] = 2;
       })

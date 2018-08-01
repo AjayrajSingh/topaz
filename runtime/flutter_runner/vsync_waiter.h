@@ -7,9 +7,10 @@
 
 #include <lib/async/cpp/wait.h>
 
+#include "flutter/fml/macros.h"
+#include "flutter/fml/memory/weak_ptr.h"
+#include "flutter/fml/time/time_point.h"
 #include "flutter/shell/common/vsync_waiter.h"
-#include "lib/fxl/macros.h"
-#include "lib/fxl/memory/weak_ptr.h"
 
 namespace flutter {
 
@@ -25,7 +26,7 @@ class VsyncWaiter final : public shell::VsyncWaiter {
  private:
   const std::string debug_label_;
   async::Wait session_wait_;
-  fxl::WeakPtrFactory<VsyncWaiter> weak_factory_;
+  fml::WeakPtrFactory<VsyncWaiter> weak_factory_;
 
   // |shell::VsyncWaiter|
   void AwaitVSync() override;
@@ -34,7 +35,7 @@ class VsyncWaiter final : public shell::VsyncWaiter {
 
   void FireCallbackNow();
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(VsyncWaiter);
+  FML_DISALLOW_COPY_AND_ASSIGN(VsyncWaiter);
 };
 
 }  // namespace flutter

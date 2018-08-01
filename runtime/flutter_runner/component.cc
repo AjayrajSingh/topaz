@@ -59,14 +59,14 @@ Application::Application(
       application_controller_(this) {
   application_controller_.set_error_handler([this]() { Kill(); });
 
-  FXL_DCHECK(fdio_ns_.is_valid());
+  FML_DCHECK(fdio_ns_.is_valid());
   // LaunchInfo::url non-optional.
   auto& launch_info = startup_info.launch_info;
 
   // LaunchInfo::arguments optional.
   if (auto& arguments = launch_info.arguments) {
     settings_ = shell::SettingsFromCommandLine(
-        fxl::CommandLineFromIterators(arguments->begin(), arguments->end()));
+        fml::CommandLineFromIterators(arguments->begin(), arguments->end()));
   }
 
   // TODO: LaunchInfo::out.
@@ -89,13 +89,13 @@ Application::Application(
     zx::channel dir = std::move(startup_info.flat_namespace.directories->at(i));
     zx_handle_t dir_handle = dir.release();
     if (fdio_ns_bind(fdio_ns_.get(), path->data(), dir_handle) != ZX_OK) {
-      FXL_DLOG(ERROR) << "Could not bind path to namespace: " << path;
+      FML_DLOG(ERROR) << "Could not bind path to namespace: " << path;
       zx_handle_close(dir_handle);
     }
   }
 
   application_directory_.reset(fdio_ns_opendir(fdio_ns_.get()));
-  FXL_DCHECK(application_directory_.is_valid());
+  FML_DCHECK(application_directory_.is_valid());
 
   application_assets_directory_.reset(
       openat(application_directory_.get(), "pkg/data", O_RDONLY | O_DIRECTORY));
@@ -190,7 +190,7 @@ class FileInNamespaceBuffer final : public blink::DartSnapshotBuffer {
     zx_status_t status =
         zx::vmar::root_self()->map(0, vmo.vmo(), 0, vmo.size(), flags, &addr);
     if (status != ZX_OK) {
-      FXL_LOG(FATAL) << "Failed to map " << path << ": "
+      FML_LOG(FATAL) << "Failed to map " << path << ": "
                      << zx_status_get_string(status);
     }
 
@@ -216,7 +216,7 @@ class FileInNamespaceBuffer final : public blink::DartSnapshotBuffer {
   void* address_;
   size_t size_;
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(FileInNamespaceBuffer);
+  FML_DISALLOW_COPY_AND_ASSIGN(FileInNamespaceBuffer);
 };
 
 std::unique_ptr<blink::DartSnapshotBuffer> CreateWithContentsOfFile(
@@ -234,8 +234,8 @@ void Application::AttemptVMLaunchWithCurrentSettings(
   }
 
   // Compare flutter_aot_app in flutter_app.gni.
-  fxl::RefPtr<blink::DartSnapshot> vm_snapshot =
-      fxl::MakeRefCounted<blink::DartSnapshot>(
+  fml::RefPtr<blink::DartSnapshot> vm_snapshot =
+      fml::MakeRefCounted<blink::DartSnapshot>(
           CreateWithContentsOfFile(
               application_assets_directory_.get() /* /pkg/data */,
               "vm_snapshot_data.bin", false),
@@ -243,7 +243,7 @@ void Application::AttemptVMLaunchWithCurrentSettings(
               application_assets_directory_.get() /* /pkg/data */,
               "vm_snapshot_instructions.bin", true));
 
-  isolate_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
+  isolate_snapshot_ = fml::MakeRefCounted<blink::DartSnapshot>(
       CreateWithContentsOfFile(
           application_assets_directory_.get() /* /pkg/data */,
           "isolate_snapshot_data.bin", false),
@@ -251,7 +251,7 @@ void Application::AttemptVMLaunchWithCurrentSettings(
           application_assets_directory_.get() /* /pkg/data */,
           "isolate_snapshot_instructions.bin", true));
 
-  shared_snapshot_ = fxl::MakeRefCounted<blink::DartSnapshot>(
+  shared_snapshot_ = fml::MakeRefCounted<blink::DartSnapshot>(
       CreateWithContentsOfFile(
           application_assets_directory_.get() /* /pkg/data */,
           "shared_snapshot_data.bin", false),
@@ -265,9 +265,9 @@ void Application::AttemptVMLaunchWithCurrentSettings(
                             shared_snapshot_         //
   );
   if (blink::DartVM::ForProcessIfInitialized()) {
-    FXL_DLOG(INFO) << "VM successfully initialized for AOT mode.";
+    FML_DLOG(INFO) << "VM successfully initialized for AOT mode.";
   } else {
-    FXL_LOG(ERROR) << "VM could not be initialized for AOT mode.";
+    FML_LOG(ERROR) << "VM could not be initialized for AOT mode.";
   }
 }
 
@@ -348,7 +348,7 @@ void Application::CreateView(
     fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> outgoing_services) {
 #endif
   if (!startup_context_) {
-    FXL_DLOG(ERROR) << "Application context was invalid when attempting to "
+    FML_DLOG(ERROR) << "Application context was invalid when attempting to "
                        "create a shell for a view provider request.";
     return;
   }

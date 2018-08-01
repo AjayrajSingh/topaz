@@ -6,7 +6,7 @@
 
 #include <trace/event.h>
 
-#include "flutter/glue/trace_event.h"
+#include "flutter/fml/trace_event.h"
 #include "third_party/skia/include/gpu/GrContext.h"
 
 namespace flutter {
@@ -25,12 +25,12 @@ VulkanSurfacePool::AcquireSurface(const SkISize& size) {
   auto surface = GetCachedOrCreateSurface(size);
 
   if (surface == nullptr) {
-    FXL_DLOG(ERROR) << "Could not acquire surface";
+    FML_DLOG(ERROR) << "Could not acquire surface";
     return nullptr;
   }
 
   if (!surface->FlushSessionAcquireAndReleaseEvents()) {
-    FXL_DLOG(ERROR) << "Could not flush acquire/release events for buffer.";
+    FML_DLOG(ERROR) << "Could not flush acquire/release events for buffer.";
     return nullptr;
   }
 
@@ -44,7 +44,7 @@ VulkanSurfacePool::GetCachedOrCreateSurface(const SkISize& size) {
     return CreateSurface(size);
   }
   SurfacesSet& available_surfaces = found_in_available->second;
-  FXL_DCHECK(available_surfaces.size() > 0);
+  FML_DCHECK(available_surfaces.size() > 0);
   auto acquired_surface = std::move(available_surfaces.back());
   available_surfaces.pop_back();
   if (available_surfaces.size() == 0) {
@@ -83,8 +83,8 @@ void VulkanSurfacePool::SubmitSurface(
 
 std::unique_ptr<VulkanSurface> VulkanSurfacePool::CreateSurface(
     const SkISize& size) {
-  auto surface = std::make_unique<VulkanSurface>(
-      vulkan_provider_, context_, scenic_session_, size);
+  auto surface = std::make_unique<VulkanSurface>(vulkan_provider_, context_,
+                                                 scenic_session_, size);
   if (!surface->IsValid()) {
     return nullptr;
   }

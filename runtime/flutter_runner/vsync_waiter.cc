@@ -22,7 +22,7 @@ VsyncWaiter::VsyncWaiter(std::string debug_label,
                           const zx_packet_signal_t* signal  //
                       ) {
     if (status != ZX_OK) {
-      FXL_LOG(ERROR) << "Vsync wait failed.";
+      FML_LOG(ERROR) << "Vsync wait failed.";
       return;
     }
 
@@ -36,11 +36,11 @@ VsyncWaiter::VsyncWaiter(std::string debug_label,
 
 VsyncWaiter::~VsyncWaiter() { session_wait_.Cancel(); }
 
-static fxl::TimePoint SnapToNextPhase(fxl::TimePoint value,
-                                      fxl::TimePoint phase,
-                                      fxl::TimeDelta interval) {
-  fxl::TimeDelta offset = (phase - value) % interval;
-  if (offset != fxl::TimeDelta::Zero()) {
+static fml::TimePoint SnapToNextPhase(fml::TimePoint value,
+                                      fml::TimePoint phase,
+                                      fml::TimeDelta interval) {
+  fml::TimeDelta offset = (phase - value) % interval;
+  if (offset != fml::TimeDelta::Zero()) {
     offset = offset + interval;
   }
   return value + offset;
@@ -49,10 +49,9 @@ static fxl::TimePoint SnapToNextPhase(fxl::TimePoint value,
 void VsyncWaiter::AwaitVSync() {
   VsyncInfo vsync_info = VsyncRecorder::GetInstance().GetCurrentVsyncInfo();
 
-  fxl::TimePoint now = fxl::TimePoint::Now();
-  fxl::TimePoint next_vsync = SnapToNextPhase(now, vsync_info.presentation_time,
+  fml::TimePoint now = fml::TimePoint::Now();
+  fml::TimePoint next_vsync = SnapToNextPhase(now, vsync_info.presentation_time,
                                               vsync_info.presentation_interval);
-
   task_runners_.GetUITaskRunner()->PostDelayedTask(
       [self = weak_factory_.GetWeakPtr()] {
         if (self) {
@@ -63,22 +62,22 @@ void VsyncWaiter::AwaitVSync() {
 }
 
 void VsyncWaiter::FireCallbackWhenSessionAvailable() {
-  FXL_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
+  FML_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
   if (session_wait_.Begin(
           deprecated_loop::MessageLoop::GetCurrent()->dispatcher()) != ZX_OK) {
-    FXL_LOG(ERROR) << "Could not begin wait for Vsync.";
+    FML_LOG(ERROR) << "Could not begin wait for Vsync.";
   }
 }
 
 void VsyncWaiter::FireCallbackNow() {
-  FXL_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
+  FML_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
 
   VsyncInfo vsync_info = VsyncRecorder::GetInstance().GetCurrentVsyncInfo();
 
-  fxl::TimePoint now = fxl::TimePoint::Now();
-  fxl::TimePoint next_vsync = SnapToNextPhase(now, vsync_info.presentation_time,
+  fml::TimePoint now = fml::TimePoint::Now();
+  fml::TimePoint next_vsync = SnapToNextPhase(now, vsync_info.presentation_time,
                                               vsync_info.presentation_interval);
-  fxl::TimePoint previous_vsync = next_vsync - vsync_info.presentation_interval;
+  fml::TimePoint previous_vsync = next_vsync - vsync_info.presentation_interval;
 
   FireCallback(previous_vsync, next_vsync);
 }

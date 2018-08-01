@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "flutter/glue/trace_event.h"
+#include "flutter/fml/trace_event.h"
 #include "third_party/skia/include/gpu/GrBackendSemaphore.h"
 #include "third_party/skia/include/gpu/GrBackendSurface.h"
 #include "third_party/skia/include/gpu/GrContext.h"
@@ -17,15 +17,14 @@
 
 namespace flutter {
 
-VulkanSurfaceProducer::VulkanSurfaceProducer(
-    scenic::Session* scenic_session) {
+VulkanSurfaceProducer::VulkanSurfaceProducer(scenic::Session* scenic_session) {
   valid_ = Initialize(scenic_session);
 
   if (valid_) {
-    FXL_DLOG(INFO)
+    FML_DLOG(INFO)
         << "Flutter engine: Vulkan surface producer initialization: Successful";
   } else {
-    FXL_LOG(ERROR)
+    FML_LOG(ERROR)
         << "Flutter engine: Vulkan surface producer initialization: Failed";
   }
 }
@@ -34,11 +33,11 @@ VulkanSurfaceProducer::~VulkanSurfaceProducer() {
   // Make sure queue is idle before we start destroying surfaces
   VkResult wait_result =
       VK_CALL_LOG_ERROR(vk_->QueueWaitIdle(logical_device_->GetQueueHandle()));
-  FXL_DCHECK(wait_result == VK_SUCCESS);
+  FML_DCHECK(wait_result == VK_SUCCESS);
 };
 
 bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
-  vk_ = fxl::MakeRefCounted<vulkan::VulkanProcTable>();
+  vk_ = fml::MakeRefCounted<vulkan::VulkanProcTable>();
 
   std::vector<std::string> extensions = {
       VK_KHR_SURFACE_EXTENSION_NAME,
@@ -50,7 +49,7 @@ bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
   if (!application_->IsValid() || !vk_->AreInstanceProcsSetup()) {
     // Make certain the application instance was created and it setup the
     // instance proc table entries.
-    FXL_LOG(ERROR) << "Instance proc addresses have not been setup.";
+    FML_LOG(ERROR) << "Instance proc addresses have not been setup.";
     return false;
   }
 
@@ -62,38 +61,37 @@ bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
       !vk_->AreDeviceProcsSetup()) {
     // Make certain the device was created and it setup the device proc table
     // entries.
-    FXL_LOG(ERROR) << "Device proc addresses have not been setup.";
+    FML_LOG(ERROR) << "Device proc addresses have not been setup.";
     return false;
   }
 
   if (!vk_->HasAcquiredMandatoryProcAddresses()) {
-    FXL_LOG(ERROR) << "Failed to acquire mandatory proc addresses.";
+    FML_LOG(ERROR) << "Failed to acquire mandatory proc addresses.";
     return false;
   }
 
   if (!vk_->IsValid()) {
-    FXL_LOG(ERROR) << "VulkanProcTable invalid";
+    FML_LOG(ERROR) << "VulkanProcTable invalid";
     return false;
   }
 
   auto getProc = vk_->CreateSkiaGetProc();
 
   if (getProc == nullptr) {
-    FXL_LOG(ERROR) << "Failed to create skia getProc.";
+    FML_LOG(ERROR) << "Failed to create skia getProc.";
     return false;
   }
 
   uint32_t skia_features = 0;
   if (!logical_device_->GetPhysicalDeviceFeaturesSkia(&skia_features)) {
-    FXL_LOG(ERROR) << "Failed to get physical device features.";
+    FML_LOG(ERROR) << "Failed to get physical device features.";
 
     return false;
   }
 
   GrVkBackendContext backend_context;
   backend_context.fInstance = application_->GetInstance();
-  backend_context.fPhysicalDevice =
-      logical_device_->GetPhysicalDeviceHandle();
+  backend_context.fPhysicalDevice = logical_device_->GetPhysicalDeviceHandle();
   backend_context.fDevice = logical_device_->GetHandle();
   backend_context.fQueue = logical_device_->GetQueueHandle();
   backend_context.fGraphicsQueueIndex =
@@ -108,8 +106,8 @@ bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
   context_->setResourceCacheLimits(vulkan::kGrCacheMaxCount,
                                    vulkan::kGrCacheMaxByteSize);
 
-  surface_pool_ = std::make_unique<VulkanSurfacePool>(
-      *this, context_, scenic_session);
+  surface_pool_ =
+      std::make_unique<VulkanSurfacePool>(*this, context_, scenic_session);
 
   return true;
 }
@@ -127,7 +125,7 @@ void VulkanSurfaceProducer::OnSurfacesPresented(
   }
 
   if (!TransitionSurfacesToExternal(surfaces))
-    FXL_LOG(ERROR) << "TransitionSurfacesToExternal failed";
+    FML_LOG(ERROR) << "TransitionSurfacesToExternal failed";
 
   // Submit surface
   for (auto& surface : surfaces) {
@@ -197,13 +195,13 @@ bool VulkanSurfaceProducer::TransitionSurfacesToExternal(
 
 std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
 VulkanSurfaceProducer::ProduceSurface(const SkISize& size) {
-  FXL_DCHECK(valid_);
+  FML_DCHECK(valid_);
   return surface_pool_->AcquireSurface(size);
 }
 
 void VulkanSurfaceProducer::SubmitSurface(
     std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface> surface) {
-  FXL_DCHECK(valid_ && surface != nullptr);
+  FML_DCHECK(valid_ && surface != nullptr);
   surface_pool_->SubmitSurface(std::move(surface));
 }
 

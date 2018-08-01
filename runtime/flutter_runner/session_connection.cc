@@ -4,8 +4,8 @@
 
 #include "session_connection.h"
 
+#include "flutter/fml/make_copyable.h"
 #include "lib/fidl/cpp/optional.h"
-#include "lib/fxl/functional/make_copyable.h"
 #include "lib/ui/scenic/fidl_helpers.h"
 #include "vsync_recorder.h"
 #include "vsync_waiter.h"
@@ -41,7 +41,7 @@ SessionConnection::SessionConnection(
       vsync_event_handle_(vsync_event_handle) {
 #ifndef SCENIC_VIEWS2
   session_wrapper_.set_error_handler(
-      fxl::MakeCopyable(std::move(session_error_callback)));
+      fml::MakeCopyable(std::move(session_error_callback)));
   session_wrapper_.set_event_handler(std::bind(
       &SessionConnection::OnSessionEvents, this, std::placeholders::_1));
 #else
@@ -141,7 +141,7 @@ void SessionConnection::ToggleSignal(zx_handle_t handle, bool set) {
                                  set ? signal : 0   // set mask
   );
   if (status != ZX_OK) {
-    FXL_LOG(ERROR) << "Could not toggle vsync signal: " << set;
+    FML_LOG(ERROR) << "Could not toggle vsync signal: " << set;
   }
 }
 

@@ -5,11 +5,11 @@
 #pragma once
 
 #include "flutter/flow/scene_update_context.h"
+#include "flutter/fml/macros.h"
 #include "flutter/vulkan/vulkan_application.h"
 #include "flutter/vulkan/vulkan_device.h"
 #include "flutter/vulkan/vulkan_proc_table.h"
 #include "flutter/vulkan/vulkan_provider.h"
-#include "lib/fxl/macros.h"
 #include "lib/ui/scenic/cpp/resources.h"
 #include "lib/ui/scenic/cpp/session.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
@@ -57,7 +57,7 @@ class VulkanSurfaceProducer final
   // Note: the order here is very important. The proctable must be destroyed
   // last because it contains the function pointers for VkDestroyDevice and
   // VkDestroyInstance.
-  fxl::RefPtr<vulkan::VulkanProcTable> vk_;
+  fml::RefPtr<vulkan::VulkanProcTable> vk_;
   std::unique_ptr<vulkan::VulkanApplication> application_;
   std::unique_ptr<vulkan::VulkanDevice> logical_device_;
   sk_sp<GrContext> context_;
@@ -66,7 +66,7 @@ class VulkanSurfaceProducer final
 
   bool Initialize(scenic::Session* scenic_session);
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(VulkanSurfaceProducer);
+  FML_DISALLOW_COPY_AND_ASSIGN(VulkanSurfaceProducer);
 };
 
 }  // namespace flutter

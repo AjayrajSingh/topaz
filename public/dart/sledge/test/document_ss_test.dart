@@ -38,15 +38,15 @@ void main() async {
 
   test('Document test with framework', () async {
     final fleet = documentFleetFactory.newFleet(3)
-      ..runInTransaction(0, (dynamic doc) {
+      ..runInTransaction(0, (dynamic doc) async {
         doc.name.value = 'Alice';
         doc.length.value = 5;
       })
-      ..runInTransaction(1, (dynamic doc) {
+      ..runInTransaction(1, (dynamic doc) async {
         doc.name.value = 'Bob';
         doc.length.value = 3;
       })
-      ..runInTransaction(2, (dynamic doc) {
+      ..runInTransaction(2, (dynamic doc) async {
         doc.name.value = 'Carlos';
         doc.length.value = 6;
       })

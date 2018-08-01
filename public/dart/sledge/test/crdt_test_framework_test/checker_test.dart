@@ -32,10 +32,10 @@ class FalseChecker extends Checker<LastOneWinsValue<bool>> {
 void main() async {
   test('Checker passes.', () async {
     final fleet = boolLastOneWinsFleetFactory.newFleet(2)
-      ..runInTransaction(0, (LastOneWinsValue<bool> b) {
+      ..runInTransaction(0, (LastOneWinsValue<bool> b) async {
         b.value = false;
       })
-      ..runInTransaction(1, (LastOneWinsValue<bool> b) {
+      ..runInTransaction(1, (LastOneWinsValue<bool> b) async {
         b.value = false;
       })
       ..synchronize([0, 1])
@@ -45,7 +45,7 @@ void main() async {
 
   test('Checker fails.', () async {
     final fleet = boolLastOneWinsFleetFactory.newFleet(1)
-      ..runInTransaction(0, (LastOneWinsValue<bool> b) {
+      ..runInTransaction(0, (LastOneWinsValue<bool> b) async {
         b.value = true;
       })
       ..addChecker(() => new FalseChecker());

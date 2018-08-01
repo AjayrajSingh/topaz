@@ -11,11 +11,11 @@
 #include <memory>
 
 #include "flutter/flow/scene_update_context.h"
+#include "flutter/fml/macros.h"
 #include "flutter/vulkan/vulkan_command_buffer.h"
 #include "flutter/vulkan/vulkan_handle.h"
 #include "flutter/vulkan/vulkan_proc_table.h"
 #include "flutter/vulkan/vulkan_provider.h"
-#include "lib/fxl/macros.h"
 #include "lib/ui/scenic/cpp/resources.h"
 #include "third_party/skia/include/core/SkSurface.h"
 
@@ -25,8 +25,7 @@ class VulkanSurface final
     : public flow::SceneUpdateContext::SurfaceProducerSurface {
  public:
   VulkanSurface(vulkan::VulkanProvider& vulkan_provider,
-                sk_sp<GrContext> context,
-                scenic::Session* session,
+                sk_sp<GrContext> context, scenic::Session* session,
                 const SkISize& size);
 
   ~VulkanSurface() override;
@@ -73,25 +72,20 @@ class VulkanSurface final
   }
 
  private:
-  void OnHandleReady(async_dispatcher_t* dispatcher,
-                     async::WaitBase* wait,
-                     zx_status_t status,
-                     const zx_packet_signal_t* signal);
+  void OnHandleReady(async_dispatcher_t* dispatcher, async::WaitBase* wait,
+                     zx_status_t status, const zx_packet_signal_t* signal);
 
-  bool AllocateDeviceMemory(sk_sp<GrContext> context,
-                            const SkISize& size,
+  bool AllocateDeviceMemory(sk_sp<GrContext> context, const SkISize& size,
                             zx::vmo& exported_vmo);
 
-  bool SetupSkiaSurface(sk_sp<GrContext> context,
-                        const SkISize& size,
+  bool SetupSkiaSurface(sk_sp<GrContext> context, const SkISize& size,
                         SkColorType color_type,
                         const VkImageCreateInfo& image_create_info,
                         const VkMemoryRequirements& memory_reqs);
 
   bool CreateFences();
 
-  bool PushSessionImageSetupOps(scenic::Session* session,
-                                zx::vmo exported_vmo);
+  bool PushSessionImageSetupOps(scenic::Session* session, zx::vmo exported_vmo);
 
   void Reset();
 
@@ -114,7 +108,7 @@ class VulkanSurface final
   size_t age_ = 0;
   bool valid_ = false;
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(VulkanSurface);
+  FML_DISALLOW_COPY_AND_ASSIGN(VulkanSurface);
 };
 
 }  // namespace flutter

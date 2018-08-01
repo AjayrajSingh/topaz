@@ -18,8 +18,8 @@
 
 #include <zx/vmar.h>
 
+#include "flutter/fml/logging.h"
 #include "lib/fsl/vmo/sized_vmo.h"
-#include "lib/fxl/logging.h"
 #include "third_party/icu/source/common/unicode/uchar.h"
 #include "txt/typeface_font_asset_provider.h"
 
@@ -40,8 +40,8 @@ sk_sp<SkData> MakeSkDataFromBuffer(const fuchsia::mem::Buffer& data) {
   }
   uint64_t size = data.size;
   uintptr_t buffer = 0;
-  zx_status_t status = zx::vmar::root_self()->map(0, data.vmo, 0, size,
-                                                 ZX_VM_FLAG_PERM_READ, &buffer);
+  zx_status_t status = zx::vmar::root_self()->map(
+      0, data.vmo, 0, size, ZX_VM_FLAG_PERM_READ, &buffer);
   if (status != ZX_OK)
     return nullptr;
   return SkData::MakeWithProc(reinterpret_cast<void*>(buffer), size,
@@ -63,17 +63,17 @@ FuchsiaFontManager::FuchsiaFontManager(
 FuchsiaFontManager::~FuchsiaFontManager() = default;
 
 int FuchsiaFontManager::onCountFamilies() const {
-  FXL_DCHECK(false);
+  FML_DCHECK(false);
   return 0;
 }
 
 void FuchsiaFontManager::onGetFamilyName(int index,
                                          SkString* familyName) const {
-  FXL_DCHECK(false);
+  FML_DCHECK(false);
 }
 
 SkFontStyleSet* FuchsiaFontManager::onCreateStyleSet(int index) const {
-  FXL_DCHECK(false);
+  FML_DCHECK(false);
   return nullptr;
 }
 
@@ -100,7 +100,7 @@ SkTypeface* FuchsiaFontManager::onMatchFamilyStyle(
 
   fuchsia::fonts::FontResponsePtr response;
   if (font_provider_->GetFont(std::move(request), &response) != ZX_OK) {
-    FXL_DLOG(ERROR) << "Unable to contact the font provider. Did you run "
+    FML_DLOG(ERROR) << "Unable to contact the font provider. Did you run "
                        "Flutter in an environment that has a font manager?";
     return nullptr;
   }
@@ -131,37 +131,37 @@ SkTypeface* FuchsiaFontManager::onMatchFamilyStyleCharacter(
 
 SkTypeface* FuchsiaFontManager::onMatchFaceStyle(const SkTypeface*,
                                                  const SkFontStyle&) const {
-  FXL_DCHECK(false);
+  FML_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromData(sk_sp<SkData>,
                                                      int ttcIndex) const {
-  FXL_DCHECK(false);
+  FML_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromStreamIndex(
     std::unique_ptr<SkStreamAsset>, int ttcIndex) const {
-  FXL_DCHECK(false);
+  FML_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromStreamArgs(
     std::unique_ptr<SkStreamAsset>, const SkFontArguments&) const {
-  FXL_DCHECK(false);
+  FML_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromFile(const char path[],
                                                      int ttcIndex) const {
-  FXL_DCHECK(false);
+  FML_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onLegacyMakeTypeface(
     const char familyName[], SkFontStyle) const {
-  FXL_DCHECK(false);
+  FML_DCHECK(false);
   return nullptr;
 }
 

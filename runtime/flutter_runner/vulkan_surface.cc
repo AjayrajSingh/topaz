@@ -14,27 +14,24 @@
 namespace flutter {
 
 VulkanSurface::VulkanSurface(vulkan::VulkanProvider& vulkan_provider,
-                             sk_sp<GrContext> context,
-                             scenic::Session* session,
+                             sk_sp<GrContext> context, scenic::Session* session,
                              const SkISize& size)
-    : vulkan_provider_(vulkan_provider),
-      session_(session),
-      wait_(this) {
-  FXL_DCHECK(session_);
+    : vulkan_provider_(vulkan_provider), session_(session), wait_(this) {
+  FML_DCHECK(session_);
 
   zx::vmo exported_vmo;
   if (!AllocateDeviceMemory(std::move(context), size, exported_vmo)) {
-    FXL_DLOG(INFO) << "Could not allocate device memory.";
+    FML_DLOG(INFO) << "Could not allocate device memory.";
     return;
   }
 
   if (!CreateFences()) {
-    FXL_DLOG(INFO) << "Could not create signal fences.";
+    FML_DLOG(INFO) << "Could not create signal fences.";
     return;
   }
 
   if (!PushSessionImageSetupOps(session, std::move(exported_vmo))) {
-    FXL_DLOG(INFO) << "Could not push session image setup ops.";
+    FML_DLOG(INFO) << "Could not push session image setup ops.";
     return;
   }
 
@@ -50,9 +47,7 @@ VulkanSurface::~VulkanSurface() {
   wait_.set_object(ZX_HANDLE_INVALID);
 }
 
-bool VulkanSurface::IsValid() const {
-  return valid_;
-}
+bool VulkanSurface::IsValid() const { return valid_; }
 
 SkISize VulkanSurface::GetSize() const {
   if (!valid_) {
@@ -70,7 +65,7 @@ vulkan::VulkanHandle<VkSemaphore> VulkanSurface::SemaphoreFromEvent(
   zx::event semaphore_event;
   zx_status_t status = event.duplicate(ZX_RIGHT_SAME_RIGHTS, &semaphore_event);
   if (status != ZX_OK) {
-    FXL_DLOG(ERROR) << "failed to duplicate semaphore event";
+    FML_DLOG(ERROR) << "failed to duplicate semaphore event";
     return vulkan::VulkanHandle<VkSemaphore>();
   }
 
@@ -114,7 +109,7 @@ bool VulkanSurface::CreateFences() {
 
   acquire_semaphore_ = SemaphoreFromEvent(acquire_event_);
   if (!acquire_semaphore_) {
-    FXL_DLOG(ERROR) << "failed to create acquire semaphore";
+    FML_DLOG(ERROR) << "failed to create acquire semaphore";
     return false;
   }
 
@@ -293,7 +288,7 @@ bool VulkanSurface::PushSessionImageSetupOps(scenic::Session* session,
   }
 
   scenic::Memory memory(session, std::move(exported_vmo),
-                            fuchsia::images::MemoryType::VK_DEVICE_MEMORY);
+                        fuchsia::images::MemoryType::VK_DEVICE_MEMORY);
 
   fuchsia::images::ImageInfo image_info;
   image_info.width = sk_surface_->width();
@@ -341,7 +336,7 @@ bool VulkanSurface::FlushSessionAcquireAndReleaseEvents() {
 
 void VulkanSurface::SignalWritesFinished(
     std::function<void(void)> on_writes_committed) {
-  FXL_DCHECK(on_writes_committed);
+  FML_DCHECK(on_writes_committed);
 
   if (!valid_) {
     on_writes_committed();
@@ -359,7 +354,7 @@ void VulkanSurface::Reset() {
   if (acquire_event_.signal(ZX_EVENT_SIGNALED, 0u) != ZX_OK ||
       release_event_.signal(ZX_EVENT_SIGNALED, 0u) != ZX_OK) {
     valid_ = false;
-    FXL_DLOG(ERROR)
+    FML_DLOG(ERROR)
         << "Could not reset fences. The surface is no longer valid.";
   }
 
@@ -379,7 +374,7 @@ void VulkanSurface::Reset() {
   acquire_semaphore_.Reset();
   acquire_semaphore_ = SemaphoreFromEvent(acquire_event_);
   if (!acquire_semaphore_) {
-    FXL_DLOG(ERROR) << "failed to create acquire semaphore";
+    FML_DLOG(ERROR) << "failed to create acquire semaphore";
   }
 
   wait_.Begin(async_get_default_dispatcher());
@@ -393,12 +388,11 @@ void VulkanSurface::Reset() {
 }
 
 void VulkanSurface::OnHandleReady(async_dispatcher_t* dispatcher,
-                                  async::WaitBase* wait,
-                                  zx_status_t status,
+                                  async::WaitBase* wait, zx_status_t status,
                                   const zx_packet_signal_t* signal) {
   if (status != ZX_OK)
     return;
-  FXL_DCHECK(signal->observed & ZX_EVENT_SIGNALED);
+  FML_DCHECK(signal->observed & ZX_EVENT_SIGNALED);
   Reset();
 }
 

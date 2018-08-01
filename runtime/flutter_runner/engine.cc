@@ -7,12 +7,13 @@
 #include <sstream>
 
 #include "flutter/common/task_runners.h"
+#include "flutter/fml/make_copyable.h"
 #include "flutter/fml/task_runner.h"
 #include "flutter/shell/common/rasterizer.h"
 #include "flutter/shell/common/run_configuration.h"
 #include "fuchsia_font_manager.h"
-#include "lib/fxl/functional/make_copyable.h"
 #include "platform_view.h"
+#include "task_runner_adapter.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/lib/deprecated_loop/waitable_event.h"
 
@@ -20,7 +21,7 @@ namespace flutter {
 
 static void UpdateNativeThreadLabelNames(const std::string& label,
                                          const blink::TaskRunners& runners) {
-  auto set_thread_name = [](fxl::RefPtr<fxl::TaskRunner> runner,
+  auto set_thread_name = [](fml::RefPtr<fml::TaskRunner> runner,
                             std::string prefix, std::string suffix) {
     if (!runner) {
       return;
@@ -39,8 +40,8 @@ static void UpdateNativeThreadLabelNames(const std::string& label,
 Engine::Engine(
     Delegate& delegate, std::string thread_label,
     component::StartupContext& startup_context, blink::Settings settings,
-    fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
-    fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
+    fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
+    fml::RefPtr<blink::DartSnapshot> shared_snapshot,
     fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
     UniqueFDIONS fdio_ns,
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
@@ -49,8 +50,8 @@ Engine::Engine(
 Engine::Engine(Delegate& delegate, std::string thread_label,
                component::StartupContext& startup_context,
                blink::Settings settings,
-               fxl::RefPtr<blink::DartSnapshot> isolate_snapshot,
-               fxl::RefPtr<blink::DartSnapshot> shared_snapshot,
+               fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
+               fml::RefPtr<blink::DartSnapshot> shared_snapshot,
                zx::eventpair view_token, UniqueFDIONS fdio_ns,
                fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
                    outgoing_services_request)
@@ -60,7 +61,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
       settings_(std::move(settings)),
       weak_factory_(this) {
   if (zx::event::create(0, &vsync_event_) != ZX_OK) {
-    FXL_DLOG(ERROR) << "Could not create the vsync event.";
+    FML_DLOG(ERROR) << "Could not create the vsync event.";
     return;
   }
 
@@ -76,7 +77,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 
   zx::eventpair import_token, export_token;
   if (zx::eventpair::create(0u, &import_token, &export_token) != ZX_OK) {
-    FXL_DLOG(ERROR) << "Could not create event pair.";
+    FML_DLOG(ERROR) << "Could not create event pair.";
     return;
   }
 
@@ -162,7 +163,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 
   // Setup the callback that will instantiate the platform view.
   shell::Shell::CreateCallback<shell::PlatformView> on_create_platform_view =
-      fxl::MakeCopyable([debug_label = thread_label_,
+      fml::MakeCopyable([debug_label = thread_label_,
                          parent_environment_service_provider =
                              std::move(parent_environment_service_provider),  //
 #ifndef SCENIC_VIEWS2
@@ -204,7 +205,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 #ifndef SCENIC_VIEWS2
   // Setup the callback that will instantiate the rasterizer.
   shell::Shell::CreateCallback<shell::Rasterizer> on_create_rasterizer =
-      fxl::MakeCopyable([compositor_context = std::move(compositor_context)](
+      fml::MakeCopyable([compositor_context = std::move(compositor_context)](
                             shell::Shell& shell) mutable {
         return std::make_unique<shell::Rasterizer>(
             shell.GetTaskRunners(),        // task runners
@@ -214,7 +215,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 #else
   // Setup the callback that will instantiate the rasterizer.
   shell::Shell::CreateCallback<shell::Rasterizer> on_create_rasterizer =
-      fxl::MakeCopyable(
+      fml::MakeCopyable(
           [scenic = std::move(scenic), session = std::move(session), this,
            view_token = std::move(view_token),
            on_session_error_callback = std::move(on_session_error_callback),
@@ -244,10 +245,11 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   // used as the "platform" thread.
   blink::TaskRunners task_runners(
       thread_label_,  // Dart thread labels
-      deprecated_loop::MessageLoop::GetCurrent()->task_runner(),  // platform
-      host_threads_[0].TaskRunner(),                              // gpu
-      host_threads_[1].TaskRunner(),                              // ui
-      host_threads_[2].TaskRunner()                               // io
+      CreateFMLTaskRunner(deprecated_loop::MessageLoop::GetCurrent()
+                              ->task_runner()),            // platform
+      CreateFMLTaskRunner(host_threads_[0].TaskRunner()),  // gpu
+      CreateFMLTaskRunner(host_threads_[1].TaskRunner()),  // ui
+      CreateFMLTaskRunner(host_threads_[2].TaskRunner())   // io
   );
 
   UpdateNativeThreadLabelNames(thread_label_, task_runners);
@@ -287,7 +289,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   );
 
   if (!shell_) {
-    FXL_LOG(ERROR) << "Could not launch the shell with settings: "
+    FML_LOG(ERROR) << "Could not launch the shell with settings: "
                    << settings_.ToString();
     return;
   }
@@ -338,7 +340,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   startup_context.ConnectToEnvironmentService(sync_font_provider.NewRequest());
 
   shell_->GetTaskRunners().GetUITaskRunner()->PostTask(
-      fxl::MakeCopyable([engine = shell_->GetEngine(),                        //
+      fml::MakeCopyable([engine = shell_->GetEngine(),                        //
                          run_configuration = std::move(run_configuration),    //
                          sync_font_provider = std::move(sync_font_provider),  //
                          on_run_failure                                       //
@@ -386,15 +388,15 @@ std::pair<bool, uint32_t> Engine::GetEngineReturnCode() const {
 void Engine::OnMainIsolateStart() {
   if (!isolate_configurator_ ||
       !isolate_configurator_->ConfigureCurrentIsolate(this)) {
-    FXL_LOG(ERROR) << "Could not configure some native embedder bindings for a "
+    FML_LOG(ERROR) << "Could not configure some native embedder bindings for a "
                       "new root isolate.";
   }
-  FXL_DLOG(INFO) << "Main isolate for engine '" << thread_label_
+  FML_DLOG(INFO) << "Main isolate for engine '" << thread_label_
                  << "' was started.";
 }
 
 void Engine::OnMainIsolateShutdown() {
-  FXL_DLOG(INFO) << "Main isolate for engine '" << thread_label_
+  FML_DLOG(INFO) << "Main isolate for engine '" << thread_label_
                  << "' shutting down.";
   Terminate();
 }
@@ -445,7 +447,7 @@ void Engine::OfferServiceProvider(
   }
 
   shell_->GetTaskRunners().GetPlatformTaskRunner()->PostTask(
-      fxl::MakeCopyable([platform_view = shell_->GetPlatformView(),       //
+      fml::MakeCopyable([platform_view = shell_->GetPlatformView(),       //
                          service_provider = std::move(service_provider),  //
                          services = std::move(services)                   //
   ]() mutable {

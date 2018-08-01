@@ -18,10 +18,10 @@
 #include <lib/fit/function.h>
 
 #include "context_writer_bridge.h"
+#include "flutter/fml/macros.h"
 #include "flutter/lib/ui/window/viewport_metrics.h"
 #include "flutter/shell/common/platform_view.h"
 #include "lib/fidl/cpp/binding.h"
-#include "lib/fxl/macros.h"
 #include "semantics_bridge.h"
 #include "surface.h"
 
@@ -124,7 +124,7 @@ class PlatformView final : public shell::PlatformView,
   std::map<
       std::string /* channel */,
       fit::function<void(
-          fxl::RefPtr<blink::PlatformMessage> /* message */)> /* handler */>
+          fml::RefPtr<blink::PlatformMessage> /* message */)> /* handler */>
       platform_message_handlers_;
   zx_handle_t vsync_event_handle_ = 0;
 
@@ -183,7 +183,7 @@ class PlatformView final : public shell::PlatformView,
 
   // |shell::PlatformView|
   void HandlePlatformMessage(
-      fxl::RefPtr<blink::PlatformMessage> message) override;
+      fml::RefPtr<blink::PlatformMessage> message) override;
 
   // |shell::PlatformView|
   void UpdateSemantics(
@@ -194,17 +194,17 @@ class PlatformView final : public shell::PlatformView,
   // being used, but it is necessary to handle accessibility messages
   // that are sent by Flutter when semantics is enabled.
   void HandleAccessibilityChannelPlatformMessage(
-      fxl::RefPtr<blink::PlatformMessage> message);
+      fml::RefPtr<blink::PlatformMessage> message);
 
   // Channel handler for kFlutterPlatformChannel
   void HandleFlutterPlatformChannelPlatformMessage(
-      fxl::RefPtr<blink::PlatformMessage> message);
+      fml::RefPtr<blink::PlatformMessage> message);
 
   // Channel handler for kTextInputChannel
   void HandleFlutterTextInputChannelPlatformMessage(
-      fxl::RefPtr<blink::PlatformMessage> message);
+      fml::RefPtr<blink::PlatformMessage> message);
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(PlatformView);
+  FML_DISALLOW_COPY_AND_ASSIGN(PlatformView);
 };
 
 }  // namespace flutter

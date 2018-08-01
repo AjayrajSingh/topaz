@@ -87,7 +87,7 @@ Future randomRelativeOrderTest(
 
     for (int epoch = 0; epoch < countEpochs; epoch++) {
       for (int instance = 0; instance < countInstances; instance++) {
-        fleet.runInTransaction(instance, (OrderedListValue<int> l) {
+        fleet.runInTransaction(instance, (OrderedListValue<int> l) async {
           for (int it = 0; it < countInsertions; it++) {
             int pos = random.nextInt(l.length + 1);
             insertIntWithCheck(l, pos, incValue++);
@@ -104,14 +104,14 @@ Future randomRelativeOrderTest(
 void main() async {
   test('OrderedList with framework', () async {
     final fleet = integerOrderedListFleetFactory.newFleet(2)
-      ..runInTransaction(0, (OrderedListValue<int> l0) {
+      ..runInTransaction(0, (OrderedListValue<int> l0) async {
         l0.insert(0, 1);
       })
-      ..runInTransaction(1, (OrderedListValue<int> l1) {
+      ..runInTransaction(1, (OrderedListValue<int> l1) async {
         l1.insert(0, 2);
       })
       ..synchronize([0, 1])
-      ..runInTransaction(0, (OrderedListValue<int> l0) {
+      ..runInTransaction(0, (OrderedListValue<int> l0) async {
         expect(l0.toList(), anyOf(equals([1, 2]), equals([2, 1])));
       });
     await fleet.testAllOrders();
@@ -119,13 +119,13 @@ void main() async {
 
   test('OrderedList with framework. Check relative order.', () async {
     final fleet = integerOrderedListFleetFactory.newFleet(3)
-      ..runInTransaction(0, (OrderedListValue<int> l0) {
+      ..runInTransaction(0, (OrderedListValue<int> l0) async {
         l0..insert(0, 1)..insert(1, 2);
       })
-      ..runInTransaction(1, (OrderedListValue<int> l1) {
+      ..runInTransaction(1, (OrderedListValue<int> l1) async {
         l1..insert(0, 3)..insert(1, 4);
       })
-      ..runInTransaction(2, (OrderedListValue<int> l2) {
+      ..runInTransaction(2, (OrderedListValue<int> l2) async {
         l2..insert(0, 5)..insert(1, 6);
       })
       ..synchronize([0, 1, 2])

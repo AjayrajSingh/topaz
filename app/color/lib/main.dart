@@ -78,7 +78,7 @@ void handleStart(ModuleDriver module) {
   final Random rand = new Random();
 
   /// Change the [entity]'s value to a random color periodically.
-  new Timer.periodic(_kUpdateDuration, (_) async {
+  new Timer.periodic(_kUpdateDuration, (_) {
     ColorEntityData value = new ColorEntityData(
         value: new Color.fromRGBO(
                 rand.nextInt(255), // red
@@ -87,7 +87,7 @@ void handleStart(ModuleDriver module) {
                 1.0)
             .value);
 
-    return module.put('color', value, _kColorCodec).then(
+    module.put('color', value, _kColorCodec).then(
         (String ref) => log.fine('updated entity: $ref'),
         onError: handleError);
   });

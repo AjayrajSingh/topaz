@@ -14,8 +14,8 @@ std::mutex g_mutex;
 
 // Since we don't have any presentation info until we call |Present| for the
 // first time, assume a 60hz refresh rate in the meantime.
-constexpr fxl::TimeDelta kDefaultPresentationInterval =
-    fxl::TimeDelta::FromSecondsF(1.0 / 60.0);
+constexpr fml::TimeDelta kDefaultPresentationInterval =
+    fml::TimeDelta::FromSecondsF(1.0 / 60.0);
 
 }  // namespace
 
@@ -28,13 +28,13 @@ VsyncInfo VsyncRecorder::GetCurrentVsyncInfo() const {
   {
     std::unique_lock<std::mutex> lock(g_mutex);
     if (last_presentation_info_set_) {
-      return {fxl::TimePoint::FromEpochDelta(fxl::TimeDelta::FromNanoseconds(
+      return {fml::TimePoint::FromEpochDelta(fml::TimeDelta::FromNanoseconds(
                   last_presentation_info_.presentation_time)),
-              fxl::TimeDelta::FromNanoseconds(
+              fml::TimeDelta::FromNanoseconds(
                   last_presentation_info_.presentation_interval)};
     }
   }
-  return {fxl::TimePoint::Now(), kDefaultPresentationInterval};
+  return {fml::TimePoint::Now(), kDefaultPresentationInterval};
 }
 
 void VsyncRecorder::UpdateVsyncInfo(

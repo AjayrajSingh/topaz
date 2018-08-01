@@ -26,7 +26,7 @@ void main() {
     Sledge sledge = newSledgeForTesting();
     List<int> events = <int>[];
     // ignore: unawaited_futures
-    sledge.runInTransaction(() {
+    sledge.runInTransaction(() async {
       events.add(0);
     });
     expect(events, equals(<int>[]));

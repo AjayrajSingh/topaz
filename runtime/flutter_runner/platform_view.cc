@@ -30,7 +30,7 @@ template <class T>
 void SetInterfaceErrorHandler(fidl::InterfacePtr<T>& interface,
                               std::string name) {
   interface.set_error_handler(
-      [name]() { FXL_LOG(ERROR) << "Interface error on: " << name; });
+      [name]() { FML_LOG(ERROR) << "Interface error on: " << name; });
 }
 
 PlatformView::PlatformView(
@@ -75,7 +75,7 @@ PlatformView::PlatformView(
   SetInterfaceErrorHandler(view_, "View");
 #else
   session_listener_binding_.set_error_handler(
-      []() { FXL_LOG(ERROR) << "Interface error on: Session Listener"; });
+      []() { FML_LOG(ERROR) << "Interface error on: Session Listener"; });
 #endif
   SetInterfaceErrorHandler(input_connection_, "Input Connection");
   SetInterfaceErrorHandler(ime_, "Input Method Editor");
@@ -284,7 +284,7 @@ void PlatformView::DidUpdateState(
   document.Accept(writer);
 
   const uint8_t* data = reinterpret_cast<const uint8_t*>(buffer.GetString());
-  DispatchPlatformMessage(fxl::MakeRefCounted<blink::PlatformMessage>(
+  DispatchPlatformMessage(fml::MakeRefCounted<blink::PlatformMessage>(
       kTextInputChannel,                                    // channel
       std::vector<uint8_t>(data, data + buffer.GetSize()),  // message
       nullptr)                                              // response
@@ -312,7 +312,7 @@ void PlatformView::OnAction(fuchsia::ui::input::InputMethodAction action) {
   document.Accept(writer);
 
   const uint8_t* data = reinterpret_cast<const uint8_t*>(buffer.GetString());
-  DispatchPlatformMessage(fxl::MakeRefCounted<blink::PlatformMessage>(
+  DispatchPlatformMessage(fml::MakeRefCounted<blink::PlatformMessage>(
       kTextInputChannel,                                    // channel
       std::vector<uint8_t>(data, data + buffer.GetSize()),  // message
       nullptr)                                              // response
@@ -342,7 +342,7 @@ void PlatformView::OnEvent(fuchsia::ui::input::InputEvent event,
 
 #ifdef SCENIC_VIEWS2
 void PlatformView::OnError(fidl::StringPtr error) {
-  FXL_LOG(ERROR) << "Session error: " << error;
+  FML_LOG(ERROR) << "Session error: " << error;
   session_listener_error_callback_();
 }
 
@@ -365,13 +365,13 @@ void PlatformView::OnEvent(fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
             break;
           }
           default: {
-            FXL_LOG(WARNING)
+            FML_LOG(WARNING)
                 << "Flutter PlatformView::OnEvent: unhandled Scenic Gfx event.";
           }
         }
         break;
       default: {
-        FXL_LOG(WARNING)
+        FML_LOG(WARNING)
             << "Flutter PlatformView::OnEvent: unhandled Scenic event.";
       }
     }
@@ -440,17 +440,17 @@ bool PlatformView::OnHandlePointerEvent(
       break;
     case blink::PointerData::Change::kAdd:
       if (down_pointers_.count(pointer_data.device) != 0) {
-        FXL_DLOG(ERROR) << "Received add event for down pointer.";
+        FML_DLOG(ERROR) << "Received add event for down pointer.";
       }
       break;
     case blink::PointerData::Change::kRemove:
       if (down_pointers_.count(pointer_data.device) != 0) {
-        FXL_DLOG(ERROR) << "Received remove event for down pointer.";
+        FML_DLOG(ERROR) << "Received remove event for down pointer.";
       }
       break;
     case blink::PointerData::Change::kHover:
       if (down_pointers_.count(pointer_data.device) != 0) {
-        FXL_DLOG(ERROR) << "Received hover event for down pointer.";
+        FML_DLOG(ERROR) << "Received hover event for down pointer.";
       }
       break;
   }
@@ -474,7 +474,7 @@ bool PlatformView::OnHandleKeyboardEvent(
   }
 
   if (type == nullptr) {
-    FXL_DLOG(ERROR) << "Unknown key event phase.";
+    FML_DLOG(ERROR) << "Unknown key event phase.";
     return false;
   }
 
@@ -491,7 +491,7 @@ bool PlatformView::OnHandleKeyboardEvent(
   document.Accept(writer);
 
   const uint8_t* data = reinterpret_cast<const uint8_t*>(buffer.GetString());
-  DispatchPlatformMessage(fxl::MakeRefCounted<blink::PlatformMessage>(
+  DispatchPlatformMessage(fml::MakeRefCounted<blink::PlatformMessage>(
       kKeyEventChannel,                                     // channel
       std::vector<uint8_t>(data, data + buffer.GetSize()),  // data
       nullptr)                                              // response
@@ -532,13 +532,13 @@ std::unique_ptr<shell::Surface> PlatformView::CreateRenderingSurface() {
 
 // |shell::PlatformView|
 void PlatformView::HandlePlatformMessage(
-    fxl::RefPtr<blink::PlatformMessage> message) {
+    fml::RefPtr<blink::PlatformMessage> message) {
   if (!message) {
     return;
   }
   auto found = platform_message_handlers_.find(message->channel());
   if (found == platform_message_handlers_.end()) {
-    FXL_DLOG(ERROR)
+    FML_DLOG(ERROR)
         << "Platform view received message on channel '" << message->channel()
         << "' with no registed handler. And empty response will be generated. "
            "Please implement the native message handler.";
@@ -558,14 +558,14 @@ void PlatformView::UpdateSemantics(
 
 // Channel handler for kAccessibilityChannel
 void PlatformView::HandleAccessibilityChannelPlatformMessage(
-    fxl::RefPtr<blink::PlatformMessage> message) {
-  FXL_DCHECK(message->channel() == kAccessibilityChannel);
+    fml::RefPtr<blink::PlatformMessage> message) {
+  FML_DCHECK(message->channel() == kAccessibilityChannel);
 }
 
 // Channel handler for kFlutterPlatformChannel
 void PlatformView::HandleFlutterPlatformChannelPlatformMessage(
-    fxl::RefPtr<blink::PlatformMessage> message) {
-  FXL_DCHECK(message->channel() == kFlutterPlatformChannel);
+    fml::RefPtr<blink::PlatformMessage> message) {
+  FML_DCHECK(message->channel() == kFlutterPlatformChannel);
   const auto& data = message->data();
   rapidjson::Document document;
   document.Parse(reinterpret_cast<const char*>(data.data()), data.size());
@@ -579,7 +579,7 @@ void PlatformView::HandleFlutterPlatformChannelPlatformMessage(
     return;
   }
 
-  fxl::RefPtr<blink::PlatformMessageResponse> response = message->response();
+  fml::RefPtr<blink::PlatformMessageResponse> response = message->response();
   if (method->value == "Clipboard.setData") {
     auto text = root["args"]["text"].GetString();
     clipboard_->Push(text);
@@ -605,8 +605,8 @@ void PlatformView::HandleFlutterPlatformChannelPlatformMessage(
 
 // Channel handler for kTextInputChannel
 void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
-    fxl::RefPtr<blink::PlatformMessage> message) {
-  FXL_DCHECK(message->channel() == kTextInputChannel);
+    fml::RefPtr<blink::PlatformMessage> message) {
+  FML_DCHECK(message->channel() == kTextInputChannel);
   const auto& data = message->data();
   rapidjson::Document document;
   document.Parse(reinterpret_cast<const char*>(data.data()), data.size());
@@ -697,7 +697,7 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
       ime_client_.Unbind();
     ime_ = nullptr;
   } else {
-    FXL_DLOG(ERROR) << "Unknown " << message->channel() << " method "
+    FML_DLOG(ERROR) << "Unknown " << message->channel() << " method "
                     << method->value.GetString();
   }
 }

@@ -19,7 +19,7 @@
 
 #include <fuchsia/fonts/cpp/fidl.h>
 #include <memory>
-#include "lib/fxl/macros.h"
+#include "flutter/fml/macros.h"
 #include "third_party/skia/include/core/SkFontMgr.h"
 #include "third_party/skia/include/core/SkStream.h"
 #include "third_party/skia/include/core/SkTypeface.h"
@@ -77,7 +77,7 @@ class FuchsiaFontManager final : public SkFontMgr {
   sk_sp<SkTypeface> onLegacyMakeTypeface(const char familyName[],
                                          SkFontStyle) const override;
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(FuchsiaFontManager);
+  FML_DISALLOW_COPY_AND_ASSIGN(FuchsiaFontManager);
 
  private:
   mutable fuchsia::fonts::FontProviderSyncPtr font_provider_;

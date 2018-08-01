@@ -80,6 +80,8 @@ template("flutter_runner") {
       "surface.h",
       "task_observers.cc",
       "task_observers.h",
+      "task_runner_adapter.cc",
+      "task_runner_adapter.h",
       "unique_fdio_ns.h",
       "vsync_recorder.cc",
       "vsync_recorder.h",
@@ -100,7 +102,6 @@ template("flutter_runner") {
       "$flutter_root/assets",
       "$flutter_root/common",
       "$flutter_root/flow",
-      "$flutter_root/glue",
       "$flutter_root/lib/ui",
       "$flutter_root/runtime",
       "$flutter_root/third_party/txt",
@@ -223,12 +224,10 @@ package("flutter_aot_runner") {
     },
   ]
 
-  meta = [
-    {
-      path = rebase_path("meta/flutter_aot_runner.cmx")
-      dest = "flutter_aot_runner.cmx"
-    },
-  ]
+  meta = [ {
+        path = rebase_path("meta/flutter_aot_runner.cmx")
+        dest = "flutter_aot_runner.cmx"
+      } ]
 }
 
 package("flutter_aot_product_runner") {
@@ -238,19 +237,15 @@ package("flutter_aot_product_runner") {
 
   binary = "flutter_aot_product_runner"
 
-  resources = [
-    {
-      path = rebase_path("//third_party/icu/common/icudtl.dat")
-      dest = "icudtl.dat"
-    },
-  ]
+  resources = [ {
+        path = rebase_path("//third_party/icu/common/icudtl.dat")
+        dest = "icudtl.dat"
+      } ]
 
-  meta = [
-    {
-      path = rebase_path("meta/flutter_aot_product_runner.cmx")
-      dest = "flutter_aot_product_runner.cmx"
-    },
-  ]
+  meta = [ {
+        path = rebase_path("meta/flutter_aot_product_runner.cmx")
+        dest = "flutter_aot_product_runner.cmx"
+      } ]
 }
 
 package("flutter_jit_runner") {
@@ -288,19 +283,15 @@ package("flutter_jit_runner") {
     },
   ]
 
-  resources += [
-    {
-      path = rebase_path(observatory_archive_file)
-      dest = "observatory.tar"
-    },
-  ]
+  resources += [ {
+        path = rebase_path(observatory_archive_file)
+        dest = "observatory.tar"
+      } ]
 
-  meta = [
-    {
-      path = rebase_path("meta/flutter_jit_runner.cmx")
-      dest = "flutter_jit_runner.cmx"
-    },
-  ]
+  meta = [ {
+        path = rebase_path("meta/flutter_jit_runner.cmx")
+        dest = "flutter_jit_runner.cmx"
+      } ]
 }
 
 package("flutter_jit_product_runner") {
@@ -340,10 +331,8 @@ package("flutter_jit_product_runner") {
     },
   ]
 
-  meta = [
-    {
-      path = rebase_path("meta/flutter_jit_product_runner.cmx")
-      dest = "flutter_jit_product_runner.cmx"
-    },
-  ]
+  meta = [ {
+        path = rebase_path("meta/flutter_jit_product_runner.cmx")
+        dest = "flutter_jit_product_runner.cmx"
+      } ]
 }

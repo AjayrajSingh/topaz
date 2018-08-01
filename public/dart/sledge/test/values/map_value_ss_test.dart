@@ -25,18 +25,18 @@ const MapFleetFactory<int, int> intMapFleetFactory =
 void main() async {
   test('Test with framework', () async {
     final fleet = intMapFleetFactory.newFleet(2)
-      ..runInTransaction(0, (MapValue<int, int> m0) {
+      ..runInTransaction(0, (MapValue<int, int> m0) async {
         m0[1] = 2;
       })
-      ..runInTransaction(1, (MapValue<int, int> m1) {
+      ..runInTransaction(1, (MapValue<int, int> m1) async {
         m1[1] = 4;
         m1[2] = 2;
       })
-      ..runInTransaction(0, (MapValue<int, int> m0) {
+      ..runInTransaction(0, (MapValue<int, int> m0) async {
         m0[2] = 4;
       })
       ..synchronize([0, 1])
-      ..runInTransaction(0, (MapValue<int, int> m0) {
+      ..runInTransaction(0, (MapValue<int, int> m0) async {
         expect(m0[1], equals(4));
         expect(m0[2], equals(4));
       });

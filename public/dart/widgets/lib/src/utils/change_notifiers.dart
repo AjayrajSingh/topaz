@@ -86,23 +86,20 @@ class ChangeNotifierList<E> extends DelegatingList<E> with ChangeNotifier {
 
   @override
   void removeRange(int start, int end) {
-    final returnValue = super.removeRange(start, end);
+    super.removeRange(start, end);
     notifyListeners();
-    return returnValue;
   }
 
   @override
   void removeWhere(bool test(E element)) {
-    final returnValue = super.removeWhere(test);
+    super.removeWhere(test);
     notifyListeners();
-    return returnValue;
   }
 
   @override
   void replaceRange(int start, int end, Iterable<E> iterable) {
-    final returnValue = super.replaceRange(start, end, iterable);
+    super.replaceRange(start, end, iterable);
     notifyListeners();
-    return returnValue;
   }
 
   @override

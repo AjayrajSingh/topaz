@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <zircon/device/vfs.h>
 
-#include "lib/fxl/files/unique_fd.h"
+#include "flutter/fml/unique_fd.h"
 
 namespace flutter {
 
@@ -19,9 +19,7 @@ Surface::Surface(std::string debug_label)
 Surface::~Surface() = default;
 
 // |shell::Surface|
-bool Surface::IsValid() {
-  return valid_;
-}
+bool Surface::IsValid() { return valid_; }
 
 // |shell::Surface|
 std::unique_ptr<shell::SurfaceFrame> Surface::AcquireFrame(
@@ -33,13 +31,9 @@ std::unique_ptr<shell::SurfaceFrame> Surface::AcquireFrame(
 }
 
 // |shell::Surface|
-GrContext* Surface::GetContext() {
-  return nullptr;
-}
+GrContext* Surface::GetContext() { return nullptr; }
 
-static zx_status_t DriverWatcher(int dirfd,
-                                 int event,
-                                 const char* fn,
+static zx_status_t DriverWatcher(int dirfd, int event, const char* fn,
                                  void* cookie) {
   if (event == WATCH_EVENT_ADD_FILE && !strcmp(fn, "000")) {
     return ZX_ERR_STOP;
@@ -49,9 +43,9 @@ static zx_status_t DriverWatcher(int dirfd,
 
 bool Surface::CanConnectToDisplay() {
   constexpr char kGpuDriverClass[] = "/dev/class/gpu";
-  fxl::UniqueFD fd(open(kGpuDriverClass, O_DIRECTORY | O_RDONLY));
+  fml::UniqueFD fd(open(kGpuDriverClass, O_DIRECTORY | O_RDONLY));
   if (fd.get() < 0) {
-    FXL_DLOG(ERROR) << "Failed to open " << kGpuDriverClass;
+    FML_DLOG(ERROR) << "Failed to open " << kGpuDriverClass;
     return false;
   }
 

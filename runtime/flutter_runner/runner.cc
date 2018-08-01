@@ -9,9 +9,9 @@
 #include <sstream>
 #include <utility>
 
+#include "flutter/fml/make_copyable.h"
 #include "flutter/lib/ui/text/font_collection.h"
 #include "fuchsia_font_manager.h"
-#include "lib/fxl/functional/make_copyable.h"
 #include "lib/icu_data/cpp/icu_data.h"
 #include "third_party/flutter/runtime/dart_vm.h"
 #include "third_party/skia/include/core/SkGraphics.h"
@@ -32,7 +32,7 @@ static void SetProcessName() {
 
 static void SetThreadName(const std::string& thread_name) {
   zx::thread::self()->set_property(ZX_PROP_NAME, thread_name.c_str(),
-                                  thread_name.size());
+                                   thread_name.size());
 }
 
 Runner::Runner()
@@ -93,10 +93,10 @@ void Runner::StartComponent(
 void Runner::OnApplicationTerminate(const Application* application) {
   auto app = active_applications_.find(application);
   if (app == active_applications_.end()) {
-    FXL_LOG(INFO) <<
-        "The remote end of the application runner tried to terminate an "
-        "application that has already been terminated, possibly because we "
-        "initiated the termination";
+    FML_LOG(INFO)
+        << "The remote end of the application runner tried to terminate an "
+           "application that has already been terminated, possibly because we "
+           "initiated the termination";
     return;
   }
   auto& active_application = app->second;
@@ -111,7 +111,7 @@ void Runner::OnApplicationTerminate(const Application* application) {
 
   // Post the task to destroy the application and quit its message loop.
   auto runner = application_destruction_thread->TaskRunner();
-  runner->PostTask(fxl::MakeCopyable(
+  runner->PostTask(fml::MakeCopyable(
       [instance = std::move(application_to_destroy)]() mutable {
         instance.reset();
 
@@ -124,7 +124,7 @@ void Runner::OnApplicationTerminate(const Application* application) {
 
 void Runner::SetupICU() {
   if (!icu_data::Initialize(host_context_.get())) {
-    FXL_LOG(ERROR) << "Could not initialize ICU data.";
+    FML_LOG(ERROR) << "Could not initialize ICU data.";
   }
 }
 

@@ -20,11 +20,11 @@
 
 #include "engine.h"
 #include "flutter/common/settings.h"
+#include "flutter/fml/macros.h"
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fxl/files/unique_fd.h"
-#include "lib/fxl/macros.h"
 #include "lib/svc/cpp/service_provider_bridge.h"
 #include "topaz/lib/deprecated_loop/thread.h"
 #include "unique_fdio_ns.h"
@@ -63,8 +63,8 @@ class Application final : public Engine::Delegate,
   TerminationCallback termination_callback_;
   const std::string debug_label_;
   UniqueFDIONS fdio_ns_ = UniqueFDIONSCreate();
-  fxl::UniqueFD application_directory_;
-  fxl::UniqueFD application_assets_directory_;
+  fml::UniqueFD application_directory_;
+  fml::UniqueFD application_assets_directory_;
   fidl::Binding<fuchsia::sys::ComponentController> application_controller_;
   fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
       outgoing_services_request_;
@@ -75,8 +75,8 @@ class Application final : public Engine::Delegate,
 #else
   fidl::BindingSet<fuchsia::ui::app::ViewProvider> shells_bindings_;
 #endif
-  fxl::RefPtr<blink::DartSnapshot> isolate_snapshot_;
-  fxl::RefPtr<blink::DartSnapshot> shared_snapshot_;
+  fml::RefPtr<blink::DartSnapshot> isolate_snapshot_;
+  fml::RefPtr<blink::DartSnapshot> shared_snapshot_;
   std::set<std::unique_ptr<Engine>> shell_holders_;
   std::vector<WaitCallback> wait_callbacks_;
   std::pair<bool, uint32_t> last_return_code_;
@@ -123,7 +123,7 @@ class Application final : public Engine::Delegate,
 
   void AttemptVMLaunchWithCurrentSettings(const blink::Settings& settings);
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(Application);
+  FML_DISALLOW_COPY_AND_ASSIGN(Application);
 };
 
 }  // namespace flutter

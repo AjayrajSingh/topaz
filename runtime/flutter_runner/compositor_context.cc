@@ -5,7 +5,7 @@
 #include "compositor_context.h"
 
 #include "flutter/flow/layers/layer_tree.h"
-#include "flutter/glue/trace_event.h"
+#include "flutter/fml/trace_event.h"
 
 namespace flutter {
 
@@ -49,7 +49,7 @@ class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
     return true;
   }
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(ScopedFrame);
+  FML_DISALLOW_COPY_AND_ASSIGN(ScopedFrame);
 };
 
 CompositorContext::CompositorContext(

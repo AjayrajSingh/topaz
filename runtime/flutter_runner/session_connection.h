@@ -15,7 +15,7 @@
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fxl/functional/closure.h"
 #endif
-#include "lib/fxl/macros.h"
+#include "flutter/fml/macros.h"
 #include "lib/ui/scenic/cpp/resources.h"
 #include "lib/ui/scenic/cpp/session.h"
 #include "vulkan_surface_producer.h"
@@ -101,7 +101,7 @@ class SessionConnection final {
 
   static void ToggleSignal(zx_handle_t handle, bool raise);
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(SessionConnection);
+  FML_DISALLOW_COPY_AND_ASSIGN(SessionConnection);
 };
 
 }  // namespace flutter

@@ -46,14 +46,14 @@ void main() async {
 
   test('PosNegCounter with framework. Single run.', () async {
     final fleet = integerCounterFleetFactory.newFleet(2)
-      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) {
+      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) async {
         cnt0.add(1);
       })
-      ..runInTransaction(1, (PosNegCounterValue<int> cnt1) {
+      ..runInTransaction(1, (PosNegCounterValue<int> cnt1) async {
         cnt1.add(2);
       })
       ..synchronize([0, 1])
-      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) {
+      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) async {
         expect(cnt0.value, equals(3));
       });
     await fleet.testSingleOrder();
@@ -61,24 +61,24 @@ void main() async {
 
   test('PosNegCounter with framework', () async {
     final fleet = integerCounterFleetFactory.newFleet(3)
-      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) {
+      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) async {
         cnt0.add(1);
       })
-      ..runInTransaction(1, (PosNegCounterValue<int> cnt1) {
+      ..runInTransaction(1, (PosNegCounterValue<int> cnt1) async {
         cnt1.add(2);
       })
       ..synchronize([0, 1])
-      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) {
+      ..runInTransaction(0, (PosNegCounterValue<int> cnt0) async {
         expect(cnt0.value, equals(3));
       })
-      ..runInTransaction(2, (PosNegCounterValue<int> cnt2) {
+      ..runInTransaction(2, (PosNegCounterValue<int> cnt2) async {
         cnt2.add(-5);
       })
       ..synchronize([0, 2])
-      ..runInTransaction(2, (PosNegCounterValue<int> cnt2) {
+      ..runInTransaction(2, (PosNegCounterValue<int> cnt2) async {
         expect(cnt2.value, equals(-2));
       })
-      ..runInTransaction(1, (PosNegCounterValue<int> cnt2) {
+      ..runInTransaction(1, (PosNegCounterValue<int> cnt2) async {
         expect(cnt2.value, equals(3));
       });
     await fleet.testAllOrders();
