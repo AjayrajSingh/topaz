@@ -1,0 +1,9 @@
+{
+    "imports": [
+        "peridot/packages/tests/modular_integration_tests",
+        "topaz/packages/examples/tests"
+    ],
+    "packages": [
+        "//topaz/tests/modular_integration_tests:topaz_modular_integration_tests"
+    ]
+}

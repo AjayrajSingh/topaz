@@ -11,6 +11,7 @@
         "topaz/packages/tests/fidl_compatibility_test_server_dart",
         "topaz/packages/tests/flutter_screencap_test",
         "topaz/packages/tests/flutter_screencap_test_app",
+        "topaz/packages/tests/modular_integration_tests",
         "topaz/packages/tests/scenic",
         "topaz/packages/tests/web_runner",
         "topaz/packages/tests/web_view"
