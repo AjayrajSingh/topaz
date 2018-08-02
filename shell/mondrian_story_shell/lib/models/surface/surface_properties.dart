@@ -7,6 +7,11 @@ class SurfaceProperties {
   /// Const constructor
   SurfaceProperties({this.containerLabel});
 
+  SurfaceProperties.fromJson(Map<String, dynamic> json) {
+    containerLabel = json['containerLabel'];
+    containerMembership = json['containerMembership'];
+  }
+
   /// Belongs to a container with label containerLabel
   String containerLabel;
 
@@ -16,4 +21,9 @@ class SurfaceProperties {
   /// end of list. If this Surface is focused, that is the container that
   /// will be laid out.
   List<String> containerMembership;
+
+  Map<String, dynamic> toJson() => {
+        'containerLabel': containerLabel,
+        'containerMembership': containerMembership,
+      };
 }

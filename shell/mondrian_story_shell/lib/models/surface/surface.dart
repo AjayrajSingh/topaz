@@ -23,13 +23,15 @@ class Surface extends Model {
   Surface(this._graph, this.node, this.properties, this.relation,
       this.compositionPattern);
 
-  Surface.fromJson(Map<String, dynamic> json)
+  Surface.fromJson(Map<String, dynamic> json, this._graph)
       : node = new Tree<String>(value: json['id']),
-        _graph = new SurfaceGraph(),
         compositionPattern = json['compositionPattern'],
-        properties = new SurfaceProperties(),
+        properties = new SurfaceProperties.fromJson(
+            json['surfaceProperties'].cast<String, dynamic>()),
         relation = SurfaceRelationUtil
-            .decode(json['surfaceRelation'].cast<String, String>());
+            .decode(json['surfaceRelation'].cast<String, String>()),
+        childIds = json['children'],
+        isParentRoot = json['parentId'] == null;
 
   final SurfaceGraph _graph;
   final Tree<String> node;
@@ -45,6 +47,14 @@ class Surface extends Model {
 
   /// The pattern with which to compose this node with its parent
   final String compositionPattern;
+
+  // Used to track whether this node is attached to the root of the graph
+  bool isParentRoot;
+
+  // Used for constructing the surface and its associated graph from json.
+  // Note: these ids will not stay up to date with what's in the node.
+  // Use the _children method below after the graph has been updated.
+  List<String> childIds;
 
   /// Whether or not this surface is currently dismissed
   bool get dismissed => _graph.isDismissed(node.value);
@@ -256,6 +266,7 @@ class Surface extends Model {
       'id': node.value,
       'parentId': parentId,
       'surfaceRelation': SurfaceRelationUtil.toMap(relation),
+      'surfaceProperties': properties,
       'compositionPattern': compositionPattern,
       'isDismissed': dismissed ? 'true' : 'false',
       'children': _children(),

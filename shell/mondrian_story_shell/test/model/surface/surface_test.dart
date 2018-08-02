@@ -15,7 +15,7 @@ import 'package:mondrian/models/tree.dart';
 void main() {
   test('toJson and fromJson', () {
     SurfaceGraph graph = new SurfaceGraph();
-    Tree parent = new Tree<String>(value: 'parentValue');
+    Tree parent = new Tree<String>(value: null);
     Tree node = new Tree<String>(value: 'value');
     Tree child = new Tree<String>(value: 'childValue');
     parent.add(node);
@@ -30,11 +30,13 @@ void main() {
     Surface surface = new Surface(graph, node, properties, relation, null);
     String encoded = json.encode(surface);
     Map decodedJson = json.decode(encoded);
-    Surface decodedSurface = new Surface.fromJson(decodedJson);
+    Surface decodedSurface = new Surface.fromJson(decodedJson, graph);
     expect(decodedSurface.node.value, 'value');
+    expect(decodedSurface.isParentRoot, true);
     expect(decodedSurface.relation.emphasis, 0.12);
     expect(decodedSurface.relation.arrangement, SurfaceArrangement.copresent);
     expect(decodedSurface.relation.dependency, SurfaceDependency.dependent);
+    expect(decodedSurface.properties.containerLabel, 'containerLabel');
     expect(decodedSurface.compositionPattern, null);
   });
 

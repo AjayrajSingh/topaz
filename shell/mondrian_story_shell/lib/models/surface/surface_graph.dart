@@ -15,8 +15,34 @@ import '../tree.dart';
 import 'surface.dart';
 import 'surface_properties.dart';
 
-/// Data structure to manage the relationships and relative focus of surfaces
+// Data structure to manage the relationships and relative focus of surfaces
 class SurfaceGraph extends Model {
+  SurfaceGraph();
+
+  SurfaceGraph.fromJson(Map<String, dynamic> json) {
+    dynamic decodedSurfaceList = json['surfaceList'];
+    List<dynamic> surfaceList = decodedSurfaceList.cast<List>();
+    // for the first item we want to attach it to _tree
+    for (dynamic item in surfaceList) {
+      Surface surface = new Surface.fromJson(item, this);
+      _surfaces[surface.node.value] = surface;
+    }
+    _surfaces.forEach((String id, Surface surface) {
+      Tree<String> node = surface.node;
+      if (surface.isParentRoot) {
+        _tree.add(node);
+      }
+      if (surface.childIds != null) {
+        for (String id in surface.childIds) {
+          node.add(_surfaces[id].node);
+        }
+      }
+    });
+    dynamic list = json['focusStack'];
+    List<String> focusStack = list.cast<String>();
+    _focusedSurfaces.addAll(focusStack);
+  }
+
   /// Cache of surfaces
   final Map<String, Surface> _surfaces = <String, Surface>{};
 
@@ -245,5 +271,13 @@ class SurfaceGraph extends Model {
           '$nodeString\n${node.children.map((Tree<String> node) => _toString(node, prefix: '$prefix  ')).join('\n')}';
     }
     return '$nodeString';
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'surfaceList': _surfaces.values.toList(),
+      'focusStack': _focusedSurfaces,
+      'links': [], // TODO(jphsiao): plumb through link data
+    };
   }
 }
