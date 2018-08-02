@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
-import("//build/dart/dart_test.gni")
+import("//topaz/runtime/dart/dart_test.gni")
 
 flutter_app("xi_mod") {
   main_dart = "lib/main.dart"

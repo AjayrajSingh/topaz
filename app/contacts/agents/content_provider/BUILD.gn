@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/dart_runner/dart_app.gni")
-import("//build/dart/dart_test.gni")
+import("//topaz/runtime/dart/dart_test.gni")
 
 dart_app("contacts_content_provider") {
   main_dart = "lib/main.dart"
