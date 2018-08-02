@@ -5,10 +5,12 @@ test against said module.
 
 ## Adding Tests
 
+`TODO(DX-366): Link to the relevant documents.`
+
 This module assumes you've read how to use the flutter and fuchsia driver code,
 and have made the appropriate modules to run your own tests.
 
-If you'd like to test a module, you'll need to add a dependency added in
+If you'd like to test a module, you'll need to add a dependency in
 `packages/tests/modular_integration_tests` (there is an example mod included).
 
 Then, you'll want to target the test(s) in the

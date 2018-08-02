@@ -4,11 +4,13 @@
 
 import("//build/package.gni")
 
-# Builds "benchmarks.sh" into a package that runs all Topaz benchmarks
-# on CI.
+# Builds the modular integration testing shell script into a package that runs
+# all Topaz modular integration tests.
 package("topaz_modular_integration_tests") {
   testonly = true
 
+  # TODO(IN-497): Move from binaries to tests once it is possible to run tests
+  # in their respective environments.
   binaries = [
     {
       name = rebase_path("run_topaz_modular_integration_tests.sh")
