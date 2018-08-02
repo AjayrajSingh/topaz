@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/dart/dart_test.gni")
+import("//build/dart/dart_library.gni")
 import("//build/dart/dart_tool.gni")
 
 dart_tool("dartfmt_extras") {
@@ -17,15 +18,28 @@ dart_tool("dartfmt_extras") {
   ]
 }
 
-dart_test("dartfmt_extras_tests") {
+dart_library("dartfmt_extras_test_utils") {
+  source_dir = "test"
+  infer_package_name = true
+
   sources = [
-    "directives_test.dart",
-    "double_quotes_test.dart",
     "util.dart",
   ]
 
   deps = [
+    "//third_party/dart-pkg/pub/path",
+  ]
+}
+
+dart_test("dartfmt_extras_tests") {
+  sources = [
+    "directives_test.dart",
+    "double_quotes_test.dart",
+  ]
+
+  deps = [
     ":dartfmt_extras_dart_library",
+    ":dartfmt_extras_test_utils",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
   ]
