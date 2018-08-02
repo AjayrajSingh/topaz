@@ -29,7 +29,7 @@ class Document implements ValueObserver {
 
   /// Default constructor.
   Document(this._sledge, this._documentId)
-      : _fields = new Uint8ListMapFactory<LeafValue>().newMap(),
+      : _fields = newUint8ListMap<LeafValue>(),
         _connectionId = _sledge.connectionId {
     _value = _documentId.schema.newValue(_connectionId);
 

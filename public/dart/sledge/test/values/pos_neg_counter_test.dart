@@ -14,9 +14,10 @@ import 'package:test/test.dart';
 
 import '../dummies/dummy_value_observer.dart';
 
+//// Returns a new Map<Uint8List, int>.
+Map<Uint8List, int> _newIntMap() => newUint8ListMap<int>();
+
 void main() {
-  final intMF = new Uint8ListMapFactory<int>();
-  final doubleMF = new Uint8ListMapFactory<double>();
   final id1 = new Uint8List.fromList([1]);
 
   test('PosNegCounterValue accumulate additions', () {
@@ -67,7 +68,7 @@ void main() {
     DataConverter conv = new DataConverter<Uint8List, int>();
     final cnt = new PosNegCounterValue<int>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
-          intMF.newMap()
+          _newIntMap()
             ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4)
             ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 3))));
     expect(cnt.value, equals(1));
@@ -77,7 +78,7 @@ void main() {
     DataConverter conv = new DataConverter<Uint8List, int>();
     final cnt = new PosNegCounterValue<int>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
-          intMF.newMap()
+          _newIntMap()
             ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4)
             ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 3)
             ..putIfAbsent(new Uint8List.fromList([0, 3]), () => 5)
@@ -89,7 +90,7 @@ void main() {
     DataConverter conv = new DataConverter<Uint8List, double>();
     final cnt = new PosNegCounterValue<double>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, double>(
-          doubleMF.newMap()
+          newUint8ListMap<double>()
             ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4.25)
             ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 3.0)
             ..putIfAbsent(new Uint8List.fromList([0, 3]), () => 2.5)
@@ -102,13 +103,13 @@ void main() {
     final cnt = new PosNegCounterValue<int>(id1);
     expect(cnt.value, equals(0));
     cnt.applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
-        intMF.newMap()..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4))));
+        _newIntMap()..putIfAbsent(new Uint8List.fromList([0, 1]), () => 4))));
     expect(cnt.value, equals(4));
     cnt.applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
-        intMF.newMap()..putIfAbsent(new Uint8List.fromList([0, 1]), () => 1))));
+        _newIntMap()..putIfAbsent(new Uint8List.fromList([0, 1]), () => 1))));
     expect(cnt.value, equals(1));
     cnt.applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
-        intMF.newMap()..putIfAbsent(new Uint8List.fromList([1, 2]), () => 5))));
+        _newIntMap()..putIfAbsent(new Uint8List.fromList([1, 2]), () => 5))));
     expect(cnt.value, equals(-4));
   });
 
@@ -116,21 +117,18 @@ void main() {
     DataConverter conv = new DataConverter<Uint8List, int>();
     final cnt = new PosNegCounterValue<int>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
-          intMF.newMap()
+          _newIntMap()
             ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 1)
             ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 2))));
     Stream<int> changeStream = cnt.onChange;
     expect(changeStream, emitsInOrder([2, 4, -3]));
     cnt
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
-          intMF.newMap()
-            ..putIfAbsent(new Uint8List.fromList([0, 2]), () => 3))))
+          _newIntMap()..putIfAbsent(new Uint8List.fromList([0, 2]), () => 3))))
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
-          intMF.newMap()
-            ..putIfAbsent(new Uint8List.fromList([0, 1]), () => 3))))
+          _newIntMap()..putIfAbsent(new Uint8List.fromList([0, 1]), () => 3))))
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
-          intMF.newMap()
-            ..putIfAbsent(new Uint8List.fromList([1, 1]), () => 9))));
+          _newIntMap()..putIfAbsent(new Uint8List.fromList([1, 1]), () => 9))));
   });
 
   test('Observer calls.', () {

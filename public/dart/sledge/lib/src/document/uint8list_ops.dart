@@ -50,13 +50,10 @@ Uint8List getUint8ListFromString(String string) {
   return new Uint8List.fromList(encodedString);
 }
 
-/// HashMap with Uint8Lists as a keys, and content equality comparator.
-class Uint8ListMapFactory<T> {
-  static const _listEquality = const ListEquality<int>();
-
-  /// Returns Map.
-  HashMap<Uint8List, T> newMap() {
-    return new HashMap<Uint8List, T>(
-        equals: _listEquality.equals, hashCode: _listEquality.hash);
-  }
+/// Returns a new HashMap with Uint8Lists as a keys.
+/// Note: The type T is enforced only at compile time.
+HashMap<Uint8List, T> newUint8ListMap<T>() {
+  const listEquality = const ListEquality<int>();
+  return new HashMap<Uint8List, T>(
+      equals: listEquality.equals, hashCode: listEquality.hash);
 }

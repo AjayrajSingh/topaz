@@ -7,51 +7,51 @@ import 'dart:typed_data';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 
 class FakeLedgerPage extends ledger.PageProxy {
-  ledger.Status putCallback;
-  ledger.Status deleteCallback;
-  ledger.Status startTransactionCallback;
-  ledger.Status commitCallback;
-  ledger.Status rollbackCallback;
-  ledger.Status getSnapshotCallback;
+  ledger.Status putStatus;
+  ledger.Status deleteStatus;
+  ledger.Status startTransactionStatus;
+  ledger.Status commitStatus;
+  ledger.Status rollbackStatus;
+  ledger.Status getSnapshotStatus;
 
-  void resetAllCallbacks() {
-    putCallback = null;
-    deleteCallback = null;
-    startTransactionCallback = null;
-    commitCallback = null;
-    rollbackCallback = null;
-    getSnapshotCallback = null;
+  void resetAllStatus() {
+    putStatus = null;
+    deleteStatus = null;
+    startTransactionStatus = null;
+    commitStatus = null;
+    rollbackStatus = null;
+    getSnapshotStatus = null;
   }
 
   @override
   void put(
       Uint8List key, Uint8List value, void callback(ledger.Status status)) {
-    callback(putCallback ?? ledger.Status.ok);
+    callback(putStatus ?? ledger.Status.ok);
   }
 
   @override
   void delete(Uint8List key, void callback(ledger.Status status)) {
-    callback(deleteCallback ?? ledger.Status.ok);
+    callback(deleteStatus ?? ledger.Status.ok);
   }
 
   @override
   void startTransaction(void callback(ledger.Status status)) {
-    callback(startTransactionCallback ?? ledger.Status.ok);
+    callback(startTransactionStatus ?? ledger.Status.ok);
   }
 
   @override
   void commit(void callback(ledger.Status status)) {
-    callback(commitCallback ?? ledger.Status.ok);
+    callback(commitStatus ?? ledger.Status.ok);
   }
 
   @override
   void rollback(void callback(ledger.Status status)) {
-    callback(rollbackCallback ?? ledger.Status.ok);
+    callback(rollbackStatus ?? ledger.Status.ok);
   }
 
   @override
   void getSnapshot(Object snapshotRequest, Uint8List keyPrefix, Object watcher,
       void callback(ledger.Status status)) {
-    callback(getSnapshotCallback ?? ledger.Status.ok);
+    callback(getSnapshotStatus ?? ledger.Status.ok);
   }
 }

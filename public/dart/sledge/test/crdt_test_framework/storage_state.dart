@@ -11,13 +11,11 @@ import 'package:sledge/src/document/values/key_value.dart';
 
 import 'entry.dart';
 
-final _mapFactory = new Uint8ListMapFactory<Entry>();
-
 /// StorageState is a key-value storage with timestamp per key.
 /// It stores timestamps for deleted keys (time of deletion).
 /// Used to fake Ledger's KeyValue storage.
 class StorageState {
-  final Map<Uint8List, Entry> _storage = _mapFactory.newMap();
+  final Map<Uint8List, Entry> _storage = newUint8ListMap<Entry>();
 
   /// Applies [change] to storage. Uses [timestamp] as a time of update.
   void applyChange(Change change, int timestamp) {

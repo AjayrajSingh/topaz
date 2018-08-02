@@ -313,7 +313,7 @@ void main() {
       expect(doc.someInteger.value, equals(14));
 
       // Test case when commit fails.
-      sledge.fakeLedgerPage.commitCallback = ledger.Status.ioError;
+      sledge.fakeLedgerPage.commitStatus = ledger.Status.ioError;
       transactionSucceed = await sledge.runInTransaction(() {
         doc.someBool.value = true;
         doc.someInteger.value = 42;
@@ -323,7 +323,7 @@ void main() {
       expect(doc.someInteger.value, equals(14));
 
       // Check that after failed transaction we can get successful one.
-      sledge.fakeLedgerPage.resetAllCallbacks();
+      sledge.fakeLedgerPage.resetAllStatus();
       transactionSucceed = await sledge.runInTransaction(() {
         doc.someInteger.value = 8;
       });
@@ -352,7 +352,7 @@ void main() {
       expect(doc.map.length, equals(1));
 
       // Test case when commit fails.
-      sledge.fakeLedgerPage.commitCallback = ledger.Status.ioError;
+      sledge.fakeLedgerPage.commitStatus = ledger.Status.ioError;
       transactionSucceed = await sledge.runInTransaction(() {
         doc.map['a'] = new Uint8List.fromList([4]);
         doc.map['foo'] = new Uint8List.fromList([1, 3]);
@@ -362,7 +362,7 @@ void main() {
       expect(doc.map['a'], equals([1, 2, 3]));
 
       // Check that after failed transaction we can get successful one.
-      sledge.fakeLedgerPage.resetAllCallbacks();
+      sledge.fakeLedgerPage.resetAllStatus();
       transactionSucceed = await sledge.runInTransaction(() {
         doc.map['foo'] = new Uint8List.fromList([1, 3]);
       });

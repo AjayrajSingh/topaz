@@ -35,8 +35,7 @@ class Sledge {
 
   // Cache to get document by documentId.prefix.
   final Map<Uint8List, Future<Document>> _documentByPrefix =
-      _mapFactory.newMap();
-  static final _mapFactory = new Uint8ListMapFactory<Future<Document>>();
+      newUint8ListMap<Future<Document>>();
 
   // The factories used for fake object injection.
   final LedgerPageSnapshotFactory _pageSnapshotFactory;

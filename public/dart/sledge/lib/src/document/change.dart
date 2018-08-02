@@ -41,7 +41,7 @@ class Change {
 
   /// Splits all changes by prefixes.
   Map<Uint8List, Change> splitByPrefix(int prefixLen) {
-    final splittedChanges = new Uint8ListMapFactory<Change>().newMap();
+    final splittedChanges = newUint8ListMap<Change>();
     for (final change in changedEntries) {
       final prefix = getUint8ListPrefix(change.key, prefixLen);
       final newChange = splittedChanges.putIfAbsent(prefix, () => new Change());

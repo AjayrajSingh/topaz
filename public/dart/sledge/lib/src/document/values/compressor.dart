@@ -17,8 +17,7 @@ import 'key_value.dart';
 /// Class to compress long keys.
 class Compressor {
   static const _listEquality = const ListEquality();
-  static final _mapFactory = new Uint8ListMapFactory<Uint8List>();
-  final Map<Uint8List, Uint8List> _keyByHash = _mapFactory.newMap();
+  final Map<Uint8List, Uint8List> _keyByHash = newUint8ListMap<Uint8List>();
 
   /// Compress Key
   Uint8List compressKey(Uint8List key) {
