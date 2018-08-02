@@ -15,6 +15,7 @@ import 'document/values/key_value.dart';
 import 'ledger_helpers.dart';
 import 'sledge.dart';
 import 'storage/document_storage.dart';
+import 'storage/kv_encoding.dart' as sledge_storage;
 import 'storage/schema_storage.dart';
 
 typedef Modification = Future Function();
@@ -109,13 +110,17 @@ class Transaction {
   Future<Document> getDocument(DocumentId documentId) async {
     final document = new Document(_sledge, documentId);
     Uint8List keyPrefix = documentId.prefix;
-    List<KeyValue> kvs =
-        await getEntriesFromSnapshotWithPrefix(_pageSnapshotProxy, keyPrefix);
+    List<KeyValue> kvs = await getEntriesFromSnapshotWithPrefix(
+        _pageSnapshotProxy,
+        concatUint8Lists(
+            sledge_storage.prefixForType(sledge_storage.KeyValueType.document),
+            keyPrefix));
 
     // Strip the document prefix from the KVs.
     for (int i = 0; i < kvs.length; i++) {
       kvs[i] = new KeyValue(
-          getUint8ListSuffix(kvs[i].key, DocumentId.prefixLength),
+          getUint8ListSuffix(kvs[i].key,
+              DocumentId.prefixLength + sledge_storage.typePrefixLength),
           kvs[i].value);
     }
 
