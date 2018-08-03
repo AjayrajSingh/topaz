@@ -28,11 +28,12 @@ class Transaction {
   final Sledge _sledge;
   final ledger.PageProxy _pageProxy;
   final ledger.PageSnapshotProxy _pageSnapshotProxy;
+  // TODO: close _pageSnapshotProxy
 
   /// Default constructor.
-  Transaction(this._sledge, this._pageProxy,
-      LedgerPageSnapshotFactory pageSnapshotFactory)
-      : _pageSnapshotProxy = pageSnapshotFactory.newInstance();
+  Transaction(
+      this._sledge, this._pageProxy, LedgerObjectsFactory ledgerObjectsFactory)
+      : _pageSnapshotProxy = ledgerObjectsFactory.newPageSnapshotProxy();
 
   /// Runs [modification].
   Future<bool> saveModification(Modification modification) async {

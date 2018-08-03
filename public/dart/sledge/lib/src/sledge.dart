@@ -39,7 +39,7 @@ class Sledge {
       newUint8ListMap<Future<Document>>();
 
   // The factories used for fake object injection.
-  final LedgerPageSnapshotFactory _pageSnapshotFactory;
+  final LedgerObjectsFactory _ledgerObjectsFactory;
 
   // Contains the status of the initialization.
   // ignore: unused_field
@@ -64,7 +64,7 @@ class Sledge {
   Sledge._(fidl.InterfaceHandle<ledger.Ledger> ledgerHandle,
       [SledgePageId pageId])
       : _pageProxy = new ledger.PageProxy(),
-        _pageSnapshotFactory = new LedgerPageSnapshotFactoryImpl() {
+        _ledgerObjectsFactory = new LedgerObjectsFactoryImpl() {
     pageId ??= new SledgePageId();
 
     _ledgerProxy.ctrl.bind(ledgerHandle);
@@ -82,7 +82,7 @@ class Sledge {
         initializationCompleter.complete(false);
       } else {
         _modificationQueue =
-            new ModificationQueue(this, _pageSnapshotFactory, _pageProxy);
+            new ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
         _subscribe(initializationCompleter);
       }
     });
@@ -114,10 +114,12 @@ class Sledge {
   }
 
   /// Convenience constructor for tests.
-  Sledge.testing(this._pageProxy, this._pageSnapshotFactory) {
+  Sledge.testing(this._pageProxy, this._ledgerObjectsFactory) {
+    Completer<bool> initializationCompleter = new Completer<bool>();
     _modificationQueue =
-        new ModificationQueue(this, _pageSnapshotFactory, _pageProxy);
-    _initializationSucceeded = new Future.value(true);
+        new ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
+    _subscribe(initializationCompleter);
+    _initializationSucceeded = initializationCompleter.future;
   }
 
   /// Closes connection to ledger.
@@ -190,6 +192,6 @@ class Sledge {
       throw new StateError('Must be called before any transaction can start.');
     }
     return new Subscription(
-        _pageProxy, _pageSnapshotFactory, _applyChange, subscriptionCompleter);
+        _pageProxy, _ledgerObjectsFactory, _applyChange, subscriptionCompleter);
   }
 }

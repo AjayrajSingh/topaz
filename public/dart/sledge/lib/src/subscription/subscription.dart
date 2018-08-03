@@ -15,20 +15,20 @@ import '../ledger_helpers.dart';
 class Subscription extends ledger.PageWatcher {
   final ledger.PageProxy _pageProxy;
   final ledger.PageSnapshotProxy _snapshotProxy;
-  final ledger.PageWatcherBinding _pageWatcherBinding =
-      new ledger.PageWatcherBinding();
+  final ledger.PageWatcherBinding _pageWatcherBinding;
   final void Function(Change change) _applyChangeCallback;
   final Change _currentChange = new Change();
 
   /// Register a watcher for Ledger page, which pass all changes to
   /// _applyChangeCallback.
-  Subscription(this._pageProxy, LedgerPageSnapshotFactory snapshotFactory,
+  Subscription(this._pageProxy, LedgerObjectsFactory ledgerObjectsFactory,
       this._applyChangeCallback, Completer<bool> subscriptionCompleter)
-      : _snapshotProxy = snapshotFactory.newInstance() {
+      : _snapshotProxy = ledgerObjectsFactory.newPageSnapshotProxy(),
+        _pageWatcherBinding = ledgerObjectsFactory.newPageWatcherBinding() {
     Completer<ledger.Status> completer = new Completer<ledger.Status>();
     _pageProxy.getSnapshot(
       _snapshotProxy.ctrl.request(),
-      Uint8List(0),
+      new Uint8List(0),
       _pageWatcherBinding.wrap(this),
       completer.complete,
     );

@@ -24,11 +24,11 @@ class ModificationQueue {
   Transaction _currentTransaction;
   final Queue<_Task> _tasks = new ListQueue<_Task>();
   final Sledge _sledge;
-  final LedgerPageSnapshotFactory _pageSnapshotFactory;
+  final LedgerObjectsFactory _ledgerObjectsFactory;
   final ledger.PageProxy _pageProxy;
 
   /// Default constructor.
-  ModificationQueue(this._sledge, this._pageSnapshotFactory, this._pageProxy);
+  ModificationQueue(this._sledge, this._ledgerObjectsFactory, this._pageProxy);
 
   /// Appends [modification] to the queue of modifications.
   ///
@@ -54,7 +54,7 @@ class ModificationQueue {
 
     // Create a transaction from [modifications], run it, and await its end.
     _currentTransaction =
-        new Transaction(_sledge, _pageProxy, _pageSnapshotFactory);
+        new Transaction(_sledge, _pageProxy, _ledgerObjectsFactory);
     bool savingModificationWasSuccesfull =
         await _currentTransaction.saveModification(modification);
 

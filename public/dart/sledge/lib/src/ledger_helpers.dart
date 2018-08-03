@@ -15,18 +15,24 @@ import 'document/change.dart';
 import 'document/values/key_value.dart';
 
 // ignore_for_file: one_member_abstracts
-/// Factory that creates PageSnapshotProxies.
-abstract class LedgerPageSnapshotFactory {
+/// Factory that creates ledger proxies and bindings.
+abstract class LedgerObjectsFactory {
   /// Returns a new PageSnapshotProxy.
-  ledger.PageSnapshotProxy newInstance();
+  ledger.PageSnapshotProxy newPageSnapshotProxy();
+
+  /// Returns a new PageWatcherBinding.
+  ledger.PageWatcherBinding newPageWatcherBinding();
 }
 
-/// Real implementation of LedgerPageSnapshotFactory.
-class LedgerPageSnapshotFactoryImpl implements LedgerPageSnapshotFactory {
+/// Real implementation of LedgerObjectsFactory.
+class LedgerObjectsFactoryImpl implements LedgerObjectsFactory {
   @override
-  ledger.PageSnapshotProxy newInstance() {
-    return new ledger.PageSnapshotProxy();
-  }
+  ledger.PageSnapshotProxy newPageSnapshotProxy() =>
+      new ledger.PageSnapshotProxy();
+
+  @override
+  ledger.PageWatcherBinding newPageWatcherBinding() =>
+      new ledger.PageWatcherBinding();
 }
 
 /// Throws an exception containing [operation] if the status is not `ok`.
