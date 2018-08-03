@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "accessibility_bridge.h"
+#include "context_writer_bridge.h"
 
 #include <unordered_set>
 
@@ -13,13 +13,13 @@
 
 namespace flutter {
 
-AccessibilityBridge::AccessibilityBridge(
+ContextWriterBridge::ContextWriterBridge(
     fidl::InterfaceHandle<fuchsia::modular::ContextWriter> writer)
     : writer_(writer.Bind()) {}
 
-AccessibilityBridge::~AccessibilityBridge() = default;
+ContextWriterBridge::~ContextWriterBridge() = default;
 
-void AccessibilityBridge::UpdateSemantics(
+void ContextWriterBridge::UpdateSemantics(
     const blink::SemanticsNodeUpdates& update) {
   for (const auto& update : update) {
     const auto& node = update.second;
@@ -50,7 +50,7 @@ void AccessibilityBridge::UpdateSemantics(
   }
 }
 
-void AccessibilityBridge::UpdateVisitedForNodeAndChildren(
+void ContextWriterBridge::UpdateVisitedForNodeAndChildren(
     const int id, std::vector<int>* visited_nodes) {
   std::map<int, blink::SemanticsNode>::const_iterator it =
       semantics_nodes_.find(id);
@@ -64,7 +64,7 @@ void AccessibilityBridge::UpdateVisitedForNodeAndChildren(
   }
 }
 
-void AccessibilityBridge::EraseUnvisitedNodes(
+void ContextWriterBridge::EraseUnvisitedNodes(
     const std::vector<int>& visited_nodes) {
   const std::unordered_set<int> visited_nodes_lookup(visited_nodes.begin(),
                                                      visited_nodes.end());

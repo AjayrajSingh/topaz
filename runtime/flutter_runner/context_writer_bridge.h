@@ -15,12 +15,12 @@ namespace flutter {
 
 // Maintain an up-to-date list of SemanticsNodes on screen, and communicate
 // with the Context Service.
-class AccessibilityBridge final {
+class ContextWriterBridge final {
  public:
-  AccessibilityBridge(
+  ContextWriterBridge(
       fidl::InterfaceHandle<fuchsia::modular::ContextWriter> writer);
 
-  ~AccessibilityBridge();
+  ~ContextWriterBridge();
 
   // Update the internal representation of the semantics nodes, and write the
   // semantics to Context Service.
@@ -39,7 +39,7 @@ class AccessibilityBridge final {
   // |visited_nodes|.
   void EraseUnvisitedNodes(const std::vector<int>& visited_nodes);
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(AccessibilityBridge);
+  FXL_DISALLOW_COPY_AND_ASSIGN(ContextWriterBridge);
 };
 
 }  // namespace flutter

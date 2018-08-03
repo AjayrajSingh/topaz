@@ -17,7 +17,7 @@
 #endif
 #include <lib/fit/function.h>
 
-#include "accessibility_bridge.h"
+#include "context_writer_bridge.h"
 #include "flutter/lib/ui/window/viewport_metrics.h"
 #include "flutter/shell/common/platform_view.h"
 #include "lib/fidl/cpp/binding.h"
@@ -109,7 +109,7 @@ class PlatformView final : public shell::PlatformView,
   fuchsia::ui::input::InputMethodEditorPtr ime_;
   fuchsia::sys::ServiceProviderPtr parent_environment_service_provider_;
   fuchsia::modular::ClipboardPtr clipboard_;
-  AccessibilityBridge accessibility_bridge_;
+  ContextWriterBridge context_writer_bridge_;
   // The Semantics bridge is used to provide semantics data from this platform
   // view to the accessibility manager.
   SemanticsBridge semantics_bridge_;

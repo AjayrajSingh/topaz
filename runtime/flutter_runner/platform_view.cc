@@ -65,7 +65,7 @@ PlatformView::PlatformView(
 #endif
       input_listener_(this),
       ime_client_(this),
-      accessibility_bridge_(std::move(accessibility_context_writer)),
+      context_writer_bridge_(std::move(accessibility_context_writer)),
       semantics_bridge_(this, &metrics_),
       surface_(std::make_unique<Surface>(debug_label_)),
       vsync_event_handle_(vsync_event_handle) {
@@ -552,7 +552,7 @@ void PlatformView::HandlePlatformMessage(
 void PlatformView::UpdateSemantics(
     blink::SemanticsNodeUpdates update,
     blink::CustomAccessibilityActionUpdates actions) {
-  accessibility_bridge_.UpdateSemantics(update);
+  context_writer_bridge_.UpdateSemantics(update);
   semantics_bridge_.UpdateSemantics(update);
 }
 

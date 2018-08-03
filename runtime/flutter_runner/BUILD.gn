@@ -55,12 +55,12 @@ template("flutter_runner") {
     libs = []
 
     sources = [
-      "accessibility_bridge.cc",
-      "accessibility_bridge.h",
       "component.cc",
       "component.h",
       "compositor_context.cc",
       "compositor_context.h",
+      "context_writer_bridge.cc",
+      "context_writer_bridge.h",
       "engine.cc",
       "engine.h",
       "fuchsia_font_manager.cc",
