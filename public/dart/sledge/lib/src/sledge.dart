@@ -169,8 +169,9 @@ class Sledge {
     final splittedChange =
         change.splitByPrefix(sledge_storage.typePrefixLength);
     // Select the changes that concern documents.
-    final documentChange = splittedChange[
-        sledge_storage.prefixForType(sledge_storage.KeyValueType.document)];
+    final documentChange = splittedChange[sledge_storage
+            .prefixForType(sledge_storage.KeyValueType.document)] ??
+        new Change();
     // Split the changes according to the document they belong to.
     final splittedDocumentChange =
         documentChange.splitByPrefix(DocumentId.prefixLength);
