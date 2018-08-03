@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:test/test.dart';
 
 import 'checker.dart';
@@ -77,7 +79,7 @@ class Fleet<T extends dynamic> {
     }
   }
 
-  void runInTransaction(int id, void Function(T) modification) {
+  void runInTransaction(int id, Future Function(T) modification) {
     final node = new ModificationNode<T>(
         'm${id}_n${graph.nodes.length}', id, modification);
     _addNode(node, id);
@@ -90,7 +92,7 @@ class Fleet<T extends dynamic> {
   /// Executes the operations in all nodes in a given [order]. If [order] is not
   /// specified, execute all nodes in some fixed order, that would be same over
   /// all calls.
-  void testSingleOrder([EvaluationOrder order]) {
+  Future testSingleOrder([EvaluationOrder order]) async {
     order ??= graph.orders.first;
     final fleetState = new FleetState<T>(_fleetSize, _instanceGenerator);
     for (final newChecker in _checkerGenerators) {
@@ -99,7 +101,7 @@ class Fleet<T extends dynamic> {
 
     for (int i = 0; i < order.nodes.length; i++) {
       try {
-        fleetState.applyNode(order.nodes[i], i);
+        await fleetState.applyNode(order.nodes[i], i);
       } on TestFailure catch (failure) {
         // ignore: only_throw_errors
         throw new SingleOrderTestFailure(failure, order, order.nodes[i]);
@@ -113,12 +115,15 @@ class Fleet<T extends dynamic> {
   ///
   /// It can be used to reproduce previous execution order with an information
   /// from TestFailure message.
-  void testFixedOrder(List<String> nodeIds, {bool allowPartial = false}) {
-    testSingleOrder(new EvaluationOrder.fromIds(nodeIds, graph.nodes,
+  Future testFixedOrder(List<String> nodeIds,
+      {bool allowPartial = false}) async {
+    await testSingleOrder(new EvaluationOrder.fromIds(nodeIds, graph.nodes,
         allowPartial: allowPartial));
   }
 
-  void testAllOrders() {
-    graph.orders.forEach(testSingleOrder);
+  Future testAllOrders() async {
+    for (final order in graph.orders) {
+      await testSingleOrder(order);
+    }
   }
 }

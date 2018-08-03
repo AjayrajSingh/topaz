@@ -27,7 +27,7 @@ class NameLengthChecker extends Checker<Document> {
   }
 }
 
-void main() {
+void main() async {
   final Schema nameLengthSchema = new Schema(<String, BaseType>{
     'name': new LastOneWinsString(),
     'length': new Integer()
@@ -36,8 +36,8 @@ void main() {
   final fakeSledge = newSledgeForTesting()..startInfiniteTransaction();
   final documentFleetFactory = new DocumentFleetFactory(fakeSledge, documentId);
 
-  test('Document test with framework', () {
-    documentFleetFactory.newFleet(3)
+  test('Document test with framework', () async {
+    final fleet = documentFleetFactory.newFleet(3)
       ..runInTransaction(0, (dynamic doc) {
         doc.name.value = 'Alice';
         doc.length.value = 5;
@@ -51,7 +51,7 @@ void main() {
         doc.length.value = 6;
       })
       ..synchronize([0, 1, 2])
-      ..addChecker(() => new NameLengthChecker())
-      ..testAllOrders();
+      ..addChecker(() => new NameLengthChecker());
+    await fleet.testAllOrders();
   });
 }

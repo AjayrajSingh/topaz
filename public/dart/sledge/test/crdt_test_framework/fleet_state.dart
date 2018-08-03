@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: implementation_imports
+import 'dart:async';
 
-import 'package:sledge/src/document/document.dart';
+import 'package:sledge/sledge.dart';
 
 import 'checker.dart';
 import 'node.dart';
@@ -30,9 +30,9 @@ class FleetState<T extends dynamic> {
         _instances =
             new List<T>.generate(size, instanceGenerator, growable: false);
 
-  void applyNode(Node node, int timer) {
+  Future applyNode(Node node, int timer) async {
     if (node is ModificationNode) {
-      applyModification(node.instanceId, node.modification, timer);
+      await applyModification(node.instanceId, node.modification, timer);
     } else if (node is SynchronizationNode) {
       applySynchronization(node.instanceId1, node.instanceId2);
     }
@@ -48,11 +48,13 @@ class FleetState<T extends dynamic> {
     _checkers.add(checker);
   }
 
-  void applyModification(int id, void Function(T) modification, int time) {
-    modification(_instances[id]);
+  Future applyModification(
+      int id, Future Function(T) modification, int time) async {
+    await modification(_instances[id]);
     if (T == Document) {
-      // ignore: argument_type_not_assignable
-      _storageStates[id].applyChange(Document.getChange(_instances[id]), time);
+      _storageStates[id]
+          // ignore: argument_type_not_assignable
+          .applyChange(Document.getChange(_instances[id]), time);
       // ignore: argument_type_not_assignable
       Document.completeTransaction(_instances[id]);
     } else {

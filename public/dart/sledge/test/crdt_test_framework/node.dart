@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 class Node {
   final List<Node> childs = <Node>[];
   int parentsCount = 0;
@@ -22,7 +24,7 @@ class Node {
 
 class ModificationNode<T> extends Node {
   final int instanceId;
-  final void Function(T) modification;
+  final Future Function(T) modification;
 
   ModificationNode(nodeId, this.instanceId, this.modification) : super(nodeId);
 

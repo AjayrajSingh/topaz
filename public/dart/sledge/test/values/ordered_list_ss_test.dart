@@ -4,6 +4,7 @@
 
 // ignore_for_file: implementation_imports, avoid_catches_without_on_clauses
 
+import 'dart:async';
 import 'dart:math' show Random;
 import 'dart:typed_data';
 
@@ -69,15 +70,15 @@ void insertIntWithCheck(List<int> list, int pos, int value) {
 //
 // For each insertion checks that it was performed correctly. And
 // checks that relative order of elements do not change.
-void randomRelativeOrderTest(
+Future randomRelativeOrderTest(
     {final int countInstances,
     final int countEpochs,
     final int countInsertions,
-    final int seed}) {
+    final int seed}) async {
   test(
       'Check relative order '
       '(i: $countInstances, e: $countEpochs, ins: $countInsertions, seed: $seed).',
-      () {
+      () async {
     final random = new Random(seed);
     int incValue = 0;
     final fleet = integerOrderedListFleetFactory.newFleet(countInstances);
@@ -95,15 +96,14 @@ void randomRelativeOrderTest(
       }
       fleet.synchronize(instanceIdList);
     }
-    fleet
-      ..addChecker(() => new RelativeOrderChecker<int>())
-      ..testAllOrders();
+    fleet.addChecker(() => new RelativeOrderChecker<int>());
+    await fleet.testAllOrders();
   });
 }
 
-void main() {
-  test('OrderedList with framework', () {
-    integerOrderedListFleetFactory.newFleet(2)
+void main() async {
+  test('OrderedList with framework', () async {
+    final fleet = integerOrderedListFleetFactory.newFleet(2)
       ..runInTransaction(0, (OrderedListValue<int> l0) {
         l0.insert(0, 1);
       })
@@ -113,12 +113,12 @@ void main() {
       ..synchronize([0, 1])
       ..runInTransaction(0, (OrderedListValue<int> l0) {
         expect(l0.toList(), anyOf(equals([1, 2]), equals([2, 1])));
-      })
-      ..testAllOrders();
+      });
+    await fleet.testAllOrders();
   });
 
-  test('OrderedList with framework. Check relative order.', () {
-    integerOrderedListFleetFactory.newFleet(3)
+  test('OrderedList with framework. Check relative order.', () async {
+    final fleet = integerOrderedListFleetFactory.newFleet(3)
       ..runInTransaction(0, (OrderedListValue<int> l0) {
         l0..insert(0, 1)..insert(1, 2);
       })
@@ -129,16 +129,14 @@ void main() {
         l2..insert(0, 5)..insert(1, 6);
       })
       ..synchronize([0, 1, 2])
-      ..addChecker(() => new RelativeOrderChecker<int>())
-      ..testAllOrders();
+      ..addChecker(() => new RelativeOrderChecker<int>());
+    await fleet.testAllOrders();
   });
 
-  group('OrderedList random relative order tests.', () {
-    randomRelativeOrderTest(
-        countInstances: 3, countEpochs: 2, countInsertions: 2, seed: 1);
-    randomRelativeOrderTest(
-        countInstances: 2, countEpochs: 3, countInsertions: 2, seed: 2);
-    randomRelativeOrderTest(
-        countInstances: 3, countEpochs: 3, countInsertions: 1, seed: 3);
-  });
+  await randomRelativeOrderTest(
+      countInstances: 3, countEpochs: 2, countInsertions: 2, seed: 1);
+  await randomRelativeOrderTest(
+      countInstances: 2, countEpochs: 3, countInsertions: 2, seed: 2);
+  await randomRelativeOrderTest(
+      countInstances: 3, countEpochs: 3, countInsertions: 1, seed: 3);
 }

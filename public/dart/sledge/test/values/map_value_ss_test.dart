@@ -22,9 +22,9 @@ class MapFleetFactory<K, V> {
 const MapFleetFactory<int, int> intMapFleetFactory =
     const MapFleetFactory<int, int>();
 
-void main() {
-  test('Test with framework', () {
-    intMapFleetFactory.newFleet(2)
+void main() async {
+  test('Test with framework', () async {
+    final fleet = intMapFleetFactory.newFleet(2)
       ..runInTransaction(0, (MapValue<int, int> m0) {
         m0[1] = 2;
       })
@@ -39,8 +39,9 @@ void main() {
       ..runInTransaction(0, (MapValue<int, int> m0) {
         expect(m0[1], equals(4));
         expect(m0[2], equals(4));
-      })
-      // TODO: enable manual node names, and replace names here
-      ..testFixedOrder(['init', 'm0_n1', 'm1_n2', 'm0_n3', 's0_1_n4', 'm0_n5']);
+      });
+    // TODO: enable manual node names, and replace names here
+    await fleet.testFixedOrder(
+        ['init', 'm0_n1', 'm1_n2', 'm0_n3', 's0_1_n4', 'm0_n5']);
   });
 }

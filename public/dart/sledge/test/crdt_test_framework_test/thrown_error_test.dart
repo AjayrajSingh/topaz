@@ -29,8 +29,8 @@ class ValuesAreUniqueChecker<K, V> extends Checker<MapValue<K, V>> {
   }
 }
 
-void main() {
-  test('Checker fails.', () {
+void main() async {
+  test('Checker fails.', () async {
     final fleet = intMapFleetFactory.newFleet(2)
       ..runInTransaction(0, (MapValue<int, int> m0) {
         m0[1] = 2;
@@ -45,7 +45,7 @@ void main() {
       ..synchronize([0, 1])
       ..addChecker(() => new ValuesAreUniqueChecker<int, int>());
     try {
-      fleet.testAllOrders();
+      await fleet.testAllOrders();
       // If SingleOrderTestFailure wasn't thrown, fail. Note that fail will
       // throw another exception, not caught in the following code.
       fail('Expected testAllOrders to fail.');
@@ -57,7 +57,7 @@ void main() {
           equals(failure.order));
 
       try {
-        fleet.testSingleOrder(failure.order);
+        await fleet.testSingleOrder(failure.order);
         // If SingleOrderTestFailure wasn't thrown, fail. Note that fail will
         // throw another exception, not caught in the following code.
         fail('Expected testSingleOrder to fail.');

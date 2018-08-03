@@ -29,9 +29,9 @@ class FalseChecker extends Checker<LastOneWinsValue<bool>> {
   }
 }
 
-void main() {
-  test('Checker passes.', () {
-    boolLastOneWinsFleetFactory.newFleet(2)
+void main() async {
+  test('Checker passes.', () async {
+    final fleet = boolLastOneWinsFleetFactory.newFleet(2)
       ..runInTransaction(0, (LastOneWinsValue<bool> b) {
         b.value = false;
       })
@@ -39,16 +39,16 @@ void main() {
         b.value = false;
       })
       ..synchronize([0, 1])
-      ..addChecker(() => new FalseChecker())
-      ..testAllOrders();
+      ..addChecker(() => new FalseChecker());
+    await fleet.testAllOrders();
   });
 
-  test('Checker fails.', () {
+  test('Checker fails.', () async {
     final fleet = boolLastOneWinsFleetFactory.newFleet(1)
       ..runInTransaction(0, (LastOneWinsValue<bool> b) {
         b.value = true;
       })
       ..addChecker(() => new FalseChecker());
-    expect(fleet.testAllOrders, throwsA(new isInstanceOf<TestFailure>()));
+    expect(fleet.testAllOrders(), throwsA(new isInstanceOf<TestFailure>()));
   });
 }
