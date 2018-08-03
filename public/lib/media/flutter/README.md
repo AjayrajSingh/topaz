@@ -32,3 +32,11 @@ The layout logic of a `MediaPlayer` attempts to preserve proper video aspect
 ratio if possible. If both dimensions are constrained, the video will be
 stretched accordingly. Otherwise, the widget will be as large as it can be
 while meeting its imposed constraints and maintaining correct aspect ratio.
+
+## ProgressNotifier
+
+`ProgressNotifier` is a `ChangeNotifier` for animating widgets that reflect
+player progress. This class can be used with `AnimatedBuilder` to create widgets
+that animate based on the progress of an `AudioPlayerController` or
+`MediaPlayerController`. Use `ProgressNotifier` to animate a progress bar or
+other progress indication with a minimum of redrawing.
