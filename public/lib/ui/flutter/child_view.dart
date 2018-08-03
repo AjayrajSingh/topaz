@@ -9,6 +9,7 @@ import 'dart:ui' as ui;
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_math/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_ui_viewsv1/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:flutter/rendering.dart';
@@ -199,6 +200,12 @@ class ChildViewConnection {
     }
   }
 
+  void requestSnapshot(void callback(fuchsia_mem.Buffer data)) {
+    if (_viewKey != null) {
+      _viewContainer.requestSnapshotHack(_viewKey, callback);
+    }
+  }
+
   // The number of render objects attached to this view. In between frames, we
   // might have more than one connected if we get added to a new render object
   // before we get removed from the old render object. By the time we get around
@@ -242,7 +249,9 @@ class ChildViewConnection {
         _currentViewProperties.viewLayout.inset.right == insetRight &&
         _currentViewProperties.viewLayout.inset.bottom == insetBottom &&
         _currentViewProperties.viewLayout.inset.left == insetLeft &&
-        (_currentViewProperties.customFocusBehavior == null || _currentViewProperties.customFocusBehavior.allowFocus) == focusable) {
+        (_currentViewProperties.customFocusBehavior == null ||
+                _currentViewProperties.customFocusBehavior.allowFocus) ==
+            focusable) {
       return null;
     }
 
@@ -394,7 +403,8 @@ class _RenderChildView extends RenderBox {
 
     _width = size.width;
     _height = size.height;
-    _connection._setChildProperties(_width, _height, 0.0, 0.0, 0.0, 0.0, _focusable);
+    _connection._setChildProperties(
+        _width, _height, 0.0, 0.0, 0.0, 0.0, _focusable);
     assert(() {
       if (_viewContainer == null) {
         _debugErrorMessage ??= new TextPainter(
@@ -522,6 +532,10 @@ class ChildView extends LeafRenderObjectWidget {
   ///
   /// Defaults to true.
   final bool focusable;
+
+  /// Request a snapshot of this |ChildView| in the supplied callback.
+  void requestSnapshot(void callback(fuchsia_mem.Buffer data)) =>
+      connection.requestSnapshot(callback);
 
   @override
   _RenderChildView createRenderObject(BuildContext context) {
