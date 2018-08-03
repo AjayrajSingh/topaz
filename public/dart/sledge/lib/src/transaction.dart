@@ -109,12 +109,11 @@ class Transaction {
   /// If the document does not exist, a new document is returned.
   Future<Document> getDocument(DocumentId documentId) async {
     final document = new Document(_sledge, documentId);
-    Uint8List keyPrefix = documentId.prefix;
-    List<KeyValue> kvs = await getEntriesFromSnapshotWithPrefix(
-        _pageSnapshotProxy,
-        concatUint8Lists(
-            sledge_storage.prefixForType(sledge_storage.KeyValueType.document),
-            keyPrefix));
+    Uint8List keyPrefix = concatUint8Lists(
+        sledge_storage.prefixForType(sledge_storage.KeyValueType.document),
+        documentId.prefix);
+    List<KeyValue> kvs =
+        await getEntriesFromSnapshotWithPrefix(_pageSnapshotProxy, keyPrefix);
 
     // Strip the document prefix from the KVs.
     for (int i = 0; i < kvs.length; i++) {
