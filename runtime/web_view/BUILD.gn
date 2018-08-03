@@ -18,12 +18,12 @@ executable("web_view_bin") {
 
   deps = [
     ":webkit",
+    "//garnet/public/fidl/fuchsia.math",
+    "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//garnet/public/lib/component/cpp",
     "//garnet/public/lib/fxl",
     "//garnet/public/lib/icu_data/cpp",
-    "//garnet/public/fidl/fuchsia.math",
     "//garnet/public/lib/ui/view_framework:view_provider",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//garnet/public/lib/url",
     "//peridot/lib/rapidjson",
     "//peridot/public/fidl/fuchsia.modular",
@@ -123,17 +123,11 @@ if (use_prebuilt_webkit) {
 }
 
 package("web_view") {
-  deprecated_system_image = true
-
   deps = [
     ":web_view_bin",
   ]
 
-  binaries = [
-    {
-      name = "web_view"
-    },
-  ]
+  binary = "web_view"
 
   resources = [
     {
@@ -143,7 +137,14 @@ package("web_view") {
     },
     {
       path = rebase_path("//third_party/icu/common/icudtl.dat")
-      dest = "web_view/icudtl.dat"
+      dest = "icudtl.dat"
+    },
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/web_view.cmx")
+      dest = "web_view.cmx"
     },
   ]
 

@@ -24,11 +24,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
- #include <assert.h>
- #include <dirent.h>
- #include <fcntl.h>
- #include <math.h>
- #include <stdlib.h>
+#include <assert.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <math.h>
+#include <stdlib.h>
 
 #include <algorithm>
 #include <chrono>
@@ -37,9 +37,12 @@
 #include <vector>
 
 #include <lib/async-loop/cpp/loop.h>
+#include <lib/fdio/namespace.h>
+#include <lib/fdio/util.h>
+#include <lib/fxl/command_line.h>
+#include <lib/fxl/files/unique_fd.h>
+#include <lib/fxl/logging.h>
 
-#include "lib/fxl/command_line.h"
-#include "lib/fxl/logging.h"
 #include "topaz/runtime/web_view/web_view_provider.h"
 
 using std::cerr;
@@ -56,6 +59,24 @@ int main(int argc, const char** argv) {
   std::string url = kDefaultUrl;
   if (!urls.empty()) {
     url = urls.front();
+  }
+
+  fxl::UniqueFD fd(open("/pkg/data/webkit", O_RDONLY | O_DIRECTORY));
+  if (fd.is_valid()) {
+    fdio_ns_t* ns;
+    zx_status_t st = fdio_ns_get_installed(&ns);
+    if (st != ZX_OK) {
+      fprintf(stderr, "Could not get installed namespace: %d", st);
+      return 1;
+    }
+
+    st = fdio_ns_bind_fd(ns, "/system/data/webkit", fd.get());
+    if (st != ZX_OK) {
+      fprintf(stderr,
+              "Could not install webkit data entry to /system/data/webkit: %d",
+              st);
+      return 1;
+    }
   }
 
   async::Loop loop(&kAsyncLoopConfigAttachToThread);
