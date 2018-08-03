@@ -1,5 +1,7 @@
 {
     "imports": [
+        "garnet/packages/config/amber",
+        "garnet/packages/prod/amber",
         "garnet/packages/prod/scenic_tools",
         "garnet/packages/prod/wlan",
         "garnet/packages/products/devtools",
