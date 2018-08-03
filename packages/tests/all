@@ -17,6 +17,7 @@
         "topaz/packages/tests/repl",
         "topaz/packages/tests/scenic",
         "topaz/packages/tests/web_runner",
+        "topaz/packages/tests/web_runner_smoke",
         "topaz/packages/tests/web_view"
     ]
 }
