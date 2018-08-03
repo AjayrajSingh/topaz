@@ -38,6 +38,7 @@ class AudioPlayerController {
   int _progressBarMicrosecondsSinceEpoch;
   int _progressBarReferenceTime;
   int _durationNanoseconds;
+  double _deferredNormalizedSeek;
 
   /// Constructs a AudioPlayerController.
   AudioPlayerController(ServiceProvider services) {
@@ -61,9 +62,13 @@ class AudioPlayerController {
     }
 
     if (_active) {
-      _mediaPlayer.setHttpSource(uri.toString());
+      _setSource(uri);
+      _ended = false;
       _hasVideo = false;
       _timelineFunction = null;
+      _loading = true;
+      _durationNanoseconds = 0;
+      _deferredNormalizedSeek = null;
     } else {
       _active = true;
 
@@ -141,6 +146,7 @@ class AudioPlayerController {
 
     _progressBarReady = false;
     _durationNanoseconds = 0;
+    _deferredNormalizedSeek = null;
   }
 
   /// Creates a local player.
@@ -162,7 +168,11 @@ class AudioPlayerController {
     }
 
     _mediaPlayer.ctrl.onConnectionError = _handleConnectionError;
+    _setSource(uri);
+  }
 
+  // Sets the source uri on the media player.
+  void _setSource(Uri uri) {
     if (uri.isScheme('FILE')) {
       _mediaPlayer.setFileSource(new Channel.fromFile(uri.toFilePath()));
     } else {
@@ -277,6 +287,7 @@ class AudioPlayerController {
     int durationInMicroseconds = duration.inMicroseconds;
 
     if (durationInMicroseconds == 0) {
+      _deferredNormalizedSeek = normalizedPosition;
       return;
     }
 
@@ -331,6 +342,10 @@ class AudioPlayerController {
 
     if (status.durationNs != 0) {
       _loading = false;
+      if (_deferredNormalizedSeek != null) {
+        normalizedSeek(_deferredNormalizedSeek);
+        _deferredNormalizedSeek = null;
+      }
     }
 
     if (_progressBarReady && _progressNanoseconds < 0) {
