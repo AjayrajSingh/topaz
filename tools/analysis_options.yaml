@@ -8,7 +8,6 @@
 #
 # The copy happens when you run "make" from the command line.
 analyzer:
-  strong-mode: true
   language:
     enableSuperMixins: true
   exclude:
