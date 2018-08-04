@@ -141,22 +141,22 @@ class GameTrackerImpl extends tictactoe_fidl.GameTracker {
   }
 
   void _sendScoreToQueue(String queueToken) {
-    if (_messageQueues.containsKey(queueToken)) {
+    if (!_messageQueues.containsKey(queueToken)) {
       log.shout('Message queue not found in tracker service.');
     }
-    _getScore()
-        .then((score) {
-            // TODO(MI4-1178): Convert all of this to use MessageSenderClient.
-            var bytes = Uint8List.fromList(
-              utf8.encode(_scoreCodec.encode(score)),
-            );
-            _messageQueues[queueToken].send(new fuchsia_mem.Buffer(
-              vmo: new SizedVmo.fromUint8List(bytes),
-              size: bytes.length,
-            ));
-          })
-        .catchError((e) =>
-            log.shout('Error sending score to message queue: ${e.toString()}'));
+    _getScore().then(
+      (score) {
+        // TODO(MI4-1178): Convert all of this to use MessageSenderClient.
+        var bytes = Uint8List.fromList(
+          utf8.encode(_scoreCodec.encode(score)),
+        );
+        _messageQueues[queueToken].send(new fuchsia_mem.Buffer(
+          vmo: new SizedVmo.fromUint8List(bytes),
+          size: bytes.length,
+        ));
+      },
+    ).catchError((e) =>
+        log.shout('Error sending score to message queue: ${e.toString()}'));
   }
 
   Future<fidl.MessageSender> _createMessageSender(String queueToken) async {

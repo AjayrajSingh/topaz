@@ -74,7 +74,7 @@ class MessageQueueClient extends MessageReader {
   Future<String> getToken() {
     assert(_queue.ctrl.isBound);
 
-    Completer<String> result;
+    Completer<String> result = new Completer();
     _queue.getToken((String token) {
       result.complete(token);
     });
@@ -93,8 +93,8 @@ class MessageQueueClient extends MessageReader {
   @override
   void onReceive(fuchsia_mem.Buffer message, void Function() ack) {
     var dataVmo = new SizedVmo(message.vmo.handle, message.size);
-    var data = dataVmo.map();
+    var readResult = dataVmo.read(message.size);
     dataVmo.close();
-    onMessage.call(data, ack);
+    onMessage.call(readResult.bytesAsUint8List(), ack);
   }
 }
