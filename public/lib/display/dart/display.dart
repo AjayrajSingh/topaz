@@ -11,7 +11,7 @@ import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 
-/// This class abstracts away the DisplayManager fidl interface,
+/// This class abstracts away the fuchsia.device.display.Manager fidl interface,
 class Display extends DeviceSettingsWatcher {
   final DeviceSettingsWatcherBinding _deviceSettingsWatcherBinding =
       DeviceSettingsWatcherBinding();
@@ -22,7 +22,7 @@ class Display extends DeviceSettingsWatcher {
       StreamController.broadcast();
 
   // Used to modify the physical display.
-  final DisplayManagerProxy _displayManagerService = DisplayManagerProxy();
+  final ManagerProxy _displayManagerService = ManagerProxy();
 
   // Used to store and retrieve user settings.
   final DeviceSettingsManagerProxy _deviceSettingsManagerService =
