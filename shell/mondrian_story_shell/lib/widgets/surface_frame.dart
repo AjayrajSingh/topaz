@@ -2,11 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui' show lerpDouble;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import '../models/depth_model.dart';
+
 const Duration _scaleAnimationDuration = const Duration(seconds: 1);
 const double _scaleMinScale = 0.6;
+const double _scaleMaxScale = 1.0;
+const double _surfaceDepth = 250.0;
 const Curve _scaleCurve = Curves.fastOutSlowIn;
 
 /// Frame for child views
@@ -28,24 +34,41 @@ class SurfaceFrame extends StatelessWidget {
   final double depth;
 
   @override
-  Widget build(BuildContext context) => new AnimatedContainer(
-        duration: _scaleAnimationDuration,
-        curve: _scaleCurve,
-        alignment: FractionalOffset.center,
-        transform: _scale,
-        child: new IgnorePointer(
-          child: new PhysicalModel(
-            elevation: (1.0 - depth) * 125.0,
-            color: const Color(0x00000000),
-            child: child,
-          ),
-        ),
-      );
+  Widget build(BuildContext context) {
+    double scale = lerpDouble(
+      _scaleMinScale,
+      _scaleMaxScale,
+      (1.0 - depth.clamp(0.0, 1.0)),
+    );
+    Matrix4 transform = new Matrix4.identity()..scale(scale, scale);
 
-  Matrix4 get _scale {
-    double scale =
-        _scaleMinScale + (1.0 - depth.clamp(0.0, 1.0)) * (1.0 - _scaleMinScale);
-    Matrix4 matrix = new Matrix4.identity()..scale(scale, scale);
-    return matrix;
+    return new AnimatedContainer(
+      duration: _scaleAnimationDuration,
+      curve: _scaleCurve,
+      alignment: FractionalOffset.center,
+      transform: transform,
+      child: new IgnorePointer(
+        child: new ScopedModelDescendant<DepthModel>(
+          builder: (
+            BuildContext context,
+            Widget child,
+            DepthModel depthModel,
+          ) {
+            double elevation = lerpDouble(
+              0.0,
+              _surfaceDepth,
+              (depthModel.maxDepth - depth) / 2.0,
+            ).clamp(0.0, _surfaceDepth);
+
+            return new PhysicalModel(
+              elevation: elevation,
+              color: const Color(0x00000000),
+              child: child,
+            );
+          },
+          child: child,
+        ),
+      ),
+    );
   }
 }

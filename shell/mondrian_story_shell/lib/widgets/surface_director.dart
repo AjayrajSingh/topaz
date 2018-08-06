@@ -12,6 +12,7 @@ import 'package:lib.widgets/model.dart';
 import '../layout/container_layout.dart' as container;
 import '../layout/copresent_layout.dart' as copresent;
 import '../layout/pattern_layout.dart' as pattern;
+import '../models/depth_model.dart';
 import '../models/inset_manager.dart';
 import '../models/layout_model.dart';
 import '../models/surface/positioned_surface.dart';
@@ -218,6 +219,30 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
       formForest.add(new Tree<SurfaceForm>(value: orphan));
     }
 
-    return new SurfaceStage(forms: formForest);
+    /// Determine the max and min depths of all visible surfaces.
+    double minDepth = double.infinity;
+    double maxDepth = -double.infinity;
+    for (double depth
+        in placedSurfaces.values.map((SurfaceForm f) => f.depth)) {
+      if (minDepth > depth) {
+        minDepth = depth;
+      }
+      if (maxDepth < depth) {
+        maxDepth = depth;
+      }
+    }
+    for (double depth in _orphanedForms.map((SurfaceForm f) => f.depth)) {
+      if (minDepth > depth) {
+        minDepth = depth;
+      }
+      if (maxDepth < depth) {
+        maxDepth = depth;
+      }
+    }
+
+    return new ScopedModel<DepthModel>(
+      model: new DepthModel(minDepth: minDepth, maxDepth: maxDepth),
+      child: new SurfaceStage(forms: formForest),
+    );
   }
 }
