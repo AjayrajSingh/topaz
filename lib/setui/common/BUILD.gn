@@ -10,6 +10,7 @@ dart_library("common") {
   package_name = "lib_setiu_common"
 
   sources = [
+    "action_handler.dart",
     "step.dart",
     "syllabus.dart",
     "syllabus_parser.dart",
