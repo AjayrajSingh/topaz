@@ -119,8 +119,8 @@ PlatformView::PlatformView(
   RegisterPlatformMessageHandlers();
 
 #ifndef SCENIC_VIEWS2
-  view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
-                            std::placeholders::_1));
+  /*view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
+                            std::placeholders::_1));*/
 #endif
 }
 
