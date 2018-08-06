@@ -28,6 +28,13 @@ class LedgerPageSnapshotFactoryImpl implements LedgerPageSnapshotFactory {
   }
 }
 
+/// Throws an exception containing [operation] if the status is not `ok`.
+void checkStatus(ledger.Status status, String operation) {
+  if (status != ledger.Status.ok) {
+    throw new Exception('Ledger operation failed: $operation');
+  }
+}
+
 /// Returns data stored in [buffer].
 Uint8List readBuffer(Buffer buffer) {
   ReadResult readResult = buffer.vmo.read(buffer.size);
@@ -65,4 +72,13 @@ Change getChangeFromPageChange(ledger.PageChange pageChange) {
               new KeyValue(entry.key, readBuffer(entry.value)))
           .toList(),
       pageChange.deletedKeys);
+}
+
+/// Returns from [mergeResultProvider] the list of KV conflicts.
+/// TODO: Change the API so that it returns chunks.
+Future<List<ledger.DiffEntry>> getConflictingDiff(
+    ledger.MergeResultProvider mergeResultProvider) async {
+  // TODO: implement.
+  final diff = <ledger.DiffEntry>[];
+  return diff;
 }
