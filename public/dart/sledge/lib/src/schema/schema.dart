@@ -6,6 +6,8 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
+
 import '../document/value.dart';
 import '../document/value_node.dart';
 import '../sledge_connection_id.dart';
@@ -51,6 +53,7 @@ class Schema implements BaseType {
     new BytelistSet(),
     new OrderedList()
   ]);
+  static const _listEquality = const ListEquality();
 
   /// The length of the hash of Schema, as returned by the hash getter.
   static const int hashLength = 20;
@@ -106,4 +109,12 @@ class Schema implements BaseType {
     }
     return _jsonToType[typeName];
   }
+
+  @override
+  bool operator ==(dynamic other) {
+    return other is Schema && _listEquality.equals(other.hash, hash);
+  }
+
+  @override
+  int get hashCode => hash.hashCode;
 }

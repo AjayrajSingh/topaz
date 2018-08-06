@@ -28,6 +28,7 @@ dart_test("dart_sledge_tests") {
     "document_test.dart",
     "ledger_helpers_test.dart",
     "schema_test.dart",
+    "schemas_obtainer_test.dart",
     "sledge_page_id_test.dart",
     "transaction_test.dart",
     "values/compressor_test.dart",
