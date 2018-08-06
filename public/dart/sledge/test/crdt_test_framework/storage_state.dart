@@ -38,11 +38,22 @@ class StorageState {
       if (!_storage.containsKey(entry.key) ||
           _storage[entry.key].timestamp < entry.value.timestamp) {
         // Use other's value for this key.
-        _storage[entry.key] = entry.value;
-        if (entry.value.isDeleted) {
-          deletedKeys.add(entry.key);
+        if (other._storage[entry.key].isDeleted) {
+          // To handle deleted on [other] keys following strategy is used:
+          //  If [key] was never presented on [this] - do nothing.
+          //  In the other case copy the deletion entry from [other] to [this].
+          if (_storage.containsKey(entry.key) &&
+              !_storage[entry.key].isDeleted) {
+            // [key] should be added to [deletedKeys] only if is currently
+            // presented in [this].
+            deletedKeys.add(entry.key);
+          }
+          if (_storage.containsKey(entry.key)) {
+            _storage[entry.key] = entry.value;
+          }
         } else {
           changedEntries.add(new KeyValue(entry.key, entry.value.value));
+          _storage[entry.key] = other._storage[entry.key];
         }
       }
     }

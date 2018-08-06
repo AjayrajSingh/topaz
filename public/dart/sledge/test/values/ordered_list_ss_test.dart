@@ -136,6 +136,21 @@ void main() async {
     await fleet.testAllOrders();
   });
 
+  test('Ordered list. Test deletion.', () async {
+    final fleet = integerOrderedListFleetFactory.newFleet(2)
+      ..runInTransaction(0, (final cnt) async {
+        cnt.insert(0, 0);
+      })
+      ..runInTransaction(0, (final cnt) async {
+        cnt.removeAt(0);
+      })
+      ..synchronize([0, 1])
+      ..runInTransaction(1, (final cnt) async {
+        expect(cnt.isEmpty, isTrue);
+      });
+    await fleet.testSingleOrder();
+  });
+
   await randomRelativeOrderTest(
       countInstances: 3, countEpochs: 2, countInsertions: 2, seed: 1);
   await randomRelativeOrderTest(

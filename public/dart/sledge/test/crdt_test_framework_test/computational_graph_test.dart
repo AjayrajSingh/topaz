@@ -121,4 +121,26 @@ void main() {
           new EvaluationOrder([n2, n1])
         ]));
   });
+
+  test('Check getRandomOrder in linear graph.', () {
+    ComputationalGraph G = new ComputationalGraph();
+    final n1 = new Node('1');
+    final n2 = new Node('2');
+    final n3 = new Node('3');
+    final n4 = new Node('4');
+    final n5 = new Node('5');
+    G
+      ..addNode(n1)
+      ..addNode(n2)
+      ..addNode(n3)
+      ..addNode(n4)
+      ..addNode(n5)
+      ..addRelation(n1, n2)
+      ..addRelation(n2, n3)
+      ..addRelation(n3, n4)
+      ..addRelation(n4, n5);
+
+    final order = G.getRandomOrder();
+    expect(order, equals(new EvaluationOrder([n1, n2, n3, n4, n5])));
+  });
 }

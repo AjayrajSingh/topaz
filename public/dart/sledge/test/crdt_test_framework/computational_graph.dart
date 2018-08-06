@@ -104,7 +104,7 @@ class ComputationalGraph {
       if (i < choices.length) {
         curChoice = choices[i];
       } else if (completeWithRandomChoices) {
-        curChoice = random.nextInt(nodes.length);
+        curChoice = random.nextInt(ready.length);
       }
       if (curChoice >= ready.length) {
         return null;
