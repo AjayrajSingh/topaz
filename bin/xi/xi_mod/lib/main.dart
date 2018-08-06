@@ -11,6 +11,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:xi_widgets/widgets.dart';
 import 'package:xi_fuchsia_client/client.dart';
+import 'package:xi_client/client.dart';
 
 /// ignore_for_file: avoid_annotating_with_dynamic
 
@@ -74,9 +75,10 @@ void main() {
   log.info('Starting Flutter app...');
 
   XiFuchsiaClient xi = new XiFuchsiaClient(pair.passHandle());
+  XiCoreProxy coreProxy = new CoreProxy(xi);
 
   runApp(new XiApp(
-    xi: xi,
+    coreProxy: coreProxy,
     drawDebugBackground: kDrawDebugBackground,
   ));
 }

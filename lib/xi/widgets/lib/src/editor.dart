@@ -49,6 +49,11 @@ const String _zeroWidthSpace = '\u{200b}';
 
 /// State for editor tab
 class EditorState extends State<Editor> implements XiViewHandler {
+  XiViewProxy _viewProxy;
+
+  /// Calls to core that were made before we were initialized are enqueued
+  /// and sent on init.
+  List<Completer<XiViewProxy>> _pending;
   LineCache _lines;
   final ScrollController _controller = new ScrollController();
   // Height of lines (currently fixed, all lines have the same height)
@@ -73,8 +78,27 @@ class EditorState extends State<Editor> implements XiViewHandler {
   @override
   void initState() {
     super.initState();
-    _xiAppState.connectEditor(this);
-    scheduleMicrotask(_sendScrollViewport);
+    _xiAppState.connectEditor(this).then((XiViewProxy viewProxy) {
+      _viewProxy = viewProxy;
+      _sendScrollViewport();
+      if (_pending != null) {
+        for (var completer in _pending) {
+          completer.complete(_viewProxy);
+        }
+        _pending = null;
+      }
+    });
+  }
+
+  /// Returns a [Future] that will resolve when initialization has finished.
+  Future<XiViewProxy> get viewProxy {
+    if (_viewProxy != null) {
+      return Future.value(_viewProxy);
+    } else {
+      Completer<XiViewProxy> completer = new Completer();
+      _pending.add(completer);
+      return completer.future;
+    }
   }
 
   double _lineHeightForStyle(TextStyle style) {
@@ -115,85 +139,70 @@ class EditorState extends State<Editor> implements XiViewHandler {
     }
   }
 
-  // Send a notification to the core. If params are not given,
-  // an empty array will be sent.
-  void _sendNotification(String method, [params]) {
-    _xiAppState.sendNotification(method, params ?? <dynamic>[]);
-  }
-
-  void _doMovement(String direction, Modifiers modifiers) {
-    // Note: the "and_modify_selection" part will probably become a parameter to the
-    // movement method.
-    String method = modifiers.shift
-        ? 'move_${direction}_and_modify_selection'
-        : 'move_$direction';
-    _sendNotification(method);
+  void _doMovement(Movement movement, bool modifySel) {
+    viewProxy.then((view) => modifySel
+        ? view.moveCursorModifyingSelection(movement)
+        : view.moveCursor(movement));
   }
 
   void _handleHidKey(int hidUsage, Modifiers modifiers) {
     if (hidUsage == 0x2A) {
       // Keyboard DELETE (Backspace)
-      _sendNotification('delete_backward');
+      viewProxy.then((view) => view.deleteBackward());
     } else if (hidUsage == 0x28) {
       // Keyboard Return (ENTER)
-      _sendNotification('insert_newline');
+      viewProxy.then((view) => view.insertNewline());
     } else if (modifiers.ctrl && hidUsage == 0x04) {
       // Keyboard a
-      _doMovement('to_beginning_of_paragraph', modifiers);
+      _doMovement(Movement.beginningOfParagraph, false);
     } else if (modifiers.ctrl && hidUsage == 0x08) {
       // Keyboard e
-      _doMovement('to_end_of_paragraph', modifiers);
+      _doMovement(Movement.endOfParagraph, false);
     } else if (modifiers.ctrl && hidUsage == 0x0E) {
       // Keyboard k
-      _sendNotification('delete_to_end_of_paragraph');
+      viewProxy.then((view) => view.kill());
     } else if (modifiers.ctrl && hidUsage == 0x17) {
       // Keyboard t
-      _sendNotification('transpose');
+      viewProxy.then((view) => view.transpose());
     } else if (modifiers.ctrl && hidUsage == 0x1C) {
       // Keyboard y
-      _sendNotification('yank');
+      viewProxy.then((view) => view.yank());
     } else if (modifiers.ctrl && hidUsage == 0x1D) {
       // Keyboard z
       if (modifiers.shift) {
-        _sendNotification('redo');
+        viewProxy.then((view) => view.redo());
       } else {
-        _sendNotification('undo');
+        viewProxy.then((view) => view.undo());
       }
-    } else if (hidUsage == 0x3A) {
-      // Keyboard F1
-      _sendNotification('debug_rewrap');
-    } else if (hidUsage == 0x3B) {
-      // Keyboard F2
-      _sendNotification('debug_wrap_width');
     } else if (hidUsage == 0x50) {
       // Keyboard LeftArrow
-      _doMovement('left', modifiers);
+      _doMovement(Movement.left, modifiers.shift);
     } else if (hidUsage == 0x4F) {
-      // Keyboard RightArrow
-      _doMovement('right', modifiers);
+      // keyboard RightArrow
+      _doMovement(Movement.right, modifiers.shift);
     } else if (hidUsage == 0x52) {
       // Keyboard UpArrow
-      _doMovement('up', modifiers);
+      _doMovement(Movement.up, modifiers.shift);
     } else if (hidUsage == 0x51) {
       // Keyboard DownArrow
-      _doMovement('down', modifiers);
+      _doMovement(Movement.down, modifiers.shift);
     } else if (modifiers.altRight && hidUsage == 0x04) {
       // altgr-a inserts emoji, to test unicode ability
-      _sendNotification('insert', <String, dynamic>{'chars': '\u{1f601}'});
+      viewProxy.then((view) => view.insert('\u{1f601}'));
     } else if (modifiers.altRight && hidUsage == 0x0f) {
       // altgr-l inserts arabic lam, to test bidi ability
-      _sendNotification('insert', <String, dynamic>{'chars': '\u{0644}'});
+      viewProxy.then((view) => view.insert('\u{0644}'));
     }
   }
 
   void _handleCodePoint(int codePoint, Modifiers modifiers) {
     if (codePoint == 9) {
-      _sendNotification('insert_tab');
+      viewProxy.then((view) => view.insertTab());
     } else if (codePoint == 10) {
-      _sendNotification('insert_newline');
+      viewProxy.then((view) => view.insertNewline());
     } else {
       String chars = new String.fromCharCode(codePoint);
-      _sendNotification('insert', <String, dynamic>{'chars': chars});
+      viewProxy.then((view) => view.insert(chars));
     }
   }
 
@@ -246,26 +255,22 @@ class EditorState extends State<Editor> implements XiViewHandler {
   void _handleTapDown(TapDownDetails details) {
     _requestKeyboard();
     _lastTapLocation = _getLineColFromGlobal(details.globalPosition);
-    _sendNotification('gesture', <String, dynamic>{
-      'line': _lastTapLocation.line,
-      'col': _lastTapLocation.col,
-      'ty': 'point_select'
-    });
+    GestureType gestureType = GestureType.pointSelect;
+    viewProxy.then((view) =>
+        view.gesture(_lastTapLocation.line, _lastTapLocation.col, gestureType));
   }
 
   void _handleLongPress() {
     if (_lastTapLocation != null) {
-      _sendNotification('gesture', <String, dynamic>{
-        'line': _lastTapLocation.line,
-        'col': _lastTapLocation.col,
-        'ty': 'word_select'
-      });
+      GestureType gestureType = GestureType.pointSelect;
+      viewProxy.then((view) => view.gesture(
+          _lastTapLocation.line, _lastTapLocation.col, gestureType));
     }
   }
 
   void _handleHorizontalDragUpdate(DragUpdateDetails details) {
     LineCol lineCol = _getLineColFromGlobal(details.globalPosition);
-    _sendNotification('drag', <int>[lineCol.line, lineCol.col, 0, 1]);
+    viewProxy.then((view) => view.drag(lineCol.line, lineCol.col));
   }
 
   void _sendScrollViewport() {
@@ -278,7 +283,7 @@ class EditorState extends State<Editor> implements XiViewHandler {
       }
       int start = pos.pixels ~/ _lineHeight;
       // TODO: be less noisy, send only if changed
-      _sendNotification('scroll', <int>[start, start + viewHeight]);
+      viewProxy.then((view) => view.scroll(start, start + viewHeight));
       log.info('sending scroll $start $viewHeight');
     }
   }
@@ -301,7 +306,7 @@ class EditorState extends State<Editor> implements XiViewHandler {
   TextLine _itemBuilder(BuildContext ctx, int ix) {
     Line line = _lines.getLine(ix);
     if (line == null) {
-      _sendNotification('request_lines', <int>[ix, ix + 1]);
+      viewProxy.then((view) => view.requestLines(ix, ix + 1));
     }
     return new TextLine(
       // TODO: the string '[invalid]' is debug painting, replace with actual UX.
