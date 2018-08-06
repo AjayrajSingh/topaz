@@ -175,10 +175,11 @@ class Sledge {
     // Split the changes according to the document they belong to.
     final splittedDocumentChange =
         documentChange.splitByPrefix(DocumentId.prefixLength);
-    for (final prefix in splittedDocumentChange.keys) {
+    for (final documentChange in splittedDocumentChange.entries) {
+      final prefix = documentChange.key;
       assert(_documentByPrefix.containsKey(prefix));
       _documentByPrefix[prefix].then((document) {
-        Document.applyChange(document, splittedDocumentChange[prefix]);
+        Document.applyChange(document, documentChange.value);
       });
     }
   }

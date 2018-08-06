@@ -58,9 +58,10 @@ class DataConverter<K, V> {
   /// Converts from Map<K, V> to List<KeyValue>.
   Change serialize(final ConvertedChange<K, V> input) {
     final Change result = new Change();
-    for (var key in input.changedEntries.keys) {
-      result.changedEntries.add(new KeyValue(_keyConverter.serialize(key),
-          _valueConverter.serialize(input.changedEntries[key])));
+    for (final changedEntry in input.changedEntries.entries) {
+      result.changedEntries.add(new KeyValue(
+          _keyConverter.serialize(changedEntry.key),
+          _valueConverter.serialize(changedEntry.value)));
     }
     for (var key in input.deletedKeys) {
       result.deletedKeys.add(_keyConverter.serialize(key));

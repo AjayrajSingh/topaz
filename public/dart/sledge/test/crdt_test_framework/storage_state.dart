@@ -33,16 +33,16 @@ class StorageState {
     final changedEntries = <KeyValue>[];
     final deletedKeys = <Uint8List>[];
 
-    for (final key in other._storage.keys) {
-      // Check who have newer value for this key.
-      if (!_storage.containsKey(key) ||
-          _storage[key].timestamp < other._storage[key].timestamp) {
+    for (final entry in other._storage.entries) {
+      // Check which storage has the most recent value for the entry's key.
+      if (!_storage.containsKey(entry.key) ||
+          _storage[entry.key].timestamp < entry.value.timestamp) {
         // Use other's value for this key.
-        _storage[key] = other._storage[key];
-        if (other._storage[key].isDeleted) {
-          deletedKeys.add(key);
+        _storage[entry.key] = entry.value;
+        if (entry.value.isDeleted) {
+          deletedKeys.add(entry.key);
         } else {
-          changedEntries.add(new KeyValue(key, other._storage[key].value));
+          changedEntries.add(new KeyValue(entry.key, entry.value.value));
         }
       }
     }

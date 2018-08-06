@@ -72,8 +72,8 @@ class Document implements ValueObserver {
   /// Gets the change for all fields of this document.
   Change _getChange() {
     Change result = new Change();
-    for (final prefix in _fields.keys) {
-      result.addAll(_fields[prefix].getChange().withPrefix(prefix));
+    for (final field in _fields.entries) {
+      result.addAll(field.value.getChange().withPrefix(field.key));
     }
     return result;
   }
@@ -88,8 +88,8 @@ class Document implements ValueObserver {
   /// Applies change to fields of this document.
   void _applyChange(final Change change) {
     Map<Uint8List, Change> splittedChanges = change.splitByPrefix(_hashLength);
-    for (final prefix in splittedChanges.keys) {
-      _fields[prefix].applyChange(splittedChanges[prefix]);
+    for (final splittedChange in splittedChanges.entries) {
+      _fields[splittedChange.key].applyChange(splittedChange.value);
     }
     _changeController.add(null);
   }

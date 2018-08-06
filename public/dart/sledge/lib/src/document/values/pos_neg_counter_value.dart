@@ -80,9 +80,10 @@ class PosNegCounterValue<T extends num> implements LeafValue {
   @override
   void applyChange(Change input) {
     final ConvertedChange<Uint8List, T> change = _converter.deserialize(input);
-    for (var key in change.changedEntries.keys) {
-      var diff = change.changedEntries[key] - (_storage[key] ?? _defaultValue);
-      if (_isKeyPositive(key)) {
+    for (final changedEntry in change.changedEntries.entries) {
+      var diff =
+          changedEntry.value - (_storage[changedEntry.key] ?? _defaultValue);
+      if (_isKeyPositive(changedEntry.key)) {
         _sum += diff;
       } else {
         _sum -= diff;
