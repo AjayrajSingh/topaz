@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:fidl_fuchsia_mem/fidl.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ledger.dart/ledger.dart';
 import 'package:zircon/zircon.dart' show ZX, ReadResult;
 
@@ -60,7 +61,7 @@ Future<List<KeyValue>> getEntriesFromSnapshotWithPrefix(
     Uint8List v = readBuffer(entry.value);
     keyValues.add(new KeyValue(k, v));
   }
-  print('Successfully read ${keyValues.length} entries');
+  log.info('Successfully read ${keyValues.length} entries');
   return keyValues;
 }
 

@@ -3,12 +3,15 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/set_value.dart';
 import 'package:test/test.dart';
 
 import 'set_api_tester.dart';
 
 void main() {
+  setupLogger();
+
   group('Set API coverage', () {
     new SetApiTester<SetValue>(() => new SetValue<int>())
       ..testApi()

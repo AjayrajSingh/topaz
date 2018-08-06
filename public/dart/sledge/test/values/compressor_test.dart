@@ -5,6 +5,7 @@
 // ignore_for_file: implementation_imports
 import 'dart:typed_data';
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/compressor.dart';
 import 'package:sledge/src/document/values/key_value.dart';
 import 'package:test/test.dart';
@@ -12,6 +13,8 @@ import 'package:test/test.dart';
 import 'matchers.dart';
 
 void main() {
+  setupLogger();
+
   group('Correct compression', () {
     test('KeyValue', () {
       final c = new Compressor(), c1 = new Compressor();

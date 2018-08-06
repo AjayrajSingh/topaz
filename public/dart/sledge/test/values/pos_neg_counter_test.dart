@@ -6,6 +6,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/uint8list_ops.dart';
 import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/converter.dart';
@@ -18,6 +19,8 @@ import '../dummies/dummy_value_observer.dart';
 Map<Uint8List, int> _newIntMap() => newUint8ListMap<int>();
 
 void main() {
+  setupLogger();
+
   final id1 = new Uint8List.fromList([1]);
 
   test('PosNegCounterValue accumulate additions', () {

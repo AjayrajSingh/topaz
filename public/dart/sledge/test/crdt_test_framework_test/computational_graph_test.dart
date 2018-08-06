@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
+import 'package:lib.app.dart/logging.dart';
 import 'package:test/test.dart';
 
 import '../crdt_test_framework/computational_graph.dart';
@@ -10,6 +11,8 @@ import '../crdt_test_framework/evaluation_order.dart';
 import '../crdt_test_framework/node.dart';
 
 void main() {
+  setupLogger();
+
   test('Build and get orders.', () {
     ComputationalGraph G = new ComputationalGraph();
     final n1 = new Node('1');

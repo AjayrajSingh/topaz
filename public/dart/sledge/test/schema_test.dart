@@ -8,6 +8,7 @@ import 'dart:typed_data';
 // TODO: investigate whether we can get rid of the implementation_imports.
 // ignore_for_file: implementation_imports
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/sledge.dart';
 import 'package:sledge/src/document/change.dart';
 import 'package:sledge/src/utils_random.dart';
@@ -28,6 +29,8 @@ Map<String, BaseType> schemaWithEmbeddedSchema() {
 }
 
 void main() {
+  setupLogger();
+
   test('Create flat schema', () {
     new Schema(flatSchema());
   });

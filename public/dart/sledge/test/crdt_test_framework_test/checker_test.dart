@@ -4,8 +4,9 @@
 
 // ignore_for_file: implementation_imports
 
-import 'package:test/test.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/last_one_wins_value.dart';
+import 'package:test/test.dart';
 
 import '../crdt_test_framework/crdt_test_framework.dart';
 
@@ -30,6 +31,8 @@ class FalseChecker extends Checker<LastOneWinsValue<bool>> {
 }
 
 void main() async {
+  setupLogger();
+
   test('Checker passes.', () async {
     final fleet = boolLastOneWinsFleetFactory.newFleet(2)
       ..runInTransaction(0, (LastOneWinsValue<bool> b) async {

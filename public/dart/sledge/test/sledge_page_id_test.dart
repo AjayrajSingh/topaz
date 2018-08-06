@@ -4,11 +4,14 @@
 
 import 'dart:typed_data';
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:sledge/sledge.dart';
 import 'package:test/test.dart';
 
 void main() {
+  setupLogger();
+
   test('Create SledgePageId objects', () {
     final a = new SledgePageId();
     final b = new SledgePageId('');

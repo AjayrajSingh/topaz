@@ -10,6 +10,7 @@ import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger_async;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular_async;
 import 'package:fidl/fidl.dart' as fidl;
+import 'package:lib.app.dart/logging.dart';
 import 'package:zircon/zircon.dart' show ChannelPair;
 
 import 'document/change.dart';
@@ -52,7 +53,7 @@ class Sledge {
     componentContext.getLedger(ledgerPair.passRequest(),
         (ledger.Status status) {
       if (status != ledger.Status.ok) {
-        print('Sledge failed to connect to Ledger: $status');
+        log.severe('Sledge failed to connect to Ledger: $status');
       }
     });
 
@@ -77,7 +78,7 @@ class Sledge {
     _ledgerProxy.getPage(pageId.id, _pageProxy.ctrl.request(),
         (ledger.Status status) {
       if (status != ledger.Status.ok) {
-        print('Sledge failed to GetPage: $status');
+        log.severe('Sledge failed to GetPage: $status');
         initializationCompleter.complete(false);
       } else {
         _modificationQueue =
@@ -97,7 +98,7 @@ class Sledge {
         .getLedger(new fidl.InterfaceRequest(pair.first))
         .then((status) async {
       if (status != ledger_async.Status.ok) {
-        print('Sledge failed to connect to Ledger: $status');
+        log.severe('Sledge failed to connect to Ledger: $status');
       }
     });
 

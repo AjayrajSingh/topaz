@@ -3,12 +3,15 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
+import 'package:lib.app.dart/logging.dart';
 import 'package:test/test.dart';
 
 import '../crdt_test_framework/evaluation_order.dart';
 import '../crdt_test_framework/node.dart';
 
 void main() {
+  setupLogger();
+
   test('EvaluationOrder operator ==', () {
     final n1 = new Node('n 1');
     final n2 = new Node('n 2');

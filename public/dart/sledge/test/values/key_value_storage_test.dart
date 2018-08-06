@@ -3,12 +3,15 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/key_value_storage.dart';
 import 'package:test/test.dart';
 
 import 'map_api_tester.dart';
 
 void main() {
+  setupLogger();
+
   group('Map API coverage', () {
     new MapApiTester<KeyValueStorage>(() => new KeyValueStorage<int, int>())
       ..testApi()

@@ -3,12 +3,15 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/sledge.dart';
 import 'package:test/test.dart';
 
 import 'helpers.dart';
 
 void main() {
+  setupLogger();
+
   test('Run a single transaction', () async {
     Sledge sledge = newSledgeForTesting();
     await sledge.runInTransaction(() async {});

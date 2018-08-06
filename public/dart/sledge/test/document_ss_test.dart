@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/sledge.dart';
 import 'package:test/test.dart';
 
@@ -28,6 +29,8 @@ class NameLengthChecker extends Checker<Document> {
 }
 
 void main() async {
+  setupLogger();
+
   final Schema nameLengthSchema = new Schema(<String, BaseType>{
     'name': new LastOneWinsString(),
     'length': new Integer()

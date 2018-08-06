@@ -7,6 +7,7 @@
 import 'dart:typed_data';
 
 // ignore_for_file: library_prefixes
+import 'package:lib.app.dart/logging.dart';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:sledge/src/ledger_helpers.dart';
 import 'package:sledge/src/document/change.dart';
@@ -15,6 +16,8 @@ import 'package:test/test.dart';
 import 'values/matchers.dart';
 
 void main() {
+  setupLogger();
+
   group('Transform ledger types.', () {
     test('Convert empty change', () {
       const emptyPageChange = const ledger.PageChange(

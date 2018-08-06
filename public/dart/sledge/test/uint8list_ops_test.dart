@@ -5,10 +5,13 @@
 // ignore_for_file: implementation_imports
 import 'dart:typed_data';
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/uint8list_ops.dart';
 import 'package:test/test.dart';
 
 void main() {
+  setupLogger();
+
   test('Concatenation of Uint8Lists', () {
     final l1 = [1, 2], l2 = [3, 4, 5], l3 = [6];
     final uint8lConcat = concatListOfUint8Lists([

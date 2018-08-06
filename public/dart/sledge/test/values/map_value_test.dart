@@ -3,12 +3,15 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/map_value.dart';
 import 'package:test/test.dart';
 
 import 'map_api_tester.dart';
 
 void main() {
+  setupLogger();
+
   group('Map API coverage', () {
     new MapApiTester<MapValue>(() => new MapValue<int, int>())
       ..testApi()

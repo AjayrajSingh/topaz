@@ -8,6 +8,7 @@ import 'dart:async';
 import 'dart:math' show Random;
 import 'dart:typed_data';
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/ordered_list_value.dart';
 import 'package:test/test.dart';
 
@@ -102,6 +103,8 @@ Future randomRelativeOrderTest(
 }
 
 void main() async {
+  setupLogger();
+
   test('OrderedList with framework', () async {
     final fleet = integerOrderedListFleetFactory.newFleet(2)
       ..runInTransaction(0, (OrderedListValue<int> l0) async {

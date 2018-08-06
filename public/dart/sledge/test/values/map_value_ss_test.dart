@@ -4,6 +4,7 @@
 
 // ignore_for_file: implementation_imports, avoid_catches_without_on_clauses
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/map_value.dart';
 import 'package:test/test.dart';
 
@@ -23,6 +24,8 @@ const MapFleetFactory<int, int> intMapFleetFactory =
     const MapFleetFactory<int, int>();
 
 void main() async {
+  setupLogger();
+
   test('Test with framework', () async {
     final fleet = intMapFleetFactory.newFleet(2)
       ..runInTransaction(0, (MapValue<int, int> m0) async {

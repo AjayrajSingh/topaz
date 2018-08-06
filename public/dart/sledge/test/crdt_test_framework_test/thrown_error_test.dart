@@ -3,8 +3,9 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
-import 'package:test/test.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/map_value.dart';
+import 'package:test/test.dart';
 
 import '../crdt_test_framework/crdt_test_framework.dart';
 import '../crdt_test_framework/evaluation_order.dart';
@@ -30,6 +31,8 @@ class ValuesAreUniqueChecker<K, V> extends Checker<MapValue<K, V>> {
 }
 
 void main() async {
+  setupLogger();
+
   test('Checker fails.', () async {
     final fleet = intMapFleetFactory.newFleet(2)
       ..runInTransaction(0, (MapValue<int, int> m0) async {

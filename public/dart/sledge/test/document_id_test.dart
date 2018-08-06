@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/sledge.dart';
 import 'package:test/test.dart';
 
@@ -14,6 +15,8 @@ Schema newSchema() {
 }
 
 void main() {
+  setupLogger();
+
   test('Verify that two unnamed DocumentId have different prefixes', () {
     Schema schema = newSchema();
     final id1 = new DocumentId(schema);

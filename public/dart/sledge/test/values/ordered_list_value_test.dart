@@ -6,12 +6,15 @@
 import 'dart:math' show Random;
 import 'dart:typed_data';
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/ordered_list_value.dart';
 import 'package:test/test.dart';
 
 import 'list_api_tester.dart';
 
 void main() {
+  setupLogger();
+
   final id1 = new Uint8List.fromList([1]);
 
   group('List API coverage', () {

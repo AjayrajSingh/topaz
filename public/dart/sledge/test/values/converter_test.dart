@@ -5,11 +5,14 @@
 // ignore_for_file: implementation_imports
 import 'dart:typed_data';
 
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/converter.dart';
 import 'package:test/test.dart';
 
 void main() {
+  setupLogger();
+
   Converter<int> intConverter = new Converter<int>();
   Converter<bool> boolConverter = new Converter<bool>();
   Converter<double> doubleConverter = new Converter<double>();

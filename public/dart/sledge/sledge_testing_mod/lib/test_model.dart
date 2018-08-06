@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/sledge.dart';
 
 /// Handles the lifecycle of the Test module.
@@ -31,7 +32,7 @@ class TestModel {
       dynamic doc = await sledge.getDocument(id);
       assert(doc.someBool.value == true);
       assert(doc.someInteger.value == 42);
-      print('it works!');
+      log.info('it works!');
     });
   }
 
