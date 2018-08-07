@@ -19,13 +19,20 @@ void main() {
   Converter<String> stringConverter = new Converter<String>();
 
   group('Correct convertions', () {
-    // TODO: add MAX_INT, MIN_INT.
     test('int converter', () {
       expect(intConverter.deserialize(intConverter.serialize(0)), equals(0));
       expect(intConverter.deserialize(intConverter.serialize(23)), equals(23));
       expect(intConverter.deserialize(intConverter.serialize(-7)), equals(-7));
       expect(intConverter.deserialize(intConverter.serialize(113124324)),
           equals(113124324));
+
+      const maxInt = (1 << 63) - 1;
+      expect(intConverter.deserialize(intConverter.serialize(maxInt)),
+          equals(maxInt));
+
+      const minInt = 1 << 63;
+      expect(intConverter.deserialize(intConverter.serialize(minInt)),
+          equals(minInt));
     });
 
     test('bool converter', () {

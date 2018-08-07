@@ -117,9 +117,6 @@ class StringConverter implements Converter<String> {
   }
 }
 
-// TODO: rewrite this converter.
-// int in Dart is an arbitrary large integer.
-// So we can't just use get/setInt64() without checks and limitations.
 /// Converter for Int.
 class IntConverter implements Converter<int> {
   /// Constructor.
@@ -130,14 +127,16 @@ class IntConverter implements Converter<int> {
 
   @override
   int deserialize(final Uint8List x) {
-    final s = new StringConverter().deserialize(x);
-    return int.parse(s);
+    if (x.length != 8) {
+      throw new FormatException(
+          "Can't parse int: Length should be 8, found ${x.length} instead for input: $x");
+    }
+    return x.buffer.asByteData().getInt64(x.offsetInBytes);
   }
 
   @override
-  Uint8List serialize(final int x) {
-    return new StringConverter().serialize(x.toString());
-  }
+  Uint8List serialize(final int x) =>
+      new Uint8List(8)..buffer.asByteData().setInt64(0, x);
 }
 
 /// Converter for double.
@@ -151,15 +150,15 @@ class DoubleConverter implements Converter<double> {
   @override
   double deserialize(final Uint8List x) {
     if (x.length != 8) {
-      throw new FormatException("Can't parse double. Length should be 8.");
+      throw new FormatException(
+          "Can't parse double: Length should be 8, found ${x.length} instead for input: $x");
     }
     return x.buffer.asByteData().getFloat64(x.offsetInBytes);
   }
 
   @override
-  Uint8List serialize(final double x) {
-    return new Uint8List(8)..buffer.asByteData().setFloat64(0, x);
-  }
+  Uint8List serialize(final double x) =>
+      new Uint8List(8)..buffer.asByteData().setFloat64(0, x);
 }
 
 /// Converter for bool.
