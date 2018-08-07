@@ -197,7 +197,6 @@ var reservedWords = map[string]bool{
 
 var declForPrimitiveType = map[types.PrimitiveSubtype]string{
 	types.Bool:    "bool",
-	types.Status:  "int",
 	types.Int8:    "int",
 	types.Int16:   "int",
 	types.Int32:   "int",
@@ -211,7 +210,6 @@ var declForPrimitiveType = map[types.PrimitiveSubtype]string{
 }
 
 var typedDataDecl = map[types.PrimitiveSubtype]string{
-	types.Status:  "Int32List",
 	types.Int8:    "Int8List",
 	types.Int16:   "Int16List",
 	types.Int32:   "Int32List",
@@ -226,7 +224,6 @@ var typedDataDecl = map[types.PrimitiveSubtype]string{
 
 var typeForPrimitiveSubtype = map[types.PrimitiveSubtype]string{
 	types.Bool:    "BoolType",
-	types.Status:  "StatusType",
 	types.Int8:    "Int8Type",
 	types.Int16:   "Int16Type",
 	types.Int32:   "Int32Type",
