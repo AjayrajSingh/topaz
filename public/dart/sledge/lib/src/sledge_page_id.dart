@@ -48,7 +48,7 @@ class SledgePageId {
   /// Returns true if the page identified with [pageId] is managed by this
   /// version of Sledge.
   static bool pageIsManagedBySledge(ledger.PageId pageId) {
-    final pageIdPrefix = getUint8ListPrefix(pageId.id, prefix.length);
+    final pageIdPrefix = getSublistView(pageId.id, end: prefix.length);
     return new ListEquality<int>().equals(pageIdPrefix, prefix);
   }
 }

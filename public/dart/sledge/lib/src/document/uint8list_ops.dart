@@ -31,23 +31,18 @@ Uint8List concatListOfUint8Lists(List<Uint8List> list) {
   return result;
 }
 
-/// Returns the prefix of [x] of length [prefixLen].
-Uint8List getUint8ListPrefix(Uint8List x, int prefixLen) {
-  return new Uint8List(prefixLen)..setAll(0, x.getRange(0, prefixLen));
-}
-
-/// Returns the suffix of [x] starting from [prefixLen].
-Uint8List getUint8ListSuffix(Uint8List x, int prefixLen) {
-  return new Uint8List(x.length - prefixLen)
-    ..setAll(0, x.getRange(prefixLen, x.length));
+/// Returns a _view_ of a region of [x] starting at [start] (inclusive) and
+/// ending at [end] (exclusive).
+Uint8List getSublistView(Uint8List x, {int start = 0, int end}) {
+  end ??= x.length;
+  return new UnmodifiableUint8ListView(
+      x.buffer.asUint8List(x.offsetInBytes + start, end - start));
 }
 
 /// Returns a Uint8List created from the utf8 encoding of [string].
 /// [string] must be non-null.
 Uint8List getUint8ListFromString(String string) {
-  assert(string != null);
-  List<int> encodedString = new List<int>.from(utf8.encode(string));
-  return new Uint8List.fromList(encodedString);
+  return new Uint8List.fromList(utf8.encode(string));
 }
 
 /// Returns a new HashMap with Uint8Lists as a keys.

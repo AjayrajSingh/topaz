@@ -118,8 +118,8 @@ class Transaction {
     // Strip the document prefix from the KVs.
     for (int i = 0; i < kvs.length; i++) {
       kvs[i] = new KeyValue(
-          getUint8ListSuffix(kvs[i].key,
-              DocumentId.prefixLength + sledge_storage.typePrefixLength),
+          getSublistView(kvs[i].key,
+              start: DocumentId.prefixLength + sledge_storage.typePrefixLength),
           kvs[i].value);
     }
 

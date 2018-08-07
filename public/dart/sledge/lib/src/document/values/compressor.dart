@@ -47,24 +47,26 @@ class Compressor {
   /// Uncompress KeyValue.
   KeyValue uncompressKeyInEntry(KeyValue entry) {
     if (entry.value.length < 8) {
-      throw new FormatException('Serialized value in a hashed key mode'
-          'has length less than eight.');
+      throw new FormatException('In a hashed key mode, the value size must be '
+          '>= 8. Found ${entry.value.length} instead, for entry $entry');
     }
     final keyLength = entry.value.buffer.asByteData().getUint64(0);
-    final content = getUint8ListSuffix(entry.value, 8);
-    if (content.length < keyLength) {
-      throw new FormatException('Serialized value incorrect format:'
-          'key length is larger than real length of content');
+    if (entry.value.length < 8 + keyLength) {
+      throw new FormatException('Incorrect format for value of given entry: '
+          'The parsed length ($keyLength) is larger than the value content\'s '
+          'length (${entry.value.length - 8}). Entry: $entry');
     }
-    final result = new KeyValue(getUint8ListPrefix(content, keyLength),
-        getUint8ListSuffix(content, keyLength));
+    final key = getSublistView(entry.value, start: 8, end: 8 + keyLength);
+    final value = getSublistView(entry.value, start: 8 + keyLength);
+
+    // TODO(nellyv): Remove this validation?
     // Important side effect: result.key is added to _keyByHash.
-    final hash = _getAndSaveHashOfKey(result.key);
+    final hash = _getAndSaveHashOfKey(key);
     if (!_listEquality.equals(hash, entry.key)) {
       throw new FormatException(
           'Hash of parsed key is not equal to passed hash.');
     }
-    return result;
+    return new KeyValue(key, value);
   }
 
   /// Returns hash of key, and adds (hash, key) pair to caching map.

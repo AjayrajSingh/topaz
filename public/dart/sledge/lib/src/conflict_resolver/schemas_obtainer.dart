@@ -43,8 +43,8 @@ Future<Set<KeyValue>> _getSchemaKeyValues(ledger.PageSnapshot snapshot) async {
 Map<Uint8List, Schema> createSchemaMap(Set<KeyValue> schemaKeyValues) {
   final map = newUint8ListMap<Schema>();
   for (final schemaKeyValue in schemaKeyValues) {
-    final schemaHash =
-        getUint8ListSuffix(schemaKeyValue.key, sledge_storage.typePrefixLength);
+    final schemaHash = getSublistView(schemaKeyValue.key,
+        start: sledge_storage.typePrefixLength);
     String jsonString = utf8.decode(schemaKeyValue.value);
     map[schemaHash] = new Schema.fromJson(json.decode(jsonString));
   }

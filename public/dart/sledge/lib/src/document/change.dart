@@ -43,15 +43,15 @@ class Change {
   Map<Uint8List, Change> splitByPrefix(int prefixLen) {
     final splittedChanges = newUint8ListMap<Change>();
     for (final change in changedEntries) {
-      final prefix = getUint8ListPrefix(change.key, prefixLen);
+      final prefix = getSublistView(change.key, end: prefixLen);
       final newChange = splittedChanges.putIfAbsent(prefix, () => new Change());
       newChange.changedEntries.add(new KeyValue(
-          getUint8ListSuffix(change.key, prefixLen), change.value));
+          getSublistView(change.key, start: prefixLen), change.value));
     }
     for (final deletion in deletedKeys) {
-      final prefix = getUint8ListPrefix(deletion, prefixLen);
+      final prefix = getSublistView(deletion, end: prefixLen);
       final newChange = splittedChanges.putIfAbsent(prefix, () => new Change());
-      newChange.deletedKeys.add(getUint8ListSuffix(deletion, prefixLen));
+      newChange.deletedKeys.add(getSublistView(deletion, start: prefixLen));
     }
     return splittedChanges;
   }
