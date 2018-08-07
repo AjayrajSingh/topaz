@@ -13,5 +13,9 @@ package("topaz_benchmarks") {
       name = rebase_path("topaz_benchmarks.sh")
       dest = "benchmarks.sh"
     },
+    {
+      name = rebase_path("topaz_gfx_benchmarks.sh")
+      dest = "gfx_benchmarks.sh"
+    },
   ]
 }
