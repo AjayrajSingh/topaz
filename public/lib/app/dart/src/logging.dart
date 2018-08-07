@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer' show Timeline;
 import 'dart:io';
@@ -45,7 +46,7 @@ const int _unexpectedLoggingLevel = 100;
 typedef LogWriter = void Function(LogWriterMessage message);
 
 /// Interim method that sets up the logger using the new-style bindings for service resolution.
-void setupLoggerAsync({
+Future<void> setupLoggerAsync({
   String name,
   Level level,
   bool forceShowCodeLocation,
@@ -53,16 +54,16 @@ void setupLoggerAsync({
   List<String> globalTags,
   zircon.Socket logSocket,
   LogWriter logWriter,
-}) {
+}) async {
   zircon.Socket sock = logSocket;
   if (logSocket == null) {
     final socketPair = zircon.SocketPair(zircon.Socket.DATAGRAM);
     final logSinkProxy = new logger_async.LogSinkProxy();
-    app_async.connectToService(
+    await app_async.connectToService(
       new app_async.StartupContext.fromStartupInfo().environmentServices,
       logSinkProxy.ctrl,
     );
-    logSinkProxy.connect(socketPair.second);
+    await logSinkProxy.connect(socketPair.second);
     sock = socketPair.first;
   }
   setupLogger(
