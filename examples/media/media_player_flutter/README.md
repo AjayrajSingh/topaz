@@ -56,18 +56,11 @@ Here's an example config file:
             "album": "At the Close of the Century Disc 2"
           }
         ]
-      },
-      {
-        "title": "Control player on myacer",
-        "device": "myacer",
-        "service": "media_player",
-      },
+      }
     ]
 
 The config file must be well-formed JSON specifying an array of objects. An
-object describes a movie, a song, a playlist of movies and songs or a 'remote'.
-A remote allows the user to control a player that's already running on another
-device.
+object describes a movie, a song or a playlist of movies and songs.
 
 The following object fields are supported:
 
@@ -75,7 +68,7 @@ The following object fields are supported:
 
 Specifies the URI from which to obtain the content. The file scheme is
 supported for files on the device. This field is required for movies and songs
-and prohibited for playlists and remotes.
+and prohibited for playlists.
 
 ### children
 
@@ -84,7 +77,7 @@ This field is required for playlists and prohibited for all other item types.
 
 ### type
 
-Specifies the type of the item, one of "movie", "music", "playlist" or "remote".
+Specifies the type of the item, one of "movie", "music" or "playlist".
 This field is optional. If it's absent, the app will attempt to infer the type
 of the content.
 
@@ -104,30 +97,5 @@ The name of the album on which the content appears. This field is optional.
 
 ### loop
 
-Whether the item should be looped. This field is optional and doesn't apply to
-remotes. Playlists can be looped.
-
-### device
-
-Specifies the name of the device (in the NetConnector sense) for a remote. This
-field is required for remotes and prohibited for all other types.
-
-### service
-
-Specifies the name of the service (in the NetConnector sense) for a remote. This
-field is required for remotes and prohibited for all other types.
-
-## FORMAT SUPPORT
-
-* Containers
-  * MATROSKA (MKV)
-  * OGG
-  * FLAC
-  * WAV
-* Encodings
-  * THEORA
-  * VP3
-  * VP8
-  * VORBIS
-  * FLAC
-  * PCM (various)
+Whether the item should be looped. This field is optional. Playlists can be
+looped.

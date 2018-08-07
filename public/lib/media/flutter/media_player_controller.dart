@@ -40,9 +40,9 @@ class MediaPlayerController extends AudioPlayerController
   }
 
   @override
-  void open(Uri uri, {String serviceName}) {
+  void open(Uri uri) {
     _wasActive = openOrConnected;
-    super.open(uri, serviceName: serviceName);
+    super.open(uri);
     scheduleMicrotask(_notifyListeners);
   }
 
@@ -59,12 +59,6 @@ class MediaPlayerController extends AudioPlayerController
       _videoViewConnection =
           new ChildViewConnection(viewOwnerPair.passHandle());
     }
-  }
-
-  @override
-  void connectToRemote({String device, String service}) {
-    _close();
-    super.connectToRemote(device: device, service: service);
   }
 
   @override

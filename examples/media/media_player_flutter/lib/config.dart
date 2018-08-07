@@ -50,8 +50,6 @@ Asset _convertAsset(Object json) {
   String album;
   List<Asset> children;
   bool loop = false;
-  String device;
-  String service;
 
   jsonMap.forEach((String key, Object value) {
     switch (key) {
@@ -74,9 +72,6 @@ Asset _convertAsset(Object json) {
           case 'playlist':
             type = AssetType.playlist;
             break;
-          case 'remote':
-            type = AssetType.remote;
-            break;
           default:
             throw new FormatException(
                 'Config file is malformed: $value is not a valid type');
@@ -97,12 +92,6 @@ Asset _convertAsset(Object json) {
       case 'loop':
         loop = _convertBool(value);
         break;
-      case 'device':
-        device = _convertString(value);
-        break;
-      case 'service':
-        service = _convertString(value);
-        break;
     }
   });
 
@@ -111,8 +100,6 @@ Asset _convertAsset(Object json) {
     if (uri == null) {
       if (children != null) {
         type = AssetType.playlist;
-      } else if (device != null || service != null) {
-        type = AssetType.remote;
       }
     } else if (_isMovieUri(uri)) {
       type = AssetType.movie;
@@ -131,8 +118,6 @@ Asset _convertAsset(Object json) {
     case AssetType.movie:
       _checkNotNull(type, uri, 'a URI');
       _checkNull(type, children, 'children');
-      _checkNull(type, device, 'device name');
-      _checkNull(type, service, 'service name');
       return new Asset.movie(
         uri: uri,
         title: title,
@@ -144,8 +129,6 @@ Asset _convertAsset(Object json) {
     case AssetType.song:
       _checkNotNull(type, uri, 'a URI');
       _checkNull(type, children, 'children');
-      _checkNull(type, device, 'device name');
-      _checkNull(type, service, 'service name');
       return new Asset.song(
         uri: uri,
         title: title,
@@ -159,8 +142,6 @@ Asset _convertAsset(Object json) {
       _checkNotNull(type, children, 'children');
       _checkNull(type, artist, 'artist name');
       _checkNull(type, album, 'album name');
-      _checkNull(type, device, 'device name');
-      _checkNull(type, service, 'service name');
       if (children.isEmpty) {
         throw const FormatException(
             'Config file is malformed: a playlist must have at least one child');
@@ -174,19 +155,6 @@ Asset _convertAsset(Object json) {
         title: title,
         children: children,
         loop: loop,
-      );
-
-    case AssetType.remote:
-      _checkNull(type, uri, 'a URI');
-      _checkNull(type, children, 'children');
-      _checkNull(type, artist, 'artist name');
-      _checkNull(type, album, 'album name');
-      _checkNotNull(type, device, 'device name');
-      _checkNotNull(type, service, 'service name');
-      return new Asset.remote(
-        title: title,
-        device: device,
-        service: service,
       );
 
     default:

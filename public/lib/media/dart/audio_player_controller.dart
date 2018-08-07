@@ -16,8 +16,6 @@ typedef UpdateCallback = void Function();
 
 /// Controller for audio-only playback.
 class AudioPlayerController {
-  final NetMediaServiceProxy _netMediaService = new NetMediaServiceProxy();
-
   ServiceProvider _services;
 
   MediaPlayerProxy _mediaPlayer;
@@ -27,7 +25,6 @@ class AudioPlayerController {
   bool _playing = false;
   bool _ended = false;
   bool _hasVideo = false;
-  bool _isRemote = false;
 
   TimelineFunction _timelineFunction;
   Problem _problem;
@@ -56,7 +53,7 @@ class AudioPlayerController {
   /// player will be published via NetConnector. It only applies when creating
   /// a new local player. If |serviceName| is not specified, the player will
   /// not be published.
-  void open(Uri uri, {String serviceName}) {
+  void open(Uri uri) {
     if (uri == null) {
       throw new ArgumentError.notNull('uri');
     }
@@ -72,38 +69,8 @@ class AudioPlayerController {
     } else {
       _active = true;
 
-      _createLocalPlayer(uri, serviceName);
+      _createLocalPlayer(uri);
     }
-
-    if (updateCallback != null) {
-      scheduleMicrotask(() {
-        updateCallback();
-      });
-    }
-  }
-
-  /// Connects to a remote media player.
-  void connectToRemote({String device, String service}) {
-    if (device == null) {
-      throw new ArgumentError.notNull('device');
-    }
-
-    if (service == null) {
-      throw new ArgumentError.notNull('service');
-    }
-
-    _close();
-    _active = true;
-    _isRemote = true;
-
-    if (!_netMediaService.ctrl.isBound) {
-      connectToService(_services, _netMediaService.ctrl);
-    }
-
-    _netMediaService.createMediaPlayerProxy(
-        device, service, _mediaPlayer.ctrl.request());
-    _mediaPlayer.ctrl.onConnectionError = _handleConnectionError;
-    _mediaPlayer.statusChanged = _handleStatusChanged;
 
     if (updateCallback != null) {
       scheduleMicrotask(() {
@@ -127,7 +94,6 @@ class AudioPlayerController {
   /// Internal version of |close|.
   void _close() {
     _active = false;
-    _isRemote = false;
 
     if (_mediaPlayer != null) {
       _mediaPlayer.ctrl.close();
@@ -150,22 +116,11 @@ class AudioPlayerController {
   }
 
   /// Creates a local player.
-  void _createLocalPlayer(Uri uri, String serviceName) {
+  void _createLocalPlayer(Uri uri) {
     connectToService(_services, _mediaPlayer.ctrl);
     _mediaPlayer.statusChanged = _handleStatusChanged;
 
     onMediaPlayerCreated(_mediaPlayer);
-
-    if (serviceName != null) {
-      if (!_netMediaService.ctrl.isBound) {
-        connectToService(_services, _netMediaService.ctrl);
-      }
-
-      MediaPlayerProxy mediaPlayer = new MediaPlayerProxy();
-      _mediaPlayer.addBinding(mediaPlayer.ctrl.request());
-      _netMediaService.publishMediaPlayer(
-          serviceName, mediaPlayer.ctrl.unbind());
-    }
 
     _mediaPlayer.ctrl.onConnectionError = _handleConnectionError;
     _setSource(uri);
@@ -191,9 +146,6 @@ class AudioPlayerController {
 
   /// Indicates whether the content has a video stream.
   bool get hasVideo => _hasVideo;
-
-  /// Indicates whether the actual player is local (false) or remote (true).
-  bool get isRemote => _isRemote;
 
   /// Indicates whether the player is currently playing.
   bool get playing => _playing;

@@ -14,14 +14,11 @@ enum AssetType {
 
   /// Composite assets that consist of a list of other assets.
   playlist,
-
-  /// Remote player
-  remote,
 }
 
 /// Describes an asset.
 class Asset {
-  /// Uri of the asset. Must be null for playlists and remotes, required for
+  /// Uri of the asset. Must be null for playlists, required for
   /// all other asset types.
   final Uri uri;
 
@@ -43,14 +40,6 @@ class Asset {
   /// Whether the asset should loop back to the beginning when it ends.
   final bool loop;
 
-  /// Device on which remote player is running. Required for remotes, must be
-  /// null for other asset types.
-  final String device;
-
-  /// Service number under which remote player is published. Required for
-  /// remotes, must be null for other asset types.
-  final String service;
-
   /// Constructs an asset describing a movie.
   Asset.movie({
     @required this.uri,
@@ -60,9 +49,7 @@ class Asset {
     this.loop,
   })
       : type = AssetType.movie,
-        children = null,
-        device = null,
-        service = null;
+        children = null;
 
   /// Constructs an asset describing a song.
   Asset.song({
@@ -73,9 +60,7 @@ class Asset {
     this.loop,
   })
       : type = AssetType.song,
-        children = null,
-        device = null,
-        service = null;
+        children = null;
 
   /// Constructs an asset describing a playlist.
   Asset.playlist({
@@ -87,23 +72,8 @@ class Asset {
         type = AssetType.playlist,
         uri = null,
         artist = null,
-        album = null,
-        device = null,
-        service = null {
+        album = null {
     assert(children.every(
         (Asset c) => c.type == AssetType.movie || c.type == AssetType.song));
   }
-
-  /// Constructs an asset describing a remote player.
-  Asset.remote({
-    @required this.device,
-    @required this.service,
-    this.title,
-  })
-      : type = AssetType.remote,
-        uri = null,
-        artist = null,
-        album = null,
-        children = null,
-        loop = false;
 }

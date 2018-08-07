@@ -13,8 +13,6 @@ namespace examples {
 MediaPlayerParams::MediaPlayerParams(const fxl::CommandLine& command_line) {
   is_valid_ = false;
 
-  stay_ = command_line.HasOption("stay");
-
   bool url_found = false;
 
   for (const std::string& arg : command_line.positional_args()) {
@@ -41,27 +39,7 @@ MediaPlayerParams::MediaPlayerParams(const fxl::CommandLine& command_line) {
     }
   }
 
-  bool service_found = command_line.GetOptionValue("service", &service_name_);
-
-  std::string remote;
-  if (command_line.GetOptionValue("remote", &remote)) {
-    if (service_found || stay_) {
-      Usage();
-      return;
-    }
-
-    auto split = fxl::SplitString(remote, "#", fxl::kTrimWhitespace,
-                                  fxl::kSplitWantNonEmpty);
-
-    if (split.size() != 2) {
-      Usage();
-      std::cerr << "Invalid --remote value\n";
-      return;
-    }
-
-    device_name_ = split[0].ToString();
-    service_name_ = split[1].ToString();
-  } else if (!url_found && !stay_) {
+  if (!url_found) {
     Usage();
     return;
   }
@@ -71,16 +49,7 @@ MediaPlayerParams::MediaPlayerParams(const fxl::CommandLine& command_line) {
 
 void MediaPlayerParams::Usage() {
   std::cerr << "media_player_skia usage:\n";
-  std::cerr << "    launch media_player_skia [ options ] [ url-or-path ]\n";
-  std::cerr << "options:\n";
-  std::cerr << "    --service=<service>         set the service name "
-               "(default is media_player_skia)\n";
-  std::cerr << "    --remote=<device>#<service> control a remote player\n";
-  std::cerr << "    --stay                      used to start the player with "
-               "no content for remote control";
-  std::cerr << "The --service and --remote options are mutually exclusive.\n";
-  std::cerr << "A url-or-path (or --stay) is required for local playback, "
-               "optional for remote.\n";
+  std::cerr << "    set_root_view media_player_skia url-or-path\n";
 }
 
 }  // namespace examples

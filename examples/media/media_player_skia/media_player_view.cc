@@ -21,7 +21,6 @@
 #include "topaz/examples/media/media_player_skia/media_player_params.h"
 
 using fuchsia::mediaplayer::MediaPlayer;
-using fuchsia::mediaplayer::NetMediaService;
 
 namespace examples {
 
@@ -81,47 +80,25 @@ MediaPlayerView::MediaPlayerView(
   pixel_aspect_ratio_.width = 1;
   pixel_aspect_ratio_.height = 1;
 
-  if (params.device_name().empty()) {
-    // Create a player from all that stuff.
-    media_player_ = startup_context->ConnectToEnvironmentService<MediaPlayer>();
-    media_player_.events().StatusChanged =
-        [this](fuchsia::mediaplayer::MediaPlayerStatus status) {
-          HandleStatusChanged(status);
-        };
+  media_player_ = startup_context->ConnectToEnvironmentService<MediaPlayer>();
+  media_player_.events().StatusChanged =
+      [this](fuchsia::mediaplayer::MediaPlayerStatus status) {
+        HandleStatusChanged(status);
+      };
 
-    fuchsia::ui::viewsv1token::ViewOwnerPtr video_view_owner;
-    media_player_->CreateView(
-        startup_context
-            ->ConnectToEnvironmentService<fuchsia::ui::viewsv1::ViewManager>()
-            .Unbind(),
-        video_view_owner.NewRequest());
+  fuchsia::ui::viewsv1token::ViewOwnerPtr video_view_owner;
+  media_player_->CreateView(
+      startup_context
+          ->ConnectToEnvironmentService<fuchsia::ui::viewsv1::ViewManager>()
+          .Unbind(),
+      video_view_owner.NewRequest());
 
-    zx::eventpair video_host_import_token;
-    video_host_node_.reset(new scenic::EntityNode(session()));
-    video_host_node_->ExportAsRequest(&video_host_import_token);
-    parent_node().AddChild(*video_host_node_);
-    GetViewContainer()->AddChild(kVideoChildKey, std::move(video_view_owner),
-                                 std::move(video_host_import_token));
-
-    if (!params.service_name().empty()) {
-      auto net_media_service =
-          startup_context->ConnectToEnvironmentService<NetMediaService>();
-
-      fidl::InterfaceHandle<MediaPlayer> media_player_handle;
-      media_player_->AddBinding(media_player_handle.NewRequest());
-
-      net_media_service->PublishMediaPlayer(params.service_name(),
-                                            std::move(media_player_handle));
-    }
-  } else {
-    // Create a player proxy.
-    auto net_media_service =
-        startup_context->ConnectToEnvironmentService<NetMediaService>();
-
-    net_media_service->CreateMediaPlayerProxy(params.device_name(),
-                                              params.service_name(),
-                                              media_player_.NewRequest());
-  }
+  zx::eventpair video_host_import_token;
+  video_host_node_.reset(new scenic::EntityNode(session()));
+  video_host_node_->ExportAsRequest(&video_host_import_token);
+  parent_node().AddChild(*video_host_node_);
+  GetViewContainer()->AddChild(kVideoChildKey, std::move(video_view_owner),
+                               std::move(video_host_import_token));
 
   if (!params.url().empty()) {
     url::GURL url = url::GURL(params.url());

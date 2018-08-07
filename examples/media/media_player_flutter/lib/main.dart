@@ -129,16 +129,9 @@ void _playLeafAsset(Asset asset) {
     _controller.close();
   }
 
-  if (_leafAssetToPlay.type == AssetType.remote) {
-    _controller.connectToRemote(
-      device: _leafAssetToPlay.device,
-      service: _leafAssetToPlay.service,
-    );
-  } else {
-    _controller
-      ..open(_leafAssetToPlay.uri)
-      ..play();
-  }
+  _controller
+    ..open(_leafAssetToPlay.uri)
+    ..play();
 }
 
 /// Screen for asset playback.
@@ -316,9 +309,6 @@ class _ChooserScreenState extends State<_ChooserScreen> {
         break;
       case AssetType.playlist:
         iconData = Icons.playlist_play;
-        break;
-      case AssetType.remote:
-        iconData = Icons.settings_remote;
         break;
     }
 
