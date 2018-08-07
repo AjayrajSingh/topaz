@@ -35,7 +35,6 @@ class ConflictResolver extends ledger.ConflictResolver {
       InterfaceHandle<ledger.PageSnapshot> right,
       InterfaceHandle<ledger.PageSnapshot> commonVersion,
       InterfaceHandle<ledger.MergeResultProvider> newResultProvider) async {
-
     // Obtain the left and right snapshots.
     ledger.PageSnapshotProxy leftPageSnapshot = new ledger.PageSnapshotProxy();
     ledger.PageSnapshotProxy rightPageSnapshot = new ledger.PageSnapshotProxy();
