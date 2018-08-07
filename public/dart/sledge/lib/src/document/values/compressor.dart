@@ -10,11 +10,12 @@ import '../../utils_hash.dart';
 import '../uint8list_ops.dart';
 import 'key_value.dart';
 
-// Instead of storing (key, value) pair in Ledger we do modification:
-// We store ({hash_of_key}, {|key|}{key}{value}).
-// [key] is an Uint64 and takes 8 bytes to store.
 
 /// Class to compress long keys.
+///
+/// Instead of directly storing (key, value) pairs in Ledger, we store
+/// ({hash(key)}, {|key|}{key}{value}) instead.
+/// {|key|} is an Uint64 and takes 8 bytes to store.
 class Compressor {
   static const _listEquality = const ListEquality();
   final Map<Uint8List, Uint8List> _keyByHash = newUint8ListMap<Uint8List>();
@@ -36,12 +37,12 @@ class Compressor {
   }
 
   /// Uncompress key.
-  Uint8List uncompressKey(Uint8List key) {
-    if (!_keyByHash.containsKey(key)) {
-      throw new FormatException(
-          "Deleting hashed key that didn't appear earlier.");
+  Uint8List uncompressKey(Uint8List keyHash) {
+    final key = _keyByHash[keyHash];
+    if (key == null) {
+      throw new FormatException('Unable to uncompress key: $keyHash');
     }
-    return _keyByHash[key];
+    return key;
   }
 
   /// Uncompress KeyValue.
@@ -72,14 +73,8 @@ class Compressor {
   /// Returns hash of key, and adds (hash, key) pair to caching map.
   Uint8List _getAndSaveHashOfKey(Uint8List key) {
     // TODO: consider using more efficient hash function.
-    Uint8List result = hash(key);
-    if (_keyByHash.containsKey(key)) {
-      if (_keyByHash[key] != result) {
-        throw new FormatException('Collision appears.');
-      }
-    } else {
-      _keyByHash[result] = key;
-    }
-    return result;
+    Uint8List keyHash = hash(key);
+    _keyByHash.putIfAbsent(keyHash, () => key);
+    return keyHash;
   }
 }
