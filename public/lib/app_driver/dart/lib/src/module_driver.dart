@@ -3,10 +3,12 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_cobalt/fidl.dart';
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
@@ -18,6 +20,7 @@ import 'package:lib.schemas.dart/entity_codec.dart';
 import 'package:lib.story.dart/story.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:meta/meta.dart';
+import 'package:zircon/zircon.dart';
 
 import 'service_client.dart';
 
@@ -332,8 +335,17 @@ class ModuleDriver {
       // QUESTION: can the ref value change between updates to the same entity
       // values set by ComponentContext#createEntityWithData(...)?
       String ref = await link.getEntity();
+      // If the link does not contain an entity, attempt to get it as json
+      // before returning an error.
       if (ref == null) {
-        return null;
+        fuchsia_mem.Buffer buffer = await link.get();
+        if (buffer == null) {
+          return null;
+        }
+        var dataVmo = new SizedVmo(buffer.vmo.handle, buffer.size);
+        var data = dataVmo.read(buffer.size);
+        dataVmo.close();
+        return jsonDecode(utf8.decode(data.bytesAsUint8List()));
       }
       EntityResolverClient resolver = await getResolver();
       EntityClient entity = await resolver.resolveEntity(ref);

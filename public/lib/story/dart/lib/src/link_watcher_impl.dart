@@ -25,7 +25,8 @@ class LinkWatcherImpl extends LinkWatcher {
   @override
   void notify(fuchsia_mem.Buffer buffer) {
     var dataVmo = new SizedVmo(buffer.vmo.handle, buffer.size);
-    var data = dataVmo.map();
-    onNotify(utf8.decode(data.sublist(0, dataVmo.size)));
+    var data = dataVmo.read(buffer.size);
+    dataVmo.close();
+    onNotify(utf8.decode(data.bytesAsUint8List()));
   }
 }

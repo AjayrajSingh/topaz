@@ -60,8 +60,9 @@ class EntityClient {
   Future<String> getData(String type) async {
     var buffer = await _getVmoData(type);
     var dataVmo = new SizedVmo(buffer.vmo.handle, buffer.size);
-    var data = dataVmo.map();
-    return utf8.decode(data.sublist(0, dataVmo.size));
+    var data = dataVmo.read(buffer.size);
+    dataVmo.close();
+    return utf8.decode(data.bytesAsUint8List());
   }
 
   /// Closes the underlying proxy connection, should be called as a response to
