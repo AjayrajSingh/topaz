@@ -59,7 +59,7 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
 
   /// Retrieves the current transaction's data.
   ConvertedChange<K, V> getChange() {
-    final change = new ConvertedChange();
+    final change = new ConvertedChange<K, V>();
     // [_changeToRollback.deletedKeys] is a collection of keys that were not in
     // [_storage] when the transaction started, but were affected by this
     // transaction.
