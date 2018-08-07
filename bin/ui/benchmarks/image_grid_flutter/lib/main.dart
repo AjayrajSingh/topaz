@@ -31,6 +31,7 @@ void main() {
                   body: model.images != null
                       ? new ImageGrid(
                           images: model.images,
+                          drawImages: false,
                           scrollController: model.scrollController,
                         )
                       : new Container(),

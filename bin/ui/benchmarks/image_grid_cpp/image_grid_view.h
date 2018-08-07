@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef TOPAZ_BIN_UI_BENCHMARKS_IMAGE_GRID_BENCHMARK_CPP_IMAGE_GRID_BENCHMARK_H_
-#define TOPAZ_BIN_UI_BENCHMARKS_IMAGE_GRID_BENCHMARK_CPP_IMAGE_GRID_BENCHMARK_H_
+#ifndef TOPAZ_BIN_UI_BENCHMARKS_IMAGE_GRID_CPP_IMAGE_GRID_VIEW_H_
+#define TOPAZ_BIN_UI_BENCHMARKS_IMAGE_GRID_CPP_IMAGE_GRID_VIEW_H_
 
 #include "examples/ui/lib/skia_view.h"
 #include "garnet/lib/ui/scenic/util/rk4_spring_simulation.h"
@@ -11,19 +11,19 @@
 
 class SkCanvas;
 
-namespace image_grid_benchmark {
+namespace image_grid {
 
 class Frame;
 class Rasterizer;
 
-class ImageGridBenchmark : public mozart::BaseView {
+class ImageGridView : public mozart::BaseView {
  public:
-  ImageGridBenchmark(
+  ImageGridView(
       fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
       fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
           view_owner_request);
 
-  ~ImageGridBenchmark() override;
+  ~ImageGridView() override;
 
  private:
   // |BaseView|:
@@ -41,11 +41,12 @@ class ImageGridBenchmark : public mozart::BaseView {
   uint64_t start_time_ = 0u;
   uint64_t last_update_time_ = 0u;
   float x_offset_ = 0.f;
+  float max_scroll_offset_ = 0.f;
   scenic::RK4SpringSimulation spring_;
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(ImageGridBenchmark);
+  FXL_DISALLOW_COPY_AND_ASSIGN(ImageGridView);
 };
 
-}  // namespace image_grid_benchmark
+}  // namespace image_grid
 
-#endif  // TOPAZ_BIN_UI_BENCHMARKS_IMAGE_GRID_BENCHMARK_CPP_IMAGE_GRID_BENCHMARK_H_
+#endif  // TOPAZ_BIN_UI_BENCHMARKS_IMAGE_GRID_CPP_IMAGE_GRID_VIEW_H_

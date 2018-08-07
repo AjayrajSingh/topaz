@@ -14,6 +14,7 @@ const RK4SpringDescription _kSimulationDesc =
     const RK4SpringDescription(tension: 10.0, friction: 50.0);
 const double _kMinScrollOffset = 0.0;
 const double _kMaxScrollOffset = 4000.0;
+const int _kNumImages = 100;
 
 /// [Model] that manages the state of the Image Grid Module
 class ImageGridModel extends Model {
@@ -47,7 +48,7 @@ class ImageGridModel extends Model {
   // Draw some images with circles.
   List<RawImage> generateImages() {
     List<RawImage> images = [];
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < _kNumImages; i++) {
       var recorder = new ui.PictureRecorder();
       var canvas = new Canvas(recorder);
       var color = const Color(0xFF673AB7); // Deep Purple 500

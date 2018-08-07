@@ -19,6 +19,8 @@ const ListEquality<RawImage> _kImageListEquality =
 class ImageGrid extends StatelessWidget {
   /// Image data used for rendering this grid.
   final List<RawImage> images;
+  // If false, just use empty Containers instead of painting the RawImages.
+  final bool drawImages;
 
   /// If not null, this is used to scroll the grid.
   final ScrollController scrollController;
@@ -26,6 +28,7 @@ class ImageGrid extends StatelessWidget {
   /// Constructor.
   const ImageGrid({
     @required this.images,
+    @required this.drawImages,
     this.scrollController,
   });
 
@@ -83,7 +86,12 @@ class ImageGrid extends StatelessWidget {
         color: Colors.grey[200],
         borderRadius: new BorderRadius.circular(4.0),
         elevation: 2.0,
-        child: image,
+        child: drawImages
+            ? image
+            : new Container(
+                width: 500.0,
+                height: 500.0,
+              ),
       ),
     );
   }

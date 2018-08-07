@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/bin/ui/benchmarks/image_grid_benchmark_cpp/image_grid_benchmark.h"
+#include "topaz/bin/ui/benchmarks/image_grid_cpp/image_grid_view.h"
 
 #include <math.h>
 
@@ -15,23 +15,23 @@
 #include "third_party/skia/include/core/SkImageInfo.h"
 #include "third_party/skia/include/core/SkPath.h"
 
-namespace image_grid_benchmark {
+namespace image_grid {
 
 namespace {
 constexpr float kSecondsPerNanosecond = .000'000'001f;
 
 constexpr float kMinScrollOffset = 0.f;
-constexpr float kMaxScrollOffset = 4000.f;
 
 constexpr float kBackgroundElevation = 0.f;
-constexpr float kCardElevation = 2.f;
+constexpr float kCardElevation = 8.f;
 constexpr float kCardCornerRadius = 8.f;
 
 constexpr int kRows = 3;
 constexpr int kColumns = 33;
+constexpr int kColumnsPerScreen = 5.f;
 }  // namespace
 
-ImageGridBenchmark::ImageGridBenchmark(
+ImageGridView::ImageGridView(
     fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
         view_owner_request)
@@ -40,17 +40,21 @@ ImageGridBenchmark::ImageGridBenchmark(
       background_node_(session()),
       cards_parent_node_(session()),
       spring_(0.0 /* initial value */, 10.0 /* tension */,
-              50.0 /* friction */) {
-  spring_.SetTargetValue(kMaxScrollOffset);
-}
+              50.0 /* friction */) {}
 
-ImageGridBenchmark::~ImageGridBenchmark() {}
+ImageGridView::~ImageGridView() {}
 
-void ImageGridBenchmark::OnSceneInvalidated(
+void ImageGridView::OnSceneInvalidated(
     fuchsia::images::PresentationInfo presentation_info) {
   if (!has_logical_size()) {
     return;
   }
+
+  if (max_scroll_offset_ == 0) {
+    max_scroll_offset_ = logical_size().width * (kColumns / kColumnsPerScreen);
+    spring_.SetTargetValue(max_scroll_offset_);
+  }
+
   if (!scene_created_) {
     CreateScene();
     scene_created_ = true;
@@ -62,13 +66,13 @@ void ImageGridBenchmark::OnSceneInvalidated(
   InvalidateScene();
 }
 
-void ImageGridBenchmark::CreateScene() {
+void ImageGridView::CreateScene() {
   parent_node().DetachChildren();
   cards_parent_node_.DetachChildren();
   cards_.clear();
 
   scenic::Material background_material(session());
-  background_material.SetColor(0x21, 0x21, 0x21, 0xff);  // Grey 900
+  background_material.SetColor(0xff, 0xff, 0xff, 0xff);  // White
   background_node_.SetMaterial(background_material);
   parent_node().AddChild(background_node_);
 
@@ -85,7 +89,7 @@ void ImageGridBenchmark::CreateScene() {
   for (int i = 0; i < kColumns; i++) {
     float y_pos = 0.f;
     for (int i = 0; i < kRows; i++) {
-      float layout_area_width = logical_size().width / 5.f;
+      float layout_area_width = logical_size().width / kColumnsPerScreen;
       float layout_area_height = logical_size().height / kRows;
       float card_width = layout_area_width * 0.95f;
       float card_height = layout_area_height * 0.95f;
@@ -113,7 +117,7 @@ void ImageGridBenchmark::CreateScene() {
   }
 }
 
-void ImageGridBenchmark::UpdateScene(uint64_t presentation_time) {
+void ImageGridView::UpdateScene(uint64_t presentation_time) {
   // Update the animation state.
   if (!start_time_) {
     start_time_ = presentation_time;
@@ -126,7 +130,7 @@ void ImageGridBenchmark::UpdateScene(uint64_t presentation_time) {
 
   if (spring_.is_done()) {
     if (spring_.target_value() == kMinScrollOffset) {
-      spring_.SetTargetValue(kMaxScrollOffset);
+      spring_.SetTargetValue(max_scroll_offset_);
     } else {
       spring_.SetTargetValue(kMinScrollOffset);
     }
@@ -135,4 +139,4 @@ void ImageGridBenchmark::UpdateScene(uint64_t presentation_time) {
   cards_parent_node_.SetTranslation((float[]){x_offset_, 0, 0});
 }
 
-}  // namespace image_grid_benchmark
+}  // namespace image_grid
