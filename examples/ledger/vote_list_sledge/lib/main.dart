@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.component.dart/component.dart';
 
 import 'widgets/vote_list_widget.dart';
 import 'widgets/vote_widget.dart';
@@ -14,14 +15,17 @@ void main() {
   setupLogger();
 
   final driver = ModuleDriver();
-  VoteListWidgetState.moduleContext = driver.moduleContext.proxy;
 
-  runApp(
-    MaterialApp(
-      home: VoteWidget(),
-      theme: ThemeData(primarySwatch: Colors.red),
-    ),
-  );
+  driver.getComponentContext().then((ComponentContextClient client) {
+    VoteListWidgetState.componentContext = client.proxy;
+
+    runApp(
+      MaterialApp(
+        home: VoteWidget(),
+        theme: ThemeData(primarySwatch: Colors.red),
+      ),
+    );
+  }).catchError(log.severe);
 
   driver.start().catchError(log.severe);
 }

@@ -23,7 +23,7 @@ class VoteListWidget extends StatefulWidget {
 }
 
 class VoteListWidgetState extends State<VoteListWidget> {
-  static ModuleContext _moduleContext;
+  static ComponentContext _componentContext;
   sledge.Sledge _sledge;
   final List<VoteItem> _voteItems = <VoteItem>[];
   dynamic _doc;
@@ -32,7 +32,7 @@ class VoteListWidgetState extends State<VoteListWidget> {
       <String, sledge.BaseType>{'items': new sledge.BytelistSet()});
   static final sledge.Schema _itemSchema = VoteItem.schema;
 
-  static set moduleContext(ModuleContext context) => _moduleContext = context;
+  static set componentContext(ComponentContext context) => _componentContext = context;
 
   void _subscribeForChanges(Stream<dynamic> stream) async {
     await for (final change in stream) {
@@ -72,8 +72,8 @@ class VoteListWidgetState extends State<VoteListWidget> {
   @override
   Widget build(BuildContext context) {
     if (_sledge == null) {
-      _sledge = new sledge.Sledge.fromModule(
-          _moduleContext, new sledge.SledgePageId('Vote ex'));
+      _sledge = new sledge.Sledge(
+          _componentContext, new sledge.SledgePageId('Vote ex'));
 
       _sledge.runInTransaction(() async {
         _doc = await _sledge
