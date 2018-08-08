@@ -460,6 +460,12 @@ class ModuleDriver {
     moduleContext.active();
   }
 
+  /// When a module calls [done] the framework will stop the module. If there
+  /// are no more running modules in the story the story will be stopped.
+  Future<void> done() {
+    return moduleContext.done();
+  }
+
   /// Log a cobalt metric when the link data first becomes non-null.
   void _observeLinkData(String linkName, String data) {
     if (!_firstObservationSent.contains(linkName) && data != null) {

@@ -27,7 +27,7 @@ class ResolutionException implements Exception {
   ResolutionException(this.message);
 }
 
-/// Holds values nessecary for interacting with Model and View related FIDL APIs
+/// Holds values necessary for interacting with Model and View related FIDL APIs
 /// for modules started via [ModuleContextClient#embedModule].
 class EmbeddedModule {
   /// The client for the ModuleController FIDL service connected to an embedded
@@ -358,6 +358,27 @@ class ModuleContextClient {
     return completer.future;
   }
 
+  /// See [fidl:ModuleContext#done]
+  Future<void> done() async {
+    Completer completer = new Completer();
+    try {
+      await bound;
+
+      // ignore: unawaited_futures
+      proxy.ctrl.error.then((Object error) {
+        if (!completer.isCompleted) {
+          completer.completeError(error);
+        }
+      });
+
+      proxy.done();
+      completer.complete();
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+    }
+    return completer.future;
+  }
+
   void _handleConnectionError() {
     Exception err = new Exception('binding connection failed');
     throw err;
@@ -377,8 +398,8 @@ class ModuleContextClient {
     log.fine('terminate called');
     proxy.ctrl.close();
     _intelligenceServices.ctrl.close();
-    return Future
-        .wait(_links.map((LinkClient link) => link.terminate()).toList())
+    return Future.wait(
+            _links.map((LinkClient link) => link.terminate()).toList())
         .then((_) => null);
   }
 }
