@@ -229,15 +229,23 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
 
     Map<String, String> metadata = _controller.metadata;
     if (metadata != null) {
-      _addLabel(metadata[media_player.metadataLabelTitle]
-          ?? _leafAssetToPlay.title ?? '(untitled)',
-          Colors.white, 20.0, columnChildren);
-      _addLabel(metadata[media_player.metadataLabelArtist]
-          ?? _leafAssetToPlay.artist, Colors.grey[600],
-          15.0, columnChildren);
-      _addLabel(metadata[media_player.metadataLabelAlbum]
-          ?? _leafAssetToPlay.album, Colors.grey[800],
-          15.0, columnChildren);
+      _addLabel(
+          metadata[media_player.metadataLabelTitle] ??
+              _leafAssetToPlay.title ??
+              '(untitled)',
+          Colors.white,
+          20.0,
+          columnChildren);
+      _addLabel(
+          metadata[media_player.metadataLabelArtist] ?? _leafAssetToPlay.artist,
+          Colors.grey[600],
+          15.0,
+          columnChildren);
+      _addLabel(
+          metadata[media_player.metadataLabelAlbum] ?? _leafAssetToPlay.album,
+          Colors.grey[800],
+          15.0,
+          columnChildren);
     }
 
     _addProblem(columnChildren);

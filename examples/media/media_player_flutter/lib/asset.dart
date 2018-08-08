@@ -47,8 +47,7 @@ class Asset {
     this.artist,
     this.album,
     this.loop,
-  })
-      : type = AssetType.movie,
+  })  : type = AssetType.movie,
         children = null;
 
   /// Constructs an asset describing a song.
@@ -58,8 +57,7 @@ class Asset {
     this.artist,
     this.album,
     this.loop,
-  })
-      : type = AssetType.song,
+  })  : type = AssetType.song,
         children = null;
 
   /// Constructs an asset describing a playlist.
@@ -67,8 +65,7 @@ class Asset {
     @required this.children,
     this.title,
     this.loop,
-  })
-      : assert(children.isNotEmpty),
+  })  : assert(children.isNotEmpty),
         type = AssetType.playlist,
         uri = null,
         artist = null,

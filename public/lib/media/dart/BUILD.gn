@@ -17,9 +17,9 @@ dart_library("dart") {
 
   deps = [
     "//garnet/public/fidl/fuchsia.device.display",
+    "//garnet/public/fidl/fuchsia.math",
     "//garnet/public/fidl/fuchsia.media",
     "//garnet/public/fidl/fuchsia.mediaplayer",
-    "//garnet/public/fidl/fuchsia.math",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/settings:settings_protos",

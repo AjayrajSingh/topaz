@@ -284,8 +284,8 @@ class AudioPlayerController {
 
     if (status.metadata != null) {
       _metadata = new Map.fromIterable(status.metadata.properties,
-                                       key: (property) => property.label,
-                                       value: (property) => property.value);
+          key: (property) => property.label,
+          value: (property) => property.value);
     } else {
       _metadata = null;
     }
