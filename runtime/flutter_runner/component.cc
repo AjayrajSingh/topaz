@@ -9,6 +9,7 @@
 #include <zircon/status.h>
 
 #include <sstream>
+#include <regex>
 
 #include "flutter/shell/common/switches.h"
 #include "lib/fsl/vmo/file.h"
@@ -49,8 +50,25 @@ static std::string DebugLabelForURL(const std::string& url) {
   }
 }
 
+std::string Application::GetDefaultComponentName(
+    const std::string& package_resolved_url) {
+  static const std::regex* const kPackageNameFileScheme =
+    new std::regex("^file:///pkgfs/packages/(.*?)/");
+  // Expect package resolved URL in the form of file:///pkgfs/packages/<FOO>/0.
+  // Look for <FOO> as the package name.
+  // Currently there is only one component per package. The default component is
+  // <FOO>.
+  std::string component_name;
+  std::smatch sm;
+  if (std::regex_search(package_resolved_url, sm, *kPackageNameFileScheme) &&
+      sm.size() >= 2) {
+    component_name = sm[1].str().c_str();
+  }
+  return component_name;
+}
+
 Application::Application(
-    TerminationCallback termination_callback, fuchsia::sys::Package,
+    TerminationCallback termination_callback, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
     fidl::InterfaceRequest<fuchsia::sys::ComponentController>
         application_controller_request)
@@ -78,6 +96,7 @@ Application::Application(
     service_provider_bridge_.ServeDirectory(
         std::move(launch_info.directory_request));
   }
+  component_name_ = GetDefaultComponentName(package.resolved_url);
 
   // LaunchInfo::flat_namespace optional.
   for (size_t i = 0; i < startup_info.flat_namespace.paths->size(); ++i) {
@@ -97,8 +116,9 @@ Application::Application(
   application_directory_.reset(fdio_ns_opendir(fdio_ns_.get()));
   FML_DCHECK(application_directory_.is_valid());
 
+  std::string data_path = "pkg/data/" + component_name_;
   application_assets_directory_.reset(
-      openat(application_directory_.get(), "pkg/data", O_RDONLY | O_DIRECTORY));
+      openat(application_directory_.get(), data_path.c_str(), O_RDONLY | O_DIRECTORY));
 
   // TODO: LaunchInfo::additional_services optional.
 

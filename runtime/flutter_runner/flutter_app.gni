@@ -84,7 +84,10 @@ template("flutter_jit_app") {
 
     main_dart = invoker.main_dart
     manifest = kernel_manifest
-    args = []
+    args = [
+      "--component-name",
+      target_name,
+    ]
   }
 
   if (defined(invoker.resources)) {
@@ -99,6 +102,7 @@ template("flutter_jit_app") {
   dart_target_gen_dir =
       get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
   dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
+  component_name = target_name
 
   action("${target_name}_resources") {
     script = "//topaz/runtime/flutter_runner/build/asset_package.py"
@@ -116,6 +120,8 @@ template("flutter_jit_app") {
       rebase_path(dot_packages),
       "--asset-manifest-out",
       rebase_path(asset_manifest),
+      "--component-name",
+      component_name,
     ]
 
     if (defined(invoker.manifest)) {
@@ -360,6 +366,7 @@ template("flutter_aot_app") {
   dart_target_gen_dir =
       get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
   dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
+  component_name = target_name
 
   action("${target_name}_resources") {
     script = "//topaz/runtime/flutter_runner/build/asset_package.py"
@@ -377,6 +384,8 @@ template("flutter_aot_app") {
       rebase_path(dot_packages),
       "--asset-manifest-out",
       rebase_path(asset_manifest),
+      "--component-name",
+      component_name,
     ]
 
     if (defined(invoker.manifest)) {
@@ -420,30 +429,31 @@ template("flutter_aot_app") {
              ":$stats_target_name",
            ]
 
+    resources_path = "${target_name}/"
     resources = [
                   {
                     path = rebase_path(vm_snapshot_data_path)
-                    dest = "vm_snapshot_data.bin"
+                    dest = "${resources_path}vm_snapshot_data.bin"
                   },
                   {
                     path = rebase_path(vm_snapshot_instructions_path)
-                    dest = "vm_snapshot_instructions.bin"
+                    dest = "${resources_path}vm_snapshot_instructions.bin"
                   },
                   {
                     path = rebase_path(snapshot_data_path)
-                    dest = "isolate_snapshot_data.bin"
+                    dest = "${resources_path}isolate_snapshot_data.bin"
                   },
                   {
                     path = rebase_path(snapshot_instructions_path)
-                    dest = "isolate_snapshot_instructions.bin"
+                    dest = "${resources_path}isolate_snapshot_instructions.bin"
                   },
                   {
                     path = rebase_path(shared_snapshot_data_path)
-                    dest = "shared_snapshot_data.bin"
+                    dest = "${resources_path}shared_snapshot_data.bin"
                   },
                   {
                     path = rebase_path(shared_snapshot_instructions_path)
-                    dest = "shared_snapshot_instructions.bin"
+                    dest = "${resources_path}shared_snapshot_instructions.bin"
                   },
                 ] + invoker_resources
 

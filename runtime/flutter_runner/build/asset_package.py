@@ -23,6 +23,7 @@ def main():
   parser.add_argument('--packages', type=str, required=True,
                       help='The package map to use')
   parser.add_argument('--manifest', type=str, help='The application manifest')
+  parser.add_argument('--component-name', type=str, help='The name of the component')
   parser.add_argument('--asset-manifest-out', type=str,
                       help='Output path for the asset manifest used by the fuchsia packaging tool')
 
@@ -39,8 +40,11 @@ def main():
   if 'manifest' in args:
     call_args.append('--manifest=%s' % args.manifest)
 
-  if args.asset_manifest_out != None:
+  if args.asset_manifest_out:
     call_args.append('--asset-manifest-out=%s' % args.asset_manifest_out)
+
+  if args.component_name:
+    call_args.append('--component-name=%s' % args.component_name)
 
   result = subprocess.call(call_args, env=env, cwd=args.app_dir)
 
