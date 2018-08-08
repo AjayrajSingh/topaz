@@ -37,6 +37,9 @@ class TestModel {
     final intsReceivedInStream = <int>[];
 
     await sledge.runInTransaction(() async {
+      final List<dynamic> documents = await sledge.getDocuments(schema);
+      assert(documents.isEmpty);
+
       dynamic doc = await sledge.getDocument(id);
       assert(doc.someBool.value == false);
       assert(doc.someInteger.value == 0);
@@ -51,6 +54,11 @@ class TestModel {
     // Verify that the document is still present in a separate
     // transaction.
     await sledge.runInTransaction(() async {
+      final List<dynamic> documents = await sledge.getDocuments(schema);
+      assert(documents.length == 1);
+      assert(documents[0].someBool.value == true);
+      assert(documents[0].someInteger.value == 42);
+
       dynamic doc = await sledge.getDocument(id);
       assert(doc.someBool.value == true);
       assert(doc.someInteger.value == 42);
@@ -61,6 +69,9 @@ class TestModel {
     Sledge sledge2 = new Sledge.fromModule(moduleContext, pageId);
     // Verify that the document is initialized.
     await sledge2.runInTransaction(() async {
+      final List<dynamic> documents = await sledge.getDocuments(schema);
+      assert(documents.length == 1);
+
       dynamic doc = await sledge2.getDocument(id);
       assert(doc.someBool.value == true);
       assert(doc.someInteger.value == 43);

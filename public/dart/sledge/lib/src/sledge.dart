@@ -18,6 +18,7 @@ import 'document/document.dart';
 import 'document/document_id.dart';
 import 'ledger_helpers.dart';
 import 'modification_queue.dart';
+import 'schema/schema.dart';
 import 'sledge_connection_id.dart';
 import 'sledge_page_id.dart';
 import 'storage/kv_encoding.dart' as sledge_storage;
@@ -155,6 +156,14 @@ class Sledge {
     }
 
     return _documentByPrefix[documentId.prefix];
+  }
+
+  /// Returns the list of all documents of the given [schema].
+  Future<List<Document>> getDocuments(Schema schema) {
+    if (currentTransaction == null) {
+      throw new StateError('No transaction started.');
+    }
+    return currentTransaction.getDocuments(schema);
   }
 
   /// Returns the current transaction.
