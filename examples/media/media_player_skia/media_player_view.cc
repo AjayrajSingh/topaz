@@ -15,6 +15,7 @@
 #include "lib/fsl/io/fd.h"
 #include "lib/fxl/logging.h"
 #include "lib/media/timeline/timeline.h"
+#include "lib/media/timeline/type_converters.h"
 #include "lib/url/gurl.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
@@ -340,8 +341,9 @@ void MediaPlayerView::DrawControls(SkCanvas* canvas, const SkISize& size) {
 void MediaPlayerView::HandleStatusChanged(
     const fuchsia::mediaplayer::MediaPlayerStatus& status) {
   // Process status received from the player.
-  if (status.timeline_transform) {
-    timeline_function_ = media::TimelineFunction(*status.timeline_transform);
+  if (status.timeline_function) {
+    timeline_function_ =
+        fxl::To<media::TimelineFunction>(*status.timeline_function);
   }
 
   previous_state_ = state_;

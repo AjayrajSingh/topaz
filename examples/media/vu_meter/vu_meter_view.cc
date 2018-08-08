@@ -37,14 +37,14 @@ VuMeterView::VuMeterView(
 
   auto audio =
       startup_context->ConnectToEnvironmentService<fuchsia::media::Audio>();
-  audio->CreateCapturer(capturer_.NewRequest(), false);
+  audio->CreateAudioIn(audio_in_.NewRequest(), false);
 
-  capturer_.set_error_handler([this]() {
+  audio_in_.set_error_handler([this]() {
     FXL_LOG(ERROR) << "Connection error occurred. Quitting.";
     Shutdown();
   });
 
-  capturer_->GetStreamType([this](fuchsia::media::StreamType type) {
+  audio_in_->GetStreamType([this](fuchsia::media::StreamType type) {
     OnDefaultFormatFetched(std::move(type));
   });
 }
@@ -119,9 +119,9 @@ void VuMeterView::SendCaptureRequest() {
   }
 
   // clang-format off
-  capturer_->CaptureAt(
-      0, payload_buffer_.size() / kBytesPerFrame,
-      [this](fuchsia::media::MediaPacket packet) {
+  audio_in_->CaptureAt(
+      0, 0, payload_buffer_.size() / kBytesPerFrame,
+      [this](fuchsia::media::StreamPacket packet) {
         OnPacketCaptured(std::move(packet));
       });
   // clang-format on
@@ -136,15 +136,9 @@ void VuMeterView::OnDefaultFormatFetched(
   FXL_DCHECK(default_type.medium_specific.is_audio());
   const auto& audio_details = default_type.medium_specific.audio();
 
-  fuchsia::media::MediumSpecificStreamType medium_specific_stream_type;
-  medium_specific_stream_type.set_audio(
+  audio_in_->SetPcmStreamType(
       media::CreateAudioStreamType(fuchsia::media::AudioSampleFormat::SIGNED_16,
                                    2, audio_details.frames_per_second));
-
-  fuchsia::media::StreamType stream_type;
-  stream_type.medium_specific = std::move(medium_specific_stream_type);
-  stream_type.encoding = fuchsia::media::AUDIO_ENCODING_LPCM;
-  capturer_->SetStreamType(std::move(stream_type));
 
   uint64_t payload_buffer_size =
       kBytesPerFrame *
@@ -162,13 +156,13 @@ void VuMeterView::OnDefaultFormatFetched(
     return;
   }
 
-  capturer_->SetPayloadBuffer(std::move(vmo));
+  audio_in_->AddPayloadBuffer(0, std::move(vmo));
 
   // Start capturing.
   ToggleStartStop();
 }
 
-void VuMeterView::OnPacketCaptured(fuchsia::media::MediaPacket packet) {
+void VuMeterView::OnPacketCaptured(fuchsia::media::StreamPacket packet) {
   request_in_flight_ = false;
   if (!started_) {
     return;
@@ -196,7 +190,7 @@ void VuMeterView::OnPacketCaptured(fuchsia::media::MediaPacket packet) {
 }
 
 void VuMeterView::Shutdown() {
-  capturer_.Unbind();
+  audio_in_.Unbind();
   loop_->Quit();
 }
 

@@ -67,7 +67,7 @@ class Audio {
   /// implicitly set to true. When gain is changed from -160db to a higher
   /// value, |systemAudioMuted| is implicitly set to false.
   set systemAudioGainDb(double value) {
-    double clampedValue = value.clamp(kMutedGain, _unityGain);
+    double clampedValue = value.clamp(mutedGain, _unityGain);
     if (_systemAudioGainDb == clampedValue) {
       return;
     }
@@ -75,7 +75,7 @@ class Audio {
     _systemAudioGainDb = clampedValue;
     _systemAudioPerceivedLevel = gainToLevel(clampedValue);
 
-    if (_systemAudioGainDb == kMutedGain) {
+    if (_systemAudioGainDb == mutedGain) {
       _systemAudioMuted = true;
     }
 
@@ -89,7 +89,7 @@ class Audio {
   /// Sets system-wide audio muted state. Setting this value to false when
   /// |systemAudioGainDb| is -160db has no effect.
   set systemAudioMuted(bool value) {
-    bool muted = value || _systemAudioGainDb == kMutedGain;
+    bool muted = value || _systemAudioGainDb == mutedGain;
     if (_systemAudioMuted == muted) {
       return;
     }
@@ -172,7 +172,7 @@ class Audio {
   /// db.
   static double levelToGain(double level) {
     if (level <= 0.0) {
-      return kMutedGain;
+      return mutedGain;
     }
 
     if (level >= 1.0) {

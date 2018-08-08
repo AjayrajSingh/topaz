@@ -76,10 +76,10 @@ class VuMeterView : public mozart::SkiaView {
   void Shutdown();
 
   void OnDefaultFormatFetched(fuchsia::media::StreamType default_type);
-  void OnPacketCaptured(fuchsia::media::MediaPacket packet);
+  void OnPacketCaptured(fuchsia::media::StreamPacket packet);
 
   async::Loop* const loop_;
-  fuchsia::media::AudioCapturerPtr capturer_;
+  fuchsia::media::AudioInPtr audio_in_;
   vmo_utils::VmoMapper payload_buffer_;
   bool started_ = false;
   bool request_in_flight_ = false;

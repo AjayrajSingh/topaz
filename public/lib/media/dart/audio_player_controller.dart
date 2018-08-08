@@ -8,7 +8,7 @@ import 'package:fidl_fuchsia_mediaplayer/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_math/fidl.dart' as geom;
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.media.dart/timeline.dart';
+import 'package:lib.media.dart/timeline.dart' as tl;
 import 'package:zircon/zircon.dart';
 
 /// Type for |AudioPlayerController| update callbacks.
@@ -26,7 +26,7 @@ class AudioPlayerController {
   bool _ended = false;
   bool _hasVideo = false;
 
-  TimelineFunction _timelineFunction;
+  tl.TimelineFunction _timelineFunction;
   Problem _problem;
 
   Map<String, String> _metadata;
@@ -264,11 +264,11 @@ class AudioPlayerController {
     // the progress bar.
     bool prepare = false;
 
-    if (status.timelineTransform != null) {
-      TimelineFunction oldTimelineFunction = _timelineFunction;
+    if (status.timelineFunction != null) {
+      tl.TimelineFunction oldTimelineFunction = _timelineFunction;
 
       _timelineFunction =
-          new TimelineFunction.fromTransform(status.timelineTransform);
+          new tl.TimelineFunction.fromFidl(status.timelineFunction);
 
       prepare = oldTimelineFunction != _timelineFunction;
     }
