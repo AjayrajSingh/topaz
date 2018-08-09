@@ -1,5 +1,6 @@
-Fuchsia Open Source Template Repository
-=======================================
+# Documents
 
-This repository is a template that we will use when creating new open source
-repositories for Fuchsia.
+> Status: Unsupported
+
+This project will need to be refactored before it can be added to the build
+again, see MS-1947 for details.

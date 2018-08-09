@@ -1,6 +1,9 @@
 # Contacts
 
-> Status: Experimental
+> Status: Unsupported
+
+This project will need to be refactored before it can be added to the build
+again, see MS-1946 for details.
 
 This project contains code for the [Fuchsia][fuchsia] Contacts [modules][modular].
 
