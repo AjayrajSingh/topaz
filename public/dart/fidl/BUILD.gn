@@ -13,6 +13,15 @@ dart_library("fidl") {
 
   sources = [
     "fidl.dart",
+    "src/codec.dart",
+    "src/enum.dart",
+    "src/error.dart",
+    "src/interface.dart",
+    "src/interface_async.dart",
+    "src/message.dart",
+    "src/struct.dart",
+    "src/types.dart",
+    "src/union.dart",
   ]
 
   deps = [
