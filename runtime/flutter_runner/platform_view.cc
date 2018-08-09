@@ -119,8 +119,8 @@ PlatformView::PlatformView(
   RegisterPlatformMessageHandlers();
 
 #ifndef SCENIC_VIEWS2
-  /*view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
-                            std::placeholders::_1));*/
+  view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
+                            std::placeholders::_1));
 #endif
 }
 
@@ -190,10 +190,8 @@ void PlatformView::OnPropertiesChanged(
 #ifndef SCENIC_VIEWS2
 void PlatformView::ConnectSemanticsProvider(
     fuchsia::ui::viewsv1token::ViewToken token) {
-  fuchsia::accessibility::SemanticsRootPtr root_ptr;
-  component::ConnectToService(parent_environment_service_provider_.get(),
-                              root_ptr.NewRequest());
-  semantics_bridge_.SetupConnection(token.value, root_ptr.Unbind());
+  semantics_bridge_.SetupEnvironment(
+      token.value, parent_environment_service_provider_.get());
 }
 
 void PlatformView::UpdateViewportMetrics(
@@ -552,7 +550,9 @@ void PlatformView::HandlePlatformMessage(
 void PlatformView::UpdateSemantics(
     blink::SemanticsNodeUpdates update,
     blink::CustomAccessibilityActionUpdates actions) {
-  context_writer_bridge_.UpdateSemantics(update);
+  // TODO(MI4-1262): Figure out if the context_writer_bridge should be removed
+  // as it is unused.
+  // context_writer_bridge_.UpdateSemantics(update);
   semantics_bridge_.UpdateSemantics(update);
 }
 

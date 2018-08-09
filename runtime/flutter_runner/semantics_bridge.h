@@ -14,6 +14,7 @@
 
 #include "flutter/lib/ui/semantics/semantics_node.h"
 #include "flutter/lib/ui/window/viewport_metrics.h"
+#include "lib/component/cpp/connect.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/macros.h"
@@ -32,15 +33,12 @@ class SemanticsBridge final : public fuchsia::accessibility::SemanticsProvider {
                   blink::LogicalMetrics* metrics);
   ~SemanticsBridge() = default;
 
-  // Sets up a connection to the accessibility manager with the view id
-  // passed in from the PlatformView. In order for Flutter to start sending
-  // semantics updates, we must call SetSemanticsEnabled(true) in the
-  // associated |platform_view_|. For now, we choose to enable it upon
-  // registering with the accessibility manager.
-  // TODO(SCN-860): Find a better place to enable and disable semantics.
-  void SetupConnection(
+  // Store the associated PlatformView's view_id and
+  // environment_service_provider to make necessary connections to |root_| and
+  // |a11y_toggle_|.
+  void SetupEnvironment(
       uint32_t view_id,
-      fidl::InterfaceHandle<fuchsia::accessibility::SemanticsRoot> handle);
+      fuchsia::sys::ServiceProvider* environment_service_provider);
 
   // Converts the updated semantics nodes in |update| to Fidl accessibility
   // node format to send to the accessibility manager. The update is split into
@@ -53,8 +51,24 @@ class SemanticsBridge final : public fuchsia::accessibility::SemanticsProvider {
   void PerformAccessibilityAction(
       int32_t node_id, fuchsia::accessibility::Action action) override;
 
+  // On enabling, sets up a connection to the accessibility manager with
+  // the view id passed in from the PlatformView. In order for Flutter to
+  // start sending semantics updates, we must call SetSemanticsEnabled(true)
+  // in the associated |platform_view_|.
+  // On disabling, we disable Flutter from sending semantic updates and break
+  // the connection to the accessibility manager.
+  void OnAccessibilityToggle(bool enabled);
+
   fidl::Binding<fuchsia::accessibility::SemanticsProvider> binding_;
+
+  // We keep a reference to the PlatformView's environment service provider
+  // to connect to the |fuchsia::accessibility::SemanticsRoot| service
+  // and the |fuchsia::accessibility::ToggleBroadcaster| service.
+  fuchsia::sys::ServiceProvider* environment_service_provider_;
   fuchsia::accessibility::SemanticsRootPtr root_;
+  fuchsia::accessibility::ToggleBroadcasterPtr a11y_toggle_;
+  // We keep track of the current on/off state;
+  bool enabled_ = false;
 
   // The associated Scenic view id for the associated PlatformView. This id
   // must registered with the accessibility manager, and sent with every
@@ -62,6 +76,9 @@ class SemanticsBridge final : public fuchsia::accessibility::SemanticsProvider {
   // TODO(SCN-847): Update the view_id system to initialize connections with
   // event pair kernel objects.
   uint32_t view_id_;
+  // We must make sure that we have a valid view id and environment service
+  // provider before registering with the a11y manager.
+  bool environment_set_ = false;
   // We keep a reference to the associated PlatformView to call
   // SemanticsActions.
   shell::PlatformView* platform_view_;

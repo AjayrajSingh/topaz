@@ -59,19 +59,41 @@ fuchsia::accessibility::Node SerializeNode(blink::SemanticsNode node,
 
 SemanticsBridge::SemanticsBridge(shell::PlatformView* platform_view,
                                  blink::LogicalMetrics* metrics)
-    : binding_(this), platform_view_(platform_view), metrics_(metrics) {}
-
-void SemanticsBridge::SetupConnection(
-    uint32_t view_id,
-    fidl::InterfaceHandle<fuchsia::accessibility::SemanticsRoot> handle) {
-  view_id_ = view_id;
+    : binding_(this), platform_view_(platform_view), metrics_(metrics) {
   root_.set_error_handler([this]() {
     FXL_LOG(INFO) << "A11y bridge disconnected from a11y manager";
+    binding_.Unbind();
+    root_.Unbind();
     platform_view_->SetSemanticsEnabled(false);
   });
-  root_ = handle.Bind();
-  root_->RegisterSemanticsProvider(view_id_, binding_.NewBinding());
-  platform_view_->SetSemanticsEnabled(true);
+
+  // Set up |a11y_toggle_| to listen for turning on/off a11y support.
+  // If this disconnects, we shut down all other connections and disable
+  // a11y support.
+  a11y_toggle_.events().OnAccessibilityToggle =
+      fit::bind_member(this, &SemanticsBridge::OnAccessibilityToggle);
+  a11y_toggle_.set_error_handler([this]() {
+    FXL_LOG(INFO) << "Disconnected from a11y toggle broadcaster.";
+    binding_.Unbind();
+    root_.Unbind();
+    environment_set_ = false;
+    platform_view_->SetSemanticsEnabled(false);
+  });
+}
+
+void SemanticsBridge::SetupEnvironment(
+    uint32_t view_id,
+    fuchsia::sys::ServiceProvider* environment_service_provider) {
+  view_id_ = view_id;
+  environment_service_provider_ = environment_service_provider;
+  component::ConnectToService(environment_service_provider_,
+                              a11y_toggle_.NewRequest());
+  environment_set_ = true;
+  // Starts up accessibility support if accessibility was toggled before
+  // the environment was set.
+  if (enabled_) {
+    OnAccessibilityToggle(enabled_);
+  }
 }
 
 void SemanticsBridge::UpdateSemantics(
@@ -115,6 +137,28 @@ void SemanticsBridge::PerformAccessibilityAction(
     default:
       FXL_LOG(ERROR) << "Accessibility action not supported";
   }
+}
+
+void SemanticsBridge::OnAccessibilityToggle(bool enabled) {
+  if (enabled == enabled_ && root_.is_bound()) {
+    return;
+  }
+  enabled_ = enabled;
+  if (enabled && environment_set_) {
+    // Reconnect if the a11y manager connection is not bound.
+    if (!root_.is_bound()) {
+      component::ConnectToService(environment_service_provider_,
+                                  root_.NewRequest());
+    }
+    if (root_.is_bound()) {
+      root_->RegisterSemanticsProvider(view_id_, binding_.NewBinding());
+      platform_view_->SetSemanticsEnabled(true);
+      return;
+    }
+  }
+  root_.Unbind();
+  // Disable if fall through to here.
+  platform_view_->SetSemanticsEnabled(false);
 }
 
 }  // namespace flutter
