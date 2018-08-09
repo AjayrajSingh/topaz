@@ -14,8 +14,8 @@ import '../models/inset_manager.dart';
 import '../models/surface/surface_graph.dart';
 import '../story_shell_impl.dart';
 import 'mondrian_logo.dart';
-import 'overview.dart';
 import 'surface_director.dart';
+import 'surface_relationships.dart';
 
 /// This is used for keeping the reference around.
 // ignore: unused_element
@@ -44,7 +44,7 @@ class MondrianState extends State<Mondrian> {
       child: Stack(
         children: <Widget>[
           _showOverview
-              ? Overview()
+              ? SurfaceRelationships()
               : Positioned.fill(child: SurfaceDirector()),
           Positioned(
             left: 0.0,
