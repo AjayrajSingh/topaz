@@ -16,7 +16,6 @@ dart_app("game_tracker_agent") {
     "//topaz/examples/tictactoe/services:game_tracker_dart_impl",
     "//topaz/examples/tictactoe/services:game_tracker_service",
     "//topaz/public/dart/fidl",
-    "//topaz/public/dart/fixtures",
     "//topaz/public/lib/agent/dart",
     "//topaz/public/lib/app/dart",
   ]

@@ -13,7 +13,6 @@ group("dart_unittests") {
     "app/documents/packages/utils:document_util_tests",
     "examples/test/driver_example_mod:driver_example_mod_remote_tests",
     "examples/test/flutter_widget_test:flutter_widget_test",
-    "public/dart/fixtures:dart_fixture_tests",
     "public/dart/sledge:dart_sledge_tests",
     # "public/dart/widgets:dart_widget_tests",
     "public/lib/app/dart:dart_app_tests",

@@ -26,7 +26,6 @@ flutter_app("contact_list") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/app/contacts/services:contacts_services",
     "//topaz/app/contacts/services:services",
-    "//topaz/public/dart/fixtures",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/app_driver/dart",
@@ -34,15 +33,3 @@ flutter_app("contact_list") {
     "//topaz/public/lib/module_resolver/dart",
   ]
 }
-
-# dart_test("contact_list_tests") {
-#   sources = [
-#     "models/contact_item_test.dart",
-#     "models/contact_list_model_test.dart",
-#   ]
-
-#   deps = [
-#     ":contact_list_dart_library",
-#     "//third_party/dart-pkg/pub/test",
-#   ]
-# }
