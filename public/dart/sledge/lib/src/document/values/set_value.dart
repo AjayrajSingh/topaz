@@ -102,6 +102,7 @@ class SetValue<E> extends SetBase<E> implements LeafValue {
 
   ConvertedChange<E, E> _copyKeyToValue(ConvertedChange<E, bool> change) {
     return new ConvertedChange<E, E>(
-        new Map<E, E>.fromIterable(change.changedEntries.keys));
+        new Map<E, E>.fromIterable(change.changedEntries.keys),
+        change.deletedKeys);
   }
 }

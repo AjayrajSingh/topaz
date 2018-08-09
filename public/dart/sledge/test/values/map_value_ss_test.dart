@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 
 import '../crdt_test_framework/crdt_test_framework.dart';
 
-// Wraps construction of Fleet of OrderedListValues.
+// Wraps construction of Fleet of MapValues.
 class MapFleetFactory<K, V> {
   const MapFleetFactory();
 

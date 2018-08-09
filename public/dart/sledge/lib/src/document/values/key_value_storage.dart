@@ -77,9 +77,9 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
     // [_changeToRollback.changedEntries] is a collection of keys that were in
     // [_storage] when transaction started and were affected by this transaction.
     for (final key in _changeToRollback.changedEntries.keys) {
-      final previousValue = _storage[key];
-      if (previousValue != null) {
-        change.changedEntries[key] = previousValue;
+      final newValue = _storage[key];
+      if (newValue != null) {
+        change.changedEntries[key] = newValue;
       } else {
         change.deletedKeys.add(key);
       }
