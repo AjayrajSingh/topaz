@@ -98,7 +98,7 @@ cd $FUCHSIA_DIR
 # Debug mode should be activated and the topaz test packages should be included, e.g.
 # fx set x64 out/debug-x64 --args=is_debug=true --packages=topaz/packages/all
 fx build
-scripts/run-dart-action.py test --out=`fx get-build-dir` --tree=//topaz/public/dart/sledge/*
+fx run-host-tests dart_sledge_tests
 ```
 
 When testing is complete, reset to default packages with:
