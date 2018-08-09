@@ -3,25 +3,21 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:convert' show utf8;
-import 'dart:typed_data';
 
-import 'package:fidl/fidl.dart' as fidl;
-import 'package:fidl_fuchsia_mem/fidl_async.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl;
 import 'package:fidl_fuchsia_tictactoe/fidl_async.dart' as tictactoe_fidl;
 import 'package:lib.app.dart/logging.dart';
+import 'package:lib.component.dart/component.dart';
 import 'package:sledge/sledge.dart';
 import 'package:tictactoe_common/common.dart';
-import 'package:zircon/zircon.dart';
 
 typedef ExecuteResultFunction = void Function(
     tictactoe_fidl.ExecuteResult result);
 
 class GameTrackerImpl extends tictactoe_fidl.GameTracker {
   final fidl.ComponentContext _componentContext;
-  final Map<String, fidl.MessageSender> _messageQueues = {};
+  final Map<String, MessageSenderClientAsync> _messageQueues = {};
   final Map<String, StreamSubscription> _xSubscriptions = {};
   final Map<String, StreamSubscription> _oSubscriptions = {};
   final Sledge _sledge;
@@ -144,24 +140,19 @@ class GameTrackerImpl extends tictactoe_fidl.GameTracker {
     if (!_messageQueues.containsKey(queueToken)) {
       log.shout('Message queue not found in tracker service.');
     }
-    _getScore().then(
-      (score) {
-        // TODO(MI4-1178): Convert all of this to use MessageSenderClient.
-        var bytes = Uint8List.fromList(
-          utf8.encode(_scoreCodec.encode(score)),
-        );
-        _messageQueues[queueToken].send(new fuchsia_mem.Buffer(
-          vmo: new SizedVmo.fromUint8List(bytes),
-          size: bytes.length,
-        ));
-      },
-    ).catchError((e) =>
-        log.shout('Error sending score to message queue: ${e.toString()}'));
+    _getScore()
+        .then(
+          (score) =>
+              _messageQueues[queueToken].sendString(_scoreCodec.encode(score)),
+        )
+        .catchError((e) =>
+            log.shout('Error sending score to message queue: ${e.toString()}'));
   }
 
-  Future<fidl.MessageSender> _createMessageSender(String queueToken) async {
-    final sender = new fidl.MessageSenderProxy();
-    await _componentContext.getMessageSender(queueToken, sender.ctrl.request());
+  Future<MessageSenderClientAsync> _createMessageSender(
+      String queueToken) async {
+    final sender = new MessageSenderClientAsync();
+    await _componentContext.getMessageSender(queueToken, sender.newRequest());
     return sender;
   }
 }

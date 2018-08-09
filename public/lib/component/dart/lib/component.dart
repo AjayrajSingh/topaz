@@ -5,3 +5,4 @@
 export 'src/component_context_client.dart';
 export 'src/message_queue_client.dart';
 export 'src/message_sender_client.dart';
+export 'src/message_sender_client_async.dart';

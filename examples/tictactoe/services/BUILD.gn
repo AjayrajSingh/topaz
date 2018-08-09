@@ -42,5 +42,6 @@ dart_library("game_tracker_dart_impl") {
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/sledge",
     "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/component/dart",
   ]
 }
