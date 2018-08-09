@@ -4,7 +4,7 @@
 
 import 'dart:typed_data';
 
-import 'uint8list_ops.dart';
+import '../uint8list_ops.dart';
 import 'values/key_value.dart';
 
 /// Change from one or more commits.

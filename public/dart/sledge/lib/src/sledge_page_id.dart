@@ -8,8 +8,7 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 
-import 'document/uint8list_ops.dart';
-import 'utils_hash.dart';
+import 'uint8list_ops.dart';
 import 'version.dart';
 
 /// Convenience wrapper of Ledger's page id.

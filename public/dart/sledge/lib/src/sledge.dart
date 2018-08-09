@@ -16,7 +16,6 @@ import 'package:zircon/zircon.dart' show ChannelPair;
 import 'document/change.dart';
 import 'document/document.dart';
 import 'document/document_id.dart';
-import 'document/uint8list_ops.dart';
 import 'ledger_helpers.dart';
 import 'modification_queue.dart';
 import 'sledge_connection_id.dart';
@@ -24,6 +23,7 @@ import 'sledge_page_id.dart';
 import 'storage/kv_encoding.dart' as sledge_storage;
 import 'subscription/subscription.dart';
 import 'transaction.dart';
+import 'uint8list_ops.dart';
 
 // TODO: consider throwing exceptions when initialization or transaction fails.
 // Instead of current approach to return false.

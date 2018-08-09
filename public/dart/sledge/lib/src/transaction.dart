@@ -10,13 +10,13 @@ import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'document/change.dart';
 import 'document/document.dart';
 import 'document/document_id.dart';
-import 'document/uint8list_ops.dart';
 import 'document/values/key_value.dart';
 import 'ledger_helpers.dart';
 import 'sledge.dart';
 import 'storage/document_storage.dart';
 import 'storage/kv_encoding.dart' as sledge_storage;
 import 'storage/schema_storage.dart';
+import 'uint8list_ops.dart';
 
 typedef Modification = Future Function();
 

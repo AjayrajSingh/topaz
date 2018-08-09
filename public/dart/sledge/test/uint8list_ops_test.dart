@@ -6,7 +6,7 @@
 import 'dart:typed_data';
 
 import 'package:lib.app.dart/logging.dart';
-import 'package:sledge/src/document/uint8list_ops.dart';
+import 'package:sledge/src/uint8list_ops.dart';
 import 'package:test/test.dart';
 
 void main() {

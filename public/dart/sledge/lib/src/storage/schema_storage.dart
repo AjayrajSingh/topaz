@@ -8,8 +8,8 @@ import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 
-import '../document/uint8list_ops.dart';
 import '../schema/schema.dart';
+import '../uint8list_ops.dart';
 import 'kv_encoding.dart' as sledge_storage;
 
 /// Returns the key used to store [schema] in Ledger.

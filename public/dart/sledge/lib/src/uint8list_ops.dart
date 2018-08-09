@@ -4,9 +4,11 @@
 
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
+import 'package:crypto/crypto.dart';
 
 // TODO: consider short function names and importing with prefix.
 
@@ -51,4 +53,21 @@ HashMap<Uint8List, T> newUint8ListMap<T>() {
   const listEquality = const ListEquality<int>();
   return new HashMap<Uint8List, T>(
       equals: listEquality.equals, hashCode: listEquality.hash);
+}
+
+/// Returns a 20 bytes long hash of [data].
+Uint8List hash(Uint8List data) {
+  final iterable = sha256.convert(data).bytes.getRange(0, 20);
+  return new Uint8List.fromList(new List.from(iterable));
+}
+
+final _random = new Random.secure();
+
+/// Returns a list of random bytes of a given [length].
+Uint8List randomUint8List(int length) {
+  final result = new Uint8List(length);
+  for (int i = 0; i < length; i++) {
+    result[i] = _random.nextInt(256);
+  }
+  return result;
 }

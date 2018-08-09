@@ -14,7 +14,6 @@ dart_library("sledge") {
     "src/document/document.dart",
     "src/document/document_id.dart",
     "src/document/leaf_value.dart",
-    "src/document/uint8list_ops.dart",
     "src/document/value.dart",
     "src/document/value_node.dart",
     "src/document/value_observer.dart",
@@ -43,7 +42,7 @@ dart_library("sledge") {
     "src/sledge_page_id.dart",
     "src/subscription/subscription.dart",
     "src/transaction.dart",
-    "src/utils_random.dart",
+    "src/uint8list_ops.dart",
   ]
 
   deps = [

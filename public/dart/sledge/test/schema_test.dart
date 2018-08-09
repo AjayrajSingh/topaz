@@ -11,7 +11,7 @@ import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/sledge.dart';
 import 'package:sledge/src/document/change.dart';
-import 'package:sledge/src/utils_random.dart';
+import 'package:sledge/src/uint8list_ops.dart';
 import 'package:test/test.dart';
 
 import 'helpers.dart';

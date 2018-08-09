@@ -7,9 +7,9 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 
+import '../../uint8list_ops.dart';
 import '../change.dart';
 import '../leaf_value.dart';
-import '../uint8list_ops.dart';
 import '../value_observer.dart';
 import 'converted_change.dart';
 import 'converter.dart';

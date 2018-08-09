@@ -11,7 +11,7 @@ import 'package:collection/collection.dart';
 import '../document/value.dart';
 import '../document/value_node.dart';
 import '../sledge_connection_id.dart';
-import '../utils_hash.dart' as utils;
+import '../uint8list_ops.dart' as utils;
 import 'base_type.dart';
 import 'types/map_type.dart';
 import 'types/ordered_list_type.dart';

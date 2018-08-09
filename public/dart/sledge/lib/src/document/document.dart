@@ -8,11 +8,10 @@ import 'dart:typed_data';
 import '../sledge.dart';
 import '../sledge_connection_id.dart';
 import '../transaction.dart';
-import '../utils_hash.dart';
+import '../uint8list_ops.dart';
 import 'change.dart';
 import 'document_id.dart';
 import 'leaf_value.dart';
-import 'uint8list_ops.dart';
 import 'value_node.dart';
 import 'value_observer.dart';
 

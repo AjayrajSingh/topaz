@@ -4,7 +4,7 @@
 
 import 'dart:typed_data';
 
-import 'utils_random.dart' as random;
+import 'uint8list_ops.dart' as utils;
 
 // TODO: 1. add device ID as a part of connection ID.
 // 2. Reuse IDs.
@@ -19,7 +19,7 @@ class ConnectionId {
   ConnectionId(this._id);
 
   /// Creates a completely random connection ID.
-  ConnectionId.random() : _id = random.randomUint8List(20);
+  ConnectionId.random() : _id = utils.randomUint8List(20);
 
   /// Returns byte representation of ID.
   Uint8List get id => _id;

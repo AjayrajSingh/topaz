@@ -6,7 +6,7 @@ import 'dart:typed_data';
 
 // ignore_for_file: implementation_imports
 import 'package:sledge/src/document/change.dart';
-import 'package:sledge/src/document/uint8list_ops.dart';
+import 'package:sledge/src/uint8list_ops.dart';
 import 'package:sledge/src/document/values/key_value.dart';
 
 import 'entry.dart';

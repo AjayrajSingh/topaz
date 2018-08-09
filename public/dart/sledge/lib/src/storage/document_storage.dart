@@ -10,8 +10,8 @@ import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import '../document/change.dart';
 import '../document/document.dart';
 import '../document/document_id.dart';
-import '../document/uint8list_ops.dart';
 import '../document/values/key_value.dart';
+import '../uint8list_ops.dart';
 import 'kv_encoding.dart' as sledge_storage;
 
 /// Returns the key prefix used to store [document] in Ledger.

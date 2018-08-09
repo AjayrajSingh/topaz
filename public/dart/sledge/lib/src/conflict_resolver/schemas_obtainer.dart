@@ -8,7 +8,7 @@ import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 
-import '../document/uint8list_ops.dart';
+import '../uint8list_ops.dart';
 import '../document/values/key_value.dart';
 import '../ledger_helpers.dart';
 import '../schema/schema.dart';

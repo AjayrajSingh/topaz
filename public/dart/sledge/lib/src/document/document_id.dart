@@ -5,7 +5,7 @@
 import 'dart:typed_data';
 
 import '../schema/schema.dart';
-import '../utils_random.dart' as random;
+import '../uint8list_ops.dart' as utils;
 
 /// Uniquely identifies a document.
 class DocumentId {
@@ -52,5 +52,5 @@ class DocumentId {
   Uint8List get subId => new Uint8List.fromList(_subId);
 
   static Uint8List _randomByteArrayForSubIds() =>
-      random.randomUint8List(_subIdByteCount);
+      utils.randomUint8List(_subIdByteCount);
 }

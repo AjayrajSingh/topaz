@@ -8,7 +8,7 @@ import 'dart:typed_data';
 // ignore_for_file: implementation_imports
 import 'package:sledge/sledge.dart';
 import 'package:sledge/src/conflict_resolver/schemas_obtainer.dart';
-import 'package:sledge/src/document/uint8list_ops.dart';
+import 'package:sledge/src/uint8list_ops.dart';
 import 'package:sledge/src/document/values/key_value.dart';
 import 'package:sledge/src/storage/kv_encoding.dart' as sledge_storage;
 import 'package:test/test.dart';

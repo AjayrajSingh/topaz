@@ -6,10 +6,8 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 
-import '../../utils_hash.dart';
-import '../uint8list_ops.dart';
+import '../../uint8list_ops.dart';
 import 'key_value.dart';
-
 
 /// Class to compress long keys.
 ///

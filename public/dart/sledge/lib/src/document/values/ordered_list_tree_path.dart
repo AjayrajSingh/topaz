@@ -7,7 +7,7 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 
-import '../uint8list_ops.dart';
+import '../../uint8list_ops.dart';
 import 'converter.dart';
 
 // Length of a bytelist, written on edge to value node.
