@@ -18,6 +18,9 @@ import 'entry.dart';
 class StorageState {
   final Map<Uint8List, Entry> _storage = newUint8ListMap<Entry>();
   static int globalIncrementalTimer = 0;
+  final void Function(Change change) _onChangeCallback;
+
+  StorageState([this._onChangeCallback]);
 
   /// Applies [change] to storage. Uses [timestamp] as a time of update.
   void applyChange(Change change, [int timestamp]) {
@@ -29,6 +32,7 @@ class StorageState {
       _storage[key] = new Entry.deleted(timestamp);
     }
     // TODO: check that changedEntries and deletedKeys do not intersect.
+    _onChangeCallback?.call(change);
   }
 
   /// Updates state of this with respect to [other]. Returns change done to this.
@@ -60,7 +64,9 @@ class StorageState {
         }
       }
     }
-    return new Change(changedEntries, deletedKeys);
+    final change = new Change(changedEntries, deletedKeys);
+    _onChangeCallback?.call(change);
+    return change;
   }
 
   List<KeyValue> getEntries(Uint8List keyPrefix) {

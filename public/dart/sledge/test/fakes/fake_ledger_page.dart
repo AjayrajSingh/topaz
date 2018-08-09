@@ -27,9 +27,13 @@ List<ledger.Entry> convertToEntries(final List<KeyValue> changedEntries) {
 }
 
 class FakeLedgerPage extends ledger.PageProxy {
-  final StorageState _storageState = new StorageState();
+  StorageState _storageState;
   final Change _modification = new Change();
   dynamic _watcher;
+
+  FakeLedgerPage() {
+    _storageState = new StorageState(onChange);
+  }
 
   ledger.Status putStatus;
   ledger.Status deleteStatus;

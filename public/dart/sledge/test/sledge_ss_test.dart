@@ -48,4 +48,27 @@ void main() async {
       });
     await fleet.testSingleOrder();
   });
+
+  test('Sledge test with framework. Two instances. Updates.', () async {
+    final fleet = sledgeFleetFactory.newFleet(2)
+      ..runInTransaction(0, (Sledge sledge) async {
+        await sledge.getDocument(documentId);
+      })
+      ..runInTransaction(1, (Sledge sledge) async {
+        await sledge.getDocument(documentId);
+      })
+      // At this point the document is stored in memory for both instances.
+      // Updates on one document will be transmitted to the other document via
+      // PageWatcher.onChange.
+      ..runInTransaction(0, (Sledge sledge) async {
+        dynamic doc = await sledge.getDocument(documentId);
+        doc.name.value = 'Alice';
+      })
+      ..synchronize([0, 1])
+      ..runInTransaction(1, (Sledge sledge) async {
+        dynamic doc = await sledge.getDocument(documentId);
+        expect(doc.name.value, equals('Alice'));
+      });
+    await fleet.testSingleOrder();
+  });
 }
