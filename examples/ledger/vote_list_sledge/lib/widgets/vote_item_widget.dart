@@ -11,13 +11,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:sledge/sledge.dart' as sledge;
 
-// TODO: remove
-// ignore_for_file: unused_field, unused_local_variable
-
 /// The data representing a single Vote.
 class VoteItem {
   dynamic _doc;
   final sledge.Sledge _sledge;
+  final void Function(sledge.DocumentId) _deletionCallback;
+
   /// Schema for VoteItem.
   static final sledge.Schema schema =
       new sledge.Schema(<String, sledge.BaseType>{
@@ -26,14 +25,15 @@ class VoteItem {
   });
 
   /// Main constructor.
-  VoteItem(this._sledge);
+  VoteItem(this._sledge, this._deletionCallback);
 
   // Should be run only in transaction.
   /// Links this to [itemId].
-  Future<void> linkToItem(Uint8List itemId) async {
+  Future linkToItem(Uint8List itemId) async {
     _doc = await _sledge.getDocument(new sledge.DocumentId(schema, itemId));
   }
 
+  Uint8List get docSubId => _doc.documentId.subId;
 }
 
 /// The widget representing a single Vote.
@@ -61,9 +61,13 @@ class VoteItemState extends State<VoteItemWidget> {
   }
 
   void _subscribeForChanges(Stream<int> stream) async {
-    await for (int x in stream) {
+    stream.listen((int x) {
       setState(() {});
-    }
+    });
+  }
+
+  void _delete() {
+    _voteItem._deletionCallback(_voteItem._doc.documentId);
   }
 
   @override
@@ -79,6 +83,12 @@ class VoteItemState extends State<VoteItemWidget> {
 
     final title = new Container(child: new Text(_voteItem._doc.title.value));
 
-    return new Row(children: [title, counterButton, counterCnt]);
+    final deleteButton = new Container(
+        child: new IconButton(
+            icon: new Icon(Icons.clear),
+            color: Colors.black,
+            onPressed: _delete));
+
+    return new Row(children: [title, counterButton, counterCnt, deleteButton]);
   }
 }
