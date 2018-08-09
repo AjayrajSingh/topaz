@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/sledge.dart';
@@ -9,9 +11,20 @@ import 'package:sledge/sledge.dart';
 /// Handles the lifecycle of the Test module.
 class TestModel {
   void _runSledgeTest(final ModuleContext moduleContext) async {
+    bool testCompleted = false;
+    // Set time limit on test execution.
+    new Future.delayed(new Duration(seconds: 10), () {
+      assert(testCompleted);
+    });
+
     // Create a Sledge instance using the page `my page`.
     final pageId = new SledgePageId('my page');
     Sledge sledge = new Sledge.fromModule(moduleContext, pageId);
+
+    Sledge sledgePassive = new Sledge.fromModule(moduleContext, pageId);
+
+    // Make sure [sledgePassive] has completed its initialization.
+    await sledgePassive.runInTransaction(() async {});
 
     // Store a document in the Sledge instance.
     Map<String, BaseType> schemaDescription = <String, BaseType>{
@@ -66,6 +79,18 @@ class TestModel {
     assert(intsReceivedInStream.length == 2);
     assert(intsReceivedInStream[0] == 42);
     assert(intsReceivedInStream[1] == 43);
+
+    // Wait until [sledgePassive] got the latest updates.
+    int someInteger;
+    while (someInteger != 43) {
+      await new Future.delayed(new Duration(milliseconds: 10), () => true);
+      await sledgePassive.runInTransaction(() async {
+        dynamic doc = await sledgePassive.getDocument(id);
+        someInteger = doc.someInteger.value;
+      });
+    }
+
+    testCompleted = true;
     log.info('it works!');
   }
 
