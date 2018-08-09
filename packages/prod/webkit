@@ -1,8 +1,4 @@
 {
-    "imports": [
-        "garnet/packages/tools/curl",
-        "topaz/packages/prod/sqlite"
-    ],
     "labels": [
         "//topaz/runtime/web_view:webkit"
     ]

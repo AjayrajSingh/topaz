@@ -1,9 +1,7 @@
 {
     "imports": [
         "garnet/packages/prod/fonts",
-        "garnet/packages/prod/scenic",
-        "garnet/packages/tools/curl",
-        "topaz/packages/prod/sqlite"
+        "garnet/packages/prod/scenic"
     ],
     "packages": [
         "//topaz/runtime/web_view:web_view_test_package",
