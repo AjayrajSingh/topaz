@@ -7,6 +7,7 @@
 
 #include "flutter/fml/time/time_delta.h"
 #include "flutter/fml/time/time_point.h"
+#include "lib/fxl/macros.h"
 #include "lib/ui/scenic/cpp/session.h"
 
 namespace flutter {
