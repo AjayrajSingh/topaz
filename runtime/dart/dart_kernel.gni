@@ -36,6 +36,7 @@ template("dart_kernel") {
     sources += [ rebase_path(invoker.main_dart, source_base) ]
   }
 
+  # TODO(tvolkert): Name this ${target_name}
   action("${target_name}_kernel") {
     if (defined(invoker.testonly)) {
       testonly = invoker.testonly

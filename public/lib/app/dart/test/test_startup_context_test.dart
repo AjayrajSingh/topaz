@@ -34,7 +34,7 @@ void main() {
           'connectedService', new Channel(new Handle.invalid()));
 
       expect(wasConnected, true);
-    });
+    }, skip: 'TODO(tvolkert): re-enable this test');
   });
 
   // TODO(ejia): add tests with full fidl service

@@ -107,7 +107,7 @@ class SyllabusParser {
 
     final YamlMap steps = docs[1].contents.value;
 
-    final Set<String> stepNames = steps.keys.toSet();
+    final Set<String> stepNames = steps.keys.toSet().cast<String>();
 
     final Map<String, Set<String>> stepResults = {};
 

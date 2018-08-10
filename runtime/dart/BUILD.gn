@@ -21,6 +21,16 @@ dart_tool("kernel_compiler") {
   ]
 }
 
+dart_tool("build_test_bootstrap") {
+  main_dart = "build_test_bootstrap.dart"
+  source_dir = "."
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter_tools",
+    "//third_party/dart-pkg/pub/args",
+  ]
+}
+
 # TODO(alainv): Move that to dart_tool.gni to make it more generic.
 sdk_atom("kernel_compiler_sdk") {
   domain = "dart"

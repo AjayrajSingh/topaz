@@ -12,10 +12,10 @@ class Board {
             (_) => new List.generate(3, (_) => new Square(SquareState.empty))));
 
   Board.withSquares(List<List<Square>> squares)
-      : _board = new List.unmodifiable(new List.generate(
+      : _board = new List.unmodifiable(new List<List<Square>>.generate(
             3,
-            (row) => new List.unmodifiable(
-                new List.generate(3, (column) => squares[row][column]))));
+            (row) => new List.unmodifiable(new List<Square>.generate(
+                3, (column) => squares[row][column]))));
 
   int get xCount {
     return _board

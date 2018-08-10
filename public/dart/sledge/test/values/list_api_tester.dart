@@ -4,6 +4,7 @@
 
 import 'dart:math' show Random;
 
+import 'package:sledge/src/document/leaf_value.dart'; // ignore: implementation_imports
 import 'package:test/test.dart';
 
 import '../dummies/dummy_value_observer.dart';
@@ -340,9 +341,11 @@ class ListApiTester<TestingList extends List> {
 
   void testObserver() {
     test('Observer calls.', () {
-      final dynamic list = _listCreator();
+      final list = _listCreator();
       final observer = new DummyValueObserver();
-      list.observer = observer;
+      expect(list, const isInstanceOf<LeafValue>());
+      dynamic leafValue = list;
+      leafValue.observer = observer; // ignore: cascade_invocations
       expect(list.length, equals(0));
       observer.expectNotChanged();
 

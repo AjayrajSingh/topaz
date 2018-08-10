@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:sledge/src/document/leaf_value.dart'; // ignore: implementation_imports
 import 'package:test/test.dart';
 
 import '../dummies/dummy_value_observer.dart';
@@ -219,9 +220,11 @@ class SetApiTester<TestingSet extends Set> {
 
   void testObserver() {
     test('Observer calls.', () {
-      final dynamic s = _setCreator();
+      final s = _setCreator();
       final observer = new DummyValueObserver();
-      s.observer = observer;
+      expect(s, const isInstanceOf<LeafValue>());
+      dynamic leafValue = s;
+      leafValue.observer = observer; // ignore: cascade_invocations
       expect(s.contains(0), equals(false));
       observer.expectNotChanged();
 

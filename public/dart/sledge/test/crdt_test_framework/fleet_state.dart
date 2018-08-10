@@ -37,7 +37,7 @@ class FleetState<T extends dynamic> {
   }
 
   Future applyNode(Node node, int timer) async {
-    if (node is ModificationNode) {
+    if (node is ModificationNode<T>) {
       await applyModification(node.instanceId, node.modification, timer);
     } else if (node is SynchronizationNode) {
       applySynchronization(node.instanceId1, node.instanceId2);
@@ -63,9 +63,10 @@ class FleetState<T extends dynamic> {
       if (T == Document) {
         _storageStates[id]
             // ignore: argument_type_not_assignable
-            .applyChange(Document.getChange(_instances[id]), time);
+            .applyChange(
+                Document.getChange(_instances.cast<Document>()[id]), time);
         // ignore: argument_type_not_assignable
-        Document.completeTransaction(_instances[id]);
+        Document.completeTransaction(_instances.cast<Document>()[id]);
       } else {
         _storageStates[id].applyChange(_instances[id].getChange(), time);
         _instances[id].completeTransaction();
@@ -80,11 +81,11 @@ class FleetState<T extends dynamic> {
     } else if (T == Document) {
       Document.applyChange(
           // ignore: argument_type_not_assignable
-          _instances[id1],
+          _instances.cast<Document>()[id1],
           _storageStates[id1].updateWith(_storageStates[id2]));
       Document.applyChange(
           // ignore: argument_type_not_assignable
-          _instances[id2],
+          _instances.cast<Document>()[id2],
           _storageStates[id2].updateWith(_storageStates[id1]));
     } else {
       _instances[id1]

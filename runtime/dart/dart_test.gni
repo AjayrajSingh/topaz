@@ -4,6 +4,7 @@
 
 import("//build/dart/dart_library.gni")
 import("//build/dart/toolchain.gni")
+import("//topaz/runtime/dart/dart_kernel.gni")
 
 # Defines a Dart test suite
 #
@@ -30,77 +31,193 @@ import("//build/dart/toolchain.gni")
 #       "//third_party/dart-pkg/pub/test",
 #     ]
 #   }
-template("dart_test") {
-  main_target_name = target_name
-  library_target_name = "${target_name}_library"
+if (current_toolchain == dart_toolchain) {
+  template("dart_test") {
+    assert(defined(invoker.sources), "dart_test() requires 'sources' be defined")
 
-  if (!defined(invoker.sources)) {
-    print("'sources' attribute is required")
-    assert(false)
+    _main_target_name = target_name
+    _library_target_name = "${target_name}_library"
+
+    _sources_dir = "test"
+    if (defined(invoker.source_dir)) {
+      _sources_dir = invoker.source_dir
+    }
+
+    dart_library(_library_target_name) {
+      forward_variables_from(invoker,
+                             [
+                               "deps",
+                               "disable_analysis",
+                             ])
+
+      infer_package_name = true
+
+      source_dir = _sources_dir
+      sources = invoker.sources
+    }
+
+    _dot_packages_file = "$target_gen_dir/$_library_target_name.packages"
+
+    _fuchsia_tester_label = "//third_party/dart-pkg/git/flutter/packages/flutter_tools:fuchsia_tester($host_toolchain)"
+    _fuchsia_tester_out_dir =
+        get_label_info(_fuchsia_tester_label, "root_out_dir")
+    _fuchsia_tester_bin = "$_fuchsia_tester_out_dir/dart-tools/fuchsia_tester"
+
+    _flutter_shell_label =
+        "//third_party/flutter/shell/testing/($host_toolchain)"
+    _flutter_shell_out_dir = get_label_info(_flutter_shell_label, "root_out_dir")
+    _flutter_shell_bin = "$_flutter_shell_out_dir/flutter_tester"
+
+    _test_target_names = []
+    _test_bundle_args = []
+
+    foreach(source_file, invoker.sources) {
+      _test_target = exec_script("//topaz/runtime/dart/gen_test_target_name.py",
+          ["--file", source_file],
+          "trim string")
+
+      if (_test_target != "") {
+        _test_target_name = "${_main_target_name}_${_test_target}"
+        _kernel_target_name = "${_test_target_name}_dill"
+        _bootstrap_target_name = "${_test_target_name}_bootstrap"
+
+        _bootstrap_file_name =
+            "${target_gen_dir}/${_bootstrap_target_name}.dart"
+
+        action(_bootstrap_target_name) {
+          script = "$root_out_dir/dart-tools/build_test_bootstrap"
+          outputs = [_bootstrap_file_name]
+
+          args = [
+            "--output",
+            rebase_path(_bootstrap_file_name),
+            "--test-name",
+            rebase_path("$_sources_dir/$source_file"),
+          ]
+
+          deps = [
+            "//topaz/runtime/dart:build_test_bootstrap",
+          ]
+        }
+
+        dart_kernel(_kernel_target_name) {
+          platform_name = "flutter_runner"
+          disable_analysis = true
+          main_dart = _bootstrap_file_name
+          args = []
+
+          # TODO(tvolkert): Change to flutter platform once libraries.json works
+          #                 in Fuchsia
+          # platform_deps = [
+          #   "//third_party/flutter/lib/snapshot:strong_platform",
+          # ]
+          # platform_path = "$root_out_dir/flutter_patched_sdk"
+          platform_deps = [
+            "//topaz/runtime/flutter_runner/kernel:kernel_platform_files",
+          ]
+          platform_path = "$root_out_dir/flutter_runner_patched_sdk"
+
+          sources = [ _bootstrap_file_name ]
+          non_dart_deps = [ ":$_bootstrap_target_name" ]
+          deps = [
+            ":$_library_target_name",
+            "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+            "//third_party/dart-pkg/pub/stream_channel",
+            "//third_party/dart-pkg/pub/test",
+          ]
+        }
+
+        _invocation_file = "$target_gen_dir/$_test_target_name"
+
+        action(_test_target_name) {
+          script = "//topaz/runtime/dart/gen_test_invocation.py"
+          testonly = true
+          outputs = [ _invocation_file ]
+
+          inputs = [
+            _dot_packages_file,
+            _bootstrap_file_name,
+            _fuchsia_tester_bin,
+            _flutter_shell_bin,
+            "$target_gen_dir/${_kernel_target_name}_kernel.dil",
+          ]
+
+          args = [
+            "--out",
+            rebase_path(_invocation_file),
+            "--test-file",
+            rebase_path(_bootstrap_file_name),
+            "--dill-file",
+            # TODO(tvolkert): get_target_outputs(_kernel_target_name + "_kernel")
+            rebase_path("$target_gen_dir/${_kernel_target_name}_kernel.dil"),
+            "--source-dir",
+            rebase_path(_sources_dir),
+            "--dot-packages",
+            rebase_path(_dot_packages_file),
+            "--test-runner",
+            rebase_path(_fuchsia_tester_bin),
+            "--flutter-shell",
+            rebase_path(_flutter_shell_bin),
+            "--sdk-root",
+            rebase_path("$root_out_dir/flutter_runner_patched_sdk"),
+          ]
+
+          deps = [
+            ":$_library_target_name",
+            ":$_bootstrap_target_name",
+            ":${_kernel_target_name}_kernel",
+            _flutter_shell_label,
+            _fuchsia_tester_label,
+          ]
+        }
+
+        _test_target_names += [":$_test_target_name"]
+        _test_bundle_args += ["--test", rebase_path(_invocation_file)]
+      }
+    }
+
+    action(_main_target_name) {
+      _invocation_file = "$target_gen_dir/$target_name"
+      script = "//topaz/runtime/dart/gen_test_bundle_invocation.py"
+      testonly = true
+      outputs = [ _invocation_file ]
+
+      args = [
+        "--out",
+        rebase_path(_invocation_file),
+      ] + _test_bundle_args
+
+      deps = _test_target_names
+    }
   }
+} else {
+  # Not the Dart toolchain.
+  template("dart_test") {
+    action(target_name) {
+      script = "//topaz/runtime/dart/gen_test_bundle_invocation.py"
+      testonly = true
+      not_needed(invoker, "*")
 
-  sources_dir = "test"
-  if (defined(invoker.source_dir)) {
-    sources_dir = invoker.source_dir
-  }
+      if (current_toolchain == host_toolchain) {
+        _invocation_file = "$root_out_dir/$target_name"
+      } else {
+        _invocation_file = "$target_gen_dir/$target_name"
+      }
 
-  dart_library(library_target_name) {
-    forward_variables_from(invoker,
-                           [
-                             "deps",
-                             "disable_analysis",
-                           ])
+      outputs = [ _invocation_file ]
 
-    infer_package_name = true
+      _dart_target_gen_dir =
+          get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+      _delegate_file = "$_dart_target_gen_dir/$target_name"
 
-    source_dir = sources_dir
-    sources = invoker.sources
-  }
+      args = [
+        "--out",
+        rebase_path(_invocation_file),
+        "--test",
+        rebase_path(_delegate_file),
+      ]
 
-  dart_target_gen_dir =
-      get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-  dot_packages_file = "$dart_target_gen_dir/$library_target_name.packages"
-
-  fuchsia_tester_label = "//third_party/dart-pkg/git/flutter/packages/flutter_tools:fuchsia_tester($host_toolchain)"
-  fuchsia_tester_out_dir = get_label_info(fuchsia_tester_label, "root_out_dir")
-  fuchsia_tester_bin = "$fuchsia_tester_out_dir/dart-tools/fuchsia_tester"
-
-  flutter_shell_label = "//third_party/flutter/shell/testing/($host_toolchain)"
-  flutter_shell_out_dir = get_label_info(flutter_shell_label, "root_out_dir")
-  flutter_shell_bin = "$flutter_shell_out_dir/flutter_tester"
-
-  if (current_toolchain == host_toolchain) {
-    invocation_file = "$root_out_dir/$target_name"
-  } else {
-    invocation_file = "$target_gen_dir/$target_name"
-  }
-
-  action(main_target_name) {
-    script = "//topaz/runtime/dart/gen_test_invocation.py"
-
-    testonly = true
-
-    outputs = [
-      invocation_file,
-    ]
-
-    args = [
-      "--out",
-      rebase_path(invocation_file),
-      "--source-dir",
-      rebase_path(sources_dir),
-      "--dot-packages",
-      rebase_path(dot_packages_file),
-      "--test-runner",
-      rebase_path(fuchsia_tester_bin),
-      "--flutter-shell",
-      rebase_path(flutter_shell_bin),
-    ]
-
-    deps = [
-      ":$library_target_name",
-      flutter_shell_label,
-      fuchsia_tester_label,
-    ]
+      deps = [ ":$target_name($dart_toolchain)" ]
+    }
   }
 }
