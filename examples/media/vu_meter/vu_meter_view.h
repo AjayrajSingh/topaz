@@ -10,7 +10,7 @@
 
 #include <fuchsia/media/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
-#include <lib/vmo-utils/vmo_mapper.h>
+#include <lib/fzl/vmo-mapper.h>
 
 #include "examples/ui/lib/skia_view.h"
 #include "lib/component/cpp/startup_context.h"
@@ -80,7 +80,7 @@ class VuMeterView : public mozart::SkiaView {
 
   async::Loop* const loop_;
   fuchsia::media::AudioInPtr audio_in_;
-  vmo_utils::VmoMapper payload_buffer_;
+  fzl::VmoMapper payload_buffer_;
   bool started_ = false;
   bool request_in_flight_ = false;
 
