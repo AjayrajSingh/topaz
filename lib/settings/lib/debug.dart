@@ -7,7 +7,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/utils.dart';
 
 /// Key/value store used to display debug state using a [DebugStatusWidget].
-abstract class DebugStatus extends ChangeNotifier {
+class DebugStatus extends ChangeNotifier {
   final ChangeNotifierMap<String, String> _output =
       ChangeNotifierMap<String, String>();
   final ChangeNotifierMap<String, Timer> _timers =
