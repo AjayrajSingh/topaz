@@ -6,4 +6,4 @@
 /// Changing this value is a breaking change that results in clients not being
 /// able to access their data.
 /// This number should only be increased.
-const int sledgeVersion = 2;
+const int sledgeVersion = 3;

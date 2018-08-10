@@ -175,11 +175,20 @@ class Transaction {
       }
     }
     // Create the last document.
-    documents
-        .add(new Document(_sledge, new DocumentId(schema, documentId)));
+    documents.add(new Document(_sledge, new DocumentId(schema, documentId)));
     Document.applyChange(documents.last, new Change(documentKeyValues));
 
     return documents;
+  }
+
+  /// Returns whether the document identified with [documentId] exists.
+  Future<bool> documentExists(DocumentId documentId) async {
+    Uint8List keyPrefix = concatUint8Lists(
+        sledge_storage.prefixForType(sledge_storage.KeyValueType.document),
+        documentId.prefix);
+    List<KeyValue> kvs =
+        await getEntriesFromSnapshotWithPrefix(_pageSnapshotProxy, keyPrefix);
+    return kvs.isNotEmpty;
   }
 
   /// Rollback the documents that were modified during the transaction.

@@ -166,6 +166,14 @@ class Sledge {
     return currentTransaction.getDocuments(schema);
   }
 
+  /// Returns whether the document identified with [documentId] exists.
+  Future<bool> documentExists(DocumentId documentId) {
+    if (currentTransaction == null) {
+      throw new StateError('No transaction started.');
+    }
+    return currentTransaction.documentExists(documentId);
+  }
+
   /// Returns the current transaction.
   /// Returns null if no transaction is in progress.
   Transaction get currentTransaction {

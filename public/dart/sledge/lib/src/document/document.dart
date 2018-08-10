@@ -14,6 +14,9 @@ import 'document_id.dart';
 import 'leaf_value.dart';
 import 'value_node.dart';
 import 'value_observer.dart';
+import 'values/last_one_wins_value.dart';
+
+enum _DocumentFieldType { public, private }
 
 /// Represents structured data that can be stored in Sledge.
 class Document implements ValueObserver {
@@ -22,9 +25,15 @@ class Document implements ValueObserver {
   ValueNode _value;
   final Map<Uint8List, LeafValue> _fields;
   final ConnectionId _connectionId;
-  static const int _hashLength = 20;
+  static const int _identifierLength = 21;
   final StreamController<void> _changeController =
       new StreamController<void>.broadcast();
+
+  /// A value that is always set to true.
+  final LastOneWinsValue<bool> _documentExists = new LastOneWinsValue<bool>();
+
+  /// The name of the private field holding [_documentExists].
+  static const String _documentExistsFieldName = 'documentExists';
 
   /// Default constructor.
   Document(this._sledge, this._documentId)
@@ -32,17 +41,33 @@ class Document implements ValueObserver {
         _connectionId = _sledge.connectionId {
     _value = _documentId.schema.newValue(_connectionId);
 
+    // Add to [_fields] all the public fields of [_value].
     _value.collectFields().forEach((final String key, final LeafValue value) {
-      value.observer = this;
-
-      // Hash the key
-      final keyBytes =
-          new Uint16List.fromList(key.codeUnits).buffer.asUint8List();
-      Uint8List hashBytes = hash(keyBytes);
-      assert(hashBytes.length == _hashLength);
-      // Insert [value] with the hashed key in [_fields].
-      _fields[hashBytes] = value;
+      Uint8List identifier =
+          _createIdentifierForField(key, _DocumentFieldType.public);
+      assert(identifier.length == _identifierLength);
+      _fields[identifier] = value;
     });
+
+    // Add to [_fields] the private fields.
+    Uint8List documentExistsValueIdentifier = _createIdentifierForField(
+        _documentExistsFieldName, _DocumentFieldType.private);
+    _fields[documentExistsValueIdentifier] = _documentExists;
+
+    // Observe all the values contained by [_fields].
+    _fields.forEach((Uint8List key, LeafValue value) {
+      value.observer = this;
+    });
+
+    // Set [_documentExists] to |true| so that Ledger has a trace that this document
+    // was created.
+    _documentExists.value = true;
+  }
+
+  Uint8List _createIdentifierForField(String key, _DocumentFieldType type) {
+    Uint8List hashOfKey = hash(getUint8ListFromString(key));
+    Uint8List prefix = new Uint8List.fromList([type.index]);
+    return concatUint8Lists(prefix, hashOfKey);
   }
 
   /// Returns this document's documentId.
@@ -86,7 +111,8 @@ class Document implements ValueObserver {
 
   /// Applies change to fields of this document.
   void _applyChange(final Change change) {
-    Map<Uint8List, Change> splittedChanges = change.splitByPrefix(_hashLength);
+    Map<Uint8List, Change> splittedChanges =
+        change.splitByPrefix(_identifierLength);
     for (final splittedChange in splittedChanges.entries) {
       _fields[splittedChange.key].applyChange(splittedChange.value);
     }
