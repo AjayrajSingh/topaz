@@ -15,8 +15,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';
-import 'package:mozart/mozart.dart';
 import 'package:zircon/zircon.dart';
+
+import 'mozart.dart';
 
 export 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart' show ViewOwner;
 export 'child_view2.dart';

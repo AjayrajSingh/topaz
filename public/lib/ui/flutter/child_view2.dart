@@ -15,8 +15,9 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';
-import 'package:mozart/mozart.dart';
 import 'package:zircon/zircon.dart';
+
+import 'mozart.dart';
 
 export 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart' show ViewOwner;
 
@@ -504,7 +505,8 @@ class ChildView2 extends LeafRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext context, _RenderChildView2 renderObject) {
+  void updateRenderObject(
+      BuildContext context, _RenderChildView2 renderObject) {
     renderObject
       ..connection = connection
       ..hitTestable = hitTestable;

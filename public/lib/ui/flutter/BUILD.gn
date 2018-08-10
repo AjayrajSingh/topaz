@@ -20,7 +20,6 @@ dart_library("flutter") {
     "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",
-    "//topaz/public/dart/mozart",
     "//topaz/public/lib/app/dart",
   ]
 }

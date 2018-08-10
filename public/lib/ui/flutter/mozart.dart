@@ -5,8 +5,8 @@
 library mozart;
 
 // ignore: unused_import
-import 'src/fakes/mozart_fakes.dart'
+import 'fakes/mozart_fakes.dart'
     if (dart.library.mozart.internal) 'dart:mozart.internal';
 
-export 'src/fakes/mozart_fakes.dart'
+export 'fakes/mozart_fakes.dart'
     if (dart.library.mozart.internal) 'dart:mozart.internal';
