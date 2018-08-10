@@ -5,3 +5,5 @@
 *.sublime-workspace
 .cipd/
 third_party/chromium/
+**/Cargo.lock
+**/Cargo.toml

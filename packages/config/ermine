@@ -1,5 +1,6 @@
 {
     "packages": [
-        "//topaz/bin/ermine:config"
+        "//topaz/bin/user_shell/ermine_user_shell:launch_ermine",
+        "//topaz/bin/user_shell/ermine_user_shell:config"
     ]
 }
