@@ -12,8 +12,8 @@
 #include <fuchsia/webview/cpp/fidl.h>
 #include <lib/fit/function.h>
 
-#include "lib/component/cpp/startup_context.h"
 #include "lib/callback/cancellable.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
 #include "lib/network_wrapper/network_wrapper.h"
@@ -83,8 +83,19 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
   // |fuchsia::webview::WebRequestDelegate|
   void WillSendRequest(fidl::StringPtr incoming_url) override;
 
+  // Calls the OAuth auth endpoint to exchange the supplied |auth_code| for a
+  // long term credential, and then calls |GetUserProfile| with that credential.
+  // If any errors are encountered a failure status is returned on the pending
+  // |get_credential_callback_|.
+  void ExchangeAuthCode(std::string auth_code);
+
+  // Calls the people endpoint to gather profile information using the supplied
+  // |access_token| and responds to the pending |get_credential_callback_|.
   void GetUserProfile(fidl::StringPtr credential, fidl::StringPtr access_token);
 
+  // Launches and connects to a WebView service, binding |this| as a
+  // |WebRequestDelegate| to process any changes in the URL, and returning a
+  // |ViewOwnerPtr| for the view.
   fuchsia::ui::viewsv1token::ViewOwnerPtr SetupWebView();
 
   void Request(

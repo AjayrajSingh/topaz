@@ -40,18 +40,68 @@ std::string GetClientId(const std::string& app_client_id) {
   return client_id;
 }
 
+std::string GetOAuthAuthUrl(fidl::StringPtr user_profile) {
+  // TODO(ukode,jsankey): use app_scopes instead of |kScopes|.
+  const std::vector<std::string> scopes(kScopes.begin(), kScopes.end());
+  std::string scopes_str = fxl::JoinStrings(scopes, "+");
+
+  std::string url = kGoogleOAuthAuthEndpoint;
+  url += "?scope=" + scopes_str;
+  url += "&response_type=code&redirect_uri=";
+  url += kRedirectUri;
+  url += "&client_id=";
+  url += kFuchsiaClientId;
+  // TODO(ukode,jsankey): Set user_profile_id in the state query arg for re-auth
+  //   This probably involves moving the current implementation of UrlEncoding
+  //   in OAuthRequestBuilder to a reusable library and using this to urlencode
+  //   the supplied user_profile into the login_hint query parameter.
+  return url;
+}
+
+// Checks the supplied Google authentication URL. If the URL indicated the user
+// has aborted the flow or an error occured these are reported as error
+// statuses, otherwise a status of OK is returned. If the URL contains an auth
+// code query parameter, this will be returned in |auth_code|.
+fuchsia::auth::AuthProviderStatus ParseAuthCodeFromUrl(const std::string& url,
+                                                       std::string& auth_code) {
+  static const std::string success_prefix =
+      std::string{kRedirectUri} + "?code=";
+  static const std::string cancel_prefix =
+      std::string{kRedirectUri} + "?error=access_denied";
+
+  if (url.find(cancel_prefix) == 0) {
+    return fuchsia::auth::AuthProviderStatus::USER_CANCELLED;
+  }
+  if (url.find(success_prefix) != 0) {
+    // The authentication process is still ongoing.
+    return fuchsia::auth::AuthProviderStatus::OK;
+  }
+
+  auto code = url.substr(success_prefix.size(), std::string::npos);
+  // There is a '#' character at the end of the url
+  code.pop_back();
+
+  if (code.empty()) {
+    return fuchsia::auth::AuthProviderStatus::OAUTH_SERVER_ERROR;
+  } else {
+    auth_code = code;
+    return fuchsia::auth::AuthProviderStatus::OK;
+  }
+}
+
 }  // namespace
 
-using fuchsia::auth::AuthProviderStatus;
-using fuchsia::auth::AuthTokenPtr;
-using fuchsia::auth::AuthenticationUIContext;
-using fuchsia::auth::FirebaseTokenPtr;
 using auth_providers::oauth::OAuthRequestBuilder;
 using auth_providers::oauth::ParseOAuthResponse;
+using fuchsia::auth::AuthenticationUIContext;
+using fuchsia::auth::AuthProviderStatus;
+using fuchsia::auth::AuthTokenPtr;
+using fuchsia::auth::FirebaseTokenPtr;
 using modular::JsonValueToPrettyString;
 
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
-    async_dispatcher_t* const main_dispatcher, component::StartupContext* context,
+    async_dispatcher_t* const main_dispatcher,
+    component::StartupContext* context,
     network_wrapper::NetworkWrapper* network_wrapper,
     fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request)
     : main_dispatcher_(main_dispatcher),
@@ -78,28 +128,7 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
   get_persistent_credential_callback_ = std::move(callback);
 
   auto view_owner = SetupWebView();
-
-  // Set a delegate which will parse incoming URLs for authorization code.
-  fuchsia::webview::WebRequestDelegatePtr web_request_delegate;
-  web_request_delegate_bindings_.AddBinding(this,
-                                            web_request_delegate.NewRequest());
-  web_view_->SetWebRequestDelegate(std::move(web_request_delegate));
-
-  web_view_->ClearCookies();
-
-  // TODO: use app_scopes instead of |kScopes|.
-  const std::vector<std::string> scopes(kScopes.begin(), kScopes.end());
-  std::string scopes_str = fxl::JoinStrings(scopes, "+");
-
-  std::string url = kGoogleOAuthAuthEndpoint;
-  url += "?scope=" + scopes_str;
-  url += "&response_type=code&redirect_uri=";
-  url += kRedirectUri;
-  url += "&client_id=";
-  url += kFuchsiaClientId;
-  // TODO(ukode): Set user_profile_id in the state query arg for re-auth
-
-  web_view_->SetUrl(url);
+  web_view_->SetUrl(GetOAuthAuthUrl(user_profile_id));
 
   auth_ui_context_ = auth_ui_context.Bind();
   auth_ui_context_.set_error_handler([this] {
@@ -289,52 +318,44 @@ void GoogleAuthProviderImpl::GetAppAccessTokenFromAssertionJWT(
 }
 
 void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
-  FXL_DCHECK(get_persistent_credential_callback_);
+  FXL_CHECK(get_persistent_credential_callback_);
 
-  const std::string& uri = incoming_url.get();
-  const std::string prefix = std::string{kRedirectUri} + "?code=";
-  const std::string cancel_prefix =
-      std::string{kRedirectUri} + "?error=access_denied";
+  std::string auth_code = "";
+  AuthProviderStatus status =
+      ParseAuthCodeFromUrl(incoming_url.get(), auth_code);
 
-  auto cancel_pos = uri.find(cancel_prefix);
-  // user denied OAuth permissions
-  if (cancel_pos == 0) {
-    get_persistent_credential_callback_(AuthProviderStatus::USER_CANCELLED,
-                                        nullptr, nullptr);
-    return;
+  // If either an error occured or the user successfully received an auth code
+  // we need to close the WebView.
+  if (status != AuthProviderStatus::OK || !auth_code.empty()) {
+    // Also, de-register previously registered error callbacks since calling
+    // StopOverlay() might cause this connection to be closed.
+    auth_ui_context_.set_error_handler([] {});
+    auth_ui_context_->StopOverlay();
+
+    if (status != AuthProviderStatus::OK) {
+      get_persistent_credential_callback_(status, nullptr, nullptr);
+    } else if (!auth_code.empty()) {
+      ExchangeAuthCode(auth_code);
+    }
   }
-  auto pos = uri.find(prefix);
-  // user performing gaia authentication inside webview, let it pass
-  if (pos != 0) {
-    return;
-  }
+}
 
-  // user accepted OAuth permissions - close the webview and exchange auth
-  // code to long lived credential.
-  // Also, de-register previously registered error callbacks since calling
-  // StopOverlay() might cause this connection to be closed.
-  auth_ui_context_.set_error_handler([] {});
-  auth_ui_context_->StopOverlay();
-
-  auto code = uri.substr(prefix.size(), std::string::npos);
-  // There is a '#' character at the end.
-  code.pop_back();
-
-  auto request =
-      OAuthRequestBuilder(kGoogleOAuthTokenEndpoint, "POST")
-          .SetUrlEncodedBody("code=" + code + "&redirect_uri=" + kRedirectUri +
-                             "&client_id=" + kFuchsiaClientId +
-                             "&grant_type=authorization_code");
+void GoogleAuthProviderImpl::ExchangeAuthCode(std::string auth_code) {
+  auto request = OAuthRequestBuilder(kGoogleOAuthTokenEndpoint, "POST")
+                     .SetUrlEncodedBody("code=" + auth_code +
+                                        "&redirect_uri=" + kRedirectUri +
+                                        "&client_id=" + kFuchsiaClientId +
+                                        "&grant_type=authorization_code");
 
   auto request_factory = fxl::MakeCopyable(
       [request = std::move(request)] { return request.Build(); });
 
-  // Generate long lived credentials
   Request(std::move(request_factory), [this](http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-      FXL_VLOG(1) << "Got response: "
+      FXL_VLOG(1) << "Got error exchanging auth code: "
+                  << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response exchanging auth code: "
                   << JsonValueToPrettyString(oauth_response.json_response);
       get_persistent_credential_callback_(oauth_response.status, nullptr,
                                           nullptr);
@@ -343,7 +364,7 @@ void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
 
     if (!oauth_response.json_response.HasMember("refresh_token") ||
         (!oauth_response.json_response.HasMember("access_token"))) {
-      FXL_VLOG(1) << "Got response: "
+      FXL_VLOG(1) << "Got response without refresh and access tokens: "
                   << JsonValueToPrettyString(oauth_response.json_response);
       get_persistent_credential_callback_(
           AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr, nullptr);
@@ -372,8 +393,9 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
 
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-      FXL_VLOG(1) << "Got response: "
+      FXL_VLOG(1) << "Got error fetching profile: "
+                  << oauth_response.error_description;
+      FXL_VLOG(1) << "Got response fetching profile: "
                   << JsonValueToPrettyString(oauth_response.json_response);
 
       get_persistent_credential_callback_(oauth_response.status, credential,
@@ -404,8 +426,8 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
   });
 }
 
-fuchsia::ui::viewsv1token::ViewOwnerPtr
-GoogleAuthProviderImpl::SetupWebView() {
+fuchsia::ui::viewsv1token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
+  // Launch an instance of the WebView component.
   component::Services web_view_services;
   fuchsia::sys::LaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
@@ -416,14 +438,24 @@ GoogleAuthProviderImpl::SetupWebView() {
     FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
   });
 
+  // Connect to the launched WebView component, request that it creates a new
+  // view, and connect to the WebView interface on this new view.
   fuchsia::ui::viewsv1token::ViewOwnerPtr view_owner;
   fuchsia::ui::viewsv1::ViewProviderPtr view_provider;
   web_view_services.ConnectToService(view_provider.NewRequest());
   fuchsia::sys::ServiceProviderPtr web_view_moz_services;
   view_provider->CreateView(view_owner.NewRequest(),
                             web_view_moz_services.NewRequest());
+  component::ConnectToService(web_view_moz_services.get(),
+                              web_view_.NewRequest());
 
-  component::ConnectToService(web_view_moz_services.get(), web_view_.NewRequest());
+  // Set ourselves as a delegate so that we receive URL change events that
+  // we can parse for an authorization code.
+  fuchsia::webview::WebRequestDelegatePtr web_request_delegate;
+  web_request_delegate_bindings_.AddBinding(this,
+                                            web_request_delegate.NewRequest());
+  web_view_->SetWebRequestDelegate(std::move(web_request_delegate));
+  web_view_->ClearCookies();
 
   return view_owner;
 }
