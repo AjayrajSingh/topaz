@@ -1,7 +1,6 @@
 {
     "host_tests" : [
       "//topaz/tools/widget_explorer/packages/widget_explorer_core:widget_explorer_core_tests",
-      "//topaz/app/dashboard:dashboard_tests",
       "//topaz/shell/keyboard:keyboard_tests",
       "//topaz/tools/widget_explorer/tools/widget_explorer_gen:widget_explorer_gen_tests",
       "//topaz/app/contacts/modules/contact_list:contact_list_tests",
