@@ -13,13 +13,16 @@
 #include "lib/fxl/macros.h"
 #include "lib/network_wrapper/network_wrapper.h"
 #include "topaz/auth_providers/google/google_auth_provider_impl.h"
+#include "topaz/auth_providers/google/settings.h"
 
 namespace google_auth_provider {
 
 class FactoryImpl : public fuchsia::auth::AuthProviderFactory {
  public:
-  FactoryImpl(async_dispatcher_t* main_dispatcher, component::StartupContext* context,
-              network_wrapper::NetworkWrapper* network_wrapper);
+  FactoryImpl(async_dispatcher_t* main_dispatcher,
+              component::StartupContext* context,
+              network_wrapper::NetworkWrapper* network_wrapper,
+              Settings settings);
 
   ~FactoryImpl() override;
 
@@ -34,6 +37,7 @@ class FactoryImpl : public fuchsia::auth::AuthProviderFactory {
   async_dispatcher_t* const main_dispatcher_;
   component::StartupContext* const context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
+  const Settings settings_;
 
   callback::AutoCleanableSet<GoogleAuthProviderImpl> providers_;
 

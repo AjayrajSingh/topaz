@@ -17,6 +17,7 @@
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
 #include "lib/network_wrapper/network_wrapper.h"
+#include "topaz/auth_providers/google/settings.h"
 
 namespace google_auth_provider {
 
@@ -30,7 +31,7 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
  public:
   GoogleAuthProviderImpl(
       async_dispatcher_t* main_dispatcher, component::StartupContext* context,
-      network_wrapper::NetworkWrapper* network_wrapper,
+      network_wrapper::NetworkWrapper* network_wrapper, Settings settings,
       fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request);
 
   ~GoogleAuthProviderImpl() override;
@@ -98,6 +99,11 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
   // |ViewOwnerPtr| for the view.
   fuchsia::ui::viewsv1token::ViewOwnerPtr SetupWebView();
 
+  // Launches and connects to a Chromium WebRunner service, binding |this| as a
+  // |FrameObserver| to process any changes in the URL, and returning a
+  // |ViewOwnerPtr| for the view.
+  fuchsia::ui::viewsv1token::ViewOwnerPtr SetupWebRunner();
+
   void Request(
       fit::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,
       fit::function<void(::fuchsia::net::oldhttp::URLResponse response)>
@@ -105,9 +111,10 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
 
   async_dispatcher_t* const main_dispatcher_;
   component::StartupContext* context_;
+  network_wrapper::NetworkWrapper* const network_wrapper_;
+  const Settings settings_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
   fuchsia::auth::AuthenticationUIContextPtr auth_ui_context_;
-  network_wrapper::NetworkWrapper* const network_wrapper_;
   fuchsia::webview::WebViewPtr web_view_;
   GetPersistentCredentialCallback get_persistent_credential_callback_;
 

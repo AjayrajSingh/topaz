@@ -10,6 +10,7 @@
 #include "lib/fxl/macros.h"
 #include "lib/gtest/test_loop_fixture.h"
 #include "lib/network_wrapper/fake_network_wrapper.h"
+#include "topaz/auth_providers/google/settings.h"
 
 namespace google_auth_provider {
 
@@ -18,7 +19,7 @@ class GoogleFactoryImplTest : public gtest::TestLoopFixture {
   GoogleFactoryImplTest()
       : network_wrapper_(dispatcher()),
         context_(component::StartupContext::CreateFromStartupInfo().get()),
-        factory_impl_(dispatcher(), context_, &network_wrapper_) {
+        factory_impl_(dispatcher(), context_, &network_wrapper_, {}) {
     factory_impl_.Bind(factory_.NewRequest());
   }
 

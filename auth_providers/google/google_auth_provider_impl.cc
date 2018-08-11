@@ -97,16 +97,18 @@ using fuchsia::auth::AuthenticationUIContext;
 using fuchsia::auth::AuthProviderStatus;
 using fuchsia::auth::AuthTokenPtr;
 using fuchsia::auth::FirebaseTokenPtr;
+using fuchsia::ui::viewsv1token::ViewOwnerPtr;
 using modular::JsonValueToPrettyString;
 
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
     async_dispatcher_t* const main_dispatcher,
     component::StartupContext* context,
-    network_wrapper::NetworkWrapper* network_wrapper,
+    network_wrapper::NetworkWrapper* network_wrapper, Settings settings,
     fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request)
     : main_dispatcher_(main_dispatcher),
       context_(context),
       network_wrapper_(network_wrapper),
+      settings_(std::move(settings)),
       binding_(this, std::move(request)) {
   FXL_DCHECK(main_dispatcher_);
   FXL_DCHECK(network_wrapper_);
@@ -127,18 +129,24 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
   FXL_DCHECK(auth_ui_context);
   get_persistent_credential_callback_ = std::move(callback);
 
-  auto view_owner = SetupWebView();
-  web_view_->SetUrl(GetOAuthAuthUrl(user_profile_id));
+  ViewOwnerPtr view_owner;
+  if (settings_.use_chromium) {
+    view_owner = SetupWebRunner();
+    // TODO(jsankey): Configure the web runner url
+  } else {
+    view_owner = SetupWebView();
+    web_view_->SetUrl(GetOAuthAuthUrl(user_profile_id));
+  }
 
   auth_ui_context_ = auth_ui_context.Bind();
   auth_ui_context_.set_error_handler([this] {
     FXL_VLOG(1) << "Overlay cancelled by the caller";
-    // close any open web view
+    // Close any open view
     if (auth_ui_context_) {
       auth_ui_context_.set_error_handler([] {});
       auth_ui_context_->StopOverlay();
+      auth_ui_context_ = nullptr;
     }
-    auth_ui_context_ = nullptr;
     get_persistent_credential_callback_(AuthProviderStatus::INTERNAL_ERROR,
                                         nullptr, nullptr);
     return;
@@ -458,6 +466,13 @@ fuchsia::ui::viewsv1token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
   web_view_->ClearCookies();
 
   return view_owner;
+}
+
+fuchsia::ui::viewsv1token::ViewOwnerPtr
+GoogleAuthProviderImpl::SetupWebRunner() {
+  // TODO(jsankey): Provide an implementation of setting up web runner
+  FXL_CHECK(false) << "web_runner not yet implemented";
+  return ViewOwnerPtr();
 }
 
 void GoogleAuthProviderImpl::Request(

@@ -3,15 +3,18 @@
 // found in the LICENSE file.
 
 #include "topaz/auth_providers/google/factory_impl.h"
+#include "topaz/auth_providers/google/settings.h"
 
 namespace google_auth_provider {
 
 FactoryImpl::FactoryImpl(async_dispatcher_t* main_dispatcher,
                          component::StartupContext* context,
-                         network_wrapper::NetworkWrapper* network_wrapper)
+                         network_wrapper::NetworkWrapper* network_wrapper,
+                         Settings settings)
     : main_dispatcher_(main_dispatcher),
       context_(context),
-      network_wrapper_(network_wrapper) {
+      network_wrapper_(network_wrapper),
+      settings_(std::move(settings)) {
   FXL_DCHECK(context_);
   FXL_DCHECK(network_wrapper_);
 }
@@ -26,7 +29,7 @@ void FactoryImpl::Bind(
 void FactoryImpl::GetAuthProvider(
     fidl::InterfaceRequest<fuchsia::auth::AuthProvider> auth_provider,
     GetAuthProviderCallback callback) {
-  providers_.emplace(main_dispatcher_, context_, network_wrapper_,
+  providers_.emplace(main_dispatcher_, context_, network_wrapper_, settings_,
                      std::move(auth_provider));
   callback(fuchsia::auth::AuthProviderStatus::OK);
 }

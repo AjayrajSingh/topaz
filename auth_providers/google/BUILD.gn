@@ -35,6 +35,7 @@ source_set("lib") {
     "factory_impl.h",
     "google_auth_provider_impl.cc",
     "google_auth_provider_impl.h",
+    "settings.h",
   ]
 
   deps = [

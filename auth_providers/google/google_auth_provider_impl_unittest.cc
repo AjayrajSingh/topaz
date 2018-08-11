@@ -11,6 +11,7 @@
 #include "lib/gtest/test_loop_fixture.h"
 #include "lib/network_wrapper/fake_network_wrapper.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
+#include "topaz/auth_providers/google/settings.h"
 
 namespace google_auth_provider {
 namespace {
@@ -24,7 +25,7 @@ class GoogleAuthProviderImplTest : public gtest::TestLoopFixture {
       : network_wrapper_(dispatcher()),
         context_(component::StartupContext::CreateFromStartupInfo().get()),
         google_auth_provider_impl_(dispatcher(), context_, &network_wrapper_,
-                                   auth_provider_.NewRequest()) {}
+                                   {}, auth_provider_.NewRequest()) {}
 
   ~GoogleAuthProviderImplTest() override {}
 

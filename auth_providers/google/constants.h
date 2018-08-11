@@ -34,6 +34,4 @@ constexpr auto kScopes = {"openid",
                           "https://www.googleapis.com/auth/plus.login",
                           "https://www.googleapis.com/auth/calendar.readonly"};
 
-} // namespace google_auth_provider
-
-
+}  // namespace google_auth_provider
