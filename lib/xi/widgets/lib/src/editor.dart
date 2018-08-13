@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'dart:ui' as ui
     show Paragraph, ParagraphBuilder, ParagraphConstraints, ParagraphStyle;
 
@@ -17,8 +18,11 @@ import 'xi_app.dart';
 
 /// Widget for one editor tab
 class Editor extends StatefulWidget {
+  /// If `true`, draws a watermark in the background of the editor view.
+  final bool debugBackground;
+
   /// Standard widget constructor
-  const Editor({Key key}) : super(key: key);
+  const Editor({Key key, this.debugBackground = false}) : super(key: key);
 
   @override
   EditorState createState() => new EditorState();
@@ -490,6 +494,14 @@ class EditorState extends State<Editor> implements XiViewHandler {
   @override
   Widget build(BuildContext context) {
     FocusScope.of(context).reparentIfNeeded(_focusNode);
+
+    final lines = new ListView.builder(
+      itemExtent: _lineHeight,
+      itemCount: _lines.height,
+      itemBuilder: _itemBuilder,
+      controller: _controller,
+    );
+
     return new RawKeyboardListener(
       focusNode: _focusNode,
       onKey: _handleKey,
@@ -499,17 +511,16 @@ class EditorState extends State<Editor> implements XiViewHandler {
         onHorizontalDragUpdate: _handleHorizontalDragUpdate,
         behavior: HitTestBehavior.opaque,
         child: new NotificationListener<ScrollUpdateNotification>(
-          onNotification: (ScrollUpdateNotification update) {
-            _sendScrollViewport();
-            return true;
-          },
-          child: new ListView.builder(
-            itemExtent: _lineHeight,
-            itemCount: _lines.height,
-            itemBuilder: _itemBuilder,
-            controller: _controller,
-          ),
-        ),
+            onNotification: (ScrollUpdateNotification update) {
+              _sendScrollViewport();
+              return true;
+            },
+            child: new Container(
+              color: Colors.white,
+              constraints: BoxConstraints.expand(),
+              child:
+                  widget.debugBackground ? _makeDebugBackground(lines) : lines,
+            )),
       ),
     );
   }
@@ -534,4 +545,22 @@ int _utf16ToUtf8Offset(String s, int utf16Offset) {
     utf16Ix++;
   }
   return utf8Ix;
+}
+
+/// Creates a new widget with the editor overlayed on a watermarked background
+Widget _makeDebugBackground(Widget editor) {
+  return new Stack(children: <Widget>[
+    Container(
+        constraints: new BoxConstraints.expand(),
+        child: new Center(
+            child: Transform.rotate(
+          angle: -math.pi / 6.0,
+          child: new Text('xi editor',
+              style: TextStyle(
+                  fontSize: 144.0,
+                  color: Colors.pink[50],
+                  fontWeight: FontWeight.w800)),
+        ))),
+    editor,
+  ]);
 }

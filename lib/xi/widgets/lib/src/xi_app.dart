@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:lib.app.dart/logging.dart';
@@ -27,8 +26,7 @@ class XiApp extends StatefulWidget {
         super(key: key);
 
   @override
-  XiAppState createState() =>
-      new XiAppState(debugBackground: drawDebugBackground);
+  XiAppState createState() => new XiAppState();
 }
 
 /// A temporary [XiHandler] that just wraps a single [EditorState] object.
@@ -68,12 +66,10 @@ class XiAppState extends State<XiApp> {
   /// the message.
   String message;
 
-  /// If `true`, draws a watermark in the background of the editor view.
-  bool debugBackground = false;
   String _viewId;
   List<_PendingNotification> _pendingReqs;
 
-  XiAppState({@required this.debugBackground});
+  XiAppState();
 
   /// Route a notification to the xi core. Called by [Editor] widget. If the tab
   /// has not yet initialized, notifications are queued up until it has.
@@ -130,7 +126,7 @@ class XiAppState extends State<XiApp> {
   /// Uses a [MaterialApp] as the root of the Xi UI hierarchy.
   @override
   Widget build(BuildContext context) {
-    const editor = Editor();
+    final editor = Editor(debugBackground: widget.drawDebugBackground);
     return new MaterialApp(
         title: 'Xi',
         home: new Material(
@@ -139,25 +135,7 @@ class XiAppState extends State<XiApp> {
             child: Container(
               constraints: new BoxConstraints.expand(),
               color: Colors.white,
-              child: debugBackground ? _makeDebugBackground(editor) : editor,
+              child: editor,
             )));
   }
-}
-
-/// Creates a new widget with the editor overlayed on a watermarked background
-Widget _makeDebugBackground(Widget editor) {
-  return new Stack(children: <Widget>[
-    Container(
-        constraints: new BoxConstraints.expand(),
-        child: new Center(
-            child: Transform.rotate(
-          angle: -math.pi / 6.0,
-          child: new Text('xi editor',
-              style: TextStyle(
-                  fontSize: 144.0,
-                  color: Colors.pink[50],
-                  fontWeight: FontWeight.w800)),
-        ))),
-    editor,
-  ]);
 }
