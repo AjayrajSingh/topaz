@@ -2,6 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// The FIDL Dart package which provides mechanisms for interacting with the
+/// FIDL IPC system. This package is a dependency of any Proxy or Binding
+/// classes implemented by generated FIDL code. It is often used directly in
+/// author code to retrieve type definitions (e.g. InterfaceHandle,
+/// InterfaceRequest, etc.) for interacting with certain FIDL services.
 library fidl;
 
 export 'src/codec.dart';
