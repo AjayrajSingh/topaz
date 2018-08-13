@@ -38,9 +38,10 @@ class {{ .Name }} extends $fidl.Struct {
 
   @override
   String toString() {
-    return '{{ .Name }}(
+    // ignore: prefer_interpolation_to_compose_strings
+    return r'{{ .Name }}' r'(
 {{- range $index, $member := .Members -}}
-      {{- if $index }}, {{ end -}}{{ $member.Name  }}: ${{ $member.Name  }}
+      {{- if $index }}, {{ end -}}{{ $member.Name  }}: ' + {{ $member.Name }}.toString() + r'
 {{- end -}}
     )';
   }

@@ -30,7 +30,7 @@ class {{ .Name }} extends $fidl.Enum {
 
   static const Map<String, {{ .Name }}> valuesMap = const {
   {{- range .Members }}
-    '{{ .Name }}': {{ .Name }},
+    r'{{ .Name }}': {{ .Name }},
   {{- end }}
   };
 
@@ -47,7 +47,7 @@ class {{ .Name }} extends $fidl.Enum {
     switch (value) {
   {{- range .Members }}
       case {{ .Value }}:
-        return '{{ $.Name }}.{{ .Name }}';
+        return r'{{ $.Name }}.{{ .Name }}';
   {{- end }}
       default:
         return null;

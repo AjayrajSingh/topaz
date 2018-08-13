@@ -181,6 +181,7 @@ var reservedWords = map[string]bool{
 	"rethrow":    true,
 	"return":     true,
 	"static":     true,
+	"String":     true,
 	"super":      true,
 	"switch":     true,
 	"this":       true,
@@ -324,7 +325,7 @@ func isReservedWord(str string) bool {
 
 func changeIfReserved(str string) string {
 	if isReservedWord(str) {
-		return str + "_"
+		return str + "$"
 	}
 	return str
 }
