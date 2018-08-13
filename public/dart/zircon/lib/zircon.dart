@@ -2,16 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+/// The Zircon Dart package contains several libraries required to support
+/// Fuchsia’s lower layer features, E.g. Zircon channels are used for the
+/// transport of the FIDL IPC system. Requiring this package directly should be
+/// rare for most mod or agent authors.
 library zircon;
 
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'src/fakes/zircon_fakes.dart'
-  if (dart.library.zircon) 'dart:zircon';
+import 'src/fakes/zircon_fakes.dart' if (dart.library.zircon) 'dart:zircon';
 
-export 'src/fakes/zircon_fakes.dart'
-  if (dart.library.zircon) 'dart:zircon';
+export 'src/fakes/zircon_fakes.dart' if (dart.library.zircon) 'dart:zircon';
 
 part 'src/channel.dart';
 part 'src/channel_reader.dart';
