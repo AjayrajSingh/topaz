@@ -4,28 +4,28 @@
 
 import 'dart:typed_data';
 
+import 'package:fidl/fidl.dart';
 import 'package:zircon/zircon.dart';
 
+// WARNING: RIO is deprecated; this code will be replaced with
+// FIDL bindings soon.
 void rioConnectToService(
     Channel directory, Channel request, String servicePath) {
-  final ByteData byteData = new ByteData(56 + servicePath.length);
+  int pathLen = servicePath.length + (8 - servicePath.length % 8);
+  final ByteData byteData = new ByteData(48 + pathLen);
 
   // struct zxrio_msg {
   //   zx_txid_t txid;
   //   uint32_t reserved0;
   //   uint32_t flags;
-  //   uint32_t op;
-  //   uint32_t datalen;
-  //   int32_t arg;
-  //   union {
-  //     int64_t off;
-  //     uint32_t mode;
-  //     uint32_t op;
-  //   } arg2;
-  //   int32_t reserved1;
-  //   uint32_t hcount;
-  //   zx_handle_t handle[4];
-  //   uint8_t data[8192];
+  //   uint32_t ordinal;
+  //   uint32_t flags;
+  //   uint32_t mode;
+  //   uint64_t path_size;
+  //   uintptr_t path_data;
+  //   zx_handle_t object;
+  //   uint32_t reserved;
+  //   uint8_t[] path;
   // };
 
   final List<Handle> handles = <Handle>[];
@@ -43,40 +43,32 @@ void rioConnectToService(
   byteData.setUint32(offset, 0, Endian.little);
   offset += 4;
 
-  // op -> ZXRIO_OPEN
-  byteData.setUint32(offset, 0x103, Endian.little);
+  // ordinal -> ZXFIDL_OPEN
+  byteData.setUint32(offset, 0x83000001, Endian.little);
   offset += 4;
 
-  // datalen -> length of servicePath
-  byteData.setUint32(offset, servicePath.length, Endian.little);
-  offset += 4;
-
-  // arg -> ZX_FS_RIGHT_READABLE | ZX_FS_RIGHT_WRITABLE
+  // flags -> ZX_FS_RIGHT_READABLE | ZX_FS_RIGHT_WRITABLE
   byteData.setInt32(offset, 0x00000003, Endian.little);
   offset += 4;
 
-  // arg2 -> 493 (inside a 64 bit union)
-  byteData.setUint32(offset, 493, Endian.little);
-  offset += 4;
-  byteData.setUint32(offset, 0, Endian.little);
-  offset += 4;
-
-  // reserved1 -> 0
+  // mode -> 0
   byteData.setInt32(offset, 0, Endian.little);
   offset += 4;
 
-  // hcount -> 1
-  byteData.setUint32(offset, 1, Endian.little);
+  // path_size -> length of servicePath
+  byteData.setUint64(offset, servicePath.length, Endian.little);
+  offset += 8;
+
+  // path_marker
+  byteData.setUint64(offset, kAllocPresent, Endian.little);
+  offset += 8;
+
+  // object
+  handles.add(request.handle);
+  byteData.setUint32(offset, kHandlePresent, Endian.little);
   offset += 4;
 
-  // handle[4]. The actual handle values don't matter.
-  byteData.setUint32(offset, 0xFFFFFFFFF, Endian.little);
-  handles.add(request.handle);
-  offset += 4;
-  byteData.setUint32(offset, 0, Endian.little);
-  offset += 4;
-  byteData.setUint32(offset, 0, Endian.little);
-  offset += 4;
+  // reserved
   byteData.setUint32(offset, 0, Endian.little);
   offset += 4;
 
