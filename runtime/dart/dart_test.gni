@@ -71,9 +71,11 @@ if (current_toolchain == dart_toolchain) {
     _test_target_names = []
     _test_bundle_args = []
 
-    foreach(source_file, invoker.sources) {
+    foreach(_source_file, invoker.sources) {
+      _source_path = "$_sources_dir/$_source_file"
+
       _test_target = exec_script("//topaz/runtime/dart/gen_test_target_name.py",
-          ["--file", source_file],
+          ["--file", _source_file],
           "trim string")
 
       if (_test_target != "") {
@@ -92,7 +94,7 @@ if (current_toolchain == dart_toolchain) {
             "--output",
             rebase_path(_bootstrap_file_name),
             "--test-name",
-            rebase_path("$_sources_dir/$source_file"),
+            rebase_path(_source_path),
           ]
 
           deps = [
@@ -172,7 +174,12 @@ if (current_toolchain == dart_toolchain) {
         }
 
         _test_target_names += [":$_test_target_name"]
-        _test_bundle_args += ["--test", rebase_path(_invocation_file)]
+        _test_bundle_args += [
+          "--test",
+          rebase_path(_invocation_file),
+          "--test-name",
+          _source_path,
+        ]
       }
     }
 

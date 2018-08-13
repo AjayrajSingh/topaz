@@ -20,6 +20,9 @@ def main():
                       action='append',
                       help='Adds a target to the list of test executables',
                       required=True)
+  parser.add_argument('--test-name',
+                      action='append',
+                      help='Adds a readable test name to the list of tests')
   args = parser.parse_args()
 
   test_file = args.out
@@ -27,9 +30,41 @@ def main():
   if not os.path.exists(test_dir):
     os.makedirs(test_dir)
 
-  script = '#!/bin/sh\n\n'
-  for test_executable in args.test:
-    script += "%s\n" % test_executable
+  test_failed_definition_block = '''
+FAILED_TESTS=()
+
+function run_test () {
+  local test_exe="$1"
+  local test_name="$2"
+  echo "Running $test_name"
+  env "$test_exe" || test_failed "$test_name"
+}
+
+function test_failed () {
+  FAILED_TESTS+=("$1")
+}
+
+'''
+
+  test_failed_check_block = '''
+if [ ${#FAILED_TESTS[@]} -gt 0 ]; then
+  >&2 echo -e "\\e[91mThe following tests failed:\\e[0m"
+  for test_name in "${FAILED_TESTS[@]}"; do
+    >&2 echo -e "\\n  - \\e[91m$test_name\\e[0m"
+  done
+  exit 1
+fi
+'''
+
+  script = '#!/bin/bash\n\n'
+  if args.test_name:
+    script += test_failed_definition_block
+    for test_executable, test_name in zip(args.test, args.test_name):
+      script += "run_test %s '%s'\n" % (test_executable, test_name)
+    script += test_failed_check_block
+  else:
+    for test_executable in args.test:
+      script += "%s\n" % test_executable
 
   with open(test_file, 'w') as file:
       file.write(script)

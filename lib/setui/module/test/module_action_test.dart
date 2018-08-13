@@ -16,7 +16,7 @@ import 'package:test/test.dart';
 
 class MockDriver extends Mock implements ModuleDriver {}
 
-class MockStream extends Mock implements Stream<dynamic> {}
+class MockStream extends Mock implements Stream<String> {}
 
 class ResultCaptor {
   ActionResult result;

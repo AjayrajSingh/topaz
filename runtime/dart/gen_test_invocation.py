@@ -44,7 +44,7 @@ def main():
   if not os.path.exists(test_path):
     os.makedirs(test_path)
 
-  script_template = string.Template('''#!/bin/sh
+  script_template = string.Template('''#!/bin/bash
 
 $test_runner \\
   --packages=$dot_packages \\
