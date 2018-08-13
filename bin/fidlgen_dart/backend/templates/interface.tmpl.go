@@ -52,7 +52,7 @@ typedef void {{ .CallbackType }}({{ template "Params" .Response }});
 class {{ .ProxyName }} extends $fidl.Proxy<{{ .Name }}>
     implements {{ .Name }} {
 
-  {{ .ProxyName }}() : super(new $fidl.ProxyController<{{ .Name }}>($serviceName: {{ .ServiceName }}, $interfaceName: '{{ .Name }}')) {
+  {{ .ProxyName }}() : super(new $fidl.ProxyController<{{ .Name }}>($serviceName: {{ .ServiceName }}, $interfaceName: r'{{ .Name }}')) {
     ctrl.onResponse = _handleResponse;
   }
 
@@ -404,7 +404,7 @@ abstract class {{ .Name }} {
 
 class {{ .ProxyName }} extends $fidl.AsyncProxy<{{ .Name }}>
     implements {{ .Name }} {
-  {{ .ProxyName }}() : super(new $fidl.AsyncProxyController<{{ .Name }}>($serviceName: {{ .ServiceName }}, $interfaceName: '{{ .Name }}')) {
+  {{ .ProxyName }}() : super(new $fidl.AsyncProxyController<{{ .Name }}>($serviceName: {{ .ServiceName }}, $interfaceName: r'{{ .Name }}')) {
     ctrl.onResponse = _handleResponse;
 
     {{- if .HasEvents }}
@@ -529,7 +529,7 @@ class {{ .ProxyName }} extends $fidl.AsyncProxy<{{ .Name }}>
 }
 
 class {{ .BindingName }} extends $fidl.AsyncBinding<{{ .Name }}> {
-  {{ .BindingName }}() : super("{{ .Name }}")
+  {{ .BindingName }}() : super(r"{{ .Name }}")
   {{- if .HasEvents }} {
     final List<StreamSubscription<dynamic>> $subscriptions = [];
     void $unsubscribe() {

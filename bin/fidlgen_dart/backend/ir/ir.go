@@ -176,6 +176,7 @@ var reservedWords = map[string]bool{
 	"library":    true,
 	"new":        true,
 	"null":       true,
+	"Object":     true,
 	"operator":   true,
 	"part":       true,
 	"rethrow":    true,
@@ -302,7 +303,7 @@ func typeExprForMethod(request []Parameter, response []Parameter, name string) s
 	return fmt.Sprintf(`const $fidl.MethodType(
     request: %s,
 	response: %s,
-	name: "%s",
+	name: r"%s",
   )`, formatParameterList(request), formatParameterList(response), name)
 }
 
