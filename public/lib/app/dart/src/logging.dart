@@ -266,7 +266,7 @@ void writeLogToSocket(LogWriterMessage message) {
     ..setUint64(0, pid, Endian.little)
     ..setUint64(8, Isolate.current.hashCode, Endian.little)
     ..setUint64(16, message.logRecord.systemTime, Endian.little)
-    ..setUint32(24, _convertLogLevel(message.logRecord.level), Endian.little)
+    ..setInt32(24, _convertLogLevel(message.logRecord.level), Endian.little)
     ..setUint32(28, 0, Endian.little); // TODO droppedLogs
   int byteOffset = 32;
 
