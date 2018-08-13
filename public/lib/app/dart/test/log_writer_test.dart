@@ -33,8 +33,8 @@ void main() {
   test('constructor options 2', _constructorOptions2);
   test('_testTooManyTags', _testTooManyTags);
   test('_tagTooLong', _testTagTooLong);
-  test('all levels', _testAllLevels);
-  test('default levels', _testDefaultLevels);
+  test('_testInfoLevels', _testInfoLevels);
+  test('_testDefaultLevels', _testDefaultLevels);
 }
 
 void _testSimpleMessage() {
@@ -177,11 +177,35 @@ void _testTagTooLong() {
   );
 }
 
-void _testAllLevels() {
+void _testInfoLevels() {
   LoggerStub logger = new LoggerStub();
   setupLogger(
     logWriter: logger.writeLogMessage,
-    level: Level.ALL,
+    level: Level.INFO,
+  );
+  expect(logger.logMessages.isEmpty, true);
+
+  log
+    ..shout('shout')
+    ..severe('severe')
+    ..warning('warning')
+    ..info('info')
+    ..config('config')
+    ..fine('fine')
+    ..finer('finer')
+    ..finest('finest');
+
+  expect(logger.logMessages.length, equals(4));
+  expect(logger.logMessages[0].logRecord.message, equals('shout'));
+  expect(logger.logMessages[1].logRecord.message, equals('severe'));
+  expect(logger.logMessages[2].logRecord.message, equals('warning'));
+  expect(logger.logMessages[3].logRecord.message, equals('info'));
+}
+
+void _testDefaultLevels() {
+  LoggerStub logger = new LoggerStub();
+  setupLogger(
+    logWriter: logger.writeLogMessage,
   );
   expect(logger.logMessages.isEmpty, true);
 
@@ -204,28 +228,4 @@ void _testAllLevels() {
   expect(logger.logMessages[5].logRecord.message, equals('fine'));
   expect(logger.logMessages[6].logRecord.message, equals('finer'));
   expect(logger.logMessages[7].logRecord.message, equals('finest'));
-}
-
-void _testDefaultLevels() {
-  LoggerStub logger = new LoggerStub();
-  setupLogger(
-    logWriter: logger.writeLogMessage,
-  );
-  expect(logger.logMessages.isEmpty, true);
-
-  log
-    ..shout('shout')
-    ..severe('severe')
-    ..warning('warning')
-    ..info('info')
-    ..config('config')
-    ..fine('fine')
-    ..finer('finer')
-    ..finest('finest');
-
-  expect(logger.logMessages.length, equals(4));
-  expect(logger.logMessages[0].logRecord.message, equals('shout'));
-  expect(logger.logMessages[1].logRecord.message, equals('severe'));
-  expect(logger.logMessages[2].logRecord.message, equals('warning'));
-  expect(logger.logMessages[3].logRecord.message, equals('info'));
 }

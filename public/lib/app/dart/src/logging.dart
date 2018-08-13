@@ -115,7 +115,7 @@ void setupLogger({
       Platform.script?.pathSegments?.lastWhere((_) => true, orElse: () => null);
   final List<String> approvedTags = _verifyGlobalTags(globalTags);
 
-  log = new FuchsiaLogger(level ?? Level.INFO);
+  log = new FuchsiaLogger(level ?? Level.ALL);
 
   // This code decides how to log messages. Here's the why:
   // If not running on zircon, there is no sys_logger so must use stdout.
