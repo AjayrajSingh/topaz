@@ -89,19 +89,16 @@ class _DummySshCommandRunner implements SshCommandRunner {
 
   @override
   Future<List<String>> run(String command) async {
-    final Completer<List<String>> completer = new Completer<List<String>>();
-    final List<String> res = <String>[];
-    _kDartPortDir.list(recursive: false, followLinks: false).listen(
-        (FileSystemEntity entity) {
-      // Bit of a hack to get the basename.
-      final String basename = entity.path
-          .replaceAll(entity.parent.path, '')
-          .replaceFirst(Platform.pathSeparator, '');
-      res.add(basename);
-    }, onDone: () {
-      completer.complete(res);
-    });
-    return completer.future;
+    try {
+      return new List<String>.of(_kDartPortDir
+          .listSync(recursive: false, followLinks: false)
+          .map((FileSystemEntity entity) => entity.path
+              .replaceAll(entity.parent.path, '')
+              .replaceFirst(Platform.pathSeparator, '')));
+    } on FileSystemException catch (e) {
+      log.warning('Error listing directory: $e');
+    }
+    return <String>[];
   }
 }
 
