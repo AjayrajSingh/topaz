@@ -18,13 +18,14 @@ class HostCanvasCycler : public EntityNode {
   HostCanvasCycler(Session* session);
   ~HostCanvasCycler();
 
+  HostCanvasCycler(const HostCanvasCycler&) = delete;
+  HostCanvasCycler& operator=(const HostCanvasCycler&) = delete;
+
   // Acquires a canvas for rendering.
   // At most one canvas can be acquired at a time.
   // The client is responsible for clearing the canvas.
-  SkCanvas* AcquireCanvas(float logical_width,
-                          float logical_height,
-                          float scale_x,
-                          float scale_y);
+  SkCanvas* AcquireCanvas(float logical_width, float logical_height,
+                          float scale_x, float scale_y);
 
   // Releases the canvas most recently acquired using |AcquireCanvas()|.
   // Sets the content node's texture to be backed by the canvas.
@@ -41,8 +42,6 @@ class HostCanvasCycler : public EntityNode {
   uint32_t surface_index_ = 0u;
   float logical_width_ = 0.f;
   float logical_height_ = 0.f;
-
-  FXL_DISALLOW_COPY_AND_ASSIGN(HostCanvasCycler);
 };
 
 }  // namespace skia

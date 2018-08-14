@@ -17,11 +17,10 @@ sk_sp<SkSurface> MakeSkSurface(const HostImage& image);
 
 // Creates a Skia surface backed by host-accessible shared memory.
 sk_sp<SkSurface> MakeSkSurface(const fuchsia::images::ImageInfo& image_info,
-                               fxl::RefPtr<HostData> data,
+                               std::shared_ptr<HostData> data,
                                off_t memory_offset);
-sk_sp<SkSurface> MakeSkSurface(SkImageInfo image_info,
-                               size_t row_bytes,
-                               fxl::RefPtr<HostData> data,
+sk_sp<SkSurface> MakeSkSurface(SkImageInfo image_info, size_t row_bytes,
+                               std::shared_ptr<HostData> data,
                                off_t memory_offset);
 
 // Represents a pool of Skia surfaces and image resources backed by
@@ -32,6 +31,9 @@ class HostSkSurfacePool {
   // Creates a pool which can supply up to |num_images| images on demand.
   explicit HostSkSurfacePool(Session* session, uint32_t num_images);
   ~HostSkSurfacePool();
+
+  HostSkSurfacePool(const HostSkSurfacePool&) = delete;
+  HostSkSurfacePool& operator=(const HostSkSurfacePool&) = delete;
 
   // The number of images which this pool can manage.
   uint32_t num_images() const { return image_pool_.num_images(); }
@@ -70,8 +72,6 @@ class HostSkSurfacePool {
  private:
   HostImagePool image_pool_;
   std::vector<sk_sp<SkSurface>> surface_ptrs_;
-
-  FXL_DISALLOW_COPY_AND_ASSIGN(HostSkSurfacePool);
 };
 
 }  // namespace skia

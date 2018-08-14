@@ -10,9 +10,26 @@
 namespace scenic {
 namespace skia {
 namespace {
-void ReleaseData(void* pixels, void* context) {
-  static_cast<HostData*>(context)->Release();
+
+// Keeps the HostData alive until skia calls us back in DestroySurfaceContext.
+//
+// If the ref pointer for HostData would allow us to AddRef/Release manually, we
+// would not need to allocate this object on the heap to keep the HostData
+// alive. Hopefully a future fit::ref_ptr will replace std::shared_ptr and let
+// us avoid the heap allocation.
+class SurfaceContext {
+ public:
+  explicit SurfaceContext(std::shared_ptr<HostData> data)
+      : data_(std::move(data)) {}
+
+ private:
+  std::shared_ptr<HostData> data_;
+};
+
+void DestroySurfaceContext(void* pixels, void* context) {
+  delete static_cast<SurfaceContext*>(context);
 }
+
 }  // namespace
 
 sk_sp<SkSurface> MakeSkSurface(const HostImage& image) {
@@ -20,20 +37,18 @@ sk_sp<SkSurface> MakeSkSurface(const HostImage& image) {
 }
 
 sk_sp<SkSurface> MakeSkSurface(const fuchsia::images::ImageInfo& image_info,
-                               fxl::RefPtr<HostData> data,
+                               std::shared_ptr<HostData> data,
                                off_t memory_offset) {
   return MakeSkSurface(MakeSkImageInfo(image_info), image_info.stride,
                        std::move(data), memory_offset);
 }
 
-sk_sp<SkSurface> MakeSkSurface(SkImageInfo image_info,
-                               size_t row_bytes,
-                               fxl::RefPtr<HostData> data,
+sk_sp<SkSurface> MakeSkSurface(SkImageInfo image_info, size_t row_bytes,
+                               std::shared_ptr<HostData> data,
                                off_t memory_offset) {
-  data->AddRef();
   return SkSurface::MakeRasterDirectReleaseProc(
       image_info, static_cast<uint8_t*>(data->ptr()) + memory_offset, row_bytes,
-      &ReleaseData, data.get());
+      &DestroySurfaceContext, new SurfaceContext(data));
 }
 
 HostSkSurfacePool::HostSkSurfacePool(Session* session, uint32_t num_images)
@@ -41,7 +56,8 @@ HostSkSurfacePool::HostSkSurfacePool(Session* session, uint32_t num_images)
 
 HostSkSurfacePool::~HostSkSurfacePool() = default;
 
-bool HostSkSurfacePool::Configure(const fuchsia::images::ImageInfo* image_info) {
+bool HostSkSurfacePool::Configure(
+    const fuchsia::images::ImageInfo* image_info) {
   if (!image_pool_.Configure(std::move(image_info)))
     return false;
 
