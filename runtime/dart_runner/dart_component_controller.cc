@@ -13,6 +13,7 @@
 #include <zx/thread.h>
 #include <zx/time.h>
 #include <utility>
+#include <regex>
 
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/optional.h"
@@ -51,6 +52,7 @@ DartComponentController::DartComponentController(
       package_(std::move(package)),
       startup_info_(std::move(startup_info)),
       binding_(this) {
+  component_name_ = GetDefaultComponentName(package_.resolved_url);
   if (controller.is_valid()) {
     binding_.Bind(std::move(controller));
     binding_.set_error_handler([this] { Kill(); });
@@ -131,7 +133,7 @@ bool DartComponentController::SetupNamespace() {
 
 bool DartComponentController::SetupFromKernel() {
   MappedResource manifest;
-  if (!MappedResource::LoadFromNamespace(namespace_, "pkg/data/app.dilplist",
+  if (!MappedResource::LoadFromNamespace(namespace_, "pkg/data/" + component_name_ + "/app.dilplist",
                                          manifest)) {
     return false;
   }
@@ -165,7 +167,7 @@ bool DartComponentController::SetupFromKernel() {
       return false;
     }
 
-    std::string path = "pkg/data/" + str.substr(start, end - start);
+    std::string path = "pkg/data/" + component_name_ + "/" + str.substr(start, end - start);
     start = end + 1;
 
     MappedResource kernel;
@@ -201,25 +203,25 @@ bool DartComponentController::SetupFromAppSnapshot() {
 #else
 
   if (!MappedResource::LoadFromNamespace(namespace_,
-                                         "pkg/data/isolate_snapshot_data.bin",
+                                         "pkg/data/" + component_name_ + "/isolate_snapshot_data.bin",
                                          isolate_snapshot_data_)) {
     return false;
   }
 
   if (!MappedResource::LoadFromNamespace(
-          namespace_, "pkg/data/isolate_snapshot_instructions.bin",
+          namespace_, "pkg/data/" + component_name_ + "/isolate_snapshot_instructions.bin",
           isolate_snapshot_instructions_, true /* executable */)) {
     return false;
   }
 
   if (!MappedResource::LoadFromNamespace(namespace_,
-                                         "pkg/data/shared_snapshot_data.bin",
+                                         "pkg/data/" + component_name_ + "/shared_snapshot_data.bin",
                                          shared_snapshot_data_)) {
     return false;
   }
 
   if (!MappedResource::LoadFromNamespace(
-          namespace_, "pkg/data/shared_snapshot_instructions.bin",
+          namespace_, "pkg/data/" + component_name_ + "/shared_snapshot_instructions.bin",
           shared_snapshot_instructions_, true /* executable */)) {
     return false;
   }
@@ -468,6 +470,23 @@ void DartComponentController::OnIdleTimer(async_dispatcher_t* dispatcher,
     }
   }
   wait->Begin(dispatcher);  // ignore errors
+}
+
+std::string DartComponentController::GetDefaultComponentName(
+    const std::string& package_resolved_url) {
+  static const std::regex* const kPackageNameFileScheme =
+    new std::regex("^file:///pkgfs/packages/(.*?)/");
+  // Expect package resolved URL in the form of file:///pkgfs/packages/<FOO>/0.
+  // Look for <FOO> as the package name.
+  // Currently there is only one component per package. The default component is
+  // <FOO>.
+  std::string component_name;
+  std::smatch sm;
+  if (std::regex_search(package_resolved_url, sm, *kPackageNameFileScheme) &&
+      sm.size() >= 2) {
+    component_name = sm[1].str().c_str();
+  }
+  return component_name;
 }
 
 }  // namespace dart_runner

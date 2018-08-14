@@ -74,7 +74,10 @@ template("dart_jit_app") {
 
     main_dart = invoker.main_dart
     manifest = kernel_manifest
-    args = []
+    args = [
+      "--component-name",
+      target_name,
+    ]
     if (dbc) {
       args += [
         "--gen-bytecode",
@@ -307,22 +310,23 @@ template("dart_aot_app") {
              ":$stats_target_name",
            ] + non_dart_deps + shared_snapshot_deps
 
+    resources_path = "${target_name}/"
     resources = [
       {
         path = rebase_path(snapshot_data_path)
-        dest = "isolate_snapshot_data.bin"
+        dest = "${resources_path}isolate_snapshot_data.bin"
       },
       {
         path = rebase_path(snapshot_instructions_path)
-        dest = "isolate_snapshot_instructions.bin"
+        dest = "${resources_path}isolate_snapshot_instructions.bin"
       },
       {
         path = rebase_path(shared_snapshot_data_path)
-        dest = "shared_snapshot_data.bin"
+        dest = "${resources_path}shared_snapshot_data.bin"
       },
       {
         path = rebase_path(shared_snapshot_instructions_path)
-        dest = "shared_snapshot_instructions.bin"
+        dest = "${resources_path}shared_snapshot_instructions.bin"
       },
     ]
     if (defined(invoker.resources)) {

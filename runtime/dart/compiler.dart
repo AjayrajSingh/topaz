@@ -26,6 +26,7 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
       defaultsTo: false)
   ..addFlag('drop-ast',
       help: 'Drop AST for members with bytecode', defaultsTo: false)
+  ..addOption('component-name', help: 'Name of the component')
   ..addFlag('embed-sources',
       help: 'Embed sources in the output dill file', defaultsTo: false)
   ..addFlag('gen-bytecode', help: 'Generate bytecode', defaultsTo: false)
@@ -72,6 +73,7 @@ Future<void> main(List<String> args) async {
   final String targetName = options['target'];
   final bool genBytecode = options['gen-bytecode'];
   final bool dropAST = options['drop-ast'];
+  final String componentName = options['component-name'];
 
   final String filename = options.rest[0];
   final Uri filenameUri = Uri.base.resolveUri(new Uri.file(filename));
@@ -140,7 +142,7 @@ Future<void> main(List<String> args) async {
   // Multiple-file output.
   final String manifestFilename = options['manifest'];
   if (manifestFilename != null) {
-    await writePackages(component, kernelBinaryFilename, manifestFilename);
+    await writePackages(component, kernelBinaryFilename, manifestFilename, componentName);
   }
 
   // Dependencies output.
@@ -182,7 +184,7 @@ Future<void> writeDepfile(
 }
 
 Future writePackages(
-    Component component, String output, String packageManifestFilename) async {
+    Component component, String output, String packageManifestFilename, String componentName) async {
   // Package sharing: make the encoding not depend on the order in which parts
   // of a package are loaded.
   component.libraries.sort((Library a, Library b) {
@@ -206,17 +208,20 @@ Future writePackages(
   packages.remove(null);
 
   for (String package in packages) {
-    await writePackage(component, output, package, packageManifest, kernelList);
+    await writePackage(component, output, package, packageManifest, kernelList, componentName);
   }
-  await writePackage(component, output, 'main', packageManifest, kernelList);
+  await writePackage(component, output, 'main', packageManifest, kernelList, componentName);
 
   packageManifest.write('data/app.dilplist=$kernelListFilename\n');
+  if (componentName != null && componentName.isNotEmpty) {
+    packageManifest.write('data/$componentName/app.dilplist=$kernelListFilename\n');
+  }
   await packageManifest.close();
   await kernelList.close();
 }
 
 Future writePackage(Component component, String output, String package,
-    IOSink packageManifest, IOSink kernelList) async {
+    IOSink packageManifest, IOSink kernelList, String componentName) async {
   final String filenameInPackage = '$package.dilp';
   final String filenameInBuild = '$output-$package.dilp';
   final IOSink sink = new File(filenameInBuild).openWrite();
@@ -235,6 +240,9 @@ Future writePackage(Component component, String output, String package,
   await sink.close();
 
   packageManifest.write('data/$filenameInPackage=$filenameInBuild\n');
+  if (componentName != null && componentName.isNotEmpty) {
+    packageManifest.write('data/$componentName/$filenameInPackage=$filenameInBuild\n');
+  }
   kernelList.write('$filenameInPackage\n');
 }
 
