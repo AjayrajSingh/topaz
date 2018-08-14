@@ -5,10 +5,11 @@
 import 'dart:async';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_tictactoe/fidl_async.dart';
-import 'package:game_tracker_impl/impl.dart';
 import 'package:lib.agent.dart/agent_async.dart';
 import 'package:lib.app.dart/app_async.dart';
 import 'package:meta/meta.dart';
+
+import 'game_tracker_impl.dart';
 
 /// An implementation of the [Agent] interface for tracking game wins.
 class GameTrackerAgent extends AgentImpl {
