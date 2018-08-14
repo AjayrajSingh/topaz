@@ -3,4 +3,4 @@
 // found in the LICENSE file.
 
 /// Player controls for the fuchsia media system.
-library modular;
+library media;

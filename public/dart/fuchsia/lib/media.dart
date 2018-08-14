@@ -3,4 +3,4 @@
 // found in the LICENSE file.
 
 /// Simplified interface for the fuchsia.media package.
-library fuchsia;
+library media;

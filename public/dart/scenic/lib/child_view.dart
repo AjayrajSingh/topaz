@@ -3,4 +3,4 @@
 // found in the LICENSE file.
 
 /// A widget which is used to embed scenic views in a Flutter Widget tree.
-library scenic;
+library child_view;

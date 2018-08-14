@@ -3,4 +3,4 @@
 // found in the LICENSE file.
 
 /// The logger for the Fuchsia library
-library fuchsia;
+library logger;
