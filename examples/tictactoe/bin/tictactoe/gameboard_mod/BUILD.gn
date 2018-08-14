@@ -20,8 +20,8 @@ flutter_aot_app("tictactoe_gameboard_mod") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/examples/tictactoe/common",
-    "//topaz/examples/tictactoe/services:game_tracker_service",
+    "//topaz/examples/tictactoe/lib/tictactoe/common",
+    "//topaz/examples/tictactoe/public/fidl/tictactoe:game_tracker_service",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/proposal/dart",
@@ -41,7 +41,7 @@ dart_test("tictactoe_gameboard_mod_test") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/examples/tictactoe/common",
+    "//topaz/examples/tictactoe/lib/tictactoe/common",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/testing/flutter",

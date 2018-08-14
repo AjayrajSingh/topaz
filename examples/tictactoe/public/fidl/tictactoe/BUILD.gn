@@ -9,6 +9,6 @@ fidl("game_tracker_service") {
   name = "fuchsia.tictactoe"
   cpp_legacy_callbacks = true
   sources = [
-    "fidl/game_tracker.fidl",
+    "game_tracker.fidl",
   ]
 }

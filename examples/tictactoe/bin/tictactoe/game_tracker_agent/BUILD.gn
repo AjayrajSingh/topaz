@@ -14,8 +14,8 @@ dart_app("game_tracker_agent") {
 
   deps = [
     "//peridot/public/fidl/fuchsia.modular",
-    "//topaz/examples/tictactoe/common",
-    "//topaz/examples/tictactoe/services:game_tracker_service",
+    "//topaz/examples/tictactoe/lib/tictactoe/common",
+    "//topaz/examples/tictactoe/public/fidl/tictactoe:game_tracker_service",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/sledge",
     "//topaz/public/lib/agent/dart",
