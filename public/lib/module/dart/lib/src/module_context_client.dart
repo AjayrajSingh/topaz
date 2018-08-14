@@ -379,6 +379,29 @@ class ModuleContextClient {
     return completer.future;
   }
 
+  /// See [fidl:ModuleContext#RequestStoryVisibilityState]
+  Future<void> requestStoryVisibilityState(
+      fidl.StoryVisibilityState state) async {
+    log.fine('requestStoryVisibilityState requesting state $state');
+    Completer completer = new Completer();
+    try {
+      await bound;
+
+      // ignore: unawaited_futures
+      proxy.ctrl.error.then((Object error) {
+        if (!completer.isCompleted) {
+          completer.completeError(error);
+        }
+      });
+
+      proxy.requestStoryVisibilityState(state);
+      completer.complete();
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+    }
+    return completer.future;
+  }
+
   void _handleConnectionError() {
     Exception err = new Exception('binding connection failed');
     throw err;
@@ -398,8 +421,8 @@ class ModuleContextClient {
     log.fine('terminate called');
     proxy.ctrl.close();
     _intelligenceServices.ctrl.close();
-    return Future.wait(
-            _links.map((LinkClient link) => link.terminate()).toList())
+    return Future
+        .wait(_links.map((LinkClient link) => link.terminate()).toList())
         .then((_) => null);
   }
 }
