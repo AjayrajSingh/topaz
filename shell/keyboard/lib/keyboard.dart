@@ -13,16 +13,15 @@ import 'package:flutter/widgets.dart';
 import 'keys.dart';
 import 'word_suggestion_service.dart';
 
-const double _kSuggestionRowHeight = 40.0;
+const double _kSuggestionRowHeight = 0.0;
 const Color _kTurquoiseAccentColor = const Color(0xFF68EFAD);
-const Color _kImageColor = const Color(0xFF909090);
-const double _kDefaultRowHeight = 54.0;
+const Color _kImageColor = const Color(0xFFFFFFFF);
+const double _kDefaultRowHeight = 48.0;
 
-const double _kKeyTextSize = 22.0;
 const TextStyle _kDefaultTextStyle = const TextStyle(
-  color: Colors.white,
+  color: _kImageColor,
   fontFamily: 'Roboto-Light',
-  fontSize: _kKeyTextSize,
+  fontSize: 22.0,
 );
 
 const String _kKeyType = 'type'; // defaults to kKeyTypeNormal
@@ -301,16 +300,14 @@ class KeyboardState extends State<Keyboard> {
     super.initState();
     _keyboards = <Widget>[];
     for (List<dynamic> keyboard in _kKeyboardLayouts) {
-      _keyboards.add(
-        new Directionality(
-          textDirection: TextDirection.ltr,
-          child: new IntrinsicHeight(
-            child: new Column(
-              children: keyboard.map(_makeRow).toList(),
-            ),
+      _keyboards.add(new Directionality(
+        textDirection: TextDirection.ltr,
+        child: new IntrinsicHeight(
+          child: new Column(
+            children: keyboard.map(_makeRow).toList(),
           ),
         ),
-      );
+      ));
     }
     _keyboardWidget = _keyboards[0];
   }
@@ -390,16 +387,10 @@ class KeyboardState extends State<Keyboard> {
     TextStyle style = (type == _kKeyTypeSuggestion)
         ? _kSuggestionTextStyle
         : (visualType == _kKeyVisualTypeActionText)
-            ? (type == _kKeyTypeSpecial)
-                ? _kDefaultTextStyle.copyWith(
-                    fontSize: _kGoKeyTextSize,
-                    fontWeight: FontWeight.bold,
-                    color: _kImageColor,
-                  )
-                : _kDefaultTextStyle.copyWith(
-                    fontSize: _kGoKeyTextSize,
-                    fontWeight: FontWeight.bold,
-                  )
+            ? _kDefaultTextStyle.copyWith(
+                fontSize: _kGoKeyTextSize,
+                fontWeight: FontWeight.bold,
+              )
             : _kDefaultTextStyle;
     bool isSuggestion = type == _kKeyTypeSuggestion;
     GlobalKey<TextKeyState> key = isSuggestion ? new GlobalKey() : null;

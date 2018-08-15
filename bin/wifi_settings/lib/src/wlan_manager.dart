@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.settings/debug.dart';
 import 'package:lib.settings/widgets.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:lib_setui_common/mode.dart';
 
 import 'fuchsia/access_point.dart';
 import 'fuchsia/wifi_settings_model.dart';
@@ -19,7 +20,7 @@ TextStyle _titleTextStyle(double scale) => TextStyle(
 
 TextStyle _textStyle(double scale) => TextStyle(
       color: Colors.grey[900],
-      fontSize: 24.0 * scale,
+      fontSize: 36.0 * scale,
       fontWeight: FontWeight.w200,
     );
 
@@ -61,9 +62,14 @@ class WlanManager extends StatelessWidget {
       widget = _buildCurrentNetwork(model, scale);
     } else if ((model.selectedAccessPoint?.isSecure ?? false) &&
         !model.connecting) {
+      final isDebug = SetUiMode().mode == Mode.debug;
+
       widget = Stack(children: [
         _buildAvailableNetworks(model, scale),
-        _buildPasswordBox(model, scale),
+        Column(children: [
+          Expanded(child: _buildPasswordBox(model, scale)),
+          isDebug ? model.passwordTextController.getKeyboard() : Offstage(),
+        ]),
       ]);
     } else {
       widget = _buildAvailableNetworks(model, scale);
@@ -162,7 +168,7 @@ class WlanManager extends StatelessWidget {
             color: Colors.white,
             child: FractionallySizedBox(
               widthFactor: 0.8,
-              heightFactor: 0.5,
+              heightFactor: 0.9,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -174,12 +180,13 @@ class WlanManager extends StatelessWidget {
                   ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: 400.0 * scale),
                     child: Container(
-                      padding: EdgeInsets.only(top: 32.0 * scale),
+                      padding: EdgeInsets.only(top: 16.0 * scale),
                       child: TextField(
                         obscureText: true,
                         autofocus: true,
                         style: _textStyle(scale),
                         onSubmitted: model.onPasswordEntered,
+                        controller: model.passwordTextController,
                       ),
                     ),
                   ),

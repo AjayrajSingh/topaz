@@ -3,10 +3,13 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:math';
 
 import 'package:fidl_fuchsia_netstack/fidl.dart' as net;
 import 'package:fidl_fuchsia_wlan_service/fidl.dart' as wlan;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:keyboard/keyboard.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.settings/debug.dart';
 import 'package:lib.widgets/model.dart';
@@ -34,6 +37,8 @@ class WifiSettingsModel extends Model {
   bool _loading;
   bool _connecting;
 
+  _PasswordTextController _passwordTextController;
+
   /// Whether or not there are any wireless adapters available on the system
   /// right now.
   bool _hasWlanInterface = true;
@@ -58,7 +63,7 @@ class WifiSettingsModel extends Model {
   WifiSettingsModel()
       : _loading = true,
         _connecting = false {
-    StartupContext startupContext = new StartupContext.fromStartupInfo();
+    StartupContext startupContext = StartupContext.fromStartupInfo();
 
     connectToService(startupContext.environmentServices, _wlanProxy.ctrl);
     connectToService(startupContext.environmentServices, _netstackProxy.ctrl);
@@ -66,14 +71,17 @@ class WifiSettingsModel extends Model {
     _netstackProxy.onInterfacesChanged = interfacesChanged;
 
     _scan();
-    _updateTimer = new Timer.periodic(_updatePeriod, (_) {
-      _update();
-    });
-    _scanTimer = new Timer.periodic(_scanPeriod, (_) {
-      _scan();
-    });
+    _updateTimer = Timer.periodic(_updatePeriod, (_) => _update());
+    _scanTimer = Timer.periodic(_scanPeriod, (_) => _scan());
 
     showDebugInfo.addListener(notifyListeners);
+  }
+
+  /// The controller for the password text box.
+  _PasswordTextController get passwordTextController {
+    return _passwordTextController ??= _PasswordTextController(onGo: () {
+      onPasswordEntered(passwordTextController.text);
+    });
   }
 
   /// The current list of available access points.
@@ -81,7 +89,7 @@ class WifiSettingsModel extends Model {
   /// Since scanning only works if there are no connected networks,
   /// this will only containb access points when unconnected.
   Iterable<AccessPoint> get accessPoints =>
-      _scannedAps?.map((wlan.Ap ap) => new AccessPoint(
+      _scannedAps?.map((wlan.Ap ap) => AccessPoint(
             name: ap.ssid,
             signalStrength: ap.rssiDbm.toDouble(),
             isSecure: ap.isSecure,
@@ -90,7 +98,7 @@ class WifiSettingsModel extends Model {
   /// The access point that is either connected, or in the process of being
   /// connected.
   AccessPoint get connectedAccessPoint => _status?.currentAp != null
-      ? new AccessPoint(
+      ? AccessPoint(
           name: _status.currentAp.ssid,
           isSecure: _status.currentAp.isSecure,
           signalStrength: _status.currentAp.rssiDbm.toDouble())
@@ -170,7 +178,6 @@ class WifiSettingsModel extends Model {
   void dispose() {
     _updateTimer.cancel();
     _scanTimer.cancel();
-    _wlanProxy.ctrl.close();
   }
 
   /// Listens for any changes to network interfaces.
@@ -188,11 +195,13 @@ class WifiSettingsModel extends Model {
   void onPasswordCanceled() {
     _selectedAccessPoint = null;
     notifyListeners();
+    passwordTextController.clear();
   }
 
   /// Called when the password for a secure network has been set.
   void onPasswordEntered(String password) {
     _connect(_selectedAccessPoint, password);
+    passwordTextController.clear();
   }
 
   void _connect(AccessPoint accessPoint, [String password]) {
@@ -233,7 +242,7 @@ class WifiSettingsModel extends Model {
       // First sort APs by signal strength so when we de-dupe we drop the
       // weakest ones
       scanResult.aps.sort((wlan.Ap a, wlan.Ap b) => b.rssiDbm - a.rssiDbm);
-      Set<String> seenNames = new Set<String>();
+      Set<String> seenNames = Set<String>();
 
       for (wlan.Ap ap in scanResult.aps) {
         // Dedupe: if we've seen this ssid before, skip it.
@@ -310,5 +319,38 @@ class _WifiDebugInfo extends DebugStatus {
   void interfaceUpdate(List<net.NetInterface> interfaces) {
     timestamp('[interface] updated');
     write('[interace] list', interfaces.toString());
+  }
+}
+
+class _PasswordTextController extends TextEditingController {
+  /// Called when enter/go is pressed on the keyboard.
+  final VoidCallback onGo;
+
+  _PasswordTextController({this.onGo});
+
+  Widget getKeyboard() =>
+      Keyboard(onDelete: _onDelete, onGo: onGo, onText: _onText);
+
+  /// Called when backspace is pressed on the keyboard.
+  void _onDelete() {
+    final int newSelectionIndex = max(selection.start - 1, 0);
+    _setNewText(
+        text.substring(0, newSelectionIndex) + selection.textAfter(text),
+        newSelectionIndex);
+  }
+
+  /// Called when a key is pressed on the keyboard.
+  void _onText(String text) {
+    final String newText =
+        selection.textBefore(this.text) + text + selection.textAfter(this.text);
+    _setNewText(newText, min(selection.start + 1, newText.length));
+  }
+
+  /// Sets the text of the controller as well as the new cursor location.
+  void _setNewText(String text, int newSelectionIndex) {
+    value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: newSelectionIndex),
+    );
   }
 }
