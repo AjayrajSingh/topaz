@@ -20,19 +20,19 @@ const String scoreBoardModUrl = 'tictactoe_scoreboard_mod';
 const int suggestionColor = 0xFFA5A700;
 
 void main() {
-  setupLogger(name: 'tictactoe gameboard');
+  setupLogger(name: 'tictactoe game board');
 
-  // The ModuleDriver is a dart-idomatic interfacer to the Fuchsia system.
+  // The ModuleDriver is a dart-idomatic interface to the Fuchsia system.
   ModuleDriver moduleDriver = new ModuleDriver()
     ..start().then((_) => trace('module is ready')).catchError(
         (error, stackTrace) =>
             log.severe('Error starting module driver.', error, stackTrace));
 
-  Future<GameTracker> futureGameTracker = _createGameTracker(moduleDriver);
+  Future<GameTracker> gameTracker = _createGameTracker(moduleDriver);
 
   TicTacToeModel model = new TicTacToeModel(
     winListener: (gameState) async =>
-        _recordWinner(await futureGameTracker, gameState),
+        _recordWinner(await gameTracker, gameState),
   );
 
   _proposeScore(moduleDriver);
@@ -94,7 +94,7 @@ Future<void> _proposeScore(ModuleDriver moduleDriver) async {
     ),
     intent: intent,
     // This parameter is the parent module. In our case, it would be
-    // gameboard mod. We would use 'root' to denote that.
+    // game board mod. We would use 'root' to denote that.
     surfaceParentModulePath: ['root'],
   );
 
