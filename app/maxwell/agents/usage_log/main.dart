@@ -21,10 +21,12 @@ import 'dart:collection';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.context.dart/context_listener_impl.dart';
 import 'package:fidl_fuchsia_cobalt/fidl.dart';
+import 'package:fidl_fuchsia_mem/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:zircon/zircon.dart';
 
-// The project ID of the usage_log registered in Cobalt.
-const int _cobaltProjectID = 101;
+// Path to Config proto
+const String _cobaltConfigBinProtoPath = '/pkg/data/cobalt_config.binproto';
 
 // The IDs of the Cobalt metric and encoding we are using.
 // These specify objects within our Cobalt project configuration.
@@ -137,7 +139,15 @@ void main(List<String> args) {
   assert(encoderFactory.ctrl.isBound);
 
   // Get an encoder
-  encoderFactory.getEncoder(_cobaltProjectID, _encoder.ctrl.request());
+  SizedVmo configVmo = SizedVmo.fromFile(_cobaltConfigBinProtoPath);
+  ProjectProfile profile =
+      ProjectProfile(config: Buffer(vmo: configVmo, size: configVmo.size));
+  encoderFactory.getEncoderForProject(profile, _encoder.ctrl.request(),
+      (Status s) {
+    if (s != Status.ok) {
+      print('[USAGE LOG] Failed to obtain Encoder. Cobalt config is invalid.');
+    }
+  });
 
   context.close();
   encoderFactory.ctrl.close();

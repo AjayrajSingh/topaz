@@ -2,7 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//third_party/cobalt_config/cobalt_config.gni")
 import("//topaz/runtime/dart_runner/dart_app.gni")
+
+cobalt_config("generate_module_usage_tracking_config") {
+  project_id = 101
+}
 
 dart_app("usage_log") {
   main_dart = "main.dart"
@@ -10,11 +15,26 @@ dart_app("usage_log") {
   source_dir = "."
   sources = []
 
+  non_dart_deps = [
+    ":generate_module_usage_tracking_config",
+  ]
+
   deps = [
     "//peridot/public/fidl/fuchsia.modular",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/context/dart",
     "//zircon/public/fidl/fuchsia-cobalt",
+  ]
+
+  resources = [
+    {
+      path = rebase_path(
+              get_label_info(
+                             ":generate_module_usage_tracking_config",
+                             "target_gen_dir")
+              + "/cobalt_config.binproto")
+      dest = "cobalt_config.binproto"
+    }
   ]
 }
