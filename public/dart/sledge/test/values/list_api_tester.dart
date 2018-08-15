@@ -343,7 +343,7 @@ class ListApiTester<TestingList extends List> {
     test('Observer calls.', () {
       final list = _listCreator();
       final observer = new DummyValueObserver();
-      expect(list, const isInstanceOf<LeafValue>());
+      expect(list, const TypeMatcher<LeafValue>());
       dynamic leafValue = list;
       leafValue.observer = observer; // ignore: cascade_invocations
       expect(list.length, equals(0));

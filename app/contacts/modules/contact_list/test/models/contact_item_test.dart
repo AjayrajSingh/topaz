@@ -10,13 +10,13 @@ void main() {
     test('should throw if display name is empty', () {
       expect(() {
         new ContactItem(id: 'id', displayName: '');
-      }, throwsA(const isInstanceOf<AssertionError>()));
+      }, throwsA(const TypeMatcher<AssertionError>()));
     });
 
     test('should throw if id is empty', () {
       expect(() {
         new ContactItem(id: '', displayName: 'displayName');
-      }, throwsA(const isInstanceOf<AssertionError>()));
+      }, throwsA(const TypeMatcher<AssertionError>()));
     });
 
     test(

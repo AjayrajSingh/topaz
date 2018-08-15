@@ -73,14 +73,14 @@ void main() {
         expect(() {
           PrefixTree<int> emptyTree = new PrefixTree<int>();
           emptyTree[null] = 1;
-        }, throwsA(const isInstanceOf<ArgumentError>()));
+        }, throwsA(const TypeMatcher<ArgumentError>()));
       });
 
       test('should throw argument error if key is an empty string', () {
         expect(() {
           PrefixTree<int> emptyTree = new PrefixTree<int>();
           emptyTree[''] = 1;
-        }, throwsA(const isInstanceOf<ArgumentError>()));
+        }, throwsA(const TypeMatcher<ArgumentError>()));
       });
 
       test('should add the key value pair if they didn\'t exist', () {
@@ -188,13 +188,13 @@ void main() {
       test('should throw if key is null', () {
         expect(() {
           new PrefixTree<double>().putIfAbsent(null, () => 0.0);
-        }, throwsA(const isInstanceOf<ArgumentError>()));
+        }, throwsA(const TypeMatcher<ArgumentError>()));
       });
 
       test('should throw if key is empty', () {
         expect(() {
           new PrefixTree<double>().putIfAbsent('', () => 0.0);
-        }, throwsA(const isInstanceOf<ArgumentError>()));
+        }, throwsA(const TypeMatcher<ArgumentError>()));
       });
 
       test('should add key and value if they are not in the tree', () {
@@ -220,13 +220,13 @@ void main() {
       test('should throw if key is null', () {
         expect(() {
           new PrefixTree<double>().remove(null);
-        }, throwsA(const isInstanceOf<ArgumentError>()));
+        }, throwsA(const TypeMatcher<ArgumentError>()));
       });
 
       test('should throw if key is empty', () {
         expect(() {
           new PrefixTree<double>().remove('');
-        }, throwsA(const isInstanceOf<ArgumentError>()));
+        }, throwsA(const TypeMatcher<ArgumentError>()));
       });
 
       group('existing keys', () {

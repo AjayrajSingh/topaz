@@ -107,7 +107,7 @@ void main() {
               ],
               phoneNumbers: const <fidl.PhoneNumber>[],
             ));
-          }, throwsA(const isInstanceOf<ArgumentError>()));
+          }, throwsA(const TypeMatcher<ArgumentError>()));
         });
 
         test('should throw if displayName is empty string', () {
@@ -122,7 +122,7 @@ void main() {
               ],
               phoneNumbers: const <fidl.PhoneNumber>[],
             ));
-          }, throwsA(const isInstanceOf<ArgumentError>()));
+          }, throwsA(const TypeMatcher<ArgumentError>()));
         });
 
         test('should throw if searchableValues is empty', () {
@@ -135,13 +135,13 @@ void main() {
               emails: const <fidl.EmailAddress>[],
               phoneNumbers: const <fidl.PhoneNumber>[],
             ));
-          }, throwsA(const isInstanceOf<ArgumentError>()));
+          }, throwsA(const TypeMatcher<ArgumentError>()));
         });
 
         test('should throw if contact is null', () {
           expect(() {
             store.addContact(null);
-          }, throwsA(const isInstanceOf<ArgumentError>()));
+          }, throwsA(const TypeMatcher<ArgumentError>()));
         });
       });
 
@@ -219,7 +219,7 @@ void main() {
           );
 
           new ContactsStore()..addContact(contact1)..addContact(contact2);
-        }, throwsA(const isInstanceOf<ArgumentError>()));
+        }, throwsA(const TypeMatcher<ArgumentError>()));
       });
 
       test('should update the contact if updateIfExists is true', () {

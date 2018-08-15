@@ -52,6 +52,6 @@ void main() async {
         b.value = true;
       })
       ..addChecker(() => new FalseChecker());
-    expect(fleet.testAllOrders(), throwsA(new isInstanceOf<TestFailure>()));
+    expect(fleet.testAllOrders(), throwsA(new TypeMatcher<TestFailure>()));
   });
 }

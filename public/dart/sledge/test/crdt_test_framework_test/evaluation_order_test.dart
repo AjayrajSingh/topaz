@@ -22,7 +22,7 @@ void main() {
         isNot(equals(new EvaluationOrder([n2, n1, n3]))));
   });
 
-  final formatExceptionMatcher = throwsA(new isInstanceOf<FormatException>());
+  final formatExceptionMatcher = throwsA(new TypeMatcher<FormatException>());
 
   test('Node restricted name', () {
     expect(() => new Node("f'o'o"), formatExceptionMatcher);

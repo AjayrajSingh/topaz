@@ -14,7 +14,7 @@ void main() {
           names: <String>['ada'],
           isMatchedOnName: true,
         );
-      }, throwsA(const isInstanceOf<Exception>()));
+      }, throwsA(const TypeMatcher<Exception>()));
     });
 
     test('should throw if isMatchedOnName is true and index < 0', () {
@@ -25,7 +25,7 @@ void main() {
           isMatchedOnName: true,
           matchedNameIndex: -10,
         );
-      }, throwsA(const isInstanceOf<Exception>()));
+      }, throwsA(const TypeMatcher<Exception>()));
     });
 
     test('should throw if isMatchedOnName is true and index > length', () {
@@ -36,7 +36,7 @@ void main() {
           isMatchedOnName: true,
           matchedNameIndex: 1,
         );
-      }, throwsA(const isInstanceOf<Exception>()));
+      }, throwsA(const TypeMatcher<Exception>()));
     });
 
     test('fullName should include all name components in order', () {

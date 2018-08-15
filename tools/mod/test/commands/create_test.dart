@@ -139,14 +139,14 @@ project_name: hello_world
 
     await expectLater(
       runner.run(const <String>['create']),
-      throwsA(const isInstanceOf<UsageException>()),
+      throwsA(const TypeMatcher<UsageException>()),
     );
 
     expect(tempDir.listSync(), isEmpty);
 
     await expectLater(
       runner.run(const <String>['create', 'WRONG_NAME']),
-      throwsA(const isInstanceOf<UsageException>()),
+      throwsA(const TypeMatcher<UsageException>()),
     );
 
     expect(tempDir.listSync(), isEmpty);

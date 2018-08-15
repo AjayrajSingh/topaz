@@ -222,7 +222,7 @@ class SetApiTester<TestingSet extends Set> {
     test('Observer calls.', () {
       final s = _setCreator();
       final observer = new DummyValueObserver();
-      expect(s, const isInstanceOf<LeafValue>());
+      expect(s, const TypeMatcher<LeafValue>());
       dynamic leafValue = s;
       leafValue.observer = observer; // ignore: cascade_invocations
       expect(s.contains(0), equals(false));
