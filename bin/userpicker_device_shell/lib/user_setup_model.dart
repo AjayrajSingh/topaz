@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/foundation.dart';
 import 'package:fidl_fuchsia_timezone/fidl.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.device_shell/netstack_model.dart';
 import 'package:lib.widgets/model.dart';
@@ -138,7 +138,7 @@ class UserSetupModel extends Model {
   }
 
   void _wifiListener() {
-    if (_netstackModel.hasIp) {
+    if (_netstackModel.networkReachable.value) {
       _connectedToWifi = true;
       nextStep();
     }
@@ -174,10 +174,10 @@ class UserSetupModel extends Model {
   /// Does not apply to going backwards, as a user may
   /// need to connect to a different wifi network
   bool get _shouldSkipStage =>
-      (currentStage == SetupStage.welcome && _userPresent)
-        || (currentStage == SetupStage.wifi
-          && !_connectedToWifi
-          && _netstackModel.hasIp);
+      (currentStage == SetupStage.welcome && _userPresent) ||
+      (currentStage == SetupStage.wifi &&
+          !_connectedToWifi &&
+          _netstackModel.networkReachable.value);
 
   /// Ends the setup flow and immediately logs in as guest
   void loginAsGuest() {

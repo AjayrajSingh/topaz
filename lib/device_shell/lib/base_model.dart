@@ -150,7 +150,8 @@ class BaseDeviceShellModel extends DeviceShellModel
   /// Currently, having an IP is equivalent to having internet, although
   /// this is not completely reliable. This will be always false until
   /// onReady is called.
-  bool get hasInternetConnection => _netstackModel?.hasIp ?? false;
+  bool get hasInternetConnection =>
+      _netstackModel?.networkReachable?.value ?? false;
 
   Future<void> waitForInternetConnection() async {
     if (hasInternetConnection) {
@@ -162,7 +163,7 @@ class BaseDeviceShellModel extends DeviceShellModel
     final completer = Completer<void>();
 
     void listener() {
-      if (_netstackModel.hasIp) {
+      if (hasInternetConnection) {
         _netstackModel.removeListener(listener);
         completer.complete();
       }

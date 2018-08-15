@@ -27,5 +27,6 @@ dart_library("lib.device_shell") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/shell/widgets",
+    "//zircon/public/fidl/fuchsia-net:fuchsia-net",
   ]
 }

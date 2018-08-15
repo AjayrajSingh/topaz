@@ -2,9 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_netstack/fidl.dart' as net;
+import 'package:fidl_fuchsia_net/fidl.dart' as net;
+import 'package:fidl_fuchsia_netstack/fidl.dart' as ns;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/model.dart';
 
 const String _kLoopbackInterfaceName = 'en1';
@@ -43,8 +45,8 @@ class InterfaceInfo {
 
   /// The animation to use when repeating sending information.
   AnimationController sendingRepeatAnimation;
-  net.NetInterface _interface;
-  net.NetInterfaceStats _stats;
+  ns.NetInterface _interface;
+  ns.NetInterfaceStats _stats;
   bool _receiving = false;
   bool _sending = false;
 
@@ -68,28 +70,10 @@ class InterfaceInfo {
     );
   }
 
-  /// Returns true if we have an ip.
-  bool get hasIp =>
-      hasIpV4 ||
-      (!_isLo &&
-          (_interface.addr.ipv6?.addr?.length ?? 0) == 6 &&
-          _interface.addr.ipv6.addr[0] != 0 &&
-          (_interface.addr.ipv6.addr[0] << 8 | _interface.addr.ipv6.addr[1]) !=
-              0xfe80);
-
-  /// Returns true if there is an IpV4 address.
-  bool get hasIpV4 =>
-      !_isLo &&
-      (_interface.addr.ipv4?.addr?.length ?? 0) == 4 &&
-      _interface.addr.ipv4.addr[0] != 0;
-
   /// Name of the interface.
   String get name => _interface.name;
 
-  /// Returns true if this interface is the local interface
-  bool get _isLo => _interface.hwaddr.every((int value) => value == 0);
-
-  void _update(net.NetInterface interface, net.NetInterfaceStats stats) {
+  void _update(ns.NetInterface interface, ns.NetInterfaceStats stats) {
     _interface = interface;
 
     bool oldReceiving = _receiving;
@@ -115,40 +99,39 @@ class InterfaceInfo {
 }
 
 /// Provides netstack information.
-class NetstackModel extends Model
-    with TickerProviderModelMixin {
+class NetstackModel extends Model with TickerProviderModelMixin {
   /// The netstack containing networking information for the device.
-  final net.NetstackProxy netstack;
+  final ns.NetstackProxy netstack;
+  final net.ConnectivityProxy connectivity = net.ConnectivityProxy();
+
+  final ValueNotifier<bool> networkReachable = ValueNotifier<bool>(false);
 
   final Map<int, InterfaceInfo> _interfaces = <int, InterfaceInfo>{};
 
   /// Constructor.
-  NetstackModel({this.netstack});
-
-  /// Returns true if the netstack has an ip.
-  bool get hasIp =>
-      interfaces.any((InterfaceInfo interfaceInfo) => interfaceInfo.hasIp);
-
-  /// Returns true if the netstack has an IPV4 address.
-  ///
-  /// Needed because IPV6 always has an address, and routing for it isn't reliable
-  /// right now.
-  bool get hasIpV4 {
-    return interfaces
-        .any((InterfaceInfo interfaceInfo) => interfaceInfo.hasIpV4);
+  NetstackModel({this.netstack}) {
+    connectToService(StartupContext.fromStartupInfo().environmentServices,
+        connectivity.ctrl);
+    networkReachable.addListener(notifyListeners);
+    connectivity.onNetworkReachable = (reachable) {
+      networkReachable.value = reachable;
+    };
   }
+
+  // TODO(ejia):remove when vendor google change is in
+  bool get hasIp => networkReachable.value;
 
   /// The current interfaces on the device.
   List<InterfaceInfo> get interfaces => _interfaces.values.toList();
 
-  void interfacesChanged(List<net.NetInterface> interfaces) {
-    List<net.NetInterface> filteredInterfaces = interfaces
-        .where((net.NetInterface interface) =>
+  void interfacesChanged(List<ns.NetInterface> interfaces) {
+    List<ns.NetInterface> filteredInterfaces = interfaces
+        .where((ns.NetInterface interface) =>
             interface.name != _kLoopbackInterfaceName)
         .toList();
 
     List<int> ids = filteredInterfaces
-        .map((net.NetInterface interface) => interface.id)
+        .map((ns.NetInterface interface) => interface.id)
         .toList();
 
     _interfaces.keys
@@ -156,10 +139,10 @@ class NetstackModel extends Model
         .toList()
         .forEach(_interfaces.remove);
 
-    for (net.NetInterface interface in filteredInterfaces) {
+    for (ns.NetInterface interface in filteredInterfaces) {
       netstack.getStats(
         interface.id,
-        (net.NetInterfaceStats stats) {
+        (ns.NetInterfaceStats stats) {
           if (_interfaces[interface.id] == null) {
             _interfaces[interface.id] = new InterfaceInfo(
               interface,
@@ -178,11 +161,10 @@ class NetstackModel extends Model
   /// Starts listening for netstack interfaces.
   void start() {
     netstack.onInterfacesChanged = interfacesChanged;
-
   }
 
   /// Stops listening for netstack interfaces.
-  void stop(){
+  void stop() {
     netstack.onInterfacesChanged = null;
   }
 }
