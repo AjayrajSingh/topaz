@@ -2,8 +2,13 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//third_party/cobalt_config/cobalt_config.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+cobalt_config("generate_sysui_config") {
+  project_id = 103
+}
 
 flutter_aot_app("userpicker_device_shell") {
   main_dart = "lib/main.dart"
@@ -13,6 +18,17 @@ flutter_aot_app("userpicker_device_shell") {
       path = rebase_path("meta/userpicker_device_shell.cmx")
       dest = "userpicker_device_shell.cmx"
     },
+  ]
+
+  resources = [
+    {
+      path = rebase_path(
+              get_label_info(
+                             ":generate_sysui_config",
+                             "target_gen_dir")
+              + "/cobalt_config.binproto")
+      dest = "cobalt_config.binproto"
+    }
   ]
 
   package_name = "userpicker_device_shell"
@@ -31,6 +47,10 @@ flutter_aot_app("userpicker_device_shell") {
     "user_picker_screen.dart",
     "user_setup.dart",
     "user_setup_model.dart",
+  ]
+
+  non_dart_deps = [
+    ":generate_sysui_config",
   ]
 
   deps = [

@@ -170,6 +170,10 @@ template("flutter_jit_app") {
       ":${target_name}_resources",
     ]
 
+    if (defined(invoker.non_dart_deps)) {
+      deps += invoker.non_dart_deps
+    }
+
     resources = invoker_resources
 
     meta = [
@@ -425,6 +429,10 @@ template("flutter_aot_app") {
              ":${target_name}_resources",
              ":$stats_target_name",
            ]
+
+    if (defined(invoker.non_dart_deps)) {
+      deps += invoker.non_dart_deps
+    }
 
     resources_path = "${component_name}/"
     resources = [

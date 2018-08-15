@@ -3,7 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:fidl_fuchsia_cobalt/fidl.dart';
+import 'package:fidl_fuchsia_cobalt/fidl.dart' as cobalt;
+import 'package:fidl_fuchsia_mem/fidl.dart';
 import 'package:fidl_fuchsia_netstack/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
@@ -12,6 +13,7 @@ import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
+import 'package:zircon/zircon.dart';
 
 import 'authentication_context_impl.dart';
 import 'user_picker_device_shell_model.dart';
@@ -22,7 +24,7 @@ import 'user_setup_model.dart';
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
 
-const int _kCobaltProjectId = 103;
+const String _kCobaltConfigBinProtoPath = '/pkg/data/cobalt_config.binproto';
 
 /// The main device shell widget.
 DeviceShellWidget<UserPickerDeviceShellModel> _deviceShellWidget;
@@ -33,11 +35,20 @@ void main() {
   StartupContext startupContext = new StartupContext.fromStartupInfo();
 
   // Connect to Cobalt
-  EncoderProxy encoder = new EncoderProxy();
+  cobalt.EncoderProxy encoder = new cobalt.EncoderProxy();
 
-  EncoderFactoryProxy encoderFactory = new EncoderFactoryProxy();
+  cobalt.EncoderFactoryProxy encoderFactory = new cobalt.EncoderFactoryProxy();
   connectToService(startupContext.environmentServices, encoderFactory.ctrl);
-  encoderFactory.getEncoder(_kCobaltProjectId, encoder.ctrl.request());
+
+  SizedVmo configVmo = SizedVmo.fromFile(_kCobaltConfigBinProtoPath);
+  cobalt.ProjectProfile profile = cobalt.ProjectProfile(
+      config: Buffer(vmo: configVmo, size: configVmo.size));
+  encoderFactory.getEncoderForProject(profile, encoder.ctrl.request(),
+      (cobalt.Status s) {
+    if (s != cobalt.Status.ok) {
+      print('Failed to obtain Encoder. Cobalt config is invalid.');
+    }
+  });
   encoderFactory.ctrl.close();
 
   NetstackProxy netstackProxy = new NetstackProxy();
