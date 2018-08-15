@@ -118,9 +118,6 @@ class NetstackModel extends Model with TickerProviderModelMixin {
     };
   }
 
-  // TODO(ejia):remove when vendor google change is in
-  bool get hasIp => networkReachable.value;
-
   /// The current interfaces on the device.
   List<InterfaceInfo> get interfaces => _interfaces.values.toList();
 
