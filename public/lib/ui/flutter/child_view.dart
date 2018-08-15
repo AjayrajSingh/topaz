@@ -233,14 +233,16 @@ class ChildViewConnection {
       double insetTop,
       double insetRight,
       double insetBottom,
-      double insetLeft) {
+      double insetLeft,
+      bool focusable) {
     if (_currentViewProperties != null &&
         _currentViewProperties.viewLayout.size.width == width &&
         _currentViewProperties.viewLayout.size.height == height &&
         _currentViewProperties.viewLayout.inset.top == insetTop &&
         _currentViewProperties.viewLayout.inset.right == insetRight &&
         _currentViewProperties.viewLayout.inset.bottom == insetBottom &&
-        _currentViewProperties.viewLayout.inset.left == insetLeft) {
+        _currentViewProperties.viewLayout.inset.left == insetLeft &&
+        (_currentViewProperties.customFocusBehavior == null || _currentViewProperties.customFocusBehavior.allowFocus) == focusable) {
       return null;
     }
 
@@ -248,8 +250,10 @@ class ChildViewConnection {
     fidl.InsetF inset = new fidl.InsetF(
         top: insetTop, right: insetRight, bottom: insetBottom, left: insetLeft);
     ViewLayout viewLayout = new ViewLayout(size: size, inset: inset);
+    final customFocusBehavior = new CustomFocusBehavior(allowFocus: focusable);
     return _currentViewProperties = new ViewProperties(
       viewLayout: viewLayout,
+      customFocusBehavior: customFocusBehavior,
     );
   }
 
@@ -260,6 +264,7 @@ class ChildViewConnection {
     double insetRight,
     double insetBottom,
     double insetLeft,
+    bool focusable,
   ) {
     assert(_attached);
     assert(_attachments == 1);
@@ -268,7 +273,7 @@ class ChildViewConnection {
       return;
     }
     ViewProperties viewProperties = _createViewProperties(
-        width, height, insetTop, insetRight, insetBottom, insetLeft);
+        width, height, insetTop, insetRight, insetBottom, insetLeft, focusable);
     if (viewProperties == null) {
       return;
     }
@@ -281,8 +286,10 @@ class _RenderChildView extends RenderBox {
   _RenderChildView({
     ChildViewConnection connection,
     bool hitTestable = true,
+    bool focusable = true,
   })  : _connection = connection,
         _hitTestable = hitTestable,
+        _focusable = focusable,
         assert(hitTestable != null);
 
   /// The child to display.
@@ -319,6 +326,20 @@ class _RenderChildView extends RenderBox {
       return;
     }
     _hitTestable = value;
+    if (_connection != null) {
+      markNeedsPaint();
+    }
+  }
+
+  /// Whether this child should be able to recieve focus events
+  bool get focusable => _focusable;
+  bool _focusable;
+  set focusable(bool value) {
+    assert(value != null);
+    if (value == _focusable) {
+      return;
+    }
+    _focusable = value;
     if (_connection != null) {
       markNeedsPaint();
     }
@@ -373,7 +394,7 @@ class _RenderChildView extends RenderBox {
 
     _width = size.width;
     _height = size.height;
-    _connection._setChildProperties(_width, _height, 0.0, 0.0, 0.0, 0.0);
+    _connection._setChildProperties(_width, _height, 0.0, 0.0, 0.0, 0.0, _focusable);
     assert(() {
       if (_viewContainer == null) {
         _debugErrorMessage ??= new TextPainter(
@@ -486,7 +507,7 @@ class ChildSceneLayer extends Layer {
 @immutable
 class ChildView extends LeafRenderObjectWidget {
   /// Creates a widget that is replaced by content from another process.
-  ChildView({this.connection, this.hitTestable = true})
+  ChildView({this.connection, this.hitTestable = true, this.focusable = true})
       : super(key: new GlobalObjectKey(connection));
 
   /// A connection to the child whose content will replace this widget.
@@ -497,11 +518,17 @@ class ChildView extends LeafRenderObjectWidget {
   /// Defaults to true.
   final bool hitTestable;
 
+  /// Whether this child and its children should be allowed to receive focus.
+  ///
+  /// Defaults to true.
+  final bool focusable;
+
   @override
   _RenderChildView createRenderObject(BuildContext context) {
     return new _RenderChildView(
       connection: connection,
       hitTestable: hitTestable,
+      focusable: focusable,
     );
   }
 
@@ -509,7 +536,8 @@ class ChildView extends LeafRenderObjectWidget {
   void updateRenderObject(BuildContext context, _RenderChildView renderObject) {
     renderObject
       ..connection = connection
-      ..hitTestable = hitTestable;
+      ..hitTestable = hitTestable
+      ..focusable = focusable;
   }
 }
 

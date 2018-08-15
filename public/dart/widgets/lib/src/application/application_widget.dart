@@ -24,6 +24,9 @@ class ApplicationWidget extends StatefulWidget {
   /// Child can be hit tested.
   final bool hitTestable;
 
+  /// Child can be focused.
+  final bool focusable;
+
   /// Constructor.
   const ApplicationWidget({
     @required this.url,
@@ -31,6 +34,7 @@ class ApplicationWidget extends StatefulWidget {
     Key key,
     this.onDone,
     this.hitTestable = true,
+    this.focusable = true,
   }) : super(key: key);
 
   @override
@@ -68,6 +72,7 @@ class _ApplicationWidgetState extends State<ApplicationWidget> {
   Widget build(BuildContext context) => new ChildView(
         connection: _connection,
         hitTestable: widget.hitTestable,
+        focusable: widget.focusable,
       );
 
   void _cleanUp() {
