@@ -160,6 +160,8 @@ if (current_toolchain == dart_toolchain) {
             rebase_path(_fuchsia_tester_bin),
             "--flutter-shell",
             rebase_path(_flutter_shell_bin),
+            "--icudtl",
+            rebase_path("//third_party/icu/common/icudtl.dat"),
             "--sdk-root",
             rebase_path("$root_out_dir/flutter_runner_patched_sdk"),
           ]

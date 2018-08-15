@@ -37,6 +37,9 @@ def main():
   parser.add_argument('--flutter-shell',
                       help='Path to the Flutter shell',
                       required=True)
+  parser.add_argument('--icudtl',
+                      help='Path to the ICU data file',
+                      required=True)
   args = parser.parse_args()
 
   test_file = args.out
@@ -53,6 +56,7 @@ $test_runner \\
   --sdk-root=$sdk_root \\
   --test-file=$test_file \\
   --dill-file=$dill_file \\
+  --icudtl=$icudtl \\
   "$$@"
 ''')
   with open(test_file, 'w') as file:
