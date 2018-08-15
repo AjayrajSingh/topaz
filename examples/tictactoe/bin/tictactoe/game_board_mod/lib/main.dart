@@ -85,7 +85,6 @@ Future<void> _proposeScore(ModuleDriver moduleDriver) async {
   final Intent intent = Intent(handler: scoreBoardModUrl);
 
   final AddModule addModule = AddModule(
-    storyId: storyId,
     moduleName: 'ScoreBoard',
     surfaceRelation: const SurfaceRelation(
       arrangement: SurfaceArrangement.copresent,
