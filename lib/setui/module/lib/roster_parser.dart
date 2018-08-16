@@ -2,11 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib_setui_common/action.dart';
 import 'package:meta/meta.dart';
 import 'package:yaml/yaml.dart';
 
-import 'module_action.dart';
-import 'module_action_repository.dart';
+import 'module_blueprint.dart';
 
 /// Results that can be returned during validation.
 enum ParseResult {
@@ -24,20 +25,24 @@ class RosterParser {
 
   static final List<String> _requiredKeys = [_keyVerb, _keyHandler];
 
-  ModuleActionRepository parse(YamlDocument config) {
+  final ModuleDriver _driver;
+
+  RosterParser(this._driver);
+
+  Roster parse(YamlDocument config) {
     if (validate(config) != ParseResult.success) {
       return null;
     }
 
     final YamlMap steps = config.contents.value;
-    final Map<String, ModuleAction> actions = {};
+    final Roster roster = new Roster();
 
     for (final String key in steps.keys) {
-      actions[key] =
-          new ModuleAction(key, steps[key][_keyVerb], steps[key][_keyHandler]);
+      roster.add(new ModuleBlueprint(
+          key, steps[key][_keyVerb], steps[key][_keyHandler], _driver));
     }
 
-    return new ModuleActionRepository(actions);
+    return roster;
   }
 
   /// Ensures the input configuration file is properly formatted. Upon success,

@@ -3,22 +3,24 @@
 // found in the LICENSE file.
 
 import 'package:lib.app_driver.dart/module_driver.dart';
-import 'package:lib_setiu_common/action_handler.dart';
+import 'package:lib_setui_common/action.dart';
 
-import 'module_action_handler.dart';
+import 'module_action.dart';
 import 'result_code_entity_codec.dart';
 
-/// Implementation of [SendResult] for modules.
-class ModuleResultHelper {
-  // The driver to write the result to.
+/// An implementation of [ActionResultSender] to send results back from the client
+/// module.
+class ModuleActionResultSender extends ActionResultSender {
+  /// The driver to write the result to.
   final ModuleDriver _driver;
 
-  // The codec to encode the data with.
+  /// The codec to encode the data with.
   final ResultCodeEntityCodec _codec = new ResultCodeEntityCodec();
 
-  ModuleResultHelper(this._driver);
+  ModuleActionResultSender(this._driver);
 
-  // Writes result to a watched module link.
+  /// Writes result to a watched module link.
+  @override
   void sendResult(String result) {
     _driver.put(stepResultLinkName, result, _codec);
   }

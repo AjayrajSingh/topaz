@@ -7,10 +7,11 @@ import("//topaz/runtime/dart/dart_test.gni")
 
 
 dart_library("common") {
-  package_name = "lib_setiu_common"
+  package_name = "lib_setui_common"
 
   sources = [
-    "action_handler.dart",
+    "action.dart",
+    "conductor.dart",
     "step.dart",
     "syllabus.dart",
     "syllabus_parser.dart",
@@ -26,6 +27,7 @@ dart_test("lib_setui_common_test") {
   source_dir = "."
 
   sources = [
+    "test/conductor_test.dart",
     "test/step_test.dart",
     "test/syllabus_parser_test.dart",
     "test/syllabus_test.dart",
@@ -34,6 +36,7 @@ dart_test("lib_setui_common_test") {
   deps = [
     ":common",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",
   ]
 }

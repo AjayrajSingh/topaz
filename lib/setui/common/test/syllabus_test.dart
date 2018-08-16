@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib_setiu_common/step.dart';
-import 'package:lib_setiu_common/syllabus.dart';
+import 'package:lib_setui_common/step.dart';
+import 'package:lib_setui_common/syllabus.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -16,7 +16,7 @@ void main() {
     final Step child1 = new Step('step1', 'action1')
       ..addResult('result', child2);
 
-    final Syllabus syllabus = new Syllabus(child1, null /*singleUseId*/);
+    final Syllabus syllabus = new Syllabus(child1);
 
     expect(syllabus.retrieveStep('step3'), child3);
     expect(syllabus.retrieveStep('unknownStep'), null);

@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib_setiu_common/step.dart';
-import 'package:lib_setiu_common/syllabus.dart';
+import 'package:lib_setui_common/step.dart';
+import 'package:lib_setui_common/syllabus.dart';
 import 'package:meta/meta.dart';
 import 'package:yaml/yaml.dart';
 
@@ -58,10 +58,10 @@ class SyllabusParser {
         stepAttr[_keyResults].value.forEach((key, value) {
           step.addResult(key, steps[value]);
         });
+      }
 
-        if (stepAttr.keys.contains(_keyDefaultTransition)) {
-          step.defaultTransition = steps[_keyDefaultTransition];
-        }
+      if (stepAttr.keys.contains(_keyDefaultTransition)) {
+        step.defaultTransition = steps[stepAttr[_keyDefaultTransition]];
       }
     });
 

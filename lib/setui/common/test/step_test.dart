@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib_setiu_common/step.dart';
+import 'package:lib_setui_common/step.dart';
 import 'package:test/test.dart';
 
 void main() {

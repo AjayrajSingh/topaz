@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib_setiu_common/step.dart';
+import 'package:lib_setui_common/step.dart';
 
 /// A representation of the decision tree consisting of Steps.
 class Syllabus {
@@ -12,7 +12,7 @@ class Syllabus {
   /// use.
   final String singleUseId;
 
-  Syllabus(this._entry, this.singleUseId);
+  Syllabus(this._entry, [this.singleUseId]);
 
   /// The first step to visit.
   Step get entry => _entry;

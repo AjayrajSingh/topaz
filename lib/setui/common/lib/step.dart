@@ -21,7 +21,7 @@ class Step {
   Step(this.key, this.action);
 
   /// Returns the next [Step] to proceed to based on the [result].
-  Step getNext(String result) {
+  Step getNext([String result]) {
     final Step searchVal = _results[result];
     return searchVal != null || _defaultTransition == null
         ? searchVal

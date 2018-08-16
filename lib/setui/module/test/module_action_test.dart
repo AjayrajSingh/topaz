@@ -6,11 +6,11 @@ import 'dart:async';
 
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.story.dart/story.dart';
-import 'package:lib_setiu_common/action_handler.dart';
-import 'package:lib_setiu_common/step.dart';
-import 'package:lib_setiu_module/module_action.dart';
-import 'package:lib_setiu_module/module_action_handler.dart';
-import 'package:lib_setiu_module/module_result_helper.dart';
+import 'package:lib_setui_common/action.dart';
+import 'package:lib_setui_common/step.dart';
+import 'package:lib_setui_module/module_action.dart';
+import 'package:lib_setui_module/module_blueprint.dart';
+import 'package:lib_setui_module/module_action_result_sender.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -18,14 +18,7 @@ class MockDriver extends Mock implements ModuleDriver {}
 
 class MockStream extends Mock implements Stream<String> {}
 
-class ResultCaptor {
-  ActionResult result;
-
-  //ignore: use_setters_to_change_properties
-  void onResult(ActionResult result) {
-    this.result = result;
-  }
-}
+class MockActionResultReceiver extends Mock implements ActionResultReceiver {}
 
 /// Invoked when the action has completed.
 typedef ResultCallback = void Function(String resultCode);
@@ -34,27 +27,26 @@ const String testResult = 'test_result';
 
 void main() {
   test('test_launch', () {
-    final ModuleAction action = new ModuleAction('foo', 'bar', 'test');
-    final Step step = new Step('start', 'foo');
     final MockDriver driver = new MockDriver();
+    final ModuleBlueprint blueprint =
+        new ModuleBlueprint('foo', 'bar', 'test', driver);
+    final Step step = new Step('start', 'foo');
 
     final MockStream stream = new MockStream();
-
-    final ModuleActionHandler handler =
-        new ModuleActionHandler(driver, step, action);
-
-    final ResultCaptor captor = new ResultCaptor();
+    final MockActionResultReceiver callback = new MockActionResultReceiver();
+    final ModuleAction action = new ModuleAction(step, blueprint, callback);
 
     // Return mock stream when asked to watch link. This should be done in
     // launch so must come before.
-    when(driver.watch(handler.linkKey, any, all: anyNamed('all')))
+    when(driver.watch(action.linkKey, any, all: anyNamed('all')))
         .thenAnswer((_) => stream);
 
     // Launch handler.
-    handler.launch(captor.onResult);
+    action.launch();
 
     // Verify that we are listening to the link and capture callback.
-    ResultCallback callback = verify(stream.listen(captureAny)).captured.single;
+    ResultCallback resultCallback =
+        verify(stream.listen(captureAny)).captured.single;
 
     // Capture intent passed in.
     final Intent intent = verify(driver.embedModule(
@@ -63,13 +55,13 @@ void main() {
         .single;
 
     // Verify verb and handler match.
-    expect(intent.action, action.verb);
-    expect(intent.handler, action.handler);
+    expect(intent.action, action.blueprint.verb);
+    expect(intent.handler, action.blueprint.handler);
 
     // Search for link and make sure correctly set to destination link name.
     bool linkFound = false;
     for (IntentParameter param in intent.parameters) {
-      if (param.name == handler.linkKey) {
+      if (param.name == action.linkKey) {
         linkFound = true;
         expect(param.data.linkName, stepResultLinkName);
       }
@@ -79,17 +71,18 @@ void main() {
     expect(linkFound, true);
 
     // Invoke the callback.
-    callback(testResult);
+    resultCallback(testResult);
 
     // Make sure change is propagated back
-    expect(captor.result.code, testResult);
+    expect(
+        verify(callback.onResult(captureAny)).captured.single.code, testResult);
   });
 
-  test('test_helper', () {
+  test('test_sender', () {
     final MockDriver driver = new MockDriver();
-    new ModuleResultHelper(driver).sendResult(testResult);
+    new ModuleActionResultSender(driver).sendResult(testResult);
 
-    // Ensure module driver receives result from helper.
+    // Ensure module driver receives result from sender.
     verify(driver.put(stepResultLinkName, testResult, any));
   });
 }

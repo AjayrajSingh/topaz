@@ -2,16 +2,51 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-/// A PODO to hold parsed module action information.
-class ModuleAction {
-  /// The name of the action as specified in the roster.
-  final String name;
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.module_resolver.dart/intent_builder.dart';
+import 'package:lib_setui_common/action.dart';
+import 'package:lib_setui_common/step.dart';
+import 'package:meta/meta.dart';
 
-  /// The module intent verb.
-  final String verb;
+import 'module_blueprint.dart';
+import 'result_code_entity_codec.dart';
 
-  /// The package that contains the module.
-  final String handler;
+/// The link name used by the result sender to communicate back the step result.
+/// It is defined here as the action handler must add the link parameter
+/// mapping.
+const String stepResultLinkName = 'setui_step_code_result';
 
-  ModuleAction(this.name, this.verb, this.handler);
+/// Module based action launching.
+class ModuleAction extends Action {
+  final ModuleBlueprint blueprint;
+
+  final ResultCodeEntityCodec _resultCodeEntityCodec =
+      new ResultCodeEntityCodec();
+
+  ModuleAction(Step step, this.blueprint, ActionResultReceiver callback)
+      : super(step, callback);
+
+  /// Returns the name of the link to be used.
+  @visibleForTesting
+  String get linkKey => 'link=${step.key}:${step.action}';
+
+  @override
+  void launch() {
+    // Create intent pointing to the action / handler combination.
+    IntentBuilder intentBuilder =
+        new IntentBuilder(action: blueprint.verb, handler: blueprint.handler)
+          ..addParameterFromLink(linkKey, stepResultLinkName);
+
+    // Watch the link for changes.
+    blueprint.driver
+        .watch(linkKey, _resultCodeEntityCodec, all: true)
+        .listen(onResult);
+
+    // Launch module.
+    blueprint.driver
+        .embedModule(name: blueprint.name, intent: intentBuilder.intent);
+  }
+
+  @override
+  String toString() => linkKey;
 }

@@ -6,34 +6,33 @@ import("//build/dart/dart_library.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
 
-dart_library("module") {
-  package_name = "lib_setui_module"
+dart_library("flutter") {
+  package_name = "lib_setui_flutter"
 
   sources = [
-    "module_action.dart",
-    "module_blueprint.dart",
-    "module_action_result_sender.dart",
-    "result_code_entity_codec.dart",
-    "roster_parser.dart",
+    "widget_action.dart",
+    "widget_action_client.dart",
+    "widget_action_host.dart",
+    "widget_blueprint.dart",
   ]
 
   deps = [
     "//third_party/dart-pkg/pub/yaml",
     "//topaz/lib/setui/common:common",
-    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
   ]
 }
 
-dart_test("lib_setui_module_test") {
+dart_test("lib_setui_flutter_test") {
   source_dir = "."
 
   sources = [
-    "test/module_action_test.dart",
-    "test/roster_parser_test.dart",
+    "test/action_test.dart",
   ]
 
   deps = [
-    ":module",
+    ":flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",

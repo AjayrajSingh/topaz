@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib_setiu_common/syllabus.dart';
-import 'package:lib_setiu_common/syllabus_parser.dart';
+import 'package:lib_setui_common/syllabus.dart';
+import 'package:lib_setui_common/syllabus_parser.dart';
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
 
@@ -25,6 +25,20 @@ login:
   default_transition: end
 end:
   action: finish
+...
+''';
+
+/// A syllabus with a default_transition.
+const String _defaultTransitionSyllabus = '''
+---
+entry: start
+...
+---
+start:
+  action: begin
+  default_transition: connectivity
+connectivity:
+  action: connect
 ...
 ''';
 
@@ -208,5 +222,12 @@ void main() {
     expect(syllabus.retrieveStep('start').action, 'begin');
     expect(syllabus.singleUseId, 'com.test.syllabus.id');
     expect(syllabus.entry.key, 'start');
+  });
+
+  // Ensures default transition is set properly
+  test('test_default_transition', () {
+    final Syllabus syllabus =
+        SyllabusParser.parse(loadYamlDocuments(_defaultTransitionSyllabus));
+    expect(syllabus.entry.getNext() != null, true);
   });
 }

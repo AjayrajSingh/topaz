@@ -2,9 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib_setiu_module/module_action.dart';
-import 'package:lib_setiu_module/module_action_repository.dart';
-import 'package:lib_setiu_module/roster_parser.dart';
+import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib_setui_common/action.dart';
+import 'package:lib_setui_common/step.dart';
+import 'package:lib_setui_module/module_action.dart';
+import 'package:lib_setui_module/roster_parser.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
 
@@ -63,6 +66,10 @@ begin:
 ...
 ''';
 
+class MockDriver extends Mock implements ModuleDriver {}
+
+class MockActionResultReceiver extends Mock implements ActionResultReceiver {}
+
 void main() {
   // Verify parser validation.
   test('test_validate', () {
@@ -81,19 +88,21 @@ void main() {
         ParseResult.missingAttr);
   });
 
-  // Check repository creation.
+  // Check roster creation.
   test('test_parse', () {
-    final RosterParser parser = new RosterParser();
-    final ModuleActionRepository repo =
-        parser.parse(loadYamlDocument(_testRoster));
+    final RosterParser parser = new RosterParser(new MockDriver());
+    final Roster roster = parser.parse(loadYamlDocument(_testRoster));
 
     // Ensure the proper number of handlers were generated.
-    expect(repo.actionCount, 2);
+    expect(roster.actionCount, 2);
 
-    ModuleAction action = repo.getAction('begin');
+    final Step step = new Step('test', 'begin');
+
+    ModuleAction action =
+        roster.getAction(step, new MockActionResultReceiver());
 
     expect(action != null, true);
-    expect(action.handler, 'com.foo.bar');
-    expect(action.verb, 'start');
+    expect(action.blueprint.handler, 'com.foo.bar');
+    expect(action.blueprint.verb, 'start');
   });
 }
