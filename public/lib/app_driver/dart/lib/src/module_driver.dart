@@ -22,6 +22,7 @@ import 'package:lib.story.dart/story.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
+import 'package:modules_config/cobalt_config.dart' as cobalt_config;
 
 import 'service_client.dart';
 
@@ -139,7 +140,17 @@ class ModuleDriver {
       environmentServices,
       encoderFactory.ctrl,
     );
-    encoderFactory.getEncoder(_kCobaltProjectId, _encoder.ctrl.request());
+
+    SizedVmo configVmo =
+        SizedVmo.fromUint8List(base64.decode(cobalt_config.config));
+    ProjectProfile profile = ProjectProfile(
+        config: fuchsia_mem.Buffer(vmo: configVmo, size: configVmo.size));
+    encoderFactory.getEncoderForProject(profile, _encoder.ctrl.request(),
+        (Status s) {
+      if (s != Status.ok) {
+        print('Failed to obtain Encoder. Cobalt config is invalid.');
+      }
+    });
     encoderFactory.ctrl.close();
 
     // Grab the current module's package name
