@@ -2,18 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:xi_client/client.dart';
 
+import 'document.dart';
 import 'editor.dart';
 
 /// Top-level Widget.
 class XiApp extends StatefulWidget {
   /// The client API interface to the xi-core Fuchsia service.
   final CoreProxy coreProxy;
+
+  /// If `true`, draws a watermark on the editor view.
   final bool drawDebugBackground;
 
   /// [XiApp] constructor.
@@ -30,47 +32,18 @@ class XiApp extends StatefulWidget {
 
 /// State for XiApp.
 class XiAppState extends State<XiApp> implements XiHandler {
-  EditorState _editorState;
+  final Document _document = new Document();
 
   XiAppState();
-
-  bool _initialized = false;
-
-  // if we get a newView request before we've init'd, we return this future
-  Completer<XiViewProxy> _pendingView;
-
-  /// Connect editor state, so that notifications from the core are routed to
-  /// the editor. Called by [Editor] widget.
-  Future<XiViewProxy> connectEditor(EditorState editorState) {
-    log.info('connect editor');
-    assert(_editorState == null);
-    _editorState = editorState;
-    if (!_initialized) {
-      _pendingView = new Completer<XiViewProxy>();
-      return _pendingView.future;
-    } else {
-      return widget.coreProxy
-          .newView()
-          .then((viewId) => widget.coreProxy.view(viewId));
-    }
-  }
 
   @override
   void initState() {
     super.initState();
     widget.coreProxy.handler = this;
-    widget.coreProxy.clientStarted().then((Null _) {
-      _initialized = true;
-      if (_pendingView != null) {
-        widget.coreProxy
-            .newView()
-            .then((viewId) => widget.coreProxy.view(viewId))
-            .then((viewProxy) {
-          _pendingView.complete(viewProxy);
-          _pendingView = null;
-        });
-      }
-    });
+    widget.coreProxy.clientStarted().then((_) => widget.coreProxy
+        .newView()
+        .then((viewId) => setState(
+            () => _document.finalizeViewProxy(widget.coreProxy.view(viewId)))));
   }
 
   @override
@@ -79,28 +52,28 @@ class XiAppState extends State<XiApp> implements XiHandler {
   }
 
   @override
-  XiViewHandler getView(String viewId) {
-    return _editorState;
-  }
+  XiViewHandler getView(String viewId) => _document;
 
   @override
-  List<double> measureWidths(List<Map<String, dynamic>> args) {
-    return _editorState.measureWidths(args);
+  List<List<double>> measureWidths(List<Map<String, dynamic>> args) {
+    return _document.measureWidths(args);
   }
 
   /// Uses a [MaterialApp] as the root of the Xi UI hierarchy.
   @override
   Widget build(BuildContext context) {
-    final editor = Editor(debugBackground: widget.drawDebugBackground);
     return new MaterialApp(
-        title: 'Xi',
-        home: new Material(
-            // required for the debug background to render correctly
-            type: MaterialType.transparency,
-            child: Container(
-              constraints: new BoxConstraints.expand(),
-              color: Colors.white,
-              child: editor,
-            )));
+      title: 'Xi',
+      home: new Material(
+        // required for the debug background to render correctly
+        type: MaterialType.transparency,
+        child: Container(
+          constraints: new BoxConstraints.expand(),
+          color: Colors.white,
+          child: new Editor(
+              document: _document, debugBackground: widget.drawDebugBackground),
+        ),
+      ),
+    );
   }
 }

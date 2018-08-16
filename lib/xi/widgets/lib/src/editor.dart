@@ -12,18 +12,21 @@ import 'package:flutter/services.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:xi_client/client.dart';
 
+import 'document.dart';
 import 'key_info.dart';
 import 'line_cache.dart';
 import 'text_line.dart';
-import 'xi_app.dart';
 
-/// Widget for one editor tab
+/// Widget for one editor tab.
 class Editor extends StatefulWidget {
   /// If `true`, draws a watermark in the background of the editor view.
   final bool debugBackground;
 
-  /// Standard widget constructor
-  const Editor({Key key, this.debugBackground = false}) : super(key: key);
+  final Document document;
+
+  const Editor({@required this.document, Key key, this.debugBackground = false})
+      : assert(document != null),
+        super(key: key);
 
   @override
   EditorState createState() => new EditorState();
@@ -48,20 +51,18 @@ class LineCol {
 const String _zeroWidthSpace = '\u{200b}';
 
 /// State for editor tab
-class EditorState extends State<Editor> implements XiViewHandler {
-  XiViewProxy _viewProxy;
-
-  /// Calls to core that were made before we were initialized are enqueued
-  /// and sent on init.
-  List<Completer<XiViewProxy>> _pending;
-  LineCache _lines;
+class EditorState extends State<Editor> {
   final ScrollController _controller = new ScrollController();
   // Height of lines (currently fixed, all lines have the same height)
   double _lineHeight;
+
   // location of last tap (used to expand selection on long press)
   LineCol _lastTapLocation;
+
   final FocusNode _focusNode = new FocusNode();
   TextStyle _defaultStyle;
+
+  StreamSubscription<Document> _documentStream;
 
   /// Creates a new editor state.
   EditorState() {
@@ -69,36 +70,38 @@ class EditorState extends State<Editor> implements XiViewHandler {
     _defaultStyle = new TextStyle(color: color);
     // TODO: make style configurable
     _lineHeight = _lineHeightForStyle(_defaultStyle);
-    _lines = new LineCache(_defaultStyle);
-  }
-
-  XiAppState get _xiAppState =>
-      context.ancestorStateOfType(const TypeMatcher<XiAppState>());
-
-  @override
-  void initState() {
-    super.initState();
-    _xiAppState.connectEditor(this).then((XiViewProxy viewProxy) {
-      _viewProxy = viewProxy;
-      _sendScrollViewport();
-      if (_pending != null) {
-        for (var completer in _pending) {
-          completer.complete(_viewProxy);
-        }
-        _pending = null;
-      }
-    });
   }
 
   /// Returns a [Future] that will resolve when initialization has finished.
   Future<XiViewProxy> get viewProxy {
-    if (_viewProxy != null) {
-      return Future.value(_viewProxy);
-    } else {
-      Completer<XiViewProxy> completer = new Completer();
-      _pending.add(completer);
-      return completer.future;
-    }
+    return widget.document.viewProxy;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _setupStream();
+  }
+
+  @override
+  void didUpdateWidget(Editor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _setupStream();
+  }
+
+  void _setupStream() {
+    _documentStream ??= widget.document?.listen((Document doc) => setState(() {
+          assert(doc != null);
+          assert(doc == widget.document);
+          _updateScrollPosition();
+        }));
+  }
+
+  @override
+  void dispose() {
+    _documentStream?.cancel();
+    _focusNode.dispose();
+    super.dispose();
   }
 
   double _lineHeightForStyle(TextStyle style) {
@@ -111,25 +114,10 @@ class EditorState extends State<Editor> implements XiViewHandler {
     return layout.height;
   }
 
-  double _measureWidth(String s) {
-    TextSpan span = new TextSpan(text: s, style: _defaultStyle);
-    TextPainter painter =
-        new TextPainter(text: span, textDirection: TextDirection.ltr)..layout();
-    return painter.width;
-  }
-
-  /// Handler for "update" method from core
-  @override
-  void update(List<Map<String, dynamic>> ops) {
-    setState(() => _lines.applyUpdate(ops));
-  }
-
-  /// Handler for "scroll_to" method from core
-  @override
-  void scrollTo(int line, int col) {
-    if (_controller.hasClients) {
+  void _updateScrollPosition() {
+    if (_controller.hasClients && _controller.position.haveDimensions) {
       ScrollPosition pos = _controller.position;
-      double topY = line * _lineHeight;
+      double topY = widget.document.scrollPos.line * _lineHeight;
       double botY = topY + _lineHeight;
       if (topY < pos.pixels) {
         pos.jumpTo(topY);
@@ -245,7 +233,7 @@ class EditorState extends State<Editor> implements XiViewHandler {
     double y = local.dy + _controller.offset;
     int line = y ~/ _lineHeight;
     int col = 0;
-    Line text = _lines.getLine(line);
+    Line text = widget.document.lines.getLine(line);
     if (text != null) {
       col = _utf16ToUtf8Offset(text.text.text, text.getIndexForHorizontal(x));
     }
@@ -288,29 +276,15 @@ class EditorState extends State<Editor> implements XiViewHandler {
     }
   }
 
-  /// Implement measure_widths rpc request, measuring the width of strings
-  /// using the font used for text display.
-  dynamic measureWidths(List<Map<String, dynamic>> params) {
-    List<List<double>> result = <List<double>>[];
-    for (Map<String, dynamic> req in params) {
-      List<double> inner = <double>[];
-      List<String> strings = req['strings'];
-      for (String s in strings) {
-        inner.add(_measureWidth(s));
-      }
-      result.add(inner);
-    }
-    return result;
-  }
-
   TextLine _itemBuilder(BuildContext ctx, int ix) {
-    Line line = _lines.getLine(ix);
+    Line line = widget.document.lines.getLine(ix);
     if (line == null) {
       viewProxy.then((view) => view.requestLines(ix, ix + 1));
     }
     return new TextLine(
       // TODO: the string '[invalid]' is debug painting, replace with actual UX.
-      line?.text ?? new TextSpan(text: '[invalid]', style: _lines.style),
+      line?.text ??
+          new TextSpan(text: '[invalid]', style: widget.document.lines.style),
       line?.cursor,
       line?.styles,
       _lineHeight,
@@ -318,21 +292,17 @@ class EditorState extends State<Editor> implements XiViewHandler {
   }
 
   @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     FocusScope.of(context).reparentIfNeeded(_focusNode);
 
-    final lines = new ListView.builder(
-      itemExtent: _lineHeight,
-      itemCount: _lines.height,
-      itemBuilder: _itemBuilder,
-      controller: _controller,
-    );
+    final Widget lines = (widget.document == null)
+        ? new Container()
+        : new ListView.builder(
+            itemExtent: _lineHeight,
+            itemCount: widget.document.lines.height,
+            itemBuilder: _itemBuilder,
+            controller: _controller,
+          );
 
     return new RawKeyboardListener(
       focusNode: _focusNode,
@@ -343,16 +313,16 @@ class EditorState extends State<Editor> implements XiViewHandler {
         onHorizontalDragUpdate: _handleHorizontalDragUpdate,
         behavior: HitTestBehavior.opaque,
         child: new NotificationListener<ScrollUpdateNotification>(
-            onNotification: (ScrollUpdateNotification update) {
-              _sendScrollViewport();
-              return true;
-            },
-            child: new Container(
-              color: Colors.white,
-              constraints: BoxConstraints.expand(),
-              child:
-                  widget.debugBackground ? _makeDebugBackground(lines) : lines,
-            )),
+          onNotification: (ScrollUpdateNotification update) {
+            _sendScrollViewport();
+            return true;
+          },
+          child: new Container(
+            color: Colors.white,
+            constraints: BoxConstraints.expand(),
+            child: widget.debugBackground ? _makeDebugBackground(lines) : lines,
+          ),
+        ),
       ),
     );
   }

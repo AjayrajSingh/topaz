@@ -10,7 +10,7 @@ abstract class XiHandler {
   /// A request to measure the width of strings. Each item in the list is a
   ///  dictionary where `style` is the id of the style and `strings` is an
   ///  array of strings to measure. The result is a list of lists of widths.
-  List<double> measureWidths(List<Map<String, dynamic>> args);
+  List<List<double>> measureWidths(List<Map<String, dynamic>> args);
 
   /// Returns the [XiViewHandler] responsible for the provided `viewId`.
   XiViewHandler getView(String viewId);
