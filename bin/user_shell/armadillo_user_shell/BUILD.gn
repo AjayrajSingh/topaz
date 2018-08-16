@@ -5,7 +5,13 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 import("//build/package.gni")
 
-flutter_app("armadillo_user_shell") {
+if (is_debug) {
+  armadillo_app_type = "flutter_jit_app"
+} else {
+  armadillo_app_type = "flutter_aot_app"
+}
+
+target(armadillo_app_type, "armadillo_user_shell") {
   main_dart = "lib/main.dart"
 
   package_name = "armadillo_user_shell"
@@ -18,9 +24,6 @@ flutter_app("armadillo_user_shell") {
   ]
 
   manifest = "pubspec.yaml"
-
-  # AOT in release, JIT in debug
-  aot = !is_debug
 
   sources = [
     "active_agents_manager.dart",

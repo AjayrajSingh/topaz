@@ -23,9 +23,3 @@ fi
 #     echo "goodbye_dart_jit failed"
 #     exit 1
 # fi
-
-run goodbye_dart_app_aot
-if [ $? -ne 42 ]; then
-    echo "goodbye_dart_app_aot failed"
-    exit 1
-fi
