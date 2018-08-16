@@ -12,6 +12,7 @@ dart_library("common") {
   sources = [
     "action.dart",
     "conductor.dart",
+    "conductor_builder.dart",
     "step.dart",
     "syllabus.dart",
     "syllabus_parser.dart",
@@ -28,6 +29,7 @@ dart_test("lib_setui_common_test") {
 
   sources = [
     "test/conductor_test.dart",
+    "test/conductor_builder_test.dart",
     "test/step_test.dart",
     "test/syllabus_parser_test.dart",
     "test/syllabus_test.dart",
