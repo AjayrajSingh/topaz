@@ -2,15 +2,16 @@
 
 Flutter and many of its dependencies are pinned in Fuchsia.
 This file contains instructions for updating Fuchsia's version of Flutter and
-its dependencies. The full procedure is often not required to build a stable
-system. However, following these instructions will result in a version of
-Flutter and its dependencies in Fuchsia that has been built and tested by the
-Flutter and Dart teams' CI.
+its dependencies (including the Dart SDK). The full procedure is often not
+required to build a stable system. However, following these instructions will
+result in a version of Flutter and its dependencies in Fuchsia that has been
+built and tested by the Flutter and Dart teams' CI.
 
 ## The Flutter "Triforce"
 
 Updating Fuchsia's version of Flutter requires updating its dependencies. There
 are three main components:
+
   1. [The Flutter framework](https://github.com/flutter/flutter)
   2. [The Flutter engine](https://github.com/flutter/engine)
   3. [The Dart VM](https://github.com/dart-lang/sdk)
@@ -30,7 +31,7 @@ of the Flutter engine. Instructions for updating the Flutter engine in the
 Flutter framework are
 [here](https://github.com/flutter/engine/wiki/Release-process).
 
-## Udpating the Flutter "Triforce" in Fuchsia
+## Updating the Flutter "Triforce" in Fuchsia
 
 To roll Flutter forward:
   1. Checkout a new topaz branch:
@@ -45,18 +46,31 @@ To roll Flutter forward:
      and write its hash into the `flutter` manifest file in this directory.
   4. Choose the version of the Dart VM that that version of the Flutter engine
      names in its [DEPS](https://github.com/flutter/engine/blob/master/DEPS)
-     file as `dart_revision` and write its hash into the `dart` manifest file
+     file as `dart_revision`, and write its hash into the `dart` manifest file
      in this directory.
-  5. Update DEFAULT_DART_VERSION in //topaz/tools/download_dev_sdk.py to the
+  5. Choose the version of Tonic that the Flutter engine version names in its
+     [DEPS](https://github.com/flutter/engine/blob/master/DEPS) file as
+     `src/third_party/tonic`, and write its hash into the `third_party` manifest
+     file in this directory.
+  6. Update DEFAULT_DART_VERSION in //topaz/tools/download_dev_sdk.py to the
      [current Dart SDK dev version](https://github.com/dart-lang/sdk/commits/dev).
-  6. Commit the manifest updates:
+  7. Commit the manifest updates:
      ```
-     $ git commit -a -m "[flutter] Rolls the Flutter triforce forward"
+     $ git commit -a -m "[flutter] Roll the Flutter triforce forward"
      ```
-  7. Run the command:
+  8. Run the command:
+
      ```
      $ jiri update -gc --local-manifest=true
      ```
+
+     This will run a hook that verifies the prebuilts are ready for all host
+     platforms and downloads the prebuilt for the current host platform. If this
+     fails, check on Fuchsia's
+     [prebuilt Dart builder bots](https://luci-milo.appspot.com/p/fuchsia/g/dart/console).
+     If they're still running for your chosen revision, wait for them to finish
+     and then try again later. If all else fails, ask
+     [`fuchsia-toolchain@`](mailto:fuchsia-toolchain@google.com) for help.
 
 ## Updating Dart packages
 
@@ -111,19 +125,25 @@ investigate.
 
 ## Create Roll CLs
 
-Create a CL for updating the topaz manifests
-```
-$ cd topaz
-$ git push origin HEAD:refs/for/master
-```
-Land this CL first.
+Create a CL for updating `//third_party/dart-pkg/pub`
 
-Then, create a CL for updating `//third_party/dart-pkg/pub`
 ```
 $ cd third_party/dart-pkg/pub
 $ git push origin HEAD:refs/for/master
 ```
-Land this CL second.
+
+Land this CL first. Once it has landed, record the commit hash of the newly
+landed commit, and update the `third_party/dart-pkg` project in the
+`//topaz/manifest/dart` manifest file to point to the new commit hash.
+
+Once you've made that update, create and land a CL for updating the topaz
+manifests:
+
+```
+$ cd topaz
+$ git commit -a --amend --no-edit
+$ git push origin HEAD:refs/for/master
+```
 
 # Breaking changes
 
