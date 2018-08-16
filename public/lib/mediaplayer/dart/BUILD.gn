@@ -8,13 +8,17 @@ dart_library("dart") {
   infer_package_name = true
 
   sources = [
-    "audio.dart",
+    "audio_player_controller.dart",
+    "timeline.dart",
   ]
 
   source_dir = "."
 
   deps = [
+    "//garnet/public/fidl/fuchsia.device.display",
+    "//garnet/public/fidl/fuchsia.math",
     "//garnet/public/fidl/fuchsia.media",
+    "//garnet/public/fidl/fuchsia.mediaplayer",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/settings:settings_protos",

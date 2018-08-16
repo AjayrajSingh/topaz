@@ -10,7 +10,7 @@ import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1/fidl.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.media.dart/audio_player_controller.dart';
+import 'package:lib.mediaplayer.dart/audio_player_controller.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 
 import 'package:flutter/foundation.dart';
@@ -47,14 +47,13 @@ class MediaPlayerController extends AudioPlayerController
   }
 
   @override
-  void onMediaPlayerCreated(MediaPlayerProxy mediaPlayer) {
+  void onMediaPlayerCreated(PlayerProxy player) {
     if (!_wasActive) {
       ViewManagerProxy viewManager = new ViewManagerProxy();
       connectToService(_services, viewManager.ctrl);
 
       InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
-      mediaPlayer.createView(
-          viewManager.ctrl.unbind(), viewOwnerPair.passRequest());
+      player.createView(viewManager.ctrl.unbind(), viewOwnerPair.passRequest());
 
       _videoViewConnection =
           new ChildViewConnection(viewOwnerPair.passHandle());

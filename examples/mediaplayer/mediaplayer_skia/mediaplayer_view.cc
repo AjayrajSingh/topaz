@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/examples/media/media_player_skia/media_player_view.h"
+#include "topaz/examples/mediaplayer/mediaplayer_skia/mediaplayer_view.h"
 
 #include <fcntl.h>
 #include <hid/usages.h>
@@ -19,9 +19,7 @@
 #include "lib/url/gurl.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
-#include "topaz/examples/media/media_player_skia/media_player_params.h"
-
-using fuchsia::mediaplayer::MediaPlayer;
+#include "topaz/examples/mediaplayer/mediaplayer_skia/mediaplayer_params.h"
 
 namespace examples {
 
@@ -81,14 +79,15 @@ MediaPlayerView::MediaPlayerView(
   pixel_aspect_ratio_.width = 1;
   pixel_aspect_ratio_.height = 1;
 
-  media_player_ = startup_context->ConnectToEnvironmentService<MediaPlayer>();
-  media_player_.events().StatusChanged =
-      [this](fuchsia::mediaplayer::MediaPlayerStatus status) {
+  player_ = startup_context
+                ->ConnectToEnvironmentService<fuchsia::mediaplayer::Player>();
+  player_.events().OnStatusChanged =
+      [this](fuchsia::mediaplayer::PlayerStatus status) {
         HandleStatusChanged(status);
       };
 
   fuchsia::ui::viewsv1token::ViewOwnerPtr video_view_owner;
-  media_player_->CreateView(
+  player_->CreateView(
       startup_context
           ->ConnectToEnvironmentService<fuchsia::ui::viewsv1::ViewManager>()
           .Unbind(),
@@ -105,14 +104,14 @@ MediaPlayerView::MediaPlayerView(
     url::GURL url = url::GURL(params.url());
 
     if (url.SchemeIsFile()) {
-      media_player_->SetFileSource(fsl::CloneChannelFromFileDescriptor(
+      player_->SetFileSource(fsl::CloneChannelFromFileDescriptor(
           fxl::UniqueFD(open(url.path().c_str(), O_RDONLY)).get()));
     } else {
-      media_player_->SetHttpSource(params.url());
+      player_->SetHttpSource(params.url());
     }
 
     // Get the first frames queued up so we can show something.
-    media_player_->Pause();
+    player_->Pause();
   }
 
   // These are for calculating frame rate.
@@ -132,10 +131,10 @@ bool MediaPlayerView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
         TogglePlayPause();
       } else if (duration_ns_ != 0) {
         // User poked the progress bar and we have duration...seek.
-        media_player_->Seek((pointer.x - progress_bar_rect_.x) * duration_ns_ /
-                            progress_bar_rect_.width);
+        player_->Seek((pointer.x - progress_bar_rect_.x) * duration_ns_ /
+                      progress_bar_rect_.width);
         if (state_ != State::kPlaying) {
-          media_player_->Play();
+          player_->Play();
         }
       }
 
@@ -339,7 +338,7 @@ void MediaPlayerView::DrawControls(SkCanvas* canvas, const SkISize& size) {
 }
 
 void MediaPlayerView::HandleStatusChanged(
-    const fuchsia::mediaplayer::MediaPlayerStatus& status) {
+    const fuchsia::mediaplayer::PlayerStatus& status) {
   // Process status received from the player.
   if (status.timeline_function) {
     timeline_function_ =
@@ -399,14 +398,14 @@ void MediaPlayerView::HandleStatusChanged(
 void MediaPlayerView::TogglePlayPause() {
   switch (state_) {
     case State::kPaused:
-      media_player_->Play();
+      player_->Play();
       break;
     case State::kPlaying:
-      media_player_->Pause();
+      player_->Pause();
       break;
     case State::kEnded:
-      media_player_->Seek(0);
-      media_player_->Play();
+      player_->Seek(0);
+      player_->Play();
       break;
     default:
       break;

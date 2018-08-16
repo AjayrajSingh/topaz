@@ -3,8 +3,8 @@
         "garnet/packages/prod/drivers"
     ],
     "packages": [
-        "//topaz/examples/media/media_player_flutter",
-        "//topaz/examples/media/media_player_skia:package",
+        "//topaz/examples/mediaplayer/mediaplayer_flutter",
+        "//topaz/examples/mediaplayer/mediaplayer_skia:package",
         "//topaz/examples/mine_digger",
         "//topaz/examples/ledger/todo_list",
         "//topaz/examples/ledger/todo_list_sledge",

@@ -4,7 +4,7 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_app("media_player_flutter") {
+flutter_app("mediaplayer_flutter") {
   main_dart = "lib/main.dart"
 
   sources = [
@@ -19,21 +19,21 @@ flutter_app("media_player_flutter") {
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/media/flutter",
+    "//topaz/public/lib/mediaplayer/flutter",
     "//topaz/public/lib/ui/flutter",
   ]
 
   meta = [
     {
-      path = rebase_path("meta/media_player_flutter.cmx")
-      dest = "media_player_flutter.cmx"
+      path = rebase_path("meta/mediaplayer_flutter.cmx")
+      dest = "mediaplayer_flutter.cmx"
     },
   ]
 
   resources = [
     {
-      path = rebase_path("media_player_flutter.config")
-      dest = "media_player_flutter.config"
+      path = rebase_path("mediaplayer_flutter.config")
+      dest = "mediaplayer_flutter.config"
     },
   ]
 }

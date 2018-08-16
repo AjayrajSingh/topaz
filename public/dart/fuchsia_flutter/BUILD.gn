@@ -12,7 +12,7 @@ dart_library("fuchsia_flutter") {
   source_dir = "lib"
 
   sources = [
-    "media.dart",
+    "mediaplayer.dart",
   ]
 
   deps = [

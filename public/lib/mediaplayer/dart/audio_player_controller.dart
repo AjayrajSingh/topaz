@@ -8,7 +8,7 @@ import 'package:fidl_fuchsia_mediaplayer/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_math/fidl.dart' as geom;
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.media.dart/timeline.dart' as tl;
+import 'package:lib.mediaplayer.dart/timeline.dart' as tl;
 import 'package:zircon/zircon.dart';
 
 /// Type for |AudioPlayerController| update callbacks.
@@ -18,7 +18,7 @@ typedef UpdateCallback = void Function();
 class AudioPlayerController {
   ServiceProvider _services;
 
-  MediaPlayerProxy _mediaPlayer;
+  PlayerProxy _player;
 
   bool _active = false;
   bool _loading = false;
@@ -95,12 +95,12 @@ class AudioPlayerController {
   void _close() {
     _active = false;
 
-    if (_mediaPlayer != null) {
-      _mediaPlayer.ctrl.close();
-      _mediaPlayer.ctrl.onConnectionError = null;
+    if (_player != null) {
+      _player.ctrl.close();
+      _player.ctrl.onConnectionError = null;
     }
 
-    _mediaPlayer = new MediaPlayerProxy();
+    _player = new PlayerProxy();
 
     _playing = false;
     _ended = false;
@@ -117,21 +117,21 @@ class AudioPlayerController {
 
   /// Creates a local player.
   void _createLocalPlayer(Uri uri) {
-    connectToService(_services, _mediaPlayer.ctrl);
-    _mediaPlayer.statusChanged = _handleStatusChanged;
+    connectToService(_services, _player.ctrl);
+    _player.onStatusChanged = _handleStatusChanged;
 
-    onMediaPlayerCreated(_mediaPlayer);
+    onMediaPlayerCreated(_player);
 
-    _mediaPlayer.ctrl.onConnectionError = _handleConnectionError;
+    _player.ctrl.onConnectionError = _handleConnectionError;
     _setSource(uri);
   }
 
   // Sets the source uri on the media player.
   void _setSource(Uri uri) {
     if (uri.isScheme('FILE')) {
-      _mediaPlayer.setFileSource(new Channel.fromFile(uri.toFilePath()));
+      _player.setFileSource(new Channel.fromFile(uri.toFilePath()));
     } else {
-      _mediaPlayer.setHttpSource(uri.toString());
+      _player.setHttpSource(uri.toString());
     }
   }
 
@@ -207,10 +207,10 @@ class AudioPlayerController {
     }
 
     if (_ended) {
-      _mediaPlayer.seek(0);
+      _player.seek(0);
     }
 
-    _mediaPlayer.play();
+    _player.play();
   }
 
   /// Pauses playback.
@@ -219,7 +219,7 @@ class AudioPlayerController {
       return;
     }
 
-    _mediaPlayer.pause();
+    _player.pause();
   }
 
   /// Seeks to a position expressed as a Duration.
@@ -230,7 +230,7 @@ class AudioPlayerController {
 
     int positionNanoseconds = (position.inMicroseconds * 1000).round();
 
-    _mediaPlayer.seek(positionNanoseconds);
+    _player.seek(positionNanoseconds);
   }
 
   /// Seeks to a position expressed as a normalized value in the range 0.0 to
@@ -248,13 +248,13 @@ class AudioPlayerController {
   }
 
   // Overridden by subclasses to get access to the local player.
-  void onMediaPlayerCreated(MediaPlayerProxy mediaPlayer) {}
+  void onMediaPlayerCreated(PlayerProxy player) {}
 
   void onVideoGeometryUpdated(
       geom.Size videoSize, geom.Size pixelAspectRatio) {}
 
   // Handles a status update from the player.
-  void _handleStatusChanged(MediaPlayerStatus status) {
+  void _handleStatusChanged(PlayerStatus status) {
     if (!_active) {
       return;
     }
@@ -273,7 +273,7 @@ class AudioPlayerController {
       prepare = oldTimelineFunction != _timelineFunction;
     }
 
-    _hasVideo = status.contentHasVideo;
+    _hasVideo = status.hasVideo;
     _ended = status.endOfStream;
 
     _playing = !ended &&

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/examples/media/media_player_skia/media_player_params.h"
+#include "topaz/examples/mediaplayer/mediaplayer_skia/mediaplayer_params.h"
 
 #include <iostream>
 
@@ -48,8 +48,8 @@ MediaPlayerParams::MediaPlayerParams(const fxl::CommandLine& command_line) {
 }
 
 void MediaPlayerParams::Usage() {
-  std::cerr << "media_player_skia usage:\n";
-  std::cerr << "    set_root_view media_player_skia url-or-path\n";
+  std::cerr << "mediaplayer_skia usage:\n";
+  std::cerr << "    set_root_view mediaplayer_skia url-or-path\n";
 }
 
 }  // namespace examples

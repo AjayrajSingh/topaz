@@ -7,7 +7,7 @@ create a media player.
 
 Run the app as follows:
 
-    set_root_view media_player_flutter
+    set_root_view mediaplayer_flutter
 
 The initial screen is a menu of content items that can be played, unless the
 config file contains only one asset, in which case the chooser screen is
@@ -17,8 +17,8 @@ contains only one item.
 The app will look for config files in two places, reading only the first file
 it finds:
 
-- /data/media_player_flutter.config
-- /pkg/data/media_player_flutter.config
+- /data/mediaplayer_flutter.config
+- /pkg/data/mediaplayer_flutter.config
 
 Here's an example config file:
 

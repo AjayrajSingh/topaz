@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
-import 'package:lib.media.flutter/media_progress.dart';
+import 'package:lib.mediaplayer.flutter/media_progress.dart';
 import 'package:lib.schemas.dart/com/fuchsia/media/media.dart';
 import 'package:lib.widgets/model.dart' show ScopedModel;
 

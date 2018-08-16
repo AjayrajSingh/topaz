@@ -5,8 +5,8 @@
 
 import 'dart:async';
 
-import 'package:lib.media.flutter/media_player_controller.dart';
-import 'package:lib.media.flutter/media_progress.dart';
+import 'package:lib.mediaplayer.flutter/media_player_controller.dart';
+import 'package:lib.mediaplayer.flutter/media_progress.dart';
 
 /// Listener class to publish video progress events
 class VideoProgressMonitor {

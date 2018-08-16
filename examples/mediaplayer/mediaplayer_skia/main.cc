@@ -6,7 +6,7 @@
 
 #include "lib/fxl/command_line.h"
 #include "lib/ui/view_framework/view_provider_app.h"
-#include "topaz/examples/media/media_player_skia/media_player_view.h"
+#include "topaz/examples/mediaplayer/mediaplayer_skia/mediaplayer_view.h"
 
 int main(int argc, const char** argv) {
   auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);

@@ -4,10 +4,10 @@
 import 'dart:async';
 
 import 'package:fidl_fuchsia_sys/fidl.dart';
-import 'package:fidl_media_player/fidl.dart';
+import 'package:fidl_fuchsia_mediaplayer/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.media.flutter/media_player_controller.dart';
-import 'package:lib.media.flutter/media_progress.dart';
+import 'package:lib.mediaplayer.flutter/media_player_controller.dart';
+import 'package:lib.mediaplayer.flutter/media_progress.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 

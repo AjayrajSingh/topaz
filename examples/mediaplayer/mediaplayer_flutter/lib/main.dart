@@ -6,14 +6,14 @@ import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_mediaplayer/fidl.dart' as media_player;
+import 'package:fidl_fuchsia_mediaplayer/fidl.dart' as mediaplayer;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.media.flutter/media_player.dart';
-import 'package:lib.media.flutter/media_player_controller.dart';
+import 'package:lib.mediaplayer.flutter/media_player.dart';
+import 'package:lib.mediaplayer.flutter/media_player_controller.dart';
 
 import 'asset.dart';
 import 'config.dart';
@@ -25,7 +25,7 @@ final MediaPlayerController _controller =
 ModuleImpl _module = new ModuleImpl();
 
 void _log(String msg) {
-  print('[media_player_flutter Module] $msg');
+  print('[mediaplayer_flutter Module] $msg');
 }
 
 /// An implementation of the [Lifecycle] interface, which controls the lifetime
@@ -48,8 +48,8 @@ class ModuleImpl implements Lifecycle {
 }
 
 const List<String> _configFileNames = const <String>[
-  '/data/media_player_flutter.config',
-  '/pkg/data/media_player_flutter.config',
+  '/data/mediaplayer_flutter.config',
+  '/pkg/data/mediaplayer_flutter.config',
 ];
 
 List<Asset> _assets = <Asset>[];
@@ -125,7 +125,7 @@ void _playLeafAsset(Asset asset) {
 
   _leafAssetToPlay = asset;
 
-  if (_controller.problem?.type == media_player.kProblemConnectionFailed) {
+  if (_controller.problem?.type == mediaplayer.kProblemConnectionFailed) {
     _controller.close();
   }
 
@@ -181,7 +181,7 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
 
   /// Adds a problem description to list [to] if there is a problem.
   void _addProblem(List<Widget> to) {
-    media_player.Problem problem = _controller.problem;
+    mediaplayer.Problem problem = _controller.problem;
     if (problem != null) {
       String text;
 
@@ -189,22 +189,22 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
         text = problem.details;
       } else {
         switch (problem.type) {
-          case media_player.kProblemInternal:
+          case mediaplayer.kProblemInternal:
             text = 'Internal error';
             break;
-          case media_player.kProblemAssetNotFound:
+          case mediaplayer.kProblemAssetNotFound:
             text = 'The requested content was not found';
             break;
-          case media_player.kProblemContainerNotSupported:
+          case mediaplayer.kProblemContainerNotSupported:
             text = 'The requested content uses an unsupported container format';
             break;
-          case media_player.kProblemAudioEncodingNotSupported:
+          case mediaplayer.kProblemAudioEncodingNotSupported:
             text = 'The requested content uses an unsupported audio encoding';
             break;
-          case media_player.kProblemVideoEncodingNotSupported:
+          case mediaplayer.kProblemVideoEncodingNotSupported:
             text = 'The requested content uses an unsupported video encoding';
             break;
-          case media_player.kProblemConnectionFailed:
+          case mediaplayer.kProblemConnectionFailed:
             text = 'Connection to player failed';
             break;
           default:
@@ -230,19 +230,19 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
     Map<String, String> metadata = _controller.metadata;
     if (metadata != null) {
       _addLabel(
-          metadata[media_player.metadataLabelTitle] ??
+          metadata[mediaplayer.metadataLabelTitle] ??
               _leafAssetToPlay.title ??
               '(untitled)',
           Colors.white,
           20.0,
           columnChildren);
       _addLabel(
-          metadata[media_player.metadataLabelArtist] ?? _leafAssetToPlay.artist,
+          metadata[mediaplayer.metadataLabelArtist] ?? _leafAssetToPlay.artist,
           Colors.grey[600],
           15.0,
           columnChildren);
       _addLabel(
-          metadata[media_player.metadataLabelAlbum] ?? _leafAssetToPlay.album,
+          metadata[mediaplayer.metadataLabelAlbum] ?? _leafAssetToPlay.album,
           Colors.grey[800],
           15.0,
           columnChildren);
