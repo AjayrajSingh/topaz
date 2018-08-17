@@ -4,3 +4,4 @@
 *.sublime-project
 *.sublime-workspace
 .cipd/
+third_party/chromium/
