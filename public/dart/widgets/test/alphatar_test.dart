@@ -48,7 +48,7 @@ void main() {
 
       expect(find.byType(Image), findsOneWidget);
       expect(find.byType(Text), findsOneWidget);
-    }, createHttpClient: createMockImageHttpClient);
+    }, createHttpClient: createFakeImageHttpClient);
   });
 
   testWidgets(

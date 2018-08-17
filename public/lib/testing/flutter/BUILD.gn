@@ -8,7 +8,7 @@ dart_library("flutter") {
   infer_package_name = true
 
   sources = [
-    "src/mock_image_http_client.dart",
+    "src/fake_image_http_client.dart",
     "testing.dart",
   ]
 
