@@ -123,15 +123,6 @@ template("dart_jit_app") {
       },
     ]
 
-    if (defined(invoker.sandbox)) {
-      meta += [
-        {
-          path = rebase_path(invoker.sandbox)
-          dest = "sandbox"
-        },
-      ]
-    }
-
     if (defined(invoker.meta)) {
       meta += invoker.meta
     }
@@ -340,15 +331,6 @@ template("dart_aot_app") {
         dest = "deprecated_runtime"
       },
     ]
-
-    if (defined(invoker.sandbox)) {
-      meta += [
-        {
-          path = rebase_path(invoker.sandbox)
-          dest = "sandbox"
-        },
-      ]
-    }
 
     if (defined(invoker.meta)) {
       meta += invoker.meta
