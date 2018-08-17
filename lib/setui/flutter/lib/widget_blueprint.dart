@@ -18,7 +18,9 @@ class WidgetBlueprint extends Blueprint {
   final ActionStateModel model;
   final CreateClient createClient;
 
-  WidgetBlueprint(String name, this.model, this.createClient) : super(name);
+  WidgetBlueprint(
+      String name, String description, this.model, this.createClient)
+      : super(name, description);
 
   @override
   Action assemble(Step step, ActionResultReceiver receiver) {

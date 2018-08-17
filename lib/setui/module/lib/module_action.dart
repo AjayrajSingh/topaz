@@ -17,14 +17,13 @@ import 'result_code_entity_codec.dart';
 const String stepResultLinkName = 'setui_step_code_result';
 
 /// Module based action launching.
-class ModuleAction extends Action {
-  final ModuleBlueprint blueprint;
-
+class ModuleAction extends Action<ModuleBlueprint> {
   final ResultCodeEntityCodec _resultCodeEntityCodec =
       new ResultCodeEntityCodec();
 
-  ModuleAction(Step step, this.blueprint, ActionResultReceiver callback)
-      : super(step, callback);
+  ModuleAction(
+      Step step, ModuleBlueprint blueprint, ActionResultReceiver callback)
+      : super(step, blueprint, callback);
 
   /// Returns the name of the link to be used.
   @visibleForTesting
@@ -44,7 +43,7 @@ class ModuleAction extends Action {
 
     // Launch module.
     blueprint.driver
-        .embedModule(name: blueprint.name, intent: intentBuilder.intent);
+        .embedModule(name: blueprint.key, intent: intentBuilder.intent);
   }
 
   @override

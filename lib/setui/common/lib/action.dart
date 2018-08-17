@@ -24,21 +24,25 @@ abstract class ActionResultReceiver {
 /// Instructions for assembling an [Action].
 abstract class Blueprint {
   /// The name of the action
-  final String name;
+  final String key;
+
+  /// A description of the action. Used for logging and debugging purposes
+  final String description;
 
   /// Default constructor requires at least the action name
-  Blueprint(this.name);
+  Blueprint(this.key, this.description);
 
   /// Creates an instance of the action for use
   Action assemble(Step step, ActionResultReceiver callback);
 }
 
 /// A running action instance generated from a [Blueprint].
-abstract class Action {
+abstract class Action<T extends Blueprint> {
+  final T blueprint;
   final Step step;
   final ActionResultReceiver callback;
 
-  Action(this.step, this.callback);
+  Action(this.step, this.blueprint, this.callback);
 
   /// Called by client to return result
   void onResult(String result) {
@@ -56,7 +60,7 @@ class Roster {
   /// Adds the specified [Blueprint] to the roster using its action name
   /// as the key.
   void add(Blueprint blueprint) {
-    _plans[blueprint.name] = blueprint;
+    _plans[blueprint.key] = blueprint;
   }
 
   /// Searches for a [Blueprint] matching the [Step]'s action and then assembles

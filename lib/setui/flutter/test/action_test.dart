@@ -25,17 +25,18 @@ void main() {
     const String testActionName = 'test_action';
     const String testResult = 'test_result';
 
-    final MockWidgetActionClient client = new MockWidgetActionClient();
-    final MockStateModel stateModel = new MockStateModel();
+    final MockWidgetActionClient client = MockWidgetActionClient();
+    final MockStateModel stateModel = MockStateModel();
 
-    final MockStep step = new MockStep();
-    final ActionResultReceiver resultReceiver = new MockActionResultReceiver();
+    final MockStep step = MockStep();
+    final ActionResultReceiver resultReceiver = MockActionResultReceiver();
 
     // Create Blueprint
     ActionResultSender actionResultSender;
 
-    final WidgetBlueprint blueprint = new WidgetBlueprint(
-        testActionName, stateModel, (ActionResultSender sender) {
+    final WidgetBlueprint blueprint =
+        WidgetBlueprint(testActionName, 'testBlueprint', stateModel,
+            (ActionResultSender sender) {
       actionResultSender = sender;
       return client;
     });

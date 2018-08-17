@@ -9,12 +9,12 @@ import 'package:lib_setui_common/syllabus.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-class MockAction extends Mock implements Action {}
+class MockAction extends Mock implements Action<TestBlueprint> {}
 
 class TestBlueprint extends Blueprint {
   final MockAction action = new MockAction();
 
-  TestBlueprint(String name) : super(name);
+  TestBlueprint(String name) : super(name, 'TestBlueprint');
 
   @override
   Action assemble(Step step, ActionResultReceiver callback) {

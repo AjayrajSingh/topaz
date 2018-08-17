@@ -38,6 +38,9 @@ class Step {
     _results[resultCode] = result;
   }
 
+  @override
+  String toString() => 'key: $key defaultTransition:$_defaultTransition}';
+
   /// Returns all next steps. Used by syllabus to discover all routes
   Set<Step> get nextSteps {
     final Set<Step> steps = new Set()..addAll(_results.values);

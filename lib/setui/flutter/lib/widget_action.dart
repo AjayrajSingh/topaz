@@ -12,19 +12,21 @@ import 'widget_blueprint.dart';
 
 /// Widget based action handling. This handler wraps the action to coordinate
 /// behavior between the step and result.
-class WidgetAction extends Action implements ActionResultSender {
-  final WidgetBlueprint _blueprint;
-
+class WidgetAction extends Action<WidgetBlueprint>
+    implements ActionResultSender {
   WidgetActionClient _client;
 
-  WidgetAction(Step step, ActionResultReceiver receiver, this._blueprint)
-      : super(step, receiver);
+  WidgetAction(
+      Step step, ActionResultReceiver receiver, WidgetBlueprint blueprint)
+      : super(step, blueprint, receiver);
 
   @override
   void launch() {
-    _client = _blueprint.createClient(this)..setState(State.started);
-    _blueprint.model.setCurrentAction(this);
+    _client = blueprint.createClient(this)..setState(State.started);
+    blueprint.model.setCurrentAction(this);
   }
+
+  String get title => _client.title;
 
   /// Called by owning host to generate layout for action.
   Widget build() {

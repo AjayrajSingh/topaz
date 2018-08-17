@@ -19,7 +19,7 @@ class ModuleBlueprint extends Blueprint {
   final ModuleDriver driver;
 
   ModuleBlueprint(String name, this.verb, this.handler, this.driver)
-      : super(name);
+      : super(name, '$handler : $verb');
 
   @override
   Action assemble(Step step, ActionResultReceiver callback) {
