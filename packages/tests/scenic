@@ -3,7 +3,6 @@
         "garnet/packages/prod/scenic"
     ],
     "packages": [
-        "//topaz/bin/ui/benchmarks/image_grid_cpp",
         "//topaz/bin/ui/benchmarks/image_grid_flutter"
     ]
 }
