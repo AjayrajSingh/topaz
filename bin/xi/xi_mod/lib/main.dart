@@ -77,8 +77,8 @@ void main() {
   XiFuchsiaClient xi = new XiFuchsiaClient(pair.passHandle());
   XiCoreProxy coreProxy = new CoreProxy(xi);
 
-  runApp(new XiApp(
+  runApp(new EditorTabs(
     coreProxy: coreProxy,
-    drawDebugBackground: kDrawDebugBackground,
+    debugBackground: kDrawDebugBackground,
   ));
 }

@@ -10,31 +10,30 @@ import 'package:xi_client/client.dart';
 import 'document.dart';
 import 'editor.dart';
 
-/// Top-level Widget.
-class XiApp extends StatefulWidget {
+/// Widget that embeds a single [Editor].
+class EditorHost extends StatefulWidget {
   /// The client API interface to the xi-core Fuchsia service.
   final CoreProxy coreProxy;
 
   /// If `true`, draws a watermark on the editor view.
-  final bool drawDebugBackground;
+  final bool debugBackground;
 
-  /// [XiApp] constructor.
-  const XiApp({
+  const EditorHost({
     @required this.coreProxy,
-    this.drawDebugBackground = false,
+    this.debugBackground = false,
     Key key,
   })  : assert(coreProxy != null),
         super(key: key);
 
   @override
-  XiAppState createState() => new XiAppState();
+  State<EditorHost> createState() => new EditorHostState();
 }
 
 /// State for XiApp.
-class XiAppState extends State<XiApp> implements XiHandler {
+class EditorHostState extends State<EditorHost> implements XiHandler {
   final Document _document = new Document();
 
-  XiAppState();
+  EditorHostState();
 
   @override
   void initState() {
@@ -71,7 +70,7 @@ class XiAppState extends State<XiApp> implements XiHandler {
           constraints: new BoxConstraints.expand(),
           color: Colors.white,
           child: new Editor(
-              document: _document, debugBackground: widget.drawDebugBackground),
+              document: _document, debugBackground: widget.debugBackground),
         ),
       ),
     );

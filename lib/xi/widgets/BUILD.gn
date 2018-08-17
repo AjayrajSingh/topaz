@@ -11,7 +11,7 @@ dart_library("xi_widgets") {
     "src/editor.dart",
     "src/line_cache.dart",
     "src/text_line.dart",
-    "src/xi_app.dart",
+    "src/editor_host.dart",
     "widgets.dart",
   ]
 
