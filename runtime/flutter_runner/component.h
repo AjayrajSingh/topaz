@@ -60,7 +60,6 @@ class Application final : public Engine::Delegate,
 
  private:
   blink::Settings settings_;
-  std::string component_name_;
   TerminationCallback termination_callback_;
   const std::string debug_label_;
   UniqueFDIONS fdio_ns_ = UniqueFDIONSCreate();
@@ -80,10 +79,6 @@ class Application final : public Engine::Delegate,
   fml::RefPtr<blink::DartSnapshot> shared_snapshot_;
   std::set<std::unique_ptr<Engine>> shell_holders_;
   std::pair<bool, uint32_t> last_return_code_;
-
-  // TODO(CP-19): Remove once we propagate component name
-  std::string GetDefaultComponentName(
-    const std::string& package_resolved_url);
 
   Application(
       TerminationCallback termination_callback, fuchsia::sys::Package package,
