@@ -212,10 +212,7 @@ Future writePackages(
   }
   await writePackage(component, output, 'main', packageManifest, kernelList, componentName);
 
-  packageManifest.write('data/app.dilplist=$kernelListFilename\n');
-  if (componentName != null && componentName.isNotEmpty) {
-    packageManifest.write('data/$componentName/app.dilplist=$kernelListFilename\n');
-  }
+  packageManifest.write('data/$componentName/app.dilplist=$kernelListFilename\n');
   await packageManifest.close();
   await kernelList.close();
 }
@@ -239,10 +236,7 @@ Future writePackage(Component component, String output, String package,
 
   await sink.close();
 
-  packageManifest.write('data/$filenameInPackage=$filenameInBuild\n');
-  if (componentName != null && componentName.isNotEmpty) {
-    packageManifest.write('data/$componentName/$filenameInPackage=$filenameInBuild\n');
-  }
+  packageManifest.write('data/$componentName/$filenameInPackage=$filenameInBuild\n');
   kernelList.write('$filenameInPackage\n');
 }
 
