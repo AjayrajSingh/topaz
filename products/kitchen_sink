@@ -1,11 +1,11 @@
 {
-  "monolith": [
-    "topaz/packages/kitchen_sink"
-  ],
-  "preinstall": [
+    "monolith": [
+        "topaz/packages/kitchen_sink"
+    ],
+    "preinstall": [
 
-  ],
-  "available": [
+    ],
+    "available": [
 
-  ]
+    ]
 }

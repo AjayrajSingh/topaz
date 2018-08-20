@@ -1,11 +1,11 @@
 {
-  "monolith": [
-    "topaz/packages/products/dashboard"
-  ],
-  "preinstall": [
+    "monolith": [
+        "topaz/packages/products/dashboard"
+    ],
+    "preinstall": [
 
-  ],
-  "available": [
+    ],
+    "available": [
 
-  ]
+    ]
 }

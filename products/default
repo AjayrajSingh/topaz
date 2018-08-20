@@ -1,11 +1,11 @@
 {
-  "monolith": [
-    "topaz/packages/default"
-  ],
-  "preinstall": [
-    "topaz/packages/tools/all"
-  ],
-  "available": [
-    "topaz/packages/all"
-  ]
+    "monolith": [
+        "topaz/packages/default"
+    ],
+    "preinstall": [
+        "topaz/packages/tools/all"
+    ],
+    "available": [
+        "topaz/packages/all"
+    ]
 }
