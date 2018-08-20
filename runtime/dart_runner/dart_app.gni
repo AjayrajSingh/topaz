@@ -53,6 +53,12 @@ template("dart_jit_app") {
     dbc = true
   }
 
+  if (defined(invoker.fuchsia_package_name)) {
+    component_name = invoker.fuchsia_package_name
+  } else {
+    component_name = target_name
+  }
+
   kernel_target_name = target_name + "_kernel"
   kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
 
@@ -76,7 +82,7 @@ template("dart_jit_app") {
     manifest = kernel_manifest
     args = [
       "--component-name",
-      target_name,
+      component_name,
     ]
     if (dbc) {
       args += [
@@ -93,9 +99,7 @@ template("dart_jit_app") {
                              "tests",
                            ])
 
-    if (defined(invoker.fuchsia_package_name)) {
-      package_name = invoker.fuchsia_package_name
-    }
+    package_name = component_name
 
     non_dart_deps = []
     if (defined(invoker.non_dart_deps)) {
@@ -140,6 +144,12 @@ template("dart_aot_app") {
   product_suffix = ""
   if (product) {
     product_suffix = "_product"
+  }
+
+  if (defined(invoker.fuchsia_package_name)) {
+    component_name = invoker.fuchsia_package_name
+  } else {
+    component_name = target_name
   }
 
   kernel_target_name = target_name + "_kernel"
@@ -287,9 +297,7 @@ template("dart_aot_app") {
                              "tests",
                            ])
 
-    if (defined(invoker.fuchsia_package_name)) {
-      package_name = invoker.fuchsia_package_name
-    }
+    package_name = component_name
 
     non_dart_deps = []
     if (defined(invoker.non_dart_deps)) {
@@ -301,7 +309,7 @@ template("dart_aot_app") {
              ":$stats_target_name",
            ] + non_dart_deps + shared_snapshot_deps
 
-    resources_path = "${target_name}/"
+    resources_path = "${component_name}/"
     resources = [
       {
         path = rebase_path(snapshot_data_path)

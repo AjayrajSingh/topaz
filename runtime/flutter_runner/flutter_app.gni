@@ -63,6 +63,12 @@ template("flutter_jit_app") {
     product_suffix = "_product"
   }
 
+  if (defined(invoker.fuchsia_package_name)) {
+    component_name = invoker.fuchsia_package_name
+  } else {
+    component_name = target_name
+  }
+
   kernel_target_name = target_name + "_kernel"
   kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
 
@@ -86,7 +92,7 @@ template("flutter_jit_app") {
     manifest = kernel_manifest
     args = [
       "--component-name",
-      target_name,
+      component_name,
     ]
   }
 
@@ -102,7 +108,6 @@ template("flutter_jit_app") {
   dart_target_gen_dir =
       get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
   dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
-  component_name = target_name
 
   action("${target_name}_resources") {
     script = "//topaz/runtime/flutter_runner/build/asset_package.py"
@@ -154,9 +159,7 @@ template("flutter_jit_app") {
   }
 
   package(target_name) {
-    if (defined(invoker.fuchsia_package_name)) {
-      package_name = invoker.fuchsia_package_name
-    }
+    package_name = component_name
     extra = [
       asset_manifest,
       kernel_manifest,
@@ -206,6 +209,12 @@ template("flutter_aot_app") {
   product_suffix = ""
   if (product) {
     product_suffix = "_product"
+  }
+
+  if (defined(invoker.fuchsia_package_name)) {
+    component_name = invoker.fuchsia_package_name
+  } else {
+    component_name = target_name
   }
 
   dart_library_target_name = target_name + "_dart_library"
@@ -357,7 +366,6 @@ template("flutter_aot_app") {
   dart_target_gen_dir =
       get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
   dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
-  component_name = target_name
 
   action("${target_name}_resources") {
     script = "//topaz/runtime/flutter_runner/build/asset_package.py"
@@ -409,9 +417,7 @@ template("flutter_aot_app") {
   }
 
   package(target_name) {
-    if (defined(invoker.fuchsia_package_name)) {
-      package_name = invoker.fuchsia_package_name
-    }
+    package_name = component_name
     extra = [ asset_manifest ]
 
     deps = shared_snapshot_deps + [
@@ -420,7 +426,7 @@ template("flutter_aot_app") {
              ":$stats_target_name",
            ]
 
-    resources_path = "${target_name}/"
+    resources_path = "${component_name}/"
     resources = [
                   {
                     path = rebase_path(vm_snapshot_data_path)
