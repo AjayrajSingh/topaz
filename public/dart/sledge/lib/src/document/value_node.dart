@@ -10,27 +10,29 @@ import 'value.dart';
 /// Class that maps field names to values.
 /// TODO: rename to NodeValue
 class ValueNode implements Value {
-  Map<Symbol, Value> _childValues;
+  Map<String, Value> _childValues;
+  // TODO: remove
+  Map<Symbol, Value> _childValuesDeprecated;
 
   /// Default constructor. [schemaDescription] specifies the name and type of
   /// every field.
   ValueNode(
       Map<String, BaseType> schemaDescription, ConnectionId connectionId) {
-    // Maps symbols to a value.
-    _childValues = <Symbol, Value>{};
+    _childValuesDeprecated = <Symbol, Value>{};
+    _childValues = <String, Value>{};
 
     schemaDescription.forEach((String name, BaseType type) {
       Value value = type.newValue(connectionId);
       assert(value != null);
-      _childValues[new Symbol(name)] = value;
+      _childValues[name] = value;
+      _childValuesDeprecated[new Symbol(name)] = value;
     });
   }
 
   /// Returns a Map from field name to value.
   Map<String, LeafValue> collectFields() {
     final fields = <String, LeafValue>{};
-    _childValues.forEach((Symbol symbolName, Value value) {
-      String name = symbolName.toString();
+    _childValues.forEach((String name, Value value) {
       if (value is ValueNode) {
         value
             .collectFields()
@@ -43,12 +45,23 @@ class ValueNode implements Value {
     return fields;
   }
 
-  /// Intercepts invocations to provide easy access to specific [_childValues].
+  /// Intercepts invocations to provide easy access to specific [_childValuesDeprecated].
   @override
   dynamic noSuchMethod(Invocation invocation) {
-    Value value = _childValues[invocation.memberName];
+    Value value = _childValuesDeprecated[invocation.memberName];
     if (value == null) {
       super.noSuchMethod(invocation);
+    }
+    return value;
+  }
+
+  /// Returns the child Value associated with [fieldName].
+  /// If [fieldName] does not have any associated Value, an ArgumentError
+  /// exception is thrown.
+  Value operator [](String fieldName) {
+    Value value = _childValues[fieldName];
+    if (value == null) {
+      throw new ArgumentError('field `$fieldName` does not exist');
     }
     return value;
   }

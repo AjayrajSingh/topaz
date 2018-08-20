@@ -120,12 +120,16 @@ void main() {
     // Read and write properties of a Sledge document.
     expect(doc.foo.someBool.value, equals(false));
     expect(doc.foo.someInteger.value, equals(0));
+    expect(doc['foo']['someBool'].value, equals(false));
+    expect(doc['foo']['someInteger'].value, equals(0));
     await sledge.runInTransaction(() async {
       doc.foo.someBool.value = true;
       doc.foo.someInteger.value = 42;
     });
     expect(doc.foo.someBool.value, equals(true));
     expect(doc.foo.someInteger.value, equals(42));
+    expect(doc['foo']['someBool'].value, equals(true));
+    expect(doc['foo']['someInteger'].value, equals(42));
   });
 
   test('Last One Wins basic types.', () async {

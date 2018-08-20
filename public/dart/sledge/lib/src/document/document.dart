@@ -12,6 +12,7 @@ import '../uint8list_ops.dart';
 import 'change.dart';
 import 'document_id.dart';
 import 'leaf_value.dart';
+import 'value.dart';
 import 'value_node.dart';
 import 'value_observer.dart';
 import 'values/last_one_wins_value.dart';
@@ -143,5 +144,12 @@ class Document implements ValueObserver {
   @override
   dynamic noSuchMethod(Invocation invocation) {
     return _value.noSuchMethod(invocation);
+  }
+
+  /// Returns the Value associated with [fieldName].
+  /// If [fieldName] does not have any associated Value, an ArgumentError
+  /// exception is thrown.
+  Value operator [](String fieldName) {
+    return _value[fieldName];
   }
 }
