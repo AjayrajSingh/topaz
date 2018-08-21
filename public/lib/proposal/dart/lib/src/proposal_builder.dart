@@ -40,11 +40,6 @@ class ProposalBuilder {
   /// given name is not running, one will be created.
   String storyName;
 
-  /// Sets the story id of the story this proposal is acting on.
-  ///
-  /// Prefer using setStoryName().
-  String storyId;
-
   /// Sets the story affinity of the proposal. If true, the proposal will only
   /// be shown as a suggestion if the story it's associated with is focused.
   bool storyAffinity = false;
@@ -109,7 +104,6 @@ class ProposalBuilder {
     return Proposal(
         id: _id,
         storyName: storyName,
-        storyId: storyId,
         storyAffinity: storyAffinity,
         onSelected: actions,
         confidence: confidence,

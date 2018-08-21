@@ -99,7 +99,7 @@ Future<void> _proposeScore(ModuleDriver moduleDriver) async {
 
   final proposalBuilder =
       ProposalBuilder(id: 'showScore', headline: 'Show Score')
-        ..storyId = storyId
+        ..storyName = storyId
         ..color = suggestionColor
         ..storyAffinity = true
         ..addAction(Action.withAddModule(addModule));
