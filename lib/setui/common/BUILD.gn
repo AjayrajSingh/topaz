@@ -13,6 +13,7 @@ dart_library("common") {
     "action.dart",
     "conductor.dart",
     "conductor_builder.dart",
+    "mode.dart",
     "step.dart",
     "syllabus.dart",
     "syllabus_parser.dart",
