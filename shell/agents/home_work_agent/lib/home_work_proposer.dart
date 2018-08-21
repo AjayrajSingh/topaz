@@ -367,15 +367,17 @@ class _QueryHandlerImpl extends QueryHandler {
     )
       ..color = 0xFFFF0080
       ..actions = askProposals
-          .map(
-            (Map<String, String> proposal) => new Action.withCreateStory(
-                  new CreateStory(
-                      intent: (new IntentBuilder.handler(
-                              proposal['module_url'] ?? '')
+          .map((Map<String, String> proposal) => new Action.withAddModule(
+                new AddModule(
+                  intent:
+                      (new IntentBuilder.handler(proposal['module_url'] ?? '')
                             ..addParameter(null, proposal['module_data']))
-                          .intent),
+                          .intent,
+                  moduleName: 'root',
+                  surfaceRelation: null,
+                  surfaceParentModulePath: [],
                 ),
-          )
+              ))
           .toList();
     return proposalBuilder.build();
   }
@@ -400,7 +402,12 @@ Future<Proposal> _createProposal(Map<String, String> proposal) async {
         ? SuggestionImageType.person
         : SuggestionImageType.other
     ..actions = <Action>[
-      Action.withCreateStory(new CreateStory(intent: intentBuilder.intent))
+      Action.withAddModule(new AddModule(
+        intent: intentBuilder.intent,
+        moduleName: 'root',
+        surfaceRelation: null,
+        surfaceParentModulePath: [],
+      ))
     ];
 
   return proposalBuilder.build();
@@ -425,7 +432,11 @@ Future<Proposal> _createAppProposal({
     ..imageUrl = imageUrl
     ..imageType = imageType
     ..annoyanceType = annoyanceType
-    ..addAction(new Action.withCreateStory(
-        new CreateStory(intent: (new IntentBuilder.handler(appUrl)).intent)));
+    ..addAction(new Action.withAddModule(new AddModule(
+      intent: (new IntentBuilder.handler(appUrl)).intent,
+      moduleName: 'root',
+      surfaceRelation: null,
+      surfaceParentModulePath: [],
+    )));
   return proposalBuilder.build();
 }

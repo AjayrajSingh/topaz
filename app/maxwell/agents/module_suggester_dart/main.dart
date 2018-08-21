@@ -672,8 +672,12 @@ Future<Proposal> _createProposal({
     ..imageUrl = imageUrl
     ..imageType = imageType
     ..annoyanceType = annoyanceType
-    ..addAction(
-        Action.withCreateStory(CreateStory(intent: intentBuilder.intent)));
+    ..addAction(Action.withAddModule(new AddModule(
+      intent: intentBuilder.intent,
+      moduleName: 'root',
+      surfaceParentModulePath: [],
+      surfaceRelation: null,
+    )));
 
   return proposalBuilder.build();
 }
