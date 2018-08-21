@@ -4,6 +4,7 @@
 
 name: modules
 dependencies:
+  fake_async: ^1.0.1
   flutter_flux: ^4.1.2
   flutter_markdown: ^0.2.0
   googleapis_auth: ^0.2.5+2
