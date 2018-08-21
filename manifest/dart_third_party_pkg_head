@@ -121,7 +121,7 @@
     <project name="third_party/dart/third_party/pkg/linter"
              path="third_party/dart/third_party/pkg/linter"
              remote="https://dart.googlesource.com/linter.git"
-             revision="0.1.58"/>
+             revision="0.1.59"/>
 
     <project name="third_party/dart/third_party/pkg/logging"
              path="third_party/dart/third_party/pkg/logging"
@@ -181,7 +181,7 @@
     <project name="third_party/dart/third_party/pkg/pub"
              path="third_party/dart/third_party/pkg/pub"
              remote="https://dart.googlesource.com/pub.git"
-             revision="5962908a66e814dd78f6856a4e5f792c6db65fbc"/>
+             revision="9f00679ef47bc79cadc18e143720ade6c06c0100"/>
 
     <project name="third_party/dart/third_party/pkg/pub_semver"
              path="third_party/dart/third_party/pkg/pub_semver"
