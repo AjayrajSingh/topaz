@@ -20,7 +20,8 @@ import 'models/surface/surface_properties.dart';
 class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   final StoryShellBinding _storyShellBinding = new StoryShellBinding();
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
-  final StoryContextProxy _storyContext = new StoryContextProxy();
+  final StoryShellContextProxy _storyShellContext =
+      new StoryShellContextProxy();
   final PointerEventsListener _pointerEventsListener =
       new PointerEventsListener();
   final KeyListener keyListener;
@@ -33,9 +34,9 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
 
   /// StoryShell
   @override
-  void initialize(InterfaceHandle<StoryContext> contextHandle) {
-    _storyContext.ctrl.bind(contextHandle);
-    _storyContext.watchVisualState(_visualStateWatcherBinding.wrap(this));
+  void initialize(InterfaceHandle<StoryShellContext> contextHandle) {
+    _storyShellContext.ctrl.bind(contextHandle);
+    _storyShellContext.watchVisualState(_visualStateWatcherBinding.wrap(this));
   }
 
   /// Bind an [InterfaceRequest] for a [StoryShell] interface to this object.
@@ -173,7 +174,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
     _pointerEventsListener.stop();
     if (visualState == StoryVisualState.maximized) {
       PresentationProxy presentationProxy = new PresentationProxy();
-      _storyContext.getPresentation(presentationProxy.ctrl.request());
+      _storyShellContext.getPresentation(presentationProxy.ctrl.request());
       _pointerEventsListener.listen(presentationProxy);
       keyListener?.listen(presentationProxy);
       presentationProxy.ctrl.close();
