@@ -58,6 +58,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
     String parentId,
     SurfaceRelation surfaceRelation,
     ModuleManifest manifest,
+    ModuleSource source, // TODO(djmurphy): use this.
   ) {
     trace('connecting view $viewId with parent $parentId');
     log.fine('Connecting view $viewId with parent $parentId');
