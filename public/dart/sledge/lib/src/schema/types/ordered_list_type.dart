@@ -4,6 +4,8 @@
 
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
+
 import '../../document/value.dart';
 import '../../document/values/ordered_list_value.dart';
 import '../../sledge_connection_id.dart';
@@ -11,10 +13,13 @@ import '../base_type.dart';
 
 /// The Sledge type for Ordered Set of [Uint8List].
 class OrderedList implements BaseType {
+  static const _listEquality = const ListEquality<int>();
+
   @override
   String toJson() => 'OrderedList';
 
   @override
   Value newValue(ConnectionId connectionId) =>
-      new OrderedListValue<Uint8List>(connectionId.id);
+      new OrderedListValue<Uint8List>(connectionId.id,
+          equals: _listEquality.equals);
 }

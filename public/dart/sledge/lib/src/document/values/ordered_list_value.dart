@@ -131,12 +131,14 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   final StreamController<OrderedListChange<E>> _changeController =
       new StreamController<OrderedListChange<E>>.broadcast();
   final DataConverter _converter;
+  final bool Function(E, E) _equals;
 
   /// Default constructor.
-  OrderedListValue(this._instanceId)
+  OrderedListValue(this._instanceId, {bool equals(E element1, E element2)})
       : _converter = new DataConverter<OrderedListTreePath, E>(
             keyConverter: orderedListTreePathConverter),
-        _storage = new KeyValueStorage<OrderedListTreePath, E>();
+        _storage = new KeyValueStorage<OrderedListTreePath, E>(),
+        _equals = equals ?? ((E element1, E element2) => element1 == element2);
 
   @override
   Stream<OrderedListChange<E>> get onChange => _changeController.stream;
@@ -179,6 +181,29 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   }
 
   @override
+  int indexOf(Object element, [int start = 0]) {
+    final values = _valuesList();
+    for (int i = start; i < values.length; i++) {
+      if (_equals(values[i], element)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  @override
+  int lastIndexOf(Object element, [int start]) {
+    final values = _valuesList();
+    start ??= values.length - 1;
+    for (int i = start; i >= 0; i--) {
+      if (_equals(values[i], element)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  @override
   E removeAt(int index) {
     return _storage.remove(_sortedKeysList()[index]);
   }
@@ -188,7 +213,7 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
     final keys = _sortedKeysList();
     final values = _valuesList();
     for (int i = 0; i < values.length; i++) {
-      if (values[i] == element) {
+      if (_equals(values[i], element)) {
         _storage.remove(keys[i]);
         return true;
       }
@@ -260,6 +285,11 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   @override
   void clear() {
     _storage.clear();
+  }
+
+  @override
+  bool contains(Object element) {
+    return indexOf(element) != -1;
   }
 
   List<OrderedListTreePath> _sortedKeysList() {

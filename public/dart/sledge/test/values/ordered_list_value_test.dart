@@ -6,6 +6,7 @@
 import 'dart:math' show Random;
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/ordered_list_value.dart';
 import 'package:test/test.dart';
@@ -18,7 +19,18 @@ void main() {
   final id1 = new Uint8List.fromList([1]);
 
   group('List API coverage', () {
-    new ListApiTester<OrderedListValue>(() => new OrderedListValue<int>(id1))
+    new ListApiTester<OrderedListValue, int>(
+        () => new OrderedListValue<int>(id1), (int id) => id)
+      ..testApi()
+      ..testObserver();
+    new ListApiTester<OrderedListValue, String>(
+        () => new OrderedListValue<String>(id1), (int id) => id.toString())
+      ..testApi()
+      ..testObserver();
+    new ListApiTester<OrderedListValue, Uint8List>(
+        () => new OrderedListValue<Uint8List>(id1,
+            equals: new ListEquality().equals),
+        (int id) => new Uint8List.fromList([id]))
       ..testApi()
       ..testObserver();
   });
