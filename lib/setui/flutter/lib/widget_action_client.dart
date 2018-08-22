@@ -15,11 +15,11 @@ abstract class WidgetActionClient {
   WidgetActionClient(this.actionResultSender);
 
   /// The title to be displayed
-  String get title;
+  String get title => null;
 
   /// Invoked to generate the root view.
   Widget build();
 
   /// Sets the [State].
-  void setState(State state);
+  void setState(State state) {}
 }
