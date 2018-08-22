@@ -18,6 +18,7 @@ dart_library("xi_widgets") {
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/lib/xi/client:xi_client",
+    "//topaz/lib/xi/fuchsia_client:xi_fuchsia_client",
     "//topaz/public/lib/app/dart",
   ]
 }

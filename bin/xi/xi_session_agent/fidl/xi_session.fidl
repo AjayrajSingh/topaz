@@ -1,0 +1,14 @@
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+library fuchsia.xi.session;
+
+// Interface for the proof-of-concept xi_session_manager service.
+[Discoverable]
+interface XiSessionManager {
+    1: NewSession() -> (string session_id);
+    2: CloseSession(string session_id);
+    3: ConnectSession(string session_id, handle<socket> sock);
+    4: GetContents(string session_id) -> (handle<vmo> buffer);
+};

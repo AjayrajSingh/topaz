@@ -4,6 +4,9 @@
     ],
     "packages": [
         "//topaz/bin/xi/xi_mod",
+        "//topaz/bin/xi/xi_embeddable",
+        "//topaz/bin/xi/xi_session_agent",
+        "//topaz/bin/xi/xi_session_demo",
         "//garnet/bin/xi_core"
     ]
 }

@@ -16,7 +16,7 @@ import 'package:xi_client/client.dart';
 /// ignore_for_file: avoid_annotating_with_dynamic
 
 /// If `true`, draws the editor with a watermarked background.
-const bool kDrawDebugBackground = true;
+const bool kDrawDebugBackground = false;
 
 dynamic _handleResponse(String description) {
   return (Status status) {

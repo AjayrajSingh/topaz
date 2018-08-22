@@ -176,3 +176,21 @@ class ViewProxy implements XiViewProxy {
     _inner.sendNotification('edit', outerParams);
   }
 }
+
+/// Embedded views don't know about the concept of a 'viewId', and they can only
+/// send 'edit' RPCs; this adapter avoids adding these fields. (They're added in
+/// the session agent as needed.)
+class EmbeddedViewProxy extends ViewProxy {
+  EmbeddedViewProxy(XiClient _inner) : super(_inner, null);
+
+  @override
+  void send(String method, [dynamic params = const <String, dynamic>{}]) {
+    _inner.sendNotification(method, params);
+  }
+
+  @override
+  Future<String> cutCopy(String method) {
+    return _inner
+        .sendRpc(method, const <String, dynamic>{}).then((data) => data);
+  }
+}

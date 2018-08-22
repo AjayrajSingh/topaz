@@ -4,3 +4,4 @@
 
 export 'src/editor_host.dart';
 export 'src/editor_tabs.dart';
+export 'src/embedded_editor.dart';
