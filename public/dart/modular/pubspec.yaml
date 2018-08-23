@@ -3,3 +3,5 @@
 # found in the LICENSE file.
 
 name: modular
+environment:
+  sdk: '>=2.0.0 <3.0.0'
