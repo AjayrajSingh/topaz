@@ -119,8 +119,9 @@ PlatformView::PlatformView(
   RegisterPlatformMessageHandlers();
 
 #ifndef SCENIC_VIEWS2
-  view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
-                            std::placeholders::_1));
+// TODO(SCN-975): Re-enable.
+//   view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
+//                             std::placeholders::_1));
 #endif
 }
 
@@ -188,11 +189,12 @@ void PlatformView::OnPropertiesChanged(
 #endif
 
 #ifndef SCENIC_VIEWS2
-void PlatformView::ConnectSemanticsProvider(
-    fuchsia::ui::viewsv1token::ViewToken token) {
-  semantics_bridge_.SetupEnvironment(
-      token.value, parent_environment_service_provider_.get());
-}
+// TODO(SCN-975): Re-enable.
+// void PlatformView::ConnectSemanticsProvider(
+//     fuchsia::ui::viewsv1token::ViewToken token) {
+//   semantics_bridge_.SetupEnvironment(
+//       token.value, parent_environment_service_provider_.get());
+// }
 
 void PlatformView::UpdateViewportMetrics(
     const fuchsia::ui::viewsv1::ViewLayout& layout) {

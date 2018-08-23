@@ -131,8 +131,10 @@ class PlatformView final : public shell::PlatformView,
   void RegisterPlatformMessageHandlers();
 
 #ifndef SCENIC_VIEWS2
-  // Method to connect the a11y bridge with the a11y manager with a view id.
-  void ConnectSemanticsProvider(::fuchsia::ui::viewsv1token::ViewToken token);
+  // TODO(SCN-975): Re-enable.
+  // // Method to connect the a11y bridge with the a11y manager with a view id.
+  // void ConnectSemanticsProvider(::fuchsia::ui::viewsv1token::ViewToken
+  // token);
 
   void UpdateViewportMetrics(const fuchsia::ui::viewsv1::ViewLayout& layout);
 #else
