@@ -58,9 +58,9 @@ dart_library("package_for_analysis") {
 
 dart_fuchsia_test("dart_zircon_test") {
   sources = [
-    "../test/channel_test.dart",
-    "../test/socket_test.dart",
-    "../test/vmo_test.dart",
+    "channel_test.dart",
+    "socket_test.dart",
+    "vmo_test.dart",
   ]
 
   deps = [

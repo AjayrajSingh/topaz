@@ -29,11 +29,9 @@ template("dart_kernel") {
     if (defined(invoker.sources)) {
       sources += invoker.sources
     }
-    source_base = "lib"
-    if (defined(invoker.source_dir)) {
-      source_base = invoker.source_dir
-    }
-    sources += [ rebase_path(invoker.main_dart, source_base) ]
+    extra_sources = [
+      invoker.main_dart,
+    ]
   }
 
   # TODO(tvolkert): Name this ${target_name}
