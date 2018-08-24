@@ -57,4 +57,9 @@ void main() {
         testResult);
     verify(client.setState(State.finished));
   });
+
+  test('test_host', () {
+    // Ensures that the action host returns a widget even without state.
+    expect(null != WidgetActionHost().getWidget(MockStateModel()), true);
+  });
 }

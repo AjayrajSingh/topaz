@@ -9,15 +9,18 @@ import 'widget_action.dart';
 /// A Widget that displays the current widget action from an [ActionStateModel].
 class WidgetActionHost extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return ScopedModelDescendant<ActionStateModel>(builder: (
-      BuildContext context,
-      Widget child,
-      ActionStateModel model,
-    ) {
-      return model.currentAction.build();
-    });
-  }
+  Widget build(BuildContext context) => ScopedModelDescendant<ActionStateModel>(
+          builder: (
+        BuildContext context,
+        Widget child,
+        ActionStateModel model,
+      ) =>
+              getWidget(model));
+
+  @visibleForTesting
+  Widget getWidget(ActionStateModel model) => model.currentAction != null
+      ? model.currentAction.build()
+      : Column(children: []);
 }
 
 /// A simple model that stores a reference to a current action.
