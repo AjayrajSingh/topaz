@@ -7,6 +7,7 @@
 // |auth_provider.fidl| interface and is typically invoked by the Token Manager
 // service in Garnet layer.
 
+#include <chromium/web/cpp/fidl.h>
 #include <fuchsia/auth/cpp/fidl.h>
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
@@ -21,12 +22,14 @@
 
 namespace google_auth_provider {
 
+using chromium::web::NavigationEvent;
 using fuchsia::auth::AssertionJWTParams;
 using fuchsia::auth::AttestationJWTParams;
 using fuchsia::auth::AttestationSigner;
 using fuchsia::auth::AuthenticationUIContext;
 
-class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
+class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
+                               fuchsia::auth::AuthProvider,
                                fuchsia::webview::WebRequestDelegate {
  public:
   GoogleAuthProviderImpl(
@@ -84,6 +87,11 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
   // |fuchsia::webview::WebRequestDelegate|
   void WillSendRequest(fidl::StringPtr incoming_url) override;
 
+  // |chromium::Web::NavigationEventObserver|
+  void OnNavigationStateChanged(
+      NavigationEvent change,
+      OnNavigationStateChangedCallback callback) override;
+
   // Calls the OAuth auth endpoint to exchange the supplied |auth_code| for a
   // long term credential, and then calls |GetUserProfile| with that credential.
   // If any errors are encountered a failure status is returned on the pending
@@ -99,10 +107,10 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
   // |ViewOwnerPtr| for the view.
   fuchsia::ui::viewsv1token::ViewOwnerPtr SetupWebView();
 
-  // Launches and connects to a Chromium WebRunner service, binding |this| as a
-  // |FrameObserver| to process any changes in the URL, and returning a
-  // |ViewOwnerPtr| for the view.
-  fuchsia::ui::viewsv1token::ViewOwnerPtr SetupWebRunner();
+  // Launches and connects to a Chromium frame, binding |this| as a
+  // |NavigationEventObserver| to process any changes in the URL, and returning
+  // a |ViewOwnerPtr| for the view.
+  fuchsia::ui::viewsv1token::ViewOwnerPtr SetupChromium();
 
   void Request(
       fit::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,
@@ -116,10 +124,13 @@ class GoogleAuthProviderImpl : fuchsia::auth::AuthProvider,
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
   fuchsia::auth::AuthenticationUIContextPtr auth_ui_context_;
   fuchsia::webview::WebViewPtr web_view_;
+  chromium::web::FramePtr chromium_frame_;
   GetPersistentCredentialCallback get_persistent_credential_callback_;
 
   fidl::BindingSet<fuchsia::webview::WebRequestDelegate>
       web_request_delegate_bindings_;
+  fidl::BindingSet<chromium::web::NavigationEventObserver>
+      navigation_event_observer_bindings_;
   fidl::Binding<fuchsia::auth::AuthProvider> binding_;
   callback::CancellableContainer requests_;
 

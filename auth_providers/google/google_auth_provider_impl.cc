@@ -97,6 +97,7 @@ using fuchsia::auth::AuthenticationUIContext;
 using fuchsia::auth::AuthProviderStatus;
 using fuchsia::auth::AuthTokenPtr;
 using fuchsia::auth::FirebaseTokenPtr;
+using fuchsia::ui::viewsv1::ViewProviderPtr;
 using fuchsia::ui::viewsv1token::ViewOwnerPtr;
 using modular::JsonValueToPrettyString;
 
@@ -131,8 +132,10 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
 
   ViewOwnerPtr view_owner;
   if (settings_.use_chromium) {
-    view_owner = SetupWebRunner();
-    // TODO(jsankey): Configure the web runner url
+    view_owner = SetupChromium();
+    chromium::web::NavigationControllerPtr controller;
+    chromium_frame_->GetNavigationController(controller.NewRequest());
+    controller->LoadUrl(GetOAuthAuthUrl(user_profile_id), {});
   } else {
     view_owner = SetupWebView();
     web_view_->SetUrl(GetOAuthAuthUrl(user_profile_id));
@@ -328,7 +331,7 @@ void GoogleAuthProviderImpl::GetAppAccessTokenFromAssertionJWT(
 void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
   FXL_CHECK(get_persistent_credential_callback_);
 
-  std::string auth_code = "";
+  std::string auth_code;
   AuthProviderStatus status =
       ParseAuthCodeFromUrl(incoming_url.get(), auth_code);
 
@@ -337,7 +340,7 @@ void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
   if (status != AuthProviderStatus::OK || !auth_code.empty()) {
     // Also, de-register previously registered error callbacks since calling
     // StopOverlay() might cause this connection to be closed.
-    auth_ui_context_.set_error_handler([] {});
+    auth_ui_context_.set_error_handler(nullptr);
     auth_ui_context_->StopOverlay();
 
     if (status != AuthProviderStatus::OK) {
@@ -346,6 +349,37 @@ void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
       ExchangeAuthCode(auth_code);
     }
   }
+}
+
+void GoogleAuthProviderImpl::OnNavigationStateChanged(
+    NavigationEvent change, OnNavigationStateChangedCallback callback) {
+  FXL_CHECK(get_persistent_credential_callback_);
+
+  // Not all events change the URL, those that don't can be ignored.
+  if (change.url.is_null()) {
+    callback();
+    return;
+  }
+
+  std::string auth_code;
+  AuthProviderStatus status = ParseAuthCodeFromUrl(change.url.get(), auth_code);
+
+  // If either an error occured or the user successfully received an auth code
+  // we need to close the WebView.
+  if (status != AuthProviderStatus::OK || !auth_code.empty()) {
+    // Also, de-register previously registered error callbacks since calling
+    // StopOverlay() might cause this connection to be closed.
+    auth_ui_context_.set_error_handler(nullptr);
+    auth_ui_context_->StopOverlay();
+
+    if (status != AuthProviderStatus::OK) {
+      get_persistent_credential_callback_(status, nullptr, nullptr);
+    } else if (!auth_code.empty()) {
+      ExchangeAuthCode(auth_code);
+    }
+  }
+
+  callback();
 }
 
 void GoogleAuthProviderImpl::ExchangeAuthCode(std::string auth_code) {
@@ -434,7 +468,7 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
   });
 }
 
-fuchsia::ui::viewsv1token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
+ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
   // Launch an instance of the WebView component.
   component::Services web_view_services;
   fuchsia::sys::LaunchInfo web_view_launch_info;
@@ -448,8 +482,8 @@ fuchsia::ui::viewsv1token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
 
   // Connect to the launched WebView component, request that it creates a new
   // view, and connect to the WebView interface on this new view.
-  fuchsia::ui::viewsv1token::ViewOwnerPtr view_owner;
-  fuchsia::ui::viewsv1::ViewProviderPtr view_provider;
+  ViewOwnerPtr view_owner;
+  ViewProviderPtr view_provider;
   web_view_services.ConnectToService(view_provider.NewRequest());
   fuchsia::sys::ServiceProviderPtr web_view_moz_services;
   view_provider->CreateView(view_owner.NewRequest(),
@@ -468,11 +502,29 @@ fuchsia::ui::viewsv1token::ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
   return view_owner;
 }
 
-fuchsia::ui::viewsv1token::ViewOwnerPtr
-GoogleAuthProviderImpl::SetupWebRunner() {
-  // TODO(jsankey): Provide an implementation of setting up web runner
-  FXL_CHECK(false) << "web_runner not yet implemented";
-  return ViewOwnerPtr();
+ViewOwnerPtr GoogleAuthProviderImpl::SetupChromium() {
+  // Connect to the Chromium service and create a new frame.
+  auto context_provider =
+      context_->ConnectToEnvironmentService<chromium::web::ContextProvider>();
+
+  chromium::web::ContextPtr context;
+  chromium::web::CreateContextParams context_params;
+  // TODO(jsankey): provide a service directory to the context.
+  context_provider->Create(std::move(context_params), context.NewRequest());
+  context->CreateFrame(chromium_frame_.NewRequest());
+
+  // Bind ourselves as a NavigationEventObserver on this frame.
+  chromium::web::NavigationEventObserverPtr navigation_event_observer;
+  navigation_event_observer_bindings_.AddBinding(
+      this, navigation_event_observer.NewRequest());
+  chromium_frame_->SetNavigationEventObserver(
+      std::move(navigation_event_observer));
+
+  // And create a view for the frame
+  ViewOwnerPtr view_owner;
+  chromium_frame_->CreateView(view_owner.NewRequest(), {});
+
+  return view_owner;
 }
 
 void GoogleAuthProviderImpl::Request(
