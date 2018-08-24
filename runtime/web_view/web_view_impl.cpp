@@ -80,6 +80,13 @@ WebViewImpl::WebViewImpl(
       image_cycler_(session()) {
   FXL_LOG(INFO) << "WebViewImpl constructor";
   web_view_.setup_once();
+
+  std::function<void(bool)> focusDelegate = [=](bool focused) {
+      this->HandleFocusEvent(focused);
+  };
+
+  web_view_.setInputFocusDelegate(focusDelegate);
+
   SetNeedSquareMetrics(true);
   parent_node().AddChild(image_cycler_);
 
@@ -100,6 +107,10 @@ WebViewImpl::WebViewImpl(
 }
 
 WebViewImpl::~WebViewImpl() {}
+
+void WebViewImpl::HandleFocusEvent(bool focused) {
+  FXL_LOG(INFO) << "WebView: input focus event:" << (focused ? "focused" : "unfocused");
+}
 
 // |WebView|:
 void WebViewImpl::SetUrl(fidl::StringPtr url) {

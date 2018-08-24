@@ -72,6 +72,7 @@ class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView {
   bool HandleMouseEvent(const fuchsia::ui::input::PointerEvent& pointer);
   void HandleTouchDown(const fuchsia::ui::input::PointerEvent& pointer);
   bool HandleTouchEvent(const fuchsia::ui::input::PointerEvent& pointer);
+  void HandleFocusEvent(bool focused);
 
   // |BaseView|:
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
