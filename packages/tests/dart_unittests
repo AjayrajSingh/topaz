@@ -15,7 +15,8 @@
       "//topaz/public/lib/display/test:display_test",
       "//topaz/public/lib/schemas/dart:dart_schema_tests",
       "//topaz/shell/mondrian_story_shell:mondrian_story_shell_tests",
-      "//topaz/tools/dartfmt_extras:dartfmt_extras_tests"
+      "//topaz/tools/dartfmt_extras:dartfmt_extras_tests",
+      "//topaz/tools/mod:mod_tests"
     ],
     "labels": [
       "//topaz:dart_unittests"

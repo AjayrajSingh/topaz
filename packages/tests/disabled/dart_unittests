@@ -5,7 +5,6 @@
       "//topaz/tools/widget_explorer/tools/widget_explorer_gen:widget_explorer_gen_tests",
       "//topaz/app/contacts/modules/contact_list:contact_list_tests",
       "//topaz/app/contacts/modules/contacts_picker:contacts_picker_tests",
-      "//topaz/tools/mod:mod_tests",
       "//topaz/shell/armadillo:armadillo_tests",
       "//topaz/bin/user_shell/capybara_user_shell:capybara_user_shell_tests"
     ]

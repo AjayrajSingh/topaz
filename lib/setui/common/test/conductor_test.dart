@@ -33,7 +33,8 @@ void main() {
     final Roster roster = new Roster()..add(actionBlueprint);
 
     new Conductor(syllabus, roster).start();
-    verify(actionBlueprint.action.launch());
+    MockAction action = actionBlueprint.action;
+    verify(action.launch());
   });
 
   // Ensure we proceed to the next step when the current step's action is
