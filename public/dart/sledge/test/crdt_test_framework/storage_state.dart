@@ -24,6 +24,10 @@ class StorageState {
 
   /// Applies [change] to storage. Uses [timestamp] as a time of update.
   void applyChange(Change change, [int timestamp]) {
+    if (change.changedEntries.isEmpty && change.deletedKeys.isEmpty) {
+      return;
+    }
+
     timestamp ??= globalIncrementalTimer++;
     for (final entry in change.changedEntries) {
       _storage[entry.key] = new Entry(entry.value, timestamp);
@@ -65,7 +69,9 @@ class StorageState {
       }
     }
     final change = new Change(changedEntries, deletedKeys);
-    _onChangeCallback?.call(change);
+    if (change.changedEntries.isNotEmpty || change.deletedKeys.isNotEmpty) {
+      _onChangeCallback?.call(change);
+    }
     return change;
   }
 

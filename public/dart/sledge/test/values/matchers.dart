@@ -7,6 +7,7 @@
 import 'package:collection/collection.dart';
 import 'package:matcher/matcher.dart';
 import 'package:sledge/src/document/change.dart';
+import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/key_value.dart';
 
 const Equality<List<int>> _listEquality = const ListEquality<int>();
@@ -71,4 +72,24 @@ class ChangeMatcher extends Matcher {
   @override
   Description describe(Description description) =>
       description.add('Change matcher.'); // TODO add description.
+}
+
+class OrderedListChangeMatcher extends Matcher {
+  final OrderedListChange _change;
+
+  // Default constructor.
+  OrderedListChangeMatcher(this._change);
+
+  @override
+  bool matches(dynamic change, Map matchState) {
+    return _listEquality.equals(change.insertedElements.keys.toList(),
+            _change.insertedElements.keys.toList()) &&
+        _listEquality.equals(change.insertedElements.values.toList(),
+            _change.insertedElements.values.toList()) &&
+        _listEquality.equals(change.deletedPositions, _change.deletedPositions);
+  }
+
+  @override
+  Description describe(Description description) =>
+      description.add('OrderedListChange matcher'); // TODO add description.
 }

@@ -327,10 +327,11 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
       }
     }
     _storage.applyChange(change);
+    final keysFinal = _sortedKeysList();
     final insertedElements = new SplayTreeMap<int, E>();
-    for (int i = 0; i < keys.length; i++) {
-      if (change.changedEntries.containsKey(keys[i])) {
-        insertedElements[i] = change.changedEntries[keys[i]];
+    for (int i = 0; i < keysFinal.length; i++) {
+      if (change.changedEntries.containsKey(keysFinal[i])) {
+        insertedElements[i] = change.changedEntries[keysFinal[i]];
       }
     }
     _changeController

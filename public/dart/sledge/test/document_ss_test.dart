@@ -57,4 +57,34 @@ void main() async {
       ..addChecker(() => new NameLengthChecker());
     await fleet.testAllOrders();
   });
+
+  test('Document. Stream', () async {
+    final fleet = documentFleetFactory.newFleet(3);
+    for (int id = 0; id < 3; id++) {
+      fleet.runInTransaction(id, (final cnt) async {
+        expect(
+            cnt.onChange,
+            emitsInOrder([
+              anything,
+              anything,
+              anything,
+            ]));
+      });
+    }
+    fleet
+      ..runInTransaction(0, (dynamic doc) async {
+        doc.name.value = 'Alice';
+      })
+      ..synchronize([0, 1, 2])
+      ..runInTransaction(1, (dynamic doc) async {
+        doc.length.value = 5;
+      })
+      ..synchronize([0, 1, 2])
+      ..runInTransaction(1, (dynamic) async {
+        doc.name.value = 'Bob';
+        doc.length.value = '3';
+      })
+      ..synchronize([0, 1, 2]);
+    await fleet.testSingleOrder();
+  });
 }

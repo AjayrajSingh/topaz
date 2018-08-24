@@ -29,9 +29,16 @@ class FleetState<T extends dynamic> {
             growable: false),
         _instances =
             new List<T>.generate(size, instanceGenerator, growable: false) {
-    if (T == Sledge) {
-      for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
+      if (T == Sledge) {
         _storageStates[i] = _instances[i].fakeLedgerPage.storageState;
+      } else if (T == Document) {
+        _storageStates[i] = new StorageState((change) => Document.applyChange(
+            // ignore: argument_type_not_assignable
+            _instances.cast<Document>()[i],
+            change));
+      } else {
+        _storageStates[i] = new StorageState(_instances[i].applyChange);
       }
     }
   }
@@ -75,23 +82,7 @@ class FleetState<T extends dynamic> {
   }
 
   void applySynchronization(int id1, int id2) {
-    if (T == Sledge) {
-      _storageStates[id1].updateWith(_storageStates[id2]);
-      _storageStates[id2].updateWith(_storageStates[id1]);
-    } else if (T == Document) {
-      Document.applyChange(
-          // ignore: argument_type_not_assignable
-          _instances.cast<Document>()[id1],
-          _storageStates[id1].updateWith(_storageStates[id2]));
-      Document.applyChange(
-          // ignore: argument_type_not_assignable
-          _instances.cast<Document>()[id2],
-          _storageStates[id2].updateWith(_storageStates[id1]));
-    } else {
-      _instances[id1]
-          .applyChange(_storageStates[id1].updateWith(_storageStates[id2]));
-      _instances[id2]
-          .applyChange(_storageStates[id2].updateWith(_storageStates[id1]));
-    }
+    _storageStates[id1].updateWith(_storageStates[id2]);
+    _storageStates[id2].updateWith(_storageStates[id1]);
   }
 }

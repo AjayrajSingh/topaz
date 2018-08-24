@@ -2,17 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: implementation_imports, avoid_catches_without_on_clauses
+// ignore_for_file: implementation_imports
 
 import 'dart:async';
+import 'dart:collection';
 import 'dart:math' show Random;
 import 'dart:typed_data';
 
 import 'package:lib.app.dart/logging.dart';
+import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/ordered_list_value.dart';
 import 'package:test/test.dart';
 
 import '../crdt_test_framework/crdt_test_framework.dart';
+import 'matchers.dart';
 
 // Wraps construction of Fleet of OrderedListValues.
 class OrderedListFleetFactory<T> {
@@ -148,6 +151,44 @@ void main() async {
       ..runInTransaction(1, (final cnt) async {
         expect(cnt.isEmpty, isTrue);
       });
+    await fleet.testSingleOrder();
+  });
+
+  test('Ordered list. Stream.', () async {
+    final fleet = integerOrderedListFleetFactory.newFleet(3);
+    for (int id = 0; id < 3; id++) {
+      fleet.runInTransaction(id, (final cnt) async {
+        expect(
+            cnt.onChange,
+            emitsInOrder([
+              new OrderedListChangeMatcher(new OrderedListChange<int>(
+                  [], new SplayTreeMap<int, int>.fromIterables([0], [1]))),
+              new OrderedListChangeMatcher(new OrderedListChange<int>([],
+                  new SplayTreeMap<int, int>.fromIterables([0, 2], [2, 3]))),
+              new OrderedListChangeMatcher(new OrderedListChange<int>(
+                  [1, 2], new SplayTreeMap<int, int>.fromIterables([], []))),
+              new OrderedListChangeMatcher(new OrderedListChange<int>(
+                  [], new SplayTreeMap<int, int>.fromIterables([0], [5]))),
+            ]));
+      });
+    }
+    fleet
+      ..runInTransaction(0, (final cnt) async {
+        cnt.insert(0, 1);
+      })
+      ..synchronize([0, 1, 2])
+      ..runInTransaction(1, (final cnt) async {
+        cnt..insert(1, 3)..insert(0, 2);
+      })
+      ..synchronize([0, 1, 2])
+      ..runInTransaction(0, (final cnt) async {
+        cnt..removeAt(1)..removeAt(1);
+      })
+      ..synchronize([0, 1, 2])
+      ..runInTransaction(0, (final cnt) async {
+        cnt.insert(0, 5);
+      })
+      ..synchronize([0, 1, 2]);
     await fleet.testSingleOrder();
   });
 
