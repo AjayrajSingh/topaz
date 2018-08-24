@@ -1,6 +1,6 @@
 {
     "imports": [
-        "topaz/packages/tests/integration_testing",
+        "peridot/packages/prod/integration_testing",
         "topaz/packages/tests/flutter_screencap_test_app"
     ],
     "packages": [
