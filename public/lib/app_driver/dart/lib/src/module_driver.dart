@@ -46,6 +46,7 @@ typedef OnTerminateAsync = Future<Null> Function();
 
 const int _kCobaltProjectId = 104;
 const int _kFirstLinkDataMetricId = 1;
+const int _cobaltNoOpEncodingID = 1;
 
 /// The [ModuleDriver] provides a high-level API for running a module in Dart
 /// code. The name and structure of this library is based on the peridot layer's
@@ -57,7 +58,7 @@ const int _kFirstLinkDataMetricId = 1;
 /// Initialization
 ///
 /// Module initialization is triggered by calling [start]. Once the module has
-/// successfully initalized additional service clients are connected providing
+/// successfully initialized additional service clients are connected providing
 /// access to The Module's Link and ModuleContext services.
 ///
 /// Termination
@@ -211,6 +212,16 @@ class ModuleDriver {
     /// functional when chaining futures.
     _start.complete(this);
 
+    _addCobaltMetric([
+      new ObservationValue(
+        name: 'mod_driver_start_millis',
+        value: new Value.withIntValue(
+          new DateTime.now().difference(_initializationTime).inMilliseconds,
+        ),
+        encodingId: _cobaltNoOpEncodingID,
+      )
+    ]);
+
     return _start.future;
   }
 
@@ -262,6 +273,7 @@ class ModuleDriver {
     Proxy<dynamic> proxy,
   ) async {
     log.fine('#connectToAgentService(...)');
+    final _initTime = new DateTime.now();
     ComponentContextClient componentContext = await getComponentContext();
 
     ServiceProviderProxy serviceProviderProxy =
@@ -270,6 +282,16 @@ class ModuleDriver {
 
     // Close all unnecessary bindings
     serviceProviderProxy.ctrl.close();
+
+    _addCobaltMetric([
+      new ObservationValue(
+        name: 'connectToAgentServiceWithProxy_millis',
+        value: new Value.withIntValue(
+          new DateTime.now().difference(_initTime).inMilliseconds,
+        ),
+        encodingId: _cobaltNoOpEncodingID,
+      )
+    ]);
   }
 
   /// Connect to an agent using a new-style async proxy.
@@ -278,6 +300,7 @@ class ModuleDriver {
     AsyncProxy<dynamic> proxy,
   ) async {
     log.fine('#connectToAgentService(...)');
+    final _initTime = new DateTime.now();
     assert(proxy.ctrl.$serviceName != null,
         'controller.\$serviceName must not be null. Check the FIDL file for a missing [Discoverable]');
 
@@ -288,6 +311,16 @@ class ModuleDriver {
           proxy.ctrl.$serviceName, proxy.ctrl.request().passChannel())
       // Close all unnecessary bindings
       ..ctrl.close();
+
+    _addCobaltMetric([
+      new ObservationValue(
+        name: 'connectToAgentServiceWithAsyncProxy_millis',
+        value: new Value.withIntValue(
+          new DateTime.now().difference(_initTime).inMilliseconds,
+        ),
+        encodingId: _cobaltNoOpEncodingID,
+      )
+    ]);
   }
 
   /// Retrieve the story id of the story this module lives in
@@ -361,7 +394,7 @@ class ModuleDriver {
     }
 
     // NOTE: do not use await, the controller.stream needs to be returned
-    // syncronously so listeners can be attached without extra async book
+    // synchronously so listeners can be attached without extra async book
     // keeping.
     getLink(key).then((LinkClient link) {
       log.info('watching link "${link.name}" for Entity updates');
@@ -471,42 +504,48 @@ class ModuleDriver {
     if (!_firstObservationSent.contains(linkName) && data != null) {
       _firstObservationSent.add(linkName);
 
-      _encoder.addMultipartObservation(
-        _kFirstLinkDataMetricId,
-        <ObservationValue>[
-          new ObservationValue(
-            name: 'module_name',
-            value: new Value.withStringValue(
-              moduleName == null || moduleName.isEmpty
-                  ? _packageName
-                  : moduleName,
-            ),
-            encodingId: 1,
+      _addCobaltMetric([
+        new ObservationValue(
+          name: 'link_name',
+          value: new Value.withStringValue(linkName),
+          encodingId: _cobaltNoOpEncodingID,
+        ),
+        new ObservationValue(
+          name: 'elapsed_millis',
+          value: new Value.withIntValue(
+            new DateTime.now().difference(_initializationTime).inMilliseconds,
           ),
-          new ObservationValue(
-            name: 'link_name',
-            value: new Value.withStringValue(linkName),
-            encodingId: 1,
-          ),
-          new ObservationValue(
-            name: 'elapsed_millis',
-            value: new Value.withIntValue(
-              new DateTime.now().difference(_initializationTime).inMilliseconds,
-            ),
-            encodingId: 1,
-          )
-        ],
-        (Status status) {
-          if (status != Status.ok) {
-            log.warning(
-              'Failed to observe frame rate metric '
-                  '$_kCobaltProjectId, '
-                  '$_kFirstLinkDataMetricId: $status. ',
-            );
-          }
-        },
-      );
+          encodingId: _cobaltNoOpEncodingID,
+        )
+      ]);
     }
+  }
+
+  void _addCobaltMetric(List<ObservationValue> observationValues) {
+    _encoder.addMultipartObservation(
+      _kFirstLinkDataMetricId,
+      <ObservationValue>[
+            new ObservationValue(
+              name: 'module_name',
+              value: new Value.withStringValue(
+                moduleName == null || moduleName.isEmpty
+                    ? _packageName
+                    : moduleName,
+              ),
+              encodingId: _cobaltNoOpEncodingID,
+            ),
+          ] +
+          observationValues,
+      (Status status) {
+        if (status != Status.ok) {
+          log.warning(
+            'Failed to observe frame rate metric '
+                '$_kCobaltProjectId, '
+                '$_kFirstLinkDataMetricId: $status. ',
+          );
+        }
+      },
+    );
   }
 
   /// Cache for [getComponentContext].
@@ -557,7 +596,7 @@ class ModuleDriver {
   /// * [ModuleContext#StartModule](https://goo.gl/9T8Gkv).
   /// * [ModuleController](https://goo.gl/ZXcYW3).
   ///
-  /// TODO(MS-1714): collapse name params or clearly document thier differences.
+  /// TODO(MS-1714): collapse name params or clearly document their differences.
   Future<ModuleControllerClient> startModule({
     @required Intent intent,
     String name,
@@ -568,6 +607,7 @@ class ModuleDriver {
       emphasis: 0.5,
     ),
   }) async {
+    final _initTime = new DateTime.now();
     name ??= module;
     assert(name != null && name.isNotEmpty);
     assert(intent != null);
@@ -578,11 +618,21 @@ class ModuleDriver {
       log.warning('param "module" is deprecated, use "name" instead');
     }
 
-    return moduleContext.startModule(
-      module: name,
-      intent: intent,
-      surfaceRelation: surfaceRelation,
-    );
+    return moduleContext
+        .startModule(
+          module: name,
+          intent: intent,
+          surfaceRelation: surfaceRelation,
+        )
+        .whenComplete(() => _addCobaltMetric([
+              new ObservationValue(
+                name: 'connectToAgentServiceWithAsyncProxy_millis',
+                value: new Value.withIntValue(
+                  new DateTime.now().difference(_initTime).inMilliseconds,
+                ),
+                encodingId: _cobaltNoOpEncodingID,
+              )
+            ]));
   }
 
   /// # Embed Module
@@ -591,7 +641,7 @@ class ModuleDriver {
   /// for embedding within a Flutter Widget tree.
   ///
   /// On successful resolution the Future completes with an [EmbeddedModule]
-  /// instance provding access to a [ChildView] Flutter Widget and a
+  /// instance providing access to a [ChildView] Flutter Widget and a
   /// [ModuleControllerClient].
   ///
   /// Related FIDL APIs:
@@ -602,13 +652,23 @@ class ModuleDriver {
   Future<EmbeddedModule> embedModule({
     @required String name,
     @required Intent intent,
-  }) {
+  }) async {
     assert(name != null && name.isNotEmpty);
     assert(intent != null);
 
     log.fine('resolving module ("$name") for embedding...');
-
-    return moduleContext.embedModule(name: name, intent: intent);
+    final _initTime = new DateTime.now();
+    return moduleContext
+        .embedModule(name: name, intent: intent)
+        .whenComplete(() => _addCobaltMetric([
+              new ObservationValue(
+                name: 'connectToAgentServiceWithAsyncProxy_millis',
+                value: new Value.withIntValue(
+                  new DateTime.now().difference(_initTime).inMilliseconds,
+                ),
+                encodingId: _cobaltNoOpEncodingID,
+              )
+            ]));
   }
 
   /// Made available for video module to access MediaPlayer.
