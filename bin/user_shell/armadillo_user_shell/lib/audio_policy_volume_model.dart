@@ -10,31 +10,28 @@ class AudioPolicyVolumeModel extends VolumeModel {
   /// Used to get and set the volume.
   final Audio audio;
 
-  /// Ranges from 0.0 to 1.0.
-  double _level = 0.0;
-
   /// Constructor.
   AudioPolicyVolumeModel({this.audio}) {
-    _setLevelFromAudioPolicy();
-    audio.updateCallback = _setLevelFromAudioPolicy;
+    audio.updateCallback = notifyListeners;
   }
 
   @override
-  double get level => _level;
+  double get level => audio.systemAudioMuted
+                          ? 0.0
+                          : audio.systemAudioPerceivedLevel;
+
 
   @override
   set level(double level) {
-    if (level == _level) {
+    if (level == this.level) {
       return;
     }
-    _level = level;
-    audio.systemAudioPerceivedLevel = level;
-    notifyListeners();
-  }
 
-  void _setLevelFromAudioPolicy() {
-    level = audio.systemAudioMuted
-        ? 0.0
-        : audio.systemAudioPerceivedLevel;
+    audio.systemAudioPerceivedLevel = level;
+    if (level > 0.0) {
+      audio.systemAudioMuted = false;
+    }
+
+    notifyListeners();
   }
 }

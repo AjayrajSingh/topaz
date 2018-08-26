@@ -226,6 +226,7 @@ class _QuickSettingsState extends State<QuickSettings> {
               max: 1.0,
               activeColor: _kActiveSliderColor,
               thumbImage: const AssetImage(_kVolumeUpGrey600),
+              divisions: 60,
               onChanged: (double value) {
                 model.level = value;
               },

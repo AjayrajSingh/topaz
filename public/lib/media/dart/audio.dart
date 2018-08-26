@@ -114,8 +114,7 @@ class Audio {
   double get systemAudioPerceivedLevel => _systemAudioPerceivedLevel;
 
   /// Sets the perceived system-wide audio level in the range [0,1]. When this
-  /// property is set to 0.0, |systemAudioGainDb| is set to -160db and
-  /// |systemAudioMuted| is implicitly set to true.
+  /// property is set to 0.0, |systemAudioGainDb| is set to -160db.
   set systemAudioPerceivedLevel(double value) {
     _systemAudioPerceivedLevel = value.clamp(0.0, 1.0);
     _systemAudioGainDb = levelToGain(_systemAudioPerceivedLevel);
