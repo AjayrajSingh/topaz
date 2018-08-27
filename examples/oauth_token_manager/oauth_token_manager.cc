@@ -1413,6 +1413,13 @@ class OAuthTokenManagerApp::GoogleProfileAttributesCall
       return false;
     }
 
+    if (attributes.HasMember("id")) {
+      account_->profile_id = attributes["id"].GetString();
+    }
+    if (account_->profile_id.is_null()) {
+      account_->profile_id = "";
+    }
+
     if (attributes.HasMember("displayName")) {
       account_->display_name = attributes["displayName"].GetString();
     }
@@ -1504,6 +1511,7 @@ void OAuthTokenManagerApp::AddAccount(
   auto account = fuchsia::modular::auth::Account::New();
   account->id = GenerateAccountId();
   account->identity_provider = identity_provider;
+  account->profile_id = "";
   account->display_name = "";
   account->url = "";
   account->image_url = "";
