@@ -4,6 +4,7 @@
 
 #include "vsync_waiter.h"
 
+#include "flutter/fml/trace_event.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "vsync_recorder.h"
 
@@ -62,6 +63,7 @@ void VsyncWaiter::AwaitVSync() {
 }
 
 void VsyncWaiter::FireCallbackWhenSessionAvailable() {
+  TRACE_EVENT0("flutter", "VsyncWaiter::FireCallbackWhenSessionAvailable");
   FML_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
   if (session_wait_.Begin(
           deprecated_loop::MessageLoop::GetCurrent()->dispatcher()) != ZX_OK) {
