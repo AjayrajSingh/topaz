@@ -33,6 +33,8 @@ void reportError(Error error) {
         return 'Page should be reachable';
       case ErrorType.obsoleteProject:
         return 'Project is obsolete';
+      case ErrorType.invalidUri:
+        return 'Invalid URI';
       default:
         throw new UnsupportedError('Unknown error type $type');
     }
@@ -49,6 +51,7 @@ enum ErrorType {
   brokenLink,
   unreachablePage,
   obsoleteProject,
+  invalidUri,
 }
 
 class Error {
@@ -105,7 +108,8 @@ Future<Null> main(List<String> args) async {
   final List<String> docs = new Directory(docsDir)
       .listSync(recursive: true)
       .where((FileSystemEntity entity) => path.extension(entity.path) == '.md')
-      .map((FileSystemEntity entity) => entity.path);
+      .map((FileSystemEntity entity) => entity.path)
+      .toList();
 
   final String readme = path.join(docsDir, 'README.md');
   final Graph graph = new Graph();
@@ -120,7 +124,13 @@ Future<Null> main(List<String> args) async {
       graph.root = node;
     }
     for (String link in new LinkScraper().scrape(doc)) {
-      final Uri uri = Uri.parse(link);
+      Uri uri;
+      try {
+        uri = Uri.parse(link);
+      } on FormatException {
+        errors.add(new Error(ErrorType.invalidUri, label, link));
+        continue;
+      }
       if (uri.hasScheme) {
         if (uri.scheme == 'http' || uri.scheme == 'https') {
           bool shouldTestLink = true;
