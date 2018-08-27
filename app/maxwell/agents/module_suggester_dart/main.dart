@@ -676,7 +676,7 @@ Future<Proposal> _createProposal({
       intent: intentBuilder.intent,
       moduleName: 'root',
       surfaceParentModulePath: [],
-      surfaceRelation: null,
+      surfaceRelation: const SurfaceRelation(),
     )));
 
   return proposalBuilder.build();

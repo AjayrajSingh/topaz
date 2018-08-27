@@ -374,7 +374,7 @@ class _QueryHandlerImpl extends QueryHandler {
                             ..addParameter(null, proposal['module_data']))
                           .intent,
                   moduleName: 'root',
-                  surfaceRelation: null,
+                  surfaceRelation: const SurfaceRelation(),
                   surfaceParentModulePath: [],
                 ),
               ))
