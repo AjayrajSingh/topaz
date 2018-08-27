@@ -1,0 +1,8 @@
+{
+    "imports": [
+        "garnet/packages/benchmarks/buildbot"
+    ],
+    "packages": [
+        "//topaz/tests/benchmarks:topaz_benchmarks"
+    ]
+}

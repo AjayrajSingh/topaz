@@ -1,5 +1,6 @@
 {
     "imports": [
+        "topaz/packages/benchmarks/all",
         "topaz/packages/examples/all",
         "topaz/packages/prod/all",
         "topaz/packages/sdk/all",
