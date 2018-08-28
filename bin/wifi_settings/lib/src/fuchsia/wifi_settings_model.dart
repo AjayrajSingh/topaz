@@ -3,13 +3,11 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:math';
 
 import 'package:fidl_fuchsia_netstack/fidl.dart' as net;
 import 'package:fidl_fuchsia_wlan_service/fidl.dart' as wlan;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:keyboard/keyboard.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.settings/debug.dart';
 import 'package:lib.widgets/model.dart';
@@ -36,8 +34,6 @@ class WifiSettingsModel extends Model {
   /// we show the loading screen.
   bool _loading;
   bool _connecting;
-
-  _PasswordTextController _passwordTextController;
 
   /// Whether or not there are any wireless adapters available on the system
   /// right now.
@@ -75,13 +71,6 @@ class WifiSettingsModel extends Model {
     _scanTimer = Timer.periodic(_scanPeriod, (_) => _scan());
 
     showDebugInfo.addListener(notifyListeners);
-  }
-
-  /// The controller for the password text box.
-  _PasswordTextController get passwordTextController {
-    return _passwordTextController ??= _PasswordTextController(onGo: () {
-      onPasswordEntered(passwordTextController.text);
-    });
   }
 
   /// The current list of available access points.
@@ -195,13 +184,11 @@ class WifiSettingsModel extends Model {
   void onPasswordCanceled() {
     _selectedAccessPoint = null;
     notifyListeners();
-    passwordTextController.clear();
   }
 
   /// Called when the password for a secure network has been set.
   void onPasswordEntered(String password) {
     _connect(_selectedAccessPoint, password);
-    passwordTextController.clear();
   }
 
   void _connect(AccessPoint accessPoint, [String password]) {
@@ -319,38 +306,5 @@ class _WifiDebugInfo extends DebugStatus {
   void interfaceUpdate(List<net.NetInterface> interfaces) {
     timestamp('[interface] updated');
     write('[interace] list', interfaces.toString());
-  }
-}
-
-class _PasswordTextController extends TextEditingController {
-  /// Called when enter/go is pressed on the keyboard.
-  final VoidCallback onGo;
-
-  _PasswordTextController({this.onGo});
-
-  Widget getKeyboard() =>
-      Keyboard(onDelete: _onDelete, onGo: onGo, onText: _onText);
-
-  /// Called when backspace is pressed on the keyboard.
-  void _onDelete() {
-    final int newSelectionIndex = max(selection.start - 1, 0);
-    _setNewText(
-        text.substring(0, newSelectionIndex) + selection.textAfter(text),
-        newSelectionIndex);
-  }
-
-  /// Called when a key is pressed on the keyboard.
-  void _onText(String text) {
-    final String newText =
-        selection.textBefore(this.text) + text + selection.textAfter(this.text);
-    _setNewText(newText, min(selection.start + 1, newText.length));
-  }
-
-  /// Sets the text of the controller as well as the new cursor location.
-  void _setNewText(String text, int newSelectionIndex) {
-    value = TextEditingValue(
-      text: text,
-      selection: TextSelection.collapsed(offset: newSelectionIndex),
-    );
   }
 }

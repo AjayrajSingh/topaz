@@ -7,7 +7,6 @@ import 'package:flutter/widgets.dart';
 import 'package:lib.settings/debug.dart';
 import 'package:lib.settings/widgets.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:lib_setui_common/mode.dart';
 
 import 'fuchsia/access_point.dart';
 import 'fuchsia/wifi_settings_model.dart';
@@ -62,14 +61,9 @@ class WlanManager extends StatelessWidget {
       widget = _buildCurrentNetwork(model, scale);
     } else if ((model.selectedAccessPoint?.isSecure ?? false) &&
         !model.connecting) {
-      final isDebug = SetUiMode().mode == Mode.debug;
-
       widget = Stack(children: [
         _buildAvailableNetworks(model, scale),
-        Column(children: [
-          Expanded(child: _buildPasswordBox(model, scale)),
-          isDebug ? model.passwordTextController.getKeyboard() : Offstage(),
-        ]),
+        _buildPasswordBox(model, scale),
       ]);
     } else {
       widget = _buildAvailableNetworks(model, scale);
@@ -186,7 +180,6 @@ class WlanManager extends StatelessWidget {
                         autofocus: true,
                         style: _textStyle(scale),
                         onSubmitted: model.onPasswordEntered,
-                        controller: model.passwordTextController,
                       ),
                     ),
                   ),
