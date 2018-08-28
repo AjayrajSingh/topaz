@@ -14,6 +14,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.entity.dart/entity.dart';
+import 'package:lib.intent_handler.dart/intent_handler.dart';
 import 'package:lib.lifecycle.dart/lifecycle.dart';
 import 'package:lib.module.dart/module.dart';
 import 'package:lib.schemas.dart/entity_codec.dart';
@@ -89,6 +90,7 @@ class ModuleDriver {
   final DateTime _initializationTime;
   final Set<String> _firstObservationSent = new Set<String>();
   LifecycleHost _lifecycle;
+  IntentHandlerImpl _intentHandler;
   String _packageName = 'modulePackageNameNotYetSet';
 
   /// Shadow async completion of [start].
@@ -129,6 +131,7 @@ class ModuleDriver {
     _lifecycle = new LifecycleHost(
       onTerminate: _handleTerminate,
     );
+    _intentHandler = IntentHandlerImpl(onHandleIntent: _handleIntent);
 
     // Connect to Cobalt
     EncoderFactoryProxy encoderFactory = new EncoderFactoryProxy();
@@ -194,6 +197,7 @@ class ModuleDriver {
 
     try {
       await _lifecycle.addService(startupContext: _startupContext);
+      _intentHandler.addService(startupContext: _startupContext);
     } on Exception catch (err, stackTrace) {
       _start.completeError(err, stackTrace);
       return _start.future;
@@ -348,6 +352,10 @@ class ModuleDriver {
       log.warning('failed to close all service connections');
       throw err;
     });
+  }
+
+  void _handleIntent(Intent intent) {
+    log.info('Received intent from framework');
   }
 
   /// Watch for Entity updates from Link with the name [key] and automatically

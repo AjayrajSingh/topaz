@@ -22,6 +22,7 @@ dart_library("dart") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
     "//topaz/public/lib/entity/dart",
+    "//topaz/public/lib/intent_handler/dart",
     "//topaz/public/lib/lifecycle/dart",
     "//topaz/public/lib/module/dart",
     "//topaz/public/lib/module_resolver/dart",
