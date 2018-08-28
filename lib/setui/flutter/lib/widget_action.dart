@@ -22,8 +22,18 @@ class WidgetAction extends Action<WidgetBlueprint>
 
   @override
   void launch() {
-    _client = blueprint.createClient(this)..setState(State.started);
-    blueprint.model.setCurrentAction(this);
+    _client = blueprint.createClient(this);
+    // We must separate these two calls rather than cascading as setState can
+    // reference back to _client, which is not set until the cascading is
+    // complete.
+    // ignore: cascade_invocations
+    _client.setState(State.started);
+
+    // It's possible the client changed the state after started. Check state
+    // before proceeding
+    if (_client.state == State.started) {
+      blueprint.model.setCurrentAction(this);
+    }
   }
 
   String get title => _client.title;

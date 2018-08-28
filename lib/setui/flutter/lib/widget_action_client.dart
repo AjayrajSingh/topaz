@@ -9,6 +9,8 @@ enum State { started, finished }
 
 /// Base definition for a widget-based action.
 abstract class WidgetActionClient {
+  State _state;
+
   /// The result helper to use for relaying results back
   final ActionResultSender actionResultSender;
 
@@ -20,6 +22,11 @@ abstract class WidgetActionClient {
   /// Invoked to generate the root view.
   Widget build();
 
+  State get state => _state;
+
+  // ignore: use_setters_to_change_properties
   /// Sets the [State].
-  void setState(State state) {}
+  void setState(State state) {
+    _state = state;
+  }
 }

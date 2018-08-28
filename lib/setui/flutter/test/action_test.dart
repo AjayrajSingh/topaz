@@ -4,6 +4,7 @@
 
 import 'package:lib_setui_common/action.dart';
 import 'package:lib_setui_common/step.dart';
+import 'package:lib_setui_flutter/widget_action.dart';
 import 'package:lib_setui_flutter/widget_action_client.dart';
 import 'package:lib_setui_flutter/widget_action_host.dart';
 import 'package:lib_setui_flutter/widget_blueprint.dart';
@@ -40,6 +41,10 @@ void main() {
       actionResultSender = sender;
       return client;
     });
+
+    // Reply back with start when asked about state.
+    when(client.state).thenReturn(State.started);
+
     blueprint.assemble(step, resultReceiver).launch();
 
     // Ensure start was called
@@ -61,5 +66,28 @@ void main() {
   test('test_host', () {
     // Ensures that the action host returns a widget even without state.
     expect(null != WidgetActionHost().getWidget(MockStateModel()), true);
+  });
+
+  // Verifies that a client can finish (by sending result) when starting.
+  test('test_finish_during_start', () {
+    final MockWidgetActionClient client = MockWidgetActionClient();
+    final MockStateModel stateModel = MockStateModel();
+    final ActionResultReceiver resultReceiver = MockActionResultReceiver();
+
+    ActionResultSender actionResultSender;
+
+    when(client.setState(State.started))
+        .thenAnswer((state) => actionResultSender.sendResult(null));
+
+    final WidgetBlueprint blueprint =
+        WidgetBlueprint('testActionName', 'testBlueprint', stateModel,
+            (ActionResultSender sender) {
+      actionResultSender = sender;
+      return client;
+    });
+
+    WidgetAction(null, resultReceiver, blueprint).launch();
+
+    verify(client.setState(State.finished));
   });
 }
