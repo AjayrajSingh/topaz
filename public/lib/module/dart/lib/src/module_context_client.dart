@@ -59,6 +59,7 @@ class ModuleContextClient {
   ComponentContextClient _componentContext;
   final IntelligenceServicesProxy _intelligenceServices =
       new IntelligenceServicesProxy();
+  final OngoingActivityProxy _ongoingActivityProxy = new OngoingActivityProxy();
 
   /// The underlying [Proxy] used to send client requests to the
   /// [fidl.ModuleContext] service.
@@ -399,6 +400,25 @@ class ModuleContextClient {
     } on Exception catch (err, stackTrace) {
       completer.completeError(err, stackTrace);
     }
+    return completer.future;
+  }
+
+  /// See [fidl.ModuleContext#StartOngoingActivity].
+  Future<OngoingActivityProxy> startOngoingActivity(
+      OngoingActivityType type) async {
+    await bound;
+    Completer<OngoingActivityProxy> completer =
+        new Completer<OngoingActivityProxy>();
+
+    try {
+      if (!_ongoingActivityProxy.ctrl.isBound) {
+        proxy.startOngoingActivity(type, _ongoingActivityProxy.ctrl.request());
+      }
+      completer.complete(_ongoingActivityProxy);
+    } on Exception catch (err, stackTrace) {
+      completer.completeError(err, stackTrace);
+    }
+
     return completer.future;
   }
 
