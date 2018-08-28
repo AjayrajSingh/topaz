@@ -344,6 +344,28 @@ void Engine::OnMainIsolateStart() {
   }
   FML_DLOG(INFO) << "Main isolate for engine '" << thread_label_
                  << "' was started.";
+
+  const intptr_t kCompilationTraceDelayInSeconds = 0;
+  if (kCompilationTraceDelayInSeconds != 0) {
+    Dart_Isolate isolate = Dart_CurrentIsolate();
+    FML_CHECK(isolate);
+    shell_->GetTaskRunners().GetUITaskRunner()->PostDelayedTask(
+      [engine = shell_->GetEngine(), isolate]() {
+          if (!engine) {
+            return;
+          }
+          Dart_EnterIsolate(isolate);
+          Dart_EnterScope();
+          uint8_t* log = nullptr;
+          intptr_t log_length = 0;
+          Dart_Handle result = Dart_SaveCompilationTrace(&log, &log_length);
+          tonic::LogIfError(result);
+          FML_LOG(ERROR) << log;
+          Dart_ExitScope();
+          Dart_ExitIsolate();
+        },
+        fml::TimeDelta::FromSeconds(kCompilationTraceDelayInSeconds));
+  }
 }
 
 void Engine::OnMainIsolateShutdown() {
