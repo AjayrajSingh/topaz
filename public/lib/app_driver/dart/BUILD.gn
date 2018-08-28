@@ -21,6 +21,7 @@ dart_library("dart") {
     "module_driver.dart",
     "src/module_driver.dart",
     "src/service_client.dart",
+    "src/intent_parameters.dart",
   ]
 
   deps = [

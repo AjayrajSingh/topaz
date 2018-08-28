@@ -12,6 +12,7 @@ import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
+import 'package:lib.app_driver.dart/intent_parameters.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.entity.dart/entity.dart';
 import 'package:lib.intent_handler.dart/intent_handler.dart';
@@ -29,6 +30,8 @@ import 'service_client.dart';
 export 'package:lib.component.dart/component.dart'
     show MessageQueueError, MessageSenderError;
 export 'package:fidl_fuchsia_modular/fidl.dart' show Intent;
+export 'package:lib.app_driver.dart/intent_parameters.dart'
+    show IntentParameters;
 export 'package:lib.module_resolver.dart/intent_builder.dart'
     show IntentBuilder;
 export 'package:lib.module.dart/module.dart'
@@ -45,6 +48,9 @@ typedef OnTerminate = void Function();
 
 /// Function to run when the module terminates asynchronously
 typedef OnTerminateAsync = Future<Null> Function();
+
+typedef OnHandleIntent = void Function(
+    String action, IntentParameters parameters);
 
 const int _kCobaltProjectId = 104;
 const int _kFirstLinkDataMetricId = 1;
@@ -77,6 +83,15 @@ class ModuleDriver {
   /// successfully. If access to more links is required use
   /// [moduleContext#getLink()].
   final LinkClient link = new LinkClient();
+
+  /// Called when a new intent is received from the framework. When set the
+  /// module driver will call [onHandleIntent] with the latest intent
+  /// received, if such an intent is available.
+  OnHandleIntent _onHandleIntent;
+
+  /// Stores the latest intent received from the framework so it can be passed to
+  /// [onHandleIntent] when it is set.
+  Intent _intent;
 
   /// The [ModuleContextClient] for this module. Async results for method calls
   /// will resolve once the Module has been initialized successfully.
@@ -168,6 +183,12 @@ class ModuleDriver {
     // Observe time to default link
     // TODO(meiyili): remove once default link is deprecated
     link.watch().listen((String data) => _observeLinkData('default', data));
+  }
+
+  /// Sets the intent handler.
+  set onHandleIntent(OnHandleIntent onHandleIntent) {
+    _onHandleIntent = onHandleIntent;
+    _handleIntent(_intent);
   }
 
   String _moduleName;
@@ -367,6 +388,11 @@ class ModuleDriver {
 
   void _handleIntent(Intent intent) {
     log.info('Received intent from framework');
+    _intent = intent;
+    if (_onHandleIntent != null && intent != null) {
+      _onHandleIntent(intent.action,
+          IntentParameters(moduleDriver: this, parameters: intent.parameters));
+    }
   }
 
   /// Watch for Entity updates from Link with the name [key] and automatically
