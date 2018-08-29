@@ -34,8 +34,6 @@ enum Metric {
   moduleLaunched,
   modulePairsInStory,
 }
-const int _cobaltForculusEncodingID = 1;
-const int _cobaltNoOpEncodingID = 2;
 const String _existingModuleKey = 'existing_module';
 const String _addedModuleKey = 'added_module';
 
@@ -44,7 +42,8 @@ final ContextReaderProxy _contextReader = new ContextReaderProxy();
 ContextListenerImpl _contextListener;
 
 // connection to Cobalt
-final EncoderProxy _encoder = new EncoderProxy();
+final LoggerProxy _logger = new LoggerProxy();
+final LoggerExtProxy _loggerExt = new LoggerExtProxy();
 
 // Deduplication Map
 final Map<String, LinkedHashSet<String>> _storyModules =
@@ -75,46 +74,53 @@ void _onContextUpdate(ContextUpdate update) {
       if (_storyModules[storyId].contains(modUrl)) {
         return;
       }
-      _addStringObservation(Metric.moduleLaunched, value.meta.mod.url);
+      _logStringEvent(Metric.moduleLaunched, value.meta.mod.url);
       for (String existingMod in _storyModules[storyId]) {
-        _addModulePairObservation(existingMod, modUrl);
+        _logModulePairEvent(existingMod, modUrl);
       }
       _storyModules[storyId].add(modUrl);
     }
   }
 }
 
-void _addStringObservation(Metric metric, String metricString) {
+void _logStringEvent(Metric metric, String metricString) {
   int metricId = _getCobaltMetricID(metric);
-  _encoder.addStringObservation(metricId, _cobaltForculusEncodingID,
-      metricString, (Status s) => _onAddObservationStatus(metricId, s));
+  _logger.logString(
+      metricId, metricString, (Status2 s) => _onLogEventStatus(metricId, s));
 }
 
-void _addModulePairObservation(String existingMod, String newMod) {
+void _logModulePairEvent(String existingMod, String newMod) {
   int metricId = _getCobaltMetricID(Metric.modulePairsInStory);
-  _encoder.addMultipartObservation(
+  _loggerExt.logCustomEvent(
       metricId,
-      <ObservationValue>[
-        _getStringObservationValue(_existingModuleKey, existingMod),
-        _getStringObservationValue(_addedModuleKey, newMod)
+      <CustomEventValue>[
+        _getStringEventValue(_existingModuleKey, existingMod),
+        _getStringEventValue(_addedModuleKey, newMod)
       ],
-      (Status s) => _onAddObservationStatus(metricId, s));
+      (Status2 s) => _onLogEventStatus(metricId, s));
 }
 
-ObservationValue _getStringObservationValue(String name, String value) {
-  return new ObservationValue(
-      name: name,
-      value: new Value.withStringValue(value),
-      encodingId: _cobaltNoOpEncodingID);
+CustomEventValue _getStringEventValue(String name, String value) {
+  return new CustomEventValue(
+      dimensionName: name, value: new Value.withStringValue(value));
 }
 
-void _onAddObservationStatus(int metricId, Status status) {
-  // If adding an observation fails, we simply drop it and do not retry.
+void _onLogEventStatus(int metricId, Status2 status) {
+  // If logging an event fails, we simply drop it and do not retry.
   // TODO(jwnichols): Perhaps we should do something smarter if we fail
-  if (status != Status.ok) {
-    print('[USAGE LOG] Failed to add Cobalt observation: $status. '
+  if (status != Status2.ok) {
+    print('[USAGE LOG] Failed to log Cobalt event: $status. '
         'Metric ID: $metricId');
   }
+}
+
+ProjectProfile2 _loadCobaltConfig() {
+  SizedVmo configVmo = SizedVmo.fromFile(_cobaltConfigBinProtoPath);
+  ProjectProfile2 profile = ProjectProfile2(
+      config: Buffer(vmo: configVmo, size: configVmo.size),
+      releaseStage: ReleaseStage.ga);
+
+  return profile;
 }
 
 void main(List<String> args) {
@@ -134,21 +140,26 @@ void main(List<String> args) {
   _contextReader.subscribe(query, _contextListener.getHandle());
 
   // Connect to Cobalt
-  final EncoderFactoryProxy encoderFactory = new EncoderFactoryProxy();
-  connectToService(context.environmentServices, encoderFactory.ctrl);
-  assert(encoderFactory.ctrl.isBound);
+  final LoggerFactoryProxy loggerFactory = new LoggerFactoryProxy();
+  connectToService(context.environmentServices, loggerFactory.ctrl);
+  assert(loggerFactory.ctrl.isBound);
 
-  // Get an encoder
-  SizedVmo configVmo = SizedVmo.fromFile(_cobaltConfigBinProtoPath);
-  ProjectProfile profile =
-      ProjectProfile(config: Buffer(vmo: configVmo, size: configVmo.size));
-  encoderFactory.getEncoderForProject(profile, _encoder.ctrl.request(),
-      (Status s) {
-    if (s != Status.ok) {
-      print('[USAGE LOG] Failed to obtain Encoder. Cobalt config is invalid.');
+  // Get the loggers
+  loggerFactory.createLogger(_loadCobaltConfig(), _logger.ctrl.request(),
+      (Status2 s) {
+    if (s != Status2.ok) {
+      print('[USAGE LOG] Failed to obtain Logger. Cobalt config is invalid.');
+    } else {
+      loggerFactory.createLoggerExt(
+          _loadCobaltConfig(), _loggerExt.ctrl.request(), (Status2 s) {
+        if (s != Status2.ok) {
+          print(
+              '[USAGE LOG] Failed to obtain LoggerExt. Cobalt config is invalid.');
+        }
+      });
     }
   });
 
   context.close();
-  encoderFactory.ctrl.close();
+  loggerFactory.ctrl.close();
 }
