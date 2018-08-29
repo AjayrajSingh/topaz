@@ -2,14 +2,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fidl_fuchsia_modular/fidl.dart';
+
 /// Inherent properties of a surface
 class SurfaceProperties {
   /// Const constructor
-  SurfaceProperties({this.containerLabel});
+  SurfaceProperties({this.containerLabel, this.source});
 
   SurfaceProperties.fromJson(Map<String, dynamic> json) {
     containerLabel = json['containerLabel'];
     containerMembership = json['containerMembership'];
+    source = json['source'];
   }
 
   /// Belongs to a container with label containerLabel
@@ -22,8 +25,14 @@ class SurfaceProperties {
   /// will be laid out.
   List<String> containerMembership;
 
+  /// Was the module producing this surface launched from inside the current
+  /// story - e.g. by a parent module in the story, or externally e.g. via a
+  /// suggestion
+  ModuleSource source;
+
   Map<String, dynamic> toJson() => {
         'containerLabel': containerLabel,
         'containerMembership': containerMembership,
+        'source': source,
       };
 }

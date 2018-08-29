@@ -55,6 +55,8 @@ dart_test("mondrian_story_shell_tests") {
     "../test/layout/pattern_layout_test.dart",
     "../test/layout/surface_relationship_test.dart",
     "../test/layout_test_utils.dart",
+    "../test/model/surface/surface_graph_test.dart",
+    "../test/model/surface/surface_test.dart",
     "../test/tree_test.dart",
   ]
 

@@ -17,13 +17,15 @@ import 'surface_properties.dart';
 
 // Data structure to manage the relationships and relative focus of surfaces
 class SurfaceGraph extends Model {
-  SurfaceGraph();
+  SurfaceGraph() {
+    setupLogger(name: 'Mondrian');
+  }
 
   SurfaceGraph.fromJson(Map<String, dynamic> json) {
-    dynamic decodedSurfaceList = json['surfaceList'];
-    List<dynamic> surfaceList = decodedSurfaceList.cast<List>();
+    List<dynamic> decodedSurfaceList = json['surfaceList'];
     // for the first item we want to attach it to _tree
-    for (dynamic item in surfaceList) {
+    for (dynamic s in decodedSurfaceList) {
+      Map<String, dynamic> item = s.cast<String, dynamic>();
       Surface surface = new Surface.fromJson(item, this);
       _surfaces[surface.node.value] = surface;
     }
@@ -54,6 +56,13 @@ class SurfaceGraph extends Model {
 
   /// The stack of previous focusedSurfaces, most focused at end
   final Set<String> _dismissedSurfaces = new Set<String>();
+
+  /// A mapping between surfaces that were brought in as ModuleSource::External
+  /// surfaces (e.g. suggestions) and surfaces that were visually present at
+  /// their introduction, in order to track where to provide a shell affordance
+  /// for resummoning external surfaces that have been dismissed
+  /// (surfaces are identified by ID)
+  final Map<String, String> _visualAssociation = <String, String>{};
 
   /// The node corresponding to the given id.
   Surface getNode(String id) => _surfaces[id];
@@ -90,6 +99,11 @@ class SurfaceGraph extends Model {
     Surface updatedSurface =
         new Surface(this, node, properties, relation, pattern);
     _surfaces[id] = updatedSurface;
+    // if this is an external surface, create an association between this and
+    // the most focused surface.
+    if (properties.source == ModuleSource.external$) {
+      _visualAssociation[_focusedSurfaces.last] = id;
+    }
     oldSurface?.notifyListeners();
     notifyListeners();
     return updatedSurface;
@@ -256,6 +270,26 @@ class SurfaceGraph extends Model {
         )
         ..notifyListeners();
     }
+  }
+
+  // Get the SurfaceIds of associated external surfaces
+  // (surfaces originating from outside the current story)
+  // that are dismissed and associated with the current Surface
+  Set<String> externalSurfaces({String surfaceId}) {
+    // Case1: An external child has a relationship with this surface
+    // and the child has been dismissed
+    Surface parent = getNode(surfaceId);
+    List<Surface> externalSurfaces = parent.children.toList()
+      ..retainWhere(
+          (Surface s) => s.properties.source == ModuleSource.external$);
+    Set<String> externalIds =
+        externalSurfaces.map((Surface s) => s.node.value).toSet();
+    // Case2: The focused surface has a recorded visual association with an
+    // external surface
+    if (_visualAssociation[surfaceId].isNotEmpty) {
+      externalIds.add(_visualAssociation[surfaceId]);
+    }
+    return externalIds;
   }
 
   /// Returns the amount of [Surface]s in the graph

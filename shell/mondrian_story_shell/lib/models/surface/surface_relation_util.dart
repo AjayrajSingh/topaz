@@ -7,7 +7,6 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 // Contains methods for converting between SurfaceRelation and strings.
 class SurfaceRelationUtil {
   static Map<String, String> toMap(SurfaceRelation relation) {
-    print('encoding surfaceRelation $relation');
     String dependency = relation.dependency.toString();
     String arrangement = relation.arrangement.toString();
     double emphasis = relation.emphasis;

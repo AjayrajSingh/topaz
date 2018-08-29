@@ -4,20 +4,21 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mondrian/models/layout_model.dart';
 import 'package:mondrian/layout/pattern_layout.dart' as pattern_layout;
 import 'package:mondrian/models/surface/positioned_surface.dart';
 import 'package:mondrian/models/surface/surface.dart';
-
 import '../layout_test_utils.dart' as test_util;
 
 class MockSurface extends Mock implements Surface {}
 
 void main() {
+  // pattern layout logs warnings
+  setupLogger(name: 'mondrain_story_shell_tests');
   Surface firstSurface = new MockSurface();
   LayoutModel layoutModel = new LayoutModel();
-
   test('Ticker pattern with 2 surfaces', () {
     Surface patternSurface = new MockSurface();
     when(patternSurface.compositionPattern).thenReturn('ticker');

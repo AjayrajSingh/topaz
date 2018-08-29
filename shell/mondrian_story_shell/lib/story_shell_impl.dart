@@ -15,7 +15,6 @@ import 'package:lib.widgets/utils.dart';
 import 'models/surface/surface_graph.dart';
 import 'models/surface/surface_properties.dart';
 
-
 /// An implementation of the [StoryShell] interface.
 class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   final StoryShellBinding _storyShellBinding = new StoryShellBinding();
@@ -62,14 +61,14 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
     String parentId,
     SurfaceRelation surfaceRelation,
     ModuleManifest manifest,
-    ModuleSource source, // TODO(djmurphy): use this.
+    ModuleSource source,
   ) {
     trace('connecting view $viewId with parent $parentId');
     log.fine('Connecting view $viewId with parent $parentId');
     surfaceGraph
       ..addSurface(
         viewId,
-        new SurfaceProperties(),
+        new SurfaceProperties(source: source),
         parentId,
         surfaceRelation ?? const SurfaceRelation(),
         manifest != null ? manifest.compositionPattern : '',

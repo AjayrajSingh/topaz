@@ -14,7 +14,7 @@ import 'package:mondrian/models/surface/surface_graph.dart';
 import 'package:mondrian/models/surface/surface_properties.dart';
 // import 'package:mondrian/models/tree.dart';
 
-class MockInterfaceHandle extends Mock implements InterfaceHandle {}
+class MockInterfaceHandle extends Mock implements InterfaceHandle<ViewOwner> {}
 
 void main() {
   test('toJson and back again with a single surface', () {
@@ -175,5 +175,25 @@ void main() {
     expect(thirdSurface.relation.dependency, SurfaceDependency.dependent);
     expect(thirdSurface.relation.emphasis, 0.0);
     expect(thirdSurface.properties.containerLabel, 'containerLabel');
+  });
+
+  test('external surfaces are found by resummon dismissed checks', () {
+    SurfaceGraph graph = new SurfaceGraph();
+    SurfaceProperties externalProp =
+        new SurfaceProperties(source: ModuleSource.external$);
+    graph
+      ..addSurface(
+          'parent', new SurfaceProperties(), '', new SurfaceRelation(), null)
+      ..connectView('parent', new MockInterfaceHandle())
+      ..focusSurface('parent', null)
+      // Now add external surface
+      ..addSurface(
+          'external', externalProp, 'parent', new SurfaceRelation(), null)
+      ..connectView('external', new MockInterfaceHandle())
+      ..focusSurface('external', null)
+      // Now dismiss the external surface
+      ..dismissSurface('external');
+    // expect that there is a dismissed external associated with the parent
+    expect(graph.externalSurfaces(surfaceId: 'parent'), ['external']);
   });
 }
