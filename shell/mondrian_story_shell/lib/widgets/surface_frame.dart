@@ -54,8 +54,14 @@ class SurfaceFrame extends StatelessWidget {
             Widget child,
             DepthModel depthModel,
           ) {
+            // Note: Currently if you set an elevation of 0.0 scenic will
+            // merge this node with other nodes around it at the same elevation.
+            // This causes black to be painted when we are displaying a
+            // ChildView that hasn't painted yet.  We work around this issue by
+            // always setting the elevation to something more than 0.0.  This
+            // will allow 'nothing' to be painted until the child view is ready.
             double elevation = lerpDouble(
-              0.0,
+              0.01,
               _surfaceDepth,
               (depthModel.maxDepth - depth) / 2.0,
             ).clamp(0.0, _surfaceDepth);
