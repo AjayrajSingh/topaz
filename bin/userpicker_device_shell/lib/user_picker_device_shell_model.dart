@@ -61,9 +61,9 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
     this.onDeviceShellStopped,
     this.onWifiTapped,
     this.onLogin,
-    cobalt.Encoder encoder,
+    cobalt.Logger logger,
     this.onSetup,
-  }) : super(encoder);
+  }) : super(logger);
 
   @override
   void onStop() {
@@ -121,7 +121,7 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
           login(null);
           hideUserActions();
         },
-        userPresent:accounts.isNotEmpty);
+        userPresent: accounts.isNotEmpty);
   }
 
   /// Login with given user

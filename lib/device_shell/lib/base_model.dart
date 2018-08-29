@@ -36,7 +36,6 @@ const int _kKeyCodeS = 115;
 const int _kKeyCodeSpacebar = 32;
 const int _kKeyModifierLeftCtrl = 8;
 const int _kKeyModifierRightAlt = 64;
-const int _kNoOpEncodingId = 1;
 const int _kUserShellLoginTimeMetricId = 14;
 
 /// Provides common features needed by all device shells.
@@ -57,8 +56,8 @@ class BaseDeviceShellModel extends DeviceShellModel
 
   NetstackModel _netstackModel;
 
-  /// Encodes metrics into cobalt.
-  final cobalt.Encoder encoder;
+  /// Logs metrics to cobalt.
+  final cobalt.Logger logger;
 
   /// A list of accounts that are already logged in on the device.
   ///
@@ -87,7 +86,7 @@ class BaseDeviceShellModel extends DeviceShellModel
       <PresentationBinding>[];
 
   /// Constructor
-  BaseDeviceShellModel(this.encoder) : super();
+  BaseDeviceShellModel(this.logger) : super();
 
   List<Account> get accounts => _accounts;
 
@@ -190,14 +189,15 @@ class BaseDeviceShellModel extends DeviceShellModel
     }
 
     trace('logging in $accountId');
-    encoder.startTimer(
+    logger.startTimer(
       _kUserShellLoginTimeMetricId,
-      _kNoOpEncodingId,
+      0,
+      '',
       'user_shell_login_timer_id',
       DateTime.now().millisecondsSinceEpoch,
       _kCobaltTimerTimeout.inSeconds,
-      (cobalt.Status status) {
-        if (status != cobalt.Status.ok) {
+      (cobalt.Status2 status) {
+        if (status != cobalt.Status2.ok) {
           log.warning(
             'Failed to start timer metric '
                 '$_kUserShellLoginTimeMetricId: $status. ',
@@ -337,12 +337,12 @@ class BaseDeviceShellModel extends DeviceShellModel
     _userManager = DeviceShellUserManager(userProvider, _userShellChooser);
 
     _userManager.onLogout.listen((_) {
-      encoder.endTimer(
+      logger.endTimer(
         'user_shell_log_out_timer_id',
         DateTime.now().millisecondsSinceEpoch,
         _kCobaltTimerTimeout.inSeconds,
-        (cobalt.Status status) {
-          if (status != cobalt.Status.ok) {
+        (cobalt.Status2 status) {
+          if (status != cobalt.Status2.ok) {
             log.warning(
               'Failed to end timer metric '
                   'user_shell_log_out_timer_id: $status. ',

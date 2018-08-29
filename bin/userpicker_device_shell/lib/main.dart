@@ -35,21 +35,22 @@ void main() {
   StartupContext startupContext = new StartupContext.fromStartupInfo();
 
   // Connect to Cobalt
-  cobalt.EncoderProxy encoder = new cobalt.EncoderProxy();
+  cobalt.LoggerProxy logger = new cobalt.LoggerProxy();
 
-  cobalt.EncoderFactoryProxy encoderFactory = new cobalt.EncoderFactoryProxy();
-  connectToService(startupContext.environmentServices, encoderFactory.ctrl);
+  cobalt.LoggerFactoryProxy loggerFactory = new cobalt.LoggerFactoryProxy();
+  connectToService(startupContext.environmentServices, loggerFactory.ctrl);
 
   SizedVmo configVmo = SizedVmo.fromFile(_kCobaltConfigBinProtoPath);
-  cobalt.ProjectProfile profile = cobalt.ProjectProfile(
-      config: Buffer(vmo: configVmo, size: configVmo.size));
-  encoderFactory.getEncoderForProject(profile, encoder.ctrl.request(),
-      (cobalt.Status s) {
-    if (s != cobalt.Status.ok) {
-      print('Failed to obtain Encoder. Cobalt config is invalid.');
+  cobalt.ProjectProfile2 profile = cobalt.ProjectProfile2(
+      config: Buffer(vmo: configVmo, size: configVmo.size),
+      releaseStage: cobalt.ReleaseStage.ga);
+  loggerFactory.createLogger(profile, logger.ctrl.request(),
+      (cobalt.Status2 s) {
+    if (s != cobalt.Status2.ok) {
+      print('Failed to obtain Logger. Cobalt config is invalid.');
     }
   });
-  encoderFactory.ctrl.close();
+  loggerFactory.ctrl.close();
 
   NetstackProxy netstackProxy = new NetstackProxy();
   connectToService(startupContext.environmentServices, netstackProxy.ctrl);
@@ -75,7 +76,7 @@ void main() {
       wifiInfoOverlayModel.showing = !wifiInfoOverlayModel.showing;
     },
     onSetup: userSetupModel.start,
-    encoder: encoder,
+    logger: logger,
   );
 
   Widget mainWidget = new Stack(
