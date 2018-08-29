@@ -354,15 +354,9 @@ void showStackTrace() {
   print(new Trace.current(1).toString());
 }
 
-/// Whether a message for [value]'s level is tracable in this logger.
-bool _isTraceable(Level value) => (value >= Level.INFO);
-
-/// Emits an instant trace with [name] prefixed with [log]'s name if [log]'s
-/// level is INFO or above.
+/// Emits an instant trace with [name] prefixed with [log]'s name
 void trace(String name) {
-  if (_isTraceable(log.level)) {
-    Timeline.instantSync('$_loggerName $name');
-  }
+  Timeline.instantSync('$_loggerName $name');
 }
 
 /// From the given [Trace], finds the last [Frame] from this package
