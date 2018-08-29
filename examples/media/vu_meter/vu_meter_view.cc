@@ -149,7 +149,7 @@ void VuMeterView::OnDefaultFormatFetched(
   zx_status_t zx_res;
   zx::vmo vmo;
   zx_res = payload_buffer_.CreateAndMap(
-      payload_buffer_size, ZX_VM_FLAG_PERM_READ, nullptr, &vmo, rights);
+      payload_buffer_size, ZX_VM_PERM_READ, nullptr, &vmo, rights);
   if (zx_res != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to create payload buffer (res " << zx_res << ")";
     Shutdown();

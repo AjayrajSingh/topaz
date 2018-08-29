@@ -38,7 +38,7 @@ sk_sp<SkData> MakeSkDataFromVMO(const fsl::SizedVmo& vmo) {
   uint64_t size = vmo.size();
   uintptr_t buffer = 0u;
   zx_status_t status = zx::vmar::root_self()->map(0, vmo.vmo(), 0u, size,
-                                                 ZX_VM_FLAG_PERM_READ, &buffer);
+                                                 ZX_VM_PERM_READ, &buffer);
   if (status != ZX_OK)
     return nullptr;
 

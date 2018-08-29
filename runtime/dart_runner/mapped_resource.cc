@@ -50,9 +50,9 @@ bool MappedResource::LoadFromVmo(const std::string& path,
     return true;
   }
 
-  uint32_t flags = ZX_VM_FLAG_PERM_READ;
+  uint32_t flags = ZX_VM_PERM_READ;
   if (executable) {
-    flags |= ZX_VM_FLAG_PERM_EXECUTE;
+    flags |= ZX_VM_PERM_EXECUTE;
   }
   uintptr_t addr;
   zx_status_t status = zx::vmar::root_self()->map(
