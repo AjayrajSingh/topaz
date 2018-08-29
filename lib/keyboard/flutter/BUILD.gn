@@ -4,19 +4,19 @@
 
 import("//build/dart/dart_library.gni")
 
-dart_library("dart") {
+dart_library("flutter") {
   infer_package_name = true
 
   source_dir = "."
 
   sources = [
-    "display.dart",
+    "keyboard.dart",
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.device.display",
-    "//garnet/public/fidl/fuchsia.devicesettings",
-    "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/lib/keyboard/dart",
+    "//topaz/lib/shell",
   ]
 }
