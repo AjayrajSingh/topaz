@@ -134,6 +134,9 @@ class TestServerImpl extends TestServer {
       new Timer(durationFromSeconds(delaySeconds), _binding.close);
     }
   }
+
+  @override
+  Stream<Null> get neverEvent => null;
 }
 
 StartupContext _context;

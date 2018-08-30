@@ -40,4 +40,6 @@ interface TestServer {
   18: ReplySlowly(string value, float64 delaySeconds) -> (string value);
 
   19: CloseConnection(float64 delaySeconds);
+
+  20: -> NeverEvent();
 };
