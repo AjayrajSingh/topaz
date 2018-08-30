@@ -101,7 +101,8 @@ Default COMMITHASH is the current `HEAD` in the CHECKOUT directory.
     version = args.version or ('git_revision:' + (
         args.revision or subprocess.check_output(git_cmd).strip()))
 
-    ensure_file = (reduce(lambda file, platform:
+    ensure_file = ('$ParanoidMode CheckPresence\n' +
+                   reduce(lambda file, platform:
                           file + ('$VerifiedPlatform %s\n' % platform),
                           VERIFIED_PLATFORMS, '') +
                    ('@Subdir %s\n' % os.path.relpath(args.output, args.root)) +
