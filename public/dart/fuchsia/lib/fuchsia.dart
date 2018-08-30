@@ -6,6 +6,6 @@
 library fuchsia;
 
 // ignore: unused_import
-import 'src/fuchsia_fakes.dart' if (dart.library.fuchsia) 'dart:fuchsia';
+import 'src/fakes/fuchsia_fakes.dart' if (dart.library.fuchsia) 'dart:fuchsia';
 
-export 'src/fuchsia_fakes.dart' if (dart.library.fuchsia) 'dart:fuchsia';
+export 'src/fakes/fuchsia_fakes.dart' if (dart.library.fuchsia) 'dart:fuchsia';

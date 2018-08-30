@@ -4,3 +4,6 @@
 
 /// The base-level functionality required by any component on Fuchsia.
 library services;
+
+export 'src/services/service_provider_impl.dart';
+export 'src/services/startup_context.dart';
