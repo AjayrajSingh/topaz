@@ -289,6 +289,8 @@ void PlatformView::DidUpdateState(
       std::vector<uint8_t>(data, data + buffer.GetSize()),  // message
       nullptr)                                              // response
   );
+  last_text_state_ =
+      std::make_unique<fuchsia::ui::input::TextInputState>(state);
 }
 
 // |fuchsia::ui::input::InputMethodEditorClient|
@@ -503,18 +505,37 @@ bool PlatformView::OnHandleKeyboardEvent(
 
 bool PlatformView::OnHandleFocusEvent(
     const fuchsia::ui::input::FocusEvent& focus) {
-  if (!focus.focused && current_text_input_client_ != 0) {
-    current_text_input_client_ = 0;
-    if (ime_) {
-      ime_->Hide();
-      ime_ = nullptr;
-    }
-    if (ime_client_.is_bound()) {
-      ime_client_.Unbind();
-    }
+  // Ensure last_text_state_ is set to make sure Flutter actually wants an IME.
+  if (focus.focused && last_text_state_ != nullptr) {
+    ActivateIme();
+    return true;
+  } else if (!focus.focused) {
+    DeactivateIme();
     return true;
   }
   return false;
+}
+
+void PlatformView::ActivateIme() {
+  FXL_DCHECK(last_text_state_);
+
+  input_connection_->GetInputMethodEditor(
+      fuchsia::ui::input::KeyboardType::TEXT,       // keyboard type
+      fuchsia::ui::input::InputMethodAction::DONE,  // input method action
+      *last_text_state_,                            // initial state
+      ime_client_.NewBinding(),                     // client
+      ime_.NewRequest()                             // editor
+  );
+}
+
+void PlatformView::DeactivateIme() {
+  if (ime_) {
+    input_connection_->HideKeyboard();
+    ime_ = nullptr;
+  }
+  if (ime_client_.is_bound()) {
+    ime_client_.Unbind();
+  }
 }
 
 // |shell::PlatformView|
@@ -624,18 +645,15 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
 
   if (method->value == "TextInput.show") {
     if (ime_) {
-      ime_->Show();
+      input_connection_->ShowKeyboard();
     }
   } else if (method->value == "TextInput.hide") {
     if (ime_) {
-      ime_->Hide();
+      input_connection_->HideKeyboard();
     }
   } else if (method->value == "TextInput.setClient") {
     current_text_input_client_ = 0;
-    if (ime_client_.is_bound())
-      ime_client_.Unbind();
-    ime_ = nullptr;
-
+    DeactivateIme();
     auto args = root.FindMember("args");
     if (args == root.MemberEnd() || !args->value.IsArray() ||
         args->value.Size() != 2)
@@ -649,13 +667,9 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
 
     auto initial_text_input_state = fuchsia::ui::input::TextInputState{};
     initial_text_input_state.text = "";
-    input_connection_->GetInputMethodEditor(
-        fuchsia::ui::input::KeyboardType::TEXT,       // keyboard type
-        fuchsia::ui::input::InputMethodAction::DONE,  // input method action
-        initial_text_input_state,                     // initial state
-        ime_client_.NewBinding(),                     // client
-        ime_.NewRequest()                             // editor
-    );
+    last_text_state_ = std::make_unique<fuchsia::ui::input::TextInputState>(
+        initial_text_input_state);
+    ActivateIme();
   } else if (method->value == "TextInput.setEditingState") {
     if (ime_) {
       auto args_it = root.FindMember("args");
@@ -696,9 +710,8 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
     }
   } else if (method->value == "TextInput.clearClient") {
     current_text_input_client_ = 0;
-    if (ime_client_.is_bound())
-      ime_client_.Unbind();
-    ime_ = nullptr;
+    last_text_state_ = nullptr;
+    DeactivateIme();
   } else {
     FML_DLOG(ERROR) << "Unknown " << message->channel() << " method "
                     << method->value.GetString();

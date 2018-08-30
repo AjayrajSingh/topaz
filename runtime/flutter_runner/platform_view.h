@@ -115,6 +115,10 @@ class PlatformView final : public shell::PlatformView,
   SemanticsBridge semantics_bridge_;
   std::unique_ptr<Surface> surface_;
   blink::LogicalMetrics metrics_;
+  // last_text_state_ is the last state of the text input as reported by the IME
+  // or initialized by Flutter. We set it to null if Flutter doesn't want any
+  // input, since then there is no text input state at all.
+  std::unique_ptr<fuchsia::ui::input::TextInputState> last_text_state_;
 #ifdef SCENIC_VIEWS2
 
   fuchsia::ui::gfx::Metrics scenic_metrics_;
@@ -177,6 +181,16 @@ class PlatformView final : public shell::PlatformView,
   bool OnHandleKeyboardEvent(const fuchsia::ui::input::KeyboardEvent& keyboard);
 
   bool OnHandleFocusEvent(const fuchsia::ui::input::FocusEvent& focus);
+
+  // Gets a new input method editor from the input connection. Run when both
+  // Scenic has focus and Flutter has requested input with setClient.
+  void ActivateIme();
+
+  // Detaches the input method editor connection, ending the edit session and
+  // closing the onscreen keyboard. Call when input is no longer desired, either
+  // because Scenic says we lost focus or when Flutter no longer has a text
+  // field focused.
+  void DeactivateIme();
 
   // |shell::PlatformView|
   std::unique_ptr<shell::VsyncWaiter> CreateVSyncWaiter() override;
