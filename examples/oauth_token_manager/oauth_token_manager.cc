@@ -135,31 +135,28 @@ std::string UrlEncode(const std::string& value) {
   return escaped.str();
 }
 
-// Returns |::auth::CredentialStore| after parsing credentials from
-// |kCredentialsFile|.
-const ::auth::CredentialStore* ParseCredsFile() {
-  // Reserialize existing users.
+// Read the contents of |kCredentialsFile| into the supplied buffer, validates
+// that these contents are a valid credentials file, and then returns a
+// |::auth::CredentialStore| pointer to the contents.
+const ::auth::CredentialStore* ParseCredsFile(std::string* buffer) {
   if (!files::IsFile(kCredentialsFile)) {
     return nullptr;
   }
 
-  std::string serialized_creds;
-  if (!files::ReadFileToString(kCredentialsFile, &serialized_creds)) {
-    FXL_LOG(WARNING) << "Unable to read user configuration file at: "
+  if (!files::ReadFileToString(kCredentialsFile, buffer)) {
+    FXL_LOG(WARNING) << "Unable to read user credential file at: "
                      << kCredentialsFile;
     return nullptr;
   }
 
   flatbuffers::Verifier verifier(
-      reinterpret_cast<const unsigned char*>(serialized_creds.data()),
-      serialized_creds.size());
+      reinterpret_cast<const unsigned char*>(buffer->data()), buffer->size());
   if (!::auth::VerifyCredentialStoreBuffer(verifier)) {
-    FXL_LOG(WARNING) << "Unable to verify credentials buffer:"
-                     << serialized_creds.data();
+    FXL_LOG(WARNING) << "Unable to verify credentials buffer";
     return nullptr;
   }
 
-  return ::auth::GetCredentialStore(serialized_creds.data());
+  return ::auth::GetCredentialStore(buffer->data());
 }
 
 // Serializes |::auth::CredentialStore| to the |kCredentialsFIle| on disk.
@@ -196,7 +193,9 @@ std::string GetRefreshTokenFromCredsFile(const std::string& account_id) {
     return "";
   }
 
-  const ::auth::CredentialStore* credentials_storage = ParseCredsFile();
+  std::string file_buffer;
+  const ::auth::CredentialStore* credentials_storage =
+      ParseCredsFile(&file_buffer);
   if (credentials_storage == nullptr) {
     FXL_LOG(ERROR) << "Failed to parse credentials.";
     return "";
@@ -453,10 +452,6 @@ class OAuthTokenManagerApp : fuchsia::modular::auth::AccountProvider {
   // account_id -> TokenProviderFactoryImpl
   std::unordered_map<std::string, std::unique_ptr<TokenProviderFactoryImpl>>
       token_provider_factory_impls_;
-
-  // In-memory cache for long lived user credentials. This cache is populated
-  // from |kCredentialsFile| on initialization.
-  const ::auth::CredentialStore* creds_ = nullptr;
 
   // In-memory cache for short lived firebase auth id tokens. These tokens get
   // reset on system reboots. Tokens are cached based on the expiration time
@@ -1074,7 +1069,8 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
     flatbuffers::FlatBufferBuilder builder;
     std::vector<flatbuffers::Offset<::auth::UserCredential>> creds;
 
-    const ::auth::CredentialStore* file_creds = ParseCredsFile();
+    std::string file_buffer;
+    const ::auth::CredentialStore* file_creds = ParseCredsFile(&file_buffer);
     if (file_creds != nullptr) {
       // Reserialize existing users.
       for (const auto* cred : *file_creds->creds()) {
@@ -1114,9 +1110,6 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
     std::string new_serialized_creds = std::string(
         reinterpret_cast<const char*>(builder.GetCurrentBufferPointer()),
         builder.GetSize());
-
-    // Add new credentials to in-memory cache |creds_|.
-    app_->creds_ = ::auth::GetCredentialStore(new_serialized_creds.data());
 
     return WriteCredsFile(new_serialized_creds);
   }
@@ -1278,7 +1271,9 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
 
   // Deletes existing user credentials for |account_->id|.
   bool DeleteCredentials() {
-    const ::auth::CredentialStore* credentials_storage = ParseCredsFile();
+    std::string file_buffer;
+    const ::auth::CredentialStore* credentials_storage =
+        ParseCredsFile(&file_buffer);
     if (credentials_storage == nullptr) {
       FXL_LOG(ERROR) << "Failed to parse credentials.";
       return false;
@@ -1290,7 +1285,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
 
     for (const auto* cred : *credentials_storage->creds()) {
       if (cred->account_id()->str() == account_->id) {
-        // delete existing credentials
+        // Delete existing credentials
         continue;
       }
 
@@ -1313,9 +1308,6 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
     std::string new_serialized_creds = std::string(
         reinterpret_cast<const char*>(builder.GetCurrentBufferPointer()),
         builder.GetSize());
-
-    // Add updated credentials to in-memory cache |creds_|.
-    app_->creds_ = ::auth::GetCredentialStore(new_serialized_creds.data());
 
     return WriteCredsFile(new_serialized_creds);
   }
@@ -1475,10 +1467,10 @@ OAuthTokenManagerApp::OAuthTokenManagerApp(async::Loop* loop)
       [this](fidl::InterfaceRequest<AccountProvider> request) {
         binding_.Bind(std::move(request));
       });
-  // Reserialize existing users.
+  // Log an error if the existing credential file is invalid.
   if (files::IsFile(kCredentialsFile)) {
-    creds_ = ParseCredsFile();
-    if (creds_ == nullptr) {
+    std::string file_buffer;
+    if (ParseCredsFile(&file_buffer) == nullptr) {
       FXL_LOG(WARNING) << "Error in parsing existing credentials from: "
                        << kCredentialsFile;
     }
