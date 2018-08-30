@@ -86,8 +86,7 @@ class LinkWatcherHost {
       return;
     }
 
-    log.warning('binding connection failed outside of async control flow.');
-    throw err;
+    log.severe('binding connection failed outside of async control flow.');
   }
 
   void _handleBind() {

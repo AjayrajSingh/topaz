@@ -182,8 +182,7 @@ class ComponentContextClient {
   }
 
   void _handleConnectionError() {
-    Exception err = new Exception('proxy connection failed');
-    throw err;
+    log.warning('ComponentContextClient connection error');
   }
 
   void _handleBind() {

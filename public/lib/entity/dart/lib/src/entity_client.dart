@@ -86,7 +86,6 @@ class EntityClient {
   }
 
   void _handleConnectionError() {
-    Exception err = new Exception('binding connection failed');
-    throw err;
+    log.warning('Entity connection error');
   }
 }

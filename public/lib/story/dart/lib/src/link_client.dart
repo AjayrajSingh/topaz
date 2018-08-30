@@ -289,7 +289,6 @@ class LinkClient {
   }
 
   void _handleConnectionError() {
-    Exception err = new Exception('binding connection failed');
-    throw err;
+    log.severe('LinkClient connection error');
   }
 }

@@ -36,8 +36,7 @@ class ModuleControllerClient {
   }
 
   void _handleConnectionError() {
-    Exception err = new Exception('binding connection failed');
-    throw err;
+    log.severe('ModuleControllerClient connection error');
   }
 
   void _handleClose() {

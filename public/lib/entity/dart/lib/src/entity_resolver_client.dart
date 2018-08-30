@@ -100,7 +100,6 @@ class EntityResolverClient {
   }
 
   void _handleConnectionError() {
-    Exception err = new Exception('binding connection failed');
-    throw err;
+    log.severe('EntityResolverClient connection error');
   }
 }

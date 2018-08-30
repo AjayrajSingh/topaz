@@ -423,8 +423,7 @@ class ModuleContextClient {
   }
 
   void _handleConnectionError() {
-    Exception err = new Exception('binding connection failed');
-    throw err;
+    log.severe('ModuleContextClient connection error');
   }
 
   void _handleClose() {
@@ -441,8 +440,8 @@ class ModuleContextClient {
     log.fine('terminate called');
     proxy.ctrl.close();
     _intelligenceServices.ctrl.close();
-    return Future
-        .wait(_links.map((LinkClient link) => link.terminate()).toList())
+    return Future.wait(
+            _links.map((LinkClient link) => link.terminate()).toList())
         .then((_) => null);
   }
 }
