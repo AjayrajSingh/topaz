@@ -4,7 +4,6 @@
         "topaz/packages/examples/tests"
     ],
     "packages": [
-        "//peridot/tests/test_driver:test_driver_module",
         "//topaz/tests/modular_integration_tests:topaz_modular_integration_tests"
     ]
 }
