@@ -9,7 +9,7 @@ import 'package:lib.app.dart/app_async.dart';
 import 'package:fidl_fuchsia_sys/fidl_async.dart'
     show ComponentControllerProxy, LaunchInfo;
 
-const _kServerName = 'bindings_test_server';
+const _kServerName = 'fidl_bindings_test_server';
 
 StartupContext _context = new StartupContext.fromStartupInfo();
 

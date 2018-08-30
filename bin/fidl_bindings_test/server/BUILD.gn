@@ -3,14 +3,15 @@
 # found in the LICENSE file.
 
 import("//topaz/runtime/dart_runner/dart_app.gni")
-import("//build/dart/dart_fuchsia_test.gni")
 
-dart_fuchsia_test("bindings_test") {
-  source_dir = "test/"
+dart_app("fidl_bindings_test_server") {
+  fuchsia_package_name = "fidl_bindings_test_server"
 
+  main_dart = "lib/main.dart"
+
+  sources = []
   deps = [
-    "//third_party/dart-pkg/pub/collection",
-    "//topaz/examples/fidl/bindings_test/fidl:bindings_test",
+    "//topaz/bin/fidl_bindings_test/fidl:bindings_test",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
   ]
