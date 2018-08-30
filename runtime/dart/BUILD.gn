@@ -35,8 +35,23 @@ dart_tool("build_test_bootstrap") {
 sdk_atom("kernel_compiler_sdk") {
   domain = "dart"
   name = "kernel_compiler"
-  id = "sdk://tools/dart"
+  id = "sdk://tools/dart_kernel_compiler"
   category = "partner"
+
+  meta = {
+    schema = "host_tool"
+    new_dest = "tools/dart_kernel_compiler-meta.json"
+    value = {
+      type = "host_tool"
+      name = "dart_kernel_compiler"
+      files = [
+        "tools/dart",
+        "tools/dart_prebuilts/dart_runner/platform_strong.dill",
+        "tools/dart_prebuilts/flutter_runner/platform_strong.dill",
+        "tools/dart_prebuilts/kernel_compiler.snapshot",
+      ]
+    }
+  }
 
   tags = [ "type:tool" ]
 
@@ -60,6 +75,25 @@ sdk_atom("kernel_compiler_sdk") {
     {
       source = "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
       dest = "dart_prebuilts/flutter_runner/platform_strong.dill"
+    },
+  ]
+
+  new_files = [
+    {
+      source = "$kernel_compiler_path"
+      dest = "tools/dart_prebuilts/kernel_compiler.snapshot"
+    },
+    {
+      source = "$dart_sdk/bin/dart"
+      dest = "tools/dart"
+    },
+    {
+      source = "$root_out_dir/dart_runner_patched_sdk/platform_strong.dill"
+      dest = "tools/dart_prebuilts/dart_runner/platform_strong.dill"
+    },
+    {
+      source = "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
+      dest = "tools/dart_prebuilts/flutter_runner/platform_strong.dill"
     },
   ]
 
