@@ -22,11 +22,11 @@ class TracingSpringModel extends SpringModel {
   TracingSpringModel({
     RK4SpringDescription springDescription = _kSimulationDesc,
     String traceName = 'TracingSpringModel',
-    Encoder cobaltEncoder,
+    Logger cobaltLogger,
     Map<double, int> targetToCobaltMetricIdMap = const <double, int>{},
   })  : _frameRateTracer = new FrameRateTracer(
           name: traceName,
-          cobaltEncoder: cobaltEncoder,
+          cobaltLogger: cobaltLogger,
         ),
         _targetToCobaltMetricIdMap = targetToCobaltMetricIdMap,
         super(springDescription: springDescription);

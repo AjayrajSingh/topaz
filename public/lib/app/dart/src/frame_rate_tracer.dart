@@ -7,16 +7,14 @@ import 'package:meta/meta.dart';
 
 import 'logging.dart';
 
-const int _kNoOpEncodingId = 1;
-
 /// Traces the frame rate of an animation.
 class FrameRateTracer {
   /// Name of the animation for tracing purposes.
   final String name;
 
-  /// Optional cobalt encoder.  If not null the frame rate will be logged as
+  /// Optional cobalt logger.  If not null the frame rate will be logged as
   /// an observation to cobalt.
-  final Encoder cobaltEncoder;
+  final Logger cobaltLogger;
 
   DateTime _animationStart = new DateTime.now();
   int _frames = 0;
@@ -24,7 +22,7 @@ class FrameRateTracer {
   int _currentCobaltMetricId;
 
   /// Constructor.
-  FrameRateTracer({@required this.name, this.cobaltEncoder});
+  FrameRateTracer({@required this.name, this.cobaltLogger});
 
   /// Starts tracking an animation.
   void start({String targetName, int cobaltMetricId}) {
@@ -54,13 +52,14 @@ class FrameRateTracer {
       '$prefix: ${frameRate.toStringAsPrecision(3)} fps '
           '($_frames/${microSeconds/1000000.0}s)',
     );
-    if (cobaltEncoder != null && _currentCobaltMetricId != null) {
-      cobaltEncoder.addDoubleObservation(
+    if (cobaltLogger != null && _currentCobaltMetricId != null) {
+      cobaltLogger.logFrameRate(
         _currentCobaltMetricId,
-        _kNoOpEncodingId,
+        0,
+        '',
         frameRate,
-        (Status status) {
-          if (status != Status.ok) {
+        (Status2 status) {
+          if (status != Status2.ok) {
             log.warning(
               'Failed to observe frame rate metric '
                   '$_currentCobaltMetricId: $status. ',

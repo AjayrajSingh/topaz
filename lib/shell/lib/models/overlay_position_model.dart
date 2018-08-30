@@ -29,7 +29,7 @@ class OverlayPositionModel extends TracingSpringModel {
 
   /// Constructor.
   OverlayPositionModel({
-    Encoder encoder,
+    Logger logger,
     String traceName,
     int showMetricId,
     int hideMetricId,
@@ -37,7 +37,7 @@ class OverlayPositionModel extends TracingSpringModel {
   }) : super(
           springDescription: _kSimulationDesc,
           traceName: traceName,
-          cobaltEncoder: encoder,
+          cobaltLogger: logger,
           targetToCobaltMetricIdMap: <double, int>{
             1.0: showMetricId,
             0.0: hideMetricId
