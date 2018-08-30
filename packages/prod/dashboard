@@ -1,6 +1,6 @@
 {
     "imports": [
-        "topaz/packages/prod/flutter",
+        "topaz/packages/prod/flutter_runner",
         "topaz/packages/prod/web_view"
     ],
     "packages": [

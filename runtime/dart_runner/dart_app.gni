@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/package.gni")
+import("//topaz/runtime/dart/config.gni")
 import("//topaz/runtime/dart/dart_kernel.gni")
 import("//third_party/dart/build/dart/dart_action.gni")
 
@@ -30,17 +31,26 @@ declare_args() {
   }
 }
 
+# In product mode, we force all Dart apps to use a specific runtime mode.
+# Currently, we force them all to use JIT, but we might switch to DBC in the
+# future.
+dart_product_app = "_dart_jit_app"
+
 _entry_manifests = [
   "//third_party/dart/runtime/bin/dart_io_entries.txt",
   "//topaz/runtime/dart_runner/entry_points.txt",
 ]
 
-template("dart_jit_app") {
+template("_dart_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   product = !is_debug
   if (defined(invoker.product)) {
     product = invoker.product
+  }
+
+  if (dart_force_product) {
+    product = true
   }
 
   product_suffix = ""
@@ -133,12 +143,16 @@ template("dart_jit_app") {
   }
 }
 
-template("dart_aot_app") {
+template("_dart_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   product = !is_debug
   if (defined(invoker.product)) {
     product = invoker.product
+  }
+
+  if (dart_force_product) {
+    product = true
   }
 
   product_suffix = ""
@@ -343,6 +357,28 @@ template("dart_aot_app") {
     if (defined(invoker.meta)) {
       meta += invoker.meta
     }
+  }
+}
+
+template("dart_jit_app") {
+  template_name = "_dart_jit_app"
+  if (dart_force_product) {
+    template_name = dart_product_app
+  }
+
+  target(template_name, target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
+
+template("dart_aot_app") {
+  template_name = "_dart_aot_app"
+  if (dart_force_product) {
+    template_name = dart_product_app
+  }
+
+  target(template_name, target_name) {
+    forward_variables_from(invoker, "*")
   }
 }
 
