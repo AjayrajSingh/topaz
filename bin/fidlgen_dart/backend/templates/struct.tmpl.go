@@ -14,6 +14,32 @@ class {{ .Name }} extends $fidl.Struct {
     this.{{ .Name }}{{ if .DefaultValue }}: {{ .DefaultValue }}{{ end }},
 {{- end }}
   });
+  {{ .Name }}.clone({{ .Name }} $orig, {
+{{- range .Members }}
+  {{ .Type.Decl }} {{ .Name }},
+{{- end }}
+  }) : this(
+    {{- range .Members }}
+      {{ .Name }}: {{ .Name }} ?? $orig.{{ .Name }},
+    {{- end }}
+    );
+
+
+  {{ if .HasNullableField }}
+    {{ .Name }}.cloneWithout({{ .Name }} $orig, {
+      {{- range .Members }}
+        {{ if .Type.Nullable }}bool {{ .Name }},{{ end }}
+      {{- end }}
+    }) : this(
+      {{- range .Members }}
+        {{ if .Type.Nullable }}
+          {{ .Name }}: {{ .Name }} ? null : $orig.{{ .Name }},
+        {{ else }}
+          {{ .Name }}: $orig.{{ .Name }},
+        {{ end }}
+      {{- end }}
+      );
+  {{ end }}
 
   {{ .Name }}._(List<Object> argv)
     :

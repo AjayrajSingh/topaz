@@ -65,10 +65,11 @@ type UnionMember struct {
 
 // Struct represents a struct declaration.
 type Struct struct {
-	Name       string
-	Members    []StructMember
-	TypeSymbol string
-	TypeExpr   string
+	Name             string
+	Members          []StructMember
+	TypeSymbol       string
+	TypeExpr         string
+	HasNullableField bool
 }
 
 // StructMember represents a member of a struct declaration.
@@ -712,11 +713,20 @@ func (c *compiler) compileStruct(val types.Struct) Struct {
 		[]StructMember{},
 		c.typeSymbolForCompoundIdentifier(ci),
 		"",
+		false,
 	}
 
+	var hasNullableField = false
+
 	for _, v := range val.Members {
-		r.Members = append(r.Members, c.compileStructMember(v))
+		var member = c.compileStructMember(v)
+		if member.Type.Nullable {
+			hasNullableField = true
+		}
+		r.Members = append(r.Members, member)
 	}
+
+	r.HasNullableField = hasNullableField
 
 	r.TypeExpr = fmt.Sprintf(`const $fidl.StructType<%s>(
   encodedSize: %v,

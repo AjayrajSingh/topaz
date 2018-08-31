@@ -10,6 +10,12 @@ struct NoHandleStruct {
     vector<uint8> baz;
 };
 
+struct ExampleStruct {
+    string foo;
+    int32 bar;
+    vector<uint8>? baz;
+};
+
 [Discoverable]
 interface TestServer {
   1: OneWayNoArgs();
