@@ -58,7 +58,9 @@ void WebViewProvider::CreateView(
   view_ = std::make_unique<WebViewImpl>(
       context_
           ->ConnectToEnvironmentService<fuchsia::ui::viewsv1::ViewManager>(),
-      std::move(view_owner_request), std::move(view_services), url_);
+      std::move(view_owner_request),
+      context_->ConnectToEnvironmentService<fuchsia::ui::input::ImeService>(),
+      std::move(view_services), url_);
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   if (context_writer_) {
     view_->set_context_writer(std::move(context_writer_));

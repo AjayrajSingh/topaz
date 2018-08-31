@@ -67,11 +67,14 @@ WebViewImpl::WebViewImpl(
     fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
     fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
         view_owner_request,
+    fuchsia::ui::input::ImeServicePtr ime_service,
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
         outgoing_services_request,
     const std::string& url)
     : BaseView(std::move(view_manager), std::move(view_owner_request),
                "WebView"),
+      ime_service_(std::move(ime_service)),
+      ime_client_binding_(this),
       weak_factory_(this),
       url_(url),
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
@@ -82,7 +85,7 @@ WebViewImpl::WebViewImpl(
   web_view_.setup_once();
 
   std::function<void(bool)> focusDelegate = [=](bool focused) {
-      this->HandleFocusEvent(focused);
+      this->HandleWebRequestsFocusEvent(focused);
   };
 
   web_view_.setInputFocusDelegate(focusDelegate);
@@ -108,8 +111,40 @@ WebViewImpl::WebViewImpl(
 
 WebViewImpl::~WebViewImpl() {}
 
-void WebViewImpl::HandleFocusEvent(bool focused) {
-  FXL_LOG(INFO) << "WebView: input focus event:" << (focused ? "focused" : "unfocused");
+void WebViewImpl::HandleWebRequestsFocusEvent(bool focused) {
+  FXL_LOG(INFO) << "WebView: web requests input focus:" << (focused ? "focused" : "unfocused");
+  web_requests_input_ = focused;
+  UpdateInputConnection();
+}
+
+void WebViewImpl::UpdateInputConnection() {
+  if (web_requests_input_ && has_scenic_focus_ && !ime_client_binding_.is_bound()) {
+    ime_service_->ShowKeyboard();
+
+    fuchsia::ui::input::InputMethodEditorClientPtr client_ptr;
+    ime_client_binding_.Bind(client_ptr.NewRequest());
+    auto state = fuchsia::ui::input::TextInputState{};
+    state.text = "";
+    ime_service_->GetInputMethodEditor(fuchsia::ui::input::KeyboardType::TEXT, fuchsia::ui::input::InputMethodAction::UNSPECIFIED,
+                                       std::move(state), std::move(client_ptr),
+                                       ime_.NewRequest());
+  } else if (ime_client_binding_.is_bound()) {
+    ime_service_->HideKeyboard();
+    ime_client_binding_.Unbind();
+  }
+}
+
+// |fuchsia::ui::input::InputMethodEditorClient|
+void WebViewImpl::DidUpdateState(fuchsia::ui::input::TextInputState state,
+                    fuchsia::ui::input::InputEventPtr event) {
+  if (event != nullptr && event->is_keyboard() && has_scenic_focus_) {
+    HandleKeyboardEvent(*event);
+  }
+}
+
+// |fuchsia::ui::input::InputMethodEditorClient|
+void WebViewImpl::OnAction(fuchsia::ui::input::InputMethodAction action) {
+  // noop for now
 }
 
 // |WebView|:
@@ -227,6 +262,11 @@ bool WebViewImpl::HandleTouchEvent(
   return handled;
 }
 
+void WebViewImpl::HandleFocusEvent(const fuchsia::ui::input::FocusEvent& focus) {
+  has_scenic_focus_ = focus.focused;
+  UpdateInputConnection();
+}
+
 // |BaseView|:
 bool WebViewImpl::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   bool handled = false;
@@ -240,7 +280,9 @@ bool WebViewImpl::OnInputEvent(fuchsia::ui::input::InputEvent event) {
       handled = HandleMouseEvent(pointer);
     }
   } else if (event.is_keyboard()) {
-    handled = HandleKeyboardEvent(event);
+    HandleKeyboardEvent(event);
+  } else if (event.is_focus()) {
+    HandleFocusEvent(event.focus());
   }
 
   InvalidateScene();

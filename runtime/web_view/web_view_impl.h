@@ -6,6 +6,7 @@
 #define TOPAZ_RUNTIME_WEB_VIEW_WEB_VIEW_IMPL_H_
 
 #include <fuchsia/webview/cpp/fidl.h>
+#include <fuchsia/ui/input/cpp/fidl.h>
 
 #include "lib/component/cpp/service_provider_impl.h"
 #include "lib/fidl/cpp/binding_set.h"
@@ -35,11 +36,13 @@ class TouchTracker {
   bool is_drag_;
 };
 
-class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView {
+class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView,
+                    fuchsia::ui::input::InputMethodEditorClient {
  public:
   WebViewImpl(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
               fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
                   view_owner_request,
+              fuchsia::ui::input::ImeServicePtr ime_service,
               fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
                   outgoing_services_request,
               const std::string& url);
@@ -57,6 +60,11 @@ class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView {
   }
 #endif
 
+  // |fuchsia::ui::input::InputMethodEditorClient|
+  void DidUpdateState(fuchsia::ui::input::TextInputState state,
+                      fuchsia::ui::input::InputEventPtr event) override;
+  void OnAction(fuchsia::ui::input::InputMethodAction action) override;
+
   // |WebView|:
   void SetUrl(fidl::StringPtr url) override;
 
@@ -72,7 +80,10 @@ class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView {
   bool HandleMouseEvent(const fuchsia::ui::input::PointerEvent& pointer);
   void HandleTouchDown(const fuchsia::ui::input::PointerEvent& pointer);
   bool HandleTouchEvent(const fuchsia::ui::input::PointerEvent& pointer);
-  void HandleFocusEvent(bool focused);
+  void HandleFocusEvent(const fuchsia::ui::input::FocusEvent& focus);
+
+  void HandleWebRequestsFocusEvent(bool focused);
+  void UpdateInputConnection();
 
   // |BaseView|:
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
@@ -86,8 +97,13 @@ class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView {
   void DidFinishLoad();
 
   ::WebView web_view_;
+  fuchsia::ui::input::ImeServicePtr ime_service_;
+  fuchsia::ui::input::InputMethodEditorPtr ime_ = nullptr;
+  fidl::Binding<fuchsia::ui::input::InputMethodEditorClient> ime_client_binding_;
   fxl::WeakPtrFactory<WebViewImpl> weak_factory_;
   bool url_set_ = false;
+  bool has_scenic_focus_ = false;
+  bool web_requests_input_ = false;
   std::string url_;
   std::map<uint32_t, TouchTracker> touch_trackers_;
   float page_scale_factor_ = 0;
