@@ -1,0 +1,6 @@
+{
+    "imports": [
+        "topaz/packages/prod/flutter_aot",
+        "topaz/packages/prod/flutter_jit"
+    ]
+}

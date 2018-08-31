@@ -4,6 +4,6 @@
         "garnet/packages/prod/scenic"
     ],
     "packages": [
-        "//topaz/runtime/flutter_runner"
+        "//topaz/runtime/flutter_runner:flutter_aot_product_runner"
     ]
 }

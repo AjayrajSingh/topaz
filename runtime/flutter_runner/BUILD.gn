@@ -5,9 +5,8 @@
 assert(is_fuchsia)
 
 import("//build/vulkan/config.gni")
-import("//garnet/bin/ui/scenic/config.gni")
-import("//topaz/runtime/dart/config.gni")
 import("$flutter_root/shell/gpu/gpu.gni")
+import("//garnet/bin/ui/scenic/config.gni")
 
 shell_gpu_configuration("fuchsia_gpu_configuration") {
   enable_software = false
@@ -197,7 +196,6 @@ flutter_runner("jit_product") {
   ]
 }
 
-import("//build/package_group.gni")
 import("//build/package.gni")
 
 observatory_target =
@@ -337,18 +335,4 @@ package("flutter_jit_product_runner") {
         path = rebase_path("meta/flutter_jit_product_runner.cmx")
         dest = "flutter_jit_product_runner.cmx"
       } ]
-}
-
-package_group("flutter_runner") {
-  deps = [
-    ":flutter_jit_product_runner",
-  ]
-
-  if (!dart_force_product) {
-    deps += [
-      ":flutter_aot_product_runner",
-      ":flutter_aot_runner",
-      ":flutter_jit_runner",
-    ]
-  }
 }
