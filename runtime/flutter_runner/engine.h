@@ -30,26 +30,19 @@ class Engine final : public mozart::NativesDelegate {
     virtual void OnEngineTerminate(const Engine* holder) = 0;
   };
 
-#ifndef SCENIC_VIEWS2
   Engine(
       Delegate& delegate, std::string thread_label,
       component::StartupContext& startup_context, blink::Settings settings,
       fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
       fml::RefPtr<blink::DartSnapshot> shared_snapshot,
+#ifndef SCENIC_VIEWS2
       fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
+#else
+      zx::eventpair view_token,
+#endif
       UniqueFDIONS fdio_ns,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
           outgoing_services_request);
-#else
-  Engine(Delegate& delegate, std::string thread_label,
-         component::StartupContext& startup_context, blink::Settings settings,
-         fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
-         fml::RefPtr<blink::DartSnapshot> shared_snapshot,
-         zx::eventpair view_token, UniqueFDIONS fdio_ns,
-         fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-             outgoing_services_request);
-#endif
-
   ~Engine();
 
   // Returns the Dart return code for the root isolate if one is present. This
@@ -72,11 +65,7 @@ class Engine final : public mozart::NativesDelegate {
 
   void Terminate();
 
-#ifndef SCENIC_VIEWS2
-  void OnSessionMetricsDidChange(double device_pixel_ratio);
-#else
   void OnSessionMetricsDidChange(const fuchsia::ui::gfx::Metrics& metrics);
-#endif
 
   // |mozart::NativesDelegate|
   void OfferServiceProvider(

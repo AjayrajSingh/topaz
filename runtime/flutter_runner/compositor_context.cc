@@ -56,35 +56,29 @@ class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
 };
 
 CompositorContext::CompositorContext(
-    fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic,
+    std::string debug_label,
 #ifndef SCENIC_VIEWS2
-    std::string debug_label, zx::eventpair import_token,
-    OnMetricsUpdate session_metrics_did_change_callback,
+    zx::eventpair import_token,
 #else
-    fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session,
-    zx::eventpair view_token, std::string debug_label,
+    zx::eventpair view_token,
 #endif
+    fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session,
     fit::closure session_error_callback, zx_handle_t vsync_event_handle)
     : debug_label_(std::move(debug_label)),
+      session_connection_(debug_label_,
 #ifndef SCENIC_VIEWS2
-      session_connection_(
-          std::move(scenic), debug_label_, std::move(import_token),
-          std::move(session_metrics_did_change_callback),
-          std::move(session_error_callback), vsync_event_handle) {
-}
+                          std::move(import_token),
 #else
-      session_connection_(
-          std::move(scenic), std::move(session), std::move(view_token),
-          debug_label_, std::move(session_error_callback), vsync_event_handle) {
-}
+                          std::move(view_token),
 #endif
+                          std::move(session), std::move(session_error_callback),
+                          vsync_event_handle) {
+}
 
-#ifdef SCENIC_VIEWS2
 void CompositorContext::OnSessionMetricsDidChange(
     const fuchsia::ui::gfx::Metrics& metrics) {
   session_connection_.set_metrics(metrics);
 }
-#endif
 
 CompositorContext::~CompositorContext() = default;
 

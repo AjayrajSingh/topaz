@@ -13,52 +13,37 @@
 namespace flutter {
 
 SessionConnection::SessionConnection(
-    fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic_handle,
+    std::string debug_label,
 #ifndef SCENIC_VIEWS2
-    std::string debug_label, zx::eventpair import_token,
-    OnMetricsUpdate session_metrics_did_change_callback,
-    fit::closure session_error_callback, zx_handle_t vsync_event_handle)
+    zx::eventpair import_token,
 #else
-    fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session,
-    zx::eventpair view_token, std::string debug_label,
-    fit::closure session_error_callback, zx_handle_t vsync_event_handle)
+    zx::eventpair view_token,
 #endif
+    fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session,
+    fit::closure session_error_callback, zx_handle_t vsync_event_handle)
     : debug_label_(std::move(debug_label)),
-      scenic_(scenic_handle.Bind()),
-#ifndef SCENIC_VIEWS2
-      session_wrapper_(scenic_.get()),
-#else
       session_wrapper_(session.Bind(), nullptr),
+#ifdef SCENIC_VIEWS2
       root_view_(&session_wrapper_, std::move(view_token), debug_label),
 #endif
       root_node_(&session_wrapper_),
       surface_producer_(
           std::make_unique<VulkanSurfaceProducer>(&session_wrapper_)),
       scene_update_context_(&session_wrapper_, surface_producer_.get()),
-#ifndef SCENIC_VIEWS2
-      metrics_changed_callback_(std::move(session_metrics_did_change_callback)),
-#endif
       vsync_event_handle_(vsync_event_handle) {
-#ifndef SCENIC_VIEWS2
-  session_wrapper_.set_error_handler(
-      fml::MakeCopyable(std::move(session_error_callback)));
-  session_wrapper_.set_event_handler(std::bind(
-      &SessionConnection::OnSessionEvents, this, std::placeholders::_1));
-#else
+
   session_wrapper_.set_error_handler(std::move(session_error_callback));
-#endif
 
 #ifndef SCENIC_VIEWS2
   root_node_.Bind(std::move(import_token));
 #else
   root_view_.AddChild(root_node_);
-#endif
-  root_node_.SetEventMask(fuchsia::ui::gfx::kMetricsEventMask);
-
-#ifdef SCENIC_VIEWS2
   // TODO: move this into BaseView or ChildView
   root_node_.SetTranslation(0.f, 0.f, 0.1f);
 #endif
+
+  root_node_.SetEventMask(fuchsia::ui::gfx::kMetricsEventMask);
+
   // Signal is initially high indicating availability of the session.
   ToggleSignal(vsync_event_handle_, true);
 
@@ -67,37 +52,6 @@ SessionConnection::SessionConnection(
 
 SessionConnection::~SessionConnection() = default;
 
-#ifndef SCENIC_VIEWS2
-void SessionConnection::OnSessionEvents(
-    fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
-  using Type = fuchsia::ui::gfx::Event::Tag;
-
-  for (auto& raw_event : *events) {
-    if (!raw_event.is_gfx()) {
-      continue;
-    }
-
-    auto& event = raw_event.gfx();
-
-    switch (event.Which()) {
-      case Type::kMetrics: {
-        if (event.metrics().node_id == root_node_.id()) {
-          auto& metrics = event.metrics().metrics;
-          double device_pixel_ratio = metrics.scale_x;
-          scene_update_context_.set_metrics(
-              fidl::MakeOptional(std::move(metrics)));
-          if (metrics_changed_callback_) {
-            metrics_changed_callback_(device_pixel_ratio);
-          }
-        }
-      } break;
-      default:
-        break;
-    }
-  }
-}
-
-#endif
 void SessionConnection::Present(flow::CompositorContext::ScopedFrame& frame) {
   // Flush all session ops. Paint tasks have not yet executed but those are
   // fenced. The compositor can start processing ops while we finalize paint

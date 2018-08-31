@@ -36,26 +36,19 @@ static void UpdateNativeThreadLabelNames(const std::string& label,
   set_thread_name(runners.GetIOTaskRunner(), label, ".io");
 }
 
-#ifndef SCENIC_VIEWS2
 Engine::Engine(
     Delegate& delegate, std::string thread_label,
     component::StartupContext& startup_context, blink::Settings settings,
     fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
     fml::RefPtr<blink::DartSnapshot> shared_snapshot,
+#ifndef SCENIC_VIEWS2
     fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
+#else
+    zx::eventpair view_token,
+#endif
     UniqueFDIONS fdio_ns,
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
         outgoing_services_request)
-#else
-Engine::Engine(Delegate& delegate, std::string thread_label,
-               component::StartupContext& startup_context,
-               blink::Settings settings,
-               fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
-               fml::RefPtr<blink::DartSnapshot> shared_snapshot,
-               zx::eventpair view_token, UniqueFDIONS fdio_ns,
-               fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-                   outgoing_services_request)
-#endif
     : delegate_(delegate),
       thread_label_(std::move(thread_label)),
       settings_(std::move(settings)),
@@ -71,6 +64,14 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
     thread.Run();
   }
 
+  // Set up the session connection.
+  auto scenic = startup_context
+                    .ConnectToEnvironmentService<fuchsia::ui::scenic::Scenic>();
+  fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session;
+  fidl::InterfaceHandle<fuchsia::ui::scenic::SessionListener> session_listener;
+  auto session_listener_request = session_listener.NewRequest();
+  scenic->CreateSession(session.NewRequest(), session_listener.Bind());
+
 #ifndef SCENIC_VIEWS2
   fuchsia::ui::viewsv1::ViewManagerPtr view_manager;
   startup_context.ConnectToEnvironmentService(view_manager.NewRequest());
@@ -80,22 +81,6 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
     FML_DLOG(ERROR) << "Could not create event pair.";
     return;
   }
-
-  // Setup the session connection.
-  fidl::InterfaceHandle<fuchsia::ui::scenic::Scenic> scenic;
-  view_manager->GetScenic(scenic.NewRequest());
-#else
-  // Setup the session connection.
-  auto scenic = startup_context
-                    .ConnectToEnvironmentService<fuchsia::ui::scenic::Scenic>();
-
-  fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session;
-  fidl::InterfaceHandle<fuchsia::ui::scenic::SessionListener>
-      session_listener_handle;
-  auto session_listener_request = session_listener_handle.NewRequest();
-
-  // Setup the session connection.
-  scenic->CreateSession(session.NewRequest(), session_listener_handle.Bind());
 #endif
 
   // Grab the parent environent services. The platform view may want to access
@@ -105,9 +90,65 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   startup_context.environment()->GetServices(
       parent_environment_service_provider.NewRequest());
 
+  // Grab the accessibilty context writer that can understand the semantics tree
+  // on the platform view.
+  fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
+      accessibility_context_writer;
+  startup_context.ConnectToEnvironmentService(
+      accessibility_context_writer.NewRequest());
+
   // We need to manually schedule a frame when the session metrics change.
   OnMetricsUpdate on_session_metrics_change_callback = std::bind(
       &Engine::OnSessionMetricsDidChange, this, std::placeholders::_1);
+
+  // SessionListener has a OnScenicError method; invoke this callback on the
+  // platform thread when that happens. The Session itself should also be
+  // disconnected when this happens, and it will also attempt to terminate.
+  fit::closure on_session_listener_error_callback =
+      [runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner(),
+       weak = weak_factory_.GetWeakPtr()]() {
+        runner->PostTask([weak]() {
+          if (weak) {
+            weak->Terminate();
+          }
+        });
+      };
+
+  // Setup the callback that will instantiate the platform view.
+  shell::Shell::CreateCallback<shell::PlatformView> on_create_platform_view =
+      fml::MakeCopyable([debug_label = thread_label_,
+                         parent_environment_service_provider =
+                             std::move(parent_environment_service_provider),  //
+                         session_listener_request = std::move(session_listener_request),
+                         on_session_listener_error_callback = std::move(on_session_listener_error_callback),
+                         on_session_metrics_change_callback = std::move(on_session_metrics_change_callback),
+#ifndef SCENIC_VIEWS2
+                         view_manager = view_manager.Unbind(),    //
+                         view_owner = std::move(view_owner),      //
+                         export_token = std::move(export_token),  //
+#endif
+                         accessibility_context_writer =
+                             std::move(accessibility_context_writer),  //
+                         vsync_handle = vsync_event_.get()             //
+  ](shell::Shell& shell) mutable {
+        return std::make_unique<flutter::PlatformView>(
+            shell,                                           // delegate
+            debug_label,                                     // debug label
+            shell.GetTaskRunners(),                          // task runners
+            std::move(parent_environment_service_provider),  // services
+            std::move(session_listener_request),  // session listener
+            std::move(on_session_listener_error_callback),
+            std::move(on_session_metrics_change_callback),
+#ifndef SCENIC_VIEWS2
+            std::move(view_manager),  // view manager
+            std::move(view_owner),    // view owner
+            std::move(export_token),  // export token
+#endif
+            std::move(
+                accessibility_context_writer),  // accessibility context writer
+            vsync_handle                        // vsync handle
+        );
+      });
 
   // Session can be terminated on the GPU thread, but we must terminate
   // ourselves on the platform thread.
@@ -125,121 +166,31 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
         });
       };
 
-  // Grab the accessibilty context writer that can understand the semtics tree
-  // on the platform view.
-  fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
-      accessibility_context_writer;
-  startup_context.ConnectToEnvironmentService(
-      accessibility_context_writer.NewRequest());
-
-#ifndef SCENIC_VIEWS2
   // Create the compositor context from the scenic pointer to create the
   // rasterizer.
   std::unique_ptr<flow::CompositorContext> compositor_context =
       std::make_unique<flutter::CompositorContext>(
-          std::move(scenic),        // scenic
-          thread_label_,            // debug label
-          std::move(import_token),  // import token
-          std::move(on_session_metrics_change_callback),
-          // session metrics did change
+          thread_label_,      // debug label
+#ifndef SCENIC_VIEWS2
+          std::move(import_token),                        // import token
+#else
+          std::move(view_token),  // scenic view we attach our tree to
+#endif
+          std::move(session),     // scenic session
           std::move(on_session_error_callback),  // session did encounter error
           vsync_event_.get()                     // vsync event handle
       );
 
-#else
-  // SessionListener has a OnError method; invoke this callback on the platform
-  // thread when that happens. The Session itself should also be disconnected
-  // when this happens, and it will also attempt to terminate.
-  fit::closure on_session_listener_error_callback =
-      [runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner(),
-       weak = weak_factory_.GetWeakPtr()]() {
-        runner->PostTask([weak]() {
-          if (weak) {
-            weak->Terminate();
-          }
-        });
-      };
-#endif
-
-  // Setup the callback that will instantiate the platform view.
-  shell::Shell::CreateCallback<shell::PlatformView> on_create_platform_view =
-      fml::MakeCopyable([debug_label = thread_label_,
-                         parent_environment_service_provider =
-                             std::move(parent_environment_service_provider),  //
-#ifndef SCENIC_VIEWS2
-                         view_manager = view_manager.Unbind(),    //
-                         view_owner = std::move(view_owner),      //
-                         export_token = std::move(export_token),  //
-#else
-                         session_listener_request =
-                             std::move(session_listener_request),
-                         on_session_metrics_change_callback =
-                             std::move(on_session_metrics_change_callback),
-                         on_session_listener_error_callback =
-                             std::move(on_session_listener_error_callback),
-#endif
-                         accessibility_context_writer =
-                             std::move(accessibility_context_writer),  //
-                         vsync_handle = vsync_event_.get()             //
-  ](shell::Shell& shell) mutable {
-        return std::make_unique<flutter::PlatformView>(
-            shell,                                           // delegate
-            debug_label,                                     // debug label
-            shell.GetTaskRunners(),                          // task runners
-            std::move(parent_environment_service_provider),  // services
-#ifndef SCENIC_VIEWS2
-            std::move(view_manager),  // view manager
-            std::move(view_owner),    // view owner
-            std::move(export_token),  // export token
-#else
-            std::move(session_listener_request),  // session listener
-            std::move(on_session_listener_error_callback),
-            std::move(on_session_metrics_change_callback),
-#endif
-            std::move(
-                accessibility_context_writer),  // accessibility context writer
-            vsync_handle                        // vsync handle
-        );
-      });
-
-#ifndef SCENIC_VIEWS2
-  // Setup the callback that will instantiate the rasterizer.
-  shell::Shell::CreateCallback<shell::Rasterizer> on_create_rasterizer =
-      fml::MakeCopyable([compositor_context = std::move(compositor_context)](
-                            shell::Shell& shell) mutable {
-        return std::make_unique<shell::Rasterizer>(
-            shell.GetTaskRunners(),        // task runners
-            std::move(compositor_context)  // compositor context
-        );
-      });
-#else
   // Setup the callback that will instantiate the rasterizer.
   shell::Shell::CreateCallback<shell::Rasterizer> on_create_rasterizer =
       fml::MakeCopyable(
-          [scenic = std::move(scenic), session = std::move(session), this,
-           view_token = std::move(view_token),
-           on_session_error_callback = std::move(on_session_error_callback),
-           on_session_metrics_change_callback =
-               std::move(on_session_metrics_change_callback),
-           vsync_event_handle =
-               vsync_event_.get()](shell::Shell& shell) mutable {
-            // Create the compositor context from the scenic handle to create
-            // the rasterizer.
-            std::unique_ptr<flow::CompositorContext> compositor_context =
-                std::make_unique<flutter::CompositorContext>(
-                    std::move(scenic),      // scenic
-                    std::move(session),     // scenic session
-                    std::move(view_token),  // scenic view we attach our tree to
-                    thread_label_,          // debug label
-                    std::move(on_session_error_callback),
-                    vsync_event_.get()  // vsync event handle
-                );
+          [compositor_context =
+               std::move(compositor_context)](shell::Shell& shell) mutable {
             return std::make_unique<shell::Rasterizer>(
                 shell.GetTaskRunners(),        // task runners
                 std::move(compositor_context)  // compositor context
             );
           });
-#endif
 
   // Get the task runners from the managed threads. The current thread will be
   // used as the "platform" thread.
@@ -301,8 +252,8 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
     auto view_container =
         static_cast<PlatformView*>(shell_->GetPlatformView().get())
             ->TakeViewContainer();
-
 #endif
+
     fuchsia::sys::EnvironmentPtr environment;
     startup_context.ConnectToEnvironmentService(environment.NewRequest());
 
@@ -407,23 +358,12 @@ void Engine::Terminate() {
   // collected this object.
 }
 
-#ifndef SCENIC_VIEWS2
-void Engine::OnSessionMetricsDidChange(double device_pixel_ratio) {
-#else
 void Engine::OnSessionMetricsDidChange(
     const fuchsia::ui::gfx::Metrics& metrics) {
-#endif
   if (!shell_) {
     return;
   }
 
-#ifndef SCENIC_VIEWS2
-  shell_->GetTaskRunners().GetPlatformTaskRunner()->PostTask(
-      [platform_view = shell_->GetPlatformView(), device_pixel_ratio]() {
-        if (platform_view) {
-          reinterpret_cast<flutter::PlatformView*>(platform_view.get())
-              ->UpdateViewportMetrics(device_pixel_ratio);
-#else
   shell_->GetTaskRunners().GetGPUTaskRunner()->PostTask(
       [rasterizer = shell_->GetRasterizer(), metrics]() {
         if (rasterizer) {
@@ -432,7 +372,6 @@ void Engine::OnSessionMetricsDidChange(
                   rasterizer->compositor_context());
 
           compositor_context->OnSessionMetricsDidChange(metrics);
-#endif
         }
       });
 }

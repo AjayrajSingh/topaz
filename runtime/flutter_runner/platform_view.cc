@@ -10,9 +10,7 @@
 
 #include "flutter/lib/ui/window/pointer_data.h"
 #include "lib/component/cpp/connect.h"
-#ifdef SCENIC_VIEWS2
 #include "lib/ui/gfx/cpp/math.h"
-#endif
 #include "third_party/rapidjson/rapidjson/document.h"
 #include "third_party/rapidjson/rapidjson/stringbuffer.h"
 #include "third_party/rapidjson/rapidjson/writer.h"
@@ -30,7 +28,12 @@ template <class T>
 void SetInterfaceErrorHandler(fidl::InterfacePtr<T>& interface,
                               std::string name) {
   interface.set_error_handler(
-      [name]() { FML_LOG(ERROR) << "Interface error on: " << name; });
+      [name] { FML_LOG(ERROR) << "Interface error on: " << name; });
+}
+template <class T>
+void SetInterfaceErrorHandler(fidl::Binding<T>& binding, std::string name) {
+  binding.set_error_handler(
+      [name] { FML_LOG(ERROR) << "Interface error on: " << name; });
 }
 
 PlatformView::PlatformView(
@@ -38,46 +41,42 @@ PlatformView::PlatformView(
     blink::TaskRunners task_runners,
     fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
         parent_environment_service_provider_handle,
+    fidl::InterfaceRequest<fuchsia::ui::scenic::SessionListener>
+        session_listener_request,
+    fit::closure session_listener_error_callback,
+    OnMetricsUpdate session_metrics_did_change_callback,
 #ifndef SCENIC_VIEWS2
     fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewManager>
         view_manager_handle,
     fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
     zx::eventpair export_token,
-#else
-    fidl::InterfaceRequest<fuchsia::ui::scenic::SessionListener>
-        session_listener_request,
-    fit::closure session_listener_error_callback,
-    OnMetricsUpdate session_metrics_did_change_callback,
 #endif
     fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
         accessibility_context_writer,
     zx_handle_t vsync_event_handle)
     : shell::PlatformView(delegate, std::move(task_runners)),
       debug_label_(std::move(debug_label)),
-#ifndef SCENIC_VIEWS2
-      view_manager_(view_manager_handle.Bind()),
-      view_listener_(this),
-#else
       session_listener_binding_(this, std::move(session_listener_request)),
       session_listener_error_callback_(
           std::move(session_listener_error_callback)),
       metrics_changed_callback_(std::move(session_metrics_did_change_callback)),
-#endif
+#ifndef SCENIC_VIEWS2
+      view_manager_(view_manager_handle.Bind()),
+      view_listener_(this),
       input_listener_(this),
+#endif
       ime_client_(this),
       context_writer_bridge_(std::move(accessibility_context_writer)),
       semantics_bridge_(this, &metrics_),
       surface_(std::make_unique<Surface>(debug_label_)),
       vsync_event_handle_(vsync_event_handle) {
   // Register all error handlers.
+  SetInterfaceErrorHandler(session_listener_binding_, "SessionListener");
 #ifndef SCENIC_VIEWS2
   SetInterfaceErrorHandler(view_manager_, "View Manager");
   SetInterfaceErrorHandler(view_, "View");
-#else
-  session_listener_binding_.set_error_handler(
-      []() { FML_LOG(ERROR) << "Interface error on: Session Listener"; });
-#endif
   SetInterfaceErrorHandler(input_connection_, "Input Connection");
+#endif
   SetInterfaceErrorHandler(ime_, "Input Method Editor");
   SetInterfaceErrorHandler(clipboard_, "Clipboard");
   SetInterfaceErrorHandler(service_provider_, "Service Provider");
@@ -100,14 +99,13 @@ PlatformView::PlatformView(
   // configurator so that it can setup Mozart bindings later.
   view_->GetContainer(view_container_.NewRequest());
 
-#endif
   // Get the input connection from the services of the view.
-  // SCN(840): Get input wired up with view2.
   component::ConnectToService(service_provider_.get(),
                               input_connection_.NewRequest());
 
   // Set the input listener on the input connection.
   input_connection_->SetEventListener(input_listener_.NewBinding());
+#endif
 
   // Access the clipboard.
   parent_environment_service_provider_ =
@@ -118,11 +116,9 @@ PlatformView::PlatformView(
   // Finally! Register the native platform message handlers.
   RegisterPlatformMessageHandlers();
 
-#ifndef SCENIC_VIEWS2
 // TODO(SCN-975): Re-enable.
 //   view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
 //                             std::placeholders::_1));
-#endif
 }
 
 PlatformView::~PlatformView() = default;
@@ -168,7 +164,6 @@ void PlatformView::OnPropertiesChanged(
   callback();
 }
 #else
-
 void PlatformView::OnPropertiesChanged(
     const fuchsia::ui::gfx::ViewProperties& view_properties) {
   fuchsia::ui::gfx::BoundingBox layout_box =
@@ -188,7 +183,6 @@ void PlatformView::OnPropertiesChanged(
 }
 #endif
 
-#ifndef SCENIC_VIEWS2
 // TODO(SCN-975): Re-enable.
 // void PlatformView::ConnectSemanticsProvider(
 //     fuchsia::ui::viewsv1token::ViewToken token) {
@@ -196,6 +190,7 @@ void PlatformView::OnPropertiesChanged(
 //       token.value, parent_environment_service_provider_.get());
 // }
 
+#ifndef SCENIC_VIEWS2
 void PlatformView::UpdateViewportMetrics(
     const fuchsia::ui::viewsv1::ViewLayout& layout) {
   metrics_.size.width = layout.size.width;
@@ -209,14 +204,9 @@ void PlatformView::UpdateViewportMetrics(
 }
 #endif
 
-#ifndef SCENIC_VIEWS2
-void PlatformView::UpdateViewportMetrics(double pixel_ratio) {
-  metrics_.scale = pixel_ratio;
-#else
 void PlatformView::UpdateViewportMetrics(
     const fuchsia::ui::gfx::Metrics& metrics) {
   metrics_.scale = metrics.scale_x;
-#endif
 
   FlushViewportMetrics();
 }
@@ -342,7 +332,6 @@ void PlatformView::OnEvent(fuchsia::ui::input::InputEvent event,
   callback(false);
 }
 
-#ifdef SCENIC_VIEWS2
 void PlatformView::OnScenicError(fidl::StringPtr error) {
   FML_LOG(ERROR) << "Session error: " << error;
   session_listener_error_callback_();
@@ -363,25 +352,46 @@ void PlatformView::OnScenicEvent(
             break;
           }
           case fuchsia::ui::gfx::Event::Tag::kViewPropertiesChanged: {
+#ifdef SCENIC_VIEWS2
             OnPropertiesChanged(
                 std::move(event.gfx().view_properties_changed().properties));
+#endif
             break;
           }
           default: {
             FML_LOG(WARNING)
-                << "Flutter PlatformView::OnEvent: unhandled Scenic Gfx event.";
+                << "Flutter PlatformView::OnScenicEvent: Unhandled GFX event.";
+          }
+        }
+        break;
+      case fuchsia::ui::scenic::Event::Tag::kInput:
+        switch (event.input().Which()) {
+          case fuchsia::ui::input::InputEvent::Tag::kFocus: {
+            OnHandleFocusEvent(event.input().focus());
+            break;
+          }
+          case fuchsia::ui::input::InputEvent::Tag::kPointer: {
+            OnHandlePointerEvent(event.input().pointer());
+            break;
+          }
+          case fuchsia::ui::input::InputEvent::Tag::kKeyboard: {
+            OnHandleKeyboardEvent(event.input().keyboard());
+            break;
+          }
+          default: {
+            FML_LOG(WARNING) << "Flutter PlatformView::OnScenicEvent: "
+                                "Unhandled input event.";
           }
         }
         break;
       default: {
         FML_LOG(WARNING)
-            << "Flutter PlatformView::OnEvent: unhandled Scenic event.";
+            << "Flutter PlatformView::OnScenicEvent: Unhandled Scenic event.";
       }
     }
   }
 }
 
-#endif
 static blink::PointerData::Change GetChangeFromPointerEventPhase(
     fuchsia::ui::input::PointerEventPhase phase) {
   switch (phase) {
@@ -519,6 +529,7 @@ bool PlatformView::OnHandleFocusEvent(
 void PlatformView::ActivateIme() {
   FXL_DCHECK(last_text_state_);
 
+#ifndef SCENIC_VIEWS2
   input_connection_->GetInputMethodEditor(
       fuchsia::ui::input::KeyboardType::TEXT,       // keyboard type
       fuchsia::ui::input::InputMethodAction::DONE,  // input method action
@@ -526,11 +537,14 @@ void PlatformView::ActivateIme() {
       ime_client_.NewBinding(),                     // client
       ime_.NewRequest()                             // editor
   );
+#endif
 }
 
 void PlatformView::DeactivateIme() {
   if (ime_) {
+#ifndef SCENIC_VIEWS2
     input_connection_->HideKeyboard();
+#endif
     ime_ = nullptr;
   }
   if (ime_client_.is_bound()) {
@@ -645,11 +659,15 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
 
   if (method->value == "TextInput.show") {
     if (ime_) {
+#ifndef SCENIC_VIEWS2
       input_connection_->ShowKeyboard();
+#endif
     }
   } else if (method->value == "TextInput.hide") {
     if (ime_) {
+#ifndef SCENIC_VIEWS2
       input_connection_->HideKeyboard();
+#endif
     }
   } else if (method->value == "TextInput.setClient") {
     current_text_input_client_ = 0;

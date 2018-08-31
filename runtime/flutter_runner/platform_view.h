@@ -36,43 +36,39 @@ namespace flutter {
 class PlatformView final : public shell::PlatformView,
 #ifndef SCENIC_VIEWS2
                            public fuchsia::ui::viewsv1::ViewListener,
-#else
-                           private fuchsia::ui::scenic::SessionListener,
 #endif
+                           private fuchsia::ui::scenic::SessionListener,
                            public fuchsia::ui::input::InputMethodEditorClient,
                            public fuchsia::ui::input::InputListener {
  public:
-#ifndef SCENIC_VIEWS2
   PlatformView(
       PlatformView::Delegate& delegate, std::string debug_label,
       blink::TaskRunners task_runners,
       fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
           parent_environment_service_provider,
+      fidl::InterfaceRequest<fuchsia::ui::scenic::SessionListener>
+          session_listener_request,
+      fit::closure on_session_listener_error_callback,
+      OnMetricsUpdate session_metrics_did_change_callback,
+#ifndef SCENIC_VIEWS2
       fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewManager> view_manager,
       fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
       zx::eventpair export_token,
+#endif
       fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
           accessibility_context_writer,
       zx_handle_t vsync_event_handle);
-#else
   PlatformView(PlatformView::Delegate& delegate, std::string debug_label,
                blink::TaskRunners task_runners,
                fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
                    parent_environment_service_provider,
-               fidl::InterfaceRequest<fuchsia::ui::scenic::SessionListener>
-                   session_listener,
-               fit::closure on_session_listener_error_callback,
-               OnMetricsUpdate session_metrics_did_change_callback,
                fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
                    accessibility_context_writer,
                zx_handle_t vsync_event_handle);
-#endif
 
   ~PlatformView();
 
-#ifndef SCENIC_VIEWS2
-  void UpdateViewportMetrics(double pixel_ratio);
-#endif
+  void UpdateViewportMetrics(const fuchsia::ui::gfx::Metrics& metrics);
 
   fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer>
   TakeViewContainer();
@@ -85,25 +81,24 @@ class PlatformView final : public shell::PlatformView,
 
  private:
   const std::string debug_label_;
-#ifndef SCENIC_VIEWS2
-  fuchsia::ui::viewsv1::ViewManagerPtr view_manager_;
-  fuchsia::ui::viewsv1::ViewPtr view_;
-  fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer> view_container_;
-#else
 
   fidl::Binding<fuchsia::ui::scenic::SessionListener> session_listener_binding_;
   fit::closure session_listener_error_callback_;
   OnMetricsUpdate metrics_changed_callback_;
 
-#endif
   fuchsia::sys::ServiceProviderPtr service_provider_;
-#ifndef SCENIC_VIEWS2
-  fidl::Binding<fuchsia::ui::viewsv1::ViewListener> view_listener_;
-#else
 
-#endif
+#ifndef SCENIC_VIEWS2
+  fuchsia::ui::viewsv1::ViewManagerPtr view_manager_;
+  fuchsia::ui::viewsv1::ViewPtr view_;
+  fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer> view_container_;
+  fidl::Binding<fuchsia::ui::viewsv1::ViewListener> view_listener_;
   fuchsia::ui::input::InputConnectionPtr input_connection_;
   fidl::Binding<fuchsia::ui::input::InputListener> input_listener_;
+#else
+  bool focused_ = false;
+#endif
+
   int current_text_input_client_ = 0;
   fidl::Binding<fuchsia::ui::input::InputMethodEditorClient> ime_client_;
   fuchsia::ui::input::InputMethodEditorPtr ime_;
@@ -115,15 +110,12 @@ class PlatformView final : public shell::PlatformView,
   SemanticsBridge semantics_bridge_;
   std::unique_ptr<Surface> surface_;
   blink::LogicalMetrics metrics_;
+  fuchsia::ui::gfx::Metrics scenic_metrics_;
   // last_text_state_ is the last state of the text input as reported by the IME
   // or initialized by Flutter. We set it to null if Flutter doesn't want any
   // input, since then there is no text input state at all.
   std::unique_ptr<fuchsia::ui::input::TextInputState> last_text_state_;
-#ifdef SCENIC_VIEWS2
 
-  fuchsia::ui::gfx::Metrics scenic_metrics_;
-
-#endif
   std::set<int> down_pointers_;
   std::map<
       std::string /* channel */,
@@ -139,10 +131,7 @@ class PlatformView final : public shell::PlatformView,
   // // Method to connect the a11y bridge with the a11y manager with a view id.
   // void ConnectSemanticsProvider(::fuchsia::ui::viewsv1token::ViewToken
   // token);
-
   void UpdateViewportMetrics(const fuchsia::ui::viewsv1::ViewLayout& layout);
-#else
-  void UpdateViewportMetrics(const fuchsia::ui::gfx::Metrics& metrics);
 #endif
 
   void FlushViewportMetrics();
@@ -169,13 +158,11 @@ class PlatformView final : public shell::PlatformView,
   void OnEvent(fuchsia::ui::input::InputEvent event,
                OnEventCallback callback) override;
 
-#ifdef SCENIC_VIEWS2
   // |fuchsia::ui::scenic::SessionListener|
   void OnScenicError(fidl::StringPtr error) override;
   void OnScenicEvent(
       fidl::VectorPtr<fuchsia::ui::scenic::Event> events) override;
 
-#endif
   bool OnHandlePointerEvent(const fuchsia::ui::input::PointerEvent& pointer);
 
   bool OnHandleKeyboardEvent(const fuchsia::ui::input::KeyboardEvent& keyboard);
