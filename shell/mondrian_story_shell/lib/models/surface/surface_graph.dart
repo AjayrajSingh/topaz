@@ -94,16 +94,20 @@ class SurfaceGraph extends Model {
         (parentId == kNoParent) ? _tree : _tree.find(parentId);
     assert(parent != null);
     assert(relation != null);
-    parent.add(node);
     Surface oldSurface = _surfaces[id];
     Surface updatedSurface =
         new Surface(this, node, properties, relation, pattern);
-    _surfaces[id] = updatedSurface;
     // if this is an external surface, create an association between this and
     // the most focused surface.
     if (properties.source == ModuleSource.external$) {
       _visualAssociation[_focusedSurfaces.last] = id;
     }
+    if (oldSurface != null) {
+      // TODO (jphsiao): determine if the children of the surface should also be removed
+      removeSurface(id);
+    }
+    _surfaces[id] = updatedSurface;
+    parent.add(node);
     oldSurface?.notifyListeners();
     notifyListeners();
     return updatedSurface;
@@ -294,6 +298,9 @@ class SurfaceGraph extends Model {
 
   /// Returns the amount of [Surface]s in the graph
   int get size => _surfaces.length;
+
+  /// The tree size includes the root node which has no surface
+  int get treeSize => _tree.flatten().length;
 
   @override
   String toString() => 'Tree:\n${_tree.children.map(_toString).join('\n')}';

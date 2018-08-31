@@ -196,4 +196,54 @@ void main() {
     // expect that there is a dismissed external associated with the parent
     expect(graph.externalSurfaces(surfaceId: 'parent'), ['external']);
   });
+
+  test('duplicate surface add', () {
+    SurfaceGraph graph = new SurfaceGraph();
+    SurfaceProperties properties =
+        new SurfaceProperties(containerLabel: 'containerLabel');
+    SurfaceRelation relation = new SurfaceRelation(
+      emphasis: 0.12,
+      arrangement: SurfaceArrangement.copresent,
+      dependency: SurfaceDependency.dependent,
+    );
+    graph
+      ..addSurface('value', properties, '', relation, null)
+      ..connectView('value', new MockInterfaceHandle())
+      ..focusSurface('value', null);
+    expect(graph.treeSize, 2);
+
+    graph
+      ..addSurface('value', properties, '', relation, null)
+      ..connectView('value', new MockInterfaceHandle())
+      ..focusSurface('value', null);
+    expect(graph.treeSize, 2);
+  });
+
+  test('duplicate child surface add', () {
+    SurfaceGraph graph = new SurfaceGraph();
+    SurfaceProperties properties =
+        new SurfaceProperties(containerLabel: 'containerLabel');
+    SurfaceRelation relation = new SurfaceRelation(
+      emphasis: 0.12,
+      arrangement: SurfaceArrangement.copresent,
+      dependency: SurfaceDependency.dependent,
+    );
+    graph
+      ..addSurface('value', properties, '', relation, null)
+      ..connectView('value', new MockInterfaceHandle())
+      ..focusSurface('value', null);
+    expect(graph.treeSize, 2);
+
+    graph
+      ..addSurface('value.child', properties, '', relation, null)
+      ..connectView('value.child', new MockInterfaceHandle())
+      ..focusSurface('value.child', null);
+    expect(graph.treeSize, 3);
+
+    graph
+      ..addSurface('value.child', properties, '', relation, null)
+      ..connectView('value.child', new MockInterfaceHandle())
+      ..focusSurface('value.child', null);
+    expect(graph.treeSize, 3);
+  });
 }

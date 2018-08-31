@@ -28,8 +28,8 @@ class Surface extends Model {
         compositionPattern = json['compositionPattern'],
         properties = new SurfaceProperties.fromJson(
             json['surfaceProperties'].cast<String, dynamic>()),
-        relation = SurfaceRelationUtil.decode(
-            json['surfaceRelation'].cast<String, String>()),
+        relation = SurfaceRelationUtil
+            .decode(json['surfaceRelation'].cast<String, String>()),
         childIds = json['children'].cast<String>(),
         isParentRoot = json['parentId'] == null;
 
