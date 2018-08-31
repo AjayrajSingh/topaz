@@ -41,7 +41,7 @@ static fml::TimePoint SnapToNextPhase(fml::TimePoint value,
                                       fml::TimePoint phase,
                                       fml::TimeDelta interval) {
   fml::TimeDelta offset = (phase - value) % interval;
-  if (offset != fml::TimeDelta::Zero()) {
+  if (offset < fml::TimeDelta::Zero()) {
     offset = offset + interval;
   }
   return value + offset;
