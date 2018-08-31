@@ -49,3 +49,33 @@ interface TestServer {
 
   20: -> NeverEvent();
 };
+
+enum EnumOne {
+  ONE = 1;
+  TWO = 2;
+  THREE = 3;
+};
+
+enum EnumTwo {
+  ONE = 1;
+  TWO = 2;
+  THREE = 3;
+};
+
+struct HandleStruct {
+    string foo;
+    int32 bar;
+    handle baz;
+};
+
+union UnionOne {
+  string foo;
+  string bar;
+  uint32 baz;
+};
+
+union UnionTwo {
+  string foo;
+  string bar;
+  uint32 baz;
+};
