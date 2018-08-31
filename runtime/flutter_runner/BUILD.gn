@@ -115,26 +115,27 @@ template("flutter_runner") {
     ]
 
     deps = [
-             "//third_party/dart/runtime/bin:libdart_builtin${product_suffix}",
-             "//garnet/public/lib/component/cpp",
              "//garnet/public/fidl/fuchsia.accessibility",
              "//garnet/public/fidl/fuchsia.fonts",
+             "//garnet/public/fidl/fuchsia.ui.input",
+             "//garnet/public/lib/component/cpp",
              "//garnet/public/lib/fsl",
              "//garnet/public/lib/fxl",
              "//garnet/public/lib/icu_data/cpp",
              "//garnet/public/lib/svc/cpp",
-             "//garnet/public/fidl/fuchsia.ui.input",
+             "//garnet/public/lib/ui/gfx/cpp",
              "//garnet/public/lib/ui/scenic/cpp",
              "//garnet/public/lib/vulkan",
              "//peridot/public/fidl/fuchsia.modular",
+             "//third_party/dart/runtime/bin:libdart_builtin${product_suffix}",
              "//third_party/rapidjson",
              "//third_party/skia",
-             "//topaz/lib/deprecated_loop",
+             "//third_party/skia:gpu",
              "//third_party/tonic",
+             "//third_party/zlib:minizip",
+             "//topaz/lib/deprecated_loop",
              "//topaz/public/dart-pkg/fuchsia",
              "//topaz/public/lib/ui/flutter/sdk_ext",
-             "//third_party/skia:gpu",
-             "//third_party/zlib:minizip",
              "//zircon/public/lib/trace-provider",
            ] + extra_deps + flutter_deps
 

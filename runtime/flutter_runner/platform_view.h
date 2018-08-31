@@ -165,8 +165,9 @@ class PlatformView final : public shell::PlatformView,
 
 #ifdef SCENIC_VIEWS2
   // |fuchsia::ui::scenic::SessionListener|
-  void OnError(fidl::StringPtr error) override;
-  void OnEvent(fidl::VectorPtr<fuchsia::ui::scenic::Event> events) override;
+  void OnScenicError(fidl::StringPtr error) override;
+  void OnScenicEvent(
+      fidl::VectorPtr<fuchsia::ui::scenic::Event> events) override;
 
 #endif
   bool OnHandlePointerEvent(const fuchsia::ui::input::PointerEvent& pointer);

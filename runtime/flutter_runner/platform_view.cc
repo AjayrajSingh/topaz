@@ -11,7 +11,7 @@
 #include "flutter/lib/ui/window/pointer_data.h"
 #include "lib/component/cpp/connect.h"
 #ifdef SCENIC_VIEWS2
-#include "lib/ui/scenic/cpp/fidl_math.h"
+#include "lib/ui/gfx/cpp/math.h"
 #endif
 #include "third_party/rapidjson/rapidjson/document.h"
 #include "third_party/rapidjson/rapidjson/stringbuffer.h"
@@ -339,12 +339,13 @@ void PlatformView::OnEvent(fuchsia::ui::input::InputEvent event,
 }
 
 #ifdef SCENIC_VIEWS2
-void PlatformView::OnError(fidl::StringPtr error) {
+void PlatformView::OnScenicError(fidl::StringPtr error) {
   FML_LOG(ERROR) << "Session error: " << error;
   session_listener_error_callback_();
 }
 
-void PlatformView::OnEvent(fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
+void PlatformView::OnScenicEvent(
+    fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
   for (const auto& event : *events) {
     switch (event.Which()) {
       case fuchsia::ui::scenic::Event::Tag::kGfx:
