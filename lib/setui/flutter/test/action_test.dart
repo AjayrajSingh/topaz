@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:flutter/material.dart' hide State, Step;
 import 'package:lib_setui_common/action.dart';
 import 'package:lib_setui_common/step.dart';
 import 'package:lib_setui_flutter/widget_action.dart';
@@ -19,6 +20,10 @@ class MockStateModel extends Mock implements ActionStateModel {}
 
 class MockWidgetActionClient extends Mock implements WidgetActionClient {}
 
+class MockBuildContext extends Mock implements BuildContext {}
+
+class MockWidgetBlueprint extends Mock implements WidgetBlueprint {}
+
 void main() {
   // Verifies that an action can be properly launched from the roster and
   // the reported result is propagated back
@@ -31,6 +36,7 @@ void main() {
 
     final MockStep step = MockStep();
     final ActionResultReceiver resultReceiver = MockActionResultReceiver();
+    final MockBuildContext context = MockBuildContext();
 
     // Create Blueprint
     ActionResultSender actionResultSender;
@@ -48,11 +54,14 @@ void main() {
     blueprint.assemble(step, resultReceiver).launch();
 
     // Ensure start was called
-    verify(client.setState(State.started));
+    verify(client.state = State.started);
 
     // launch action and make sure client built
-    verify(stateModel.setCurrentAction(captureAny)).captured.single.build();
-    verify(client.build());
+    verify(stateModel.setCurrentAction(captureAny))
+        .captured
+        .single
+        .build(context);
+    verify(client.build(context));
 
     reset(client);
 
@@ -60,12 +69,15 @@ void main() {
     actionResultSender.sendResult(testResult);
     expect(verify(resultReceiver.onResult(captureAny)).captured.single.code,
         testResult);
-    verify(client.setState(State.finished));
+    verify(client.state = State.finished);
   });
 
   test('test_host', () {
     // Ensures that the action host returns a widget even without state.
-    expect(null != WidgetActionHost().getWidget(MockStateModel()), true);
+    expect(
+        null !=
+            WidgetActionHost().getWidget(MockStateModel(), MockBuildContext()),
+        true);
   });
 
   // Verifies that a client can finish (by sending result) when starting.
@@ -76,8 +88,9 @@ void main() {
 
     ActionResultSender actionResultSender;
 
-    when(client.setState(State.started))
-        .thenAnswer((state) => actionResultSender.sendResult(null));
+    when(client.state = State.started).thenAnswer((state) {
+      actionResultSender.sendResult(null);
+    });
 
     final WidgetBlueprint blueprint =
         WidgetBlueprint('testActionName', 'testBlueprint', stateModel,
@@ -88,6 +101,27 @@ void main() {
 
     WidgetAction(null, resultReceiver, blueprint).launch();
 
-    verify(client.setState(State.finished));
+    verify(client.state = State.finished);
+  });
+
+  // Ensures BuildContext is passed through to the client.
+  test('test_build_context_propagation', () {
+    final MockStateModel stateModel = MockStateModel();
+    final MockBuildContext context = MockBuildContext();
+    final MockWidgetBlueprint blueprint = MockWidgetBlueprint();
+    final MockWidgetActionClient client = MockWidgetActionClient();
+
+    when(blueprint.model).thenReturn(stateModel);
+    when(blueprint.createClient).thenReturn((sender) => client);
+
+    final WidgetAction action =
+        WidgetAction(null, MockActionResultReceiver(), blueprint);
+    when(stateModel.currentAction).thenReturn(action);
+
+    action.launch();
+
+    WidgetActionHost().getWidget(stateModel, context);
+
+    expect(verify(client.build(captureAny)).captured.single, context);
   });
 }

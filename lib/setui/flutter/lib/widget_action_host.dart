@@ -15,12 +15,13 @@ class WidgetActionHost extends StatelessWidget {
         Widget child,
         ActionStateModel model,
       ) =>
-              getWidget(model));
+              getWidget(model, context));
 
   @visibleForTesting
-  Widget getWidget(ActionStateModel model) => model.currentAction != null
-      ? model.currentAction.build()
-      : Column(children: []);
+  Widget getWidget(ActionStateModel model, BuildContext context) =>
+      model.currentAction != null
+          ? model.currentAction.build(context)
+          : Column(children: []);
 }
 
 /// A simple model that stores a reference to a current action.

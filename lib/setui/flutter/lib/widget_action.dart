@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 /// namespaced as material.dart defines a Step and State class as well.
-import 'package:flutter/material.dart' show Widget;
+import 'package:flutter/material.dart' show BuildContext, Widget;
 import 'package:lib_setui_common/action.dart';
 import 'package:lib_setui_common/step.dart';
 
@@ -23,11 +23,11 @@ class WidgetAction extends Action<WidgetBlueprint>
   @override
   void launch() {
     _client = blueprint.createClient(this);
-    // We must separate these two calls rather than cascading as setState can
-    // reference back to _client, which is not set until the cascading is
+    // We must separate these two calls rather than cascading as setting state
+    // can reference back to _client, which is not set until the cascading is
     // complete.
     // ignore: cascade_invocations
-    _client.setState(State.started);
+    _client.state = State.started;
 
     // It's possible the client changed the state after started. Check state
     // before proceeding
@@ -39,13 +39,13 @@ class WidgetAction extends Action<WidgetBlueprint>
   String get title => _client.title;
 
   /// Called by owning host to generate layout for action.
-  Widget build() {
-    return _client.build();
+  Widget build(BuildContext context) {
+    return _client.build(context);
   }
 
   @override
   void sendResult(String result) {
     onResult(result);
-    _client.setState(State.finished);
+    _client.state = State.finished;
   }
 }

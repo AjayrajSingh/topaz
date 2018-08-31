@@ -20,13 +20,14 @@ abstract class WidgetActionClient {
   String get title => null;
 
   /// Invoked to generate the root view.
-  Widget build();
+  Widget build(BuildContext context);
 
   State get state => _state;
 
-  // ignore: use_setters_to_change_properties
-  /// Sets the [State].
-  void setState(State state) {
+  set state(State state) {
     _state = state;
+    onStateChanged(state);
   }
+
+  void onStateChanged(State state) {}
 }
