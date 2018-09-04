@@ -99,7 +99,7 @@ class SurfaceGraph extends Model {
         new Surface(this, node, properties, relation, pattern);
     // if this is an external surface, create an association between this and
     // the most focused surface.
-    if (properties.source == ModuleSource.external$) {
+    if (properties.source == ModuleSource.external$ && _focusedSurfaces.isNotEmpty) {
       _visualAssociation[_focusedSurfaces.last] = id;
     }
     if (oldSurface != null) {
