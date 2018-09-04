@@ -177,6 +177,8 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
       _pointerEventsListener.listen(presentationProxy);
       keyListener?.listen(presentationProxy);
       presentationProxy.ctrl.close();
+    } else {
+      keyListener.stop();
     }
   }
 }
