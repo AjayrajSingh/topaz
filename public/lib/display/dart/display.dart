@@ -57,6 +57,10 @@ class Display extends DeviceSettingsWatcher {
     _deviceSettingsManagerService.getString(_brightnessSettingsKey,
         (String val, Status status) {
       if (status == Status.ok) {
+        if (val == null || val.isEmpty) {
+          return;
+        }
+
         // If previous value exists, restore brightness.
         setBrightness(double.parse(val));
       } else {
