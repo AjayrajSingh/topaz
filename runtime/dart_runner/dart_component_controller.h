@@ -5,8 +5,8 @@
 #ifndef TOPAZ_RUNTIME_DART_RUNNER_DART_COMPONENT_CONTROLLER_H_
 #define TOPAZ_RUNTIME_DART_RUNNER_DART_COMPONENT_CONTROLLER_H_
 
-#include <lib/fdio/namespace.h>
 #include <lib/async/cpp/wait.h>
+#include <lib/fdio/namespace.h>
 #include <lib/zx/timer.h>
 
 #include <fuchsia/sys/cpp/fidl.h>
@@ -50,18 +50,14 @@ class DartComponentController : public fuchsia::sys::ComponentController {
 
   // Idle notification.
   void MessageEpilogue(Dart_Handle result);
-  void OnIdleTimer(async_dispatcher_t* dispatcher, async::WaitBase* wait, zx_status_t status,
-                   const zx_packet_signal* signal);
-
-  // TODO(CP-19): Remove once we propagate component name
-  std::string GetDefaultComponentName(
-    const std::string& package_resolved_url);
+  void OnIdleTimer(async_dispatcher_t* dispatcher, async::WaitBase* wait,
+                   zx_status_t status, const zx_packet_signal* signal);
 
   std::string label_;
   std::string url_;
   fuchsia::sys::Package package_;
   fuchsia::sys::StartupInfo startup_info_;
-  std::string component_name_;
+  std::string data_path_;
   component::ServiceProviderBridge service_provider_bridge_;
   fidl::Binding<fuchsia::sys::ComponentController> binding_;
 
