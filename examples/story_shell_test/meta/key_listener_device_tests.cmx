@@ -1,6 +1,6 @@
 {
     "program": {
-        "data": "data/dart_zircon_test"
+        "data": "data/key_listener_device_tests"
     },
     "sandbox": {
         "features": [

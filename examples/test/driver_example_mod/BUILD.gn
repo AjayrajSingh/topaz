@@ -75,7 +75,7 @@ dart_fuchsia_test("driver_example_mod_target_tests") {
 
   meta = [
     {
-      path = "//topaz/runtime/dart_runner/meta/dart_zircon_test.cmx"
+      path = rebase_path("meta/driver_example_mod_target_tests.cmx")
       dest = "driver_example_mod_target_tests.cmx"
     },
   ]

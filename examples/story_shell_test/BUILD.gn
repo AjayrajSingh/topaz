@@ -18,8 +18,8 @@ dart_fuchsia_test("key_listener_device_tests") {
 
   meta = [
     {
-      path = "//topaz/runtime/dart_runner/meta/dart_zircon_test.cmx"
-      dest = "device_side_mondrian_tests.cmx"
+      path = rebase_path("meta/key_listener_device_tests.cmx")
+      dest = "key_listener_device_tests.cmx"
     },
   ]
 }

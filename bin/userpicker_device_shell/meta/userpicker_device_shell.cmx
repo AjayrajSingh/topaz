@@ -1,6 +1,6 @@
 {
     "program": {
-        "binary": "bin/app"
+        "data": "data/userpicker_device_shell"
     },
     "sandbox": {
         "features": [ "deprecated-all-services" ],

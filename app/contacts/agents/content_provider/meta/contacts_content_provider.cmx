@@ -1,6 +1,6 @@
 {
     "program": {
-        "binary": "bin/app"
+        "data": "data/contacts_content_provider"
     },
     "sandbox": {
         "features": [ "deprecated-all-services" ],

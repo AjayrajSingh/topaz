@@ -1,6 +1,6 @@
 {
     "program": {
-        "binary": "bin/app"
+        "data": "data/device_settings"
     },
     "sandbox": {
         "features": [ "deprecated-all-services" ],

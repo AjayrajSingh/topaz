@@ -1,6 +1,6 @@
 {
     "program": {
-        "binary": "bin/app"
+        "data": "data/home_work_agent"
     },
     "sandbox": {
         "features": [ "deprecated-all-services" ],

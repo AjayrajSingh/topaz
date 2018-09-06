@@ -1,6 +1,6 @@
 {
     "program": {
-        "data": "data/dart_zircon_test"
+        "data": "data/driver_example_mod_target_tests"
     },
     "sandbox": {
         "features": [
