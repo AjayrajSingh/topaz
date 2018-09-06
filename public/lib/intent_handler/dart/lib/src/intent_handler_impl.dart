@@ -11,14 +11,14 @@ import 'package:meta/meta.dart';
 /// Callback for [IntentHandler#handleIntent].
 typedef HandleIntentCallback = void Function(fidl.Intent intent);
 
-/// Impl for [IntentHandler].
+/// Impl for [fidl.IntentHandler].
 class IntentHandlerImpl extends fidl.IntentHandler {
   /// Callback for when the system calls [handleIntent].
   final HandleIntentCallback onHandleIntent;
 
   final _intentHandlerBinding = fidl.IntentHandlerBinding();
 
-  /// Creates an [IntentHandler] which calls [onHandleIntent] when a
+  /// Creates an [fidl.IntentHandler] which calls [onHandleIntent] when a
   /// new intent is received from the framework.
   IntentHandlerImpl({
     @required this.onHandleIntent,
@@ -35,7 +35,7 @@ class IntentHandlerImpl extends fidl.IntentHandler {
     onHandleIntent(intent);
   }
 
-  /// Adds an [IntentHandler] service to the outgoing services of [startupContext].
+  /// Adds an [fidl.IntentHandler] service to the outgoing services of [startupContext].
   void addService({
     @required StartupContext startupContext,
   }) {

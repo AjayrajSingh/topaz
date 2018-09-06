@@ -72,13 +72,13 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   /// [AgentContext] used for creating entity references
   final AgentContext _agentContext;
 
-  /// [Ledger] instance
+  /// [ledger.Ledger] instance
   ledger.LedgerProxy _ledger;
 
-  /// Ledger [Page] instance containing contacts
+  /// Ledger [ledger.Page] instance containing contacts
   ledger.PageProxy _page;
 
-  /// Watcher to keep track of updates to the Ledger [Page]
+  /// Watcher to keep track of updates to the Ledger [ledger.Page]
   ContactsWatcher _contactsWatcher;
 
   /// Keep track of subscribers via a map of message queue tokens to the

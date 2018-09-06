@@ -11,9 +11,12 @@ namespace flutter {
 
 class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
  public:
-  ScopedFrame(flow::CompositorContext& context, bool instrumentation_enabled,
+  ScopedFrame(flow::CompositorContext& context,
+              const SkMatrix& root_surface_transformation,
+              bool instrumentation_enabled,
               SessionConnection& session_connection)
       : flow::CompositorContext::ScopedFrame(context, nullptr, nullptr,
+                                             root_surface_transformation,
                                              instrumentation_enabled),
         session_connection_(session_connection) {}
 
@@ -86,14 +89,17 @@ void CompositorContext::OnSessionMetricsDidChange(
 CompositorContext::~CompositorContext() = default;
 
 std::unique_ptr<flow::CompositorContext::ScopedFrame>
-CompositorContext::AcquireFrame(GrContext* gr_context, SkCanvas* canvas,
+CompositorContext::AcquireFrame(GrContext* gr_context,
+                                SkCanvas* canvas,
+                                const SkMatrix& root_surface_transformation,
                                 bool instrumentation_enabled) {
   // TODO: The AcquireFrame interface is too broad and must be refactored to get
   // rid of the context and canvas arguments as those seem to be only used for
   // colorspace correctness purposes on the mobile shells.
-  return std::make_unique<flutter::ScopedFrame>(*this,                    //
-                                                instrumentation_enabled,  //
-                                                session_connection_       //
+  return std::make_unique<flutter::ScopedFrame>(*this,                        //
+                                                root_surface_transformation,  //
+                                                instrumentation_enabled,      //
+                                                session_connection_           //
   );
 }
 

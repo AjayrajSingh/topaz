@@ -38,7 +38,7 @@ class TimeZoneController extends SettingController implements TimezoneWatcher {
 
   @override
   Future<void> initialize() async {
-    Completer<bool> completer = Completer();
+    Completer<void> completer = Completer();
 
     _timeZoneProxy = TimezoneProxy();
     connectToService(StartupContext.fromStartupInfo().environmentServices,

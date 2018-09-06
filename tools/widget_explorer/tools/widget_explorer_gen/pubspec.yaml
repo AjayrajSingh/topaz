@@ -5,7 +5,7 @@
 name: widget_explorer_gen
 description: A CLI Tool for extracting widget specs and generating widget explorer pages.
 dependencies:
-  strings: ^0.0.6
+  strings: ^0.1.0
   widget_explorer_core:
     path: ../../packages/widget_explorer_core
 dev_dependencies:

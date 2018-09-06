@@ -20,8 +20,8 @@ void main() {
   test('Check that multiple empty transactions can be started without awaiting',
       () async {
     Sledge sledge = newSledgeForTesting()
-      ..runInTransaction(() async {})
-      ..runInTransaction(() async {});
+      ..runInTransaction(() async {})   // ignore: unawaited_futures
+      ..runInTransaction(() async {});  // ignore: unawaited_futures
     await sledge.runInTransaction(() async {});
   });
 

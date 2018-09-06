@@ -40,7 +40,9 @@ class CompositorContext final : public flow::CompositorContext {
 
   // |flow::CompositorContext|
   std::unique_ptr<ScopedFrame> AcquireFrame(
-      GrContext* gr_context, SkCanvas* canvas,
+      GrContext* gr_context,
+      SkCanvas* canvas,
+      const SkMatrix& root_surface_transformation,
       bool instrumentation_enabled) override;
 
   FML_DISALLOW_COPY_AND_ASSIGN(CompositorContext);

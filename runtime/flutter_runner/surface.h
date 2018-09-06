@@ -34,6 +34,9 @@ class Surface final : public shell::Surface {
   // |shell::Surface|
   GrContext* GetContext() override;
 
+  // |shell::Surface|
+  SkMatrix GetRootTransformation() const override;
+
   static bool CanConnectToDisplay();
 
   FML_DISALLOW_COPY_AND_ASSIGN(Surface);

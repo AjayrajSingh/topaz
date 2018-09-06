@@ -54,4 +54,13 @@ bool Surface::CanConnectToDisplay() {
   return status == ZX_ERR_STOP;
 }
 
+// |shell::Surface|
+SkMatrix Surface::GetRootTransformation() const {
+  // This backend does not support delegating to the underlying platform to
+  // query for root surface transformations. Just return identity.
+  SkMatrix matrix;
+  matrix.reset();
+  return matrix;
+}
+
 }  // namespace flutter
