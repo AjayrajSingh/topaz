@@ -32,18 +32,27 @@ def main():
 
   test_failed_definition_block = '''
 FAILED_TESTS=()
+PIDS_NAMES=()
 
 function run_test () {
   local test_exe="$1"
   local test_name="$2"
   echo "Running $test_name"
-  env "$test_exe" || test_failed "$test_name"
+  env $test_exe & PIDS_NAMES+=($!:$test_name)
 }
 
 function test_failed () {
   FAILED_TESTS+=("$1")
 }
 
+'''
+
+  test_wait_to_complete_block = '''
+for pid_name in ${PIDS_NAMES[*]}; do
+  pid="${pid_name%%:*}"
+  name="${pid_name#*:}"
+  wait $pid || test_failed $name
+done
 '''
 
   test_failed_check_block = '''
@@ -59,8 +68,10 @@ fi
   script = '#!/bin/bash\n\n'
   if args.test_name:
     script += test_failed_definition_block
+    # TODO(FL-104): Limit concurrency to number of cores
     for test_executable, test_name in zip(args.test, args.test_name):
       script += "run_test %s '%s'\n" % (test_executable, test_name)
+    script += test_wait_to_complete_block
     script += test_failed_check_block
   else:
     for test_executable in args.test:
