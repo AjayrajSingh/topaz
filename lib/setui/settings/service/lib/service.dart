@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_setui/fidl.dart';
-import 'package:flutter/material.dart';
+import 'package:lib_setui_settings_common/setting_adapter.dart';
+import 'package:lib_setui_settings_common/setting_source.dart';
 
 import 'src/local_service.dart';
 
@@ -11,34 +12,36 @@ import 'src/local_service.dart';
 /// Can be used to swap out between different implementations.
 /// A [SetUiListenerBinder] can be passed in to provide alternative
 /// binding forms (such as in linux host tests).
-class SetUiServiceManager {
+class SetUiServiceAdapter implements SettingAdapter {
   final SetUiService _service;
   final SetUiListenerBinder _listenerBinder;
 
-  factory SetUiServiceManager(
+  factory SetUiServiceAdapter(
       {SetUiService service, SetUiListenerBinder binder = _bindListener}) {
     return service != null
-        ? SetUiServiceManager.withService(service, binder)
-        : SetUiServiceManager._local(binder);
+        ? SetUiServiceAdapter.withService(service, binder)
+        : SetUiServiceAdapter._local(binder);
   }
 
-  SetUiServiceManager.withService(this._service, this._listenerBinder);
+  SetUiServiceAdapter.withService(this._service, this._listenerBinder);
 
-  SetUiServiceManager._local(this._listenerBinder)
+  SetUiServiceAdapter._local(this._listenerBinder)
       : _service = LocalSetUiService();
 
   /// Gets the setting from the service with the given [SettingType].
   ///
   /// [T] must be the type returned by the service for the given SettingType
   /// as documented in fuchsia.setui.types.fidl.
-  SettingsObjectNotifier<T> getSetting<T>(SettingType settingType) {
-    final notifier = SettingsObjectNotifier<T>();
+  @override
+  SettingSource<T> fetch<T>(SettingType settingType) {
+    final notifier = SettingSource<T>();
     _service.listen(settingType, _listenerBinder(notifier));
     return notifier;
   }
 
   /// Updates the setting based on [SettingsObject]'s type.
-  Future<UpdateResponse> setSetting(SettingsObject object) async {
+  @override
+  Future<UpdateResponse> update(SettingsObject object) async {
     Completer<UpdateResponse> c = Completer<UpdateResponse>();
 
     _service.update(object, (response) {
@@ -46,23 +49,6 @@ class SetUiServiceManager {
     });
 
     return c.future;
-  }
-}
-
-/// [T] must be within the list of structs in the union class of SettingsData
-class SettingsObjectNotifier<T> extends ChangeNotifier
-    implements SettingListener {
-  final ValueNotifier<T> _valueNotifier = ValueNotifier<T>(null);
-
-  SettingsObjectNotifier() {
-    _valueNotifier.addListener(notifyListeners);
-  }
-
-  T get value => _valueNotifier.value;
-
-  @override
-  Future<Null> notify(SettingsObject object) async {
-    _valueNotifier.value = object.data.$data;
   }
 }
 

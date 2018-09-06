@@ -1,0 +1,23 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_library.gni")
+import("//topaz/runtime/dart/dart_test.gni")
+
+dart_library("common") {
+  package_name = "lib_setui_settings_common"
+
+  sources = [
+    "setting_adapter.dart",
+    "setting_controller.dart",
+    "setting_model.dart",
+    "setting_source.dart",
+  ]
+
+  deps = [
+    "//garnet/public/fidl/fuchsia.setui",
+    "//topaz/lib/setui/common:common",
+    "//topaz/lib/setui/flutter:flutter",
+  ]
+}

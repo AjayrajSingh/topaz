@@ -17,6 +17,7 @@ dart_library("service") {
     "//garnet/public/fidl/fuchsia.setui",
     "//garnet/public/fidl/fuchsia.timezone",
     "//topaz/lib/settings:lib.settings",
+    "//topaz/lib/setui/settings/common:common",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

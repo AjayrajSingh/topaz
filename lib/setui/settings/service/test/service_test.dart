@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_setui/fidl.dart';
 import 'package:flutter/material.dart';
+import 'package:lib_setui_settings_common/setting_source.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -16,7 +17,7 @@ const String defaultValue = 'default';
 const String value1 = 'value1';
 
 void main() {
-  SetUiServiceManager manager;
+  SetUiServiceAdapter manager;
   LocalSetUiService service;
   FakeSettingControllerCreator fakeControllers;
 
@@ -24,36 +25,36 @@ void main() {
     fakeControllers = FakeSettingControllerCreator();
     service = LocalSetUiService(
         creator: fakeControllers, proxyBinder: _bindListenerProxy);
-    manager = SetUiServiceManager.withService(service, _bindListener);
+    manager = SetUiServiceAdapter.withService(service, _bindListener);
   });
 
   group('SetUi service', () {
     test('gets an object that then gets updated', () async {
-      final object = manager.getSetting<String>(SettingType.unknown);
-      expect(object.value, defaultValue);
+      final object = manager.fetch<String>(SettingType.unknown);
+      expect(object.state, defaultValue);
 
       final controller = fakeControllers.fakes[SettingType.unknown];
       controller.item.value = value1;
-      expect(object.value, value1);
+      expect(object.state, value1);
     });
 
     test('sets a value', () async {
-      final object = manager.getSetting<String>(SettingType.unknown);
-      expect(object.value, defaultValue);
+      final object = manager.fetch<String>(SettingType.unknown);
+      expect(object.state, defaultValue);
 
-      final response = await manager.setSetting(stringObject(value1));
+      final response = await manager.update(stringObject(value1));
       expect(response.returnCode, ReturnCode.ok);
-      expect(object.value, value1);
+      expect(object.state, value1);
     });
     test('sets a value without listeners and closes after set', () async {
-      final response = await manager.setSetting(stringObject(value1));
+      final response = await manager.update(stringObject(value1));
       expect(response.returnCode, ReturnCode.ok);
       final FakeStringSettingController controller =
           fakeControllers.fakes[SettingType.unknown];
       expect(controller.open, false);
     });
     test('calls initialize and close depending on listeners', () async {
-      manager.getSetting<String>(SettingType.unknown);
+      manager.fetch<String>(SettingType.unknown);
       final FakeStringSettingController controller =
           fakeControllers.fakes[SettingType.unknown];
 
@@ -65,14 +66,14 @@ void main() {
 
       expect(controller.open, false);
 
-      manager.getSetting<String>(SettingType.unknown);
+      manager.fetch<String>(SettingType.unknown);
 
       expect(controller.open, true);
     });
   });
 }
 
-Future<void> listenForNextChange(SettingsObjectNotifier notifier) async {
+Future<void> listenForNextChange(SettingSource notifier) async {
   final completer = Completer();
   notifier.addListener(completer.complete);
   await completer.future;

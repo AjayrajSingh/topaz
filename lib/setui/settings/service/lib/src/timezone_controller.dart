@@ -38,7 +38,7 @@ class TimeZoneController extends SettingController implements TimezoneWatcher {
 
   @override
   Future<void> initialize() async {
-    Completer<bool> completer;
+    Completer<bool> completer = Completer();
 
     _timeZoneProxy = TimezoneProxy();
     connectToService(StartupContext.fromStartupInfo().environmentServices,
@@ -56,7 +56,7 @@ class TimeZoneController extends SettingController implements TimezoneWatcher {
 
   @override
   Future<bool> setSettingValue(SettingsObject value) async {
-    Completer<bool> completer;
+    Completer<bool> completer = Completer();
 
     final newId = value.data.timeZoneValue.current.id;
 
@@ -71,7 +71,7 @@ class TimeZoneController extends SettingController implements TimezoneWatcher {
   SettingsObject get value => SettingsObject(
       settingType: SettingType.timeZone,
       data: SettingData.withTimeZoneValue(TimeZoneInfo(
-          available: _timeZones.values,
+          available: _timeZones.values.toList(),
           current: _timeZones[_currentTimeZoneId])));
 
   @override
