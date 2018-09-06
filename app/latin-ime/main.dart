@@ -42,9 +42,22 @@ class ImeKeyboard extends StatelessWidget {
     _imeService.injectInput(event);
   }
 
+  void _onGo() {
+    final kbEvent = KeyboardEvent(
+      phase: KeyboardEventPhase.pressed,
+      codePoint: 0,
+      hidUsage: 0x28,
+      eventTime: 0,
+      modifiers: 0,
+      deviceId: 0,
+    );
+    var event = InputEvent.withKeyboard(kbEvent);
+    _imeService.injectInput(event);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Keyboard(onText: _onText, onDelete: _onDelete);
+    return Keyboard(onText: _onText, onDelete: _onDelete, onGo: _onGo);
   }
 }
 
