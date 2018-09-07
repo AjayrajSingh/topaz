@@ -68,8 +68,9 @@ if (current_toolchain == dart_toolchain) {
     _flutter_shell_out_dir = get_label_info(_flutter_shell_label, "root_out_dir")
     _flutter_shell_bin = "$_flutter_shell_out_dir/flutter_tester"
 
-    _test_target_names = []
-    _test_bundle_args = []
+    _precompiled_kernel_target_names = []
+    _tests_json = []
+    _tests_filename = "$target_gen_dir/tests.json"
 
     foreach(_source_file, invoker.sources) {
       _source_path = "$_sources_dir/$_source_file"
@@ -129,75 +130,63 @@ if (current_toolchain == dart_toolchain) {
           ]
         }
 
-        _invocation_file = "$target_gen_dir/$_test_target_name"
+        _precompiled_kernel_target_names += [":${_kernel_target_name}_kernel"]
 
-        action(_test_target_name) {
-          script = "//topaz/runtime/dart/gen_test_invocation.py"
-          testonly = true
-          outputs = [ _invocation_file ]
-
-          inputs = [
-            _dot_packages_file,
-            _bootstrap_file_name,
-            _fuchsia_tester_bin,
-            _flutter_shell_bin,
-            "$target_gen_dir/${_kernel_target_name}_kernel.dil",
-          ]
-
-          args = [
-            "--out",
-            rebase_path(_invocation_file),
-            "--test-file",
-            rebase_path(_bootstrap_file_name),
-            "--dill-file",
-            # TODO(tvolkert): get_target_outputs(_kernel_target_name + "_kernel")
-            rebase_path("$target_gen_dir/${_kernel_target_name}_kernel.dil"),
-            "--source-dir",
-            rebase_path(_sources_dir),
-            "--dot-packages",
-            rebase_path(_dot_packages_file),
-            "--test-runner",
-            rebase_path(_fuchsia_tester_bin),
-            "--flutter-shell",
-            rebase_path(_flutter_shell_bin),
-            "--icudtl",
-            rebase_path("//third_party/icu/common/icudtl.dat"),
-            "--sdk-root",
-            rebase_path("$root_out_dir/flutter_runner_patched_sdk"),
-          ]
-
-          deps = [
-            ":$_library_target_name",
-            ":$_bootstrap_target_name",
-            ":${_kernel_target_name}_kernel",
-            _flutter_shell_label,
-            _fuchsia_tester_label,
-          ]
-        }
-
-        _test_target_names += [":$_test_target_name"]
-        _test_bundle_args += [
-          "--test",
-          rebase_path(_invocation_file),
-          "--test-name",
-          _source_path,
+        _tests_json += [
+          {
+            source = rebase_path(_bootstrap_file_name)
+            dill = rebase_path("$target_gen_dir/${_kernel_target_name}_kernel.dil")
+          },
         ]
+
       }
+
+      write_file(_tests_filename, _tests_json, "json")
     }
 
     action(_main_target_name) {
       _invocation_file = "$target_gen_dir/$target_name"
-      script = "//topaz/runtime/dart/gen_test_bundle_invocation.py"
+      script = "//topaz/runtime/dart/gen_test_invocation.py"
       testonly = true
       outputs = [ _invocation_file ]
+
+      inputs = [
+        _dot_packages_file,
+        _bootstrap_file_name,
+        _fuchsia_tester_bin,
+        _flutter_shell_bin,
+        _tests_filename,
+      ]
 
       args = [
         "--out",
         rebase_path(_invocation_file),
-      ] + _test_bundle_args
+        "--tests",
+        rebase_path(_tests_filename),
+        "--source-dir",
+        rebase_path(_sources_dir),
+        "--dot-packages",
+        rebase_path(_dot_packages_file),
+        "--test-runner",
+        rebase_path(_fuchsia_tester_bin),
+        "--flutter-shell",
+        rebase_path(_flutter_shell_bin),
+        "--icudtl",
+        rebase_path("//third_party/icu/common/icudtl.dat"),
+        "--sdk-root",
+        rebase_path("$root_out_dir/flutter_runner_patched_sdk"),
+      ]
 
-      deps = _test_target_names
+      deps = [
+        ":$_library_target_name",
+        ":$_bootstrap_target_name",
+        ":${_kernel_target_name}_kernel",
+        _flutter_shell_label,
+        _fuchsia_tester_label,
+      ] + _precompiled_kernel_target_names
     }
+
+
   }
 } else {
   # Not the Dart toolchain.

@@ -82,5 +82,7 @@ template("dart_kernel") {
       args += [ "--embed-sources" ]
     }
     args += [ rebase_path(invoker.main_dart) ]
+
+    pool = "//build/dart:dart_pool($dart_toolchain)"
   }
 }

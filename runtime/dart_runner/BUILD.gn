@@ -80,8 +80,8 @@ runner("dart_dbc_runner_bin") {
   product = false
   extra_defines = []
   extra_deps = [
-    "//third_party/dart/runtime:libdart_jit_interpreter",
-    "//third_party/dart/runtime/platform:libdart_platform_jit_interpreter",
+    "//third_party/dart/runtime:libdart_jit",
+    "//third_party/dart/runtime/platform:libdart_platform_jit",
   ]
 }
 
@@ -90,8 +90,8 @@ runner("dart_dbc_product_runner_bin") {
   product = true
   extra_defines = [ "DART_PRODUCT" ]
   extra_deps = [
-    "//third_party/dart/runtime:libdart_jit_product_interpreter",
-    "//third_party/dart/runtime/platform:libdart_platform_jit_product_interpreter",
+    "//third_party/dart/runtime:libdart_jit_product",
+    "//third_party/dart/runtime/platform:libdart_platform_jit_product",
   ]
 }
 

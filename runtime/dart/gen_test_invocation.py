@@ -22,11 +22,8 @@ def main():
   parser.add_argument('--sdk-root',
                       help='Path to the SDK platform files',
                       required=True)
-  parser.add_argument('--test-file',
-                      help='Path to test file',
-                      required=True)
-  parser.add_argument('--dill-file',
-                      help='Path to precompiled kernel file for test',
+  parser.add_argument('--tests',
+                      help='Path to test-to-precompiled-kernel file list',
                       required=True)
   parser.add_argument('--dot-packages',
                       help='Path to the .packages file',
@@ -53,9 +50,8 @@ $test_runner \\
   --packages=$dot_packages \\
   --shell=$flutter_shell \\
   --test-directory=$source_dir \\
+  --tests=$tests \\
   --sdk-root=$sdk_root \\
-  --test-file=$test_file \\
-  --dill-file=$dill_file \\
   --icudtl=$icudtl \\
   "$$@"
 ''')
