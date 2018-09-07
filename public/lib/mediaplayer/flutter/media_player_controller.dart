@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:fidl_fuchsia_math/fidl.dart' as geom;
 import 'package:fidl_fuchsia_mediaplayer/fidl.dart';
@@ -40,9 +41,9 @@ class MediaPlayerController extends AudioPlayerController
   }
 
   @override
-  void open(Uri uri) {
+  void open(Uri uri, {HttpHeaders headers}) {
     _wasActive = openOrConnected;
-    super.open(uri);
+    super.open(uri, headers: headers);
     scheduleMicrotask(_notifyListeners);
   }
 

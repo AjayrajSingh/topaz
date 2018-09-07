@@ -107,7 +107,7 @@ MediaPlayerView::MediaPlayerView(
       player_->SetFileSource(fsl::CloneChannelFromFileDescriptor(
           fxl::UniqueFD(open(url.path().c_str(), O_RDONLY)).get()));
     } else {
-      player_->SetHttpSource(params.url());
+      player_->SetHttpSource(params.url(), nullptr);
     }
 
     // Get the first frames queued up so we can show something.

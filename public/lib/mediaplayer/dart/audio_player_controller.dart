@@ -3,8 +3,10 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:fidl_fuchsia_mediaplayer/fidl.dart';
+import 'package:fidl_fuchsia_net_oldhttp/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_math/fidl.dart' as geom;
 import 'package:lib.app.dart/app.dart';
@@ -46,20 +48,25 @@ class AudioPlayerController {
   /// Called when properties have changed.
   UpdateCallback updateCallback;
 
-  /// Opens a URI for playback. If there is no player or player proxy (because
-  /// the controller has never been opened or has been closed), a new local
-  /// player will be created. If there is a player or player proxy, the URL
-  /// will be set on it. |serviceName| indicates the name under which the
-  /// player will be published via NetConnector. It only applies when creating
-  /// a new local player. If |serviceName| is not specified, the player will
-  /// not be published.
-  void open(Uri uri) {
+  /// Opens a URI for playback. Only HTTP and FILE URIs are allowed. |headers|
+  /// must only be supplied for HTTP URIs. Supplied headers will be added to
+  /// every HTTP request issued to the URI.
+  void open(Uri uri, {HttpHeaders headers}) {
     if (uri == null) {
       throw new ArgumentError.notNull('uri');
     }
+    if (uri.isScheme('FILE')) {
+      if (headers != null) {
+        throw new ArgumentError.value(headers,
+            'headers', 'Not valid for FILE URIs.');
+      }
+    } else if (!uri.isScheme('HTTP')) {
+      throw new ArgumentError.value(uri,
+          'uri', 'Only HTTP and FILE protocols are supported.');
+    }
 
     if (_active) {
-      _setSource(uri);
+      _setSource(uri, headers);
       _ended = false;
       _hasVideo = false;
       _timelineFunction = null;
@@ -69,7 +76,7 @@ class AudioPlayerController {
     } else {
       _active = true;
 
-      _createLocalPlayer(uri);
+      _createLocalPlayer(uri, headers);
     }
 
     if (updateCallback != null) {
@@ -79,8 +86,8 @@ class AudioPlayerController {
     }
   }
 
-  /// Closes this controller, undoing a previous |open| or |connectToRemote|
-  /// call. Does nothing if the controller is already closed.
+  /// Closes this controller, undoing a previous |open| call. Does nothing if
+  /// the controller is already closed.
   void close() {
     _close();
 
@@ -116,23 +123,36 @@ class AudioPlayerController {
   }
 
   /// Creates a local player.
-  void _createLocalPlayer(Uri uri) {
+  void _createLocalPlayer(Uri uri, HttpHeaders headers) {
     connectToService(_services, _player.ctrl);
     _player.onStatusChanged = _handleStatusChanged;
 
     onMediaPlayerCreated(_player);
 
     _player.ctrl.onConnectionError = _handleConnectionError;
-    _setSource(uri);
+    _setSource(uri, headers);
   }
 
   // Sets the source uri on the media player.
-  void _setSource(Uri uri) {
+  void _setSource(Uri uri, HttpHeaders headers) {
     if (uri.isScheme('FILE')) {
-      _player.setFileSource(new Channel.fromFile(uri.toFilePath()));
+      _player.setFileSource(
+          new Channel.fromFile(uri.toFilePath()));
     } else {
-      _player.setHttpSource(uri.toString());
+      _player.setHttpSource(uri.toString(), _convertHeaders(headers));
     }
+  }
+
+  List<HttpHeader> _convertHeaders(HttpHeaders headers) {
+    List<HttpHeader> result = [];
+    headers.forEach((name, values) {
+      for (String value in values) {
+        HttpHeader header = new HttpHeader(name: name, value: value);
+        result.add(header);
+      }
+    });
+
+    return result;
   }
 
   /// Indicates whether the player open or connected (as opposed to closed).
@@ -347,12 +367,6 @@ class AudioPlayerController {
     // because flutter doesn't provide access to FrameInfo::presentationTime.
     // TODO(dalesat): Fix once we're given access to presentation time.
     // https://fuchsia.atlassian.net/browse/US-130
-    // One instance in which our correlation assumption falls down is when
-    // we're connecting to a (remote) player whose current timeline was
-    // established some time ago. In this case, the reference time in the
-    // timeline function correlates to a past time, and the progress values we
-    // get will be negative. When that happens, this function should be called
-    // again.
     _progressBarMicrosecondsSinceEpoch =
         (new DateTime.now()).microsecondsSinceEpoch;
     _progressBarReferenceTime = _timelineFunction.referenceTime;
