@@ -15,6 +15,7 @@ dart_tool("kernel_compiler") {
 
   deps = [
     "//third_party/dart-pkg/pub/args",
+    "//third_party/dart/pkg/build_integration",
     "//third_party/dart/pkg/front_end",
     "//third_party/dart/pkg/kernel",
     "//third_party/dart/pkg/vm",

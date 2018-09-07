@@ -59,12 +59,18 @@ template("dart_kernel") {
     rebased_packages_path =
         rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
 
+    single_root = "fuchsia-source"
+
     script = _compiler_path
     args = invoker.args + [
              "--target",
              invoker.platform_name,
              "--sdk-root",
              rebase_path(invoker.platform_path),
+             "--single-root-scheme",
+             single_root,
+             "--single-root-base",
+             rebase_path("//"),
              "--packages",
              rebased_packages_path,
              "--depfile",
@@ -81,7 +87,8 @@ template("dart_kernel") {
     if (is_debug) {
       args += [ "--embed-sources" ]
     }
-    args += [ rebase_path(invoker.main_dart) ]
+    rebased_main_dart = rebase_path(invoker.main_dart, "//")
+    args += [ "$single_root:///$rebased_main_dart" ]
 
     pool = "//build/dart:dart_pool($dart_toolchain)"
   }

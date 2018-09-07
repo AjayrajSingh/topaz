@@ -91,11 +91,12 @@ if (current_toolchain == dart_toolchain) {
           script = "$root_out_dir/dart-tools/build_test_bootstrap"
           outputs = [_bootstrap_file_name]
 
+          rebased_source = rebase_path(_source_path, target_gen_dir)
           args = [
             "--output",
             rebase_path(_bootstrap_file_name),
             "--test-name",
-            rebase_path(_source_path),
+            "$rebased_source",
           ]
 
           deps = [

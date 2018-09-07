@@ -8,6 +8,13 @@ import 'dart:io';
 import 'package:args/args.dart';
 
 import 'package:front_end/src/api_prototype/compiler_options.dart';
+import 'package:front_end/src/api_prototype/file_system.dart' show FileSystem, FileSystemEntity;
+import 'package:front_end/src/api_prototype/standard_file_system.dart'
+    show StandardFileSystem;
+import 'package:front_end/src/scheme_based_file_system.dart'
+    show SchemeBasedFileSystem;
+import 'package:build_integration/file_system/single_root.dart'
+    show SingleRootFileSystem, SingleRootFileSystemEntity;
 
 import 'package:kernel/ast.dart';
 import 'package:kernel/binary/ast_to_binary.dart';
@@ -21,6 +28,8 @@ import 'package:vm/target/flutter_runner.dart' show FlutterRunnerTarget;
 
 ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addOption('sdk-root', help: 'Path to runner_patched_sdk')
+  ..addOption('single-root-scheme', help: 'The URI scheme for the single root')
+  ..addOption('single-root-base', help: 'The base for the single root')
   ..addFlag('aot',
       help: 'Run compiler in AOT mode (enables whole-program transformations)',
       defaultsTo: false)
@@ -35,7 +44,8 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addOption('manifest', help: 'Path to output Fuchsia package manifest')
   ..addOption('output', help: 'Path to output dill file')
   ..addOption('packages', help: 'Path to .packages file')
-  ..addOption('target', help: 'Kernel target name');
+  ..addOption('target', help: 'Kernel target name')
+  ..addFlag('verbose', help: 'Run in verbose mode');
 
 String _usage = '''
 Usage: compiler [options] [input.dart]
@@ -67,6 +77,8 @@ Future<void> main(List<String> args) async {
   }
 
   final Uri sdkRoot = _ensureFolderPath(options['sdk-root']);
+  final String singleRootScheme = options['single-root-scheme'];
+  final Uri singleRootBase = new Uri.file(options['single-root-base']);
   final String packages = options['packages'];
   final bool aot = options['aot'];
   final bool embedSources = options['embed-sources'];
@@ -74,9 +86,10 @@ Future<void> main(List<String> args) async {
   final bool genBytecode = options['gen-bytecode'];
   final bool dropAST = options['drop-ast'];
   final String componentName = options['component-name'];
+  final bool verbose = options['verbose'];
 
   final String filename = options.rest[0];
-  final Uri filenameUri = Uri.base.resolveUri(new Uri.file(filename));
+  final Uri filenameUri = Uri.parse(filename);
 
   Uri platformKernelDill = sdkRoot.resolve('platform_strong.dill');
 
@@ -95,15 +108,29 @@ Future<void> main(List<String> args) async {
       return;
   }
 
+  FileSystem fileSystem = StandardFileSystem.instance;
+  if (singleRootScheme != null) {
+    SingleRootFileSystem singleRootFS =
+        new SingleRootFileSystem(singleRootScheme, singleRootBase, fileSystem);
+    fileSystem = new SchemeBasedFileSystem({
+      'file': fileSystem,
+      'data': fileSystem,
+      '': fileSystem,
+      singleRootScheme: singleRootFS,
+    });
+  }
+
   final errorPrinter = new ErrorPrinter();
   final errorDetector = new ErrorDetector(previousErrorHandler: errorPrinter);
   final CompilerOptions compilerOptions = new CompilerOptions()
     ..sdkSummary = platformKernelDill
     ..strongMode = true
+    ..fileSystem = fileSystem
     ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
     ..target = target
     ..embedSourceText = embedSources
-    ..onProblem = errorDetector;
+    ..onProblem = errorDetector
+    ..verbose = verbose;
 
   if (aot) {
     // Link in the platform to produce an output with no external references.
@@ -135,7 +162,7 @@ Future<void> main(List<String> args) async {
 
     final String depfile = options['depfile'];
     if (depfile != null) {
-      await writeDepfile(component, kernelBinaryFilename, depfile);
+      await writeDepfile(fileSystem, component, kernelBinaryFilename, depfile);
     }
   }
 
@@ -148,7 +175,7 @@ Future<void> main(List<String> args) async {
   // Dependencies output.
   if (options['print-dependencies']) {
     for (Uri dep in getDependencies(component)) {
-      print(dep.toFilePath());
+      print(fileSystem.entityForUri(dep).uri.toFilePath());
     }
   }
 }
@@ -160,6 +187,9 @@ String escapePath(String path) {
 List<Uri> getDependencies(Component component) {
   var deps = <Uri>[];
   for (Library lib in component.libraries) {
+    if (lib.importUri.scheme == 'dart') {
+      continue;
+    }
     deps.add(lib.fileUri);
     for (LibraryPart part in lib.parts) {
       final Uri fileUri = lib.fileUri.resolve(part.partUri);
@@ -170,21 +200,26 @@ List<Uri> getDependencies(Component component) {
 }
 
 // https://ninja-build.org/manual.html#_depfile
-Future<void> writeDepfile(
+Future<void> writeDepfile(FileSystem fileSystem,
     Component component, String output, String depfile) async {
   var file = new File(depfile).openWrite();
   file.write(escapePath(output));
   file.write(':');
   for (Uri dep in getDependencies(component)) {
+    FileSystemEntity fse = fileSystem.entityForUri(dep);
+    if (fse is SingleRootFileSystemEntity) {
+      SingleRootFileSystemEntity srfse = fse;
+      fse = srfse.delegate;
+    }
+    Uri uri = fse.uri;
     file.write(' ');
-    file.write(escapePath(dep.toFilePath()));
+    file.write(escapePath(uri.toFilePath()));
   }
   file.write('\n');
   await file.close();
 }
 
-Future writePackages(
-    Component component, String output, String packageManifestFilename, String componentName) async {
+Future writePackages(Component component, String output, String packageManifestFilename, String componentName) async {
   // Package sharing: make the encoding not depend on the order in which parts
   // of a package are loaded.
   component.libraries.sort((Library a, Library b) {
