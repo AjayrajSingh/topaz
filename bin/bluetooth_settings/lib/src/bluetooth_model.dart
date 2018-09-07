@@ -2,19 +2,22 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fidl_fuchsia_bluetooth/fidl.dart';
 import 'package:fidl_fuchsia_bluetooth_control/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/model.dart';
 
 /// Model containing state needed for the bluetooth settings app.
-class BluetoothSettingsModel extends Model {
+class BluetoothSettingsModel extends Model implements PairingDelegate {
   /// Bluetooth controller proxy.
   final ControlProxy _control = new ControlProxy();
 
   List<AdapterInfo> _adapters;
   AdapterInfo _activeAdapter;
-  List<RemoteDevice> _remoteDevices;
+  final List<RemoteDevice> _remoteDevices = [];
   bool _discoverable = true;
+
+  PairingStatus pairingStatus;
 
   BluetoothSettingsModel() {
     _onStart();
@@ -29,17 +32,22 @@ class BluetoothSettingsModel extends Model {
 
   bool get discoverable => _discoverable;
 
+  /// TODO(ejia): handle failures and error messages
+  void connect(RemoteDevice device) {
+    _control.connect(device.identifier, (Status status) {});
+  }
+
+  void disconnect(RemoteDevice device) {
+    _control.disconnect(device.identifier, (Status status) {});
+  }
+
   /// Bluetooth devices that are seen, but are not connected.
   Iterable<RemoteDevice> get availableDevices =>
-      _remoteDevices
-          ?.where((remoteDevice) => remoteDevice.connected == false) ??
-      [];
+      _remoteDevices.where((device) => !device.bonded);
 
   /// Bluetooth devices that are connected to the current adapter.
-  Iterable<RemoteDevice> get connectedDevices =>
-      _remoteDevices
-          ?.where((remoteDevice) => remoteDevice.connected == false) ??
-      [];
+  Iterable<RemoteDevice> get knownDevices =>
+      _remoteDevices.where((remoteDevice) => remoteDevice.bonded);
 
   /// The current adapter that is being used
   AdapterInfo get activeAdapter => _activeAdapter;
@@ -52,6 +60,7 @@ class BluetoothSettingsModel extends Model {
   void _onStart() {
     final startupContext = StartupContext.fromStartupInfo();
     connectToService(startupContext.environmentServices, _control.ctrl);
+    _refresh();
 
     // Just for first draft purposes, refresh whenever there are any changes.
     // TODO: handle errors, refresh more gracefully
@@ -65,18 +74,26 @@ class BluetoothSettingsModel extends Model {
       ..onAdapterUpdated = (_) {
         _refresh();
       }
-      ..onDeviceUpdated = (_) {
-        _refresh();
+      ..onDeviceUpdated = (device) {
+        _removeDeviceFromList(device.identifier);
+        _remoteDevices
+          ..add(device)
+          ..sort((a, b) => b.rssi?.value ?? 0.compareTo(a.rssi?.value ?? 0));
+        notifyListeners();
       }
-      ..onDeviceRemoved = (_) {
-        _refresh();
+      ..onDeviceRemoved = (deviceId) {
+        _removeDeviceFromList(deviceId);
+        notifyListeners();
       }
-      ..requestDiscovery(true, (status) {
-        _refresh();
-      })
-      ..setDiscoverable(true, (status) {
-        _refresh();
+      ..requestDiscovery(true, (status) {})
+      ..setDiscoverable(true, (status) {})
+      ..setPairingDelegate(PairingDelegateBinding().wrap(this), (success) {
+        assert(success);
       });
+  }
+
+  void _removeDeviceFromList(String deviceId) {
+    _remoteDevices.removeWhere((device) => device.identifier == deviceId);
   }
 
   /// Updates all the state that the model gets from bluetooth.
@@ -89,10 +106,6 @@ class BluetoothSettingsModel extends Model {
       ..getActiveAdapterInfo((adapter) {
         _activeAdapter = adapter;
         notifyListeners();
-      })
-      ..getKnownRemoteDevices((remoteDevices) {
-        _remoteDevices = remoteDevices;
-        notifyListeners();
       });
   }
 
@@ -101,4 +114,52 @@ class BluetoothSettingsModel extends Model {
   void dispose() {
     _control.ctrl.close();
   }
+
+  @override
+  void onPairingComplete(String deviceId, Status status) {
+    pairingStatus = null;
+    notifyListeners();
+  }
+
+  @override
+  void onPairingRequest(
+      RemoteDevice device,
+      PairingMethod method,
+      String displayedPasskey,
+      void Function(bool accept, String enteredPasskey) callback) {
+    pairingStatus = PairingStatus(displayedPasskey, method, device);
+
+    // accept the pairing request and show passkey
+    callback(true, displayedPasskey);
+    notifyListeners();
+  }
+
+  @override
+  void onRemoteKeypress(String deviceId, PairingKeypressType keypress) {
+    assert(pairingStatus.device.identifier == deviceId);
+    switch (keypress) {
+      case PairingKeypressType.digitEntered:
+        pairingStatus.digitsEntered++;
+        break;
+      case PairingKeypressType.digitErased:
+        pairingStatus.digitsEntered++;
+        break;
+      case PairingKeypressType.passkeyCleared:
+        pairingStatus.digitsEntered = 0;
+        break;
+      case PairingKeypressType.passkeyEntered:
+        pairingStatus.completing = true;
+    }
+    notifyListeners();
+  }
+}
+
+class PairingStatus {
+  final String displayedPassKey;
+  final PairingMethod pairingMethod;
+  final RemoteDevice device;
+  int digitsEntered = 0;
+  bool completing = false;
+
+  PairingStatus(this.displayedPassKey, this.pairingMethod, this.device);
 }
