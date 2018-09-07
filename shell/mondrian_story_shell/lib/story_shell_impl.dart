@@ -93,6 +93,13 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
     callback();
   }
 
+  @override
+  void viewReady(String viewId) {
+    // TODO(MI4-1260): Process this signal to inform the user shell to replace
+    // the splash screen with story view.
+    trace('view ready $viewId');
+  }
+
   /// Add a container node to the graph, with associated layout as a property,
   /// and optionally specify a parent and a relationship to the parent
   @override
