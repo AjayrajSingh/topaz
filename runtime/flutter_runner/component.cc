@@ -12,12 +12,12 @@
 #include <regex>
 #include <sstream>
 
+#include "flutter/fml/synchronization/waitable_event.h"
 #include "flutter/shell/common/switches.h"
 #include "lib/fsl/vmo/file.h"
 #include "lib/fsl/vmo/vector.h"
 #include "lib/fxl/command_line.h"
 #include "task_observers.h"
-#include "topaz/lib/deprecated_loop/waitable_event.h"
 
 namespace flutter {
 
@@ -32,7 +32,7 @@ Application::Create(
   auto thread = std::make_unique<deprecated_loop::Thread>();
   std::unique_ptr<Application> application;
 
-  deprecated_loop::AutoResetWaitableEvent latch;
+  fml::AutoResetWaitableEvent latch;
   thread->TaskRunner()->PostTask([&]() mutable {
     application.reset(
         new Application(std::move(termination_callback), std::move(package),

@@ -8,6 +8,7 @@
 
 #include "flutter/common/task_runners.h"
 #include "flutter/fml/make_copyable.h"
+#include "flutter/fml/synchronization/waitable_event.h"
 #include "flutter/fml/task_runner.h"
 #include "flutter/shell/common/rasterizer.h"
 #include "flutter/shell/common/run_configuration.h"
@@ -15,7 +16,6 @@
 #include "platform_view.h"
 #include "task_runner_adapter.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
-#include "topaz/lib/deprecated_loop/waitable_event.h"
 
 namespace flutter {
 
@@ -323,7 +323,7 @@ std::pair<bool, uint32_t> Engine::GetEngineReturnCode() const {
   if (!shell_) {
     return code;
   }
-  deprecated_loop::AutoResetWaitableEvent latch;
+  fml::AutoResetWaitableEvent latch;
   fml::TaskRunner::RunNowOrPostTask(
       shell_->GetTaskRunners().GetUITaskRunner(),
       [&latch, &code, engine = shell_->GetEngine()]() {
