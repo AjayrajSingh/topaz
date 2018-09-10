@@ -34,7 +34,7 @@ class KeyboardContainer extends StatelessWidget {
                   keyboardModel.overlayPositionModel.overlayDragModel.offset;
               yShift = yShift.clamp(0.0, _kKeyboardOverlayHeight);
               return ConditionalBuilder(
-                  condition: yShift <= _kKeyboardOverlayHeight,
+                  condition: yShift < _kKeyboardOverlayHeight,
                   builder: (BuildContext context) {
                     return Align(
                       alignment: FractionalOffset.bottomCenter,
