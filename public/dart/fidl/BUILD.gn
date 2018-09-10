@@ -16,6 +16,7 @@ dart_library("fidl") {
     "src/codec.dart",
     "src/enum.dart",
     "src/error.dart",
+    "src/hash_codes.dart",
     "src/interface.dart",
     "src/interface_async.dart",
     "src/message.dart",
