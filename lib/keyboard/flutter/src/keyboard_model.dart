@@ -3,11 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:fidl_fuchsia_cobalt/fidl.dart';
-
-import 'package:lib.app.dart/logging.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:topaz.lib.keyboard.dart/keyboard_display.dart';
 import 'package:topaz.lib.shell/models/overlay_position_model.dart';
-import 'package:lib.widgets/model.dart';
 
 export 'package:topaz.lib.keyboard.dart/keyboard_display.dart'
     show KeyboardDisplay;
@@ -28,7 +26,6 @@ class KeyboardModel extends Model {
     this.keyboardElevation = 0.0,
   })  : assert(_keyboardDisplay != null),
         _overlayPositionModel = overlayPositionModel {
-    setupLogger(name: 'keyboard_model');
     _keyboardDisplay.addListener((visible) => notifyListeners());
   }
 

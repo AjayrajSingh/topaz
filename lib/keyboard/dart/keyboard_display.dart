@@ -11,7 +11,6 @@ import 'package:fidl_fuchsia_ui_input/fidl.dart'
         ImeServiceProxy,
         ImeVisibilityService,
         ImeVisibilityServiceProxy;
-
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 
@@ -27,8 +26,6 @@ class KeyboardDisplay {
   bool _keyboardVisible;
 
   KeyboardDisplay(ServiceProvider services) : assert(services != null) {
-    setupLogger(name: 'keyboard_display');
-
     connectToService(services, _imeProxy.ctrl);
     _imeProxy.ctrl.onConnectionError = _handleImeServiceError;
     _imeProxy.ctrl.error
@@ -60,21 +57,25 @@ class KeyboardDisplay {
 
   /// Called when keyboard should be shown or hidden.
   void _onVisibilityChanged(bool visible) {
-    log.fine('onVisibilityChanged: $visible');
+    _log(Level.SEVERE, 'onVisibilityChanged: $visible');
     _keyboardVisible = visible;
     _notifyKeyboardVisibilityChange();
   }
 
   /// Handles connection error to the [ImeVisibilityService].
   void _handleImeVisibilityServiceError({ProxyError error}) =>
-      log.severe('Unable to connect to ImeVisibilityService', error);
+      _log(Level.SEVERE, 'Unable to connect to ImeVisibilityService', error);
 
   /// Handles connection error to the [ImeService].
   void _handleImeServiceError({ProxyError error}) =>
-      log.severe('Unable to connect to ImeService', error);
+      _log(Level.SEVERE, 'Unable to connect to ImeService', error);
 
   /// Invoked internally to signal to any registered listener of a change
   /// in keyboard visibility.
   void _notifyKeyboardVisibilityChange() =>
       _keyboardStreamController.add(keyboardVisible);
+
+  void _log(Level level, String message, [Object error]) {
+    log.log(level, message, 'keyboard_display', error, null);
+  }
 }
