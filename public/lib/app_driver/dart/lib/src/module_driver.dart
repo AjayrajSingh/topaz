@@ -54,11 +54,10 @@ typedef OnHandleIntent = void Function(
 
 // The following metrics id's must be registered here:
 // https://cobalt-analytics.googlesource.com/config/+/master/fuchsia/modules/config.yaml
-const int _defaultEncodingId = 1;
-const int _cobaltFirstLinkDataMetricId = 1;
+const int _cobaltFirstLinkDataMetricId = 9;
 // const int _cobaltEntitySerializationMetricId = 2;
 // const int _cobaltEventFrameRatesMetricId = 3;
-const int _cobaltTimeToConnectAgentMetricId = 4;
+const int _cobaltTimeToConnectAgentMetricId = 10;
 // const int _cobaltModuleErrorMetricId = 5;
 const int _cobaltTimeToStartModuleDriverMetricId = 6;
 const int _cobaltTimeToStartNewModMetricId = 7;
@@ -110,7 +109,7 @@ class ModuleDriver {
   MessageQueueClient _messageQueue;
 
   /// Message queue token completer
-  final EncoderProxy _encoder = new EncoderProxy();
+  final LoggerProxy _logger = new LoggerProxy();
   final DateTime _initializationTime;
   final Set<String> _firstObservationSent = new Set<String>();
   LifecycleHost _lifecycle;
@@ -239,15 +238,12 @@ class ModuleDriver {
     /// functional when chaining futures.
     _start.complete(this);
 
-    _addCobaltMetric(_cobaltTimeToStartModuleDriverMetricId, [
-      new ObservationValue(
-        name: 'elapsed_micros',
-        value: new Value.withIntValue(
+    _cobaltLogElapsedTime(
+      metricId: _cobaltTimeToStartModuleDriverMetricId,
+      elapsedMicros:
           new DateTime.now().difference(_initializationTime).inMicroseconds,
-        ),
-        encodingId: _defaultEncodingId,
-      )
-    ]);
+      shouldIncludeModuleName: true,
+    );
 
     return _start.future;
   }
@@ -303,7 +299,6 @@ class ModuleDriver {
     final _initTime = new DateTime.now();
     assert(proxy.ctrl.$serviceName != null,
         'controller.\$serviceName must not be null. Check the FIDL file for a missing [Discoverable]');
-    final serviceName = proxy.ctrl.$serviceName;
     ComponentContextClient componentContext = await getComponentContext();
 
     ServiceProviderProxy serviceProviderProxy =
@@ -313,20 +308,10 @@ class ModuleDriver {
     // Close all unnecessary bindings
     serviceProviderProxy.ctrl.close();
 
-    _addCobaltMetric(_cobaltTimeToConnectAgentMetricId, [
-      new ObservationValue(
-        name: 'agent_name',
-        value: Value.withStringValue(serviceName),
-        encodingId: _defaultEncodingId,
-      ),
-      new ObservationValue(
-        name: 'elapsed_micros',
-        value: new Value.withIntValue(
-          new DateTime.now().difference(_initTime).inMicroseconds,
-        ),
-        encodingId: _defaultEncodingId,
-      )
-    ]);
+    _cobaltLogElapsedTime(
+      metricId: _cobaltTimeToConnectAgentMetricId,
+      elapsedMicros: new DateTime.now().difference(_initTime).inMicroseconds,
+    );
   }
 
   /// Connect to an agent using a new-style async proxy.
@@ -347,20 +332,10 @@ class ModuleDriver {
       // Close all unnecessary bindings
       ..ctrl.close();
 
-    _addCobaltMetric(_cobaltTimeToConnectAgentMetricId, [
-      new ObservationValue(
-        name: 'agent_name',
-        value: Value.withStringValue(serviceName),
-        encodingId: _defaultEncodingId,
-      ),
-      new ObservationValue(
-        name: 'elapsed_micros',
-        value: new Value.withIntValue(
-          new DateTime.now().difference(_initTime).inMicroseconds,
-        ),
-        encodingId: _defaultEncodingId,
-      )
-    ]);
+    _cobaltLogElapsedTime(
+      metricId: _cobaltTimeToConnectAgentMetricId,
+      elapsedMicros: new DateTime.now().difference(_initTime).inMicroseconds,
+    );
   }
 
   /// Retrieve the story id of the story this module lives in
@@ -373,7 +348,7 @@ class ModuleDriver {
     log.info('closing service connections');
 
     _messageQueue?.close();
-    _encoder.ctrl.close();
+    _logger.ctrl.close();
 
     List<Future<Null>> futures = <Future<Null>>[
       moduleContext.terminate(),
@@ -553,20 +528,14 @@ class ModuleDriver {
     if (!_firstObservationSent.contains(linkName) && data != null) {
       _firstObservationSent.add(linkName);
 
-      _addCobaltMetric(_cobaltFirstLinkDataMetricId, [
-        new ObservationValue(
-          name: 'link_name',
-          value: new Value.withStringValue(linkName),
-          encodingId: _defaultEncodingId,
-        ),
-        new ObservationValue(
-          name: 'elapsed_micros',
-          value: new Value.withIntValue(
+      int linkIndex = linkName == 'card_data' ? 0 : 1;
+      _cobaltLogElapsedTime(
+        metricId: _cobaltFirstLinkDataMetricId,
+        enumIndex: linkIndex,
+        elapsedMicros:
             new DateTime.now().difference(_initializationTime).inMicroseconds,
-          ),
-          encodingId: _defaultEncodingId,
-        )
-      ]);
+        shouldIncludeModuleName: true,
+      );
     }
   }
 
@@ -647,22 +616,11 @@ class ModuleDriver {
           surfaceRelation: surfaceRelation,
         )
         .whenComplete(
-          () => _addCobaltMetric(
-                _cobaltTimeToStartNewModMetricId,
-                [
-                  new ObservationValue(
-                      name: 'starting_mod_name',
-                      value: Value.withStringValue(name),
-                      encodingId: _defaultEncodingId),
-                  new ObservationValue(
-                    name: 'elapsed_micros',
-                    value: new Value.withIntValue(
-                      new DateTime.now().difference(_initTime).inMicroseconds,
-                    ),
-                    encodingId: _defaultEncodingId,
-                  )
-                ],
-                false,
+          () => _cobaltLogElapsedTime(
+                metricId: _cobaltTimeToStartNewModMetricId,
+                component: name,
+                elapsedMicros:
+                    new DateTime.now().difference(_initTime).inMicroseconds,
               ),
         );
   }
@@ -691,22 +649,11 @@ class ModuleDriver {
     log.fine('resolving module ("$name") for embedding...');
     final _initTime = new DateTime.now();
     return moduleContext.embedModule(name: name, intent: intent).whenComplete(
-          () => _addCobaltMetric(
-                _cobaltTimeToEmbedNewModMetricId,
-                [
-                  new ObservationValue(
-                      name: 'embedding_mod_name',
-                      value: Value.withStringValue(name),
-                      encodingId: _defaultEncodingId),
-                  new ObservationValue(
-                    name: 'elapsed_micros',
-                    value: new Value.withIntValue(new DateTime.now()
-                        .difference(_initTime)
-                        .inMicroseconds),
-                    encodingId: _defaultEncodingId,
-                  )
-                ],
-                false,
+          () => _cobaltLogElapsedTime(
+                metricId: _cobaltTimeToEmbedNewModMetricId,
+                component: name,
+                elapsedMicros:
+                    new DateTime.now().difference(_initTime).inMicroseconds,
               ),
         );
   }
@@ -716,49 +663,55 @@ class ModuleDriver {
   ServiceProviderProxy get environmentServices =>
       _startupContext.environmentServices;
 
-  /// The [EncoderProxy] for sending Cobalt metrics
-  EncoderProxy get cobaltEncoder => _encoder;
+  /// The [LoggerProxy] for sending Cobalt metrics
+  LoggerProxy get cobaltLogger => _logger;
 
   void _connectToCobalt() {
-    EncoderFactoryProxy encoderFactory = new EncoderFactoryProxy();
-    connectToService(environmentServices, encoderFactory.ctrl);
+    LoggerFactoryProxy loggerFactory = new LoggerFactoryProxy();
+    connectToService(environmentServices, loggerFactory.ctrl);
 
     SizedVmo configVmo =
         SizedVmo.fromUint8List(base64.decode(cobalt_config.config));
-    ProjectProfile profile = ProjectProfile(
-        config: fuchsia_mem.Buffer(vmo: configVmo, size: configVmo.size));
+    ProjectProfile2 profile = ProjectProfile2(
+      config: fuchsia_mem.Buffer(vmo: configVmo, size: configVmo.size),
+      releaseStage: ReleaseStage.ga,
+    );
 
-    encoderFactory.getEncoderForProject(
+    loggerFactory.createLogger(
       profile,
-      _encoder.ctrl.request(),
-      (Status s) {
-        if (s != Status.ok) {
-          log.warning('Failed to obtain Encoder. Cobalt config is invalid.');
+      _logger.ctrl.request(),
+      (Status2 s) {
+        if (s != Status2.ok) {
+          log.warning('Failed to create Logger. Cobalt config is invalid.');
         }
       },
     );
-    encoderFactory.ctrl.close();
+    loggerFactory.ctrl.close();
   }
 
   /// Helper method to emit cobalt metrics.
-  void _addCobaltMetric(int metricId, List<ObservationValue> observationValues,
-      [shouldIncludeModuleName = true]) {
-    List<ObservationValue> observations = [];
+  void _cobaltLogElapsedTime({
+    int metricId,
+    int elapsedMicros,
+    int enumIndex = 0,
+    String component = '',
+    shouldIncludeModuleName = false,
+  }) {
+    String componentString;
     if (shouldIncludeModuleName) {
-      observations.add(new ObservationValue(
-          name: 'module_name',
-          value: new Value.withStringValue(
-            moduleName == null || moduleName.isEmpty
-                ? _packageName
-                : moduleName,
-          ),
-          encodingId: _defaultEncodingId));
+      componentString =
+          moduleName == null || moduleName.isEmpty ? _packageName : moduleName;
+    } else {
+      componentString = component;
     }
-    _encoder.addMultipartObservation(
+
+    _logger.logElapsedTime(
       metricId,
-      observations + observationValues,
-      (Status status) {
-        if (status != Status.ok) {
+      enumIndex,
+      componentString,
+      elapsedMicros,
+      (Status2 status) {
+        if (status != Status2.ok) {
           log.warning('Failed to observe frame Cobalt metric '
               '$metricId: $status.');
         }
