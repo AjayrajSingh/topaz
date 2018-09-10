@@ -241,7 +241,7 @@ class ModuleDriver {
 
     _addCobaltMetric(_cobaltTimeToStartModuleDriverMetricId, [
       new ObservationValue(
-        name: 'elapsed_millis',
+        name: 'elapsed_micros',
         value: new Value.withIntValue(
           new DateTime.now().difference(_initializationTime).inMicroseconds,
         ),
@@ -320,7 +320,7 @@ class ModuleDriver {
         encodingId: _defaultEncodingId,
       ),
       new ObservationValue(
-        name: 'elapsed_millis',
+        name: 'elapsed_micros',
         value: new Value.withIntValue(
           new DateTime.now().difference(_initTime).inMicroseconds,
         ),
@@ -354,7 +354,7 @@ class ModuleDriver {
         encodingId: _defaultEncodingId,
       ),
       new ObservationValue(
-        name: 'elapsed_millis',
+        name: 'elapsed_micros',
         value: new Value.withIntValue(
           new DateTime.now().difference(_initTime).inMicroseconds,
         ),
@@ -560,7 +560,7 @@ class ModuleDriver {
           encodingId: _defaultEncodingId,
         ),
         new ObservationValue(
-          name: 'elapsed_millis',
+          name: 'elapsed_micros',
           value: new Value.withIntValue(
             new DateTime.now().difference(_initializationTime).inMicroseconds,
           ),
@@ -655,7 +655,7 @@ class ModuleDriver {
                       value: Value.withStringValue(name),
                       encodingId: _defaultEncodingId),
                   new ObservationValue(
-                    name: 'elapsed_millis',
+                    name: 'elapsed_micros',
                     value: new Value.withIntValue(
                       new DateTime.now().difference(_initTime).inMicroseconds,
                     ),
@@ -699,7 +699,7 @@ class ModuleDriver {
                       value: Value.withStringValue(name),
                       encodingId: _defaultEncodingId),
                   new ObservationValue(
-                    name: 'elapsed_millis',
+                    name: 'elapsed_micros',
                     value: new Value.withIntValue(new DateTime.now()
                         .difference(_initTime)
                         .inMicroseconds),
@@ -743,7 +743,7 @@ class ModuleDriver {
   /// Helper method to emit cobalt metrics.
   void _addCobaltMetric(int metricId, List<ObservationValue> observationValues,
       [shouldIncludeModuleName = true]) {
-    final observations = [];
+    List<ObservationValue> observations = [];
     if (shouldIncludeModuleName) {
       observations.add(new ObservationValue(
           name: 'module_name',
