@@ -5,11 +5,6 @@
 import("//build/package.gni")
 import("dart_app.gni")
 
-pool("dart_aot_pool") {
-  # AOT invocations of gen_snapshot can use ~450MB each.
-  depth = 16
-}
-
 template("runner") {
   assert(defined(invoker.product), "The parameter 'product' must be defined")
   product_suffix = ""

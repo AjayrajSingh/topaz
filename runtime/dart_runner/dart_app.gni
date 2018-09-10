@@ -266,7 +266,7 @@ template("dart_aot_app") {
     }
     args += [ rebase_path(kernel_path) ]
 
-    pool = "//topaz/runtime/dart_runner:dart_aot_pool($target_toolchain)"
+    pool = "//build/dart:dart_pool($dart_toolchain)"
   }
 
   dart_action(stats_target_name) {
