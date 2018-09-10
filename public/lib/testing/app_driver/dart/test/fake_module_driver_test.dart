@@ -13,6 +13,7 @@ const _action = 'action';
 const _key1 = 'key1';
 const _value1 = 'value1';
 const _value2 = 'value2';
+const _value3 = 3;
 
 class _StringCodec extends EntityCodec<String> {
   _StringCodec()
@@ -20,6 +21,15 @@ class _StringCodec extends EntityCodec<String> {
           type: 'com.fuchsia.string',
           encode: (String s) => s,
           decode: (String s) => s,
+        );
+}
+
+class _IntCodec extends EntityCodec<int> {
+  _IntCodec()
+      : super(
+          type: 'com.fuchsia.int',
+          encode: (int i) => i.toString(),
+          decode: int.parse,
         );
 }
 
@@ -40,11 +50,29 @@ void main() async {
         moduleDriver.getTestLinkCurrentValue(_key1, _StringCodec()), _value1);
   });
 
+  test('test put and getTestLinkValue with multiple types', () {
+    moduleDriver.put(_key1, _value1, _StringCodec());
+    expect(
+        moduleDriver.getTestLinkCurrentValue(_key1, _StringCodec()), _value1);
+
+    moduleDriver.put(_key1, _value3, _IntCodec());
+    expect(moduleDriver.getTestLinkCurrentValue(_key1, _IntCodec()), _value3);
+  });
+
   test('test putTestValue and getTestLinkValue', () {
     moduleDriver.putTestValue(_key1, _value1, _StringCodec());
 
     expect(
         moduleDriver.getTestLinkCurrentValue(_key1, _StringCodec()), _value1);
+  });
+
+  test('test putTestValue and getTestLinkValue with multiple codec types', () {
+    moduleDriver.putTestValue(_key1, _value1, _StringCodec());
+    expect(
+        moduleDriver.getTestLinkCurrentValue(_key1, _StringCodec()), _value1);
+
+    moduleDriver.putTestValue(_key1, _value3, _IntCodec());
+    expect(moduleDriver.getTestLinkCurrentValue(_key1, _IntCodec()), _value3);
   });
 
   test('test startModule and intent history', () {
@@ -63,10 +91,29 @@ void main() async {
 
     moduleDriver
       ..putTestValue(_key1, _value1, _StringCodec())
-      ..putTestValue(_key1, _value2, _StringCodec());
+      ..putTestValue(_key1, _value2, _StringCodec())
+      ..cleanUp();
 
     expect(watchQueue, emitsInOrder([_value1, _value2]));
     expect(watchQueue2, emitsInOrder([_value1, _value2]));
+  });
+
+  test('test putTestValue and watch with multiple codec types', () {
+    StreamQueue<String> watchQueueString =
+        StreamQueue<String>(moduleDriver.watch(_key1, _StringCodec()));
+    StreamQueue<int> watchQueueInt =
+        StreamQueue<int>(moduleDriver.watch(_key1, _IntCodec()));
+
+    moduleDriver
+      ..putTestValue(_key1, _value1, _StringCodec())
+      ..putTestValue(_key1, _value2, _StringCodec())
+      ..putTestValue(_key1, _value3, _IntCodec())
+      ..cleanUp();
+
+    expect(
+        watchQueueString, emitsInOrder([_value1, _value2, _value3.toString()]));
+    expect(watchQueueInt,
+        emitsInOrder([emitsError(anything), emitsError(anything), _value3]));
   });
 
   test('test put and watch', () {
@@ -83,6 +130,24 @@ void main() async {
     expect(watchQueue, emitsDone);
     expect(watchQueue.eventsDispatched, 0);
     expect(watchAllQueue, emitsInOrder([_value1, _value2]));
+  });
+
+  test('test putTestValue and watch with multiple codec types', () {
+    StreamQueue<String> watchQueueString = StreamQueue<String>(
+        moduleDriver.watch(_key1, _StringCodec(), all: true));
+    StreamQueue<int> watchQueueInt =
+        StreamQueue<int>(moduleDriver.watch(_key1, _IntCodec(), all: true));
+
+    moduleDriver
+      ..put(_key1, _value1, _StringCodec())
+      ..put(_key1, _value2, _StringCodec())
+      ..put(_key1, _value3, _IntCodec())
+      ..cleanUp();
+
+    expect(
+        watchQueueString, emitsInOrder([_value1, _value2, _value3.toString()]));
+    expect(watchQueueInt,
+        emitsInOrder([emitsError(anything), emitsError(anything), _value3]));
   });
 
   tearDown(() {

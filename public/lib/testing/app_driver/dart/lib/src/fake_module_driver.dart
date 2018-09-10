@@ -12,8 +12,8 @@ import 'package:fidl_fuchsia_modular/fidl.dart'
     show SurfaceRelation, SurfaceArrangement, SurfaceDependency;
 import 'package:flutter/material.dart';
 
-class LinkStreamController<T> {
-  final StreamController<T> controller;
+class LinkStreamController {
+  final StreamController<String> controller;
   final bool watchAll;
 
   LinkStreamController({@required this.controller, @required this.watchAll});
@@ -21,8 +21,7 @@ class LinkStreamController<T> {
 
 class FakeModuleDriver implements ModuleDriver {
   final Map<String, String> _linkValue = {};
-  final Map<String, List<LinkStreamController<dynamic>>>
-      _linkStreamControllers = {};
+  final Map<String, List<LinkStreamController>> _linkStreamControllers = {};
   final List<Intent> _startModuleIntents = [];
 
   @override
@@ -35,12 +34,12 @@ class FakeModuleDriver implements ModuleDriver {
   @override
   Future<String> put<T>(String key, T value, EntityCodec<T> codec) async {
     _linkValue[key] = codec.encode(value);
-    List<LinkStreamController<T>> streamContollerList =
+    List<LinkStreamController> streamContollerList =
         _getLinkStreamControllerList(key);
     for (var linkStreamController in streamContollerList) {
       if (linkStreamController.watchAll) {
         /// Encode and decode to tests codec.
-        linkStreamController.controller.add(codec.decode(codec.encode(value)));
+        linkStreamController.controller.add(codec.encode(value));
       }
     }
     return null;
@@ -50,8 +49,8 @@ class FakeModuleDriver implements ModuleDriver {
   Stream<T> watch<T>(String key, EntityCodec<T> codec, {bool all = false}) {
     // Do not combine the next two lines or dart gets confused about types.
     // ignore: close_sinks
-    StreamController<T> streamController = _createNewStreamController(key, all);
-    return streamController.stream;
+    StreamController streamController = _createNewStreamController(key, all);
+    return streamController.stream.map(codec.decode);
   }
 
   @override
@@ -72,10 +71,10 @@ class FakeModuleDriver implements ModuleDriver {
   /// link.
   void putTestValue<T>(String key, T value, EntityCodec<T> codec) {
     _linkValue[key] = codec.encode(value);
-    List<LinkStreamController<T>> streamContollerList =
+    List<LinkStreamController> streamContollerList =
         _getLinkStreamControllerList(key);
     for (var linkStreamController in streamContollerList) {
-      linkStreamController.controller.add(codec.decode(codec.encode(value)));
+      linkStreamController.controller.add(codec.encode(value));
     }
   }
 
@@ -96,25 +95,26 @@ class FakeModuleDriver implements ModuleDriver {
         controllerList.forEach((contoller) => contoller.controller.close()));
   }
 
-  StreamController<T> _createNewStreamController<T>(String key, bool watchAll) {
+  StreamController<String> _createNewStreamController<T>(
+      String key, bool watchAll) {
     // Do not combine the lines in this method or dart gets confused about
     // types.
-    StreamController<T> newController = StreamController();
-    LinkStreamController<T> newLinkController =
+    StreamController<String> newController = StreamController();
+    LinkStreamController newLinkController =
         LinkStreamController(controller: newController, watchAll: watchAll);
-    List<LinkStreamController<T>> linkStreamControllerList =
+    List<LinkStreamController> linkStreamControllerList =
         _getLinkStreamControllerList(key);
     // ignore: cascade_invocations
     linkStreamControllerList.add(newLinkController);
     return newController;
   }
 
-  List<LinkStreamController<T>> _getLinkStreamControllerList<T>(String key) {
+  List<LinkStreamController> _getLinkStreamControllerList(String key) {
     // Do not combine the lines in this method or dart gets confused about
     // types.
     if (!_linkStreamControllers.containsKey(key)) {
       // ignore: close_sinks
-      List<LinkStreamController<T>> controllerList = [];
+      List<LinkStreamController> controllerList = [];
       _linkStreamControllers.putIfAbsent(key, () => controllerList);
     }
 
