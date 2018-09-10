@@ -8,9 +8,7 @@ import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:fidl/fidl.dart';
 
 /// Called when [UserShell.initialize] occurs.
-typedef OnDankUserShellReady = void Function(
-  UserShellContext userShellContext,
-);
+typedef OnDankUserShellReady = void Function(UserShellContext userShellContext);
 
 /// Implements a [UserShell].
 /// This is a lightweight version that passes the [UserShellContextProxy]
@@ -22,31 +20,27 @@ class DankUserShellImpl
         FocusWatcher,
         Lifecycle {
   /// Constructor.
-  DankUserShellImpl({
-    this.onReady,
-  });
+  DankUserShellImpl({this.onReady});
 
   /// Binding for the actual UserShell interface object.
-  final UserShellContextProxy _userShellContextProxy =
-      new UserShellContextProxy();
+  final _userShellContextProxy = UserShellContextProxy();
 
   /// Binding for the [FocusProvider] proxy.
-  final FocusProviderProxy _focusProviderProxy = new FocusProviderProxy();
+  final _focusProviderProxy = FocusProviderProxy();
 
   /// Mapping of story id to [StoryVisualStateWatcher] handle.
-  final Map<String, StoryVisualStateWatcherProxy> _visualStateWatchers =
-      <String, StoryVisualStateWatcherProxy>{};
+  final _visualStateWatchers = <String, StoryVisualStateWatcherProxy>{};
 
   /// Binding for [FocusWatcher] implemented by this UserShell.
-  final FocusWatcherBinding _focusWatcherBinding = new FocusWatcherBinding();
+  final _focusWatcherBinding = FocusWatcherBinding();
 
   /// Called when [initialize] occurs.
   final OnDankUserShellReady onReady;
 
+  String _lastFocusedStoryId;
+
   @override
-  void initialize(
-    InterfaceHandle<UserShellContext> userShellContextHandle,
-  ) {
+  void initialize(InterfaceHandle<UserShellContext> userShellContextHandle) {
     if (onReady != null) {
       _userShellContextProxy.ctrl.bind(userShellContextHandle);
       _userShellContextProxy
@@ -61,34 +55,45 @@ class DankUserShellImpl
   void terminate() => fuchsia.exit(0);
 
   @override
-  void getPresentation(String storyId, InterfaceRequest<Presentation> request) {
-    _userShellContextProxy.getPresentation(request);
-  }
+  void getPresentation(
+    String storyId,
+    InterfaceRequest<Presentation> request,
+  ) =>
+      _userShellContextProxy.getPresentation(request);
 
   @override
   void watchVisualState(
-      String storyId, InterfaceHandle<StoryVisualStateWatcher> watcherHandle) {
-    StoryVisualStateWatcherProxy watcherProxy =
-        new StoryVisualStateWatcherProxy();
+    String storyId,
+    InterfaceHandle<StoryVisualStateWatcher> watcherHandle,
+  ) {
+    void removeWatcher() => _visualStateWatchers.remove(storyId);
+
+    final watcherProxy = StoryVisualStateWatcherProxy();
+
     watcherProxy.ctrl
       ..bind(watcherHandle)
-      ..onClose = () => _visualStateWatchers.remove(storyId);
-    watcherProxy.ctrl.onConnectionError =
-        () => _visualStateWatchers.remove(storyId);
+      ..onClose = removeWatcher
+      ..onConnectionError = removeWatcher;
 
     _visualStateWatchers[storyId] = watcherProxy;
+
+    _notifyWatchers();
   }
 
   @override
-  void onFocusChange(FocusInfo focusInfo) =>
-      _setFocus(focusInfo.focusedStoryId);
+  void onFocusChange(FocusInfo focusInfo) {
+    _lastFocusedStoryId = focusInfo.focusedStoryId;
 
-  void _setFocus(String storyId) {
-    for (MapEntry<String, StoryVisualStateWatcherProxy> entry
-        in _visualStateWatchers.entries) {
-      entry.value.onVisualStateChange(entry.key == storyId
-          ? StoryVisualState.maximized
-          : StoryVisualState.minimized);
+    _notifyWatchers();
+  }
+
+  void _notifyWatchers() {
+    for (final entry in _visualStateWatchers.entries) {
+      entry.value.onVisualStateChange(
+        entry.key == _lastFocusedStoryId
+            ? StoryVisualState.maximized
+            : StoryVisualState.minimized,
+      );
     }
   }
 }
