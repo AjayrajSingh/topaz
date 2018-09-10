@@ -41,12 +41,11 @@ void main() {
   connectToService(startupContext.environmentServices, loggerFactory.ctrl);
 
   SizedVmo configVmo = SizedVmo.fromFile(_kCobaltConfigBinProtoPath);
-  cobalt.ProjectProfile2 profile = cobalt.ProjectProfile2(
+  cobalt.ProjectProfile profile = cobalt.ProjectProfile(
       config: Buffer(vmo: configVmo, size: configVmo.size),
       releaseStage: cobalt.ReleaseStage.ga);
-  loggerFactory.createLogger(profile, logger.ctrl.request(),
-      (cobalt.Status2 s) {
-    if (s != cobalt.Status2.ok) {
+  loggerFactory.createLogger(profile, logger.ctrl.request(), (cobalt.Status s) {
+    if (s != cobalt.Status.ok) {
       print('Failed to obtain Logger. Cobalt config is invalid.');
     }
   });

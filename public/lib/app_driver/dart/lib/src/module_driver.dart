@@ -672,7 +672,7 @@ class ModuleDriver {
 
     SizedVmo configVmo =
         SizedVmo.fromUint8List(base64.decode(cobalt_config.config));
-    ProjectProfile2 profile = ProjectProfile2(
+    ProjectProfile profile = ProjectProfile(
       config: fuchsia_mem.Buffer(vmo: configVmo, size: configVmo.size),
       releaseStage: ReleaseStage.ga,
     );
@@ -680,8 +680,8 @@ class ModuleDriver {
     loggerFactory.createLogger(
       profile,
       _logger.ctrl.request(),
-      (Status2 s) {
-        if (s != Status2.ok) {
+      (Status s) {
+        if (s != Status.ok) {
           log.warning('Failed to create Logger. Cobalt config is invalid.');
         }
       },
@@ -710,8 +710,8 @@ class ModuleDriver {
       enumIndex,
       componentString,
       elapsedMicros,
-      (Status2 status) {
-        if (status != Status2.ok) {
+      (Status status) {
+        if (status != Status.ok) {
           log.warning('Failed to observe frame Cobalt metric '
               '$metricId: $status.');
         }

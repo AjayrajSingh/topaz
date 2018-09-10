@@ -86,7 +86,7 @@ void _onContextUpdate(ContextUpdate update) {
 void _logStringEvent(Metric metric, String metricString) {
   int metricId = _getCobaltMetricID(metric);
   _logger.logString(
-      metricId, metricString, (Status2 s) => _onLogEventStatus(metricId, s));
+      metricId, metricString, (Status s) => _onLogEventStatus(metricId, s));
 }
 
 void _logModulePairEvent(String existingMod, String newMod) {
@@ -97,7 +97,7 @@ void _logModulePairEvent(String existingMod, String newMod) {
         _getStringEventValue(_existingModuleKey, existingMod),
         _getStringEventValue(_addedModuleKey, newMod)
       ],
-      (Status2 s) => _onLogEventStatus(metricId, s));
+      (Status s) => _onLogEventStatus(metricId, s));
 }
 
 CustomEventValue _getStringEventValue(String name, String value) {
@@ -105,18 +105,18 @@ CustomEventValue _getStringEventValue(String name, String value) {
       dimensionName: name, value: new Value.withStringValue(value));
 }
 
-void _onLogEventStatus(int metricId, Status2 status) {
+void _onLogEventStatus(int metricId, Status status) {
   // If logging an event fails, we simply drop it and do not retry.
   // TODO(jwnichols): Perhaps we should do something smarter if we fail
-  if (status != Status2.ok) {
+  if (status != Status.ok) {
     print('[USAGE LOG] Failed to log Cobalt event: $status. '
         'Metric ID: $metricId');
   }
 }
 
-ProjectProfile2 _loadCobaltConfig() {
+ProjectProfile _loadCobaltConfig() {
   SizedVmo configVmo = SizedVmo.fromFile(_cobaltConfigBinProtoPath);
-  ProjectProfile2 profile = ProjectProfile2(
+  ProjectProfile profile = ProjectProfile(
       config: Buffer(vmo: configVmo, size: configVmo.size),
       releaseStage: ReleaseStage.ga);
 
@@ -146,13 +146,13 @@ void main(List<String> args) {
 
   // Get the loggers
   loggerFactory.createLogger(_loadCobaltConfig(), _logger.ctrl.request(),
-      (Status2 s) {
-    if (s != Status2.ok) {
+      (Status s) {
+    if (s != Status.ok) {
       print('[USAGE LOG] Failed to obtain Logger. Cobalt config is invalid.');
     } else {
       loggerFactory.createLoggerExt(
-          _loadCobaltConfig(), _loggerExt.ctrl.request(), (Status2 s) {
-        if (s != Status2.ok) {
+          _loadCobaltConfig(), _loggerExt.ctrl.request(), (Status s) {
+        if (s != Status.ok) {
           print(
               '[USAGE LOG] Failed to obtain LoggerExt. Cobalt config is invalid.');
         }

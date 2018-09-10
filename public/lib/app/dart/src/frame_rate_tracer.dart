@@ -58,8 +58,8 @@ class FrameRateTracer {
         0,
         '',
         frameRate,
-        (Status2 status) {
-          if (status != Status2.ok) {
+        (Status status) {
+          if (status != Status.ok) {
             log.warning(
               'Failed to observe frame rate metric '
                   '$_currentCobaltMetricId: $status. ',

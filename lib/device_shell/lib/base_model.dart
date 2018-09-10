@@ -196,8 +196,8 @@ class BaseDeviceShellModel extends DeviceShellModel
       'user_shell_login_timer_id',
       DateTime.now().millisecondsSinceEpoch,
       _kCobaltTimerTimeout.inSeconds,
-      (cobalt.Status2 status) {
-        if (status != cobalt.Status2.ok) {
+      (cobalt.Status status) {
+        if (status != cobalt.Status.ok) {
           log.warning(
             'Failed to start timer metric '
                 '$_kUserShellLoginTimeMetricId: $status. ',
@@ -341,8 +341,8 @@ class BaseDeviceShellModel extends DeviceShellModel
         'user_shell_log_out_timer_id',
         DateTime.now().millisecondsSinceEpoch,
         _kCobaltTimerTimeout.inSeconds,
-        (cobalt.Status2 status) {
-          if (status != cobalt.Status2.ok) {
+        (cobalt.Status status) {
+          if (status != cobalt.Status.ok) {
             log.warning(
               'Failed to end timer metric '
                   'user_shell_log_out_timer_id: $status. ',
