@@ -336,7 +336,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
       };
 
   // Connect to the system font provider.
-  fuchsia::fonts::FontProviderSyncPtr sync_font_provider;
+  fuchsia::fonts::ProviderSyncPtr sync_font_provider;
   startup_context.ConnectToEnvironmentService(sync_font_provider.NewRequest());
 
   shell_->GetTaskRunners().GetUITaskRunner()->PostTask(

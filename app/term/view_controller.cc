@@ -37,13 +37,13 @@ ViewController::ViewController(
       context_(context),
       font_loader_(
           context_
-              ->ConnectToEnvironmentService<fuchsia::fonts::FontProvider>()),
+              ->ConnectToEnvironmentService<fuchsia::fonts::Provider>()),
       params_(term_params) {
   FXL_DCHECK(context_);
 
   SetReleaseHandler([this] { disconnect_(this); });
 
-  fuchsia::fonts::FontRequest font_request;
+  fuchsia::fonts::Request font_request;
   font_request.family = "RobotoMono";
   font_loader_.LoadFont(
       std::move(font_request), [this](sk_sp<SkTypeface> typeface) {

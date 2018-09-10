@@ -20,19 +20,19 @@ class SkiaFontLoader {
  public:
   using FontCallback = fit::function<void(sk_sp<SkTypeface>)>;
 
-  SkiaFontLoader(fuchsia::fonts::FontProviderPtr font_provider);
+  SkiaFontLoader(fuchsia::fonts::ProviderPtr font_provider);
   ~SkiaFontLoader();
 
   // Loads the requested font and invokes the callback when done.
   // If the request fails, the callback will receive a null typeface.
-  void LoadFont(fuchsia::fonts::FontRequest request, FontCallback callback);
+  void LoadFont(fuchsia::fonts::Request request, FontCallback callback);
 
   // Loads the default font and invokes the callback when done.
   // If the request fails, the callback will receive a null typeface.
   void LoadDefaultFont(FontCallback callback);
 
  private:
-  fuchsia::fonts::FontProviderPtr font_provider_;
+  fuchsia::fonts::ProviderPtr font_provider_;
 
   FXL_DISALLOW_COPY_AND_ASSIGN(SkiaFontLoader);
 };

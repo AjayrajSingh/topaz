@@ -20,7 +20,7 @@ class JankView : public mozart::SkiaView {
  public:
   JankView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
            fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request,
-           fuchsia::fonts::FontProviderPtr font_provider);
+           fuchsia::fonts::ProviderPtr font_provider);
   ~JankView() override;
 
  private:

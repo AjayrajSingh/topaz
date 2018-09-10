@@ -17,7 +17,7 @@ int main(int argc, const char** argv) {
         std::move(view_context.view_manager),
         std::move(view_context.view_owner_request),
         view_context.startup_context
-            ->ConnectToEnvironmentService<fuchsia::fonts::FontProvider>());
+            ->ConnectToEnvironmentService<fuchsia::fonts::Provider>());
   });
 
   loop.Run();

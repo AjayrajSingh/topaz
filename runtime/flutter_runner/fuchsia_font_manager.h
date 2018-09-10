@@ -28,7 +28,7 @@ namespace txt {
 
 class FuchsiaFontManager final : public SkFontMgr {
  public:
-  FuchsiaFontManager(fuchsia::fonts::FontProviderSyncPtr provider);
+  FuchsiaFontManager(fuchsia::fonts::ProviderSyncPtr provider);
 
   ~FuchsiaFontManager() override;
 
@@ -80,7 +80,7 @@ class FuchsiaFontManager final : public SkFontMgr {
   FML_DISALLOW_COPY_AND_ASSIGN(FuchsiaFontManager);
 
  private:
-  mutable fuchsia::fonts::FontProviderSyncPtr font_provider_;
+  mutable fuchsia::fonts::ProviderSyncPtr font_provider_;
 };
 
 }  // namespace txt

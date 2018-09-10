@@ -30,7 +30,7 @@ const JankView::Button JankView::kButtons[] = {
 
 JankView::JankView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
                    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request,
-                   fuchsia::fonts::FontProviderPtr font_provider)
+                   fuchsia::fonts::ProviderPtr font_provider)
     : SkiaView(std::move(view_manager), std::move(view_owner_request), "Jank"),
       font_loader_(std::move(font_provider)) {
   font_loader_.LoadDefaultFont([this](sk_sp<SkTypeface> typeface) {
