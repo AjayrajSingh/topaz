@@ -1,10 +1,10 @@
 {
     "program": {
-        "binary": "bin/app"
+        "data": "data"
     },
     "sandbox": {
         "features": [
-	    "deprecated-all-services",
+            "deprecated-all-services",
             "root-ssl-certificates",
             "system-temp",
             "vulkan"
