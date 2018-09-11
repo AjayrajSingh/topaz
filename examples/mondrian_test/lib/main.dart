@@ -14,7 +14,7 @@ void main() {
       new Color(0xFF000000 + new math.Random().nextInt(0xFFFFFF));
 
   runApp(new MaterialApp(
-    title: 'Mondrian test',
+    title: 'Mondrian Test',
     home: new Container(
       color: randomColor,
     ),

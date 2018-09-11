@@ -91,6 +91,7 @@ class SurfaceGraph extends Model {
     String parentId,
     SurfaceRelation relation,
     String pattern,
+    String placeholderColor,
   ) {
     Tree<String> node = _tree.find(id) ?? new Tree<String>(value: id);
     Tree<String> parent =
@@ -98,8 +99,8 @@ class SurfaceGraph extends Model {
     assert(parent != null);
     assert(relation != null);
     Surface oldSurface = _surfaces[id];
-    Surface updatedSurface =
-        new Surface(this, node, properties, relation, pattern);
+    Surface updatedSurface = new Surface(
+        this, node, properties, relation, pattern, placeholderColor);
     // if this is an external surface, create an association between this and
     // the most focused surface.
     if (properties.source == ModuleSource.external$ &&

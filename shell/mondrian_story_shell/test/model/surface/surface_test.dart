@@ -27,7 +27,7 @@ void main() {
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
-    Surface surface = new Surface(graph, node, properties, relation, null);
+    Surface surface = new Surface(graph, node, properties, relation, null, '');
     String encoded = json.encode(surface);
     Map decodedJson = json.decode(encoded);
     Surface decodedSurface = new Surface.fromJson(decodedJson, graph);

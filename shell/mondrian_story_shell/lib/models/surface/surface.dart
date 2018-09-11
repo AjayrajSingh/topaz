@@ -9,6 +9,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
+import '../../models/surface/surface_transition.dart';
 import '../tree/tree.dart';
 import 'surface_graph.dart';
 import 'surface_properties.dart';
@@ -21,20 +22,31 @@ const String kNoParent = '';
 class Surface extends Model {
   /// Public constructor
   Surface(this._graph, this.node, this.properties, this.relation,
-      this.compositionPattern);
+      this.compositionPattern, this.placeholderColor) {
+    transitionModel = new SurfaceTransitionModel()
+
+      // notify listeners of Surface model to changes that happen in
+      // surface_transition, so we can use the same model in builders
+      /// ignore: unnecessary_lambdas
+      ..addListener(() => notifyListeners());
+  }
 
   Surface.fromJson(Map<String, dynamic> json, this._graph)
       : node = new Tree<String>(value: json['id']),
         compositionPattern = json['compositionPattern'],
         properties = new SurfaceProperties.fromJson(
             json['surfaceProperties'].cast<String, dynamic>()),
-        relation = SurfaceRelationUtil
-            .decode(json['surfaceRelation'].cast<String, String>()),
+        relation = SurfaceRelationUtil.decode(
+            json['surfaceRelation'].cast<String, String>()),
         childIds = json['children'].cast<String>(),
-        isParentRoot = json['parentId'] == null;
+        isParentRoot = json['parentId'] == null,
+        placeholderColor = json['placeholderColor'];
 
   final SurfaceGraph _graph;
   final Tree<String> node;
+
+  /// The transitionModel handling placeholder timinggit
+  SurfaceTransitionModel transitionModel;
 
   /// Connection to underlying view
   ChildViewConnection connection;
@@ -47,6 +59,11 @@ class Surface extends Model {
 
   /// The pattern with which to compose this node with its parent
   final String compositionPattern;
+
+  /// The placeholder color to use if the surface is focused before the
+  /// module is ready to display. This comes in as a hex string on the
+  /// module manifest.
+  final String placeholderColor;
 
   // Used to track whether this node is attached to the root of the graph
   bool isParentRoot;
@@ -165,6 +182,7 @@ class Surface extends Model {
       'compositionPattern': compositionPattern,
       'isDismissed': dismissed ? 'true' : 'false',
       'children': _children(),
+      'placeholderColor': placeholderColor,
     };
   }
 }
@@ -178,7 +196,7 @@ class SurfaceContainer extends Surface {
       SurfaceRelation relation,
       String compositionPattern,
       this._layouts)
-      : super(graph, node, properties, relation, compositionPattern) {
+      : super(graph, node, properties, relation, compositionPattern, '') {
     super.connection = null;
   }
 

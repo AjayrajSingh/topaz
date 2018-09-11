@@ -26,7 +26,7 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('value', properties, '', relation, null)
+      ..addSurface('value', properties, '', relation, null, '')
       ..connectView('value', new MockInterfaceHandle())
       ..focusSurface('value', null);
     expect(graph.focusStack.length, 1);
@@ -55,7 +55,7 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('parent', properties, '', relation, null)
+      ..addSurface('parent', properties, '', relation, null, '')
       ..connectView('parent', new MockInterfaceHandle())
       ..focusSurface('parent', null);
     expect(graph.focusStack.length, 1);
@@ -67,7 +67,7 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('child', properties, 'parent', relation, null)
+      ..addSurface('child', properties, 'parent', relation, null, '')
       ..connectView('child', new MockInterfaceHandle())
       ..focusSurface('child', null);
     expect(graph.focusStack.length, 2);
@@ -109,7 +109,7 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('parent', properties, '', relation, null)
+      ..addSurface('parent', properties, '', relation, null, '')
       ..connectView('parent', new MockInterfaceHandle())
       ..focusSurface('parent', null);
     expect(graph.focusStack.length, 1);
@@ -121,7 +121,7 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('child1', properties, 'parent', relation, null)
+      ..addSurface('child1', properties, 'parent', relation, null, '')
       ..connectView('child1', new MockInterfaceHandle())
       ..focusSurface('child1', null);
     expect(graph.focusStack.length, 2);
@@ -133,7 +133,7 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('child2', properties, 'parent', relation, null)
+      ..addSurface('child2', properties, 'parent', relation, null, '')
       ..connectView('child2', new MockInterfaceHandle())
       ..focusSurface('child2', null);
     expect(graph.focusStack.length, 3);
@@ -181,13 +181,13 @@ void main() {
     SurfaceProperties externalProp =
         new SurfaceProperties(source: ModuleSource.external$);
     graph
-      ..addSurface(
-          'parent', new SurfaceProperties(), '', new SurfaceRelation(), null)
+      ..addSurface('parent', new SurfaceProperties(), '', new SurfaceRelation(),
+          null, '')
       ..connectView('parent', new MockInterfaceHandle())
       ..focusSurface('parent', null)
       // Now add external surface
       ..addSurface(
-          'external', externalProp, 'parent', new SurfaceRelation(), null)
+          'external', externalProp, 'parent', new SurfaceRelation(), null, '')
       ..connectView('external', new MockInterfaceHandle())
       ..focusSurface('external', null)
       // Now dismiss the external surface
@@ -206,13 +206,13 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('value', properties, '', relation, null)
+      ..addSurface('value', properties, '', relation, null, '')
       ..connectView('value', new MockInterfaceHandle())
       ..focusSurface('value', null);
     expect(graph.treeSize, 2);
 
     graph
-      ..addSurface('value', properties, '', relation, null)
+      ..addSurface('value', properties, '', relation, null, '')
       ..connectView('value', new MockInterfaceHandle())
       ..focusSurface('value', null);
     expect(graph.treeSize, 2);
@@ -228,19 +228,19 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('value', properties, '', relation, null)
+      ..addSurface('value', properties, '', relation, null, '')
       ..connectView('value', new MockInterfaceHandle())
       ..focusSurface('value', null);
     expect(graph.treeSize, 2);
 
     graph
-      ..addSurface('value.child', properties, '', relation, null)
+      ..addSurface('value.child', properties, '', relation, null, '')
       ..connectView('value.child', new MockInterfaceHandle())
       ..focusSurface('value.child', null);
     expect(graph.treeSize, 3);
 
     graph
-      ..addSurface('value.child', properties, '', relation, null)
+      ..addSurface('value.child', properties, '', relation, null, '')
       ..connectView('value.child', new MockInterfaceHandle())
       ..focusSurface('value.child', null);
     expect(graph.treeSize, 3);
@@ -256,20 +256,20 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('value', properties, '', relation, null)
+      ..addSurface('value', properties, '', relation, null, '')
       ..connectView('value', new MockInterfaceHandle())
       ..focusSurface('value', null);
     expect(graph.treeSize, 2);
 
     graph
-      ..addSurface('value.child', properties, '', relation, null)
+      ..addSurface('value.child', properties, '', relation, null, '')
       ..connectView('value.child', new MockInterfaceHandle())
       ..focusSurface('value.child', null);
     expect(graph.treeSize, 3);
 
     MockInterfaceHandle handle = new MockInterfaceHandle();
     graph
-      ..addSurface('value.child', properties, '', relation, null)
+      ..addSurface('value.child', properties, '', relation, null, '')
       ..connectView('value.child', handle)
       ..focusSurface('value.child', null);
     expect(graph.treeSize, 3);

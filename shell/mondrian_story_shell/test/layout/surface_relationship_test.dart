@@ -26,8 +26,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface root =
-        graph.addSurface('root_of_test', properties, '', surfaceRelation, '');
+    Surface root = graph.addSurface(
+        'root_of_test', properties, '', surfaceRelation, '', '');
 
     List<Surface> surfaces = [
       root,
@@ -51,8 +51,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface root =
-        graph.addSurface('root_of_test', properties, '', surfaceRelation, '');
+    Surface root = graph.addSurface(
+        'root_of_test', properties, '', surfaceRelation, '', '');
 
     // properties for the copresent surface
     properties = new SurfaceProperties();
@@ -61,8 +61,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface copresentSurface = graph.addSurface(
-        'copresentSurface', properties, 'root_of_test', surfaceRelation, '');
+    Surface copresentSurface = graph.addSurface('copresentSurface', properties,
+        'root_of_test', surfaceRelation, '', '');
 
     List<Surface> surfaces = [
       root,
@@ -91,8 +91,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface root =
-        graph.addSurface('root_of_test', properties, '', surfaceRelation, '');
+    Surface root = graph.addSurface(
+        'root_of_test', properties, '', surfaceRelation, '', '');
 
     // properties for the sequential surface
     properties = new SurfaceProperties();
@@ -101,8 +101,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface sequentialSurface = graph.addSurface(
-        'copresentSurface', properties, 'root_of_test', surfaceRelation, '');
+    Surface sequentialSurface = graph.addSurface('copresentSurface', properties,
+        'root_of_test', surfaceRelation, '', '');
 
     List<Surface> surfaces = [
       root,
@@ -127,8 +127,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface root =
-        graph.addSurface('root_of_test', properties, '', surfaceRelation, '');
+    Surface root = graph.addSurface(
+        'root_of_test', properties, '', surfaceRelation, '', '');
 
     // properties for the ontop surface
     properties = new SurfaceProperties();
@@ -138,7 +138,7 @@ void main() {
       emphasis: 1.0,
     );
     Surface ontopSurface = graph.addSurface(
-        'ontop', properties, 'root_of_test', surfaceRelation, '');
+        'ontop', properties, 'root_of_test', surfaceRelation, '', '');
 
     List<Surface> surfaces = [
       root,
@@ -168,8 +168,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface root =
-        graph.addSurface('root_of_test', properties, '', surfaceRelation, '');
+    Surface root = graph.addSurface(
+        'root_of_test', properties, '', surfaceRelation, '', '');
 
     // properties for root surface
     properties = new SurfaceProperties();
@@ -179,7 +179,7 @@ void main() {
       emphasis: 1.0,
     );
     Surface copresentSurface = graph.addSurface(
-        'copresent', properties, 'root_of_test', surfaceRelation, '');
+        'copresent', properties, 'root_of_test', surfaceRelation, '', '');
 
     // properties for the ontop surface
     properties = new SurfaceProperties();
@@ -189,7 +189,7 @@ void main() {
       emphasis: 1.0,
     );
     Surface ontopSurface = graph.addSurface(
-        'ontop', properties, 'root_of_test', surfaceRelation, '');
+        'ontop', properties, 'root_of_test', surfaceRelation, '', '');
 
     List<Surface> surfaces = [
       root,
@@ -225,8 +225,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface root =
-        graph.addSurface('root_of_test', properties, '', surfaceRelation, '');
+    Surface root = graph.addSurface(
+        'root_of_test', properties, '', surfaceRelation, '', '');
 
     // properties for root surface
     properties = new SurfaceProperties();
@@ -236,7 +236,7 @@ void main() {
       emphasis: 1.0,
     );
     Surface copresentSurface = graph.addSurface(
-        'copresent', properties, 'root_of_test', surfaceRelation, '');
+        'copresent', properties, 'root_of_test', surfaceRelation, '', '');
 
     // properties for the ontop surface
     properties = new SurfaceProperties();
@@ -245,8 +245,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface ontopSurface =
-        graph.addSurface('ontop', properties, 'copresent', surfaceRelation, '');
+    Surface ontopSurface = graph.addSurface(
+        'ontop', properties, 'copresent', surfaceRelation, '', '');
 
     List<Surface> surfaces = [
       root,
@@ -280,8 +280,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface root =
-        graph.addSurface('root_of_test', properties, '', surfaceRelation, '');
+    Surface root = graph.addSurface(
+        'root_of_test', properties, '', surfaceRelation, '', '');
 
     // properties for root surface
     properties = new SurfaceProperties();
@@ -291,8 +291,7 @@ void main() {
       emphasis: 1.0,
     );
     Surface firstOnTop = graph.addSurface(
-        'ontop1', properties, 'root_of_test', surfaceRelation, '');
-
+        'ontop1', properties, 'root_of_test', surfaceRelation, '', '');
     // properties for the ontop surface
     properties = new SurfaceProperties();
     surfaceRelation = const SurfaceRelation(
@@ -300,8 +299,8 @@ void main() {
       dependency: SurfaceDependency.none,
       emphasis: 1.0,
     );
-    Surface secondOntop =
-        graph.addSurface('ontop2', properties, 'ontop1', surfaceRelation, '');
+    Surface secondOntop = graph.addSurface(
+        'ontop2', properties, 'ontop1', surfaceRelation, '', '');
 
     List<Surface> surfaces = [
       root,

@@ -22,7 +22,8 @@ void main() {
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
-    Surface parent = graph.addSurface('value', properties, '', relation, null);
+    Surface parent =
+        graph.addSurface('value', properties, '', relation, null, '');
     Tree<Surface> spanningTree = getCopresentSpanningTree(parent);
     expect(spanningTree.length, 1);
     expect(spanningTree.value, parent);
@@ -38,11 +39,12 @@ void main() {
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
-    Surface parent = graph.addSurface('parent', properties, '', relation, null);
+    Surface parent =
+        graph.addSurface('parent', properties, '', relation, null, '');
     Surface child =
-        graph.addSurface('child', properties, 'parent', relation, null);
+        graph.addSurface('child', properties, 'parent', relation, null, '');
     Surface grandchild =
-        graph.addSurface('grandchild', properties, 'child', relation, null);
+        graph.addSurface('grandchild', properties, 'child', relation, null, '');
     Tree<Surface> spanningTree = getCopresentSpanningTree(grandchild);
 
     expect(spanningTree.length, 3);
@@ -65,10 +67,10 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('parent', properties, '', relation, null)
-      ..addSurface('child', properties, '', relation, null);
+      ..addSurface('parent', properties, '', relation, null, '')
+      ..addSurface('child', properties, '', relation, null, '');
     Surface grandchild =
-        graph.addSurface('grandchild', properties, '', relation, null);
+        graph.addSurface('grandchild', properties, '', relation, null, '');
     Tree<Surface> spanningTree = getCopresentSpanningTree(grandchild);
 
     expect(spanningTree.length, 1);
@@ -87,10 +89,10 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('parent', properties, '', relation, null)
-      ..addSurface('child', properties, '', relation, null);
+      ..addSurface('parent', properties, '', relation, null, '')
+      ..addSurface('child', properties, '', relation, null, '');
     Surface grandchild =
-        graph.addSurface('grandchild', properties, '', relation, null);
+        graph.addSurface('grandchild', properties, '', relation, null, '');
     Tree<Surface> spanningTree = getDependentSpanningTree(grandchild);
 
     expect(spanningTree.length, 1);
@@ -109,10 +111,10 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('parent', properties, '', relation, null)
-      ..addSurface('child', properties, '', relation, null);
+      ..addSurface('parent', properties, '', relation, null, '')
+      ..addSurface('child', properties, '', relation, null, '');
     Surface grandchild =
-        graph.addSurface('grandchild', properties, '', relation, null);
+        graph.addSurface('grandchild', properties, '', relation, null, '');
     Tree<Surface> spanningTree = getDependentSpanningTree(grandchild);
 
     expect(spanningTree.length, 1);
@@ -129,10 +131,10 @@ void main() {
       dependency: SurfaceDependency.dependent,
     );
     graph
-      ..addSurface('parent', properties, '', relation, null)
-      ..addSurface('child', properties, '', relation, null);
+      ..addSurface('parent', properties, '', relation, null, '')
+      ..addSurface('child', properties, '', relation, null, '');
     Surface grandchild =
-        graph.addSurface('grandchild', properties, '', relation, null);
+        graph.addSurface('grandchild', properties, '', relation, null, '');
     List<Tree<Surface>> spanningTree =
         getDependentSpanningTrees(grandchild).flatten();
 

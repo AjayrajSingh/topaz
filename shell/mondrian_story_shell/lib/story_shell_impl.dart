@@ -65,6 +65,9 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   ) {
     trace('connecting view $viewId with parent $parentId');
     log.fine('Connecting view $viewId with parent $parentId');
+
+    /// ignore: cascade_invocations
+    log.fine('Were passed manifest: $manifest');
     surfaceGraph
       ..addSurface(
         viewId,
@@ -72,6 +75,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
         parentId,
         surfaceRelation ?? const SurfaceRelation(),
         manifest != null ? manifest.compositionPattern : '',
+        manifest != null ? manifest.placeholderColor : '',
       )
       ..connectView(viewId, view);
   }
@@ -140,7 +144,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
             ..containerMembership = <String>[containerName]
             ..containerLabel = nodeId;
           surfaceGraph.addSurface(
-              nodeId, prop, parentId, nodeMap[nodeId].relationship, null);
+              nodeId, prop, parentId, nodeMap[nodeId].relationship, null, '');
           addedParents.add(nodeId);
           surfaceGraph.connectView(nodeId, viewMap[nodeId]);
           nodeQueue.remove(nodeId);
