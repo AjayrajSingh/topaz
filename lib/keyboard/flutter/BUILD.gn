@@ -18,5 +18,6 @@ dart_library("flutter") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/lib/keyboard/dart",
     "//topaz/lib/shell",
+    "//topaz/shell/keyboard",
   ]
 }

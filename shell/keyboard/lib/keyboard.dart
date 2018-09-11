@@ -10,18 +10,20 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import 'constants.dart' as constants;
 import 'keys.dart';
 import 'word_suggestion_service.dart';
 
 const double _kSuggestionRowHeight = 0.0;
-const Color _kTurquoiseAccentColor = const Color(0xFF68EFAD);
-const Color _kImageColor = const Color(0xFFFFFFFF);
-const double _kDefaultRowHeight = 48.0;
+const Color _kAccentColor = const Color(0xFF68EFAD);
 
+const Color _kBorderColor = const Color(0xFFD8D9DA);
+const Color _kBackgroundColor = const Color(0xFFF8F9FA);
+const Color _kContentColor = const Color(0xFF202124);
 const TextStyle _kDefaultTextStyle = const TextStyle(
-  color: _kImageColor,
+  color: _kContentColor,
   fontFamily: 'Roboto-Light',
-  fontSize: 22.0,
+  fontSize: 16.0,
 );
 
 const String _kKeyType = 'type'; // defaults to kKeyTypeNormal
@@ -32,6 +34,7 @@ const String _kKeyTypeSpecial = 'special';
 const String _kKeyVisualType = 'visualtype'; // defaults to kKeyVisualTypeText
 const String _kKeyVisualTypeText = 'text';
 const String _kKeyVisualTypeImage = 'image';
+const String _kKeyVisualTypeSpacer = 'spacer';
 const String _kKeyVisualTypeActionText = 'actiontext';
 
 const String _kKeyAction =
@@ -55,24 +58,21 @@ const String _kKeyboardLayoutsJson = '['
 // Lower Case Layout
     '['
     '['
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},'
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},'
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}'
+    '{\"$_kKeyText\":\"q\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"w\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"e\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"r\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"t\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"y\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"u\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"i\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"o\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"p\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"2\"}'
     '],'
     '['
-    '{\"$_kKeyText\":\"q\"},'
-    '{\"$_kKeyText\":\"w\"},'
-    '{\"$_kKeyText\":\"e\"},'
-    '{\"$_kKeyText\":\"r\"},'
-    '{\"$_kKeyText\":\"t\"},'
-    '{\"$_kKeyText\":\"y\"},'
-    '{\"$_kKeyText\":\"u\"},'
-    '{\"$_kKeyText\":\"i\"},'
-    '{\"$_kKeyText\":\"o\"},'
-    '{\"$_kKeyText\":\"p\"}'
-    '],'
-    '['
-    '{\"$_kKeyText\":\"a\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.66666666\"},'
+    '{\"$_kKeyVisualType\":\"$_kKeyVisualTypeSpacer\", \"$_kKeyWidth\":\"1\"},'
+    '{\"$_kKeyText\":\"a\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"s\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"d\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"f\", \"$_kKeyWidth\":\"2\"},'
@@ -80,10 +80,12 @@ const String _kKeyboardLayoutsJson = '['
     '{\"$_kKeyText\":\"h\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"j\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"k\", \"$_kKeyWidth\":\"2\"},'
-    '{\"$_kKeyText\":\"l\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.33333333\"}'
+    '{\"$_kKeyText\":\"l\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyVisualType\":\"$_kKeyVisualTypeSpacer\", \"$_kKeyWidth\":\"1\"}'
     '],'
     '['
-    '{\"$_kKeyImage\":\"packages/keyboard/res/ArrowUp.png\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexUpperCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/ArrowUp.png\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexUpperCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"z\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"x\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"c\", \"$_kKeyWidth\":\"2\"},'
@@ -91,36 +93,38 @@ const String _kKeyboardLayoutsJson = '['
     '{\"$_kKeyText\":\"b\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"n\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"m\", \"$_kKeyWidth\":\"2\"},'
-    '{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"}'
+    '{\"$_kKeyText\":\"!\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"?\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/ArrowUp.png\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexUpperCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"2\"}'
     '],'
     '['
-    '{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"5\"},'
+    '{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"_\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"-\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyImage\":\"packages/keyboard/res/Space.png\", \"$_kKeyAction\":\"$_kKeyActionSpace\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"10\"},'
+    '{\"$_kKeyText\":\",\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\".\", \"$_kKeyWidth\":\"2\"},'
-    '{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"}'
+    '{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"2\"}'
     ']'
     '],'
 // Upper Case Layout
     '['
     '['
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},'
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},'
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}'
+    '{\"$_kKeyText\":\"Q\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"W\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"E\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"R\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"T\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"Y\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"U\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"I\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"O\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"P\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"2\"}'
     '],'
     '['
-    '{\"$_kKeyText\":\"Q\"},'
-    '{\"$_kKeyText\":\"W\"},'
-    '{\"$_kKeyText\":\"E\"},'
-    '{\"$_kKeyText\":\"R\"},'
-    '{\"$_kKeyText\":\"T\"},'
-    '{\"$_kKeyText\":\"Y\"},'
-    '{\"$_kKeyText\":\"U\"},'
-    '{\"$_kKeyText\":\"I\"},'
-    '{\"$_kKeyText\":\"O\"},'
-    '{\"$_kKeyText\":\"P\"}'
-    '],'
-    '['
-    '{\"$_kKeyText\":\"A\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.66666666\"},'
+    '{\"$_kKeyVisualType\":\"$_kKeyVisualTypeSpacer\", \"$_kKeyWidth\":\"1\"},'
+    '{\"$_kKeyText\":\"A\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"S\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"D\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"F\", \"$_kKeyWidth\":\"2\"},'
@@ -128,10 +132,12 @@ const String _kKeyboardLayoutsJson = '['
     '{\"$_kKeyText\":\"H\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"J\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"K\", \"$_kKeyWidth\":\"2\"},'
-    '{\"$_kKeyText\":\"L\", \"$_kKeyWidth\":\"3\", \"$_kKeyAlign\":\"0.33333333\"}'
+    '{\"$_kKeyText\":\"L\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyVisualType\":\"$_kKeyVisualTypeSpacer\", \"$_kKeyWidth\":\"1\"}'
     '],'
     '['
-    '{\"$_kKeyImage\":\"packages/keyboard/res/ArrowDown.png\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexLowerCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/ArrowDown.png\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexLowerCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"Z\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"X\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"C\", \"$_kKeyWidth\":\"2\"},'
@@ -139,22 +145,22 @@ const String _kKeyboardLayoutsJson = '['
     '{\"$_kKeyText\":\"B\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"N\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\"M\", \"$_kKeyWidth\":\"2\"},'
-    '{\"$_kKeyImage\":\"packages/keyboard/res/Delete.png\", \"$_kKeyAction\":\"$_kKeyActionDelete\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"3\"}'
+    '{\"$_kKeyText\":\"!\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"?\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyImage\":\"packages/keyboard/res/ArrowDown.png\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexLowerCase\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"2\"}'
     '],'
     '['
-    '{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"5\"},'
+    '{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"_\", \"$_kKeyWidth\":\"2\"},'
+    '{\"$_kKeyText\":\"-\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyImage\":\"packages/keyboard/res/Space.png\", \"$_kKeyAction\":\"$_kKeyActionSpace\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeImage\", \"$_kKeyWidth\":\"10\"},'
+    '{\"$_kKeyText\":\",\", \"$_kKeyWidth\":\"2\"},'
     '{\"$_kKeyText\":\".\", \"$_kKeyWidth\":\"2\"},'
-    '{\"$_kKeyText\":\"Go\", \"$_kKeyAction\":\"$_kKeyActionGo\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"3\"}'
+    '{\"$_kKeyText\":\"?123\", \"$_kKeyAction\":\"$_kKeyboardLayoutIndexSymbolsOne\", \"$_kKeyType\":\"$_kKeyTypeSpecial\", \"$_kKeyVisualType\":\"$_kKeyVisualTypeActionText\", \"$_kKeyWidth\":\"2\"}'
     ']'
     '],'
 // Symbols One Layout
     '['
-    '['
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},'
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},'
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}'
-    '],'
     '['
     '{\"$_kKeyText\":\"1\"},'
     '{\"$_kKeyText\":\"2\"},'
@@ -201,11 +207,6 @@ const String _kKeyboardLayoutsJson = '['
     '],'
 // Symbols Two Layout
     '['
-    '['
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"call\"},'
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"text\"},'
-    '{\"$_kKeyType\":\"$_kKeyTypeSuggestion\", \"$_kKeyText\":\"play\"}'
-    '],'
     '['
     '{\"$_kKeyText\":\"~\"},'
     '{\"$_kKeyText\":\"`\"},'
@@ -275,7 +276,7 @@ class Keyboard extends StatefulWidget {
       : super(key: key);
 
   @override
-  KeyboardState createState() => new KeyboardState();
+  KeyboardState createState() => KeyboardState();
 }
 
 /// Displays the current keyboard for [Keyboard].
@@ -283,12 +284,13 @@ class Keyboard extends StatefulWidget {
 /// [_kKeyboardLayouts] while [_keyboardWidget] is the one currently being
 /// displayed.
 class KeyboardState extends State<Keyboard> {
-  static const double _kGoKeyTextSize = 16.0;
+  static const double _kGoKeyTextSize = 12.0;
   static const double _kSuggestionTextSize = 16.0;
   static const TextStyle _kSuggestionTextStyle = const TextStyle(
-      color: _kTurquoiseAccentColor,
-      fontSize: _kSuggestionTextSize,
-      letterSpacing: 2.0);
+    color: _kAccentColor,
+    fontSize: _kSuggestionTextSize,
+    letterSpacing: 2.0,
+  );
 
   final List<GlobalKey<TextKeyState>> _suggestionKeys =
       <GlobalKey<TextKeyState>>[];
@@ -300,11 +302,30 @@ class KeyboardState extends State<Keyboard> {
     super.initState();
     _keyboards = <Widget>[];
     for (List<dynamic> keyboard in _kKeyboardLayouts) {
-      _keyboards.add(new Directionality(
+      _keyboards.add(Directionality(
         textDirection: TextDirection.ltr,
-        child: new IntrinsicHeight(
-          child: new Column(
-            children: keyboard.map(_makeRow).toList(),
+        child: IntrinsicHeight(
+          child: Container(
+            decoration: BoxDecoration(
+              color: _kBorderColor,
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(constants.cornerRadius),
+              ),
+            ),
+            padding: EdgeInsets.only(
+              left: constants.borderWidth,
+              right: constants.borderWidth,
+              top: constants.borderWidth,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                color: _kBackgroundColor,
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(constants.cornerRadius),
+                ),
+              ),
+              child: Column(children: keyboard.map(_makeRow).toList()),
+            ),
           ),
         ),
       ));
@@ -335,8 +356,7 @@ class KeyboardState extends State<Keyboard> {
 
     final String currentWord = stringList.removeLast();
 
-    final WordSuggestionService wordSuggestionService =
-        new WordSuggestionService();
+    final WordSuggestionService wordSuggestionService = WordSuggestionService();
     List<String> suggestedWords =
         wordSuggestionService.suggestWords(currentWord);
     _clearSuggestions();
@@ -355,7 +375,7 @@ class KeyboardState extends State<Keyboard> {
 
   Row _makeRow(dynamic jsonRow) {
     List<dynamic> row = jsonRow;
-    return new Row(
+    return Row(
       children: row.map(_makeKey).toList(),
       mainAxisAlignment: MainAxisAlignment.center,
     );
@@ -372,6 +392,8 @@ class KeyboardState extends State<Keyboard> {
       case _kKeyVisualTypeImage:
         String image = key[_kKeyImage];
         return _createImageKey(image, width, action);
+      case _kKeyVisualTypeSpacer:
+        return _createSpacerKey(width);
       case _kKeyVisualTypeText:
       case _kKeyVisualTypeActionText:
       default:
@@ -381,6 +403,8 @@ class KeyboardState extends State<Keyboard> {
         return _createTextKey(text, width, action, align, type, visualType);
     }
   }
+
+  Widget _createSpacerKey(int width) => SpacerKey(flex: width);
 
   Widget _createTextKey(String text, int width, String action, double align,
       String type, String visualType) {
@@ -393,9 +417,13 @@ class KeyboardState extends State<Keyboard> {
               )
             : _kDefaultTextStyle;
     bool isSuggestion = type == _kKeyTypeSuggestion;
-    GlobalKey<TextKeyState> key = isSuggestion ? new GlobalKey() : null;
-    TextKey textKey = new TextKey(
+    GlobalKey<TextKeyState> key = isSuggestion ? GlobalKey() : null;
+    TextKey textKey = TextKey(
       isSuggestion ? '' : text,
+      style: style,
+      height: isSuggestion ? _kSuggestionRowHeight : constants.keyHeight,
+      horizontalAlign: align,
+      verticalAlign: 0.5,
       key: key,
       flex: width,
       onText: (String text) {
@@ -408,23 +436,19 @@ class KeyboardState extends State<Keyboard> {
           _onText(text);
         }
       },
-      horizontalAlign: align,
-      style: style,
-      height: isSuggestion ? _kSuggestionRowHeight : _kDefaultRowHeight,
-      verticalAlign: 0.5,
     );
+
     if (isSuggestion) {
       _suggestionKeys.add(key);
     }
     return textKey;
   }
 
-  Widget _createImageKey(String image, int width, String action) =>
-      new ImageKey(
-        image,
-        _getAction(action),
-        _kImageColor,
-        _kDefaultRowHeight,
+  Widget _createImageKey(String imageUrl, int width, String action) => ImageKey(
+        imageUrl: imageUrl,
+        onKeyPressed: _getAction(action),
+        height: constants.keyHeight,
+        imageColor: _kContentColor,
         flex: width,
       );
 

@@ -9,6 +9,7 @@ dart_library("keyboard") {
   package_name = "keyboard"
 
   sources = [
+    "constants.dart",
     "keyboard.dart",
     "keys.dart",
     "word_suggestion_service.dart",

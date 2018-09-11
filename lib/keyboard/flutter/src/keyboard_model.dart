@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'package:fidl_fuchsia_cobalt/fidl.dart';
-import 'package:lib.widgets/model.dart';
 import 'package:topaz.lib.keyboard.dart/keyboard_display.dart';
 import 'package:topaz.lib.shell/models/overlay_position_model.dart';
 

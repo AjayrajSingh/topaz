@@ -5,6 +5,8 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
+import 'package:keyboard/constants.dart'
+    as keyboard; // Temporary solution for keyboard height.
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/model.dart';
@@ -13,7 +15,8 @@ import 'package:topaz.lib.shell/models/overlay_position_model.dart';
 
 import 'keyboard_model.dart';
 
-const double _kKeyboardOverlayHeight = 192.0;
+const double _kKeyboardOverlayHeight = keyboard.keyboardHeight;
+const double _kKeyboardCornerRadius = keyboard.cornerRadius;
 const double _kKeyboardDrawerSidePadding = 24.0;
 
 /// Defines the UX of the keyboard drawer.
@@ -60,9 +63,8 @@ class KeyboardContainer extends StatelessWidget {
         child: SizedBox(
           height: _kKeyboardOverlayHeight,
           child: Material(
-            borderRadius: const BorderRadius.only(
-                topLeft: const Radius.circular(8.0),
-                topRight: const Radius.circular(8.0)),
+            borderRadius: const BorderRadius.vertical(
+                top: const Radius.circular(_kKeyboardCornerRadius)),
             elevation: model.keyboardElevation,
             child: ApplicationWidget(
               url: 'latin-ime',
