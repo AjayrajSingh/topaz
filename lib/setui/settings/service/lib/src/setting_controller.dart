@@ -7,22 +7,23 @@ import 'package:fidl_fuchsia_setui/fidl.dart';
 /// The service instantiates [SettingController]s mapped to [SettingType]s.
 abstract class SettingController {
   final List<SettingListenerProxy> listeners = [];
+  bool _active = false;
 
-  void addListener(SettingListenerProxy listener) {
+  Future addListener(SettingListenerProxy listener) async {
     if (listeners.isEmpty) {
-      initialize();
+      await _initialize();
     }
     listeners.add(listener);
-    listener.notify(value);
+    listener.notify(_getValue());
   }
 
-  void notifyListeners() {
+  Future<void> notifyListeners() async {
     listeners.removeWhere((listener) => !listener.ctrl.isBound);
     for (SettingListenerProxy listener in listeners) {
-      listener.notify(value);
+      listener.notify(_getValue());
     }
     if (listeners.isEmpty) {
-      close();
+      await _close();
     }
   }
 
@@ -31,11 +32,16 @@ abstract class SettingController {
   /// They should override [setSettingValue] instead.
   Future<bool> setSetting(SettingsObject value) async {
     if (listeners.isEmpty) {
-      await initialize();
+      await _initialize();
     }
+
+    if (!_active)
+      throw StateError(
+          'Attempted to set state with an uninitialized controller!');
+
     final result = await setSettingValue(value);
     if (listeners.isEmpty) {
-      await close();
+      await _close();
     }
     return result;
   }
@@ -50,6 +56,23 @@ abstract class SettingController {
   // [initialize] and [close] can both be called multiple times during the
   // controller's lifetime
   Future<void> close();
+
+  Future<void> _initialize() async {
+    await initialize();
+    _active = true;
+  }
+
+  Future<void> _close() async {
+    await close();
+    _active = false;
+  }
+
+  SettingsObject _getValue() {
+    if (!_active)
+      throw StateError(
+          'Attempted to retreive state from an uninitialized controller!');
+    return value;
+  }
 
   SettingsObject get value;
 }

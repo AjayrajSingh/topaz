@@ -1,6 +1,7 @@
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_setui/fidl.dart';
 
+import 'network_controller.dart';
 import 'setting_controller.dart';
 import 'timezone_controller.dart';
 
@@ -41,6 +42,8 @@ class SettingControllerCreator {
     switch (type) {
       case SettingType.timeZone:
         return TimeZoneController();
+      case SettingType.wireless:
+        return NetworkController();
       default:
         throw UnimplementedError('No controller for the given type!');
     }
