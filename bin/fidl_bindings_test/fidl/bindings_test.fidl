@@ -79,3 +79,7 @@ union UnionTwo {
   string bar;
   uint32 baz;
 };
+
+interface SimpleServer {
+  1: Ping() -> ();
+};
