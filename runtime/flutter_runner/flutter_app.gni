@@ -6,8 +6,9 @@ assert(is_fuchsia || is_fuchsia_host)
 
 import("//build/package.gni")
 import("//peridot/build/module_manifest.gni")
-import("//topaz/runtime/dart/dart_kernel.gni")
 import("//third_party/dart/build/dart/dart_action.gni")
+import("//topaz/runtime/dart/config.gni")
+import("//topaz/runtime/dart/dart_kernel.gni")
 
 declare_args() {
   flutter_default_app = "flutter_jit_app"
@@ -31,6 +32,11 @@ declare_args() {
     flutter_profile = false
   }
 }
+
+# In product mode, we force all Flutter apps to use a specific runtime mode.
+# Currently, we force them all to use JIT, but we might switch to DBC in the
+# future.
+flutter_product_app = "_flutter_jit_app"
 
 flutter_base = "//third_party/dart-pkg/git/flutter"
 flutter_tools_label =
@@ -95,12 +101,16 @@ template("_flutter_jit_app_package") {
   }
 }
 
-template("flutter_jit_app") {
+template("_flutter_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   product = !flutter_profile
   if (defined(invoker.product)) {
     product = invoker.product
+  }
+
+  if (dart_force_product) {
+    product = true
   }
 
   product_suffix = ""
@@ -286,12 +296,16 @@ template("_flutter_aot_app_package") {
   }
 }
 
-template("flutter_aot_app") {
+template("_flutter_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   product = !flutter_profile
   if (defined(invoker.product)) {
     product = invoker.product
+  }
+
+  if (dart_force_product) {
+    product = true
   }
 
   product_suffix = ""
@@ -505,6 +519,28 @@ template("flutter_aot_app") {
   }
 
   _flutter_aot_app_package(target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
+
+template("flutter_jit_app") {
+  template_name = "_flutter_jit_app"
+  if (dart_force_product) {
+    template_name = flutter_product_app
+  }
+
+  target(template_name, target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
+
+template("flutter_aot_app") {
+  template_name = "_flutter_aot_app"
+  if (dart_force_product) {
+    template_name = flutter_product_app
+  }
+
+  target(template_name, target_name) {
     forward_variables_from(invoker, "*")
   }
 }

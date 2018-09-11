@@ -3,8 +3,9 @@
 # found in the LICENSE file.
 
 import("//build/package.gni")
-import("//topaz/runtime/dart/dart_kernel.gni")
 import("//third_party/dart/build/dart/dart_action.gni")
+import("//topaz/runtime/dart/config.gni")
+import("//topaz/runtime/dart/dart_kernel.gni")
 
 declare_args() {
   # Controls whether dart_app() targets generate JIT or AOT Dart snapshots.
@@ -29,6 +30,11 @@ declare_args() {
         "//topaz/app/maxwell/agents/module_suggester_dart:module_suggester"
   }
 }
+
+# In product mode, we force all Dart apps to use a specific runtime mode.
+# Currently, we force them all to use JIT, but we might switch to DBC in the
+# future.
+dart_product_app = "_dart_jit_app"
 
 _entry_manifests = [
   "//third_party/dart/runtime/bin/dart_io_entries.txt",
@@ -77,12 +83,16 @@ template("_dart_jit_app_package") {
   }
 }
 
-template("dart_jit_app") {
+template("_dart_jit_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   product = !is_debug
   if (defined(invoker.product)) {
     product = invoker.product
+  }
+
+  if (dart_force_product) {
+    product = true
   }
 
   product_suffix = ""
@@ -196,7 +206,7 @@ template("_dart_aot_app_package") {
   }
 }
 
-template("dart_aot_app") {
+template("_dart_aot_app") {
   assert(defined(invoker.main_dart), "Must specify main_dart file")
 
   product = !is_debug
@@ -207,6 +217,10 @@ template("dart_aot_app") {
   product_suffix = ""
   if (product) {
     product_suffix = "_product"
+  }
+
+  if (dart_force_product) {
+    product = true
   }
 
   if (defined(invoker.fuchsia_package_name)) {
@@ -354,6 +368,32 @@ template("dart_aot_app") {
   }
 
   _dart_aot_app_package(target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
+
+template("dart_jit_app") {
+  template_name = "_dart_jit_app"
+  if (dart_force_product) {
+    template_name = dart_product_app
+  }
+
+  target(template_name, target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
+
+template("dart_aot_app") {
+  template_name = "_dart_aot_app"
+  if (dart_force_product) {
+    template_name = dart_product_app
+
+    if (defined(invoker.extra_entry_manifests)) {
+      not_needed(invoker, [ "extra_entry_manifests" ])
+    }
+  }
+
+  target(template_name, target_name) {
     forward_variables_from(invoker, "*")
   }
 }

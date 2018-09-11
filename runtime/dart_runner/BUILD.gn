@@ -256,7 +256,8 @@ template("jit_runner_package") {
 }
 
 aot_runner_package("dart_aot_runner") {
-  product = false
+  product = dart_force_product
+
   meta = [
     {
       path = rebase_path("meta/dart_aot_runner.cmx")
@@ -276,7 +277,8 @@ aot_runner_package("dart_aot_product_runner") {
 }
 
 jit_runner_package("dart_jit_runner") {
-  product = false
+  product = dart_force_product
+
   meta = [
     {
       path = rebase_path("meta/dart_jit_runner.cmx")
