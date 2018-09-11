@@ -34,6 +34,8 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "set_root_view image_grid_flutter"  \
+    --flutter_app_name 'image_grid_flutter'   \
+    --sleep_before_trace 5                    \
     --unshadowed --clipping_disabled
 
 BENCHMARK="fuchsia.scenic.image_grid_flutter_noshadows"
@@ -43,6 +45,8 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "set_root_view image_grid_flutter"  \
+    --flutter_app_name 'image_grid_flutter'   \
+    --sleep_before_trace 5                    \
     --unshadowed --clipping_enabled
 
 BENCHMARK="fuchsia.scenic.image_grid_flutter_ssdo"
@@ -52,6 +56,8 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "set_root_view image_grid_flutter"  \
+    --flutter_app_name 'image_grid_flutter'   \
+    --sleep_before_trace 5                    \
     --screen_space_shadows --clipping_enabled
 
 BENCHMARK="fuchsia.scenic.image_grid_flutter_shadow_map"
@@ -61,6 +67,8 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "set_root_view image_grid_flutter"  \
+    --flutter_app_name 'image_grid_flutter'   \
+    --sleep_before_trace 5                    \
     --shadow_map --clipping_enabled
 
 BENCHMARK="fuchsia.scenic.image_grid_flutter_moment_shadow_map"
@@ -70,11 +78,15 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "set_root_view image_grid_flutter"  \
+    --flutter_app_name 'image_grid_flutter'   \
+    --sleep_before_trace 5                    \
     --moment_shadow_map --clipping_enabled
 
 #
 # image_grid_flutter x3
 #
+# TODO: Support tracking multiple flutter apps of the same name in
+# process_scenic_trace.
 IMAGE_GRID_FLUTTER_X3_COMMAND="set_root_view fuchsia-pkg://fuchsia.com/tile_view#meta/tile_view.cmx image_grid_flutter image_grid_flutter image_grid_flutter"
 BENCHMARK="fuchsia.scenic.image_grid_flutter_x3_noclipping_noshadows"
 runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
@@ -130,6 +142,8 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "${CHOREOGRAPHY_COMMAND}"           \
+    --flutter_app_name 'dashboard'            \
+    --sleep_before_trace 5                    \
     --unshadowed --clipping_disabled
 
 BENCHMARK="fuchsia.scenic.choreography_noshadows"
@@ -139,6 +153,8 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "${CHOREOGRAPHY_COMMAND}"           \
+    --flutter_app_name 'dashboard'            \
+    --sleep_before_trace 5                    \
     --unshadowed --clipping_enabled
 
 BENCHMARK="fuchsia.scenic.choreography_ssdo"
@@ -148,6 +164,8 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "${CHOREOGRAPHY_COMMAND}"           \
+    --flutter_app_name 'dashboard'            \
+    --sleep_before_trace 5                    \
     --screen_space_shadows --clipping_enabled
 
 BENCHMARK="fuchsia.scenic.choreography_shadow_map"
@@ -157,6 +175,8 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "${CHOREOGRAPHY_COMMAND}"           \
+    --flutter_app_name 'dashboard'            \
+    --sleep_before_trace 5                    \
     --shadow_map --clipping_enabled
 
 BENCHMARK="fuchsia.scenic.choreography_moment_shadow_map"
@@ -166,4 +186,6 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "${CHOREOGRAPHY_COMMAND}"           \
+    --flutter_app_name 'dashboard'            \
+    --sleep_before_trace 5                    \
     --moment_shadow_map --clipping_enabled
