@@ -49,8 +49,8 @@ class AudioPlayerController {
   UpdateCallback updateCallback;
 
   /// Opens a URI for playback. Only HTTP and FILE URIs are allowed. |headers|
-  /// must only be supplied for HTTP URIs. Supplied headers will be added to
-  /// every HTTP request issued to the URI.
+  /// must only be supplied for HTTP/S URIs. Supplied headers will be added to
+  /// every HTTP/S request issued to the URI.
   void open(Uri uri, {HttpHeaders headers}) {
     if (uri == null) {
       throw new ArgumentError.notNull('uri');
@@ -60,9 +60,9 @@ class AudioPlayerController {
         throw new ArgumentError.value(headers,
             'headers', 'Not valid for FILE URIs.');
       }
-    } else if (!uri.isScheme('HTTP')) {
+    } else if (!uri.isScheme('HTTP') && !uri.isScheme('HTTPS')) {
       throw new ArgumentError.value(uri,
-          'uri', 'Only HTTP and FILE protocols are supported.');
+          'uri', 'Only HTTP/S and FILE protocols are supported.');
     }
 
     if (_active) {
@@ -145,12 +145,14 @@ class AudioPlayerController {
 
   List<HttpHeader> _convertHeaders(HttpHeaders headers) {
     List<HttpHeader> result = [];
-    headers.forEach((name, values) {
-      for (String value in values) {
-        HttpHeader header = new HttpHeader(name: name, value: value);
-        result.add(header);
-      }
-    });
+    if (headers != null) {
+      headers.forEach((name, values) {
+        for (String value in values) {
+          HttpHeader header = new HttpHeader(name: name, value: value);
+          result.add(header);
+        }
+      });
+    }
 
     return result;
   }
