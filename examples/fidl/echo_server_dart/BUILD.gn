@@ -13,4 +13,10 @@ dart_app("echo_server_dart") {
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
   ]
+  meta = [
+    {
+      path = rebase_path("meta/echo_server_dart.cmx")
+      dest = "echo_server_dart.cmx"
+    },
+  ]
 }

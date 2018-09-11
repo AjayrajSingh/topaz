@@ -1,0 +1,8 @@
+{
+    "program": {
+        "data": "data/echo_server_dart"
+    },
+    "sandbox": {
+        "services": [ "fuchsia.sys.Environment" ]
+    }
+}
