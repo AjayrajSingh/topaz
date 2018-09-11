@@ -30,6 +30,10 @@ String _generateChildId() {
   return 'C$_childId';
 }
 
+String _fixedChildId() {
+  return 'ontop_child';
+}
+
 class _ModuleControllerWrapper {
   final ModuleControllerProxy proxy;
   final String name;
@@ -202,6 +206,13 @@ class MainWidget extends StatelessWidget {
                         arrangement: SurfaceArrangement.sequential),
                     'Sequential',
                     _generateChildId,
+                  ),
+                  StartModuleButton(
+                    _moduleContext,
+                    const SurfaceRelation(
+                        arrangement: SurfaceArrangement.ontop),
+                    'On Top',
+                    _fixedChildId,
                   ),
                   const LaunchContainerButton(),
                 ],
