@@ -72,9 +72,9 @@ const int _cobaltTimeToEmbedNewModMetricId = 8;
 ///
 /// Initialization
 ///
-/// Module initialization is triggered by calling [start]. Once the module has
-/// successfully initialized additional service clients are connected providing
-/// access to The Module's Link and ModuleContext services.
+/// Module initialization is triggered by calling [startSync]. Once the module
+/// has successfully initialized additional service clients are connected
+/// providing access to The Module's Link and ModuleContext services.
 ///
 /// Termination
 ///
@@ -116,10 +116,10 @@ class ModuleDriver {
   IntentHandlerImpl _intentHandler;
   String _packageName = 'modulePackageNameNotYetSet';
 
-  /// Shadow async completion of [start].
+  /// Shadow async completion of [startSync].
   final _start = Completer<ModuleDriver>();
 
-  /// A flag indicating if the user has called [start] yet.
+  /// A flag indicating if the user has called [startSync] yet.
   var _hasCalledStart = false;
 
   // Methods to run when the module is being torn down
@@ -139,7 +139,7 @@ class ModuleDriver {
   ///
   /// Start the module:
   ///
-  ///     module.start();
+  ///     module.startSync();
   ///
   ModuleDriver({
     // TODO(MS-1521): consider removing
@@ -200,43 +200,33 @@ class ModuleDriver {
   void addOnTerminateAsyncHandler(OnTerminateAsync onTerminate) =>
       _onTerminatesAsync.add(onTerminate);
 
+  /// Deprecated use [#startSync] instead.
+  ///
   /// Start the module and connect to dependent services on module
-  /// initialization.
+  /// initialization
+  // @Deprecated('use startSync instead') can't add this because of linter
   Future<ModuleDriver> start() async {
     log.fine('#start(...)');
+    startSync();
+    return _start.future;
+  }
+
+  /// Start the module and connect to dependent services on module
+  /// initialization.
+  void startSync() {
+    log.fine('#startSync()');
 
     // Fail fast on subsequent (accidental) calls to #start() instead of
     // triggering deeper errors by re-binding the impl.
-    if (_hasCalledStart == true) {
-      Exception err =
-          new Exception('moduleDrive.start(...) should only be called once.');
-
-      _start.completeError(err);
-      return _start.future;
-    } else {
-      _hasCalledStart = true;
+    if (_hasCalledStart) {
+      throw Exception('moduleDrive.startSync()) should only be called once.');
     }
+    _hasCalledStart = true;
 
-    try {
-      await _lifecycle.addService(startupContext: _startupContext);
-      _intentHandler.addService(startupContext: _startupContext);
-    } on Exception catch (err, stackTrace) {
-      _start.completeError(err, stackTrace);
-      return _start.future;
-    }
-
+    _lifecycle.addService(startupContext: _startupContext);
+    _intentHandler.addService(startupContext: _startupContext);
     connectToService(environmentServices, moduleContext.proxy.ctrl);
-
-    try {
-      await moduleContext.getLink(linkClient: link);
-    } on Exception catch (err, stackTrace) {
-      _start.completeError(err, stackTrace);
-      return _start.future;
-    }
-
-    /// Return the instance of this module driver to enable simpler composition
-    /// functional when chaining futures.
-    _start.complete(this);
+    moduleContext.getLink(linkClient: link);
 
     _cobaltLogElapsedTime(
       metricId: _cobaltTimeToStartModuleDriverMetricId,
@@ -245,7 +235,9 @@ class ModuleDriver {
       shouldIncludeModuleName: true,
     );
 
-    return _start.future;
+    // Still complete the future since the rest of the login in this class
+    // awaiting on it.
+    _start.complete(this);
   }
 
   /// Creates a message queue and returns a [Future] with the message queue
@@ -283,7 +275,7 @@ class ModuleDriver {
     String url,
     ServiceClient<T> client,
   ) async {
-    await _start.future;
+    await _start.future.timeout(Duration(seconds: 5));
     await connectToAgentServiceWithProxy(url, client.proxy);
   }
 
