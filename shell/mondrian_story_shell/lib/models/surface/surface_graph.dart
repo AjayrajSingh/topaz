@@ -99,28 +99,40 @@ class SurfaceGraph extends Model {
         new Surface(this, node, properties, relation, pattern);
     // if this is an external surface, create an association between this and
     // the most focused surface.
-    if (properties.source == ModuleSource.external$ && _focusedSurfaces.isNotEmpty) {
+    if (properties.source == ModuleSource.external$ &&
+        _focusedSurfaces.isNotEmpty) {
       _visualAssociation[_focusedSurfaces.last] = id;
     }
     if (oldSurface != null) {
-      // TODO (jphsiao): determine if the children of the surface should also be removed
-      removeSurface(id);
+      // TODO (jphsiao): this is a hack to handle the adding of a surface with
+      // the same view id. In this case we assume the view is going to be
+      // reused.
+      updatedSurface.connection = oldSurface.connection;
     }
     _surfaces[id] = updatedSurface;
-    parent.add(node);
-    oldSurface?.notifyListeners();
+    // Do not add the child again if the parent already knows about it.
+    if (!parent.children.contains(node)) {
+      parent.add(node);
+    }
+
     notifyListeners();
     return updatedSurface;
   }
 
   /// Removes [Surface] from graph
   void removeSurface(String id) {
-    // TODO(alangardner): Remap edges to transitive nodes appropriately
     if (_surfaces.keys.contains(id)) {
-      Tree<String> node = _tree.find(id);
-      Tree<String> parent = node.parent;
-      node.detach();
-      node.children.forEach(parent.add);
+      Tree<String> node = _tree.find(id)..detach();
+      // Remove orphaned children
+      for (Tree<String> child in node.children) {
+        child.detach();
+        // As a temporary policy, remove child surfaces when surfaces are
+        // removed. This policy will be revisited when we have a better sense
+        // of what to do with orphaned children.
+        _surfaces[child.value].remove();
+        _focusedSurfaces.remove(child.value);
+        _dismissedSurfaces.remove(child.value);
+      }
       _focusedSurfaces.remove(id);
       _dismissedSurfaces.remove(id);
       _surfaces.remove(id);
@@ -173,7 +185,6 @@ class SurfaceGraph extends Model {
     // Also request the input focus through the child view connection.
     _surfaces[id].connection.requestFocus();
     _lastFocusedSurface = _surfaces[id];
-
     notifyListeners();
   }
 
@@ -247,6 +258,11 @@ class SurfaceGraph extends Model {
   void connectView(String id, InterfaceHandle<ViewOwner> viewOwner) {
     final Surface surface = _surfaces[id];
     if (surface != null) {
+      if (surface.connection != null) {
+        // TODO(jphsiao): remove this hack once story shell API has been
+        // change to accomodate view reusage
+        return;
+      }
       log.fine('connectView $surface');
       surface
         ..connection = new ChildViewConnection(
@@ -258,7 +274,6 @@ class SurfaceGraph extends Model {
             if (_lastFocusedSurface == surface) {
               connection.requestFocus();
             }
-
             surface.notifyListeners();
           },
           onUnavailable: (ChildViewConnection connection) {
