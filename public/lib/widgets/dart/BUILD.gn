@@ -10,6 +10,7 @@ dart_library("dart") {
 
   sources = [
     "model.dart",
+    "listening_builder.dart",
     "src/model/model.dart",
     "src/model/value_model.dart",
   ]
