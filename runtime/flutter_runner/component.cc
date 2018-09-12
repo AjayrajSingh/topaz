@@ -5,6 +5,7 @@
 #include "component.h"
 
 #include <dlfcn.h>
+#include <sys/stat.h>
 #include <zircon/dlfcn.h>
 #include <zircon/status.h>
 
@@ -50,6 +51,12 @@ static std::string DebugLabelForURL(const std::string& url) {
   } else {
     return {url, found + 1};
   }
+}
+
+static bool ShouldEnableInterpreter(int appdir_fd) {
+  struct stat stat_buffer = {};
+  return
+      fstatat(appdir_fd, "pkg/data/enable_interpreter", &stat_buffer, 0) == 0;
 }
 
 Application::Application(
@@ -179,6 +186,13 @@ Application::Application(
 
   settings_.task_observer_remove = std::bind(
       &CurrentMessageLoopRemoveAfterTaskObserver, std::placeholders::_1);
+
+  if (ShouldEnableInterpreter(application_directory_.get())) {
+    FML_DLOG(INFO) << "Found pkg/data/enable_interpreter. Passing --enable_interpreter";
+    settings_.dart_flags = { "--enable_interpreter" };
+  } else {
+    FML_DLOG(INFO) << "Did NOT find pkg/data/enable_interpreter.";
+  }
 
   AttemptVMLaunchWithCurrentSettings(settings_);
 }

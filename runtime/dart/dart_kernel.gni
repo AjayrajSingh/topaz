@@ -8,7 +8,48 @@ import("//build/dart/toolchain.gni")
 _compiler_label = "//topaz/runtime/dart:kernel_compiler($host_toolchain)"
 _compiler_path = get_label_info(_compiler_label, "root_out_dir") + "/dart-tools/kernel_compiler"
 
+# Generates dill files for a Dart application
+#
+# Parameters
+#
+#  platform_deps (required)
+#    Dependent targets that populate `platform_path` with the platform dill
+#    files.
+#
+#  platform_path (required)
+#    Path to the build output directory containing the platform dill files.
+#
+#  platform_name (required)
+#    The name of the platform, either "flutter_runner" or "dart_runner".
+#
+#  main_dart (required)
+#    Path to Dart source file containing main().
+#
+#  package_name (optional)
+#    The name of the package. If not provided it will be inferred from the
+#    target name.
+#
+#  sources (optional)
+#    A list of the application's Dart source files.
+#
+#  manifest (optional)
+#    Path to an output manifest file containing the list of partial dill files.
+#
+#  args (optional)
+#    A list of additional arguments to the compiler.dart program in this
+#    directory that generates the kernel files.
+#
+#  gen_bytecode (optional)
+#    Whether the kernel compiler should generate bytecode. Defaults to false.
+#
+#  Forwarded to dart_library:
+#    deps, disable_analysis, non_dart_deps, source_dir.
 template("dart_kernel") {
+  assert(defined(invoker.platform_deps), "dart_kernel() requires platform_deps")
+  assert(defined(invoker.platform_path), "dart_kernel() requires platform_path")
+  assert(defined(invoker.platform_name), "dart_kernel() requires platform_name")
+  assert(defined(invoker.main_dart), "dart_kernel() requires main_dart")
+
   dart_library_target_name = "${target_name}_dart_library"
   dart_library(dart_library_target_name) {
     forward_variables_from(invoker,
@@ -36,9 +77,8 @@ template("dart_kernel") {
 
   # TODO(tvolkert): Name this ${target_name}
   action("${target_name}_kernel") {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
-    }
+    pool = "//build/dart:dart_pool($dart_toolchain)"
+    forward_variables_from(invoker, ["testonly"])
 
     kernel_path = "$target_gen_dir/${target_name}.dil"
 
@@ -87,9 +127,13 @@ template("dart_kernel") {
     if (is_debug) {
       args += [ "--embed-sources" ]
     }
+
+    if (defined(invoker.gen_bytecode) && invoker.gen_bytecode) {
+      # TODO(zra): Drop ASTs when bytecode works without ASTs.
+      args += [ "--gen-bytecode" ]
+    }
+
     rebased_main_dart = rebase_path(invoker.main_dart, "//")
     args += [ "$single_root:///$rebased_main_dart" ]
-
-    pool = "//build/dart:dart_pool($dart_toolchain)"
   }
 }

@@ -16,3 +16,18 @@ flutter_app("hello_mod") {
     "//topaz/public/lib/app_driver/dart",
   ]
 }
+
+
+flutter_app("hello_space_dart") {
+  main_dart = "main.dart"
+  package_name = "hello_space_dart"
+  fuchsia_package_name = "hello_space_dart"
+
+  space_dart = true
+
+  sources = []
+  deps = [
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app_driver/dart",
+  ]
+}

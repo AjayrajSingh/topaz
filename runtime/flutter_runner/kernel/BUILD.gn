@@ -64,13 +64,13 @@ template("core_snapshot") {
       script = gen_snapshot
     }
     args = [
-      # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
-      "--reify_generic_functions",
-      "--strong",
-      "--sync-async",
       "--enable_mirrors=false",
       "--deterministic",
-      "--snapshot_kind=core-jit",
+
+      # TODO(zra): When JIT mode with and without the interpreter enabled can
+      # use the same core-jit snapshot, change this to core-jit.
+      "--snapshot_kind=core",
+
       "--load_compilation_trace=" + rebase_path(compilation_trace, root_build_dir),
       "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
       "--vm_snapshot_instructions=" +

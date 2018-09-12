@@ -57,6 +57,7 @@ _entry_manifests = [
 ]
 
 template("_flutter_jit_app_package") {
+  config_suffix = "${invoker.product_suffix}"
   package(target_name) {
     package_name = invoker.component_name
     extra = [
@@ -75,9 +76,18 @@ template("_flutter_jit_app_package") {
 
     resources = invoker.invoker_resources
 
+    if (invoker.interpreter) {
+      resources += [
+          {
+            path = rebase_path("//topaz/runtime/dart/enable_interpreter")
+            dest = "enable_interpreter"
+          }
+      ]
+    }
+
     meta = [
       {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit${invoker.product_suffix}_runtime")
+        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit${config_suffix}_runtime")
         dest = "deprecated_runtime"
       },
     ]
@@ -108,9 +118,15 @@ template("_flutter_jit_app") {
   if (defined(invoker.product)) {
     product = invoker.product
   }
-
   if (dart_force_product) {
     product = true
+  }
+
+  gen_bytecode = false
+  interpreter = false
+  if (defined(invoker.space_dart) && invoker.space_dart) {
+    gen_bytecode = true
+    interpreter = true
   }
 
   product_suffix = ""
@@ -137,6 +153,7 @@ template("_flutter_jit_app") {
                            [
                              "deps",
                              "disable_analysis",
+                             "gen_bytecode",
                              "non_dart_deps",
                              "sources",
                              "source_dir",
