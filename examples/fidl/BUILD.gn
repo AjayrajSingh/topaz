@@ -1,0 +1,42 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/dart_runner/dart_app.gni")
+
+dart_jit_app("echo_dart") {
+  components = [
+    {
+      component_name = "echo_client_dart"
+      main_dart = "echo_client_dart/lib/main.dart"
+      sources = []
+       deps = [
+         "//garnet/examples/fidl/services:echo2",
+         "//garnet/public/fidl/fuchsia.sys",
+         "//topaz/public/dart/fidl",
+         "//topaz/public/lib/app/dart",
+       ]
+    },
+    {
+      component_name = "echo_server_dart"
+      main_dart = "echo_server_dart/lib/main.dart"
+      sources = []
+      deps = [
+        "//garnet/examples/fidl/services:echo2",
+        "//topaz/public/dart/fidl",
+        "//topaz/public/lib/app/dart",
+      ]
+    },
+  ]
+
+  meta = [
+    {
+      path = rebase_path("echo_server_dart/meta/echo_server_dart.cmx")
+      dest = "echo_server_dart.cmx"
+    },
+    {
+      path = rebase_path("echo_client_dart/meta/echo_client_dart.cmx")
+      dest = "echo_client_dart.cmx"
+    },
+  ]
+}
