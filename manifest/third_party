@@ -16,7 +16,7 @@
              path="third_party/cairo"
              remote="https://fuchsia.googlesource.com/third_party/cairo"
              gerrithost="https://fuchsia-review.googlesource.com"
-             historydepth="1"/>
+             historydepth="5"/>
     <project name="third_party/freetype2"
              path="third_party/freetype2"
              remote="https://fuchsia.googlesource.com/third_party/freetype2"
@@ -46,7 +46,7 @@
              path="third_party/pixman"
              remote="https://fuchsia.googlesource.com/third_party/pixman"
              gerrithost="https://fuchsia-review.googlesource.com"
-             historydepth="1"/>
+             historydepth="5"/>
     <project name="third_party/sqlite"
              path="third_party/sqlite"
              remote="https://fuchsia.googlesource.com/third_party/sqlite"
@@ -66,6 +66,6 @@
              path="third_party/webkit"
              remote="https://fuchsia.googlesource.com/third_party/webkit"
              gerrithost="https://fuchsia-review.googlesource.com"
-             historydepth="1"/>
+             historydepth="5"/>
   </projects>
 </manifest>
