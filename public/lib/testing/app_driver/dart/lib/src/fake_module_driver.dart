@@ -8,6 +8,7 @@ import 'dart:async';
 
 import 'package:lib.schemas.dart/entity_codec.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.module.dart/module.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart'
     show SurfaceRelation, SurfaceArrangement, SurfaceDependency;
 import 'package:flutter/material.dart';
@@ -20,9 +21,10 @@ class LinkStreamController {
 }
 
 class FakeModuleDriver implements ModuleDriver {
-  final Map<String, String> _linkValue = {};
-  final Map<String, List<LinkStreamController>> _linkStreamControllers = {};
-  final List<Intent> _startModuleIntents = [];
+  final _linkValue = {};
+  final _linkStreamControllers = {};
+  final _startModuleIntents = [];
+  final _fakeModuleContext = FakeModuleContext();
 
   @override
   // ignore: use_to_and_as_if_applicable
@@ -66,6 +68,9 @@ class FakeModuleDriver implements ModuleDriver {
     _startModuleIntents.add(intent);
     return null;
   }
+
+  @override
+  ModuleContextClient get moduleContext => _fakeModuleContext;
 
   /// Puts a value on a link from a test. Value is sent to all watcher of the
   /// link.
@@ -122,5 +127,14 @@ class FakeModuleDriver implements ModuleDriver {
   }
 
   @override
-  dynamic noSuchMethod(Invocation invocation) {}
+  dynamic noSuchMethod(Invocation invocation) {
+    super.noSuchMethod(invocation);
+  }
+}
+
+class FakeModuleContext implements ModuleContextClient {
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    super.noSuchMethod(invocation);
+  }
 }
