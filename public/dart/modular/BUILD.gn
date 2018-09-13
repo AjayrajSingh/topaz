@@ -4,6 +4,7 @@
 
 import("//build/dart/dart_library.gni")
 import("//topaz/runtime/dart/dart_test.gni")
+import("//build/dart/dart_fuchsia_test.gni")
 
 library_deps = [
   "//peridot/public/fidl/fuchsia.modular",
@@ -20,10 +21,11 @@ dart_library("modular") {
   source_dir = "lib"
 
   sources = [
-    "agent_driver.dart",
+    "agent.dart",
     "codecs.dart",
     "entity_codec.dart",
     "logger.dart",
+    "lifecycle.dart",
     "module.dart",
   ]
 
@@ -38,7 +40,20 @@ dart_test("modular_package_unittests") {
     "test/module/intent_handler_test.dart",
     "test/module/module_impl_test.dart",
     "test/module/module_test.dart",
-    "test/module/noop_intent_handler_test.dart"
+    "test/module/noop_intent_handler_test.dart",
+    "test/lifecycle/lifecycle_test.dart"
+  ]
+
+  deps = library_deps + [
+    "//third_party/dart-pkg/pub/test",
+  ]
+}
+
+dart_fuchsia_test("modular_package_integration_tests") {
+  source_dir = "."
+
+  sources = [
+    "test/lifecycle/lifecycle_impl_test.dart"
   ]
 
   deps = library_deps + [
