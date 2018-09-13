@@ -43,7 +43,6 @@ ContextListenerImpl _contextListener;
 
 // connection to Cobalt
 final LoggerProxy _logger = new LoggerProxy();
-final LoggerExtProxy _loggerExt = new LoggerExtProxy();
 
 // Deduplication Map
 final Map<String, LinkedHashSet<String>> _storyModules =
@@ -91,7 +90,7 @@ void _logStringEvent(Metric metric, String metricString) {
 
 void _logModulePairEvent(String existingMod, String newMod) {
   int metricId = _getCobaltMetricID(Metric.modulePairsInStory);
-  _loggerExt.logCustomEvent(
+  _logger.logCustomEvent(
       metricId,
       <CustomEventValue>[
         _getStringEventValue(_existingModuleKey, existingMod),
@@ -149,14 +148,6 @@ void main(List<String> args) {
       (Status s) {
     if (s != Status.ok) {
       print('[USAGE LOG] Failed to obtain Logger. Cobalt config is invalid.');
-    } else {
-      loggerFactory.createLoggerExt(
-          _loadCobaltConfig(), _loggerExt.ctrl.request(), (Status s) {
-        if (s != Status.ok) {
-          print(
-              '[USAGE LOG] Failed to obtain LoggerExt. Cobalt config is invalid.');
-        }
-      });
     }
   });
 
