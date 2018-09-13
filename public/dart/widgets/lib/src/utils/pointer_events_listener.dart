@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:developer';
 import 'dart:ui' as ui;
 
 import 'package:fidl_fuchsia_ui_input/fidl.dart';
@@ -79,6 +80,12 @@ class PointerEventsListener implements PointerCaptureListenerHack {
   /// |PointerCaptureListener|.
   @override
   void onPointerEvent(PointerEvent event) {
+    Timeline.startSync('PointerEventsListener.onPointerEvent $hashCode');
+    _onPointerEvent(event);
+    Timeline.finishSync();
+  }
+
+  void _onPointerEvent(PointerEvent event) {
     if (_originalCallback == null) {
       return;
     }
