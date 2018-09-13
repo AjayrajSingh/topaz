@@ -5,6 +5,7 @@
 assert(is_fuchsia || is_fuchsia_host)
 
 import("//build/package.gni")
+import("//build/tools/json_merge/json_merge.gni")
 import("//peridot/build/module_manifest.gni")
 import("//third_party/dart/build/dart/dart_action.gni")
 import("//topaz/runtime/dart/config.gni")
@@ -59,7 +60,6 @@ _entry_manifests = [
 ]
 
 template("_flutter_jit_app_package") {
-  config_suffix = "${invoker.product_suffix}"
   package(target_name) {
     package_name = invoker.component_name
     extra = [
@@ -67,7 +67,7 @@ template("_flutter_jit_app_package") {
       invoker.kernel_manifest,
     ]
 
-    deps = [
+    deps = invoker.cmx_deps + [
       ":${invoker.kernel_target_name}",
       ":${target_name}_resources",
     ]
@@ -87,12 +87,7 @@ template("_flutter_jit_app_package") {
       ]
     }
 
-    meta = [
-      {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/jit${config_suffix}_runtime")
-        dest = "deprecated_runtime"
-      },
-    ]
+    meta = invoker.cmx_filtered_meta
 
     if (defined(invoker.module_manifest)) {
       deps += [
@@ -105,10 +100,6 @@ template("_flutter_jit_app_package") {
           dest = "module.json"
         },
       ]
-    }
-
-    if (defined(invoker.meta)) {
-      meta += invoker.meta
     }
   }
 }
@@ -232,6 +223,48 @@ template("_flutter_jit_app") {
     }
   }
 
+  package_meta = []
+  if (defined(invoker.meta)) {
+    package_meta = invoker.meta
+  }
+  # Inject appropriate "runner" into Component manifests
+  cmx_filtered_meta = []
+  cmx_deps = []
+  found_cmx = false
+  foreach(item, package_meta) {
+    dest = item.path
+    if (defined(item.dest)) {
+      dest = item.dest
+    }
+    if (get_path_info(dest, "extension") == "cmx") {
+      found_cmx = true
+      merged = "merged_" + get_path_info(dest, "file")
+      json_merge(merged) {
+        sources = [
+          item.path,
+          rebase_path(
+              "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime"),
+        ]
+      }
+      merged_outputs = get_target_outputs(":$merged")
+      item.path = merged_outputs[0]
+      cmx_deps += [ ":$merged" ]
+    }
+    cmx_filtered_meta += [ item ]
+  }
+
+  if (!found_cmx) {
+    # No cmx to inject to. Inject the runner aspect as a dangling deprecated_runtime.
+    # CP-129: deprecate cmx-less components, then delete this.
+    cmx_filtered_meta += [
+      {
+        path = rebase_path(
+                "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime")
+        dest = "deprecated_runtime"
+      },
+    ]
+  }
+
   _flutter_jit_app_package(target_name) {
     forward_variables_from(invoker, "*")
   }
@@ -242,7 +275,7 @@ template("_flutter_aot_app_package") {
     package_name = invoker.component_name
     extra = [ invoker.asset_manifest ]
 
-    deps = invoker.shared_snapshot_deps + [
+    deps = invoker.shared_snapshot_deps + invoker.cmx_deps + [
              ":${invoker.snapshot_target_name}",
              ":${target_name}_resources",
              ":${invoker.stats_target_name}",
@@ -280,12 +313,7 @@ template("_flutter_aot_app_package") {
                   },
                 ] + invoker.invoker_resources
 
-    meta = [
-      {
-        path = rebase_path("//topaz/runtime/flutter_runner/meta/aot${invoker.product_suffix}_runtime")
-        dest = "deprecated_runtime"
-      },
-    ]
+    meta = invoker.cmx_filtered_meta
 
     if (defined(invoker.module_manifest)) {
       deps += [
@@ -307,10 +335,6 @@ template("_flutter_aot_app_package") {
           dest = "sandbox"
         },
       ]
-    }
-
-    if (defined(invoker.meta)) {
-      meta += invoker.meta
     }
   }
 }
@@ -535,6 +559,49 @@ template("_flutter_aot_app") {
       package_name = target_name
       module_manifest = rebase_path(invoker.module_manifest)
     }
+  }
+
+  package_meta = []
+  if (defined(invoker.meta)) {
+    package_meta = invoker.meta
+  }
+
+  # Inject appropriate "runner" into Component manifests
+  cmx_filtered_meta = []
+  cmx_deps = []
+  found_cmx = false
+  foreach(item, package_meta) {
+    dest = item.path
+    if (defined(item.dest)) {
+      dest = item.dest
+    }
+    if (get_path_info(dest, "extension") == "cmx") {
+      found_cmx = true
+      merged = "merged_" + get_path_info(dest, "file")
+      json_merge(merged) {
+        sources = [
+          item.path,
+          rebase_path(
+              "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime"),
+        ]
+      }
+      merged_outputs = get_target_outputs(":$merged")
+      item.path = merged_outputs[0]
+      cmx_deps += [ ":$merged" ]
+    }
+    cmx_filtered_meta += [ item ]
+  }
+
+  if (!found_cmx) {
+    # No cmx to inject to. Inject the runner aspect as a dangling deprecated_runtime.
+    # CP-129: deprecate cmx-less components, then delete this.
+    cmx_filtered_meta += [
+      {
+        path = rebase_path(
+                "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime")
+        dest = "deprecated_runtime"
+      },
+    ]
   }
 
   _flutter_aot_app_package(target_name) {

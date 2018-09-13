@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/package.gni")
+import("//build/tools/json_merge/json_merge.gni")
 import("//third_party/dart/build/dart/dart_action.gni")
 import("//topaz/runtime/dart/config.gni")
 import("//topaz/runtime/dart/dart_kernel.gni")
@@ -169,6 +170,55 @@ template("_dart_jit_package") {
     ]
   }
 
+  runner_name = "jit"
+  if (dbc) {
+    runner_name = "dbc"
+  }
+
+  # If a component manifest exists, merge in the runtime portion of the
+  # manifest. If it doesn't exist, drop in the deprecated_runtime file.
+  package_meta = []
+  if (defined(invoker.meta)) {
+    package_meta = invoker.meta
+  }
+  cmx_filtered_meta = []
+  cmx_deps = []
+  found_cmx = false
+  foreach(item, package_meta) {
+    dest = item.path
+    if (defined(item.dest)) {
+      dest = item.dest
+    }
+    if (get_path_info(dest, "extension") == "cmx") {
+      found_cmx = true
+      merged = "merged_" + get_path_info(dest, "file")
+      json_merge(merged) {
+        sources = [
+          item.path,
+          rebase_path(
+              "//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime"),
+        ]
+      }
+      merged_outputs = []
+      merged_outputs = get_target_outputs(":$merged")
+      item.path = merged_outputs[0]
+      cmx_deps += [ ":$merged" ]
+    }
+    cmx_filtered_meta += [ item ]
+  }
+
+  if (!found_cmx) {
+    # No cmx to inject to. Inject the runner aspect as a dangling deprecated_runtime.
+    # CP-129: deprecate cmx-less components, then delete this.
+    cmx_filtered_meta += [
+      {
+        path = rebase_path(
+                "//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime")
+        dest = "deprecated_runtime"
+      },
+    ]
+  }
+
   # We have all components and their kernels generated now. We call package() to
   # put everything into a fuchsia package, merging deps, extra, meta etc.
   package(target_name) {
@@ -183,7 +233,7 @@ template("_dart_jit_package") {
     if (defined(invoker.non_dart_deps)) {
       non_dart_deps = invoker.non_dart_deps
     }
-    deps = non_dart_deps
+    deps = non_dart_deps + cmx_deps
     extra = []
 
     foreach(component, components_with_kernel) {
@@ -196,22 +246,7 @@ template("_dart_jit_package") {
       resources = invoker.resources
     }
 
-    runner_name = "jit"
-    if (dbc) {
-      runner_name = "dbc"
-    }
-
-    meta = [
-      {
-        path = rebase_path(
-                "//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime")
-        dest = "deprecated_runtime"
-      },
-    ]
-
-    if (defined(invoker.meta)) {
-      meta += invoker.meta
-    }
+    meta = cmx_filtered_meta
   }
 }
 
@@ -457,6 +492,51 @@ template("_dart_aot_package") {
     ]
   }
 
+  # If a component manifest exists, merge in the runtime portion of the
+  # manifest. If it doesn't exist, drop in the deprecated_runtime file.
+  package_meta = []
+  if (defined(invoker.meta)) {
+    package_meta = invoker.meta
+  }
+
+  # Inject appropriate "runner" into Component manifests
+  cmx_filtered_meta = []
+  cmx_deps = []
+  found_cmx = false
+  foreach(item, package_meta) {
+    dest = item.path
+    if (defined(item.dest)) {
+      dest = item.dest
+    }
+    if (get_path_info(dest, "extension") == "cmx") {
+      found_cmx = true
+      merged = "merged_" + get_path_info(dest, "file")
+      json_merge(merged) {
+        sources = [
+          item.path,
+          rebase_path(
+              "//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime"),
+        ]
+      }
+      merged_outputs = get_target_outputs(":$merged")
+      item.path = merged_outputs[0]
+      cmx_deps += [ ":$merged" ]
+    }
+    cmx_filtered_meta += [ item ]
+  }
+
+  if (!found_cmx) {
+    # No cmx to inject to. Inject the runner aspect as a dangling deprecated_runtime.
+    # CP-129: deprecate cmx-less components, then delete this.
+    cmx_filtered_meta += [
+      {
+        path = rebase_path(
+                "//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime")
+        dest = "deprecated_runtime"
+      },
+    ]
+  }
+
   # We have all components and their kernels generated now. We call package() to
   # put everything into a fuchsia package, merging deps, extra, meta etc.
   package(target_name) {
@@ -472,7 +552,7 @@ template("_dart_aot_package") {
     if (defined(invoker.non_dart_deps)) {
       non_dart_deps = invoker.non_dart_deps
     }
-    deps = non_dart_deps
+    deps = non_dart_deps + cmx_deps
     resources = []
 
     foreach(component, components_with_kernel) {
@@ -506,17 +586,7 @@ template("_dart_aot_package") {
       resources += invoker.resources
     }
 
-    meta = [
-      {
-        path = rebase_path(
-                "//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime")
-        dest = "deprecated_runtime"
-      },
-    ]
-
-    if (defined(invoker.meta)) {
-      meta += invoker.meta
-    }
+    meta = cmx_filtered_meta
   }
 }
 
