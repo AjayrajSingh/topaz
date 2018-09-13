@@ -4,7 +4,7 @@
 
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
-dart_jit_app("echo_dart") {
+dart_app("echo_dart") {
   components = [
     {
       component_name = "echo_client_dart"

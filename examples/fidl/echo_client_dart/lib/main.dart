@@ -10,7 +10,7 @@ StartupContext _context;
 EchoProxy _echo;
 
 void main(List<String> args) {
-  String server = 'echo_server_dart';
+  String server = 'fuchsia-pkg://fuchsia.com/echo_dart#meta/echo_server_dart.cmx';
   if (args.length >= 2 && args[0] == '--server') {
     server = args[1];
   }
