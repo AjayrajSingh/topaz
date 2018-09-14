@@ -2,12 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:developer';
 import 'dart:ui' as ui;
 
 import 'package:fidl_fuchsia_ui_input/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:flutter/scheduler.dart';
 
 /// Listens for pointer events and injects them into Flutter input pipeline.
 class PointerEventsListener implements PointerCaptureListenerHack {
@@ -27,6 +28,9 @@ class PointerEventsListener implements PointerCaptureListenerHack {
   // Holds the [onPointerDataCallback] assigned to [ui.window] at
   // the start of the program.
   ui.PointerDataPacketCallback _originalCallback;
+
+  final _queuedEvents = <PointerEvent>[];
+  bool _frameScheduled = false;
 
   /// Starts listening to pointer events. Also overrides the original
   /// [ui.window.onPointerDataPacket] callback to a NOP since we
@@ -80,9 +84,7 @@ class PointerEventsListener implements PointerCaptureListenerHack {
   /// |PointerCaptureListener|.
   @override
   void onPointerEvent(PointerEvent event) {
-    Timeline.startSync('PointerEventsListener.onPointerEvent $hashCode');
     _onPointerEvent(event);
-    Timeline.finishSync();
   }
 
   void _onPointerEvent(PointerEvent event) {
@@ -90,37 +92,33 @@ class PointerEventsListener implements PointerCaptureListenerHack {
       return;
     }
 
-    PointerEvent lastEvent = _lastPointerEvent[event.pointerId] ?? event;
+    _queuedEvents.add(event);
 
-    // Only allow add and remove pointer events from outside the window bounds.
-    // For other events, we drop them if the last two were outside the window
-    // bounds. If any of current event or last event lies inside the window,
-    // we generate a synthetic down or up event.
-    if (event.phase != PointerEventPhase.add &&
-        event.phase != PointerEventPhase.remove &&
-        _outside(event) &&
-        _outside(lastEvent)) {
-      _lastPointerEvent[event.pointerId] = event;
+    if (_frameScheduled) {
       return;
     }
 
-    // Convert from PointerEvent to PointerData.
-    ui.PointerData pointerData = new ui.PointerData(
-      buttons: event.buttons,
-      device: event.pointerId,
-      timeStamp: new Duration(microseconds: event.eventTime ~/ 1000),
-      change: _changeFromPointerEvent(event),
-      kind: _kindFromPointerEvent(event),
-      physicalX: event.x * ui.window.devicePixelRatio,
-      physicalY: event.y * ui.window.devicePixelRatio,
-    );
-
-    _originalCallback(new ui.PointerDataPacket(
-      data: <ui.PointerData>[pointerData],
-    ));
-
-    // Remember this event for checking boundary condition on the next event.
-    _lastPointerEvent[event.pointerId] = event;
+    _frameScheduled = true;
+    SchedulerBinding.instance.scheduleFrameCallback((_) {
+      if (_originalCallback == null) {
+        return;
+      }
+      _frameScheduled = false;
+      Timeline.startSync('PointerEventsListener.onPointerEvent');
+      List<ui.PointerData> packets = [];
+      for (PointerEvent event in _queuedEvents) {
+        final packet = _getPacket(event);
+        if (packet != null) {
+          packets.add(packet);
+        }
+      }
+      if (packets.isNotEmpty) {
+        _originalCallback(new ui.PointerDataPacket(data: packets));
+      }
+      _queuedEvents.clear();
+      Timeline.finishSync();
+    });
+    SchedulerBinding.instance.scheduleFrame();
   }
 
   ui.PointerChange _changeFromPointerEvent(PointerEvent event) {
@@ -188,6 +186,38 @@ class PointerEventsListener implements PointerCaptureListenerHack {
       default:
         return ui.PointerDeviceKind.touch;
     }
+  }
+
+  ui.PointerData _getPacket(PointerEvent event) {
+    PointerEvent lastEvent = _lastPointerEvent[event.pointerId] ?? event;
+
+    // Only allow add and remove pointer events from outside the window bounds.
+    // For other events, we drop them if the last two were outside the window
+    // bounds. If any of current event or last event lies inside the window,
+    // we generate a synthetic down or up event.
+    if (event.phase != PointerEventPhase.add &&
+        event.phase != PointerEventPhase.remove &&
+        _outside(event) &&
+        _outside(lastEvent)) {
+      _lastPointerEvent[event.pointerId] = event;
+      return null;
+    }
+
+    // Convert from PointerEvent to PointerData.
+    final data = new ui.PointerData(
+      buttons: event.buttons,
+      device: event.pointerId,
+      timeStamp: new Duration(microseconds: event.eventTime ~/ 1000),
+      change: _changeFromPointerEvent(event),
+      kind: _kindFromPointerEvent(event),
+      physicalX: event.x * ui.window.devicePixelRatio,
+      physicalY: event.y * ui.window.devicePixelRatio,
+    );
+
+    // Remember this event for checking boundary condition on the next event.
+    _lastPointerEvent[event.pointerId] = event;
+
+    return data;
   }
 
   bool _inside(PointerEvent event) {
