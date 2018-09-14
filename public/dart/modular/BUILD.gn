@@ -3,6 +3,14 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_library.gni")
+import("//topaz/runtime/dart/dart_test.gni")
+
+library_deps = [
+  "//peridot/public/fidl/fuchsia.modular",
+  "//third_party/dart-pkg/pub/meta",
+  "//topaz/public/dart/fidl",
+  "//topaz/public/dart/fuchsia",
+]
 
 dart_library("modular") {
   package_name = "modular"
@@ -16,11 +24,24 @@ dart_library("modular") {
     "codecs.dart",
     "entity_codec.dart",
     "logger.dart",
-    "module_driver.dart",
+    "module.dart",
   ]
 
-  deps = [
-    "//third_party/dart-pkg/pub/meta",
-    "//topaz/public/dart/fuchsia",
+  deps = library_deps
+}
+
+dart_test("modular_package_unittests") {
+  source_dir = "."
+
+  sources = [
+    "test/module/intent_handler_host_test.dart",
+    "test/module/intent_handler_test.dart",
+    "test/module/module_impl_test.dart",
+    "test/module/module_test.dart",
+    "test/module/noop_intent_handler_test.dart"
+  ]
+
+  deps = library_deps + [
+    "//third_party/dart-pkg/pub/test",
   ]
 }

@@ -13,6 +13,7 @@
       "//topaz/lib/setui/settings/client:lib_setui_settings_client_test",
       "//topaz/lib/setui/settings/service:lib_setui_service_test",
       "//topaz/public/dart/fuchsia:fuchsia_package_unittests",
+      "//topaz/public/dart/modular:modular_package_unittests",
       "//topaz/public/dart/sledge:dart_sledge_tests",
       "//topaz/public/dart/widgets:dart_widget_tests",
       "//topaz/public/lib/app/dart:dart_app_tests",

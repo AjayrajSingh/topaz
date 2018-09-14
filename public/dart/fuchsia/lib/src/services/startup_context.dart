@@ -31,7 +31,7 @@ class StartupContext {
   final fidl.ServiceProvider environmentServices;
 
   /// The service provider which can be used to expose outgoing services
-  final fidl.ServiceProvider outgoingServices;
+  final ServiceProviderImpl outgoingServices;
 
   /// Creates a new instance of [StartupContext].
   ///
