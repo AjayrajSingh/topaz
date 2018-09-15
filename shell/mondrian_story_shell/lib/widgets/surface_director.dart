@@ -39,60 +39,62 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
     PositionedSurface ps,
     double depth,
     FractionalOffset offscreen,
-  ) =>
-      new SurfaceForm.single(
-        key: new GlobalObjectKey(ps.surface),
-        child: MondrianChildView(
-          surface: ps.surface,
-          interactable: depth <= 0.0,
-        ),
-        position: ps.position,
-        initPosition: ps.position.shift(new Offset(offscreen.dx, offscreen.dy)),
-        depth: _draggedSurfaces.contains(ps.surface) ? -0.1 : depth,
-        friction: depth > 0.0
-            ? kDragFrictionInfinite
-            : ps.surface.canDismiss()
-                ? kDragFrictionNone
-                : (Offset offset, Offset delta) =>
-                    delta / math.max(1.0, offset.distanceSquared / 100.0),
-        onDragStarted: () {
-          setState(() {
-            _draggedSurfaces.add(ps.surface);
-          });
-        },
-        onDragFinished: (Offset offset, Velocity velocity) {
-          Offset expectedOffset = offset + (velocity.pixelsPerSecond / 5.0);
-          // Only remove if greater than threshold
-          if (expectedOffset.distance > 200.0) {
-            // HACK(alangardner): Hardcoded distances for swipe gesture to
-            // avoid complicated layout work.
-            ps.surface.dismiss();
-          }
-          setState(() {
-            _draggedSurfaces.remove(ps.surface);
-          });
-        },
-      );
+  ) {
+    return new SurfaceForm.single(
+      key: new GlobalObjectKey(ps.surface.node),
+      child: MondrianChildView(
+        surface: ps.surface,
+        interactable: depth <= 0.0,
+      ),
+      position: ps.position,
+      initPosition: ps.position.shift(new Offset(offscreen.dx, offscreen.dy)),
+      depth: _draggedSurfaces.contains(ps.surface) ? -0.1 : depth,
+      friction: depth > 0.0
+          ? kDragFrictionInfinite
+          : ps.surface.canDismiss()
+              ? kDragFrictionNone
+              : (Offset offset, Offset delta) =>
+                  delta / math.max(1.0, offset.distanceSquared / 100.0),
+      onDragStarted: () {
+        setState(() {
+          _draggedSurfaces.add(ps.surface);
+        });
+      },
+      onDragFinished: (Offset offset, Velocity velocity) {
+        Offset expectedOffset = offset + (velocity.pixelsPerSecond / 5.0);
+        // Only remove if greater than threshold
+        if (expectedOffset.distance > 200.0) {
+          // HACK(alangardner): Hardcoded distances for swipe gesture to
+          // avoid complicated layout work.
+          ps.surface.dismiss();
+        }
+        setState(() {
+          _draggedSurfaces.remove(ps.surface);
+        });
+      },
+    );
+  }
 
   SurfaceForm _orphanedForm(
-          Surface surface, SurfaceForm form, FractionalOffset offscreen) =>
-      new SurfaceForm.single(
-        key: form.key,
-        child: MondrianChildView(
-          surface: surface,
-          interactable: false,
-        ),
-        position: form.position.shift(new Offset(offscreen.dx, offscreen.dy)),
-        initPosition: form.initPosition,
-        depth: form.depth,
-        friction: kDragFrictionInfinite,
-        onPositioned: () {
-          // TODO(alangardner): Callback to notify framework
-          setState(() {
-            _orphanedForms.removeWhere((SurfaceForm f) => f.key == form.key);
-          });
-        },
-      );
+      Surface surface, SurfaceForm form, FractionalOffset offscreen) {
+    return new SurfaceForm.single(
+      key: form.key,
+      child: MondrianChildView(
+        surface: surface,
+        interactable: false,
+      ),
+      position: form.position.shift(new Offset(offscreen.dx, offscreen.dy)),
+      initPosition: form.initPosition,
+      depth: form.depth,
+      friction: kDragFrictionInfinite,
+      onPositioned: () {
+        // TODO(alangardner): Callback to notify framework
+        setState(() {
+          _orphanedForms.removeWhere((SurfaceForm f) => f.key == form.key);
+        });
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) => ScopedModelDescendant<InsetManager>(
@@ -164,9 +166,16 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           );
         }
       }
+      List<String> placedViewIds =
+          placedSurfaces.keys.map((Surface s) => s.node.value).toList();
       for (PositionedSurface ps in positionedSurfaces) {
-        if (!placedSurfaces.keys.contains(ps.surface)) {
-          _prevForms.remove(ps.surface);
+        // TODO (jphsiao): Make this check more thorough. A new surface may
+        // have the same view id, but not the same arrangement, parent or
+        // connection. These may result in animations for surfaces that are
+        // already on screen that we do not handle yet.
+        if (!placedViewIds.contains(ps.surface.node.value)) {
+          _prevForms.removeWhere((Surface surface, SurfaceForm form) =>
+              surface.node.value == ps.surface.node.value);
           FractionalOffset surfaceOrigin = positionedSurfaces.length > 1
               ? offscreen
               : FractionalOffset.topLeft;
