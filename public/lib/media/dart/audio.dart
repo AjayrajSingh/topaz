@@ -16,9 +16,9 @@ typedef UpdateCallback = void Function();
 
 /// System audio.
 class Audio {
-  static const double _minLevelGain = -60.0;
-  static const double _unityGain = 0.0;
-  static const double _initialGain = -12.0;
+  static const double _minLevelGainDb = -60.0;
+  static const double _unityGainDb = 0.0;
+  static const double _initialGainDb = -12.0;
 
   // These values determine what counts as a 'significant' change when deciding
   // whether to call |updateCallback|.
@@ -27,9 +27,9 @@ class Audio {
 
   final AudioProxy _audioService = new AudioProxy();
 
-  double _systemAudioGainDb = _initialGain;
+  double _systemAudioGainDb = _initialGainDb;
   bool _systemAudioMuted = false;
-  double _systemAudioPerceivedLevel = gainToLevel(_initialGain);
+  double _systemAudioPerceivedLevel = gainToLevel(_initialGainDb);
 
   SettingStore<stored_audio.Audio> _store;
 
@@ -67,7 +67,7 @@ class Audio {
   /// implicitly set to true. When gain is changed from -160db to a higher
   /// value, |systemAudioMuted| is implicitly set to false.
   set systemAudioGainDb(double value) {
-    double clampedValue = value.clamp(mutedGain, _unityGain);
+    double clampedValue = value.clamp(mutedGainDb, _unityGainDb);
     if (_systemAudioGainDb == clampedValue) {
       return;
     }
@@ -75,7 +75,7 @@ class Audio {
     _systemAudioGainDb = clampedValue;
     _systemAudioPerceivedLevel = gainToLevel(clampedValue);
 
-    if (_systemAudioGainDb == mutedGain) {
+    if (_systemAudioGainDb == mutedGainDb) {
       _systemAudioMuted = true;
     }
 
@@ -89,7 +89,7 @@ class Audio {
   /// Sets system-wide audio muted state. Setting this value to false when
   /// |systemAudioGainDb| is -160db has no effect.
   set systemAudioMuted(bool value) {
-    bool muted = value || _systemAudioGainDb == mutedGain;
+    bool muted = value || _systemAudioGainDb == mutedGainDb;
     if (_systemAudioMuted == muted) {
       return;
     }
@@ -155,29 +155,29 @@ class Audio {
 
   /// Converts a gain in db to an audio 'level' in the range 0.0 to 1.0
   /// inclusive.
-  static double gainToLevel(double gain) {
-    if (gain <= _minLevelGain) {
+  static double gainToLevel(double gainDb) {
+    if (gainDb <= _minLevelGainDb) {
       return 0.0;
     }
 
-    if (gain >= _unityGain) {
+    if (gainDb >= _unityGainDb) {
       return 1.0;
     }
 
-    return 1.0 - gain / _minLevelGain;
+    return 1.0 - gainDb / _minLevelGainDb;
   }
 
   /// Converts an audio 'level' in the range 0.0 to 1.0 inclusive to a gain in
   /// db.
   static double levelToGain(double level) {
     if (level <= 0.0) {
-      return mutedGain;
+      return mutedGainDb;
     }
 
     if (level >= 1.0) {
-      return _unityGain;
+      return _unityGainDb;
     }
 
-    return (1.0 - level) * _minLevelGain;
+    return (1.0 - level) * _minLevelGainDb;
   }
 }

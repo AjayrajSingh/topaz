@@ -97,7 +97,8 @@ SkTypeface* FuchsiaFontManager::onMatchFamilyStyle(
   request.weight = style.weight();
   request.width = style.width();
   request.slant = ToFontSlant(style.slant());
-
+  request.language = fidl::VectorPtr<fidl::StringPtr>::New(0);
+  
   fuchsia::fonts::ResponsePtr response;
   if (font_provider_->GetFont(std::move(request), &response) != ZX_OK) {
     FML_DLOG(ERROR) << "Unable to contact the font provider. Did you run "
