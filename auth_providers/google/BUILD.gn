@@ -81,15 +81,16 @@ source_set("unittests") {
 }
 
 package("google_auth_provider") {
-  deprecated_system_image = true
-
   deps = [
     ":bin",
   ]
 
-  binaries = [
+  binary = "google_auth_provider"
+
+  meta = [
     {
-      name = "google_auth_provider"
+      path = rebase_path("meta/google_auth_provider.cmx")
+      dest = "google_auth_provider.cmx"
     },
   ]
 }
