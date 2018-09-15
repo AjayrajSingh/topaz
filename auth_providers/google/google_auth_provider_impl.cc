@@ -6,6 +6,7 @@
 
 #include <fuchsia/net/oldhttp/cpp/fidl.h>
 #include <fuchsia/ui/viewsv1token/cpp/fidl.h>
+#include <lib/fdio/util.h>
 #include <lib/fit/function.h>
 
 #include "lib/component/cpp/connect.h"
@@ -130,26 +131,27 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
   FXL_DCHECK(auth_ui_context);
   get_persistent_credential_callback_ = std::move(callback);
 
+  std::string url = GetOAuthAuthUrl(user_profile_id);
   ViewOwnerPtr view_owner;
   if (settings_.use_chromium) {
     view_owner = SetupChromium();
+    if (!view_owner) {
+      return;
+    }
     chromium::web::NavigationControllerPtr controller;
     chromium_frame_->GetNavigationController(controller.NewRequest());
-    controller->LoadUrl(GetOAuthAuthUrl(user_profile_id), {});
+    controller->LoadUrl(url, {});
+    FXL_LOG(INFO) << "Loading URL in Chromium: " << url;
   } else {
     view_owner = SetupWebView();
-    web_view_->SetUrl(GetOAuthAuthUrl(user_profile_id));
+    web_view_->SetUrl(url);
+    FXL_LOG(INFO) << "Loading URL in WebView: " << url;
   }
 
   auth_ui_context_ = auth_ui_context.Bind();
   auth_ui_context_.set_error_handler([this] {
     FXL_VLOG(1) << "Overlay cancelled by the caller";
-    // Close any open view
-    if (auth_ui_context_) {
-      auth_ui_context_.set_error_handler([] {});
-      auth_ui_context_->StopOverlay();
-      auth_ui_context_ = nullptr;
-    }
+    ReleaseResources();
     get_persistent_credential_callback_(AuthProviderStatus::INTERNAL_ERROR,
                                         nullptr, nullptr);
     return;
@@ -365,13 +367,9 @@ void GoogleAuthProviderImpl::OnNavigationStateChanged(
   AuthProviderStatus status = ParseAuthCodeFromUrl(change.url.get(), auth_code);
 
   // If either an error occured or the user successfully received an auth code
-  // we need to close the WebView.
+  // we need to close the browser instance.
   if (status != AuthProviderStatus::OK || !auth_code.empty()) {
-    // Also, de-register previously registered error callbacks since calling
-    // StopOverlay() might cause this connection to be closed.
-    auth_ui_context_.set_error_handler(nullptr);
-    auth_ui_context_->StopOverlay();
-
+    ReleaseResources();
     if (status != AuthProviderStatus::OK) {
       get_persistent_credential_callback_(status, nullptr, nullptr);
     } else if (!auth_code.empty()) {
@@ -507,11 +505,17 @@ ViewOwnerPtr GoogleAuthProviderImpl::SetupChromium() {
   auto context_provider =
       context_->ConnectToEnvironmentService<chromium::web::ContextProvider>();
 
-  chromium::web::ContextPtr context;
-  chromium::web::CreateContextParams context_params;
-  // TODO(jsankey): provide a service directory to the context.
-  context_provider->Create(std::move(context_params), context.NewRequest());
-  context->CreateFrame(chromium_frame_.NewRequest());
+  zx_handle_t incoming_service_clone =
+      fdio_service_clone(context_->incoming_services()->directory().get());
+  if (incoming_service_clone == ZX_HANDLE_INVALID) {
+    FXL_LOG(ERROR) << "Failed to clone service directory.";
+    return nullptr;
+  }
+
+  chromium::web::CreateContextParams params;
+  params.service_directory = zx::channel(incoming_service_clone);
+  context_provider->Create(std::move(params), chromium_context_.NewRequest());
+  chromium_context_->CreateFrame(chromium_frame_.NewRequest());
 
   // Bind ourselves as a NavigationEventObserver on this frame.
   chromium::web::NavigationEventObserverPtr navigation_event_observer;
@@ -525,6 +529,20 @@ ViewOwnerPtr GoogleAuthProviderImpl::SetupChromium() {
   chromium_frame_->CreateView(view_owner.NewRequest(), {});
 
   return view_owner;
+}
+
+void GoogleAuthProviderImpl::ReleaseResources() {
+  // Close any open view
+  if (auth_ui_context_) {
+    auth_ui_context_.set_error_handler(nullptr);
+    auth_ui_context_->StopOverlay();
+    auth_ui_context_ = nullptr;
+  }
+  // Release all smart pointers for WebView and Chromium resources.
+  web_view_controller_ = nullptr;
+  web_view_ = nullptr;
+  chromium_frame_ = nullptr;
+  chromium_context_ = nullptr;
 }
 
 void GoogleAuthProviderImpl::Request(

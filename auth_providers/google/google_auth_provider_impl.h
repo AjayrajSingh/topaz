@@ -112,6 +112,10 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
   // a |ViewOwnerPtr| for the view.
   fuchsia::ui::viewsv1token::ViewOwnerPtr SetupChromium();
 
+  // Safely releases any resources associated with an open Webkit or Chromium
+  // instance, including the associated view.
+  void ReleaseResources();
+
   void Request(
       fit::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,
       fit::function<void(::fuchsia::net::oldhttp::URLResponse response)>
@@ -124,6 +128,7 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
   fuchsia::auth::AuthenticationUIContextPtr auth_ui_context_;
   fuchsia::webview::WebViewPtr web_view_;
+  chromium::web::ContextPtr chromium_context_;
   chromium::web::FramePtr chromium_frame_;
   GetPersistentCredentialCallback get_persistent_credential_callback_;
 
