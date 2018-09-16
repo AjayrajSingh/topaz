@@ -39,7 +39,7 @@ declare_args() {
 # In product mode, we force all Flutter apps to use a specific runtime mode.
 # Currently, we force them all to use JIT, but we might switch to DBC in the
 # future.
-flutter_product_app = "_flutter_jit_app"
+flutter_product_app = "_flutter_jit_component"
 
 flutter_base = "//third_party/dart-pkg/git/flutter"
 flutter_tools_label =
@@ -53,23 +53,68 @@ flutter_asset_tools_out_dir =
 flutter_asset_tools_bin =
     "$flutter_asset_tools_out_dir/dart-tools/fuchsia_asset_builder"
 
-template("_flutter_jit_app_package") {
+# Defines a Flutter package with JIT runtime components
+#
+# After Flutter JIT runtime components are calculated in
+# _flutter_jit_component, put them all into one Fuchsia package.
+#
+# Parameters
+#
+#   components_with_kernel (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the components_with_kernel list:
+#
+#       kernel_target_name (required)
+#         Name of the kernel target.
+#
+#       kernel_manifest (required)
+#         Manifest file for the dart kernel.
+#
+#       deps (required)
+#         Dependencies of this component.
+#
+#       sources (required)
+#         Source files of this component.
+#
+#       component_resources (required)
+#         Resources of this component.
+#
+#       component_copy_manifest (required)
+#         Copy of the module manifest of this component.
+#
+#       component_verify_manifest (required)
+#         Verify target of the module manifest of this component.
+template("_flutter_jit_package") {
   package(target_name) {
-    package_name = invoker.component_name
-    extra = [
-      invoker.asset_manifest,
-      invoker.kernel_manifest,
-    ]
+    package_name = invoker.pkg_name
+    deps = invoker.cmx_deps
+    extra = []
+    public_deps = []
 
-    deps = invoker.cmx_deps + [
-      ":${invoker.kernel_target_name}",
-      ":${target_name}_resources",
-    ]
+    foreach(component, invoker.components_with_kernel) {
+      extra += [
+        component.asset_manifest,
+        component.kernel_manifest,
+      ]
 
-    # TODO(rmacnak): Remove core_jit_cheat_target.
-    public_deps = [
-      ":${invoker.kernel_target_name}",
-    ]
+      # TODO(rmacnak): Remove core_jit_cheat_target.
+      public_deps += [
+        ":${component.kernel_target_name}",
+      ]
+
+      deps += [
+        ":${component.kernel_target_name}",
+        ":${component.component_resources}",
+      ]
+      if (defined(invoker.module_manifest)) {
+        deps += [
+          ":${component.component_copy_manifest}",
+          ":${component.component_verify_manifest}",
+        ]
+      }
+    }
 
     if (defined(invoker.non_dart_deps)) {
       deps += invoker.non_dart_deps
@@ -88,11 +133,8 @@ template("_flutter_jit_app_package") {
 
     meta = invoker.cmx_filtered_meta
 
+    # TODO(CP-140): Support module_manifest per component.
     if (defined(invoker.module_manifest)) {
-      deps += [
-        ":${target_name}_copy_manifest",
-        ":${target_name}_verify_manifest",
-      ]
       meta += [
         {
           path = rebase_path(invoker.module_manifest)
@@ -103,8 +145,62 @@ template("_flutter_jit_app_package") {
   }
 }
 
-template("_flutter_jit_app") {
-  assert(defined(invoker.main_dart), "Must specify main_dart file")
+# Defines JIT runtime components to be further distributed in one package.
+#
+# Takes a set of flutter components and puts them into one fuchsia package with
+# the flutter_jit_runner as its runtime. Also supports legacy calls where the
+# components parameter isn't specified, in which we will create one default
+# component for the package.
+#
+# Parameters
+#
+#   components (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the resources list:
+#
+#       component_name (required)
+#         Name of the component.
+#
+#       main_dart (required)
+#         File containing the main function of the component.
+#
+#   main_dart (required)
+#     File containing the main function of the application. Either main_dart or
+#     components must be defined, but not both.
+template("_flutter_jit_component") {
+    legacy_component = false
+  pkg_name = target_name
+  components = []
+  if (defined(invoker.components)) {
+    components += invoker.components
+  } else {
+    # If components is not specified, we are fitting main_dart into a component
+    # scope, and using that for the package.
+    #
+    # TODO(CP-140): Remove support for legacy_component once all existing calls
+    # to flutter_app() have a components parameter.
+    legacy_component = true
+    if (defined(invoker.fuchsia_package_name)) {
+      legacy_component_name = invoker.fuchsia_package_name
+    } else {
+      legacy_component_name = target_name
+    }
+    pkg_name = legacy_component_name
+    pkg_sources = []
+    if (defined(invoker.sources)) {
+      pkg_sources = invoker.sources
+    }
+    components += [
+      {
+        main_dart = invoker.main_dart
+        component_name = legacy_component_name
+        deps = invoker.deps
+        sources = pkg_sources
+      }
+    ]
+  }
 
   product = !flutter_profile
   if (defined(invoker.product)) {
@@ -126,100 +222,120 @@ template("_flutter_jit_app") {
     product_suffix = "_product"
   }
 
-  if (defined(invoker.fuchsia_package_name)) {
-    component_name = invoker.fuchsia_package_name
-  } else {
-    component_name = target_name
-  }
+  # Build the kernel for each of the components, and bundle them in the same
+  # scope for later packaging.
+  components_with_kernel = []
+  foreach(component, components) {
+    assert(defined(component.main_dart), "Must specify main_dart file")
 
-  kernel_target_name = target_name + "_kernel"
-  kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
+    component_name = component.component_name
+    if (legacy_component) {
+      kernel_name = target_name
+    } else {
+      kernel_name = component_name
+    }
+    kernel_target_name = kernel_name + "_kernel"
+    kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
 
-  dart_kernel(target_name) {
-    platform_name = "flutter_runner"
-    platform_deps =
-        [ "//topaz/runtime/flutter_runner/kernel:kernel_platform_files" ]
-    platform_path = "$root_out_dir/flutter_runner_patched_sdk"
+    dart_kernel(kernel_name) {
+      platform_name = "flutter_runner"
+      platform_deps =
+          [ "//topaz/runtime/flutter_runner/kernel:kernel_platform_files" ]
+      platform_path = "$root_out_dir/flutter_runner_patched_sdk"
 
-    forward_variables_from(invoker,
-                           [
-                             "deps",
-                             "disable_analysis",
-                             "gen_bytecode",
-                             "non_dart_deps",
-                             "sources",
-                             "source_dir",
-                             "package_name",
-                           ])
+      # TODO(CP-140): These variables should be from the component
+      forward_variables_from(invoker,
+                             [
+                               "disable_analysis",
+                               "gen_bytecode",
+                               "non_dart_deps",
+                               "source_dir",
+                               "package_name",
+                             ])
+      deps = component.deps
+      sources = component.sources
 
-    main_dart = invoker.main_dart
-    manifest = kernel_manifest
-    args = [
-      "--component-name",
-      component_name,
-    ]
-  }
-
-  if (defined(invoker.resources)) {
-    invoker_resources = invoker.resources
-  } else {
-    invoker_resources = []
-  }
-
-  asset_manifest = "$target_gen_dir/build/${target_name}_pkgassets"
-
-  dart_library_target_name = "${target_name}_dart_library"
-  dart_target_gen_dir =
-      get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-  dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
-
-  action("${target_name}_resources") {
-    script = "//topaz/runtime/flutter_runner/build/asset_package.py"
-
-    args = [
-      "--flutter-root",
-      rebase_path(flutter_base),
-      "--flutter-tools",
-      rebase_path(flutter_asset_tools_bin),
-      "--asset-dir",
-      rebase_path("$target_gen_dir/build"),
-      "--app-dir",
-      rebase_path("."),
-      "--packages",
-      rebase_path(dot_packages),
-      "--asset-manifest-out",
-      rebase_path(asset_manifest),
-      "--component-name",
-      component_name,
-    ]
-
-    if (defined(invoker.manifest)) {
-      args += [
-        "--manifest",
-        rebase_path(invoker.manifest),
+      main_dart = component.main_dart
+      manifest = kernel_manifest
+      args = [
+        "--component-name",
+        component_name,
       ]
     }
 
-    deps = [
-      ":$dart_library_target_name",
-      flutter_asset_tools_label,
-    ]
+    asset_manifest = "$target_gen_dir/build/${kernel_name}_pkgassets"
 
-    outputs = [
-      asset_manifest,
+    dart_library_target_name = "${kernel_name}_dart_library"
+    dart_target_gen_dir =
+        get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+    dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
+
+    action("${kernel_name}_resources") {
+      script = "//topaz/runtime/flutter_runner/build/asset_package.py"
+
+      args = [
+        "--flutter-root",
+        rebase_path(flutter_base),
+        "--flutter-tools",
+        rebase_path(flutter_asset_tools_bin),
+        "--asset-dir",
+        rebase_path("$target_gen_dir/build"),
+        "--app-dir",
+        rebase_path("."),
+        "--packages",
+        rebase_path(dot_packages),
+        "--asset-manifest-out",
+        rebase_path(asset_manifest),
+        "--component-name",
+        component_name,
+      ]
+
+      if (defined(invoker.manifest)) {
+        args += [
+          "--manifest",
+          rebase_path(invoker.manifest),
+        ]
+      }
+
+      deps = [
+        ":$dart_library_target_name",
+        flutter_asset_tools_label,
+      ]
+
+      outputs = [
+        asset_manifest,
+      ]
+    }
+
+    # The module manifest verify & copy targets.
+    if (defined(invoker.module_manifest)) {
+      verify_module_manifest("${kernel_name}_verify_manifest") {
+        original_target_name = kernel_name
+        module_manifest = invoker.module_manifest
+      }
+      copy_module_manifest("${kernel_name}_copy_manifest") {
+        package_name = kernel_name
+        module_manifest = rebase_path(invoker.module_manifest)
+      }
+    }
+
+    components_with_kernel += [
+      {
+        kernel_target_name = kernel_target_name
+        kernel_manifest = kernel_manifest
+        asset_manifest = asset_manifest
+        deps = component.deps
+        sources = component.sources
+        component_resources = "${kernel_name}_resources"
+        component_copy_manifest = "${kernel_name}_copy_manifest"
+        component_verify_manifest = "${kernel_name}_verify_manifest"
+      }
     ]
   }
 
-  # The module manifest verify & copy targets.
-  if (defined(invoker.module_manifest)) {
-    verify_module_manifest("${target_name}_verify_manifest") {
-      original_target_name = invoker.target_name
-      module_manifest = invoker.module_manifest
-    }
-    copy_module_manifest("${target_name}_copy_manifest") {
-      package_name = target_name
-      module_manifest = rebase_path(invoker.module_manifest)
-    }
+  invoker_resources = []
+  if (defined(invoker.resources)) {
+    invoker_resources += invoker.resources
   }
 
   package_meta = []
@@ -245,7 +361,8 @@ template("_flutter_jit_app") {
               "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime"),
         ]
       }
-      merged_outputs = get_target_outputs(":$merged")
+      merged_outputs = []
+      merged_outputs += get_target_outputs(":$merged")
       item.path = merged_outputs[0]
       cmx_deps += [ ":$merged" ]
     }
@@ -264,7 +381,9 @@ template("_flutter_jit_app") {
     ]
   }
 
-  _flutter_jit_app_package(target_name) {
+  # We have all components and their kernels generated now. We call package() to
+  # put everything into a fuchsia package, merging deps, extra, meta etc.
+  _flutter_jit_package(target_name) {
     forward_variables_from(invoker, "*")
   }
 }
@@ -596,7 +715,7 @@ template("_flutter_aot_app") {
 }
 
 template("flutter_jit_app") {
-  template_name = "_flutter_jit_app"
+  template_name = "_flutter_jit_component"
   if (dart_force_product) {
     template_name = flutter_product_app
   }
@@ -622,7 +741,8 @@ template("flutter_aot_app") {
 # Parameters
 #
 #   main_dart (required)
-#     Name of the Dart file containing the main function.
+#     Name of the Dart file containing the main function. Either main_dart or
+#     components must be defined, but not both.
 #
 #   package_name (optional)
 #     Name of the Dart package.
@@ -642,7 +762,22 @@ template("flutter_aot_app") {
 #   product (optional)
 #     A boolean. Whether to build/run the app in a stripped-down Dart VM.
 #     Defaults to !is_debug.
+#
+#   components (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the resources list:
+#
+#       component_name (required)
+#         Name of the component.
+#
+#       main_dart (required)
+#         File containing the main function of the component.
 template("flutter_app") {
+  assert((defined(invoker.components) && !defined(invoker.main_dart)) ||
+         (!defined(invoker.components) && defined(invoker.main_dart)),
+         "Only one of components or main_dart should be defined")
   target(flutter_default_app, target_name) {
     forward_variables_from(invoker, "*", [ "aot" ])
   }

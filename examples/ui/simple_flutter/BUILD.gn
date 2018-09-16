@@ -43,3 +43,43 @@ flutter_app("leaf_flutter") {
     }
   ]
 }
+
+# TODO(CP-140): Rename to simple_flutter and remove the legacy one component
+# per package rules above.
+flutter_app("simple_leaf_flutter") {
+  components = [
+    {
+      component_name = "simple_flutter2"
+      main_dart = "lib/main.dart"
+      sources = []
+      deps = [
+        "//garnet/public/fidl/fuchsia.ui.gfx",
+        "//garnet/public/fidl/fuchsia.ui.scenic",
+        "//garnet/public/fidl/fuchsia.ui.viewsv1",
+        "//third_party/dart-pkg/git/flutter/packages/flutter",
+        "//topaz/public/dart/widgets:lib.widgets",
+        "//topaz/public/lib/ui/flutter",
+      ]
+    },
+    {
+     component_name = "leaf_flutter2"
+      main_dart = "lib/leaf.dart"
+      sources = [
+        "leaf.dart",
+      ]
+      deps = [
+        "//third_party/dart-pkg/git/flutter/packages/flutter",
+      ]
+    },
+  ]
+  meta = [
+    {
+      path = rebase_path("meta/simple_flutter2.cmx")
+      dest = "simple_flutter2.cmx"
+    },
+    {
+      path = rebase_path("meta/leaf_flutter2.cmx")
+      dest = "leaf_flutter2.cmx"
+    }
+  ]
+}
