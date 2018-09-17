@@ -52,6 +52,11 @@ class RK4SpringSimulation {
   /// below 1 etc, as it 'springs'.
   double _curT = 0.0;
 
+  double _max;
+  double _min;
+  double _delta;
+  double _value;
+
   /// [initValue] is the value the simulation will begin with.
   /// [desc] specifies the parameters of the simulation and is optional.
   RK4SpringSimulation({
@@ -59,6 +64,10 @@ class RK4SpringSimulation {
     this.desc = const RK4SpringDescription(),
   })  : _startValue = initValue,
         _targetValue = initValue,
+        _min = initValue,
+        _max = initValue,
+        _value = initValue,
+        _delta = 0.0,
         _velocity = 0.0,
         _accelerationMultipler = 0.0,
         _isDone = true;
@@ -74,6 +83,9 @@ class RK4SpringSimulation {
       }
       _startValue = value;
       _targetValue = target;
+      _max = math.max(_startValue, _targetValue);
+      _min = math.min(_startValue, _targetValue);
+      _delta = _targetValue - _startValue;
       if (_startValue != _targetValue) {
         _curT = 0.0;
         _isDone = false;
@@ -87,11 +99,7 @@ class RK4SpringSimulation {
   bool get isDone => _isDone;
 
   /// The simulation's current value.
-  double get value =>
-      (_startValue + _curT * (_targetValue - _startValue)).clamp(
-        math.min(_startValue, _targetValue),
-        math.max(_startValue, _targetValue),
-      );
+  double get value => _value;
 
   /// The simulation's target value.
   double get target => _targetValue;
@@ -113,6 +121,7 @@ class RK4SpringSimulation {
       );
       if (_evaluateRK(stepSize)) {
         _curT = 1.0;
+        _value = _targetValue;
         _velocity = 0.0;
         _isDone = true;
         _accelerationMultipler = 0.0;
@@ -155,6 +164,7 @@ class RK4SpringSimulation {
     double aftV = v + dvdt * stepSize;
 
     _curT = 1 + aftX;
+    _value = (_startValue + _curT * _delta).clamp(_min, _max);
     double finalVelocity = aftV;
     double netFloat = aftX;
     double net1DVelocity = aftV;
