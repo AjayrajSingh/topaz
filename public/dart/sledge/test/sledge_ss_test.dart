@@ -25,12 +25,12 @@ void main() async {
   test('Sledge test with framework. One instance.', () async {
     final fleet = sledgeFleetFactory.newFleet(1)
       ..runInTransaction(0, (Sledge sledge) async {
-        dynamic doc = await sledge.getDocument(documentId);
-        doc.name.value = 'Alice';
+        Document doc = await sledge.getDocument(documentId);
+        doc['name'].value = 'Alice';
       })
       ..runInTransaction(0, (Sledge sledge) async {
-        dynamic doc = await sledge.getDocument(documentId);
-        expect(doc.name.value, equals('Alice'));
+        Document doc = await sledge.getDocument(documentId);
+        expect(doc['name'].value, equals('Alice'));
       });
     await fleet.testSingleOrder();
   });
@@ -38,13 +38,13 @@ void main() async {
   test('Sledge test with framework. Two instances.', () async {
     final fleet = sledgeFleetFactory.newFleet(2)
       ..runInTransaction(0, (Sledge sledge) async {
-        dynamic doc = await sledge.getDocument(documentId);
-        doc.name.value = 'Alice';
+        Document doc = await sledge.getDocument(documentId);
+        doc['name'].value = 'Alice';
       })
       ..synchronize([0, 1])
       ..runInTransaction(1, (Sledge sledge) async {
-        dynamic doc = await sledge.getDocument(documentId);
-        expect(doc.name.value, equals('Alice'));
+        Document doc = await sledge.getDocument(documentId);
+        expect(doc['name'].value, equals('Alice'));
       });
     await fleet.testSingleOrder();
   });
@@ -61,13 +61,13 @@ void main() async {
       // Updates on one document will be transmitted to the other document via
       // PageWatcher.onChange.
       ..runInTransaction(0, (Sledge sledge) async {
-        dynamic doc = await sledge.getDocument(documentId);
-        doc.name.value = 'Alice';
+        Document doc = await sledge.getDocument(documentId);
+        doc['name'].value = 'Alice';
       })
       ..synchronize([0, 1])
       ..runInTransaction(1, (Sledge sledge) async {
-        dynamic doc = await sledge.getDocument(documentId);
-        expect(doc.name.value, equals('Alice'));
+        Document doc = await sledge.getDocument(documentId);
+        expect(doc['name'].value, equals('Alice'));
       });
     await fleet.testSingleOrder();
   });

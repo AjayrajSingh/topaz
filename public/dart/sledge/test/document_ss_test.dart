@@ -24,7 +24,7 @@ class DocumentFleetFactory {
 class NameLengthChecker extends Checker<Document> {
   @override
   void check(dynamic doc) {
-    expect(doc.name.value.length, equals(doc.length.value));
+    expect(doc['name'].value.length, equals(doc.length.value));
   }
 }
 
@@ -41,17 +41,17 @@ void main() async {
 
   test('Document test with framework', () async {
     final fleet = documentFleetFactory.newFleet(3)
-      ..runInTransaction(0, (dynamic doc) async {
-        doc.name.value = 'Alice';
-        doc.length.value = 5;
+      ..runInTransaction(0, (Document doc) async {
+        doc['name'].value = 'Alice';
+        doc['length'].value = 5;
       })
-      ..runInTransaction(1, (dynamic doc) async {
-        doc.name.value = 'Bob';
-        doc.length.value = 3;
+      ..runInTransaction(1, (Document doc) async {
+        doc['name'].value = 'Bob';
+        doc['length'].value = 3;
       })
-      ..runInTransaction(2, (dynamic doc) async {
-        doc.name.value = 'Carlos';
-        doc.length.value = 6;
+      ..runInTransaction(2, (Document doc) async {
+        doc['name'].value = 'Carlos';
+        doc['length'].value = 6;
       })
       ..synchronize([0, 1, 2])
       ..addChecker(() => new NameLengthChecker());
@@ -73,16 +73,16 @@ void main() async {
     }
     fleet
       ..runInTransaction(0, (dynamic doc) async {
-        doc.name.value = 'Alice';
+        doc['name'].value = 'Alice';
       })
       ..synchronize([0, 1, 2])
       ..runInTransaction(1, (dynamic doc) async {
-        doc.length.value = 5;
+        doc['length'].value = 5;
       })
       ..synchronize([0, 1, 2])
       ..runInTransaction(1, (dynamic) async {
-        doc.name.value = 'Bob';
-        doc.length.value = '3';
+        doc['name'].value = 'Bob';
+        doc['length'].value = '3';
       })
       ..synchronize([0, 1, 2]);
     await fleet.testSingleOrder();

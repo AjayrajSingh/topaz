@@ -58,7 +58,7 @@ class ValueNode implements Value {
   /// Returns the child Value associated with [fieldName].
   /// If [fieldName] does not have any associated Value, an ArgumentError
   /// exception is thrown.
-  Value operator [](String fieldName) {
+  dynamic operator [](String fieldName) {
     Value value = _childValues[fieldName];
     if (value == null) {
       throw new ArgumentError('field `$fieldName` does not exist');

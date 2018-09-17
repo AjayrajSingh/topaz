@@ -41,16 +41,16 @@ class TestModel {
       assert(documents.isEmpty);
       assert(await sledge.documentExists(id) == false);
 
-      dynamic doc = await sledge.getDocument(id);
+      Document doc = await sledge.getDocument(id);
 
-      assert(doc.someBool.value == false);
-      assert(doc.someInteger.value == 0);
+      assert(doc['someBool'].value == false);
+      assert(doc['someInteger'].value == 0);
       doc.someInteger.onChange.listen(intsReceivedInStream.add);
 
-      doc.someBool.value = true;
-      doc.someInteger.value = 42;
-      assert(doc.someBool.value == true);
-      assert(doc.someInteger.value == 42);
+      doc['someBool'].value = true;
+      doc['someInteger'].value = 42;
+      assert(doc['someBool'].value == true);
+      assert(doc['someInteger'].value == 42);
     });
 
     // Verify that the document is still present in a separate
@@ -59,15 +59,15 @@ class TestModel {
       final List<dynamic> documents = await sledge.getDocuments(schema);
       assert(documents.length == 1);
       // TODO(nellyv): Fix [getDocuments]'s implementation:
-      // documents[0].someBool.value == true
+      // documents[0]['someBool'].value == true
       // and
-      // documents[0].someInteger.value == 42
+      // documents[0]['someInteger'].value == 42
       // should be valid assertions at this point.
       assert(await sledge.documentExists(id) == true);
-      dynamic doc = await sledge.getDocument(id);
-      assert(doc.someBool.value == true);
-      assert(doc.someInteger.value == 42);
-      doc.someInteger.value++;
+      Document doc = await sledge.getDocument(id);
+      assert(doc['someBool'].value == true);
+      assert(doc['someInteger'].value == 42);
+      doc['someInteger'].value++;
     });
 
     // Create a new Sledge instance using the same page as before.
@@ -77,9 +77,9 @@ class TestModel {
       final List<dynamic> documents = await sledge2.getDocuments(schema);
       assert(documents.length == 1);
 
-      dynamic doc = await sledge2.getDocument(id);
-      assert(doc.someBool.value == true);
-      assert(doc.someInteger.value == 43);
+      Document doc = await sledge2.getDocument(id);
+      assert(doc['someBool'].value == true);
+      assert(doc['someInteger'].value == 43);
     });
 
     // Create a new Sledge instance using a different page.
@@ -88,9 +88,9 @@ class TestModel {
     // Verify that the document is not initialized.
     await sledge3.runInTransaction(() async {
       assert(await sledge3.documentExists(id) == false);
-      dynamic doc = await sledge3.getDocument(id);
-      assert(doc.someBool.value == false);
-      assert(doc.someInteger.value == 0);
+      Document doc = await sledge3.getDocument(id);
+      assert(doc['someBool'].value == false);
+      assert(doc['someInteger'].value == 0);
     });
 
     assert(intsReceivedInStream.length == 2);
@@ -102,8 +102,8 @@ class TestModel {
     while (someInteger != 43) {
       await new Future.delayed(new Duration(milliseconds: 10), () => true);
       await sledgePassive.runInTransaction(() async {
-        dynamic doc = await sledgePassive.getDocument(id);
-        someInteger = doc.someInteger.value;
+        Document doc = await sledgePassive.getDocument(id);
+        someInteger = doc['someInteger'].value;
       });
     }
 

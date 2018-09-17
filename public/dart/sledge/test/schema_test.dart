@@ -154,6 +154,12 @@ void main() {
     expect(doc.someInteger.value, equals(0));
     expect(doc.someDouble.value, equals(0.0));
     expect(doc.someString.value, equals(''));
+
+    expect(doc['someBool'].value, equals(false));
+    expect(doc['someInteger'].value, equals(0));
+    expect(doc['someDouble'].value, equals(0.0));
+    expect(doc['someString'].value, equals(''));
+
     await sledge.runInTransaction(() async {
       doc.someBool.value = true;
       doc.someInteger.value = 42;
@@ -164,6 +170,11 @@ void main() {
     expect(doc.someInteger.value, equals(42));
     expect(doc.someDouble.value, equals(10.5));
     expect(doc.someString.value, equals('abacaba'));
+
+    expect(doc['someBool'].value, equals(true));
+    expect(doc['someInteger'].value, equals(42));
+    expect(doc['someDouble'].value, equals(10.5));
+    expect(doc['someString'].value, equals('abacaba'));
   });
 
   test('Integration of PosNegCounter with Sledge', () async {
@@ -176,28 +187,28 @@ void main() {
 
     // Create a new Sledge document.
     Sledge sledge = newSledgeForTesting();
-    dynamic doc;
+    Document doc;
     await sledge.runInTransaction(() async {
       doc = await sledge.getDocument(new DocumentId(schema));
     });
 
     // Modify and get value of PosNegCounter.
-    expect(doc.cnt.value, equals(0));
-    expect(doc.cnt_d.value, equals(0.0));
+    expect(doc['cnt'].value, equals(0));
+    expect(doc['cnt_d'].value, equals(0.0));
     await sledge.runInTransaction(() async {
-      doc.cnt.add(5);
+      doc['cnt'].add(5);
     });
-    expect(doc.cnt.value, equals(5));
+    expect(doc['cnt'].value, equals(5));
     await sledge.runInTransaction(() async {
-      doc.cnt.add(-3);
-      doc.cnt_d.add(-5.2);
+      doc['cnt'].add(-3);
+      doc['cnt_d'].add(-5.2);
     });
-    expect(doc.cnt.value, equals(2));
-    expect(doc.cnt_d.value, equals(-5.2));
+    expect(doc['cnt'].value, equals(2));
+    expect(doc['cnt_d'].value, equals(-5.2));
     await sledge.runInTransaction(() async {
-      doc.cnt_d.add(3.12);
+      doc['cnt_d'].add(3.12);
     });
-    expect(doc.cnt_d.value, equals(-2.08));
+    expect(doc['cnt_d'].value, equals(-2.08));
   });
 
   // TODO: add tests for BytelistMap and BytelistSet.
@@ -210,26 +221,26 @@ void main() {
 
     // Create a new Sledge document.
     Sledge sledge = newSledgeForTesting();
-    dynamic doc;
+    Document doc;
     await sledge.runInTransaction(() async {
       doc = await sledge.getDocument(new DocumentId(schema));
     });
 
     // Apply modifications to OrderedList.
-    expect(doc.list.toList(), equals([]));
+    expect(doc['list'].toList(), equals([]));
     await sledge.runInTransaction(() async {
-      doc.list.insert(0, new Uint8List.fromList([1]));
+      doc['list'].insert(0, new Uint8List.fromList([1]));
     });
-    expect(doc.list.toList().length, equals(1));
-    expect(doc.list[0].toList(), equals([1]));
+    expect(doc['list'].toList().length, equals(1));
+    expect(doc['list'][0].toList(), equals([1]));
     await sledge.runInTransaction(() async {
-      doc.list.insert(1, new Uint8List.fromList([3]));
-      doc.list.insert(1, new Uint8List.fromList([2]));
+      doc['list'].insert(1, new Uint8List.fromList([3]));
+      doc['list'].insert(1, new Uint8List.fromList([2]));
     });
-    expect(doc.list.toList().length, equals(3));
-    expect(doc.list[0].toList(), equals([1]));
-    expect(doc.list[1].toList(), equals([2]));
-    expect(doc.list[2].toList(), equals([3]));
+    expect(doc['list'].toList().length, equals(3));
+    expect(doc['list'][0].toList(), equals([1]));
+    expect(doc['list'][1].toList(), equals([2]));
+    expect(doc['list'][2].toList(), equals([3]));
   });
 
   test('get and apply changes', () async {
@@ -243,7 +254,7 @@ void main() {
 
     // Create two Sledge documents
     Sledge sledgeA = newSledgeForTesting(), sledgeB = newSledgeForTesting();
-    dynamic docA, docB;
+    Document docA, docB;
     await sledgeA.runInTransaction(() async {
       docA = await sledgeA.getDocument(new DocumentId(schema));
     });
@@ -254,18 +265,18 @@ void main() {
     Change c1;
     await sledgeA.runInTransaction(() async {
       docA
-        ..name.value = 'value + counter'
-        ..number.value = 5
-        ..cnt.add(1);
+        ..['name'].value = 'value + counter'
+        ..['number'].value = 5
+        ..['cnt'].add(1);
 
       c1 = Document.getChange(docA);
     });
 
     Document.applyChange(docB, c1);
 
-    expect(docB.name.value, equals('value + counter'));
-    expect(docB.number.value, equals(5));
-    expect(docB.cnt.value, equals(1));
+    expect(docB['name'].value, equals('value + counter'));
+    expect(docB['number'].value, equals(5));
+    expect(docB['cnt'].value, equals(1));
   });
 
   test('put large list into set', () async {
@@ -277,7 +288,7 @@ void main() {
 
     // Create two Sledge documents
     Sledge sledgeA = newSledgeForTesting(), sledgeB = newSledgeForTesting();
-    dynamic docA, docB;
+    Document docA, docB;
     await sledgeA.runInTransaction(() async {
       docA = await sledgeA.getDocument(new DocumentId(schema));
     });
@@ -289,12 +300,12 @@ void main() {
 
     Change c1;
     await sledgeA.runInTransaction(() async {
-      docA.names.add(largeList);
+      docA['names'].add(largeList);
       c1 = Document.getChange(docA);
     });
 
     Document.applyChange(docB, c1);
-    expect(docB.names.single, equals(largeList));
+    expect(docB['names'].single, equals(largeList));
   });
 
   group('Rollback', () {
@@ -308,34 +319,34 @@ void main() {
 
       // Create a new Sledge document.
       SledgeForTesting sledge = newSledgeForTesting();
-      dynamic doc;
+      Document doc;
       await sledge.runInTransaction(() async {
         doc = await sledge.getDocument(new DocumentId(schema));
       });
       // Read and write properties of a Sledge document.
       bool transactionSucceed = await sledge.runInTransaction(() async {
-        doc.someInteger.value = 14;
+        doc['someInteger'].value = 14;
       });
       expect(transactionSucceed, true);
-      expect(doc.someInteger.value, equals(14));
+      expect(doc['someInteger'].value, equals(14));
 
       // Test case when commit fails.
       sledge.fakeLedgerPage.commitStatus = ledger.Status.ioError;
       transactionSucceed = await sledge.runInTransaction(() async {
-        doc.someBool.value = true;
-        doc.someInteger.value = 42;
+        doc['someBool'].value = true;
+        doc['someInteger'].value = 42;
       });
       expect(transactionSucceed, false);
-      expect(doc.someBool.value, equals(false));
-      expect(doc.someInteger.value, equals(14));
+      expect(doc['someBool'].value, equals(false));
+      expect(doc['someInteger'].value, equals(14));
 
       // Check that after failed transaction we can get successful one.
       sledge.fakeLedgerPage.resetAllStatus();
       transactionSucceed = await sledge.runInTransaction(() async {
-        doc.someInteger.value = 8;
+        doc['someInteger'].value = 8;
       });
       expect(transactionSucceed, true);
-      expect(doc.someInteger.value, equals(8));
+      expect(doc['someInteger'].value, equals(8));
     });
 
     test('rollback BytelistMap', () async {
@@ -347,42 +358,42 @@ void main() {
 
       // Create a new Sledge document.
       SledgeForTesting sledge = newSledgeForTesting();
-      dynamic doc;
+      Document doc;
       await sledge.runInTransaction(() async {
         doc = await sledge.getDocument(new DocumentId(schema));
       });
       // Read and write properties of a Sledge document.
       bool transactionSucceed = await sledge.runInTransaction(() async {
-        doc.map['a'] = new Uint8List.fromList([1, 2, 3]);
+        doc['map']['a'] = new Uint8List.fromList([1, 2, 3]);
       });
       expect(transactionSucceed, true);
-      expect(doc.map.length, equals(1));
+      expect(doc['map'].length, equals(1));
 
       // Test case when commit fails.
       sledge.fakeLedgerPage.commitStatus = ledger.Status.ioError;
       transactionSucceed = await sledge.runInTransaction(() async {
-        doc.map['a'] = new Uint8List.fromList([4]);
-        doc.map['foo'] = new Uint8List.fromList([1, 3]);
+        doc['map']['a'] = new Uint8List.fromList([4]);
+        doc['map']['foo'] = new Uint8List.fromList([1, 3]);
       });
       expect(transactionSucceed, false);
-      expect(doc.map.length, equals(1));
-      expect(doc.map['a'], equals([1, 2, 3]));
+      expect(doc['map'].length, equals(1));
+      expect(doc['map']['a'], equals([1, 2, 3]));
 
       // Check that after failed transaction we can get successful one.
       sledge.fakeLedgerPage.resetAllStatus();
       transactionSucceed = await sledge.runInTransaction(() async {
-        doc.map['foo'] = new Uint8List.fromList([1, 3]);
+        doc['map']['foo'] = new Uint8List.fromList([1, 3]);
       });
       expect(transactionSucceed, true);
-      expect(doc.map.length, equals(2));
-      expect(doc.map['a'], equals([1, 2, 3]));
-      expect(doc.map['foo'], equals([1, 3]));
+      expect(doc['map'].length, equals(2));
+      expect(doc['map']['a'], equals([1, 2, 3]));
+      expect(doc['map']['foo'], equals([1, 3]));
 
       transactionSucceed = await sledge.runInTransaction(() async {
-        doc.map['a'] = new Uint8List.fromList([3, 4]);
+        doc['map']['a'] = new Uint8List.fromList([3, 4]);
       });
       expect(transactionSucceed, true);
-      expect(doc.map['a'], equals([3, 4]));
+      expect(doc['map']['a'], equals([3, 4]));
     });
   });
 }

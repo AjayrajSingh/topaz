@@ -50,18 +50,18 @@ Writing a document to Sledge is done in 3 steps:
 3. Create and write to a document
 ```dart
     await sledge.runInTransaction(() async {
-      dynamic doc = await sledge.getDocument(id);
-      doc.someField.value = true;
-      doc.someOtherField.value = 42;
+      Document doc = await sledge.getDocument(id);
+      doc['someField'].value = true;
+      doc['someOtherField'].value = 42;
     });
 ```
 
 ### Reading a document
 ```dart
     await sledge.runInTransaction(() async {
-      dynamic doc = await sledge.getDocument(id);
-      assert(doc.someField.value == true);
-      assert(doc.someOtherField.value == 42);
+      Document doc = await sledge.getDocument(id);
+      assert(doc['someField'].value == true);
+      assert(doc['someOtherField'].value == 42);
     });
 ```
 
