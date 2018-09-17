@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         width: 300.0,
                         height: 300.0,
                         child: new ApplicationWidget(
-                            url: 'leaf_flutter',
+                            url: 'fuchsia-pkg://fuchsia.com/leaf_flutter#meta/leaf_flutter.cmx',
                             launcher:
                                 StartupContext.fromStartupInfo().launcher),
                       ))),

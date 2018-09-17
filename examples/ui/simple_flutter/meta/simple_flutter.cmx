@@ -1,0 +1,15 @@
+{
+    "program": {
+        "data": "data/simple_flutter"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.accessibility.ToggleBroadcaster",
+            "fuchsia.fonts.Provider",
+            "fuchsia.modular.Clipboard",
+            "fuchsia.modular.ContextWriter" ,
+            "fuchsia.sys.Environment",
+            "fuchsia.ui.viewsv1.ViewManager"
+        ]
+    }
+}

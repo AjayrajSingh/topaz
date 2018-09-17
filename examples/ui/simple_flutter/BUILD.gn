@@ -17,6 +17,13 @@ flutter_app("simple_flutter") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/ui/flutter",
   ]
+
+  meta = [
+    {
+      path = rebase_path("meta/simple_flutter.cmx")
+      dest = "simple_flutter.cmx"
+    }
+  ]
 }
 
 flutter_app("leaf_flutter") {
@@ -27,5 +34,12 @@ flutter_app("leaf_flutter") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/leaf_flutter.cmx")
+      dest = "leaf_flutter.cmx"
+    }
   ]
 }
