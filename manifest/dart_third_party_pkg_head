@@ -16,7 +16,7 @@
     <project name="third_party/dart/third_party/pkg/bazel_worker"
              path="third_party/dart/third_party/pkg/bazel_worker"
              remote="https://dart.googlesource.com/bazel_worker.git"
-             revision="0.1.11"/>
+             revision="0.1.14"/>
 
     <project name="third_party/dart/third_party/pkg/boolean_selector"
              path="third_party/dart/third_party/pkg/boolean_selector"
