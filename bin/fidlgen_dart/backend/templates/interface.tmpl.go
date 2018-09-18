@@ -390,18 +390,30 @@ class {{ .AsyncResponseClass }} {
   {{- end }}
 {{- end }}
 
+{{- range .Doc }}
+///{{ . -}}
+{{- end }}
 abstract class {{ .Name }} {
   static const String $serviceName = {{ .ServiceName }};
 
 {{- range .Methods }}
   {{- if .HasRequest }}
+  {{- range .Doc }}
+  ///{{ . -}}
+  {{- end }}
   {{ template "AsyncReturn" . }} {{ .Name }}({{ template "AsyncParams" .Request }});
   {{- else }}
+  {{- range .Doc }}
+  ///{{ . -}}
+  {{- end }}
   Stream<{{ .AsyncResponseType}}> get {{ .Name }};
   {{- end }}
 {{- end }}
 }
 
+{{- range .Doc }}
+///{{ . -}}
+{{- end }}
 class {{ .ProxyName }} extends $fidl.AsyncProxy<{{ .Name }}>
     implements {{ .Name }} {
   {{ .ProxyName }}() : super(new $fidl.AsyncProxyController<{{ .Name }}>($serviceName: {{ .ServiceName }}, $interfaceName: r'{{ .Name }}')) {
@@ -495,6 +507,9 @@ class {{ .ProxyName }} extends $fidl.AsyncProxy<{{ .Name }}>
 
 {{- range .Methods }}
   {{- if .HasRequest }}
+    {{- range .Doc }}
+    ///{{ . -}}
+    {{- end }}
     @override
     {{ template "AsyncReturn" . }} {{ .Name }}({{ template "AsyncParams" .Request }}) async {
       if (!ctrl.isBound) {
@@ -522,6 +537,9 @@ class {{ .ProxyName }} extends $fidl.AsyncProxy<{{ .Name }}>
     }
   {{ else }}
     final _{{ .Name }}EventStreamController = new StreamController<{{ .AsyncResponseType }}>.broadcast();
+    {{- range .Doc }}
+    ///{{ . -}}
+    {{- end }}
     @override
     Stream<{{ .AsyncResponseType }}> get {{ .Name }} => _{{ .Name }}EventStreamController.stream;
   {{ end }}

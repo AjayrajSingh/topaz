@@ -13,6 +13,9 @@ enum {{ .TagName }} {
 {{- end }}
 }
 
+{{- range .Doc }}
+///{{ . -}}
+{{- end }}
 class {{ .Name }} extends $fidl.Union {
 {{- range .Members }}
 
@@ -46,6 +49,9 @@ class {{ .Name }} extends $fidl.Union {
     }
   }
 
+  {{- range .Doc }}
+  ///{{ . -}}
+  {{- end }}
   @override
   int get $index => tag.index;
 

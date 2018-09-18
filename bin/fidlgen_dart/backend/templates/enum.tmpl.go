@@ -7,6 +7,9 @@ package templates
 // Enum is the template for enum declarations.
 const Enum = `
 {{- define "EnumDeclaration" -}}
+{{- range .Doc }}
+///{{ . -}}
+{{- end }}
 class {{ .Name }} extends $fidl.Enum {
   factory {{ .Name }}(int v) {
     switch (v) {
@@ -20,6 +23,9 @@ class {{ .Name }} extends $fidl.Enum {
   }
 
 {{- range .Members }}
+  {{- range .Doc }}
+  ///{{ . -}}
+  {{- end }}
   static const {{ $.Name }} {{ .Name }} = const {{ $.Name }}._({{ .Value }});
 {{- end }}
 

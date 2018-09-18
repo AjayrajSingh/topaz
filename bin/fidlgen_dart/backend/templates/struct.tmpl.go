@@ -7,6 +7,9 @@ package templates
 // Struct is the template for struct declarations.
 const Struct = `
 {{- define "StructDeclaration" -}}
+{{- range .Doc }}
+///{{ . -}}
+{{- end }}
 class {{ .Name }} extends $fidl.Struct {
   const {{ .Name }}({
 {{- range .Members }}
@@ -50,6 +53,9 @@ class {{ .Name }} extends $fidl.Struct {
 {{- end }};
 
 {{- range .Members }}
+  {{- range .Doc }}
+  ///{{ . -}}
+  {{- end }}
   final {{ .Type.Decl }} {{ .Name }};
 {{- end }}
 

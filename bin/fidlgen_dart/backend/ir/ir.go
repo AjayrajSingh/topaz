@@ -9,9 +9,15 @@ import (
 	"fidl/compiler/backend/types"
 	"fmt"
 	"log"
+	"regexp"
 	"strconv"
 	"strings"
 )
+
+// Documented is embedded in structs for declarations that may hold documentation.
+type Documented struct {
+	Doc []string
+}
 
 // Type represents a FIDL datatype.
 type Type struct {
@@ -29,6 +35,7 @@ type Const struct {
 	Type  Type
 	Name  string
 	Value string
+	Documented
 }
 
 // Enum represents an enum declaration.
@@ -37,12 +44,14 @@ type Enum struct {
 	Members    []EnumMember
 	TypeSymbol string
 	TypeExpr   string
+	Documented
 }
 
 // EnumMember represents a member of an enum declaration.
 type EnumMember struct {
 	Name  string
 	Value string
+	Documented
 }
 
 // Union represents a union declaration.
@@ -52,6 +61,7 @@ type Union struct {
 	Members    []UnionMember
 	TypeSymbol string
 	TypeExpr   string
+	Documented
 }
 
 // UnionMember represents a member of a union declaration.
@@ -61,6 +71,7 @@ type UnionMember struct {
 	CtorName string
 	Offset   int
 	typeExpr string
+	Documented
 }
 
 // Struct represents a struct declaration.
@@ -70,6 +81,7 @@ type Struct struct {
 	TypeSymbol       string
 	TypeExpr         string
 	HasNullableField bool
+	Documented
 }
 
 // StructMember represents a member of a struct declaration.
@@ -79,6 +91,7 @@ type StructMember struct {
 	DefaultValue string
 	Offset       int
 	typeExpr     string
+	Documented
 }
 
 // Interface represents an interface declaration.
@@ -90,6 +103,7 @@ type Interface struct {
 	EventsName  string
 	Methods     []Method
 	HasEvents   bool
+	Documented
 }
 
 // Method represents a method declaration within an interface declaration.
@@ -108,6 +122,7 @@ type Method struct {
 	CallbackType       string
 	TypeSymbol         string
 	TypeExpr           string
+	Documented
 }
 
 // Parameter represents an interface method parameter.
@@ -237,6 +252,31 @@ var typeForPrimitiveSubtype = map[types.PrimitiveSubtype]string{
 	types.Uint64:  "Uint64Type",
 	types.Float32: "Float32Type",
 	types.Float64: "Float64Type",
+}
+
+func docStringLink(nameWithBars string) string {
+	return fmt.Sprintf("[%s]", nameWithBars[1:len(nameWithBars)-1])
+}
+
+var reLink = regexp.MustCompile("\\|([^\\|]+)\\|")
+
+func docString(node types.Annotated) Documented {
+	attribute, ok := node.LookupAttribute("Doc")
+	if !ok {
+		return Documented{nil}
+	}
+	var docs []string
+	lines := strings.Split(attribute.Value, "\n")
+	if len(lines[len(lines)-1]) == 0 {
+		// Remove the blank line at the end
+		lines = lines[:len(lines)-1]
+	}
+	for _, line := range lines {
+		// Turn |something| into [something]
+		line = reLink.ReplaceAllStringFunc(line, docStringLink)
+		docs = append(docs, line)
+	}
+	return Documented{docs}
 }
 
 func formatBool(val bool) string {
@@ -571,6 +611,7 @@ func (c *compiler) compileConst(val types.Const) Const {
 		c.compileType(val.Type),
 		c.compileLowerCamelCompoundIdentifier(types.ParseCompoundIdentifier(val.Name), ""),
 		c.compileConstant(val.Value, nil),
+		docString(val),
 	}
 	if r.Type.declType == types.EnumDeclType {
 		r.Value = fmt.Sprintf("%s.%s", r.Type.Decl, r.Value)
@@ -586,11 +627,13 @@ func (c *compiler) compileEnum(val types.Enum) Enum {
 		[]EnumMember{},
 		c.typeSymbolForCompoundIdentifier(ci),
 		fmt.Sprintf("const $fidl.EnumType<%s>(type: %s, ctor: %s._ctor)", n, typeExprForPrimitiveSubtype(val.Type), n),
+		docString(val),
 	}
 	for _, v := range val.Members {
 		e.Members = append(e.Members, EnumMember{
 			c.compileLowerCamelIdentifier(v.Name),
 			c.compileConstant(v.Value, nil),
+			docString(v),
 		})
 	}
 	return e
@@ -633,6 +676,7 @@ func (c *compiler) compileInterface(val types.Interface) Interface {
 		c.compileUpperCamelCompoundIdentifier(ci, "Events"),
 		[]Method{},
 		false,
+		docString(val),
 	}
 
 	if r.ServiceName == "" {
@@ -677,6 +721,7 @@ func (c *compiler) compileInterface(val types.Interface) Interface {
 			fmt.Sprintf("%s%sCallback", r.Name, v.Name),
 			fmt.Sprintf("_k%s_%s_Type", r.Name, v.Name),
 			typeExprForMethod(request, response, fmt.Sprintf("%s.%s", r.Name, v.Name)),
+			docString(v),
 		}
 		r.Methods = append(r.Methods, m)
 		if !v.HasRequest && v.HasResponse {
@@ -703,6 +748,7 @@ func (c *compiler) compileStructMember(val types.StructMember) StructMember {
 		defaultValue,
 		val.Offset,
 		fmt.Sprintf("const $fidl.MemberType<%s>(%s, %s)", t.Decl, typeStr, offsetStr),
+		docString(val),
 	}
 }
 
@@ -714,6 +760,7 @@ func (c *compiler) compileStruct(val types.Struct) Struct {
 		c.typeSymbolForCompoundIdentifier(ci),
 		"",
 		false,
+		docString(val),
 	}
 
 	var hasNullableField = false
@@ -746,6 +793,7 @@ func (c *compiler) compileUnionMember(val types.UnionMember) UnionMember {
 		c.compileUpperCamelIdentifier(val.Name),
 		val.Offset,
 		fmt.Sprintf("const $fidl.MemberType<%s>(%s, %s)", t.Decl, typeStr, offsetStr),
+		docString(val),
 	}
 }
 
@@ -757,6 +805,7 @@ func (c *compiler) compileUnion(val types.Union) Union {
 		[]UnionMember{},
 		c.typeSymbolForCompoundIdentifier(ci),
 		"",
+		docString(val),
 	}
 
 	for _, v := range val.Members {
