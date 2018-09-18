@@ -55,12 +55,16 @@ template("_dart_jit_package") {
       legacy_component_name = target_name
     }
     pkg_name = legacy_component_name
+    pkg_sources = []
+    if (defined(invoker.sources)) {
+      pkg_sources = invoker.sources
+    }
     components += [
       {
         main_dart = invoker.main_dart
         component_name = legacy_component_name
         deps = invoker.deps
-        sources = invoker.sources
+        sources = pkg_sources
       }
     ]
   }
