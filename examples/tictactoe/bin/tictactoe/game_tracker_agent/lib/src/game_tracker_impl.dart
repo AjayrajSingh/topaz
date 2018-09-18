@@ -41,21 +41,21 @@ class GameTrackerImpl extends tictactoe_fidl.GameTracker {
       tictactoe_fidl.Player player) async {
     try {
       bool transactionResult = await _sledge.runInTransaction(() async {
-        dynamic doc = await _sledge.getDocument(_sledgeDocumentId);
+        Document doc = await _sledge.getDocument(_sledgeDocumentId);
         if (doc == null) {
           throw Exception('Failure get document from sledge.');
         }
 
         if (player == tictactoe_fidl.Player.x) {
-          doc.xScore.value++;
+          doc['xScore'].value++;
         } else {
-          doc.oScore.value++;
+          doc['oScore'].value++;
         }
 
         log
           ..infoT('Player $player won')
           ..infoT(
-              'Current score x: ${doc.xScore.value}  o: ${doc.oScore.value}');
+              'Current score x: ${doc['xScore'].value}  o: ${doc['oScore'].value}');
       });
       if (transactionResult == false) {
         throw Exception('Error writing result to sledge.');
@@ -100,12 +100,12 @@ class GameTrackerImpl extends tictactoe_fidl.GameTracker {
   Future<Score> _getScore() async {
     Completer<Score> score = Completer();
     await _sledge.runInTransaction(() async {
-      dynamic doc = await _sledge.getDocument(_sledgeDocumentId);
+      Document doc = await _sledge.getDocument(_sledgeDocumentId);
       if (doc == null) {
         throw Exception('Failure get document from sledge.');
       }
-      if (doc.xScore.value is int && doc.oScore.value is int) {
-        score.complete(Score(doc.xScore.value, doc.oScore.value));
+      if (doc['xScore'].value is int && doc['oScore'].value is int) {
+        score.complete(Score(doc['xScore'].value, doc['oScore'].value));
       } else {
         score.completeError('Unable to retrieve score from sledge.');
       }
@@ -116,7 +116,7 @@ class GameTrackerImpl extends tictactoe_fidl.GameTracker {
 
   void _setupScoreListeners(String queueToken) async {
     await _sledge.runInTransaction(() async {
-      dynamic doc = await _sledge.getDocument(_sledgeDocumentId);
+      Document doc = await _sledge.getDocument(_sledgeDocumentId);
       if (doc != null) {
         // TODO: With the completion of LE-529, we should be able to listen to
         // the whole document for changes rather than individual fields;
@@ -129,9 +129,9 @@ class GameTrackerImpl extends tictactoe_fidl.GameTracker {
         // [_sendScoreToQueue] rather that relying on the parameters to the
         // listen functions.
         _xSubscriptions[queueToken] =
-            doc.xScore.onChange.listen((_) => _sendScoreToQueue(queueToken));
+            doc['xScore'].onChange.listen((_) => _sendScoreToQueue(queueToken));
         _oSubscriptions[queueToken] =
-            doc.oScore.onChange.listen((_) => _sendScoreToQueue(queueToken));
+            doc['oScore'].onChange.listen((_) => _sendScoreToQueue(queueToken));
       }
     });
   }
