@@ -9,20 +9,17 @@ import("//topaz/runtime/dart/dart_kernel.gni")
 
 declare_args() {
   # Controls whether dart_app() targets generate JIT or AOT Dart snapshots.
-  # In a debug build, the default is JIT so that attaching a debugger is
-  # possible. In a release build the default is AOT to save compilation time
-  # and memory footprint.
-  if (is_debug) {
-    dart_default_app = "dart_jit_app"
-  } else {
-    dart_default_app = "dart_aot_app"
-  }
+  # This defaults to JIT, use `fx set <ARCH> --args
+  # 'dart_default_app="dart_aot_app"' to switch to AOT.
+  dart_default_app = "dart_jit_app"
+}
 
+declare_args() {
   # When AOT compiling, an app will reference objects in the sharing basis's
   # snapshot when available instead of writing the objects in its own snapshot.
   # The snapshot of the sharing basis app will be included in every other app's
   # package and deduplicated by blobfs.
-  if (is_debug) {
+  if (dart_default_app == "dart_jit_app") {
     # module_suggester is not AOT compiled in debug builds
     dart_aot_sharing_basis = ""
   } else {
