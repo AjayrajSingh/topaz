@@ -52,8 +52,6 @@ class RK4SpringSimulation {
   /// below 1 etc, as it 'springs'.
   double _curT = 0.0;
 
-  double _max;
-  double _min;
   double _delta;
   double _value;
 
@@ -64,8 +62,6 @@ class RK4SpringSimulation {
     this.desc = const RK4SpringDescription(),
   })  : _startValue = initValue,
         _targetValue = initValue,
-        _min = initValue,
-        _max = initValue,
         _value = initValue,
         _delta = 0.0,
         _velocity = 0.0,
@@ -83,8 +79,6 @@ class RK4SpringSimulation {
       }
       _startValue = value;
       _targetValue = target;
-      _max = math.max(_startValue, _targetValue);
-      _min = math.min(_startValue, _targetValue);
       _delta = _targetValue - _startValue;
       if (_startValue != _targetValue) {
         _curT = 0.0;
@@ -125,10 +119,11 @@ class RK4SpringSimulation {
         _velocity = 0.0;
         _isDone = true;
         _accelerationMultipler = 0.0;
-        break;
+        return;
       }
       secondsRemaining -= _kMaxStepSize;
     }
+    _value = _startValue + _curT * _delta;
   }
 
   /// Evaluates one tick of a spring using the Runge-Kutta Algorithm.
@@ -164,7 +159,6 @@ class RK4SpringSimulation {
     double aftV = v + dvdt * stepSize;
 
     _curT = 1 + aftX;
-    _value = (_startValue + _curT * _delta).clamp(_min, _max);
     double finalVelocity = aftV;
     double netFloat = aftX;
     double net1DVelocity = aftV;
