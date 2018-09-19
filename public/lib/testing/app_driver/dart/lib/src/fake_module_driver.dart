@@ -8,6 +8,7 @@ import 'dart:async';
 
 import 'package:lib.schemas.dart/entity_codec.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.module.dart/module.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart'
     show SurfaceRelation, SurfaceArrangement, SurfaceDependency;
 import 'package:flutter/material.dart';
@@ -20,9 +21,10 @@ class LinkStreamController {
 }
 
 class FakeModuleDriver implements ModuleDriver {
-  final Map<String, String> _linkValue = {};
-  final Map<String, List<LinkStreamController>> _linkStreamControllers = {};
-  final List<Intent> _startModuleIntents = [];
+  final _linkValue = {};
+  final _linkStreamControllers = {};
+  final _startModuleIntents = [];
+  final _fakeModuleContext = FakeModuleContext();
 
   @override
   // ignore: use_to_and_as_if_applicable
@@ -44,6 +46,9 @@ class FakeModuleDriver implements ModuleDriver {
     }
     return null;
   }
+
+  @override
+  ModuleContextClient get moduleContext => _fakeModuleContext;
 
   @override
   Stream<T> watch<T>(String key, EntityCodec<T> codec, {bool all = false}) {
@@ -121,6 +126,11 @@ class FakeModuleDriver implements ModuleDriver {
     return _linkStreamControllers[key];
   }
 
+  @override
+  dynamic noSuchMethod(Invocation invocation) {}
+}
+
+class FakeModuleContext implements ModuleContextClient {
   @override
   dynamic noSuchMethod(Invocation invocation) {}
 }
