@@ -38,6 +38,30 @@ _entry_manifests = [
   "//topaz/runtime/dart_runner/entry_points.txt",
 ]
 
+# Defines a Dart package with JIT runtime components
+#
+# Takes a set of dart components and puts them into one fuchsia package with
+# the dart_jit_runner as its runtime. Also supports legacy calls where the
+# components parameter isn't specified, in which we will create one default
+# component for the package.
+#
+# Parameters
+#
+#   components (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the resources list:
+#
+#       component_name (required)
+#         Name of the component.
+#
+#       main_dart (required)
+#         File containing the main function of the component.
+#
+#   main_dart (required)
+#     File containing the main function of the application. Either main_dart or
+#     components must be defined, but not both.
 template("_dart_jit_package") {
   legacy_component = false
   pkg_name = target_name
@@ -45,6 +69,11 @@ template("_dart_jit_package") {
   if (defined(invoker.components)) {
     components += invoker.components
   } else {
+    # If components is not specified, we are fitting main_dart into a component
+    # scope, and using that for the package.
+    #
+    # TODO(CP-141): Remove support for legacy_component once all existing calls
+    # to dart_app() have a components parameter.
     legacy_component = true
     if (defined(invoker.fuchsia_package_name)) {
       legacy_component_name = invoker.fuchsia_package_name
@@ -66,6 +95,8 @@ template("_dart_jit_package") {
     ]
   }
 
+  # Build the kernel for each of the components, and bundle them in the same
+  # scope for later packaging.
   components_with_kernel = []
   foreach(component, components) {
     assert(defined(component.main_dart), "Must specify main_dart file")
@@ -138,6 +169,8 @@ template("_dart_jit_package") {
     ]
   }
 
+  # We have all components and their kernels generated now. We call package() to
+  # put everything into a fuchsia package, merging deps, extra, meta etc.
   package(target_name) {
     forward_variables_from(invoker,
                            [
@@ -439,7 +472,8 @@ template("dart_aot_app") {
 #     Name of the dart package.
 #
 #   main_dart (required)
-#     File containing the main function of the application.
+#     File containing the main function of the application. Either main_dart or
+#     components must be defined, but not both.
 #
 #   deps (optional)
 #     Dependencies of this application
@@ -462,7 +496,22 @@ template("dart_aot_app") {
 #   product (optional)
 #     A boolean. Whether to build/run the app in a stripped-down Dart VM.
 #     Defaults to !is_debug.
+#
+#   components (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the resources list:
+#
+#       component_name (required)
+#         Name of the component.
+#
+#       main_dart (required)
+#         File containing the main function of the component.
 template("dart_app") {
+  assert((defined(invoker.components) && !defined(invoker.main_dart)) ||
+         (!defined(invoker.components) && defined(invoker.main_dart)),
+         "Only one of components or main_dart should be defined")
   target(dart_default_app, target_name) {
     forward_variables_from(invoker, "*")
   }
