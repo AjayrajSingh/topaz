@@ -264,13 +264,13 @@ bool WebViewImpl::HandleTouchEvent(
 
 void WebViewImpl::HandleFocusEvent(const fuchsia::ui::input::FocusEvent& focus) {
   has_scenic_focus_ = focus.focused;
+  web_view_.setFocused(focus.focused);
   UpdateInputConnection();
 }
 
 // |BaseView|:
 bool WebViewImpl::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   bool handled = false;
-  web_view_.setFocused(true);
   web_view_.setVisible(true);
   if (event.is_pointer()) {
     const fuchsia::ui::input::PointerEvent& pointer = event.pointer();
