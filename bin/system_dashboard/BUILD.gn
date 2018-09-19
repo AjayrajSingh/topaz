@@ -4,7 +4,7 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_aot_app("system_dashboard") {
+flutter_app("system_dashboard") {
   main_dart = "lib/main.dart"
 
   manifest = "pubspec.yaml"

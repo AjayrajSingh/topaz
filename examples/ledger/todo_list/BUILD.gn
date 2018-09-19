@@ -4,7 +4,7 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_aot_app("todo_list") {
+flutter_app("todo_list") {
   main_dart = "lib/main.dart"
 
   sources = [

@@ -4,7 +4,7 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_aot_app("perspective") {
+flutter_app("perspective") {
   main_dart = "lib/main.dart"
   package_name = "perspective"
 

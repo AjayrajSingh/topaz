@@ -23,7 +23,7 @@ flutter_app("driver_example_mod") {
 # The tester app, which contains the driver extension code.
 #
 # Note that this AOT compilation is temporary.
-flutter_aot_app("driver_example_mod_wrapper") {
+flutter_app("driver_example_mod_wrapper") {
   package_name = "driver_example_mod_wrapper"
 
   main_dart = "lib/main_driver_wrapper.dart"

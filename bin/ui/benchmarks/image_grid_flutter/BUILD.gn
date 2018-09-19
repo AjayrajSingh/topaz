@@ -4,7 +4,7 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_aot_app("image_grid_flutter") {
+flutter_app("image_grid_flutter") {
   main_dart = "lib/main.dart"
 
   fuchsia_package_name = "image_grid_flutter"

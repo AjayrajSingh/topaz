@@ -10,7 +10,7 @@ cobalt_config("generate_sysui_config") {
   project_id = 103
 }
 
-flutter_aot_app("userpicker_device_shell") {
+flutter_app("userpicker_device_shell") {
   main_dart = "lib/main.dart"
 
   meta = [
