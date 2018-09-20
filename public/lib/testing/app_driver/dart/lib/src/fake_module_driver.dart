@@ -7,6 +7,7 @@
 import 'dart:async';
 
 import 'package:lib.schemas.dart/entity_codec.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.module.dart/module.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart'
@@ -25,6 +26,7 @@ class FakeModuleDriver implements ModuleDriver {
   final _linkStreamControllers = {};
   final _startModuleIntents = [];
   final _fakeModuleContext = FakeModuleContext();
+  final _fakeModuleControllerClient = FakeModuleControllerClient();
 
   @override
   // ignore: use_to_and_as_if_applicable
@@ -69,7 +71,7 @@ class FakeModuleDriver implements ModuleDriver {
         emphasis: 0.5,
       )}) {
     _startModuleIntents.add(intent);
-    return null;
+    return Future.value(_fakeModuleControllerClient);
   }
 
   /// Puts a value on a link from a test. Value is sent to all watcher of the
@@ -127,10 +129,24 @@ class FakeModuleDriver implements ModuleDriver {
   }
 
   @override
-  dynamic noSuchMethod(Invocation invocation) {}
+  dynamic noSuchMethod(Invocation invocation) {
+    log.warning(
+        'Method ${invocation.memberName} not implemented in FakeModuleDriver');
+  }
 }
 
 class FakeModuleContext implements ModuleContextClient {
   @override
-  dynamic noSuchMethod(Invocation invocation) {}
+  dynamic noSuchMethod(Invocation invocation) {
+    log.warning(
+        'Method ${invocation.memberName} not implemented in FakeModuleContext');
+  }
+}
+
+class FakeModuleControllerClient implements ModuleControllerClient {
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    log.warning(
+        'Method ${invocation.memberName} not implemented in FakeModuleControllerClient');
+  }
 }
