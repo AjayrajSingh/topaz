@@ -8,20 +8,30 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 
 /// Base class for classes that provide data via [InheritedWidget]s.
-abstract class Model extends Listenable {
-  final Set<VoidCallback> _listeners = new Set<VoidCallback>();
+abstract class Model implements Listenable {
+  final _listeners = Set<VoidCallback>();
+  final _modifications = <VoidCallback>[];
   int _version = 0;
   int _microtaskVersion = 0;
+  bool _notifyingListeners = false;
 
   /// [listener] will be notified when the model changes.
   @override
   void addListener(VoidCallback listener) {
+    if (_notifyingListeners) {
+      _modifications.add(() => _listeners.add(listener));
+      return;
+    }
     _listeners.add(listener);
   }
 
   /// [listener] will no longer be notified when the model changes.
   @override
   void removeListener(VoidCallback listener) {
+    if (_notifyingListeners) {
+      _modifications.add(() => _listeners.remove(listener));
+      return;
+    }
     _listeners.remove(listener);
   }
 
@@ -30,20 +40,25 @@ abstract class Model extends Listenable {
 
   /// Should be called only by [Model] when the model has changed.
   void notifyListeners() {
-    // We schedule a microtask as it's not uncommon for changes that trigger
-    // listener notifications to occur in a build step and for listeners to
-    // call setState.  Its a big no-no to setState during build so we schedule
-    // for them to happen later.
-    // TODO(apwilson): This is a bad-flutter-code-smell. Eliminate the need for
-    // this scheduleMicrotask.
+    // We schedule a microtask to debounce multiple changes that can occur
+    // all at once.
     if (_microtaskVersion == _version) {
       _microtaskVersion++;
       scheduleMicrotask(() {
         _version++;
         _microtaskVersion = _version;
+        _notifyingListeners = true;
         for (VoidCallback listener in _listeners) {
           listener();
         }
+        _notifyingListeners = false;
+
+        // If listeners were added or removed during the notification of
+        // listeners, make adjustments to the listener set now.
+        for (VoidCallback modification in _modifications) {
+          modification();
+        }
+        _modifications.clear();
       });
     }
   }
@@ -58,8 +73,8 @@ class ModelFinder<T extends Model> {
   /// whenever there's a change to the returned model.
   T of(BuildContext context, {bool rebuildOnChange = false}) {
     // ignore: prefer_const_constructors
-    final Type type = new _InheritedModel<T>.forRuntimeType().runtimeType;
-    Widget widget = rebuildOnChange
+    final type = _InheritedModel<T>.forRuntimeType().runtimeType;
+    final widget = rebuildOnChange
         ? context.inheritFromWidgetOfExactType(type)
         : context.ancestorWidgetOfExactType(type);
     return (widget is _InheritedModel<T>) ? widget.model : null;
@@ -79,9 +94,9 @@ class ScopedModel<T extends Model> extends StatelessWidget {
   const ScopedModel({this.model, this.child});
 
   @override
-  Widget build(BuildContext context) => new _ModelListener(
+  Widget build(BuildContext context) => _ModelListener(
         model: model,
-        builder: (BuildContext context) => new _InheritedModel<T>(
+        builder: (BuildContext context) => _InheritedModel<T>(
               model: model,
               child: child,
             ),
@@ -96,7 +111,7 @@ class _ModelListener extends StatefulWidget {
   const _ModelListener({this.model, this.builder});
 
   @override
-  _ModelListenerState createState() => new _ModelListenerState();
+  _ModelListenerState createState() => _ModelListenerState();
 }
 
 class _ModelListenerState extends State<_ModelListener> {
@@ -172,19 +187,19 @@ class ScopedModelDescendant<T extends Model> extends StatelessWidget {
   Widget build(BuildContext context) => builder(
         context,
         child,
-        new ModelFinder<T>().of(context, rebuildOnChange: true),
+        ModelFinder<T>().of(context, rebuildOnChange: true),
       );
 }
 
 /// Mixin to enable a model to provide tickers for animations.
 abstract class TickerProviderModelMixin extends Model
     implements TickerProvider {
-  final Set<Ticker> _tickers = new Set<Ticker>();
+  final _tickers = Set<Ticker>();
 
   /// Creates a ticker with the given callback.
   @override
   Ticker createTicker(TickerCallback onTick) {
-    Ticker ticker = new Ticker(onTick);
+    final ticker = Ticker(onTick);
     _tickers.add(ticker);
     return ticker;
   }
