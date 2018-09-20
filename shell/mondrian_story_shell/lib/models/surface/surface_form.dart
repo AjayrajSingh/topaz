@@ -84,7 +84,8 @@ class SurfaceForm {
   final DragCallback onDragFinished;
 
   @override
-  String toString() => 'SurfaceForm($key) position $position';
+  String toString() =>
+      'SurfaceForm($key) with initPosition:$initPosition position:$position depth:$depth';
 }
 
 /// Generates a movement delta from a manipulation delta.

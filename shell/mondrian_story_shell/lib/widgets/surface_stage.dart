@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -117,6 +119,9 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
   FluxAnimation<Rect> get animation => _animation;
   ManualAnimation<Rect> _animation;
 
+  bool isDragging = false;
+  double depth = 0.0;
+
   @override
   void initState() {
     super.initState();
@@ -171,6 +176,13 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
             (1.0 - (fractionalOffset.dx + animation.value.size.width));
         double bottom = parentSize.height *
             (1.0 - (fractionalOffset.dy + animation.value.size.height));
+        double surfaceDepth = isDragging
+            ? -2.0
+            : lerpDouble(
+                form.depth,
+                depth,
+                fractionalOffset.dy.abs(),
+              );
         return new Stack(
           fit: StackFit.expand,
           children: <Widget>[
@@ -181,7 +193,7 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
               right: right,
               child: new SurfaceFrame(
                 child: form.parts.keys.first,
-                depth: form.depth,
+                depth: surfaceDepth,
                 // HACK(alangardner): May need explicit interactable parameter
                 interactable: form.dragFriction != kDragFrictionInfinite,
               ),
@@ -228,6 +240,7 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
           velocity: Rect.zero,
         );
         form.onDragStarted();
+        isDragging = true;
       },
       onHorizontalDragUpdate: (DragUpdateDetails details) {
         _animation.update(
@@ -271,6 +284,8 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
           ),
           details.velocity,
         );
+        isDragging = false;
+        depth = -2.0;
       },
     );
   }

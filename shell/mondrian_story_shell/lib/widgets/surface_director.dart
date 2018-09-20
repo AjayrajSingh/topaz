@@ -33,7 +33,6 @@ class SurfaceDirector extends StatefulWidget {
 
 class _SurfaceDirectorState extends State<SurfaceDirector> {
   final Map<Surface, SurfaceForm> _prevForms = <Surface, SurfaceForm>{};
-  final List<Surface> _draggedSurfaces = <Surface>[];
   final List<SurfaceForm> _orphanedForms = <SurfaceForm>[];
 
   SurfaceForm _form(
@@ -49,18 +48,14 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
       ),
       position: ps.position,
       initPosition: ps.position.shift(new Offset(offscreen.dx, offscreen.dy)),
-      depth: _draggedSurfaces.contains(ps.surface) ? -0.1 : depth,
+      depth: depth,
       friction: depth > 0.0
           ? kDragFrictionInfinite
           : ps.surface.canDismiss()
               ? kDragFrictionNone
               : (Offset offset, Offset delta) =>
                   delta / math.max(1.0, offset.distanceSquared / 100.0),
-      onDragStarted: () {
-        setState(() {
-          _draggedSurfaces.add(ps.surface);
-        });
-      },
+      onDragStarted: () {},
       onDragFinished: (Offset offset, Velocity velocity) {
         Offset expectedOffset = offset + (velocity.pixelsPerSecond / 5.0);
         // Only remove if greater than threshold
@@ -69,9 +64,6 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
           // avoid complicated layout work.
           ps.surface.dismiss();
         }
-        setState(() {
-          _draggedSurfaces.remove(ps.surface);
-        });
       },
     );
   }
