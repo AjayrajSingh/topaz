@@ -12,11 +12,11 @@ void main() {
   test('test_step_retrieval', () {
     final Step child3 = new Step('step3', 'action3');
     final Step child2 = new Step('step2', 'action2')
-      ..addResult('result', child3);
+      ..addResult('result', child3.key);
     final Step child1 = new Step('step1', 'action1')
-      ..addResult('result', child2);
+      ..addResult('result', child2.key);
 
-    final Syllabus syllabus = new Syllabus(child1);
+    final Syllabus syllabus = new Syllabus([child3, child2, child1], child1);
 
     expect(syllabus.retrieveStep('step3'), child3);
     expect(syllabus.retrieveStep('unknownStep'), null);

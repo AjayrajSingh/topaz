@@ -28,7 +28,7 @@ void main() {
     final Step entry = new Step('step1', 'action1');
     final TestBlueprint actionBlueprint = new TestBlueprint('action1');
 
-    final Syllabus syllabus = new Syllabus(entry);
+    final Syllabus syllabus = new Syllabus([entry], entry);
 
     final Roster roster = new Roster()..add(actionBlueprint);
 
@@ -43,9 +43,10 @@ void main() {
     final Step step2 = new Step('step2', 'action2');
     final TestBlueprint actionBlueprint = new TestBlueprint('action2');
 
-    final Step entry = new Step('step1', 'action1')..defaultTransition = step2;
+    final Step entry = new Step('step1', 'action1')
+      ..defaultTransition = step2.key;
 
-    final Syllabus syllabus = new Syllabus(entry);
+    final Syllabus syllabus = new Syllabus([step2, entry], entry);
 
     final Roster roster = new Roster()..add(actionBlueprint);
 

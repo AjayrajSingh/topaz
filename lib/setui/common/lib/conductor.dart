@@ -23,7 +23,7 @@ class Conductor implements ActionResultReceiver {
   @override
   void onResult(ActionResult result) {
     // On result, proceed to the next step.
-    _advance(result.step.getNext(result.code));
+    _advance(_syllabus.retrieveStep(result.step.getNext(result.code)));
   }
 
   /// Launches the matching action for the given [Step] if defined. Otherwise,
@@ -37,7 +37,7 @@ class Conductor implements ActionResultReceiver {
       action = _roster.getAction(targetStep, this);
 
       if (action == null) {
-        targetStep = step.getNext();
+        targetStep = _syllabus.retrieveStep(step.getNext());
       }
     }
 
