@@ -694,7 +694,7 @@ func (c *compiler) compileInterface(val types.Interface) Interface {
 		asyncResponseType := ""
 		if v.HasResponse {
 			if len(response) == 0 {
-				asyncResponseType = "Null"
+				asyncResponseType = "void"
 			} else if len(response) == 1 {
 				responseType := response[0].Type
 				if responseType.SyncDecl != "" {

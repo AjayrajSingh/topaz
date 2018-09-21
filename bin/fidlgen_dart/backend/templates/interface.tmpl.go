@@ -309,7 +309,7 @@ class {{ .BindingName }} extends $fidl.Binding<{{ .Name }}> {
 {{- if .HasResponse -}}
 Future<{{ .AsyncResponseType }}>
 {{- else -}}
-Future<Null>
+Future<void>
 {{- end -}}
 {{- end -}}
 

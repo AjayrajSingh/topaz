@@ -14,7 +14,7 @@ class TestServerImpl extends TestServer {
   bool _receivedOneWayNoArgs = false;
 
   @override
-  Future<Null> oneWayNoArgs() async {
+  Future<void> oneWayNoArgs() async {
     _receivedOneWayNoArgs = true;
   }
 
@@ -26,7 +26,7 @@ class TestServerImpl extends TestServer {
   String _oneWayStringArg;
 
   @override
-  Future<Null> oneWayStringArg(String value) async {
+  Future<void> oneWayStringArg(String value) async {
     _oneWayStringArg = value;
   }
 
@@ -40,7 +40,7 @@ class TestServerImpl extends TestServer {
   NoHandleStruct _oneWayThreeArgZ;
 
   @override
-  Future<Null> oneWayThreeArgs(int x, int y, NoHandleStruct z) async {
+  Future<void> oneWayThreeArgs(int x, int y, NoHandleStruct z) async {
     _oneWayThreeArgX = x;
     _oneWayThreeArgY = y;
     _oneWayThreeArgZ = z;
@@ -54,7 +54,7 @@ class TestServerImpl extends TestServer {
   }
 
   @override
-  Future<Null> twoWayNoArgs() async {}
+  Future<void> twoWayNoArgs() async {}
 
   @override
   Future<String> twoWayStringArg(String value) async {
@@ -67,20 +67,20 @@ class TestServerImpl extends TestServer {
     return new TestServer$TwoWayThreeArgs$Response(x, y, z);
   }
 
-  final StreamController<Null> _emptyEventController =
+  final StreamController<void> _emptyEventController =
       new StreamController.broadcast();
   @override
-  Future<Null> sendEmptyEvent() async {
+  Future<void> sendEmptyEvent() async {
     _emptyEventController.add(null);
   }
 
   @override
-  Stream<Null> get emptyEvent => _emptyEventController.stream;
+  Stream<void> get emptyEvent => _emptyEventController.stream;
 
   final StreamController<String> _stringEventController =
       new StreamController.broadcast();
   @override
-  Future<Null> sendStringEvent(String value) async {
+  Future<void> sendStringEvent(String value) async {
     _stringEventController.add(value);
   }
 
@@ -91,7 +91,7 @@ class TestServerImpl extends TestServer {
       _threeArgEventController = new StreamController.broadcast();
 
   @override
-  Future<Null> sendThreeArgEvent(int x, int y, NoHandleStruct z) async {
+  Future<void> sendThreeArgEvent(int x, int y, NoHandleStruct z) async {
     _threeArgEventController
         .add(new TestServer$ThreeArgEvent$Response(x, y, z));
   }
@@ -103,7 +103,7 @@ class TestServerImpl extends TestServer {
   final StreamController<int> _multipleEventController =
       new StreamController.broadcast();
   @override
-  Future<Null> sendMultipleEvents(int count, double intervalSeconds) async {
+  Future<void> sendMultipleEvents(int count, double intervalSeconds) async {
     if (intervalSeconds == 0.0) {
       _binding.close();
     } else {
@@ -127,7 +127,7 @@ class TestServerImpl extends TestServer {
   }
 
   @override
-  Future<Null> closeConnection(double delaySeconds) async {
+  Future<void> closeConnection(double delaySeconds) async {
     if (delaySeconds == 0.0) {
       _binding.close();
     } else {
@@ -136,7 +136,7 @@ class TestServerImpl extends TestServer {
   }
 
   @override
-  Stream<Null> get neverEvent => null;
+  Stream<void> get neverEvent => null;
 }
 
 StartupContext _context;
