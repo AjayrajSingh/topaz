@@ -10,7 +10,7 @@ import 'package:mondrian/models/surface/surface.dart';
 import 'package:mondrian/models/surface/surface_graph.dart';
 import 'package:mondrian/models/surface/surface_properties.dart';
 import 'package:mondrian/models/surface/surface_relation_util.dart';
-import 'package:mondrian/models/tree.dart';
+import 'package:mondrian/models/tree/tree.dart';
 
 void main() {
   test('toJson and fromJson', () {

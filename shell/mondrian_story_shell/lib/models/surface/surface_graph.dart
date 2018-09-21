@@ -11,7 +11,8 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
-import '../tree.dart';
+import '../tree/spanning_tree.dart';
+import '../tree/tree.dart';
 import 'surface.dart';
 import 'surface_properties.dart';
 
@@ -219,7 +220,7 @@ class SurfaceGraph extends Model {
   List<String> dismissedSet(String id) {
     Surface dismissed = _surfaces[id];
     List<Surface> ancestors = dismissed.ancestors.toList();
-    List<Surface> dependentTree = dismissed.dependentSpanningTree
+    List<Surface> dependentTree = getDependentSpanningTree(dismissed)
         .map((Tree<Surface> t) => t.value)
         .toList()
           // TODO(djmurphy) - when codependent comes in this needs to change

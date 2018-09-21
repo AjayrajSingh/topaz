@@ -33,7 +33,7 @@ void main() {
       root,
     ];
     List<PositionedSurface> positionedSurfaces = copresent_layout
-        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
+        .layoutSurfaces(null /* BuildContext */, graph, surfaces, layoutModel);
     expect(positionedSurfaces.length, 1);
 
     expect(positionedSurfaces[0].surface, root);
@@ -69,7 +69,7 @@ void main() {
       copresentSurface,
     ];
     List<PositionedSurface> positionedSurfaces = copresent_layout
-        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
+        .layoutSurfaces(null /* BuildContext */, graph, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
     expect(positionedSurfaces[0].surface, root);
@@ -109,7 +109,7 @@ void main() {
       sequentialSurface,
     ];
     List<PositionedSurface> positionedSurfaces = copresent_layout
-        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
+        .layoutSurfaces(null /* BuildContext */, graph, surfaces, layoutModel);
     expect(positionedSurfaces.length, 1);
 
     expect(positionedSurfaces[0].surface, sequentialSurface);
@@ -145,7 +145,7 @@ void main() {
       ontopSurface,
     ];
     List<PositionedSurface> positionedSurfaces = copresent_layout
-        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
+        .layoutSurfaces(null /* BuildContext */, graph, surfaces, layoutModel);
     expect(positionedSurfaces.length, 2);
 
     expect(positionedSurfaces[0].surface, root);
@@ -197,7 +197,7 @@ void main() {
       ontopSurface,
     ];
     List<PositionedSurface> positionedSurfaces = copresent_layout
-        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
+        .layoutSurfaces(null /* BuildContext */, graph, surfaces, layoutModel);
     expect(positionedSurfaces.length, 3);
 
     expect(positionedSurfaces[0].surface, root);
@@ -254,7 +254,7 @@ void main() {
       ontopSurface,
     ];
     List<PositionedSurface> positionedSurfaces = copresent_layout
-        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
+        .layoutSurfaces(null /* BuildContext */, graph, surfaces, layoutModel);
     expect(positionedSurfaces.length, 3);
 
     expect(positionedSurfaces[0].surface, root);
@@ -309,7 +309,7 @@ void main() {
       secondOntop,
     ];
     List<PositionedSurface> positionedSurfaces = copresent_layout
-        .layoutSurfaces(null /* BuildContext */, surfaces, layoutModel);
+        .layoutSurfaces(null /* BuildContext */, graph, surfaces, layoutModel);
     expect(positionedSurfaces.length, 3);
 
     expect(positionedSurfaces[0].surface, root);

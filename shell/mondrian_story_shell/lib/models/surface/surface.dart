@@ -9,7 +9,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
-import '../tree.dart';
+import '../tree/tree.dart';
 import 'surface_graph.dart';
 import 'surface_properties.dart';
 import 'surface_relation_util.dart';
@@ -115,78 +115,6 @@ class Surface extends Model {
     return t;
   }
 
-  /// Gets the dependent spanning tree the current widget is part of
-  Tree<Surface> get dependentSpanningTree {
-    Tree<Surface> root = new Tree<Surface>(value: _surface(node));
-    while (root.ancestors.isNotEmpty &&
-        root.value.relation.dependency == SurfaceDependency.dependent) {
-      root = root.ancestors.first;
-    }
-    return _spanningTree(null, root.value,
-        (Surface s) => s.relation.dependency == SurfaceDependency.dependent);
-  }
-
-  // TODO(jphsiao) SY-497: move spanning treee logic to make it testable.
-
-  /// Spans the full tree of all copresenting surfaces starting with this
-  Tree<Surface> get copresentSpanningTree => _spanningTree(
-      null,
-      _surface(node), // default to co-present if no opinion presented
-      (Surface s) =>
-          s.relation.arrangement == SurfaceArrangement.copresent ||
-          s.relation.arrangement == SurfaceArrangement.none);
-
-  Tree<Surface> _spanningTree(
-      Surface previous, Surface current, bool condition(Surface s)) {
-    Tree<Surface> tree = new Tree<Surface>(value: current);
-    if (current.parent != previous &&
-        current.parent != null &&
-        condition(current)) {
-      tree.add(_spanningTree(current, current.parent, condition));
-    }
-    for (Surface child in current.children) {
-      if (child != previous && condition(child)) {
-        tree.add(
-          _spanningTree(current, child, condition),
-        );
-      }
-    }
-    return tree;
-  }
-
-  /// Gets the pattern spanning tree the current widget is part of
-  Tree<Surface> patternSpanningTree(String pattern) {
-    Tree<Surface> root = new Tree<Surface>(value: _surface(node));
-    while (
-        root.ancestors.isNotEmpty && root.value.compositionPattern == pattern) {
-      root = root.ancestors.first;
-    }
-    return _spanningTree(
-        null, root.value, (Surface s) => s.compositionPattern == pattern);
-  }
-
-  /// Gets the spanning tree of Surfaces participating in the Container
-  /// identified by containerId
-  Tree<Surface> containerSpanningTree(String containerId) {
-    log.info('looking for container: $containerId');
-    Tree<String> containerNode = node.root.find(containerId);
-    log.info('found: $node');
-    Tree<Surface> root = new Tree<Surface>(value: _surface(containerNode));
-    log.info('root: $root');
-    if (root.value is SurfaceContainer) {
-      return _spanningTree(
-        null,
-        root.value,
-        (Surface s) =>
-            // TODO: (djmurphy) this will fail nested containers
-            s.properties.containerMembership != null &&
-            s.properties.containerMembership.contains(containerId),
-      );
-    } else {
-      return root;
-    }
-  }
-
   /// Dismiss this node hiding it from layouts
   bool dismiss() => _graph.dismissSurface(node.value);
 
@@ -218,39 +146,6 @@ class Surface extends Model {
     String edgeArrow = '$edgeLabel->'.padLeft(6, '-');
     String disconnected = connection == null ? '[DISCONNECTED]' : '';
     return '${edgeArrow}Surface ${node.value} $disconnected';
-  }
-
-  List<Tree<Surface>> _endsOfChain({Tree<Surface> current}) {
-    List<Tree<Surface>> ends = <Tree<Surface>>[];
-    for (Tree<Surface> s in current.children) {
-      if (s.value.relation.dependency != SurfaceDependency.dependent) {
-        ends.add(s);
-      } else {
-        ends.addAll(_endsOfChain(current: s));
-      }
-    }
-    return ends;
-  }
-
-  /// Returns the List (forest) of DependentSpanningTrees in the current graph
-  Forest<Surface> getDependentSpanningTrees() {
-    List<Tree<Surface>> queue = <Tree<Surface>>[];
-    Forest<Surface> forest = new Forest<Surface>();
-
-    Tree<Surface> tree =
-        _spanningTree(null, _surface(node), (Surface s) => true);
-
-    queue.add(tree);
-    while (queue.isNotEmpty) {
-      Tree<Surface> t = queue.removeAt(0);
-      List<Tree<Surface>> ends = _endsOfChain(current: t);
-      queue.addAll(ends);
-      for (Tree<Surface> s in ends) {
-        t.find(s.value).detach();
-      }
-      forest.add(t);
-    }
-    return forest;
   }
 
   List<String> _children() {

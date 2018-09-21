@@ -12,7 +12,6 @@ import 'package:mockito/mockito.dart';
 import 'package:mondrian/models/surface/surface.dart';
 import 'package:mondrian/models/surface/surface_graph.dart';
 import 'package:mondrian/models/surface/surface_properties.dart';
-// import 'package:mondrian/models/tree.dart';
 
 class MockInterfaceHandle extends Mock implements InterfaceHandle<ViewOwner> {}
 

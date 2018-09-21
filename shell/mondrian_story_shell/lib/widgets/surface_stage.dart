@@ -12,7 +12,7 @@ import 'package:meta/meta.dart';
 import '../anim/flux.dart';
 import '../anim/sim.dart';
 import '../models/surface/surface_form.dart';
-import '../models/tree.dart';
+import '../models/tree/tree.dart';
 import '../widgets/gestures.dart';
 import 'surface_frame.dart';
 

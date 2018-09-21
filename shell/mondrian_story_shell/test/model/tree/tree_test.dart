@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mondrian/models/tree.dart';
+import 'package:mondrian/models/tree/tree.dart';
 
 /// Convenience function for making trees
 

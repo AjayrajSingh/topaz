@@ -19,7 +19,8 @@ import '../models/surface/positioned_surface.dart';
 import '../models/surface/surface.dart';
 import '../models/surface/surface_form.dart';
 import '../models/surface/surface_graph.dart';
-import '../models/tree.dart';
+import '../models/tree/spanning_tree.dart';
+import '../models/tree/tree.dart';
 import 'mondrian_child_view.dart';
 
 import 'surface_stage.dart';
@@ -155,12 +156,14 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
             last.properties.containerMembership.isNotEmpty) {
           positionedSurfaces = container.layoutSurfaces(
             context,
+            graph,
             last,
             layoutModel,
           );
         } else {
           positionedSurfaces = copresent.layoutSurfaces(
             context,
+            graph,
             focusStack,
             layoutModel,
           );
@@ -199,8 +202,9 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
     // The actual node doesn't matter
     if (placedSurfaces.isNotEmpty) {
       // The actual surface doesn't matter
+      // dependent spanning tree of the first thing...
       dependentSpanningTrees =
-          placedSurfaces.keys.first.getDependentSpanningTrees();
+          getDependentSpanningTrees(placedSurfaces.keys.first);
 
       /// prune non-visible surfaces
       for (Tree<Surface> t in dependentSpanningTrees.flatten()) {

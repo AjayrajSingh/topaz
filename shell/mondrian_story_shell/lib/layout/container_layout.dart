@@ -9,11 +9,14 @@ import 'package:lib.app.dart/logging.dart';
 import '../models/layout_model.dart';
 import '../models/surface/positioned_surface.dart';
 import '../models/surface/surface.dart';
-import '../models/tree.dart';
+import '../models/surface/surface_graph.dart';
+import '../models/tree/spanning_tree.dart';
+import '../models/tree/tree.dart';
 
 /// Returns in the order they should stacked
 List<PositionedSurface> layoutSurfaces(
   BuildContext context,
+  SurfaceGraph graph,
   Surface focusedSurface,
   LayoutModel layoutModel,
 ) {
@@ -23,7 +26,7 @@ List<PositionedSurface> layoutSurfaces(
   String containerId = focusedSurface.properties.containerMembership.last;
   // get the spanning tree of container nodes
   Tree<Surface> spanningTree =
-      focusedSurface.containerSpanningTree(containerId);
+      getContainerSpanningTree(graph, focusedSurface, containerId);
   Map<String, Surface> nodeMap = <String, Surface>{};
   List<Surface> containerSurfaces =
       spanningTree.map((Tree<Surface> t) => t.value).toList(growable: false);

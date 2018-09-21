@@ -10,7 +10,9 @@ import 'package:flutter/widgets.dart';
 import '../models/layout_model.dart';
 import '../models/surface/positioned_surface.dart';
 import '../models/surface/surface.dart';
-import '../models/tree.dart';
+import '../models/surface/surface_graph.dart';
+import '../models/tree/spanning_tree.dart';
+import '../models/tree/tree.dart';
 
 // Convenience comparator used to ensure more focused items get higher priority
 int _compareByOtherList(Surface l, Surface r, List<Surface> otherList) {
@@ -28,6 +30,7 @@ int _compareByOtherList(Surface l, Surface r, List<Surface> otherList) {
 /// Returns in the order they should stacked
 List<PositionedSurface> layoutSurfaces(
   BuildContext context,
+  SurfaceGraph graph,
   List<Surface> focusStack,
   LayoutModel layoutModel,
 ) {
@@ -37,14 +40,14 @@ List<PositionedSurface> layoutSurfaces(
   Surface focused = focusStack.last;
   SurfaceArrangement focusedArrangement = focused.relation.arrangement;
 
-  Tree<Surface> copresTree = focused.copresentSpanningTree;
+  Tree<Surface> copresTree = getCopresentSpanningTree(focused);
 
   // Ontop only applies if the currently focused mod has a parent. If there's
   // only one sutface in the stack, fall through to the logic below.
   if (focusedArrangement == SurfaceArrangement.ontop && focusStack.length > 1) {
     // Determine the parent's position and then place the focused surface on top.
-    List<PositionedSurface> surfaces = layoutSurfaces(
-        context, focusStack.sublist(0, focusStack.length - 1), layoutModel);
+    List<PositionedSurface> surfaces = layoutSurfaces(context, graph,
+        focusStack.sublist(0, focusStack.length - 1), layoutModel);
     PositionedSurface parentSurface =
         surfaces.firstWhere((PositionedSurface positioned) {
       return positioned.surface == focused.parent;
