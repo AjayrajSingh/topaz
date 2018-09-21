@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:lib.app.dart/app.dart';
+import 'package:fidl_fuchsia_auth/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:flutter/material.dart';
@@ -46,11 +47,13 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
     @required this.startupContext,
     T deviceShellModel,
     AuthenticationContext authenticationContext,
+    AuthenticationUiContext authenticationUiContext,
     this.child,
   })  : _deviceShellModel = deviceShellModel,
         _deviceShell = _createDeviceShell(
           deviceShellModel,
           authenticationContext,
+          authenticationUiContext,
         );
 
   @override
@@ -86,9 +89,11 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
   static DeviceShell _createDeviceShell(
     DeviceShellModel deviceShellModel,
     AuthenticationContext authenticationContext,
+    AuthenticationUiContext authenticationUiContext,
   ) {
     return new DeviceShellImpl(
       authenticationContext: authenticationContext,
+      authenticationUiContext: authenticationUiContext,
       onReady: deviceShellModel?.onReady,
       onStop: () {
         deviceShellModel?.onStop?.call();

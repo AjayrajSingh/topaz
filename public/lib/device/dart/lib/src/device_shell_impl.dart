@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fidl_fuchsia_auth/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl/fidl.dart';
@@ -27,6 +28,8 @@ class DeviceShellImpl implements DeviceShell, Lifecycle {
   final PresentationProxy _presentationProxy = new PresentationProxy();
   final Set<AuthenticationContextBinding> _bindingSet =
       new Set<AuthenticationContextBinding>();
+  final Set<AuthenticationUiContextBinding> _authUiContextBindingSet =
+      new Set<AuthenticationUiContextBinding>();
 
   /// Called when [initialize] occurs.
   final OnDeviceShellReady onReady;
@@ -37,9 +40,15 @@ class DeviceShellImpl implements DeviceShell, Lifecycle {
   /// The [AuthenticationContext] to provide when requested.
   final AuthenticationContext authenticationContext;
 
+  /// The [AuthenticationUiContext] is a new interface from
+  /// |fuchsia::auth::TokenManager| service that provides a new authentication
+  /// UI context to display signin and permission screens when requested.
+  final AuthenticationUiContext authenticationUiContext;
+
   /// Constructor.
   DeviceShellImpl({
     @required this.authenticationContext,
+    this.authenticationUiContext,
     this.onReady,
     this.onStop,
   });
@@ -68,6 +77,9 @@ class DeviceShellImpl implements DeviceShell, Lifecycle {
     for (AuthenticationContextBinding binding in _bindingSet) {
       binding.close();
     }
+    for (AuthenticationUiContextBinding binding in _authUiContextBindingSet) {
+      binding.close();
+    }
   }
 
   @override
@@ -80,6 +92,16 @@ class DeviceShellImpl implements DeviceShell, Lifecycle {
     _bindingSet.add(binding);
   }
 
+  @override
+  void getAuthenticationUiContext(
+    InterfaceRequest<AuthenticationUiContext> request,
+  ) {
+    AuthenticationUiContextBinding binding =
+        new AuthenticationUiContextBinding()
+          ..bind(authenticationUiContext, request);
+    _authUiContextBindingSet.add(binding);
+  }
+
   /// Closes all bindings to authentication contexts, effectively cancelling any ongoing
   /// authorization flows.
   void closeAuthenticationContextBindings() {
@@ -87,5 +109,10 @@ class DeviceShellImpl implements DeviceShell, Lifecycle {
       binding.close();
     }
     _bindingSet.clear();
+
+    for (AuthenticationUiContextBinding binding in _authUiContextBindingSet) {
+      binding.close();
+    }
+    _authUiContextBindingSet.clear();
   }
 }

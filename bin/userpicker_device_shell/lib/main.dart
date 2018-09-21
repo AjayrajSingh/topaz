@@ -16,6 +16,7 @@ import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
 import 'authentication_context_impl.dart';
+import 'authentication_ui_context_impl.dart';
 import 'user_picker_device_shell_model.dart';
 import 'user_picker_device_shell_screen.dart';
 import 'user_setup.dart';
@@ -119,6 +120,9 @@ void main() {
     startupContext: startupContext,
     deviceShellModel: userPickerDeviceShellModel,
     authenticationContext: new AuthenticationContextImpl(
+        onStartOverlay: userSetupModel.authModel.onStartOverlay,
+        onStopOverlay: userSetupModel.endAuthFlow),
+    authenticationUiContext: new AuthenticationUiContextImpl(
         onStartOverlay: userSetupModel.authModel.onStartOverlay,
         onStopOverlay: userSetupModel.endAuthFlow),
     child: new LayoutBuilder(
