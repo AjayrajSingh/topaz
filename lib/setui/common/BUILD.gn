@@ -21,6 +21,7 @@ dart_library("common") {
 
   deps = [
     "//third_party/dart-pkg/pub/yaml",
+    "//third_party/dart-pkg/pub/quiver",
     "//topaz/public/lib/app/dart",
   ]
 }

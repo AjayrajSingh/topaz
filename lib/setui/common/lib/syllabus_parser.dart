@@ -55,19 +55,18 @@ class SyllabusParser {
     docs[1].contents.value.forEach((key, stepAttr) {
       final Step step = steps[key];
       if (stepAttr.keys.contains(_keyResults)) {
-        stepAttr[_keyResults].value.forEach((key, value) {
-          step.addResult(key, steps[value]);
-        });
+        stepAttr[_keyResults].value.forEach(step.addResult);
       }
 
       if (stepAttr.keys.contains(_keyDefaultTransition)) {
-        step.defaultTransition = steps[stepAttr[_keyDefaultTransition]];
+        step.defaultTransition = stepAttr[_keyDefaultTransition];
       }
     });
 
     final YamlMap metaData = docs[0].contents.value;
 
-    return new Syllabus(steps[metaData[_keyEntry]], metaData[_keySingleUseId]);
+    return new Syllabus(steps.values.toList(), steps[metaData[_keyEntry]],
+        metaData[_keySingleUseId]);
   }
 
   /// Ensures that the specified docs are of the correct format. If successful,
