@@ -21,7 +21,7 @@
              path="third_party/freetype2"
              remote="https://fuchsia.googlesource.com/third_party/freetype2"
              gerrithost="https://fuchsia-review.googlesource.com"
-             revision="bd6b6b9105f69808cbe50b5cde2775759eb0802d"/>
+             revision="38d69ce0df2fbae1321a951e896a5c69304e8fb8"/>
     <project name="third_party/harfbuzz"
              path="third_party/harfbuzz"
              remote="https://fuchsia.googlesource.com/third_party/harfbuzz"
