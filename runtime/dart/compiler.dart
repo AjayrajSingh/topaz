@@ -156,7 +156,7 @@ Future<void> main(List<String> args) async {
   if (kernelBinaryFilename != null) {
     final IOSink sink = new File(kernelBinaryFilename).openWrite();
     final BinaryPrinter printer = new LimitedBinaryPrinter(sink,
-        (Library lib) => aot || !lib.isExternal, false /* excludeUriToSource */);
+        (Library lib) => true, false /* excludeUriToSource */);
     printer.writeComponentFile(component);
     await sink.close();
 

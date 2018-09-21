@@ -72,6 +72,11 @@ template("_flutter_jit_app_package") {
       ":${target_name}_resources",
     ]
 
+    # TODO(rmacnak): Remove core_jit_cheat_target.
+    public_deps = [
+      ":${invoker.kernel_target_name}",
+    ]
+
     if (defined(invoker.non_dart_deps)) {
       deps += invoker.non_dart_deps
     }
