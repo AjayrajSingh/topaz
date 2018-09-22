@@ -55,13 +55,14 @@ class ModificationQueue {
     // Create a transaction from [modifications], run it, and await its end.
     _currentTransaction =
         new Transaction(_sledge, _pageProxy, _ledgerObjectsFactory);
-    bool savingModificationWasSuccesfull =
-        await _currentTransaction.saveModification(modification);
 
-    _currentTransaction = null;
-    _tasks.removeFirst();
-    task.completer.complete(true);
-    return savingModificationWasSuccesfull;
+    try {
+      return await _currentTransaction.saveModification(modification);
+    } finally {
+      _currentTransaction = null;
+      _tasks.removeFirst();
+      task.completer.complete(true);
+    }
   }
 
   /// The inflight transaction, if any.

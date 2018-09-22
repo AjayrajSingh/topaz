@@ -22,6 +22,9 @@ import 'uint8list_ops.dart';
 
 typedef Modification = Future Function();
 
+/// A private exception used to abort and rollback transactions
+class _RollbackException implements Exception {}
+
 /// Runs a modification and tracks modified documents in order to write the
 /// changes to Ledger.
 class Transaction {
@@ -66,7 +69,16 @@ class Transaction {
     // The modifications may:
     // - obtain a handle to a document, which would trigger a call to |getDocument|.
     // - modify a document. This would result in |documentWasModified| being called.
-    await modification();
+    try {
+      await modification();
+    } on _RollbackException {
+      await _rollbackModification();
+      return false;
+      // ignore: avoid_catches_without_on_clauses
+    } catch (e) {
+      await _rollbackModification();
+      rethrow;
+    }
 
     // Iterate through all the documents modified by this transaction and
     // forward the updates (puts and deletes) to Ledger.
@@ -101,6 +113,11 @@ class Transaction {
       ..forEach(Document.completeTransaction)
       ..clear();
     return true;
+  }
+
+  /// Abort and rollback the transaction
+  void abortAndRollback() {
+    throw _RollbackException();
   }
 
   /// Notification that [document] was modified.

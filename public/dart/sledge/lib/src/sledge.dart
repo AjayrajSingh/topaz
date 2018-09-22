@@ -141,6 +141,15 @@ class Sledge {
     return _modificationQueue.queueModification(modification);
   }
 
+  /// Abort and rollback the current modification.
+  /// Execution of the transaction does not continue past this point.
+  void abortAndRollback() {
+    if (currentTransaction == null) {
+      throw new StateError('No transaction started.');
+    }
+    currentTransaction.abortAndRollback();
+  }
+
   /// Returns the document identified with [documentId].
   /// If the document does not exist or an error occurs, an empty
   /// document is returned.

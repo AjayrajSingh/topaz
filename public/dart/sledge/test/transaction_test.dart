@@ -9,6 +9,8 @@ import 'package:test/test.dart';
 
 import 'helpers.dart';
 
+class _RollbackException implements Exception {}
+
 void main() {
   setupLogger();
 
@@ -20,8 +22,10 @@ void main() {
   test('Check that multiple empty transactions can be started without awaiting',
       () async {
     Sledge sledge = newSledgeForTesting()
-      ..runInTransaction(() async {})   // ignore: unawaited_futures
-      ..runInTransaction(() async {});  // ignore: unawaited_futures
+      // ignore: unawaited_futures
+      ..runInTransaction(() async {})
+      // ignore: unawaited_futures
+      ..runInTransaction(() async {});
     await sledge.runInTransaction(() async {});
   });
 
@@ -37,5 +41,66 @@ void main() {
       events.add(1);
     });
     expect(events, equals(<int>[0, 1]));
+  });
+
+  test('Check that abortAndRollback works', () async {
+    Map<String, BaseType> schemaDescription = <String, BaseType>{
+      'written': new Boolean()
+    };
+    Schema schema = new Schema(schemaDescription);
+
+    Sledge sledge = newSledgeForTesting();
+    dynamic doc;
+    await sledge.runInTransaction(() async {
+      doc = await sledge.getDocument(new DocumentId(schema));
+      doc.written.value = false;
+    });
+    expect(doc.written.value, equals(false));
+
+    bool modificationSucceeded = await sledge.runInTransaction(() async {
+      doc.written.value = true;
+      sledge.abortAndRollback();
+    });
+    expect(modificationSucceeded, equals(false));
+    expect(doc.written.value, equals(false));
+  });
+
+  test('Check that exceptions rollback transactions', () async {
+    Map<String, BaseType> schemaDescription = <String, BaseType>{
+      'written': new Boolean()
+    };
+    Schema schema = new Schema(schemaDescription);
+
+    Sledge sledge = newSledgeForTesting();
+    dynamic doc;
+    await sledge.runInTransaction(() async {
+      doc = await sledge.getDocument(new DocumentId(schema));
+      doc.written.value = false;
+    });
+    expect(doc.written.value, equals(false));
+
+    try {
+      await sledge.runInTransaction(() async {
+        doc.written.value = true;
+        throw _RollbackException();
+      });
+      expect(false, equals(true)); //XXX assert unreachable
+    } on _RollbackException {
+      //exception intended
+    }
+    expect(doc.written.value, equals(false));
+  });
+
+  test('Check that exceptions remove transactions from the queue', () async {
+    Sledge sledge = newSledgeForTesting();
+    try {
+      await sledge.runInTransaction(() async {
+        throw _RollbackException();
+      });
+    } on _RollbackException {
+      //exception intended
+    }
+
+    await sledge.runInTransaction(() async {});
   });
 }
