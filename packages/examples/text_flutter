@@ -1,0 +1,5 @@
+{
+    "packages": [
+        "//topaz/examples/ui/text_flutter:text_flutter"
+    ]
+}
