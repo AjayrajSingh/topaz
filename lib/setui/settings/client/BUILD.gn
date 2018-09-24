@@ -21,10 +21,9 @@ dart_library("client") {
 }
 
 dart_test("lib_setui_settings_client_test") {
-  source_dir = "."
 
   sources = [
-    "test/time_zone_controller_test.dart",
+    "time_zone_controller_test.dart",
   ]
 
   deps = [

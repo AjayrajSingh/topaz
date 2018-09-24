@@ -26,14 +26,13 @@ dart_library("common") {
 }
 
 dart_test("lib_setui_common_test") {
-  source_dir = "."
 
   sources = [
-    "test/conductor_test.dart",
-    "test/conductor_builder_test.dart",
-    "test/step_test.dart",
-    "test/syllabus_parser_test.dart",
-    "test/syllabus_test.dart",
+    "conductor_test.dart",
+    "conductor_builder_test.dart",
+    "step_test.dart",
+    "syllabus_parser_test.dart",
+    "syllabus_test.dart",
   ]
 
   deps = [

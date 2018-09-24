@@ -25,11 +25,10 @@ dart_library("module") {
 }
 
 dart_test("lib_setui_module_test") {
-  source_dir = "."
 
   sources = [
-    "test/module_action_test.dart",
-    "test/roster_parser_test.dart",
+    "module_action_test.dart",
+    "roster_parser_test.dart",
   ]
 
   deps = [
