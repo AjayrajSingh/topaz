@@ -17,7 +17,4 @@ class TimeZoneController extends SettingController<TimeZoneInfo> {
         data: SettingData.withTimeZoneValue(
             TimeZoneInfo(available: state.available, current: timeZone))));
   }
-
-  @override
-  SettingType get type => SettingType.timeZone;
 }

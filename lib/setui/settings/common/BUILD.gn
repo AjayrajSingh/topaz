@@ -21,3 +21,19 @@ dart_library("common") {
     "//topaz/lib/setui/flutter:flutter",
   ]
 }
+
+dart_test("lib_setui_settings_common_test") {
+  source_dir = "."
+
+  sources = [
+    "test/setting_controller_test.dart",
+  ]
+
+  deps = [
+    ":common",
+    "//garnet/public/fidl/fuchsia.setui",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}

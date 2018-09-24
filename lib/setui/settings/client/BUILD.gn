@@ -10,6 +10,7 @@ dart_library("client") {
 
   sources = [
     "time_zone_controller.dart",
+    "wireless_controller.dart",
   ]
 
   deps = [
@@ -21,9 +22,11 @@ dart_library("client") {
 }
 
 dart_test("lib_setui_settings_client_test") {
+  source_dir = "."
 
   sources = [
-    "time_zone_controller_test.dart",
+    "test/time_zone_controller_test.dart",
+    "test/wireless_controller_test.dart",
   ]
 
   deps = [

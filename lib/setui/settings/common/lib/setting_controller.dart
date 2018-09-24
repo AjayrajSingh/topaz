@@ -10,7 +10,7 @@ import 'setting_source.dart';
 
 /// Base controller that handles interaction with the underlying setting adapter
 /// and access to the state data.
-abstract class SettingController<T> {
+class SettingController<T> {
   final SettingAdapter _adapter;
   SettingSource<T> _source;
 
@@ -18,12 +18,23 @@ abstract class SettingController<T> {
 
   /// Returns a setting model that will be updated with the latest state.
   SettingModel<T> fetch() {
-    _source ??= _adapter.fetch(type);
+    _source ??= _adapter.fetch(settingType);
 
     return SettingModel<T>(_source);
   }
 
-  SettingType get type;
+  SettingType get settingType {
+    switch (T) {
+      case TimeZoneInfo:
+        return SettingType.timeZone;
+      case WirelessState:
+        return SettingType.wireless;
+      case ConnectedState:
+        return SettingType.connectivity;
+    }
+
+    throw new Exception('Undefined setting type!');
+  }
 
   /// Updates the setting state to the provided version.
   void update(SettingsObject state) {
