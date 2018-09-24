@@ -262,7 +262,7 @@ void Post(const std::string& request_body, http::URLLoader* const url_loader,
   request.headers.push_back(std::move(content_type_header));
 
   request.body = http::URLBody::New();
-  request.body->set_sized_buffer(std::move(data).ToTransport());
+  request.body->set_buffer(std::move(data).ToTransport());
 
   url_loader->Start(std::move(request), [success_callback, failure_callback,
                                          set_token_callback](

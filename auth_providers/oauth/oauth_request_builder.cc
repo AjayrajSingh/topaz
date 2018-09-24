@@ -96,7 +96,7 @@ http::URLRequest OAuthRequestBuilder::Build() const {
   request.method = method_;
   request.auto_follow_redirects = true;
   request.body = http::URLBody::New();
-  request.body->set_sized_buffer(std::move(data).ToTransport());
+  request.body->set_buffer(std::move(data).ToTransport());
   for (const auto& http_header : http_headers_) {
     http::HttpHeader hdr;
     hdr.name = http_header.first;
