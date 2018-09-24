@@ -8,7 +8,6 @@
         "topaz/packages/examples/noodles",
         "topaz/packages/examples/simple_flutter",
         "topaz/packages/examples/spinning_cube",
-        "topaz/packages/examples/simple_flutter",
         "topaz/packages/examples/tests",
         "topaz/packages/examples/tictactoe",
         "topaz/packages/examples/ui"

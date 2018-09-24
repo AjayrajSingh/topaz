@@ -388,56 +388,101 @@ template("_flutter_jit_component") {
   }
 }
 
-template("_flutter_aot_app_package") {
-  package(target_name) {
-    package_name = invoker.component_name
-    extra = [ invoker.asset_manifest ]
+# Defines a Flutter package with AOT runtime components
+#
+# After Flutter AOT runtime components are calculated in
+# _flutter_aot_component, put them all into one Fuchsia package.
+#
+# Parameters
+#
+#   components_with_kernel (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the components_with_kernel list:
+#
+#       kernel_target_name (required)
+#         Name of the kernel target.
+#
+#       kernel_manifest (required)
+#         Manifest file for the dart kernel.
+#
+#       deps (required)
+#         Dependencies of this component.
+#
+#       sources (required)
+#         Source files of this component.
+#
+#       component_resources (required)
+#         Resources of this component.
+#
+#       component_copy_manifest (required)
+#         Copy of the module manifest of this component.
+#
+#       component_verify_manifest (required)
+#         Verify target of the module manifest of this component.
 
-    deps = invoker.shared_snapshot_deps + invoker.cmx_deps + [
-             ":${invoker.snapshot_target_name}",
-             ":${target_name}_resources",
-             ":${invoker.stats_target_name}",
-           ]
+template("_flutter_aot_package") {
+  package(target_name) {
+    package_name = invoker.pkg_name
+    deps = invoker.cmx_deps
+    extra = []
+    resources = invoker.invoker_resources
+
+    foreach(component, invoker.components_with_kernel) {
+      extra += [
+        component.asset_manifest,
+      ]
+
+      deps += [
+             ":${component.snapshot_target_name}",
+             ":${component.component_resources}",
+             ":${component.stats_target_name}",
+           ] + component.component_shared_snapshot_deps + component.deps
+      if (defined(invoker.module_manifest)) {
+        deps += [
+          ":${component.component_copy_manifest}",
+          ":${component.component_verify_manifest}",
+        ]
+      }
+
+      resources_path = "${component.component_name}/"
+      resources = [
+                    {
+                      path = rebase_path(component.vm_snapshot_data_path)
+                      dest = "${resources_path}vm_snapshot_data.bin"
+                    },
+                    {
+                      path = rebase_path(component.vm_snapshot_instructions_path)
+                      dest = "${resources_path}vm_snapshot_instructions.bin"
+                    },
+                    {
+                      path = rebase_path(component.snapshot_data_path)
+                      dest = "${resources_path}isolate_snapshot_data.bin"
+                    },
+                    {
+                      path = rebase_path(component.snapshot_instructions_path)
+                      dest = "${resources_path}isolate_snapshot_instructions.bin"
+                    },
+                    {
+                      path = rebase_path(component.shared_snapshot_data_path)
+                      dest = "${resources_path}shared_snapshot_data.bin"
+                    },
+                    {
+                      path = rebase_path(component.shared_snapshot_instructions_path)
+                      dest = "${resources_path}shared_snapshot_instructions.bin"
+                    },
+                  ]
+    }
 
     if (defined(invoker.non_dart_deps)) {
       deps += invoker.non_dart_deps
     }
 
-    resources_path = "${invoker.component_name}/"
-    resources = [
-                  {
-                    path = rebase_path(invoker.vm_snapshot_data_path)
-                    dest = "${resources_path}vm_snapshot_data.bin"
-                  },
-                  {
-                    path = rebase_path(invoker.vm_snapshot_instructions_path)
-                    dest = "${resources_path}vm_snapshot_instructions.bin"
-                  },
-                  {
-                    path = rebase_path(invoker.snapshot_data_path)
-                    dest = "${resources_path}isolate_snapshot_data.bin"
-                  },
-                  {
-                    path = rebase_path(invoker.snapshot_instructions_path)
-                    dest = "${resources_path}isolate_snapshot_instructions.bin"
-                  },
-                  {
-                    path = rebase_path(invoker.shared_snapshot_data_path)
-                    dest = "${resources_path}shared_snapshot_data.bin"
-                  },
-                  {
-                    path = rebase_path(invoker.shared_snapshot_instructions_path)
-                    dest = "${resources_path}shared_snapshot_instructions.bin"
-                  },
-                ] + invoker.invoker_resources
-
     meta = invoker.cmx_filtered_meta
 
+    # TODO(CP-140): Support module_manifest per component.
     if (defined(invoker.module_manifest)) {
-      deps += [
-        ":${target_name}_copy_manifest",
-        ":${target_name}_verify_manifest",
-      ]
       meta += [
         {
           path = rebase_path(invoker.module_manifest)
@@ -445,20 +490,65 @@ template("_flutter_aot_app_package") {
         },
       ]
     }
-
-    if (defined(invoker.sandbox)) {
-      meta += [
-        {
-          path = rebase_path(invoker.sandbox)
-          dest = "sandbox"
-        },
-      ]
-    }
   }
 }
 
-template("_flutter_aot_app") {
-  assert(defined(invoker.main_dart), "Must specify main_dart file")
+# Defines AOT runtime components to be further distributed in one package.
+#
+# Takes a set of flutter components and puts them into one fuchsia package with
+# the flutter_aot_runner as its runtime. Also supports legacy calls where the
+# components parameter isn't specified, in which we will create one default
+# component for the package.
+#
+# Parameters
+#
+#   components (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the resources list:
+#
+#       component_name (required)
+#         Name of the component.
+#
+#       main_dart (required)
+#         File containing the main function of the component.
+#
+#   main_dart (required)
+#     File containing the main function of the application. Either main_dart or
+#     components must be defined, but not both.
+template("_flutter_aot_component") {
+  legacy_component = false
+  pkg_name = target_name
+  components = []
+  if (defined(invoker.components)) {
+    components += invoker.components
+  } else {
+    # If components is not specified, we are fitting main_dart into a component
+    # scope, and using that for the package.
+    #
+    # TODO(CP-140): Remove support for legacy_component once all existing calls
+    # to flutter_app() have a components parameter.
+    legacy_component = true
+    if (defined(invoker.fuchsia_package_name)) {
+      legacy_component_name = invoker.fuchsia_package_name
+    } else {
+      legacy_component_name = target_name
+    }
+    pkg_name = legacy_component_name
+    pkg_sources = []
+    if (defined(invoker.sources)) {
+      pkg_sources = invoker.sources
+    }
+    components += [
+      {
+        main_dart = invoker.main_dart
+        component_name = legacy_component_name
+        deps = invoker.deps
+        sources = pkg_sources
+      }
+    ]
+  }
 
   product = !flutter_profile
   if (defined(invoker.product)) {
@@ -474,196 +564,232 @@ template("_flutter_aot_app") {
     product_suffix = "_product"
   }
 
-  if (defined(invoker.fuchsia_package_name)) {
-    component_name = invoker.fuchsia_package_name
-  } else {
-    component_name = target_name
-  }
+  # Build the kernel for each of the components, and bundle them in the same
+  # scope for later packaging.
+  components_with_kernel = []
+  foreach(component, components) {
+    assert(defined(component.main_dart), "Must specify main_dart file")
 
-  dart_library_target_name = target_name + "_dart_library"
-  kernel_target_name = target_name + "_kernel"
-  kernel_path = "$target_gen_dir/${kernel_target_name}.dil"
-
-  dart_kernel(target_name) {
-    platform_name = "flutter_runner"
-    platform_deps =
-        [ "//topaz/runtime/flutter_runner/kernel:kernel_platform_files" ]
-    platform_path = "$root_out_dir/flutter_runner_patched_sdk"
-
-    forward_variables_from(invoker,
-                           [
-                             "deps",
-                             "disable_analysis",
-                             "non_dart_deps",
-                             "sources",
-                             "source_dir",
-                             "package_name",
-                           ])
-
-    main_dart = invoker.main_dart
-    args = [ "--aot" ]
-  }
-
-  # TODO(rmacnak): Don't bake the VM service into each app.
-  vm_snapshot_data_path = "$target_gen_dir/${target_name}_vm_data.aotsnapshot"
-  vm_snapshot_instructions_path =
-      "$target_gen_dir/${target_name}_vm_instructions.aotsnapshot"
-  snapshot_data_path = "$target_gen_dir/${target_name}_data.aotsnapshot"
-  snapshot_instructions_path =
-      "$target_gen_dir/${target_name}_instructions.aotsnapshot"
-  snapshot_target_name = target_name + "_snapshot"
-
-  if (flutter_aot_sharing_basis != "" &&
-      get_label_info(":$target_name", "label_no_toolchain") !=
-      get_label_info(flutter_aot_sharing_basis, "label_no_toolchain")) {
-    # Note: The use of "label_no_toolchain" is to ensure we are comparing fully
-    # qualified target names. We don't actually care about the toolchain.
-    shared_snapshot_deps =
-        [ get_label_info(flutter_aot_sharing_basis, "label_no_toolchain") +
-          "_snapshot" ]
-    prefix = get_label_info(flutter_aot_sharing_basis, "target_gen_dir") + "/" +
-             get_label_info(flutter_aot_sharing_basis, "name")
-    shared_snapshot_data_path = "${prefix}_data.aotsnapshot"
-    shared_snapshot_instructions_path = "${prefix}_instructions.aotsnapshot"
-  } else {
-    shared_snapshot_deps = []
-    shared_snapshot_data_path = "//topaz/runtime/dart_runner/empty"
-    shared_snapshot_instructions_path = "//topaz/runtime/dart_runner/empty"
-  }
-
-  stats_target_name = "${target_name}_stats"
-  stats_json_path = "$target_gen_dir/${target_name}/stats/symbol_sizes.json"
-  stats_html_dir = "$target_gen_dir/${target_name}/stats"
-
-  action(snapshot_target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
-    }
-
-    deps = gen_snapshot_deps + shared_snapshot_deps + [ ":$kernel_target_name" ]
-    inputs = [
-               shared_snapshot_data_path,
-               shared_snapshot_instructions_path,
-               kernel_path,
-             ]
-    outputs = [
-      vm_snapshot_data_path,
-      vm_snapshot_instructions_path,
-      snapshot_data_path,
-      snapshot_instructions_path,
-      stats_json_path,
-    ]
-
-    if (product) {
-      script = gen_snapshot_product
+    component_name = component.component_name
+    if (legacy_component) {
+      kernel_name = target_name
     } else {
-      script = gen_snapshot
+      kernel_name = component_name
+    }
+    dart_library_target_name = kernel_name + "_dart_library"
+    kernel_target_name = kernel_name + "_kernel"
+    kernel_path = "$target_gen_dir/${kernel_target_name}.dil"
+
+    dart_kernel(kernel_name) {
+      platform_name = "flutter_runner"
+      platform_deps =
+          [ "//topaz/runtime/flutter_runner/kernel:kernel_platform_files" ]
+      platform_path = "$root_out_dir/flutter_runner_patched_sdk"
+
+      forward_variables_from(invoker,
+                             [
+                               "disable_analysis",
+                               "non_dart_deps",
+                               "source_dir",
+                               "package_name",
+                             ])
+      deps = component.deps
+      sources = component.sources
+
+      main_dart = component.main_dart
+      args = [ "--aot" ]
     }
 
-    args = [
-      # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
-      "--reify_generic_functions",
-      "--strong",
-      "--sync-async",
-      "--deterministic",
-      "--snapshot_kind=app-aot-blobs",
-      "--vm_snapshot_data=" + rebase_path(vm_snapshot_data_path),
-      "--vm_snapshot_instructions=" +
-          rebase_path(vm_snapshot_instructions_path),
-      "--isolate_snapshot_data=" + rebase_path(snapshot_data_path),
-      "--isolate_snapshot_instructions=" +
-          rebase_path(snapshot_instructions_path),
-      "--shared_data=" + rebase_path(shared_snapshot_data_path),
-      "--shared_instructions=" + rebase_path(shared_snapshot_instructions_path),
-      "--print-instructions-sizes-to=" + rebase_path(stats_json_path),
-    ]
-    if (is_debug && !product) {
-      args += [ "--enable_asserts" ]
-    }
-    args += [ rebase_path(kernel_path) ]
+    # TODO(rmacnak): Don't bake the VM service into each app.
+    vm_snapshot_data_path = "$target_gen_dir/${kernel_name}_vm_data.aotsnapshot"
+    vm_snapshot_instructions_path =
+        "$target_gen_dir/${kernel_name}_vm_instructions.aotsnapshot"
+    snapshot_data_path = "$target_gen_dir/${kernel_name}_data.aotsnapshot"
+    snapshot_instructions_path =
+        "$target_gen_dir/${kernel_name}_instructions.aotsnapshot"
+    snapshot_target_name = kernel_name + "_snapshot"
 
-    pool = "//build/dart:dart_pool($dart_toolchain)"
-  }
-
-  dart_action(stats_target_name) {
-    if (defined(invoker.testonly)) {
-      testonly = invoker.testonly
+    if (flutter_aot_sharing_basis != "" &&
+        get_label_info(":$kernel_name", "label_no_toolchain") !=
+        get_label_info(flutter_aot_sharing_basis, "label_no_toolchain")) {
+      # Note: The use of "label_no_toolchain" is to ensure we are comparing fully
+      # qualified target names. We don't actually care about the toolchain.
+      shared_snapshot_deps =
+          [ get_label_info(flutter_aot_sharing_basis, "label_no_toolchain") +
+            "_snapshot" ]
+      prefix = get_label_info(flutter_aot_sharing_basis, "target_gen_dir") + "/" +
+               get_label_info(flutter_aot_sharing_basis, "name")
+      shared_snapshot_data_path = "${prefix}_data.aotsnapshot"
+      shared_snapshot_instructions_path = "${prefix}_instructions.aotsnapshot"
+    } else {
+      shared_snapshot_deps = []
+      shared_snapshot_data_path = "//topaz/runtime/dart_runner/empty"
+      shared_snapshot_instructions_path = "//topaz/runtime/dart_runner/empty"
     }
 
-    deps = [
-      ":$snapshot_target_name",
-    ]
-    script = "//third_party/dart/pkg/vm/bin/run_binary_size_analysis.dart"
-    inputs = [
-      stats_json_path,
-    ]
-    outputs = [
-      "$stats_html_dir/index.html",
-    ]
-    args = [
-      rebase_path(stats_json_path),
-      rebase_path(stats_html_dir),
-    ]
-  }
+    stats_target_name = "${kernel_name}_stats"
+    stats_json_path = "$target_gen_dir/${kernel_name}/stats/symbol_sizes.json"
+    stats_html_dir = "$target_gen_dir/${kernel_name}/stats"
 
-  if (defined(invoker.resources)) {
-    invoker_resources = invoker.resources
-  } else {
-    invoker_resources = []
-  }
+    action(snapshot_target_name) {
+      if (defined(invoker.testonly)) {
+        testonly = invoker.testonly
+      }
 
-  asset_manifest = "$target_gen_dir/build/${target_name}_pkgassets"
-  dart_target_gen_dir =
-      get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-  dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
+      deps = gen_snapshot_deps + shared_snapshot_deps + [ ":$kernel_target_name" ]
+      inputs = [
+                 shared_snapshot_data_path,
+                 shared_snapshot_instructions_path,
+                 kernel_path,
+               ]
+      outputs = [
+        vm_snapshot_data_path,
+        vm_snapshot_instructions_path,
+        snapshot_data_path,
+        snapshot_instructions_path,
+        stats_json_path,
+      ]
 
-  action("${target_name}_resources") {
-    script = "//topaz/runtime/flutter_runner/build/asset_package.py"
+      if (product) {
+        script = gen_snapshot_product
+      } else {
+        script = gen_snapshot
+      }
 
-    args = [
-      "--flutter-root",
-      rebase_path(flutter_base),
-      "--flutter-tools",
-      rebase_path(flutter_asset_tools_bin),
-      "--app-dir",
-      rebase_path("."),
-      "--asset-dir",
-      rebase_path("$target_gen_dir/build"),
-      "--packages",
-      rebase_path(dot_packages),
-      "--asset-manifest-out",
-      rebase_path(asset_manifest),
-      "--component-name",
-      component_name,
-    ]
+      args = [
+        # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
+        "--reify_generic_functions",
+        "--strong",
+        "--sync-async",
+        "--deterministic",
+        "--snapshot_kind=app-aot-blobs",
+        "--vm_snapshot_data=" + rebase_path(vm_snapshot_data_path),
+        "--vm_snapshot_instructions=" +
+            rebase_path(vm_snapshot_instructions_path),
+        "--isolate_snapshot_data=" + rebase_path(snapshot_data_path),
+        "--isolate_snapshot_instructions=" +
+            rebase_path(snapshot_instructions_path),
+        "--shared_data=" + rebase_path(shared_snapshot_data_path),
+        "--shared_instructions=" + rebase_path(shared_snapshot_instructions_path),
+        "--print-instructions-sizes-to=" + rebase_path(stats_json_path),
+      ]
+      if (is_debug && !product) {
+        args += [ "--enable_asserts" ]
+      }
+      args += [ rebase_path(kernel_path) ]
 
-    if (defined(invoker.manifest)) {
-      args += [
-        "--manifest",
-        rebase_path(invoker.manifest),
+      pool = "//build/dart:dart_pool($dart_toolchain)"
+    }
+
+    dart_action(stats_target_name) {
+      if (defined(invoker.testonly)) {
+        testonly = invoker.testonly
+      }
+
+      deps = [
+        ":$snapshot_target_name",
+      ]
+      script = "//third_party/dart/pkg/vm/bin/run_binary_size_analysis.dart"
+      inputs = [
+        stats_json_path,
+      ]
+      outputs = [
+        "$stats_html_dir/index.html",
+      ]
+      args = [
+        rebase_path(stats_json_path),
+        rebase_path(stats_html_dir),
       ]
     }
 
-    deps = [
-      ":$dart_library_target_name",
-      flutter_asset_tools_label,
-    ]
+    if (defined(invoker.resources)) {
+      invoker_resources = invoker.resources
+    } else {
+      invoker_resources = []
+    }
 
-    outputs = [
-      asset_manifest,
+    asset_manifest = "$target_gen_dir/build/${kernel_name}_pkgassets"
+    dart_target_gen_dir =
+        get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+    dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
+
+    action("${kernel_name}_resources") {
+      script = "//topaz/runtime/flutter_runner/build/asset_package.py"
+
+      args = [
+        "--flutter-root",
+        rebase_path(flutter_base),
+        "--flutter-tools",
+        rebase_path(flutter_asset_tools_bin),
+        "--app-dir",
+        rebase_path("."),
+        "--asset-dir",
+        rebase_path("$target_gen_dir/build"),
+        "--packages",
+        rebase_path(dot_packages),
+        "--asset-manifest-out",
+        rebase_path(asset_manifest),
+        "--component-name",
+        component_name,
+      ]
+
+      if (defined(invoker.manifest)) {
+        args += [
+          "--manifest",
+          rebase_path(invoker.manifest),
+        ]
+      }
+
+      deps = [
+        ":$dart_library_target_name",
+        flutter_asset_tools_label,
+      ]
+
+      outputs = [
+        asset_manifest,
+      ]
+    }
+
+    # The module manifest verify & copy targets.
+    if (defined(invoker.module_manifest)) {
+      verify_module_manifest("${kernel_name}_verify_manifest") {
+        original_target_name = kernel_name
+        module_manifest = invoker.module_manifest
+      }
+      copy_module_manifest("${kernel_name}_copy_manifest") {
+        package_name = kernel_name
+        module_manifest = rebase_path(invoker.module_manifest)
+      }
+    }
+
+    components_with_kernel += [
+      {
+        kernel_target_name = kernel_target_name
+        component_name = component_name
+        asset_manifest = asset_manifest
+
+        snapshot_target_name = snapshot_target_name
+        stats_target_name = stats_target_name
+        vm_snapshot_data_path = vm_snapshot_data_path
+        vm_snapshot_instructions_path = vm_snapshot_instructions_path
+        snapshot_data_path = snapshot_data_path
+        snapshot_instructions_path = snapshot_instructions_path
+        shared_snapshot_data_path = shared_snapshot_data_path
+        shared_snapshot_instructions_path = shared_snapshot_instructions_path
+
+        component_shared_snapshot_deps = shared_snapshot_deps
+        deps = component.deps
+        sources = component.sources
+        component_resources = "${kernel_name}_resources"
+        component_copy_manifest = "${kernel_name}_copy_manifest"
+        component_verify_manifest = "${kernel_name}_verify_manifest"
+      }
     ]
   }
 
-  # The module manifest verify & copy targets.
-  if (defined(invoker.module_manifest)) {
-    verify_module_manifest("${target_name}_verify_manifest") {
-      original_target_name = invoker.target_name
-      module_manifest = invoker.module_manifest
-    }
-    copy_module_manifest("${target_name}_copy_manifest") {
-      package_name = target_name
-      module_manifest = rebase_path(invoker.module_manifest)
-    }
+  invoker_resources = []
+  if (defined(invoker.resources)) {
+    invoker_resources += invoker.resources
   }
 
   package_meta = []
@@ -709,7 +835,7 @@ template("_flutter_aot_app") {
     ]
   }
 
-  _flutter_aot_app_package(target_name) {
+  _flutter_aot_package(target_name) {
     forward_variables_from(invoker, "*")
   }
 }
@@ -726,7 +852,7 @@ template("flutter_jit_app") {
 }
 
 template("flutter_aot_app") {
-  template_name = "_flutter_aot_app"
+  template_name = "_flutter_aot_component"
   if (dart_force_product) {
     template_name = flutter_product_app
   }
