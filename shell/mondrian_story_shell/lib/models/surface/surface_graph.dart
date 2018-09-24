@@ -65,6 +65,8 @@ class SurfaceGraph extends Model {
   /// (surfaces are identified by ID)
   final Map<String, String> _visualAssociation = <String, String>{};
 
+  Tree<String> get root => _tree;
+
   /// The node corresponding to the given id.
   Surface getNode(String id) => _surfaces[id];
 

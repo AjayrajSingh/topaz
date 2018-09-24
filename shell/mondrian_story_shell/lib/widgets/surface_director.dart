@@ -199,12 +199,12 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
       }
     }
     Forest<Surface> dependentSpanningTrees = new Forest<Surface>();
-    // The actual node doesn't matter
     if (placedSurfaces.isNotEmpty) {
-      // The actual surface doesn't matter
-      // dependent spanning tree of the first thing...
-      dependentSpanningTrees =
-          getDependentSpanningTrees(placedSurfaces.keys.first);
+      // Get the dependent spanning trees for each tree off of the root
+      for (Tree<String> childTree in graph.root.children) {
+        getDependentSpanningTrees(graph.getNode(childTree.value))
+            .forEach(dependentSpanningTrees.add);
+      }
 
       /// prune non-visible surfaces
       for (Tree<Surface> t in dependentSpanningTrees.flatten()) {
@@ -228,6 +228,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
     /// Create form forest
     final Forest<SurfaceForm> formForest =
         dependentSpanningTrees.mapForest((Surface s) => placedSurfaces[s]);
+
     for (SurfaceForm orphan in _orphanedForms) {
       formForest.add(new Tree<SurfaceForm>(value: orphan));
     }
