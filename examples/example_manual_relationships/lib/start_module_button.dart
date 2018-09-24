@@ -48,7 +48,7 @@ class StartModuleButton extends StatelessWidget {
     String name = _generateChildId();
 
     IntentBuilder intentBuilder = new IntentBuilder.handler(_kModuleUrl);
-    moduleContext.startModule(
+    moduleContext.addModuleToStory(
         name,
         intentBuilder.intent,
         moduleController.ctrl.request(),

@@ -602,7 +602,7 @@ class ModuleDriver {
     }
 
     return moduleContext
-        .startModule(
+        .addModuleToStory(
           module: name,
           intent: intent,
           surfaceRelation: surfaceRelation,

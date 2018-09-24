@@ -173,8 +173,8 @@ class ModuleContextClient {
     return completer.future;
   }
 
-  /// See [fidl.ModuleContext#startModule].
-  Future<ModuleControllerClient> startModule({
+  /// See [fidl.ModuleContext#addModuleToStory].
+  Future<ModuleControllerClient> addModuleToStory({
     @required String module,
     @required Intent intent,
     @required SurfaceRelation surfaceRelation,
@@ -218,7 +218,7 @@ class ModuleContextClient {
     }
 
     try {
-      proxy.startModule(
+      proxy.addModuleToStory(
         module,
         intent,
         controller.proxy.ctrl.request(),
@@ -372,7 +372,7 @@ class ModuleContextClient {
         }
       });
 
-      proxy.done();
+      proxy.removeSelfFromStory();
       completer.complete();
     } on Exception catch (err, stackTrace) {
       completer.completeError(err, stackTrace);
