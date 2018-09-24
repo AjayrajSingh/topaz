@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lib.widgets/modular.dart';
-
-import '../lib/src/model/tictactoe_model.dart'; // ignore: avoid_relative_lib_imports
-import '../lib/src/widget/square.dart'; // ignore: avoid_relative_lib_imports
-import '../lib/src/widget/tictactoe_board.dart'; // ignore: avoid_relative_lib_imports
+import 'package:topaz.examples.tictactoe.bin.tictactoe.game_board_mod._tictactoe_game_board_mod_dart_library/src/model/tictactoe_model.dart'; // ignore: implementation_imports
+import 'package:topaz.examples.tictactoe.bin.tictactoe.game_board_mod._tictactoe_game_board_mod_dart_library/src/widget/square.dart'; // ignore: implementation_imports
+import 'package:topaz.examples.tictactoe.bin.tictactoe.game_board_mod._tictactoe_game_board_mod_dart_library/src/widget/tictactoe_board.dart'; // ignore: implementation_imports
 
 void main() {
   testWidgets('x in middle', (WidgetTester tester) async {
