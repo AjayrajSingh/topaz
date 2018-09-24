@@ -4,7 +4,7 @@
 
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-flutter_aot_app("latin-ime") {
+flutter_app("latin-ime") {
   main_dart = "main.dart"
 
   manifest = "pubspec.yaml"
