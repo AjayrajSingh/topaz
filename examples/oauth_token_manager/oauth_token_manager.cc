@@ -88,7 +88,7 @@ constexpr auto kScopes = {
     "https://www.googleapis.com/auth/userinfo.profile",
     "https://www.googleapis.com/auth/youtube.readonly",
     "https://www.googleapis.com/auth/contacts",
-    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/drive.file",
     "https://www.googleapis.com/auth/plus.login",
     "https://www.googleapis.com/auth/calendar.readonly"};
 
