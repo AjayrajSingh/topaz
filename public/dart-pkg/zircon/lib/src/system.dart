@@ -13,6 +13,7 @@ class _Namespace { // ignore: unused_element
 
   // Library private variable set by the embedder used to cache the
   // namespace (as an fdio_ns_t*).
+  @pragma('vm:entry-point')
   static int _namespace; // ignore: unused_field
 }
 
@@ -39,6 +40,7 @@ class _Result {
 
 class HandleResult extends _Result {
   final Handle handle;
+  @pragma('vm:entry-point')
   const HandleResult(final int status, [this.handle]) : super(status);
   @override
   String toString() => 'HandleResult(status=$status, handle=$handle)';
@@ -47,6 +49,7 @@ class HandleResult extends _Result {
 class HandlePairResult extends _Result {
   final Handle first;
   final Handle second;
+  @pragma('vm:entry-point')
   const HandlePairResult(final int status, [this.first, this.second])
       : super(status);
   @override
@@ -58,6 +61,7 @@ class ReadResult extends _Result {
   final ByteData bytes;
   final int numBytes;
   final List<Handle> handles;
+  @pragma('vm:entry-point')
   const ReadResult(final int status, [this.bytes, this.numBytes, this.handles])
       : super(status);
   Uint8List bytesAsUint8List() =>
@@ -70,6 +74,7 @@ class ReadResult extends _Result {
 
 class WriteResult extends _Result {
   final int numBytes;
+  @pragma('vm:entry-point')
   const WriteResult(final int status, [this.numBytes]) : super(status);
   @override
   String toString() => 'WriteResult(status=$status, numBytes=$numBytes)';
@@ -77,6 +82,7 @@ class WriteResult extends _Result {
 
 class GetSizeResult extends _Result {
   final int size;
+  @pragma('vm:entry-point')
   const GetSizeResult(final int status, [this.size]) : super(status);
   @override
   String toString() => 'GetSizeResult(status=$status, size=$size)';
@@ -85,6 +91,7 @@ class GetSizeResult extends _Result {
 class FromFileResult extends _Result {
   final Handle handle;
   final int numBytes;
+  @pragma('vm:entry-point')
   const FromFileResult(final int status, [this.handle, this.numBytes])
       : super(status);
   @override
@@ -94,6 +101,7 @@ class FromFileResult extends _Result {
 
 class MapResult extends _Result {
   final Uint8List data;
+  @pragma('vm:entry-point')
   const MapResult(final int status, [this.data]) : super(status);
   @override
   String toString() => 'MapResult(status=$status, data=$data)';

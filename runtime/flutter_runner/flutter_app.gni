@@ -53,12 +53,6 @@ flutter_asset_tools_out_dir =
 flutter_asset_tools_bin =
     "$flutter_asset_tools_out_dir/dart-tools/fuchsia_asset_builder"
 
-_entry_manifests = [
-  "//third_party/dart/runtime/bin/dart_io_entries.txt",
-  "//third_party/flutter/runtime/dart_vm_entry_points.txt",
-  "//topaz/runtime/flutter_runner/dart_vm_entry_points_fuchsia.txt",
-]
-
 template("_flutter_jit_app_package") {
   package(target_name) {
     package_name = invoker.component_name
@@ -428,14 +422,11 @@ template("_flutter_aot_app") {
     }
 
     deps = gen_snapshot_deps + shared_snapshot_deps + [ ":$kernel_target_name" ]
-    inputs = _entry_manifests + [
+    inputs = [
                shared_snapshot_data_path,
                shared_snapshot_instructions_path,
                kernel_path,
              ]
-    if (defined(invoker.extra_entry_manifests)) {
-      inputs += invoker.extra_entry_manifests
-    }
     outputs = [
       vm_snapshot_data_path,
       vm_snapshot_instructions_path,
@@ -467,16 +458,6 @@ template("_flutter_aot_app") {
       "--shared_instructions=" + rebase_path(shared_snapshot_instructions_path),
       "--print-instructions-sizes-to=" + rebase_path(stats_json_path),
     ]
-    foreach(entry_manifest, _entry_manifests) {
-      args +=
-          [ "--embedder_entry_points_manifest=" + rebase_path(entry_manifest) ]
-    }
-    if (defined(invoker.extra_entry_manifests)) {
-      foreach(entry_manifest, invoker.extra_entry_manifests) {
-        args += [ "--embedder_entry_points_manifest=" +
-                  rebase_path(entry_manifest) ]
-      }
-    }
     if (is_debug && !product) {
       args += [ "--enable_asserts" ]
     }

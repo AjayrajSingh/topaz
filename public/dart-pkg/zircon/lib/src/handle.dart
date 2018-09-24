@@ -9,6 +9,7 @@ part of zircon;
 
 class Handle extends NativeFieldWrapperClass2 {
   // No public constructor - this can only be created from native code.
+  @pragma('vm:entry-point')
   Handle._();
 
   // Create an invalid handle object.

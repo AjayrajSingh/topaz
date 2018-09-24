@@ -61,7 +61,7 @@
     <project name="third_party/dart/third_party/pkg/dartdoc"
              path="third_party/dart/third_party/pkg/dartdoc"
              remote="https://dart.googlesource.com/dartdoc.git"
-             revision="v0.20.4"/>
+             revision="v0.21.1"/>
 
     <project name="third_party/dart/third_party/pkg/fixnum"
              path="third_party/dart/third_party/pkg/fixnum"
@@ -121,7 +121,7 @@
     <project name="third_party/dart/third_party/pkg/linter"
              path="third_party/dart/third_party/pkg/linter"
              remote="https://dart.googlesource.com/linter.git"
-             revision="0.1.62"/>
+             revision="0.1.63"/>
 
     <project name="third_party/dart/third_party/pkg/logging"
              path="third_party/dart/third_party/pkg/logging"
@@ -321,7 +321,7 @@
     <project name="third_party/dart/third_party/pkg_tested/dart_style"
              path="third_party/dart/third_party/pkg_tested/dart_style"
              remote="https://dart.googlesource.com/dart_style.git"
-             revision="6f3efd209ff1828835936397b64be79265cc0c19"/>
+             revision="1.2.0"/>
 
     <project name="third_party/dart/third_party/pkg_tested/http_io"
              path="third_party/dart/third_party/pkg_tested/http_io"

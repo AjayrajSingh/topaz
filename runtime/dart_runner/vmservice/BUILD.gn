@@ -11,9 +11,6 @@ dart_aot_app("vmservice") {
 
   product = false
 
-  extra_entry_manifests =
-      [ "//topaz/runtime/dart_runner/service_entry_points.txt" ]
-
   sources = []
   deps = []
 }

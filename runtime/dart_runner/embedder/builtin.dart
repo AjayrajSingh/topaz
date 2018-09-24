@@ -16,7 +16,9 @@ class _Logger {
   static void _printString(String s) native "Logger_PrintString";
 }
 
+@pragma('vm:entry-point')
 String _rawScript;
+
 Uri _scriptUri() {
   if (_rawScript.startsWith('http:') ||
       _rawScript.startsWith('https:') ||
@@ -28,10 +30,14 @@ Uri _scriptUri() {
 }
 
 void _scheduleMicrotask(void callback()) native "ScheduleMicrotask";
+
+@pragma('vm:entry-point')
 _getScheduleMicrotaskClosure() => _scheduleMicrotask;
 
+@pragma('vm:entry-point')
 _setupHooks() {
   VMLibraryHooks.platformScript = _scriptUri;
 }
 
+@pragma('vm:entry-point')
 _getPrintClosure() => _print;

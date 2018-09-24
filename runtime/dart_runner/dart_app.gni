@@ -34,11 +34,6 @@ declare_args() {
 # future.
 dart_product_app = "_dart_jit_package"
 
-_entry_manifests = [
-  "//third_party/dart/runtime/bin/dart_io_entries.txt",
-  "//topaz/runtime/dart_runner/entry_points.txt",
-]
-
 # Defines a Dart package with JIT runtime components
 #
 # Takes a set of dart components and puts them into one fuchsia package with
@@ -395,14 +390,11 @@ template("_dart_aot_package") {
       }
 
       deps = gen_snapshot_deps + shared_snapshot_deps + [ ":$kernel_target_name" ]
-      inputs = _entry_manifests + [
+      inputs = [
                  shared_snapshot_data_path,
                  shared_snapshot_instructions_path,
                  kernel_path,
                ]
-      if (defined(invoker.extra_entry_manifests)) {
-        inputs += invoker.extra_entry_manifests
-      }
       outputs = [
         vm_snapshot_data_path,
         vm_snapshot_instructions_path,
@@ -434,16 +426,6 @@ template("_dart_aot_package") {
         "--shared_instructions=" + rebase_path(shared_snapshot_instructions_path),
         "--print-instructions-sizes-to=" + rebase_path(stats_json_path),
       ]
-      foreach(entry_manifest, _entry_manifests) {
-        args +=
-            [ "--embedder_entry_points_manifest=" + rebase_path(entry_manifest) ]
-      }
-      if (defined(invoker.extra_entry_manifests)) {
-        foreach(entry_manifest, invoker.extra_entry_manifests) {
-          args += [ "--embedder_entry_points_manifest=" +
-                    rebase_path(entry_manifest) ]
-        }
-      }
       if (is_debug && !product) {
         args += [ "--enable_asserts" ]
       }
@@ -605,10 +587,6 @@ template("dart_aot_app") {
   template_name = "_dart_aot_package"
   if (dart_force_product) {
     template_name = dart_product_app
-
-    if (defined(invoker.extra_entry_manifests)) {
-      not_needed(invoker, [ "extra_entry_manifests" ])
-    }
   }
 
   target(template_name, target_name) {
@@ -641,9 +619,6 @@ template("dart_aot_app") {
 #
 #   tests (optional)
 #     List of tests forwarded for the package. See the definition in //build/package.gni.
-#
-#   extra_entry_manifests (optional)
-#     List of AOT entry point manifest files. Most apps do not need this.
 #
 #   product (optional)
 #     A boolean. Whether to build/run the app in a stripped-down Dart VM.

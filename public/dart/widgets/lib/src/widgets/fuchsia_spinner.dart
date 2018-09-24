@@ -75,11 +75,11 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
             builder: (_, __) {
               double tweenProgress = _tweenValue;
               double width = maxDiameter *
-                  _fractionalWidthTween.lerp(
+                  _fractionalWidthTween.transform(
                     tweenProgress,
                   );
               double height = maxDiameter *
-                  _fractionalHeightTween.lerp(
+                  _fractionalHeightTween.transform(
                     tweenProgress,
                   );
               return new Transform(
@@ -95,7 +95,7 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
                     child: new Material(
                       color: _transformHue(
                         widget.color,
-                        _hueTween.lerp(tweenProgress),
+                        _hueTween.transform(tweenProgress),
                       ),
                       borderRadius: new BorderRadius.circular(width / 2),
                     ),
