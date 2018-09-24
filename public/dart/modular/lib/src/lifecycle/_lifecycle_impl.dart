@@ -40,6 +40,9 @@ class LifecycleImpl extends fidl.Lifecycle implements Lifecycle {
   /// shutdown this process. Returns `false` if this listener was already added.
   @override
   bool addTerminateListener(Future<void> Function() listener) {
+    if (listener == null) {
+      throw Exception('listener cannot be null!');
+    }
     return _terminateListeners.add(listener);
   }
 
@@ -62,7 +65,7 @@ class LifecycleImpl extends fidl.Lifecycle implements Lifecycle {
 
   // Exposes this instance to the [StartupContext#outgoingServices].
   //
-  // This class must called before the first iteration of the event loop.
+  // This class be must called before the first iteration of the event loop.
   void _exposeService() {
     StartupContext startupContext = StartupContext.fromStartupInfo();
     startupContext.outgoingServices.addServiceForName(

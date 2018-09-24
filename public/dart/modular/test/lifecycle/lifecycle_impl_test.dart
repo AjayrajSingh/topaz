@@ -21,6 +21,11 @@ Future<void> throwingTerminateListener() async {
 }
 
 void main() {
+  test('addTerminateListener throws for null listener', () {
+    expect(() => LifecycleImpl()..addTerminateListener(null),
+        throwsA((const TypeMatcher<Exception>())));
+  });
+
   test('addTerminateListener should return false when adding same handler', () {
     final host = LifecycleImpl()..addTerminateListener(terminateListener1);
     expect(host.addTerminateListener(terminateListener1), false);
