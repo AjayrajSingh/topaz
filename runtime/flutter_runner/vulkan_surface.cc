@@ -6,6 +6,9 @@
 
 #include <lib/async/default.h>
 
+#include <algorithm>
+
+#include "flutter/fml/trace_event.h"
 #include "lib/fxl/logging.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/gpu/GrBackendSemaphore.h"
@@ -13,6 +16,62 @@
 #include "third_party/skia/include/gpu/GrContext.h"
 
 namespace flutter {
+
+namespace {
+
+constexpr SkColorType kSkiaColorType = kBGRA_8888_SkColorType;
+
+}  // namespace
+
+bool CreateVulkanImage(vulkan::VulkanProvider& vulkan_provider,
+                       const SkISize& size, VulkanImage* out_vulkan_image) {
+  TRACE_EVENT0("flutter", "CreateVulkanImage");
+
+  FML_DCHECK(!size.isEmpty());
+  FML_DCHECK(out_vulkan_image != nullptr);
+
+  out_vulkan_image->vk_image_create_info = {
+      .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
+      .pNext = nullptr,
+      .flags = VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT,
+      .imageType = VK_IMAGE_TYPE_2D,
+      .format = VK_FORMAT_B8G8R8A8_UNORM,
+      .extent = VkExtent3D{static_cast<uint32_t>(size.width()),
+                           static_cast<uint32_t>(size.height()), 1},
+      .mipLevels = 1,
+      .arrayLayers = 1,
+      .samples = VK_SAMPLE_COUNT_1_BIT,
+      .tiling = VK_IMAGE_TILING_OPTIMAL,
+      .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+      .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
+      .queueFamilyIndexCount = 0,
+      .pQueueFamilyIndices = nullptr,
+      .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+  };
+
+  {
+    VkImage vk_image = VK_NULL_HANDLE;
+
+    if (VK_CALL_LOG_ERROR(vulkan_provider.vk().CreateImage(
+            vulkan_provider.vk_device(),
+            &out_vulkan_image->vk_image_create_info, nullptr, &vk_image)) !=
+        VK_SUCCESS) {
+      return false;
+    }
+
+    out_vulkan_image->vk_image = {
+        vk_image, [& vulkan_provider = vulkan_provider](VkImage image) {
+          vulkan_provider.vk().DestroyImage(vulkan_provider.vk_device(), image,
+                                            NULL);
+        }};
+  }
+
+  vulkan_provider.vk().GetImageMemoryRequirements(
+      vulkan_provider.vk_device(), out_vulkan_image->vk_image,
+      &out_vulkan_image->vk_memory_requirements);
+
+  return true;
+}
 
 VulkanSurface::VulkanSurface(vulkan::VulkanProvider& vulkan_provider,
                              sk_sp<GrContext> context, scenic::Session* session,
@@ -31,10 +90,15 @@ VulkanSurface::VulkanSurface(vulkan::VulkanProvider& vulkan_provider,
     return;
   }
 
-  if (!PushSessionImageSetupOps(session, std::move(exported_vmo))) {
+  scenic_memory_ = std::make_unique<scenic::Memory>(
+      session, std::move(exported_vmo),
+      fuchsia::images::MemoryType::VK_DEVICE_MEMORY);
+  if (!PushSessionImageSetupOps(session)) {
     FML_DLOG(INFO) << "Could not push session image setup ops.";
     return;
   }
+
+  std::fill(size_history_.begin(), size_history_.end(), SkISize::MakeEmpty());
 
   wait_.set_object(release_event_.get());
   wait_.set_trigger(ZX_EVENT_SIGNALED);
@@ -126,52 +190,23 @@ bool VulkanSurface::CreateFences() {
 bool VulkanSurface::AllocateDeviceMemory(sk_sp<GrContext> context,
                                          const SkISize& size,
                                          zx::vmo& exported_vmo) {
+  TRACE_EVENT0("flutter", "VulkanSurface::AllocateDeviceMemory");
+
   if (size.isEmpty()) {
     return false;
   }
 
-  const SkColorType color_type = kBGRA_8888_SkColorType;
-
-  // Create the image.
-  const VkImageCreateInfo image_create_info = {
-      .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
-      .pNext = nullptr,
-      .flags = VK_IMAGE_CREATE_MUTABLE_FORMAT_BIT,
-      .imageType = VK_IMAGE_TYPE_2D,
-      .format = VK_FORMAT_B8G8R8A8_UNORM,
-      .extent = VkExtent3D{static_cast<uint32_t>(size.width()),
-                           static_cast<uint32_t>(size.height()), 1},
-      .mipLevels = 1,
-      .arrayLayers = 1,
-      .samples = VK_SAMPLE_COUNT_1_BIT,
-      .tiling = VK_IMAGE_TILING_OPTIMAL,
-      .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-      .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
-      .queueFamilyIndexCount = 0,
-      .pQueueFamilyIndices = nullptr,
-      .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED,
-  };
-
-  {
-    VkImage vk_image = VK_NULL_HANDLE;
-
-    if (VK_CALL_LOG_ERROR(vulkan_provider_.vk().CreateImage(
-            vulkan_provider_.vk_device(), &image_create_info, nullptr,
-            &vk_image)) != VK_SUCCESS) {
-      return false;
-    }
-
-    vk_image_ = {vk_image,
-                 [& vulkan_provider = vulkan_provider_](VkImage image) {
-                   vulkan_provider.vk().DestroyImage(
-                       vulkan_provider.vk_device(), image, NULL);
-                 }};
+  VulkanImage vulkan_image;
+  if (!CreateVulkanImage(vulkan_provider_, size, &vulkan_image)) {
+    FML_DLOG(ERROR) << "Failed to create VkImage";
+    return false;
   }
 
-  // Create the memory.
-  VkMemoryRequirements memory_reqs;
-  vulkan_provider_.vk().GetImageMemoryRequirements(vulkan_provider_.vk_device(),
-                                                   vk_image_, &memory_reqs);
+  vulkan_image_ = std::move(vulkan_image);
+  const VkMemoryRequirements& memory_reqs =
+      vulkan_image_.vk_memory_requirements;
+  const VkImageCreateInfo& image_create_info =
+      vulkan_image_.vk_image_create_info;
 
   uint32_t memory_type = 0;
   for (; memory_type < 32; memory_type++) {
@@ -205,12 +240,14 @@ bool VulkanSurface::AllocateDeviceMemory(sk_sp<GrContext> context,
                     vulkan_provider.vk().FreeMemory(vulkan_provider.vk_device(),
                                                     memory, NULL);
                   }};
+
+    vk_memory_info_ = alloc_info;
   }
 
   // Bind image memory.
   if (VK_CALL_LOG_ERROR(vulkan_provider_.vk().BindImageMemory(
-          vulkan_provider_.vk_device(), vk_image_, vk_memory_, 0)) !=
-      VK_SUCCESS) {
+          vulkan_provider_.vk_device(), vulkan_image_.vk_image, vk_memory_,
+          0)) != VK_SUCCESS) {
     return false;
   }
 
@@ -237,7 +274,7 @@ bool VulkanSurface::AllocateDeviceMemory(sk_sp<GrContext> context,
     return false;
   }
 
-  return SetupSkiaSurface(std::move(context), size, color_type,
+  return SetupSkiaSurface(std::move(context), size, kSkiaColorType,
                           image_create_info, memory_reqs);
 }
 
@@ -251,7 +288,7 @@ bool VulkanSurface::SetupSkiaSurface(sk_sp<GrContext> context,
   }
 
   const GrVkImageInfo image_info = {
-      vk_image_,                             // image
+      vulkan_image_.vk_image,                // image
       {vk_memory_, 0, memory_reqs.size, 0},  // alloc
       image_create_info.tiling,              // tiling
       image_create_info.initialLayout,       // layout
@@ -282,14 +319,12 @@ bool VulkanSurface::SetupSkiaSurface(sk_sp<GrContext> context,
   return true;
 }
 
-bool VulkanSurface::PushSessionImageSetupOps(scenic::Session* session,
-                                             zx::vmo exported_vmo) {
+bool VulkanSurface::PushSessionImageSetupOps(scenic::Session* session) {
+  FML_DCHECK(scenic_memory_ != nullptr);
+
   if (sk_surface_ == nullptr) {
     return false;
   }
-
-  scenic::Memory memory(session, std::move(exported_vmo),
-                        fuchsia::images::MemoryType::VK_DEVICE_MEMORY);
 
   fuchsia::images::ImageInfo image_info;
   image_info.width = sk_surface_->width();
@@ -300,7 +335,7 @@ bool VulkanSurface::PushSessionImageSetupOps(scenic::Session* session,
   image_info.tiling = fuchsia::images::Tiling::LINEAR;
 
   session_image_ = std::make_unique<scenic::Image>(
-      memory, 0 /* memory offset */, std::move(image_info));
+      *scenic_memory_, 0 /* memory offset */, std::move(image_info));
 
   return session_image_ != nullptr;
 }
@@ -316,7 +351,49 @@ sk_sp<SkSurface> VulkanSurface::GetSkiaSurface() const {
   return valid_ ? sk_surface_ : nullptr;
 }
 
+bool VulkanSurface::BindToImage(sk_sp<GrContext> context,
+                                VulkanImage vulkan_image) {
+  FML_DCHECK(vulkan_image.vk_memory_requirements.size <=
+             vk_memory_info_.allocationSize);
+
+  vulkan_image_ = std::move(vulkan_image);
+
+  // Bind image memory.
+  if (VK_CALL_LOG_ERROR(vulkan_provider_.vk().BindImageMemory(
+          vulkan_provider_.vk_device(), vulkan_image_.vk_image, vk_memory_,
+          0)) != VK_SUCCESS) {
+    valid_ = false;
+    return false;
+  }
+
+  const auto& extent = vulkan_image.vk_image_create_info.extent;
+  auto size = SkISize::Make(extent.width, extent.height);
+
+  if (!SetupSkiaSurface(std::move(context), size, kSkiaColorType,
+                        vulkan_image.vk_image_create_info,
+                        vulkan_image.vk_memory_requirements)) {
+    FML_DLOG(ERROR) << "Failed to setup skia surface";
+    valid_ = false;
+    return false;
+  }
+
+  if (sk_surface_ == nullptr) {
+    valid_ = false;
+    return false;
+  }
+
+  if (!PushSessionImageSetupOps(session_)) {
+    FML_DLOG(ERROR) << "Could not push session image setup ops.";
+    valid_ = false;
+    return false;
+  }
+
+  return true;
+}
+
 size_t VulkanSurface::AdvanceAndGetAge() {
+  size_history_[size_history_index_] = GetSize();
+  size_history_index_ = (size_history_index_ + 1) % kSizeHistorySize;
   age_++;
   return age_;
 }

@@ -64,6 +64,11 @@ class VulkanSurfaceProducer final
   std::unique_ptr<VulkanSurfacePool> surface_pool_;
   bool valid_ = false;
 
+  // Keep track of the last time we produced a surface.  This is used to
+  // determine whether it is safe to shrink |surface_pool_| or not.
+  fxl::TimePoint last_produce_time_ = fxl::TimePoint::Now();
+  fml::WeakPtrFactory<VulkanSurfaceProducer> weak_factory_{this};
+
   bool Initialize(scenic::Session* scenic_session);
 
   FML_DISALLOW_COPY_AND_ASSIGN(VulkanSurfaceProducer);

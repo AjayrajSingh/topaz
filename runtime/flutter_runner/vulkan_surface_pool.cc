@@ -4,12 +4,24 @@
 
 #include "vulkan_surface_pool.h"
 
+#include <algorithm>
+#include <string>
+
 #include <trace/event.h>
 
 #include "flutter/fml/trace_event.h"
 #include "third_party/skia/include/gpu/GrContext.h"
 
 namespace flutter {
+
+namespace {
+
+std::string ToString(const SkISize& size) {
+  return "{height: " + std::to_string(size.height()) +
+         ", width: " + std::to_string(size.width()) + "}";
+}
+
+}  // namespace
 
 VulkanSurfacePool::VulkanSurfacePool(vulkan::VulkanProvider& vulkan_provider,
                                      sk_sp<GrContext> context,
@@ -39,41 +51,83 @@ VulkanSurfacePool::AcquireSurface(const SkISize& size) {
 
 std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
 VulkanSurfacePool::GetCachedOrCreateSurface(const SkISize& size) {
-  auto found_in_available = available_surfaces_.find(size);
-  if (found_in_available == available_surfaces_.end()) {
+  // First try to find a surface that exactly matches |size|.
+  {
+    auto exact_match_it =
+        std::find_if(available_surfaces_.begin(), available_surfaces_.end(),
+                     [&size](const auto& surface) {
+                       return surface->IsValid() && surface->GetSize() == size;
+                     });
+    if (exact_match_it != available_surfaces_.end()) {
+      auto acquired_surface = std::move(*exact_match_it);
+      available_surfaces_.erase(exact_match_it);
+      return acquired_surface;
+    }
+  }
+
+  // Then, look for a surface that has enough |VkDeviceMemory| to hold a
+  // |VkImage| of size |size|, but is currently holding a |VkImage| of a
+  // different size.
+  VulkanImage vulkan_image;
+  if (!CreateVulkanImage(vulkan_provider_, size, &vulkan_image)) {
+    FML_DLOG(ERROR) << "Failed to create a VkImage of size: " << ToString(size);
+    return nullptr;
+  }
+
+  auto best_it = available_surfaces_.end();
+  for (auto it = available_surfaces_.begin(); it != available_surfaces_.end();
+       ++it) {
+    const auto& surface = *it;
+    if (!surface->IsValid() || surface->GetAllocationSize() <
+                                   vulkan_image.vk_memory_requirements.size) {
+      continue;
+    }
+    if (best_it == available_surfaces_.end() ||
+        surface->GetAllocationSize() < (*best_it)->GetAllocationSize()) {
+      best_it = it;
+    }
+  }
+
+  // If no such surface exists, then create a new one.
+  if (best_it == available_surfaces_.end()) {
     return CreateSurface(size);
   }
-  SurfacesSet& available_surfaces = found_in_available->second;
-  FML_DCHECK(available_surfaces.size() > 0);
-  auto acquired_surface = std::move(available_surfaces.back());
-  available_surfaces.pop_back();
-  if (available_surfaces.size() == 0) {
-    available_surfaces_.erase(found_in_available);
+
+  auto acquired_surface = std::move(*best_it);
+  available_surfaces_.erase(best_it);
+  bool swap_succeeded =
+      acquired_surface->BindToImage(context_, std::move(vulkan_image));
+  if (!swap_succeeded) {
+    FML_DLOG(ERROR) << "Failed to swap VulkanSurface to new VkImage of size: "
+                    << ToString(size);
+    return CreateSurface(size);
   }
-  if (acquired_surface->IsValid()) {
-    trace_surfaces_reused_++;
-    return acquired_surface;
-  }
-  // This is only likely to happen if the surface was invalidated between the
-  // time it was sent into the available buffers cache and accessed now.
-  // Extremely unlikely.
-  return CreateSurface(size);
+  FML_DCHECK(acquired_surface->IsValid());
+  trace_surfaces_reused_++;
+  return acquired_surface;
 }
 
 void VulkanSurfacePool::SubmitSurface(
     std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
         p_surface) {
   TRACE_EVENT0("flutter", "VulkanSurfacePool::SubmitSurface");
-  if (!p_surface) {
+
+  // This cast is safe because |VulkanSurface| is the only implementation of
+  // |SurfaceProducerSurface| for Flutter on Fuchsia.  Additionally, it is
+  // required, because we need to access |VulkanSurface| specific information
+  // of the surface (such as the amount of VkDeviceMemory it contains).
+  auto vulkan_surface = std::unique_ptr<VulkanSurface>(
+      static_cast<VulkanSurface*>(p_surface.release()));
+  if (!vulkan_surface) {
     return;
   }
 
-  uintptr_t surface_key = reinterpret_cast<uintptr_t>(p_surface.get());
+  uintptr_t surface_key = reinterpret_cast<uintptr_t>(vulkan_surface.get());
 
-  auto insert_iterator =
-      pending_surfaces_.insert(std::make_pair(surface_key,          // key
-                                              std::move(p_surface)  // value
-                                              ));
+  auto insert_iterator = pending_surfaces_.insert(std::make_pair(
+      surface_key,               // key
+      std::move(vulkan_surface)  // value
+      ));
 
   if (insert_iterator.second) {
     insert_iterator.first->second->SignalWritesFinished(
@@ -83,6 +137,7 @@ void VulkanSurfacePool::SubmitSurface(
 
 std::unique_ptr<VulkanSurface> VulkanSurfacePool::CreateSurface(
     const SkISize& size) {
+  TRACE_EVENT0("flutter", "VulkanSurfacePool::CreateSurface");
   auto surface = std::make_unique<VulkanSurface>(vulkan_provider_, context_,
                                                  scenic_session_, size);
   if (!surface->IsValid()) {
@@ -102,8 +157,7 @@ void VulkanSurfacePool::RecycleSurface(uintptr_t surface_key) {
 
   // Grab a hold of the surface to recycle and clear the entry in the pending
   // surfaces collection.
-  std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
-      surface_to_recycle = std::move(found_in_pending->second);
+  auto surface_to_recycle = std::move(found_in_pending->second);
   pending_surfaces_.erase(found_in_pending);
 
   // The surface may have become invalid (for example it the fences could
@@ -112,32 +166,60 @@ void VulkanSurfacePool::RecycleSurface(uintptr_t surface_key) {
     return;
   }
 
-  // Recycle the buffer by putting it in the list of available surfaces if the
-  // maximum size of buffers in the collection is not already present.
-  auto& available_surfaces = available_surfaces_[surface_to_recycle->GetSize()];
-  if (available_surfaces.size() < kMaxSurfacesOfSameSize) {
-    available_surfaces.emplace_back(std::move(surface_to_recycle));
+  // Recycle the buffer by putting it in the list of available surfaces if we
+  // have not reached the maximum amount of cached surfaces.
+  if (available_surfaces_.size() < kMaxSurfaces) {
+    available_surfaces_.push_back(std::move(surface_to_recycle));
   }
 }
 
 void VulkanSurfacePool::AgeAndCollectOldBuffers() {
-  std::vector<SkISize> sizes_to_erase;
-  for (auto& surface_iterator : available_surfaces_) {
-    SurfacesSet& old_surfaces = surface_iterator.second;
-    SurfacesSet new_surfaces;
-    for (auto& surface : old_surfaces) {
-      if (surface->AdvanceAndGetAge() < kMaxSurfaceAge) {
-        new_surfaces.emplace_back(std::move(surface));
-      }
+  TRACE_EVENT0("flutter", "VulkanSurfacePool::AgeAndCollectOldBuffers");
+
+  // Remove all surfaces that are no longer valid or are too old.
+  available_surfaces_.erase(
+      std::remove_if(available_surfaces_.begin(), available_surfaces_.end(),
+                     [&](auto& surface) {
+                       return !surface->IsValid() ||
+                              surface->AdvanceAndGetAge() >= kMaxSurfaceAge;
+                     }),
+      available_surfaces_.end());
+
+  // Look for a surface that has both a larger |VkDeviceMemory| allocation
+  // than is necessary for its |VkImage|, and has a stable size history.
+  auto surface_to_remove_it = std::find_if(
+      available_surfaces_.begin(), available_surfaces_.end(),
+      [](const auto& surface) {
+        return surface->IsOversized() && surface->HasStableSizeHistory();
+      });
+  // If we found such a surface, then destroy it and cache a new one that only
+  // uses a necessary amount of memory.
+  if (surface_to_remove_it != available_surfaces_.end()) {
+    auto size = (*surface_to_remove_it)->GetSize();
+    available_surfaces_.erase(surface_to_remove_it);
+    auto new_surface = CreateSurface(size);
+    if (new_surface != nullptr) {
+      available_surfaces_.push_back(std::move(new_surface));
+    } else {
+      FML_DLOG(ERROR) << "Failed to create a new shrunk surface";
     }
-    if (new_surfaces.size() == 0) {
-      sizes_to_erase.emplace_back(surface_iterator.first);
+  }
+
+  TraceStats();
+}
+
+void VulkanSurfacePool::ShrinkToFit() {
+  for (auto& surface : available_surfaces_) {
+    if (surface->IsOversized()) {
+      auto size = surface->GetSize();
+      // Reset |surface| first so that the old surface and new surface don't
+      // exist at the same time at any point, reducing our peak memory
+      // footprint.
+      surface.reset();
+      surface = CreateSurface(size);
     }
-    old_surfaces.swap(new_surfaces);
   }
-  for (const auto& size : sizes_to_erase) {
-    available_surfaces_.erase(size);
-  }
+
   TraceStats();
 }
 
@@ -145,12 +227,10 @@ void VulkanSurfacePool::TraceStats() {
   // Resources held in cached buffers.
   size_t cached_surfaces = 0;
   size_t cached_surfaces_bytes = 0;
-  for (const auto& surfaces : available_surfaces_) {
-    const auto surface_count = surfaces.second.size();
-    cached_surfaces += surface_count;
-    // TODO(chinmaygarde): Assuming for now that all surfaces are 32bpp.
-    cached_surfaces_bytes +=
-        (surfaces.first.fWidth * surfaces.first.fHeight * 4 * surface_count);
+
+  for (const auto& surface : available_surfaces_) {
+    cached_surfaces++;
+    cached_surfaces_bytes += surface->GetAllocationSize();
   }
 
   // Resources held by Skia.

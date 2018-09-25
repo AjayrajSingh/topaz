@@ -134,6 +134,23 @@ void VulkanSurfaceProducer::OnSurfacesPresented(
 
   // Buffer management.
   surface_pool_->AgeAndCollectOldBuffers();
+
+  // If no further surface production has taken place for 10 frames (TODO:
+  // Don't hardcode refresh rate here), then shrink our surface pool to fit.
+  constexpr auto kShouldShrinkThreshold =
+      fxl::TimeDelta::FromMilliseconds(10 * 16.67);
+  deprecated_loop::MessageLoop::GetCurrent()->task_runner()->PostDelayedTask(
+      [self = weak_factory_.GetWeakPtr(), kShouldShrinkThreshold] {
+        if (!self) {
+          return;
+        }
+        auto time_since_last_produce =
+            fxl::TimePoint::Now() - self->last_produce_time_;
+        if (time_since_last_produce >= kShouldShrinkThreshold) {
+          self->surface_pool_->ShrinkToFit();
+        }
+      },
+      kShouldShrinkThreshold);
 }
 
 bool VulkanSurfaceProducer::TransitionSurfacesToExternal(
@@ -196,6 +213,7 @@ bool VulkanSurfaceProducer::TransitionSurfacesToExternal(
 std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
 VulkanSurfaceProducer::ProduceSurface(const SkISize& size) {
   FML_DCHECK(valid_);
+  last_produce_time_ = fxl::TimePoint::Now();
   return surface_pool_->AcquireSurface(size);
 }
 

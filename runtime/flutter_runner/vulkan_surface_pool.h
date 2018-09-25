@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <list>
 #include <unordered_map>
+#include <vector>
 
 #include "flutter/fml/macros.h"
 #include "vulkan_surface.h"
@@ -14,8 +14,11 @@ namespace flutter {
 
 class VulkanSurfacePool final {
  public:
-  static const size_t kMaxSurfacesOfSameSize = 3;
-  static const size_t kMaxSurfaceAge = 3;
+  // Only keep 12 surfaces at a time.  This value was based on how many
+  // surfaces got cached in the old, exact-match-only caching logic.
+  static constexpr int kMaxSurfaces = 12;
+  // If a surface doesn't get used for 3 or more generations, we discard it.
+  static constexpr int kMaxSurfaceAge = 3;
 
   VulkanSurfacePool(vulkan::VulkanProvider& vulkan_provider,
                     sk_sp<GrContext> context, scenic::Session* scenic_session);
@@ -31,31 +34,16 @@ class VulkanSurfacePool final {
 
   void AgeAndCollectOldBuffers();
 
+  // Shrink all oversized |VulkanSurfaces| in |available_surfaces_| to as
+  // small as they can be.
+  void ShrinkToFit();
+
  private:
-  using SurfacesSet = std::list<
-      std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>>;
-
-  template <class T>
-  static void HashCombine(size_t& seed, T const& v) {
-    seed ^= std::hash<T>()(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-  }
-
-  struct SkISizeHash {
-    std::size_t operator()(const SkISize& key) const {
-      size_t seed = 0;
-      HashCombine(seed, key.fWidth);
-      HashCombine(seed, key.fHeight);
-      return seed;
-    }
-  };
-
   vulkan::VulkanProvider& vulkan_provider_;
   sk_sp<GrContext> context_;
   scenic::Session* scenic_session_;
-  std::unordered_map<SkISize, SurfacesSet, SkISizeHash> available_surfaces_;
-  std::unordered_map<
-      uintptr_t,
-      std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>>
+  std::vector<std::unique_ptr<VulkanSurface>> available_surfaces_;
+  std::unordered_map<uintptr_t, std::unique_ptr<VulkanSurface>>
       pending_surfaces_;
   size_t trace_surfaces_created_ = 0;
   size_t trace_surfaces_reused_ = 0;
