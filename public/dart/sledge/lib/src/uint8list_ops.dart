@@ -55,6 +55,23 @@ HashMap<Uint8List, T> newUint8ListMap<T>() {
       equals: listEquality.equals, hashCode: listEquality.hash);
 }
 
+int _compareLists(List a, List b) {
+  final minLength = min(a.length, b.length);
+  for (int i = 0; i < minLength; i++) {
+    if (a[i] != b[i]) {
+      return a[i] - b[i];
+    }
+  }
+  // Missing parts come before present ones.
+  return a.length.compareTo(b.length);
+}
+
+/// Returns a new ordered HashMap with Uint8Lists as a keys.
+/// Note: The type T is enforced only at compile time.
+SplayTreeMap<Uint8List, T> newUint8ListOrderedMap<T>() {
+  return new SplayTreeMap<Uint8List, T>(_compareLists);
+}
+
 /// Returns a 20 bytes long hash of [data].
 Uint8List hash(Uint8List data) {
   final iterable = sha256.convert(data).bytes.getRange(0, 20);

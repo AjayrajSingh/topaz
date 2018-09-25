@@ -16,7 +16,7 @@ import 'entry.dart';
 /// It stores timestamps for deleted keys (time of deletion).
 /// Used to fake Ledger's KeyValue storage.
 class StorageState {
-  final Map<Uint8List, Entry> _storage = newUint8ListMap<Entry>();
+  final Map<Uint8List, Entry> _storage = newUint8ListOrderedMap<Entry>();
   static int globalIncrementalTimer = 0;
   final void Function(Change change) _onChangeCallback;
 
