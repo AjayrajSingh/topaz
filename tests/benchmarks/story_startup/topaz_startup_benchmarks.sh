@@ -32,4 +32,5 @@ bench() {
 bench "dashboard" "fuchsia.startup.dashboard"
 
 # choreography
-bench "choreography" "fuchsia.startup.choreography"
+# TODO(fmeawad): Disabled, See bug BLD-285 for details.
+# bench "choreography" "fuchsia.startup.choreography"
