@@ -28,14 +28,21 @@ sdk_molecule("fidl_dart") {
   ]
 }
 
+sdk_molecule("dart_support") {
+  deps = [
+    "//topaz/public/dart/fuchsia:fuchsia_sdk($dart_toolchain)",
+    "//topaz/runtime/dart:kernel_compiler_sdk($host_toolchain)",
+  ]
+}
+
 sdk("topaz") {
   category = "partner"
 
   testonly = true
 
   deps = [
+    ":dart_support",
     ":fidl_dart",
     "//garnet/public/sdk:garnet_molecule",
-    "//topaz/runtime/dart:kernel_compiler_sdk($host_toolchain)",
   ]
 }
