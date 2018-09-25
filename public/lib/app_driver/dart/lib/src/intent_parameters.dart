@@ -44,7 +44,7 @@ class IntentParameters {
       String parameterName, EntityCodec<T> codec) async {
     IntentParameterData data = _parameters[parameterName];
     if (data == null) {
-      throw Exception('Invalid parameter name');
+      throw Exception('Invalid parameter name: $parameterName');
     }
 
     switch (data.tag) {
