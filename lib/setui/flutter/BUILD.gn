@@ -25,10 +25,9 @@ dart_library("flutter") {
 }
 
 dart_test("lib_setui_flutter_test") {
-  source_dir = "."
 
   sources = [
-    "test/action_test.dart",
+    "action_test.dart",
   ]
 
   deps = [

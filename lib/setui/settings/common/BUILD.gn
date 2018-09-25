@@ -23,10 +23,9 @@ dart_library("common") {
 }
 
 dart_test("lib_setui_settings_common_test") {
-  source_dir = "."
 
   sources = [
-    "test/setting_controller_test.dart",
+    "setting_controller_test.dart",
   ]
 
   deps = [

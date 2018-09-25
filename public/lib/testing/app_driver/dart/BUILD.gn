@@ -18,11 +18,11 @@ dart_library("dart") {
 }
 
 dart_test("fake_module_driver_test") {
-  source_dir = "."
 
   sources = [
-    "test/fake_module_driver_test.dart",
+    "fake_module_driver_test.dart",
   ]
+
   deps = [
     ":dart",
     "//third_party/dart-pkg/pub/async",
