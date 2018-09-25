@@ -63,6 +63,18 @@ class GoogleAuthProviderApp {
     Settings settings;
     if (command_line.HasOption("chromium")) {
       settings.use_chromium = true;
+    } else if (command_line.HasOption("webkit")) {
+      settings.use_chromium = false;
+    }
+    if (command_line.HasOption("glif")) {
+      settings.use_glif = true;
+    } else if (command_line.HasOption("redcarpet")) {
+      settings.use_glif = false;
+    }
+    if (command_line.HasOption("fuchsiaendpoint")) {
+      settings.use_dedicated_endpoint = true;
+    } else if (command_line.HasOption("oauthendpoint")) {
+      settings.use_dedicated_endpoint = false;
     }
     return settings;
   }

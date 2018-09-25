@@ -10,6 +10,8 @@ constexpr char kFuchsiaClientId[] =
     "934259141868-rejmm4ollj1bs7th1vg2ur6antpbug79.apps.googleusercontent.com";
 constexpr char kGoogleOAuthAuthEndpoint[] =
     "https://accounts.google.com/o/oauth2/v2/auth";
+constexpr char kGoogleFuchsiaEndpoint[] =
+    "https://accounts.google.com/embedded/setup/fuchsia";
 constexpr char kGoogleOAuthTokenEndpoint[] =
     "https://www.googleapis.com/oauth2/v4/token";
 constexpr char kGoogleRevokeTokenEndpoint[] =

@@ -11,6 +11,12 @@ struct Settings {
   // Set true to display authentication UI using the chromium.web interface, or
   // false to use to the fuchsia.webview interface.
   bool use_chromium = false;
+  // Set true to request the "GLIF" UI style. The default of false will request
+  // the legacy "RedCarpet" UI style.
+  bool use_glif = false;
+  // Set true to connect to a dedicated authentication endpoint for Fuchsia
+  // instead of the standard OAuth endpoint.
+  bool use_dedicated_endpoint = false;
 };
 
 }  // namespace google_auth_provider

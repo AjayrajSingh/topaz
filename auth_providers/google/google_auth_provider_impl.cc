@@ -41,24 +41,6 @@ std::string GetClientId(const std::string& app_client_id) {
   return client_id;
 }
 
-std::string GetOAuthAuthUrl(fidl::StringPtr user_profile) {
-  // TODO(ukode,jsankey): use app_scopes instead of |kScopes|.
-  const std::vector<std::string> scopes(kScopes.begin(), kScopes.end());
-  std::string scopes_str = fxl::JoinStrings(scopes, "+");
-
-  std::string url = kGoogleOAuthAuthEndpoint;
-  url += "?scope=" + scopes_str;
-  url += "&response_type=code&redirect_uri=";
-  url += kRedirectUri;
-  url += "&client_id=";
-  url += kFuchsiaClientId;
-  // TODO(ukode,jsankey): Set user_profile_id in the state query arg for re-auth
-  //   This probably involves moving the current implementation of UrlEncoding
-  //   in OAuthRequestBuilder to a reusable library and using this to urlencode
-  //   the supplied user_profile into the login_hint query parameter.
-  return url;
-}
-
 // Checks the supplied Google authentication URL. If the URL indicated the user
 // has aborted the flow or an error occured these are reported as error
 // statuses, otherwise a status of OK is returned. If the URL contains an auth
@@ -131,7 +113,7 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
   FXL_DCHECK(auth_ui_context);
   get_persistent_credential_callback_ = std::move(callback);
 
-  std::string url = GetOAuthAuthUrl(user_profile_id);
+  std::string url = GetAuthorizeUrl(user_profile_id);
   ViewOwnerPtr view_owner;
   if (settings_.use_chromium) {
     view_owner = SetupChromium();
@@ -378,6 +360,28 @@ void GoogleAuthProviderImpl::OnNavigationStateChanged(
   }
 
   callback();
+}
+
+std::string GoogleAuthProviderImpl::GetAuthorizeUrl(
+    fidl::StringPtr user_profile) {
+  // TODO(ukode,jsankey): use app_scopes instead of |kScopes|.
+  const std::vector<std::string> scopes(kScopes.begin(), kScopes.end());
+  std::string scopes_str = fxl::JoinStrings(scopes, "+");
+
+  std::string url = settings_.use_dedicated_endpoint ? kGoogleFuchsiaEndpoint
+                                                     : kGoogleOAuthAuthEndpoint;
+  url += "?scope=" + scopes_str;
+  url += "&glif=";
+  url += settings_.use_glif ? "true" : "false";
+  url += "&response_type=code&redirect_uri=";
+  url += kRedirectUri;
+  url += "&client_id=";
+  url += kFuchsiaClientId;
+  // TODO(ukode,jsankey): Set user_profile_id in the state query arg for re-auth
+  // This probably involves moving the current implementation of UrlEncoding in
+  // OAuthRequestBuilder to a reusable library and using this to urlencode the
+  // supplied user_profile into the login_hint query parameter.
+  return url;
 }
 
 void GoogleAuthProviderImpl::ExchangeAuthCode(std::string auth_code) {

@@ -92,6 +92,10 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
       NavigationEvent change,
       OnNavigationStateChangedCallback callback) override;
 
+  // Returns the URL to be used for the authentication call, respecting any
+  // settings that influence the URL.
+  std::string GetAuthorizeUrl(fidl::StringPtr user_profile_id);
+
   // Calls the OAuth auth endpoint to exchange the supplied |auth_code| for a
   // long term credential, and then calls |GetUserProfile| with that credential.
   // If any errors are encountered a failure status is returned on the pending
