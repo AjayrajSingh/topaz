@@ -75,7 +75,7 @@ fi
     script += test_failed_check_block
   else:
     for test_executable in args.test:
-      script += "%s\n" % test_executable
+      script += '%s "$@"\n' % test_executable
 
   with open(test_file, 'w') as file:
       file.write(script)
