@@ -21,7 +21,7 @@ constexpr char kGooglePeopleGetEndpoint[] =
 constexpr char kFirebaseAuthEndpoint[] =
     "https://www.googleapis.com/identitytoolkit/v3/relyingparty/"
     "verifyAssertion";
-constexpr char kRedirectUri[] = "com.google.fuchsia.auth:/oauth2redirect";
+constexpr char kRedirectUri[] = "https://localhost/fuchsiaoauth2redirect";
 constexpr char kWebViewUrl[] = "web_view";
 
 constexpr auto kScopes = {"openid",
