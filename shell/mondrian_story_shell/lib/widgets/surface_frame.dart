@@ -9,11 +9,7 @@ import 'package:flutter/widgets.dart';
 
 import '../models/depth_model.dart';
 
-const Duration _scaleAnimationDuration = const Duration(seconds: 1);
-const double _scaleMinScale = 0.6;
-const double _scaleMaxScale = 1.0;
 const double _surfaceDepth = 250.0;
-const Curve _scaleCurve = Curves.fastOutSlowIn;
 
 /// Frame for child views
 class SurfaceFrame extends StatelessWidget {
@@ -35,18 +31,8 @@ class SurfaceFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double scale = lerpDouble(
-      _scaleMinScale,
-      _scaleMaxScale,
-      (1.0 - depth.clamp(0.0, 1.0)),
-    );
-    Matrix4 transform = new Matrix4.identity()..scale(scale, scale);
-
-    return new AnimatedContainer(
-      duration: _scaleAnimationDuration,
-      curve: _scaleCurve,
+    return new Container(
       alignment: FractionalOffset.center,
-      transform: transform,
       child: new IgnorePointer(
         child: new ScopedModelDescendant<DepthModel>(
           builder: (
@@ -65,7 +51,6 @@ class SurfaceFrame extends StatelessWidget {
               _surfaceDepth,
               (depthModel.maxDepth - depth) / 2.0,
             ).clamp(0.0, _surfaceDepth);
-
             return new PhysicalModel(
               elevation: elevation,
               color: const Color(0x00000000),
