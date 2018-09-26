@@ -6,13 +6,6 @@ import("//build/dart/dart_library.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 import("//build/dart/dart_fuchsia_test.gni")
 
-library_deps = [
-  "//peridot/public/fidl/fuchsia.modular",
-  "//third_party/dart-pkg/pub/meta",
-  "//topaz/public/dart/fidl",
-  "//topaz/public/dart/fuchsia",
-]
-
 dart_library("modular") {
   package_name = "modular"
 
@@ -27,23 +20,36 @@ dart_library("modular") {
     "logger.dart",
     "lifecycle.dart",
     "module.dart",
+    "src/lifecycle/_lifecycle_impl.dart",
+    "src/lifecycle/lifecycle.dart",
+    "src/module/_intent_handler_impl.dart",
+    "src/module/_module_impl.dart",
+    "src/module/intent.dart",
+    "src/module/intent_handler.dart",
+    "src/module/module.dart",
+    "src/module/module_state_exception.dart",
+    "src/module/noop_intent_handler.dart",
   ]
 
-  deps = library_deps
+  deps = [
+    "//peridot/public/fidl/fuchsia.modular",
+    "//third_party/dart-pkg/pub/meta",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/dart/fuchsia",
+  ]
 }
 
 dart_test("modular_package_unittests") {
 
   sources = [
-    "module/intent_handler_host_test.dart",
-    "module/intent_handler_test.dart",
+    "module/intent_handler_impl_test.dart",
     "module/module_impl_test.dart",
     "module/module_test.dart",
     "module/noop_intent_handler_test.dart",
     "lifecycle/lifecycle_test.dart"
   ]
 
-  deps = library_deps + [
+  deps = [
     ":modular",
     "//third_party/dart-pkg/pub/test",
   ]
@@ -55,7 +61,7 @@ dart_fuchsia_test("modular_package_integration_tests") {
     "lifecycle/lifecycle_impl_test.dart"
   ]
 
-  deps = library_deps + [
+  deps = [
     ":modular",
     "//third_party/dart-pkg/pub/test",
   ]

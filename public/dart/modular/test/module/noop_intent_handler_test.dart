@@ -4,13 +4,13 @@
 
 import 'package:test/test.dart';
 
-import 'package:modular/src/module/intent_handler.dart'; // ignore: implementation_imports
+import 'package:modular/src/module/intent.dart'; // ignore: implementation_imports
 import 'package:modular/src/module/noop_intent_handler.dart'; // ignore: implementation_imports
 
 void main() {
   group('no-op intent handler', () {
     test('calling handle intent does nothing', () {
-      NoopIntentHandler().handleIntent('foo', Intent());
+      NoopIntentHandler().handleIntent(Intent(action: 'foo'));
     });
   });
 }

@@ -4,7 +4,8 @@
 
 import 'package:meta/meta.dart';
 
-import '_intent_handler_host.dart';
+import '_intent_handler_impl.dart';
+import 'intent.dart';
 import 'intent_handler.dart';
 import 'module.dart';
 import 'module_state_exception.dart';
@@ -19,12 +20,12 @@ class ModuleImpl implements Module {
   /// The intent handler host which will proxy intents to the registered
   /// intent handler
   //ignore: unused_field
-  IntentHandlerHost _intentHandlerHost;
+  IntentHandlerImpl _intentHandlerImpl;
 
   /// The default constructor for this instance.
-  ModuleImpl({@required IntentHandlerHost intentHandlerHost})
-      : assert(intentHandlerHost != null) {
-    _intentHandlerHost = intentHandlerHost
+  ModuleImpl({@required IntentHandlerImpl intentHandlerImpl})
+      : assert(intentHandlerImpl != null) {
+    _intentHandlerImpl = intentHandlerImpl
       ..onHandleIntent = _proxyIntentToIntentHandler;
   }
 
@@ -38,7 +39,7 @@ class ModuleImpl implements Module {
     _intentHandler = intentHandler;
   }
 
-  void _proxyIntentToIntentHandler(String name, Intent intent) {
+  void _proxyIntentToIntentHandler(Intent intent) {
     if (_intentHandler == null) {
       throw ModuleStateException(
           'Module received an intent but no intent handler was registered to '
@@ -46,6 +47,6 @@ class ModuleImpl implements Module {
           'need to use the module functionality register a NoopIntentHandler '
           'to explicitly declare that you will not handle the intent.');
     }
-    _intentHandler.handleIntent(name, intent);
+    _intentHandler.handleIntent(intent);
   }
 }

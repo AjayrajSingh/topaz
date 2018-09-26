@@ -5,6 +5,7 @@
 /// A collection of utilities simplifying module interactions
 library module;
 
+export 'src/module/intent.dart';
 export 'src/module/intent_handler.dart';
 export 'src/module/module.dart';
 export 'src/module/module_state_exception.dart';

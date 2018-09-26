@@ -4,7 +4,7 @@
 
 import 'package:fuchsia/services.dart';
 
-import '_intent_handler_host.dart';
+import '_intent_handler_impl.dart';
 import '_module_impl.dart';
 import 'intent_handler.dart';
 
@@ -18,8 +18,8 @@ abstract class Module {
   /// returns a shared instance of this.
   factory Module() {
     return _module ??= ModuleImpl(
-      intentHandlerHost:
-          IntentHandlerHost(startupContext: StartupContext.fromStartupInfo()),
+      intentHandlerImpl:
+          IntentHandlerImpl(startupContext: StartupContext.fromStartupInfo()),
     );
   }
 

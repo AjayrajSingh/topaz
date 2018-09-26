@@ -6,8 +6,9 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
 import 'package:test/test.dart';
 
-import 'package:modular/src/module/_intent_handler_host.dart'; // ignore: implementation_imports
+import 'package:modular/src/module/_intent_handler_impl.dart'; // ignore: implementation_imports
 import 'package:modular/src/module/_module_impl.dart'; // ignore: implementation_imports
+import 'package:modular/src/module/intent.dart'; // ignore: implementation_imports
 import 'package:modular/src/module/intent_handler.dart'; // ignore: implementation_imports
 import 'package:modular/src/module/noop_intent_handler.dart'; // ignore: implementation_imports
 
@@ -19,11 +20,12 @@ const fidl.Intent _emptyIntent = fidl.Intent(
 
 void main() {
   ModuleImpl mod;
-  IntentHandlerHost host;
+  IntentHandlerImpl handlerImpl;
 
   setUp(() {
-    host = IntentHandlerHost(startupContext: StartupContext.fromStartupInfo());
-    mod = ModuleImpl(intentHandlerHost: host);
+    handlerImpl =
+        IntentHandlerImpl(startupContext: StartupContext.fromStartupInfo());
+    mod = ModuleImpl(intentHandlerImpl: handlerImpl);
   });
 
   group('intent handling', () {
@@ -36,7 +38,7 @@ void main() {
     });
 
     test('throws when no intent handler registered', () {
-      expect(host.handleIntent(_emptyIntent), throwsException);
+      expect(handlerImpl.handleIntent(_emptyIntent), throwsException);
     });
 
     test('module proxies intents to handler', () {
@@ -45,7 +47,7 @@ void main() {
         ..onDidHandleIntent = () => didHandleIntent = true;
 
       mod.registerIntentHandler(handler);
-      host.handleIntent(_emptyIntent);
+      handlerImpl.handleIntent(_emptyIntent);
       expect(didHandleIntent, isTrue);
     });
   });
@@ -55,7 +57,7 @@ class _StubIntentHandler implements IntentHandler {
   void Function() onDidHandleIntent;
 
   @override
-  void handleIntent(String name, Intent intent) {
+  void handleIntent(Intent intent) {
     if (onDidHandleIntent != null) {
       onDidHandleIntent();
     }

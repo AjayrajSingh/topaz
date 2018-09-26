@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'intent.dart';
 import 'intent_handler.dart';
 
 /// A concrete implementation of the [IntentHandler] class. This class
@@ -16,5 +17,5 @@ import 'intent_handler.dart';
 /// ```
 class NoopIntentHandler extends IntentHandler {
   @override
-  void handleIntent(String name, Intent intent) {}
+  void handleIntent(Intent intent) {}
 }
