@@ -7,10 +7,9 @@ import 'package:lib_setui_settings_common/setting_source.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import '../lib/service.dart';
-import '../lib/src/local_service.dart';
-import '../lib/src/setting_controller.dart';
-// ignore_for_file: avoid_relative_lib_imports
+import 'package:lib_setui_service/service.dart';
+import 'package:lib_setui_service/src/local_service.dart'; // ignore: implementation_imports
+import 'package:lib_setui_service/src/setting_controller.dart'; // ignore: implementation_imports
 
 const String defaultValue = 'default';
 

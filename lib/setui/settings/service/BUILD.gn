@@ -25,10 +25,9 @@ dart_library("service") {
 }
 
 dart_test("lib_setui_service_test") {
-  source_dir = "."
 
   sources = [
-    "test/service_test.dart",
+    "service_test.dart",
   ]
 
   deps = [
