@@ -4,7 +4,7 @@
 
 import 'package:test/test.dart';
 
-import '../../lib/src/services/startup_context.dart'; // ignore: avoid_relative_lib_imports
+import 'package:fuchsia/src/services/startup_context.dart'; // ignore: implementation_imports
 
 void main() {
   group('StartupContext', () {

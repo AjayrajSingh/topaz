@@ -4,8 +4,7 @@
 
 import 'package:test/test.dart';
 
-// ignore_for_file: avoid_relative_lib_imports
-import '../../lib/src/lifecycle/_lifecycle_impl.dart';
+import 'package:modular/src/lifecycle/_lifecycle_impl.dart'; // ignore: implementation_imports
 
 Future<void> terminateListener1() async {
   print('terminateListener1');

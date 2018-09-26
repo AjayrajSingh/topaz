@@ -5,8 +5,7 @@
 import 'package:fuchsia/services.dart';
 import 'package:test/test.dart';
 
-// ignore_for_file: avoid_relative_lib_imports
-import '../../lib/src/module/_intent_handler_host.dart';
+import 'package:modular/src/module/_intent_handler_host.dart'; // ignore: implementation_imports
 
 void main() {
   group('intent handler host', () {

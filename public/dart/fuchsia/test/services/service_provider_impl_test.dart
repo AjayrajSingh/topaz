@@ -4,8 +4,7 @@
 
 import 'package:test/test.dart';
 
-// ignore_for_file: avoid_relative_lib_imports
-import '../../lib/src/services/service_provider_impl.dart';
+import 'package:fuchsia/src/services/service_provider_impl.dart'; // ignore: implementation_imports
 
 void main() {
   group('service provider impl', () {

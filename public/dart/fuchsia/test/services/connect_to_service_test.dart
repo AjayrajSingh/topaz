@@ -4,10 +4,9 @@
 
 import 'package:test/test.dart';
 
-// ignore_for_file: avoid_relative_lib_imports
-import '../../lib/src/services/connect_to_service.dart';
-import '../../lib/testing/stub_async_proxy_controller.dart';
-import '../../lib/testing/stub_service_provider.dart';
+import 'package:fuchsia/src/services/connect_to_service.dart'; // ignore: implementation_imports
+import 'package:fuchsia/testing/stub_async_proxy_controller.dart';
+import 'package:fuchsia/testing/stub_service_provider.dart';
 
 void main() {
   group('connectToService', () {

@@ -35,15 +35,15 @@ dart_library("fuchsia") {
 }
 
 dart_test("fuchsia_package_unittests") {
-  source_dir = "."
 
   sources = [
-    "test/services/connect_to_service_test.dart",
-    "test/services/service_provider_impl_test.dart",
-    "test/services/startup_context_test.dart",
+    "services/connect_to_service_test.dart",
+    "services/service_provider_impl_test.dart",
+    "services/startup_context_test.dart",
   ]
 
   deps = library_deps + [
+    ":fuchsia",
     "//third_party/dart-pkg/pub/test",
   ]
 }

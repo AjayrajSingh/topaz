@@ -33,30 +33,30 @@ dart_library("modular") {
 }
 
 dart_test("modular_package_unittests") {
-  source_dir = "."
 
   sources = [
-    "test/module/intent_handler_host_test.dart",
-    "test/module/intent_handler_test.dart",
-    "test/module/module_impl_test.dart",
-    "test/module/module_test.dart",
-    "test/module/noop_intent_handler_test.dart",
-    "test/lifecycle/lifecycle_test.dart"
+    "module/intent_handler_host_test.dart",
+    "module/intent_handler_test.dart",
+    "module/module_impl_test.dart",
+    "module/module_test.dart",
+    "module/noop_intent_handler_test.dart",
+    "lifecycle/lifecycle_test.dart"
   ]
 
   deps = library_deps + [
+    ":modular",
     "//third_party/dart-pkg/pub/test",
   ]
 }
 
 dart_fuchsia_test("modular_package_integration_tests") {
-  source_dir = "."
 
   sources = [
-    "test/lifecycle/lifecycle_impl_test.dart"
+    "lifecycle/lifecycle_impl_test.dart"
   ]
 
   deps = library_deps + [
+    ":modular",
     "//third_party/dart-pkg/pub/test",
   ]
 }

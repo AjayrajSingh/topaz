@@ -24,17 +24,10 @@ dart_library("common") {
 }
 
 dart_test("tictactoe_game_test") {
-  source_dir = "."
+
   sources = [
-    "lib/common.dart",
-    "lib/src/board.dart",
-    "lib/src/game.dart",
-    "lib/src/score.dart",
-    "lib/src/score_codec.dart",
-    "lib/src/square.dart",
-    "lib/src/win_detection.dart",
-    "test/game_test.dart",
-    "test/win_detection_test.dart",
+    "game_test.dart",
+    "win_detection_test.dart",
   ]
 
   deps = [

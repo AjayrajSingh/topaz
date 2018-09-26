@@ -4,9 +4,8 @@
 
 import 'package:test/test.dart';
 
-// ignore_for_file: avoid_relative_lib_imports
-import '../../lib/src/module/intent_handler.dart';
-import '../../lib/src/module/noop_intent_handler.dart';
+import 'package:modular/src/module/intent_handler.dart'; // ignore: implementation_imports
+import 'package:modular/src/module/noop_intent_handler.dart'; // ignore: implementation_imports
 
 void main() {
   group('no-op intent handler', () {

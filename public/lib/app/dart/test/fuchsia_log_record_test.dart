@@ -7,8 +7,8 @@ import 'dart:io';
 import 'package:test/test.dart';
 import 'package:zircon/zircon.dart';
 
-import '../logging.dart';
-import '../src/fuchsia_log_record.dart';
+import 'package:lib.app.dart/logging.dart';
+import 'package:lib.app.dart/src/fuchsia_log_record.dart';
 
 const int _lookBackTimeGap = 15 * 1000 * 1000 * 1000; // 15 sec in nanoseconds
 

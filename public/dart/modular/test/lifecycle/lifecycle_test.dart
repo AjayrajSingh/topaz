@@ -4,8 +4,7 @@
 
 import 'package:test/test.dart';
 
-// ignore_for_file: avoid_relative_lib_imports
-import '../../lib/src/lifecycle/lifecycle.dart';
+import 'package:modular/src/lifecycle/lifecycle.dart'; // ignore: implementation_imports
 
 void main() {
   test('factory should return same instance', () {

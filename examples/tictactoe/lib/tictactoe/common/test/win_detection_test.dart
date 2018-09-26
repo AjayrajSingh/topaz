@@ -4,10 +4,10 @@
 
 import 'package:test/test.dart';
 
-import '../lib/src/board.dart'; // ignore: avoid_relative_lib_imports
-import '../lib/src/game.dart'; // ignore: avoid_relative_lib_imports
-import '../lib/src/square.dart'; // ignore: avoid_relative_lib_imports
-import '../lib/src/win_detection.dart'; // ignore: avoid_relative_lib_imports
+import 'package:tictactoe_common/src/board.dart'; // ignore: implementation_imports
+import 'package:tictactoe_common/src/game.dart'; // ignore: implementation_imports
+import 'package:tictactoe_common/src/square.dart'; // ignore: implementation_imports
+import 'package:tictactoe_common/src/win_detection.dart'; // ignore: implementation_imports
 
 const SquareState _ = SquareState.empty;
 const SquareState x = SquareState.x;
