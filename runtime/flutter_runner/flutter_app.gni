@@ -597,7 +597,7 @@ template("_flutter_aot_component") {
       sources = component.sources
 
       main_dart = component.main_dart
-      args = [ "--aot" ]
+      args = [ "--aot", "--tfa" ]
     }
 
     # TODO(rmacnak): Don't bake the VM service into each app.

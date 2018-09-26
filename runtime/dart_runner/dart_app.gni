@@ -348,7 +348,7 @@ template("_dart_aot_package") {
       sources = component.sources
 
       main_dart = component.main_dart
-      args = [ "--aot" ]
+      args = [ "--aot", "--tfa" ]
     }
 
 

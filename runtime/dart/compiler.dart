@@ -33,6 +33,8 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addFlag('aot',
       help: 'Run compiler in AOT mode (enables whole-program transformations)',
       defaultsTo: false)
+  ..addFlag('tfa',
+      help: 'Run global type flow analysis', defaultsTo: false)
   ..addFlag('drop-ast',
       help: 'Drop AST for members with bytecode', defaultsTo: false)
   ..addOption('component-name', help: 'Name of the component')
@@ -81,6 +83,7 @@ Future<void> main(List<String> args) async {
   final Uri singleRootBase = new Uri.file(options['single-root-base']);
   final String packages = options['packages'];
   final bool aot = options['aot'];
+  final bool tfa = options['tfa'];
   final bool embedSources = options['embed-sources'];
   final String targetName = options['target'];
   final bool genBytecode = options['gen-bytecode'];
@@ -141,6 +144,7 @@ Future<void> main(List<String> args) async {
     filenameUri,
     compilerOptions,
     aot: aot,
+    useGlobalTypeFlowAnalysis: tfa,
     genBytecode: genBytecode,
     dropAST: dropAST,
   );
