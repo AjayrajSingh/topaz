@@ -79,7 +79,7 @@ class VuMeterView : public mozart::SkiaView {
   void OnPacketCaptured(fuchsia::media::StreamPacket packet);
 
   async::Loop* const loop_;
-  fuchsia::media::AudioInPtr audio_in_;
+  fuchsia::media::AudioCapturerPtr audio_capturer_;
   fzl::VmoMapper payload_buffer_;
   bool started_ = false;
   bool request_in_flight_ = false;

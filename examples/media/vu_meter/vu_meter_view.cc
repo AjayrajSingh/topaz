@@ -37,14 +37,14 @@ VuMeterView::VuMeterView(
 
   auto audio =
       startup_context->ConnectToEnvironmentService<fuchsia::media::Audio>();
-  audio->CreateAudioIn(audio_in_.NewRequest(), false);
+  audio->CreateAudioCapturer(audio_capturer_.NewRequest(), false);
 
-  audio_in_.set_error_handler([this]() {
+  audio_capturer_.set_error_handler([this]() {
     FXL_LOG(ERROR) << "Connection error occurred. Quitting.";
     Shutdown();
   });
 
-  audio_in_->GetStreamType([this](fuchsia::media::StreamType type) {
+  audio_capturer_->GetStreamType([this](fuchsia::media::StreamType type) {
     OnDefaultFormatFetched(std::move(type));
   });
 }
@@ -119,7 +119,7 @@ void VuMeterView::SendCaptureRequest() {
   }
 
   // clang-format off
-  audio_in_->CaptureAt(
+  audio_capturer_->CaptureAt(
       0, 0, payload_buffer_.size() / kBytesPerFrame,
       [this](fuchsia::media::StreamPacket packet) {
         OnPacketCaptured(std::move(packet));
@@ -136,7 +136,7 @@ void VuMeterView::OnDefaultFormatFetched(
   FXL_DCHECK(default_type.medium_specific.is_audio());
   const auto& audio_details = default_type.medium_specific.audio();
 
-  audio_in_->SetPcmStreamType(
+  audio_capturer_->SetPcmStreamType(
       media::CreateAudioStreamType(fuchsia::media::AudioSampleFormat::SIGNED_16,
                                    2, audio_details.frames_per_second));
 
@@ -148,15 +148,15 @@ void VuMeterView::OnDefaultFormatFetched(
       ZX_RIGHT_TRANSFER | ZX_RIGHT_READ | ZX_RIGHT_WRITE | ZX_RIGHT_MAP;
   zx_status_t zx_res;
   zx::vmo vmo;
-  zx_res = payload_buffer_.CreateAndMap(
-      payload_buffer_size, ZX_VM_PERM_READ, nullptr, &vmo, rights);
+  zx_res = payload_buffer_.CreateAndMap(payload_buffer_size, ZX_VM_PERM_READ,
+                                        nullptr, &vmo, rights);
   if (zx_res != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to create payload buffer (res " << zx_res << ")";
     Shutdown();
     return;
   }
 
-  audio_in_->AddPayloadBuffer(0, std::move(vmo));
+  audio_capturer_->AddPayloadBuffer(0, std::move(vmo));
 
   // Start capturing.
   ToggleStartStop();
@@ -190,7 +190,7 @@ void VuMeterView::OnPacketCaptured(fuchsia::media::StreamPacket packet) {
 }
 
 void VuMeterView::Shutdown() {
-  audio_in_.Unbind();
+  audio_capturer_.Unbind();
   loop_->Quit();
 }
 
