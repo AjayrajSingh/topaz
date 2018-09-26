@@ -8,5 +8,5 @@ chromium_web_sources = [
   "//topaz/third_party/chromium/fidl/chromium.web/context_provider.fidl",
   "//topaz/third_party/chromium/fidl/chromium.web/frame.fidl",
   "//topaz/third_party/chromium/fidl/chromium.web/navigation_controller.fidl",
-  "//topaz/third_party/chromium/fidl/chromium.web/navigation_state_change_observer.fidl",
+  "//topaz/third_party/chromium/fidl/chromium.web/navigation_event_observer.fidl",
 ]
