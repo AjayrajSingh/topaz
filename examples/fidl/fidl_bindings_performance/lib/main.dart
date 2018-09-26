@@ -17,7 +17,7 @@ const List<String> kDefaultServers = [
   'echo2_server_cpp',
   'echo2_server_rust',
   'echo2_server_go',
-  'echo_server_dart',
+  'fuchsia-pkg://fuchsia.com/echo_dart#meta/echo_server_dart.cmx',
   'echo_server_async_dart'
 ];
 const List<int> kDefaultCalls = [1000, 10000];

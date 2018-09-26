@@ -4,10 +4,8 @@
     ],
     "packages": [
         "//topaz/examples/fidl/echo_client_async_dart",
-        "//topaz/examples/fidl/echo_client_dart",
         "//topaz/examples/fidl:echo_dart",
         "//topaz/examples/fidl/echo_server_async_dart",
-        "//topaz/examples/fidl/echo_server_dart",
         "//topaz/examples/fidl/fidl_bindings_performance"
     ]
 }
