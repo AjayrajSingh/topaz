@@ -55,6 +55,20 @@ HashMap<Uint8List, T> newUint8ListMap<T>() {
       equals: listEquality.equals, hashCode: listEquality.hash);
 }
 
+/// Returns true if `a` and `b` are equal.
+/// Returns false otherwise.
+bool uint8ListsAreEqual(Uint8List a, Uint8List b) {
+  if (a == b) {
+    return true;
+  }
+  const listEquality = const ListEquality<int>();
+  return listEquality.equals(a, b);
+}
+
+/// Compares lists `a` and `b`.
+/// Returns 0 if the content of the two list is equal.
+/// Returns a number less than 0 if `a` is short or lexicographical before `b`.
+/// Returns a number greater than 0 otherwise.
 int _compareLists(List a, List b) {
   final minLength = min(a.length, b.length);
   for (int i = 0; i < minLength; i++) {

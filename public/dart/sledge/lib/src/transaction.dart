@@ -5,7 +5,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:collection/collection.dart';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 
 import 'document/change.dart';
@@ -151,51 +150,30 @@ class Transaction {
     return document;
   }
 
-  /// Returns the list of all documents of the given [schema]. The result will
-  /// not contain any updates in progress in the current transaction.
-  Future<List<Document>> getDocuments(Schema schema) async {
-    const listEquality = const ListEquality<int>();
+  /// Returns the list of the ids of all documents of the given [schema].
+  /// The result will not contain any updates in progress in the current transaction.
+  Future<List<DocumentId>> getDocumentIds(Schema schema) async {
     Uint8List keyPrefix = concatUint8Lists(
         sledge_storage.prefixForType(sledge_storage.KeyValueType.document),
         schema.hash);
 
     // Get all entries that correspond to the given schema.
-    final documents = <Document>[];
+    final documentIds = <DocumentId>[];
+
     List<KeyValue> keyValues =
         await getEntriesFromSnapshotWithPrefix(_pageSnapshotProxy, keyPrefix);
-    if (keyValues.isEmpty) {
-      return documents;
-    }
     // Entries are sorted by key, thus entries corresponding to the same
     // document will be in consecutive positions.
-    // Keys are serialized as: `d{schemaId}{documentId}{entryKey}`
-    Uint8List documentId;
-    final List<KeyValue> documentKeyValues = <KeyValue>[];
+    Uint8List currentDocumentSubId;
     for (KeyValue keyValue in keyValues) {
-      final nextDocumentId = getSublistView(keyValue.key,
-          start: 1 + Schema.hashLength, end: 1 + DocumentId.prefixLength);
-      final entry = new KeyValue(
-          getSublistView(keyValue.key, start: 1 + DocumentId.prefixLength),
-          keyValue.value);
-      documentKeyValues.add(entry);
-
-      if (!listEquality.equals(nextDocumentId, documentId)) {
-        if (documentId != null) {
-          // Create the document from the entries collected up to now.
-          documents
-              .add(new Document(_sledge, new DocumentId(schema, documentId)));
-          Document.applyChange(documents.last, new Change(documentKeyValues));
-        }
-        // Prepare the next document.
-        documentId = nextDocumentId;
-        documentKeyValues.clear();
+      final newDocumentSubId =
+          sledge_storage.documentSubIdFromKey(keyValue.key);
+      if (!uint8ListsAreEqual(currentDocumentSubId, newDocumentSubId)) {
+        documentIds.add(new DocumentId(schema, newDocumentSubId));
+        currentDocumentSubId = newDocumentSubId;
       }
     }
-    // Create the last document.
-    documents.add(new Document(_sledge, new DocumentId(schema, documentId)));
-    Document.applyChange(documents.last, new Change(documentKeyValues));
-
-    return documents;
+    return documentIds;
   }
 
   /// Returns whether the document identified with [documentId] exists.

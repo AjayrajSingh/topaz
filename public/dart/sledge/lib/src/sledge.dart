@@ -170,11 +170,18 @@ class Sledge {
   }
 
   /// Returns the list of all documents of the given [schema].
-  Future<List<Document>> getDocuments(Schema schema) {
+  Future<List<Document>> getDocuments(Schema schema) async {
     if (currentTransaction == null) {
       throw new StateError('No transaction started.');
     }
-    return currentTransaction.getDocuments(schema);
+
+    List<DocumentId> documentIds =
+        await currentTransaction.getDocumentIds(schema);
+    List<Future<Document>> documents = <Future<Document>>[];
+    for (final documentId in documentIds) {
+      documents.add(getDocument(documentId));
+    }
+    return Future.wait(documents);
   }
 
   /// Returns whether the document identified with [documentId] exists.

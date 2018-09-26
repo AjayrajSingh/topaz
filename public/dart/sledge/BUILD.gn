@@ -76,6 +76,7 @@ dart_test("dart_sledge_tests") {
     "fakes/fake_ledger_object_factories.dart",
     "fakes/fake_ledger_page.dart",
     "fakes/fake_ledger_page_snapshot.dart",
+    "get_documents_test.dart",
     "helpers.dart",
     "ledger_helpers_test.dart",
     "schema_test.dart",

@@ -10,6 +10,12 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/uint8list_ops.dart';
 import 'package:test/test.dart';
 
+bool _listsAreEqualHelper(a, b) {
+  final convertedA = new Uint8List.fromList(a);
+  final convertedB = new Uint8List.fromList(b);
+  return uint8ListsAreEqual(convertedA, convertedB);
+}
+
 void main() {
   setupLogger();
   test('Concatenation of Uint8Lists', () {
@@ -38,6 +44,16 @@ void main() {
     expect(getUint8ListFromString(' '), equals([32]));
     expect(getUint8ListFromString(' @'), equals([32, 64]));
     expect(getUint8ListFromString('🌸'), equals([0xf0, 0x9f, 0x8c, 0xb8]));
+  });
+
+  test('listsAreEqual', () {
+    expect(uint8ListsAreEqual(null, null), equals(true));
+    expect(uint8ListsAreEqual(new Uint8List.fromList([]), null), equals(false));
+    expect(_listsAreEqualHelper(<int>[], <int>[]), equals(true));
+    expect(_listsAreEqualHelper([1], <int>[]), equals(false));
+    expect(_listsAreEqualHelper([1], [1]), equals(true));
+    expect(_listsAreEqualHelper([1, 2], [1]), equals(false));
+    expect(_listsAreEqualHelper([1, 2], [1, 2]), equals(true));
   });
 
   test('Ordered map with Uint8List keys of same length', () {

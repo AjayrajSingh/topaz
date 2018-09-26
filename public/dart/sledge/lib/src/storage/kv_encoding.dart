@@ -4,6 +4,10 @@
 
 import 'dart:typed_data';
 
+import '../document/document_id.dart';
+import '../schema/schema.dart';
+import '../uint8list_ops.dart';
+
 /// The type of the KV stored in Ledger backing the data
 /// stored in Sledge.
 /// When modifying this enum:
@@ -26,4 +30,16 @@ const int typePrefixLength = 1;
 Uint8List prefixForType(KeyValueType type) {
   assert(type.index >= 0 && type.index <= 255);
   return new Uint8List.fromList([type.index]);
+}
+
+/// Returns the document subId stored in `key`.
+Uint8List documentSubIdFromKey(Uint8List key) {
+  // Keys are serialized as: `{keyValueType}{schemaId}{documentId}{entryKey}`
+  assert(uint8ListsAreEqual(
+      getSublistView(key, start: 0, end: typePrefixLength),
+      prefixForType(KeyValueType.document)));
+  final subId = getSublistView(key,
+      start: typePrefixLength + Schema.hashLength,
+      end: 1 + DocumentId.prefixLength);
+  return subId;
 }
