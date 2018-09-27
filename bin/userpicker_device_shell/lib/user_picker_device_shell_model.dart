@@ -5,13 +5,13 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:fidl_fuchsia_cobalt/fidl.dart' as cobalt;
+import 'package:fidl_fuchsia_modular_auth/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:fidl_fuchsia_cobalt/fidl.dart' as cobalt;
-import 'package:fidl_fuchsia_sys/fidl.dart';
-import 'package:fidl_fuchsia_modular_auth/fidl.dart';
-import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:lib.device_shell/base_model.dart';
 import 'package:lib.widgets/model.dart';
 
@@ -20,13 +20,6 @@ export 'package:lib.widgets/model.dart'
 
 /// Function signature for GetPresentationMode callback
 typedef GetPresentationModeCallback = void Function(PresentationMode mode);
-
-/// HACKY way to retrofit.
-typedef SetupCallback = void Function({
-  VoidCallback addNewUser,
-  VoidCallback loginAsGuest,
-  bool userPresent,
-});
 
 const Duration _kShowLoadingSpinnerDelay = const Duration(milliseconds: 500);
 
@@ -45,9 +38,6 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
   /// Called when wifi is tapped.
   final VoidCallback onWifiTapped;
 
-  /// Called when setup is tapped
-  final SetupCallback onSetup;
-
   /// Called when a user is logging in.
   final VoidCallback onLogin;
 
@@ -62,7 +52,6 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
     this.onWifiTapped,
     this.onLogin,
     cobalt.Logger logger,
-    this.onSetup,
   }) : super(logger);
 
   @override
@@ -107,21 +96,6 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
     _addingUser = false;
     _updateShowLoadingSpinner();
     notifyListeners();
-  }
-
-  /// Start the setup flow to create a new user and login with that user
-  void startSetupFlow() {
-    _addingUser = true;
-    _updateShowLoadingSpinner();
-    notifyListeners();
-
-    onSetup?.call(
-        addNewUser: createAndLoginUser,
-        loginAsGuest: () {
-          login(null);
-          hideUserActions();
-        },
-        userPresent: accounts.isNotEmpty);
   }
 
   /// Login with given user

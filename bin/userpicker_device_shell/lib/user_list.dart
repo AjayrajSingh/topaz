@@ -188,7 +188,7 @@ class UserList extends StatelessWidget {
           ),
           onTap: () {
             model
-              ..startSetupFlow()
+              ..createAndLoginUser()
               ..hideUserActions();
           },
           isSmall: isSmall,

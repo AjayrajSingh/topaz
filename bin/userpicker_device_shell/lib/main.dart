@@ -2,10 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
 import 'package:fidl_fuchsia_cobalt/fidl.dart' as cobalt;
 import 'package:fidl_fuchsia_mem/fidl.dart';
 import 'package:fidl_fuchsia_netstack/fidl.dart';
+import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.device_shell/netstack_model.dart';
@@ -16,11 +16,11 @@ import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
 import 'authentication_context_impl.dart';
+import 'authentication_overlay.dart';
+import 'authentication_overlay_model.dart';
 import 'authentication_ui_context_impl.dart';
 import 'user_picker_device_shell_model.dart';
 import 'user_picker_device_shell_screen.dart';
-import 'user_setup.dart';
-import 'user_setup_model.dart';
 
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
@@ -58,10 +58,9 @@ void main() {
   NetstackModel netstackModel = new NetstackModel(netstack: netstackProxy)
     ..start();
 
-  UserSetupModel userSetupModel = new UserSetupModel(
-      startupContext, netstackModel, _cancelAuthenticationFlow);
-
   _OverlayModel wifiInfoOverlayModel = new _OverlayModel();
+
+  final AuthenticationOverlayModel authModel = AuthenticationOverlayModel();
 
   UserPickerDeviceShellModel userPickerDeviceShellModel =
       new UserPickerDeviceShellModel(
@@ -75,7 +74,6 @@ void main() {
     onWifiTapped: () {
       wifiInfoOverlayModel.showing = !wifiInfoOverlayModel.showing;
     },
-    onSetup: userSetupModel.start,
     logger: logger,
   );
 
@@ -85,8 +83,10 @@ void main() {
       new UserPickerDeviceShellScreen(
         launcher: startupContext.launcher,
       ),
-      new ScopedModel<UserSetupModel>(
-          model: userSetupModel, child: const UserSetup()),
+      new ScopedModel<AuthenticationOverlayModel>(
+        model: authModel,
+        child: AuthenticationOverlay(),
+      ),
     ],
   );
 
@@ -120,11 +120,11 @@ void main() {
     startupContext: startupContext,
     deviceShellModel: userPickerDeviceShellModel,
     authenticationContext: new AuthenticationContextImpl(
-        onStartOverlay: userSetupModel.authModel.onStartOverlay,
-        onStopOverlay: userSetupModel.endAuthFlow),
+        onStartOverlay: authModel.onStartOverlay,
+        onStopOverlay: authModel.onStopOverlay),
     authenticationUiContext: new AuthenticationUiContextImpl(
-        onStartOverlay: userSetupModel.authModel.onStartOverlay,
-        onStopOverlay: userSetupModel.endAuthFlow),
+        onStartOverlay: authModel.onStartOverlay,
+        onStopOverlay: authModel.onStopOverlay),
     child: new LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) =>
           (constraints.biggest == Size.zero)
@@ -140,11 +140,6 @@ void main() {
 
   _deviceShellWidget.advertise();
   trace('started');
-}
-
-/// Cancels any ongoing authorization flows in the device shell.
-void _cancelAuthenticationFlow() {
-  _deviceShellWidget.cancelAuthenticationFlow();
 }
 
 class _WifiInfo extends StatelessWidget {
