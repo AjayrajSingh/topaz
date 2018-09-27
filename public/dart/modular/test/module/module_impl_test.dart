@@ -4,6 +4,8 @@
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
+import 'package:modular/lifecycle.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import 'package:modular/src/module/_intent_handler_impl.dart'; // ignore: implementation_imports
@@ -17,6 +19,9 @@ const fidl.Intent _emptyIntent = fidl.Intent(
   handler: '',
   parameters: [],
 );
+
+// Mock classes
+class MockLifecycle extends Mock implements Lifecycle {}
 
 void main() {
   ModuleImpl mod;
@@ -50,6 +55,12 @@ void main() {
       handlerImpl.handleIntent(_emptyIntent);
       expect(didHandleIntent, isTrue);
     });
+  });
+
+  test('verify Lifecycle init during the construction of ModuleImpl', () {
+    final mockLifecycle = MockLifecycle();
+    ModuleImpl(intentHandlerImpl: handlerImpl, lifecycle: mockLifecycle);
+    verify(mockLifecycle.addTerminateListener(any));
   });
 }
 

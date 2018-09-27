@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:meta/meta.dart';
+import 'package:modular/lifecycle.dart';
 
 import '_intent_handler_impl.dart';
 import 'intent.dart';
@@ -23,8 +24,10 @@ class ModuleImpl implements Module {
   IntentHandlerImpl _intentHandlerImpl;
 
   /// The default constructor for this instance.
-  ModuleImpl({@required IntentHandlerImpl intentHandlerImpl})
+  ModuleImpl(
+      {@required IntentHandlerImpl intentHandlerImpl, Lifecycle lifecycle})
       : assert(intentHandlerImpl != null) {
+    (lifecycle ??= Lifecycle()).addTerminateListener(_terminate);
     _intentHandlerImpl = intentHandlerImpl
       ..onHandleIntent = _proxyIntentToIntentHandler;
   }
@@ -48,5 +51,10 @@ class ModuleImpl implements Module {
           'to explicitly declare that you will not handle the intent.');
     }
     _intentHandler.handleIntent(intent);
+  }
+
+  // any necessary cleanup should be done in this method.
+  Future<void> _terminate() async {
+    _intentHandler = null;
   }
 }

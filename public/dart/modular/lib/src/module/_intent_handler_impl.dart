@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
+import 'package:modular/lifecycle.dart';
 
 import 'intent.dart';
 
@@ -30,6 +31,7 @@ class IntentHandlerImpl extends fidl.IntentHandler {
   /// default to using [StartupContext.fromStartupInfo] if not present.
   IntentHandlerImpl({StartupContext startupContext}) {
     _exposeService(startupContext ?? StartupContext.fromStartupInfo());
+    Lifecycle().addTerminateListener(_terminate);
   }
 
   // Note: this method needs to run before the first iteration of
@@ -74,5 +76,11 @@ class IntentHandlerImpl extends fidl.IntentHandler {
         throw Exception(
             'IntentParameter with type ${parameter.data.tag} is not supported at this time');
     }
+  }
+
+    // any necessary cleanup should be done in this method.
+  Future<void> _terminate() async {
+    _intentHandlerBinding.close();
+    onHandleIntent = null;
   }
 }

@@ -51,6 +51,7 @@ dart_test("modular_package_unittests") {
 
   deps = [
     ":modular",
+    "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",
   ]
 }
@@ -63,6 +64,7 @@ dart_fuchsia_test("modular_package_integration_tests") {
 
   deps = [
     ":modular",
+    "//third_party/dart-pkg/pub/mockito", # Remove after DX-470 is fixed
     "//third_party/dart-pkg/pub/test",
   ]
 }
