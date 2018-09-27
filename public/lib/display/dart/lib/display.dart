@@ -29,6 +29,7 @@ class Display extends DeviceSettingsWatcher {
       DeviceSettingsManagerProxy();
   double _brightness;
 
+  // ignore: public_member_api_docs
   Display(ServiceProvider services) {
     connectToService(services, _displayManagerService.ctrl);
     _displayManagerService.ctrl.onConnectionError =
@@ -76,12 +77,14 @@ class Display extends DeviceSettingsWatcher {
     });
   }
 
+  // ignore: public_member_api_docs
   void addListener(void onEvent(double brightness)) {
     _brightnessStreamController.stream.listen(onEvent);
   }
 
   // Cache the brightness so callers can retrieve it without reading the
   // device settings or display.
+  // ignore: public_member_api_docs
   double get brightness => _brightness;
 
   /// Sets the brightness to the specified percentage. If specified, the

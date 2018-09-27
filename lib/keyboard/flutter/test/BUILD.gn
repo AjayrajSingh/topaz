@@ -5,31 +5,57 @@
 import("//build/dart/dart_library.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
-dart_library("flutter") {
-  infer_package_name = true
+dart_library("dart") {
+  package_name = "keyboard.dart"
 
   sources = [
-    "display_policy_brightness_model.dart",
+    "keyboard_display.dart",
   ]
 
+  source_dir = "dart"
+
   deps = [
-    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//garnet/public/fidl/fuchsia.ui.input",
+    "//topaz/lib/shell",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/display/dart",
+    "//topaz/public/lib/app/dart",
   ]
 }
 
-dart_test("display_test") {
+
+dart_library("flutter") {
+  package_name = "keyboard.flutter"
+
+  source_dir = "flutter"
 
   sources = [
-    "display_policy_brightness_model_test.dart",
+    "keyboard.dart",
   ]
 
   deps = [
+    ":dart",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/lib/shell",
+    "//topaz/shell/keyboard",
+  ]
+}
+
+
+dart_test("keyboard_test") {
+
+  sources = [
+    "keyboard_model_test.dart",
+  ]
+
+  deps = [
+    ":dart",
     ":flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
     "//third_party/dart-pkg/pub/mockito",
-    "//topaz/public/lib/display/dart",
+    "//topaz/lib/shell",
   ]
 }
+

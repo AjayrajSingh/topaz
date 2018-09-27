@@ -7,8 +7,6 @@ import("//build/dart/dart_library.gni")
 dart_library("dart") {
   infer_package_name = true
 
-  source_dir = "."
-
   sources = [
     "display.dart",
   ]

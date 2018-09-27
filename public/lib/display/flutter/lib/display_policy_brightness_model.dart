@@ -20,6 +20,7 @@ class DisplayPolicyBrightnessModel extends Model {
 
   Display _display;
 
+  // ignore: public_member_api_docs
   DisplayPolicyBrightnessModel(this._display) {
     _display.addListener((double brightness) {
       notifyListeners();
