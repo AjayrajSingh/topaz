@@ -164,7 +164,9 @@ class Sledge {
           currentTransaction.getDocument(documentId);
     }
 
-    return _documentByPrefix[documentId.prefix];
+    return _documentByPrefix[documentId.prefix].then((Document d) {
+      return d..makeExist();
+    });
   }
 
   /// Returns the list of all documents of the given [schema].

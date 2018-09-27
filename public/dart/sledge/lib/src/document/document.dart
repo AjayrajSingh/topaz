@@ -29,7 +29,9 @@ class Document implements ValueObserver {
   final StreamController<void> _changeController =
       new StreamController<void>.broadcast();
 
-  /// A value that is always set to true.
+  /// A value that is set to true for all documents that exist.
+  /// If the Document object was created in a rollbacked transaction, then this
+  /// field is false and all operations on this object are invalid.
   final LastOneWinsValue<bool> _documentExists = new LastOneWinsValue<bool>();
 
   /// The name of the private field holding [_documentExists].
@@ -59,9 +61,7 @@ class Document implements ValueObserver {
       value.observer = this;
     });
 
-    // Set [_documentExists] to |true| so that Ledger has a trace that this document
-    // was created.
-    _documentExists.value = true;
+    makeExist();
   }
 
   Uint8List _createIdentifierForField(String key, _DocumentFieldType type) {
@@ -131,8 +131,22 @@ class Document implements ValueObserver {
     }
   }
 
+  /// Throws an exception if the document is in an invalid state.
+  void _checkExistsState() {
+    if (!_documentExists.value) {
+      throw new StateError('Value access to a non-existing document.');
+    }
+  }
+
+  /// Sets [_documentExists] to |true| so that Ledger has a trace that this
+  /// document was created. This makes the Document object valid.
+  void makeExist() {
+    _documentExists.value = true;
+  }
+
   @override
   void valueWasChanged() {
+    _checkExistsState();
     Transaction currentTransaction = _sledge.currentTransaction;
     if (currentTransaction == null) {
       throw new StateError('Value changed outside of transaction.');
@@ -142,6 +156,7 @@ class Document implements ValueObserver {
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
+    _checkExistsState();
     return _value.noSuchMethod(invocation);
   }
 
@@ -149,6 +164,7 @@ class Document implements ValueObserver {
   /// If [fieldName] does not have any associated Value, an ArgumentError
   /// exception is thrown.
   dynamic operator [](String fieldName) {
+    _checkExistsState();
     return _value[fieldName];
   }
 }

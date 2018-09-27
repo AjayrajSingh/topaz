@@ -84,7 +84,8 @@ void main() {
         doc.written.value = true;
         throw _RollbackException();
       });
-      expect(false, equals(true)); //XXX assert unreachable
+      // unreachable
+      expect(false, equals(true));
     } on _RollbackException {
       //exception intended
     }

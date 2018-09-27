@@ -91,4 +91,45 @@ void main() async {
     });
     expect(doc1, isNot(equals(doc2)));
   });
+
+  test(
+      'Check that creating then rolling back a document does not prevent from'
+      'creating it later', () async {
+    Schema schema = newSchema();
+    final id = new DocumentId(schema);
+    Sledge sledge = newSledgeForTesting();
+    await sledge.runInTransaction(() async {
+      await sledge.getDocument(id);
+      sledge.abortAndRollback();
+    });
+    await sledge.runInTransaction(() async {
+      bool exists = await sledge.documentExists(id);
+      expect(exists, equals(false));
+    });
+    await sledge.runInTransaction(() async {
+      await sledge.getDocument(id);
+    });
+    await sledge.runInTransaction(() async {
+      bool exists = await sledge.documentExists(id);
+      expect(exists, equals(true));
+    });
+  });
+
+  test('Check that operations on non-existing documents throw exceptions', () async {
+    Schema schema = newSchema();
+    final id = new DocumentId(schema);
+    Sledge sledge = newSledgeForTesting();
+    Document doc;
+    await sledge.runInTransaction(() async {
+      doc = await sledge.getDocument(id);
+      sledge.abortAndRollback();
+    });
+    expect(() => doc['a'].value, throwsStateError);
+    await sledge.runInTransaction(() async {
+      expect(() => doc['a'].value, throwsStateError);
+      expect(() => doc['a'].value = 2, throwsStateError);
+      doc = await sledge.getDocument(id);
+      expect(() => doc['a'].value, isNot(throwsStateError));
+    });
+  });
 }
