@@ -304,7 +304,8 @@ Engine::Engine(
         engine->GetFontCollection().GetFontCollection()->SetDefaultFontManager(
             sk_make_sp<txt::FuchsiaFontManager>(std::move(sync_font_provider)));
 
-        if (!engine->Run(std::move(run_configuration))) {
+        if (engine->Run(std::move(run_configuration)) ==
+              shell::Engine::RunStatus::Failure) {
           on_run_failure();
         }
       }));
