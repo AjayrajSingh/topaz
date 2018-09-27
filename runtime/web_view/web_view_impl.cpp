@@ -125,7 +125,7 @@ void WebViewImpl::UpdateInputConnection() {
     ime_client_binding_.Bind(client_ptr.NewRequest());
     auto state = fuchsia::ui::input::TextInputState{};
     state.text = "";
-    ime_service_->GetInputMethodEditor(fuchsia::ui::input::KeyboardType::TEXT, fuchsia::ui::input::InputMethodAction::UNSPECIFIED,
+    ime_service_->GetInputMethodEditor(fuchsia::ui::input::KeyboardType::TEXT, fuchsia::ui::input::InputMethodAction::SEND,
                                        std::move(state), std::move(client_ptr),
                                        ime_.NewRequest());
   } else if (ime_client_binding_.is_bound()) {
@@ -144,8 +144,21 @@ void WebViewImpl::DidUpdateState(fuchsia::ui::input::TextInputState state,
 
 // |fuchsia::ui::input::InputMethodEditorClient|
 void WebViewImpl::OnAction(fuchsia::ui::input::InputMethodAction action) {
-  // noop for now
+  if (fuchsia::ui::input::InputMethodAction::SEND == action) {
+    // treat send action as return, simulate press and release.
+    fuchsia::ui::input::InputEvent event;
+    fuchsia::ui::input::KeyboardEvent keyboard;
+    keyboard.phase = fuchsia::ui::input::KeyboardEventPhase::PRESSED;
+    keyboard.hid_usage = HID_USAGE_KEY_ENTER;
+    event.set_keyboard(keyboard);
+    HandleKeyboardEvent(event);
+
+    keyboard.phase = fuchsia::ui::input::KeyboardEventPhase::RELEASED;
+    HandleKeyboardEvent(event);
+  }
 }
+
+
 
 // |WebView|:
 void WebViewImpl::SetUrl(fidl::StringPtr url) {
