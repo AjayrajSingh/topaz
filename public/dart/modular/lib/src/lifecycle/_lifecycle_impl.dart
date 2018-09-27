@@ -49,7 +49,7 @@ class LifecycleImpl extends fidl.Lifecycle implements Lifecycle {
   // This is being triggered by the framework when the system starts to shutdown
   // this process.
   @override
-  Future<Null> terminate() async {
+  Future<void> terminate() async {
     // close the underlying binding
     _lifecycleBinding.close();
     // terminate all registered listeners
@@ -57,10 +57,6 @@ class LifecycleImpl extends fidl.Lifecycle implements Lifecycle {
     // if we don't terminate ourselves in a timely manner, we will be
     // forcibly terminated by the system.
     fuchsia.exit(0);
-
-    // Need to return null here to make the compiler happy. This should
-    // go away when the generated fidl code returns Future<void>.
-    return null;
   }
 
   // Exposes this instance to the [StartupContext#outgoingServices].
