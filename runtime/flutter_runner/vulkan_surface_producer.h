@@ -42,6 +42,12 @@ class VulkanSurfaceProducer final
           std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>>
           surfaces);
 
+  void OnSessionSizeChangeHint(float width_change_factor,
+                               float height_change_factor) {
+    FXL_LOG(INFO) << "VulkanSurfaceProducer:OnSessionSizeChangeHint "
+                  << width_change_factor << ", " << height_change_factor;
+  }
+
  private:
   // VulkanProvider
   const vulkan::VulkanProcTable& vk() override { return *vk_.get(); }

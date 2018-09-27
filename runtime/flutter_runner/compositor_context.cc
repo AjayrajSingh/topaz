@@ -80,11 +80,16 @@ void CompositorContext::OnSessionMetricsDidChange(
   session_connection_.set_metrics(metrics);
 }
 
+void CompositorContext::OnSessionSizeChangeHint(float width_change_factor,
+                                                float height_change_factor) {
+  session_connection_.OnSessionSizeChangeHint(width_change_factor,
+                                              height_change_factor);
+}
+
 CompositorContext::~CompositorContext() = default;
 
 std::unique_ptr<flow::CompositorContext::ScopedFrame>
-CompositorContext::AcquireFrame(GrContext* gr_context,
-                                SkCanvas* canvas,
+CompositorContext::AcquireFrame(GrContext* gr_context, SkCanvas* canvas,
                                 const SkMatrix& root_surface_transformation,
                                 bool instrumentation_enabled) {
   // TODO: The AcquireFrame interface is too broad and must be refactored to get

@@ -10,10 +10,10 @@
 
 #include "flutter/flow/compositor_context.h"
 #include "flutter/flow/scene_update_context.h"
+#include "flutter/fml/macros.h"
 #include "lib/fidl/cpp/interface_handle.h"
 #include "lib/fidl/cpp/optional.h"
 #include "lib/fxl/functional/closure.h"
-#include "flutter/fml/macros.h"
 #include "lib/ui/scenic/cpp/resources.h"
 #include "lib/ui/scenic/cpp/session.h"
 #include "vulkan_surface_producer.h"
@@ -21,6 +21,8 @@
 namespace flutter {
 
 using OnMetricsUpdate = fit::function<void(const fuchsia::ui::gfx::Metrics&)>;
+using OnSizeChangeHint =
+    fit::function<void(float width_change_factor, float height_change_factor)>;
 
 // The component residing on the GPU thread that is responsible for
 // maintaining the Scenic session connection and presenting node updates.
@@ -63,6 +65,9 @@ class SessionConnection final {
 #endif
 
   void Present(flow::CompositorContext::ScopedFrame& frame);
+
+  void OnSessionSizeChangeHint(float width_change_factor,
+                               float height_change_factor);
 
  private:
   const std::string debug_label_;

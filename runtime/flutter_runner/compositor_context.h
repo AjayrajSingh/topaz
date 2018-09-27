@@ -31,6 +31,8 @@ class CompositorContext final : public flow::CompositorContext {
   ~CompositorContext() override;
 
   void OnSessionMetricsDidChange(const fuchsia::ui::gfx::Metrics& metrics);
+  void OnSessionSizeChangeHint(float width_change_factor,
+                               float height_change_factor);
 
  private:
   const std::string debug_label_;
@@ -38,8 +40,7 @@ class CompositorContext final : public flow::CompositorContext {
 
   // |flow::CompositorContext|
   std::unique_ptr<ScopedFrame> AcquireFrame(
-      GrContext* gr_context,
-      SkCanvas* canvas,
+      GrContext* gr_context, SkCanvas* canvas,
       const SkMatrix& root_surface_transformation,
       bool instrumentation_enabled) override;
 

@@ -45,6 +45,7 @@ PlatformView::PlatformView(
         session_listener_request,
     fit::closure session_listener_error_callback,
     OnMetricsUpdate session_metrics_did_change_callback,
+    OnSizeChangeHint session_size_change_hint_callback,
 #ifndef SCENIC_VIEWS2
     fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewManager>
         view_manager_handle,
@@ -60,6 +61,7 @@ PlatformView::PlatformView(
       session_listener_error_callback_(
           std::move(session_listener_error_callback)),
       metrics_changed_callback_(std::move(session_metrics_did_change_callback)),
+      size_change_hint_callback_(std::move(session_size_change_hint_callback)),
 #ifndef SCENIC_VIEWS2
       view_manager_(view_manager_handle.Bind()),
       view_listener_(this),
@@ -349,6 +351,12 @@ void PlatformView::OnScenicEvent(
               metrics_changed_callback_(scenic_metrics_);
               UpdateViewportMetrics(scenic_metrics_);
             }
+            break;
+          }
+          case fuchsia::ui::gfx::Event::Tag::kSizeChangeHint: {
+            size_change_hint_callback_(
+                event.gfx().size_change_hint().width_change_factor,
+                event.gfx().size_change_hint().height_change_factor);
             break;
           }
           case fuchsia::ui::gfx::Event::Tag::kViewPropertiesChanged: {

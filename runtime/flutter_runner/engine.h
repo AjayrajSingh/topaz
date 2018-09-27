@@ -66,6 +66,8 @@ class Engine final : public mozart::NativesDelegate {
   void Terminate();
 
   void OnSessionMetricsDidChange(const fuchsia::ui::gfx::Metrics& metrics);
+  void OnSessionSizeChangeHint(float width_change_factor,
+                               float height_change_factor);
 
   // |mozart::NativesDelegate|
   void OfferServiceProvider(

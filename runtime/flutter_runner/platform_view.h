@@ -50,6 +50,7 @@ class PlatformView final : public shell::PlatformView,
           session_listener_request,
       fit::closure on_session_listener_error_callback,
       OnMetricsUpdate session_metrics_did_change_callback,
+      OnSizeChangeHint session_size_change_hint_callback,
 #ifndef SCENIC_VIEWS2
       fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewManager> view_manager,
       fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
@@ -85,6 +86,7 @@ class PlatformView final : public shell::PlatformView,
   fidl::Binding<fuchsia::ui::scenic::SessionListener> session_listener_binding_;
   fit::closure session_listener_error_callback_;
   OnMetricsUpdate metrics_changed_callback_;
+  OnSizeChangeHint size_change_hint_callback_;
 
   fuchsia::sys::ServiceProviderPtr service_provider_;
 

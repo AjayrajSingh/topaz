@@ -234,6 +234,21 @@ class ChildViewConnection {
     }
   }
 
+  void sendSizeChangeHintHack(double widthChangeFactor, double heightChangeFactor) {
+    assert(_attached);
+    assert(_attachments == 1);
+    if (_viewKey == null) {
+      return;
+    }
+
+    if (_viewContainer == null) {
+      return;
+    }
+
+    _viewContainer.sendSizeChangeHintHack(
+        _viewKey, widthChangeFactor, heightChangeFactor);
+  }
+
   ViewProperties _createViewProperties(
       double width,
       double height,

@@ -101,6 +101,10 @@ Engine::Engine(
   OnMetricsUpdate on_session_metrics_change_callback = std::bind(
       &Engine::OnSessionMetricsDidChange, this, std::placeholders::_1);
 
+  OnSizeChangeHint on_session_size_change_hint_callback =
+      std::bind(&Engine::OnSessionSizeChangeHint, this, std::placeholders::_1,
+                std::placeholders::_2);
+
   // SessionListener has a OnScenicError method; invoke this callback on the
   // platform thread when that happens. The Session itself should also be
   // disconnected when this happens, and it will also attempt to terminate.
@@ -119,9 +123,14 @@ Engine::Engine(
       fml::MakeCopyable([debug_label = thread_label_,
                          parent_environment_service_provider =
                              std::move(parent_environment_service_provider),  //
-                         session_listener_request = std::move(session_listener_request),
-                         on_session_listener_error_callback = std::move(on_session_listener_error_callback),
-                         on_session_metrics_change_callback = std::move(on_session_metrics_change_callback),
+                         session_listener_request =
+                             std::move(session_listener_request),
+                         on_session_listener_error_callback =
+                             std::move(on_session_listener_error_callback),
+                         on_session_metrics_change_callback =
+                             std::move(on_session_metrics_change_callback),
+                         on_session_size_change_hint_callback =
+                             std::move(on_session_size_change_hint_callback),
 #ifndef SCENIC_VIEWS2
                          view_manager = view_manager.Unbind(),    //
                          view_owner = std::move(view_owner),      //
@@ -136,9 +145,10 @@ Engine::Engine(
             debug_label,                                     // debug label
             shell.GetTaskRunners(),                          // task runners
             std::move(parent_environment_service_provider),  // services
-            std::move(session_listener_request),  // session listener
+            std::move(session_listener_request),             // session listener
             std::move(on_session_listener_error_callback),
             std::move(on_session_metrics_change_callback),
+            std::move(on_session_size_change_hint_callback),
 #ifndef SCENIC_VIEWS2
             std::move(view_manager),  // view manager
             std::move(view_owner),    // view owner
@@ -170,27 +180,26 @@ Engine::Engine(
   // rasterizer.
   std::unique_ptr<flow::CompositorContext> compositor_context =
       std::make_unique<flutter::CompositorContext>(
-          thread_label_,      // debug label
+          thread_label_,  // debug label
 #ifndef SCENIC_VIEWS2
-          std::move(import_token),                        // import token
+          std::move(import_token),  // import token
 #else
           std::move(view_token),  // scenic view we attach our tree to
 #endif
-          std::move(session),     // scenic session
+          std::move(session),                    // scenic session
           std::move(on_session_error_callback),  // session did encounter error
           vsync_event_.get()                     // vsync event handle
       );
 
   // Setup the callback that will instantiate the rasterizer.
   shell::Shell::CreateCallback<shell::Rasterizer> on_create_rasterizer =
-      fml::MakeCopyable(
-          [compositor_context =
-               std::move(compositor_context)](shell::Shell& shell) mutable {
-            return std::make_unique<shell::Rasterizer>(
-                shell.GetTaskRunners(),        // task runners
-                std::move(compositor_context)  // compositor context
-            );
-          });
+      fml::MakeCopyable([compositor_context = std::move(compositor_context)](
+                            shell::Shell& shell) mutable {
+        return std::make_unique<shell::Rasterizer>(
+            shell.GetTaskRunners(),        // task runners
+            std::move(compositor_context)  // compositor context
+        );
+      });
 
   // Get the task runners from the managed threads. The current thread will be
   // used as the "platform" thread.
@@ -305,7 +314,7 @@ Engine::Engine(
             sk_make_sp<txt::FuchsiaFontManager>(std::move(sync_font_provider)));
 
         if (engine->Run(std::move(run_configuration)) ==
-              shell::Engine::RunStatus::Failure) {
+            shell::Engine::RunStatus::Failure) {
           on_run_failure();
         }
       }));
@@ -351,7 +360,7 @@ void Engine::OnMainIsolateStart() {
     Dart_Isolate isolate = Dart_CurrentIsolate();
     FML_CHECK(isolate);
     shell_->GetTaskRunners().GetUITaskRunner()->PostDelayedTask(
-      [engine = shell_->GetEngine(), isolate]() {
+        [engine = shell_->GetEngine(), isolate]() {
           if (!engine) {
             return;
           }
@@ -399,6 +408,26 @@ void Engine::OnSessionMetricsDidChange(
       });
 }
 
+void Engine::OnSessionSizeChangeHint(float width_change_factor,
+                                     float height_change_factor) {
+  if (!shell_) {
+    return;
+  }
+
+  shell_->GetTaskRunners().GetGPUTaskRunner()->PostTask(
+      [rasterizer = shell_->GetRasterizer(), width_change_factor,
+       height_change_factor]() {
+        if (rasterizer) {
+          auto compositor_context =
+              reinterpret_cast<flutter::CompositorContext*>(
+                  rasterizer->compositor_context());
+
+          compositor_context->OnSessionSizeChangeHint(width_change_factor,
+                                                      height_change_factor);
+        }
+      });
+}
+
 // |mozart::NativesDelegate|
 void Engine::OfferServiceProvider(
     fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
@@ -420,7 +449,7 @@ void Engine::OfferServiceProvider(
         }
       }));
 #else
-  // TODO(SCN-840): Remove OfferServiceProvider.
+                                  // TODO(SCN-840): Remove OfferServiceProvider.
 #endif
 }
 

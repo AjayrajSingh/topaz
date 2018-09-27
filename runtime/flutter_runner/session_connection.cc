@@ -42,7 +42,8 @@ SessionConnection::SessionConnection(
   root_node_.SetTranslation(0.f, 0.f, 0.1f);
 #endif
 
-  root_node_.SetEventMask(fuchsia::ui::gfx::kMetricsEventMask);
+  root_node_.SetEventMask(fuchsia::ui::gfx::kMetricsEventMask |
+                          fuchsia::ui::gfx::kSizeChangeHintEventMask);
 
   // Signal is initially high indicating availability of the session.
   ToggleSignal(vsync_event_handle_, true);
@@ -68,6 +69,12 @@ void SessionConnection::Present(flow::CompositorContext::ScopedFrame& frame) {
   // Prepare for the next frame. These ops won't be processed till the next
   // present.
   EnqueueClearOps();
+}
+
+void SessionConnection::OnSessionSizeChangeHint(float width_change_factor,
+                                                float height_change_factor) {
+  surface_producer_->OnSessionSizeChangeHint(width_change_factor,
+                                             height_change_factor);
 }
 
 void SessionConnection::EnqueueClearOps() {
