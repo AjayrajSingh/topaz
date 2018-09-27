@@ -118,7 +118,7 @@ void WebViewImpl::HandleWebRequestsFocusEvent(bool focused) {
 }
 
 void WebViewImpl::UpdateInputConnection() {
-  if (web_requests_input_ && has_scenic_focus_ && !ime_client_binding_.is_bound()) {
+  if (web_requests_input_ && has_scenic_focus_) {
     ime_service_->ShowKeyboard();
 
     fuchsia::ui::input::InputMethodEditorClientPtr client_ptr;
