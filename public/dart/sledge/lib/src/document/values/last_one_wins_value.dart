@@ -39,11 +39,13 @@ class _LastOneWinsValue<T> {
       return;
     }
     if (change.deletedKeys.isNotEmpty) {
-      throw new FormatException('Should be no deleted keys.', change);
+      throw new FormatException(
+          'There should be no deleted keys. Found `${change.deletedKeys}`.',
+          change);
     }
     if (change.changedEntries.length != 1 ||
         !change.changedEntries.containsKey(0)) {
-      throw new FormatException('Changes have not supported format.', change);
+      throw new FormatException('Changes have unsupported format.', change);
     }
     _value = change.changedEntries[0];
     _changeController.add(_value);

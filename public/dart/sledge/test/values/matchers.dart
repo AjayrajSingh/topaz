@@ -9,6 +9,8 @@ import 'package:matcher/matcher.dart';
 import 'package:sledge/src/document/change.dart';
 import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/key_value.dart';
+import 'package:sledge/src/sledge_errors.dart';
+import 'package:test/test.dart';
 
 const Equality<List<int>> _listEquality = const ListEquality<int>();
 
@@ -93,3 +95,7 @@ class OrderedListChangeMatcher extends Matcher {
   Description describe(Description description) =>
       description.add('OrderedListChange matcher'); // TODO add description.
 }
+
+/// Matcher for InternalSledgeErrors.
+final Matcher throwsInternalError =
+    throwsA(new TypeMatcher<InternalSledgeError>());

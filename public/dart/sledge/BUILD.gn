@@ -39,6 +39,7 @@ dart_library("sledge") {
     "src/schema/types/trivial_types.dart",
     "src/sledge.dart",
     "src/sledge_connection_id.dart",
+    "src/sledge_errors.dart",
     "src/sledge_page_id.dart",
     "src/subscription/subscription.dart",
     "src/transaction.dart",

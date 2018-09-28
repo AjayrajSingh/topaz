@@ -149,7 +149,7 @@ class Document implements ValueObserver {
     _checkExistsState();
     Transaction currentTransaction = _sledge.currentTransaction;
     if (currentTransaction == null) {
-      throw new StateError('Value changed outside of transaction.');
+      throw new StateError('Value was changed outside of a transaction.');
     }
     currentTransaction.documentWasModified(this);
   }

@@ -61,7 +61,7 @@ class ValueNode implements Value {
   dynamic operator [](String fieldName) {
     Value value = _childValues[fieldName];
     if (value == null) {
-      throw new ArgumentError('field `$fieldName` does not exist');
+      throw new ArgumentError('Field `$fieldName` does not exist.');
     }
     return value;
   }

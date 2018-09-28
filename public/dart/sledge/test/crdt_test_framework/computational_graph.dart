@@ -98,7 +98,7 @@ class ComputationalGraph {
     Map<Node, int> known = <Node, int>{};
     for (int i = 0; i < nodes.length; i++) {
       if (ready.isEmpty) {
-        throw new StateError('Computational graph should be acyclic');
+        throw new StateError('Computational graph should be acyclic.');
       }
       int curChoice = 0;
       if (i < choices.length) {

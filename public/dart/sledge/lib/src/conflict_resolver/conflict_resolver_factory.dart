@@ -38,7 +38,7 @@ class ConflictResolverFactory extends ledger.ConflictResolverFactory {
     ledgerInstance.setConflictResolverFactory(wrapper, (ledger.Status status) {
       if (status != ledger.Status.ok) {
         throw new Exception(
-            'Sledge failed to SetConflictResolverFactory ($status)');
+            'Sledge failed to SetConflictResolverFactory (status: $status).');
         _setUpCompleted.complete(false);
       } else {
         _setUpCompleted.complete(true);

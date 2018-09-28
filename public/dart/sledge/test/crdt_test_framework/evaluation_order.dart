@@ -24,14 +24,14 @@ class EvaluationOrder {
 
     final setIds = ids.toSet();
     if (setIds.length != ids.length) {
-      throw new FormatException('Elements of $ids should be unique');
+      throw new ArgumentError('Elements of ids ($ids) must be unique.');
     }
 
     if (!allowPartial) {
       for (final node in graphNodes) {
         if (!setIds.contains(node.nodeId)) {
-          throw new FormatException(
-              '$ids should contain all nodes from $graphNodes');
+          throw new ArgumentError(
+              'ids ($ids) must contain all nodes from `$graphNodes`.');
         }
       }
     }
@@ -40,8 +40,8 @@ class EvaluationOrder {
       Node node = idToNode[id];
       if (node == null) {
         if (!allowGenerated || !id.startsWith('g-')) {
-          throw new FormatException(
-              '$id is not an id of a node from $graphNodes');
+          throw new ArgumentError(
+              '`$id` is not an id of a node from `$graphNodes`.');
         }
         // Can throw FormatException
         int firstDash = 1;

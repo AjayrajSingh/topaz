@@ -10,6 +10,8 @@ import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/converter.dart';
 import 'package:test/test.dart';
 
+import 'matchers.dart';
+
 void main() {
   setupLogger();
 
@@ -86,13 +88,13 @@ void main() {
   group('Exceptions', () {
     test('odd lengthInBytes', () {
       expect(() => stringConverter.deserialize(new Uint8List(1)),
-          throwsFormatException);
+          throwsInternalError);
     });
     test("double's length", () {
       for (int i = 0; i < 10; i++) {
         if (i != 8) {
           expect(() => doubleConverter.deserialize(new Uint8List(i)),
-              throwsFormatException);
+              throwsInternalError);
         }
       }
     });
@@ -100,13 +102,13 @@ void main() {
       for (int i = 0; i < 10; i++) {
         if (i != 1) {
           expect(() => boolConverter.deserialize(new Uint8List(i)),
-              throwsFormatException);
+              throwsInternalError);
         }
       }
       expect(() => boolConverter.deserialize(new Uint8List.fromList([2])),
-          throwsFormatException);
+          throwsInternalError);
       expect(() => boolConverter.deserialize(new Uint8List.fromList([-1])),
-          throwsFormatException);
+          throwsInternalError);
       expect(boolConverter.deserialize(new Uint8List.fromList([0])),
           equals(false));
       expect(

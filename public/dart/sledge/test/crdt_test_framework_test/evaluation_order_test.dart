@@ -22,10 +22,10 @@ void main() {
         isNot(equals(new EvaluationOrder([n2, n1, n3]))));
   });
 
-  final formatExceptionMatcher = throwsA(new TypeMatcher<FormatException>());
+  final argumentErrorMatcher = throwsA(new TypeMatcher<ArgumentError>());
 
   test('Node restricted name', () {
-    expect(() => new Node("f'o'o"), formatExceptionMatcher);
+    expect(() => new Node("f'o'o"), argumentErrorMatcher);
   });
 
   test('EvaluationOrder from list of ids', () {
@@ -36,14 +36,14 @@ void main() {
         new EvaluationOrder.fromIds(['n-1', 'n-3', 'n-2'], [n1, n2, n3]);
     expect(order132, equals(new EvaluationOrder([n1, n3, n2])));
     expect(() => new EvaluationOrder.fromIds(['n-1', 'n-2'], [n1, n2, n3]),
-        formatExceptionMatcher);
+        argumentErrorMatcher);
     expect(
         () => new EvaluationOrder.fromIds(
             ['n-1', 'n-2', 'n-3', 'n-1'], [n1, n2, n3]),
-        formatExceptionMatcher);
+        argumentErrorMatcher);
     expect(
         () => new EvaluationOrder.fromIds(['n-1', 'n-2', 'n-1'], [n1, n2, n3]),
-        formatExceptionMatcher);
+        argumentErrorMatcher);
     expect(
         new EvaluationOrder.fromIds(['n-1', 'n-3'], [n1, n2, n3],
             allowPartial: true),

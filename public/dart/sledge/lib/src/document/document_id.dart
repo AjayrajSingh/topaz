@@ -26,7 +26,9 @@ class DocumentId {
   DocumentId(this.schema, [Uint8List identifier]) {
     identifier ??= _randomByteArrayForSubIds();
     if (identifier.length != _subIdByteCount) {
-      throw new ArgumentError('identifier does not contain 16 bytes');
+      throw new ArgumentError(
+          'Identifier does not contain $_subIdByteCount bytes.'
+          'Found ${identifier.length} bytes instead.');
     }
     _subId = new Uint8List.fromList(identifier);
   }

@@ -99,9 +99,8 @@ class Fleet<T extends dynamic> {
   /// [expectedSyncsPerAction].
   void setRandomSynchronizationsRate(double expectedSyncsPerAction) {
     if (expectedSyncsPerAction < 0) {
-      throw new FormatException(
-          'Expected number of synchronizations is negative ',
-          expectedSyncsPerAction);
+      throw new ArgumentError(
+          'Number of synchronizations must be greater or equal to 0. Got $expectedSyncsPerAction.');
     }
     _expectedSyncsPerAction = expectedSyncsPerAction;
   }

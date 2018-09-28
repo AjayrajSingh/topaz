@@ -10,7 +10,6 @@ import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger_async;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular_async;
 import 'package:fidl/fidl.dart' as fidl;
-import 'package:lib.app.dart/logging.dart';
 import 'package:zircon/zircon.dart' show ChannelPair;
 
 import 'document/change.dart';
@@ -20,6 +19,7 @@ import 'ledger_helpers.dart';
 import 'modification_queue.dart';
 import 'schema/schema.dart';
 import 'sledge_connection_id.dart';
+import 'sledge_errors.dart';
 import 'sledge_page_id.dart';
 import 'storage/kv_encoding.dart' as sledge_storage;
 import 'subscription/subscription.dart';
@@ -54,7 +54,8 @@ class Sledge {
     componentContext.getLedger(ledgerPair.passRequest(),
         (ledger.Status status) {
       if (status != ledger.Status.ok) {
-        log.severe('Sledge failed to connect to Ledger: $status');
+        throw new Exception(
+            'Sledge failed to connect to Ledger with status `$status`.');
       }
     });
 
@@ -74,13 +75,14 @@ class Sledge {
 
     _ledgerProxy.ctrl.onConnectionError = () {
       initializationCompleter.complete(false);
+      throw new Exception('Sledge failed to connect to Ledger.');
     };
 
     _ledgerProxy.getPage(pageId.id, _pageProxy.ctrl.request(),
         (ledger.Status status) {
       if (status != ledger.Status.ok) {
-        log.severe('Sledge failed to GetPage: $status');
         initializationCompleter.complete(false);
+        throw new Exception('Sledge failed to GetPage with status `$status`.');
       } else {
         _modificationQueue =
             new ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
@@ -99,7 +101,8 @@ class Sledge {
         .getLedger(new fidl.InterfaceRequest(pair.first))
         .then((status) async {
       if (status != ledger_async.Status.ok) {
-        log.severe('Sledge failed to connect to Ledger: $status');
+        throw new Exception(
+            'Sledge failed to connect to Ledger with status `$status`.');
       }
     });
 
@@ -154,11 +157,7 @@ class Sledge {
   /// If the document does not exist or an error occurs, an empty
   /// document is returned.
   Future<Document> getDocument(DocumentId documentId) {
-    // TODO: Throw an error only if the document has not been instantiated
-    // before.
-    if (currentTransaction == null) {
-      throw new StateError('No transaction started.');
-    }
+    _verifyThatTransactionHasStarted();
     if (!_documentByPrefix.containsKey(documentId.prefix)) {
       _documentByPrefix[documentId.prefix] =
           currentTransaction.getDocument(documentId);
@@ -171,9 +170,7 @@ class Sledge {
 
   /// Returns the list of all documents of the given [schema].
   Future<List<Document>> getDocuments(Schema schema) async {
-    if (currentTransaction == null) {
-      throw new StateError('No transaction started.');
-    }
+    _verifyThatTransactionHasStarted();
 
     List<DocumentId> documentIds =
         await currentTransaction.getDocumentIds(schema);
@@ -186,9 +183,7 @@ class Sledge {
 
   /// Returns whether the document identified with [documentId] exists.
   Future<bool> documentExists(DocumentId documentId) {
-    if (currentTransaction == null) {
-      throw new StateError('No transaction started.');
-    }
+    _verifyThatTransactionHasStarted();
     return currentTransaction.documentExists(documentId);
   }
 
@@ -224,9 +219,16 @@ class Sledge {
   /// Subscribes for page.onChange to perform applyChange.
   Subscription _subscribe(Completer<bool> subscriptionCompleter) {
     if (_modificationQueue.currentTransaction != null) {
-      throw new StateError('Must be called before any transaction can start.');
+      throw new InternalSledgeError(
+          'Must be called before any transaction can start.');
     }
     return new Subscription(
         _pageProxy, _ledgerObjectsFactory, _applyChange, subscriptionCompleter);
+  }
+
+  void _verifyThatTransactionHasStarted() {
+    if (currentTransaction == null) {
+      throw new StateError('No transaction started.');
+    }
   }
 }

@@ -8,6 +8,7 @@ import 'dart:typed_data';
 import 'package:lib.app.dart/logging.dart';
 import 'package:sledge/src/document/values/compressor.dart';
 import 'package:sledge/src/document/values/key_value.dart';
+
 import 'package:test/test.dart';
 
 import 'matchers.dart';
@@ -41,13 +42,13 @@ void main() {
       final c = new Compressor(), c1 = new Compressor();
       expect(
           () => c.uncompressKey(c1.compressKey(new Uint8List.fromList([1, 2]))),
-          throwsFormatException);
+          throwsInternalError);
     });
 
     test('Uncompress short key', () {
       final c = new Compressor();
       expect(() => c.uncompressKey(new Uint8List.fromList([1, 2])),
-          throwsFormatException);
+          throwsInternalError);
     });
 
     test('Uncompress key value with wrong key length', () {
@@ -56,7 +57,7 @@ void main() {
           new Uint8List.fromList([1, 2, 3]), new Uint8List.fromList([4, 5]));
       final kvC = c.compressKeyInEntry(kv);
       kvC.value.buffer.asByteData().setUint64(0, 6);
-      expect(() => c.uncompressKeyInEntry(kvC), throwsFormatException);
+      expect(() => c.uncompressKeyInEntry(kvC), throwsInternalError);
     });
   });
 }

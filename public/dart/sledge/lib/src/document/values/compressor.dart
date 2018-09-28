@@ -6,6 +6,7 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 
+import '../../sledge_errors.dart';
 import '../../uint8list_ops.dart';
 import 'key_value.dart';
 
@@ -38,7 +39,7 @@ class Compressor {
   Uint8List uncompressKey(Uint8List keyHash) {
     final key = _keyByHash[keyHash];
     if (key == null) {
-      throw new FormatException('Unable to uncompress key: $keyHash');
+      throw new InternalSledgeError('Unable to uncompress key `$keyHash`.');
     }
     return key;
   }
@@ -46,14 +47,16 @@ class Compressor {
   /// Uncompress KeyValue.
   KeyValue uncompressKeyInEntry(KeyValue entry) {
     if (entry.value.length < 8) {
-      throw new FormatException('In a hashed key mode, the value size must be '
-          '>= 8. Found ${entry.value.length} instead, for entry $entry');
+      throw new InternalSledgeError(
+          'In a hashed key mode, the value size must be '
+          '>= 8. Found ${entry.value.length} instead for entry `$entry`.');
     }
     final keyLength = entry.value.buffer.asByteData().getUint64(0);
     if (entry.value.length < 8 + keyLength) {
-      throw new FormatException('Incorrect format for value of given entry: '
+      throw new InternalSledgeError(
+          'Incorrect format for value of given entry: '
           'The parsed length ($keyLength) is larger than the value content\'s '
-          'length (${entry.value.length - 8}). Entry: $entry');
+          'length (${entry.value.length - 8}). Entry: `$entry`');
     }
     final key = getSublistView(entry.value, start: 8, end: 8 + keyLength);
     final value = getSublistView(entry.value, start: 8 + keyLength);
@@ -62,8 +65,8 @@ class Compressor {
     // Important side effect: result.key is added to _keyByHash.
     final hash = _getAndSaveHashOfKey(key);
     if (!_listEquality.equals(hash, entry.key)) {
-      throw new FormatException(
-          'Hash of parsed key is not equal to passed hash.');
+      throw new InternalSledgeError(
+          'Hash of parsed key is not equal to passed hash (expected `$hash`, got `${entry.key}`).');
     }
     return new KeyValue(key, value);
   }

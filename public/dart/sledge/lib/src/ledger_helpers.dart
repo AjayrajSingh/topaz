@@ -37,7 +37,7 @@ class LedgerObjectsFactoryImpl implements LedgerObjectsFactory {
 /// Throws an exception containing [operation] if the status is not `ok`.
 void checkStatus(ledger.Status status, String operation) {
   if (status != ledger.Status.ok) {
-    throw new Exception('Ledger operation failed: $operation');
+    throw new Exception('Ledger operation `$operation` failed.');
   }
 }
 
@@ -45,7 +45,7 @@ void checkStatus(ledger.Status status, String operation) {
 Uint8List readBuffer(Buffer buffer) {
   ReadResult readResult = buffer.vmo.read(buffer.size);
   if (readResult.status != ZX.OK) {
-    throw new Exception('Unable to read from vmo: ${readResult.status}');
+    throw new Exception('Unable to read from vmo `${readResult.status}`.');
   }
   if (readResult.bytes.lengthInBytes != buffer.size) {
     throw new Exception('Unexpected count of bytes read.');

@@ -4,6 +4,7 @@
 
 import 'dart:typed_data';
 
+import '../../sledge_errors.dart';
 import '../change.dart';
 import 'compressor.dart';
 import 'converted_change.dart';
@@ -15,7 +16,7 @@ abstract class Converter<T> {
   factory Converter() {
     final result = _converters[T];
     if (result == null) {
-      throw new UnsupportedError('No converter found for type $T.');
+      throw new InternalSledgeError('No converter found for type `$T`.');
     }
     return result;
   }
@@ -105,7 +106,8 @@ class StringConverter implements Converter<String> {
   @override
   String deserialize(final Uint8List x) {
     if (x.length.isOdd) {
-      throw new FormatException("Can't parse String. Length should be even.");
+      throw new InternalSledgeError(
+          'Cannot parse String. Length should be even.');
     }
     return new String.fromCharCodes(
         x.buffer.asUint16List(x.offsetInBytes, x.lengthInBytes ~/ 2));
@@ -128,8 +130,8 @@ class IntConverter implements Converter<int> {
   @override
   int deserialize(final Uint8List x) {
     if (x.length != 8) {
-      throw new FormatException(
-          "Can't parse int: Length should be 8, found ${x.length} instead for input: $x");
+      throw new InternalSledgeError(
+          "Can't parse int: Length should be 8, found ${x.length} instead for input: `$x`.");
     }
     return x.buffer.asByteData().getInt64(x.offsetInBytes);
   }
@@ -150,8 +152,8 @@ class DoubleConverter implements Converter<double> {
   @override
   double deserialize(final Uint8List x) {
     if (x.length != 8) {
-      throw new FormatException(
-          "Can't parse double: Length should be 8, found ${x.length} instead for input: $x");
+      throw new InternalSledgeError(
+          "Can't parse double: Length should be 8, found ${x.length} instead for input: `$x`.");
     }
     return x.buffer.asByteData().getFloat64(x.offsetInBytes);
   }
@@ -172,10 +174,12 @@ class BoolConverter implements Converter<bool> {
   @override
   bool deserialize(final Uint8List x) {
     if (x.lengthInBytes != 1) {
-      throw new FormatException("Can't parse bool. Length should be 1.");
+      throw new InternalSledgeError(
+          "Can't parse bool. Length should be 1, found ${x.lengthInBytes} bytes instead.");
     }
     if (x[0] != 0 && x[0] != 1) {
-      throw new FormatException("Can't parse bool. Value should be 0 or 1,");
+      throw new InternalSledgeError(
+          "Can't parse bool. Value should be 0 or 1, found ${x[0]} bytes instead.");
     }
     return x[0] == 1;
   }

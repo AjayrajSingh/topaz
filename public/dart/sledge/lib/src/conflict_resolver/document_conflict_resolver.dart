@@ -14,7 +14,7 @@ Map<DocumentId, List<ledger.DiffEntry>> documentChangeMap(
     List<ledger.DiffEntry> diffs, Map<Uint8List, Schema> map) {
   // TODO: implement.
   throw new UnimplementedError(
-      'the method [documentChangeMap] is not yet implemented');
+      'The method `documentChangeMap` is not yet implemented.');
   return <DocumentId, List<ledger.DiffEntry>>{};
 }
 

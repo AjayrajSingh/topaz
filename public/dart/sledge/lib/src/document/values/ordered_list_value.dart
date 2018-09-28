@@ -147,7 +147,7 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   void insert(int index, E element) {
     final sortedKeys = _sortedKeysList();
     if (index < 0 || index > sortedKeys.length) {
-      throw new RangeError.value(index, 'index', 'Index is out of range');
+      throw new RangeError.value(index, 'index', 'Index is out of range.');
     }
 
     OrderedListTreePath newKey;
@@ -172,7 +172,7 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   @override
   void insertAll(int index, Iterable<E> iterable) {
     if (index < 0 || index > length) {
-      throw new RangeError.value(index, 'index', 'Index is out of range');
+      throw new RangeError.value(index, 'index', 'Index is out of range.');
     }
     int insertIndex = index;
     for (final element in iterable) {
@@ -269,7 +269,7 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   set length(int newLength) {
     // This list is not fixed length.
     // However, it does not support the length setter because [null] cannot be stored.
-    throw new UnsupportedError('length setter is not supported.');
+    throw new UnsupportedError('Length setter is not supported.');
   }
 
   @override
