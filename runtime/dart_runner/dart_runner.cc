@@ -12,7 +12,7 @@
 #include "lib/fxl/arraysize.h"
 #include "third_party/tonic/dart_microtask_queue.h"
 #include "third_party/tonic/dart_state.h"
-#include "third_party/dart/runtime/bin/embedded_dart_io.h"
+#include "third_party/dart/runtime/include/bin/dart_io_api.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
 #include "topaz/runtime/dart_runner/service_isolate.h"
@@ -27,10 +27,6 @@ namespace {
 
 const char* kDartVMArgs[] = {
     // clang-format off
-    // TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
-    "--reify_generic_functions",
-    "--strong",
-    "--sync_async",
 #if defined(AOT_RUNTIME)
     "--precompilation",
 #else
