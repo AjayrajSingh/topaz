@@ -78,7 +78,7 @@ template("dart_kernel") {
   # TODO(tvolkert): Name this ${target_name}
   action("${target_name}_kernel") {
     pool = "//build/dart:dart_pool($dart_toolchain)"
-    forward_variables_from(invoker, ["testonly"])
+    forward_variables_from(invoker, ["testonly", "visibility"])
 
     kernel_path = "$target_gen_dir/${target_name}.dil"
 

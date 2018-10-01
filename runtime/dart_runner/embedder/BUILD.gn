@@ -2,10 +2,22 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_library.gni")
 import("//build/dart/toolchain.gni")
-import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
-import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
+import("//topaz/runtime/dart/dart_kernel.gni")
+
+dart_kernel("shim") {
+  platform_name = "dart_runner"
+  platform_deps =
+          [ "//topaz/runtime/dart_runner/kernel:kernel_platform_files" ]
+  platform_path = "$root_out_dir/dart_runner_patched_sdk"
+
+  disable_analysis = true
+
+  main_dart = "shim.dart"
+  args = [ "--aot" ]
+
+  visibility = [ ":*" ]
+}
 
 template("create_aot_snapshot") {
   assert(defined(invoker.product), "The parameter 'product' must be defined")
@@ -16,11 +28,18 @@ template("create_aot_snapshot") {
   action("${target_name}_assembly") {
     snapshot_assembly = "$target_gen_dir/aot${product_suffix}_vm_snapshot.S"
 
+    # gen_snapshot only needs this to go through the motions of setting up an isolate.
+    shim_target = ":shim_kernel"
+    shim_kernel = get_label_info(shim_target, "target_gen_dir") + "/shim_kernel.dil"
+
+    inputs = [
+      shim_kernel,
+    ]
     outputs = [
       snapshot_assembly,
     ]
 
-    deps = gen_snapshot_deps
+    deps = gen_snapshot_deps + [ shim_target ]
     if (invoker.product) {
       script = gen_snapshot_product
     } else {
@@ -28,10 +47,6 @@ template("create_aot_snapshot") {
     }
 
     args = [
-      # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
-      "--reify_generic_functions",
-      "--strong",
-      "--sync-async",
       "--deterministic",
       "--snapshot_kind=vm-aot-assembly",
       "--assembly=" + rebase_path(snapshot_assembly),
@@ -39,6 +54,7 @@ template("create_aot_snapshot") {
     if (is_debug && !invoker.product) {
       args += [ "--enable_asserts" ]
     }
+    args += [ rebase_path(shim_kernel) ]
   }
 
   source_set(target_name) {

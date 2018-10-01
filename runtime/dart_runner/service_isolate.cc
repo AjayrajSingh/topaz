@@ -10,7 +10,7 @@
 #include "third_party/tonic/dart_microtask_queue.h"
 #include "third_party/tonic/dart_state.h"
 #include "third_party/tonic/typed_data/uint8_list.h"
-#include "third_party/dart/runtime/bin/embedded_dart_io.h"
+#include "third_party/dart/runtime/include/bin/dart_io_api.h"
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
 
