@@ -4,6 +4,8 @@
 
 import("//build/dart/dart_library.gni")
 import("//build/dart/toolchain.gni")
+import("//topaz/public/dart-pkg/fuchsia/sdk_ext.gni")
+import("//topaz/public/dart-pkg/zircon/sdk_ext.gni")
 
 template("create_aot_snapshot") {
   assert(defined(invoker.product), "The parameter 'product' must be defined")
@@ -14,18 +16,11 @@ template("create_aot_snapshot") {
   action("${target_name}_assembly") {
     snapshot_assembly = "$target_gen_dir/aot${product_suffix}_vm_snapshot.S"
 
-    # gen_snapshot only needs this to go through the motions of setting up an isolate.
-    shim_target = "../examples/hello_dart:hello_dart_aot${product_suffix}_kernel"
-    shim_kernel = get_label_info(shim_target, "target_gen_dir") + "/hello_dart_aot${product_suffix}_kernel.dil"
-
-    inputs = [
-      shim_kernel,
-    ]
     outputs = [
       snapshot_assembly,
     ]
 
-    deps = gen_snapshot_deps + [ shim_target ]
+    deps = gen_snapshot_deps
     if (invoker.product) {
       script = gen_snapshot_product
     } else {
@@ -33,6 +28,10 @@ template("create_aot_snapshot") {
     }
 
     args = [
+      # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
+      "--reify_generic_functions",
+      "--strong",
+      "--sync-async",
       "--deterministic",
       "--snapshot_kind=vm-aot-assembly",
       "--assembly=" + rebase_path(snapshot_assembly),
@@ -40,7 +39,6 @@ template("create_aot_snapshot") {
     if (is_debug && !invoker.product) {
       args += [ "--enable_asserts" ]
     }
-    args += [ rebase_path(shim_kernel) ]
   }
 
   source_set(target_name) {

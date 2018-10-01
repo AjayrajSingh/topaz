@@ -474,7 +474,7 @@ class ChildSceneLayer extends Layer {
   bool hitTestable;
 
   @override
-  void addToScene(ui.SceneBuilder builder, [Offset layerOffset]) {
+  void addToScene(ui.SceneBuilder builder, Offset layerOffset) {
     builder.addChildScene(
       offset: offset + layerOffset,
       width: width,

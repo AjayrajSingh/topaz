@@ -35,7 +35,7 @@ template("runner") {
     defines = extra_defines
 
     dart_deps = [
-      "//third_party/dart/runtime/bin:dart_io_api${product_suffix}",
+      "//third_party/dart/runtime/bin:embedded_dart_io${product_suffix}",
 
       # TODO(abarth): We shouldn't need to depend on libdart_builtin but we
       # fail to link otherwise.

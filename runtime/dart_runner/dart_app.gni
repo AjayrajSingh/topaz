@@ -410,6 +410,10 @@ template("_dart_aot_package") {
       }
 
       args = [
+        # TODO(https://github.com/dart-lang/sdk/issues/32608): Default flags.
+        "--reify_generic_functions",
+        "--strong",
+        "--sync-async",
         "--deterministic",
         "--snapshot_kind=app-aot-blobs",
         "--vm_snapshot_data=" + rebase_path(vm_snapshot_data_path),
