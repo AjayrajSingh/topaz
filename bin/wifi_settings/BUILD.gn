@@ -15,6 +15,13 @@ flutter_app("wifi_settings") {
     "src/wlan_manager.dart",
   ]
 
+  meta = [
+    {
+      path = rebase_path("meta/wifi_settings.cmx")
+      dest = "wifi_settings.cmx"
+    },
+  ]
+
   deps = [
     "//garnet/public/fidl/fuchsia.netstack",
     "//garnet/public/fidl/fuchsia.wlan.service",
