@@ -322,6 +322,9 @@ void WebViewImpl::OnSceneInvalidated(
                metrics().scale_y);  // we asked for square metrics
 
     auto requestCallback = [this](std::string url) {
+      // changing urls MUST cancel focus requests, ensure this happens:
+      HandleWebRequestsFocusEvent(false);
+
       if (webRequestDelegate_) {
         webRequestDelegate_->WillSendRequest(url);
       }
