@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:fidl_fuchsia_setui/fidl.dart';
 import 'package:fidl_fuchsia_wlan_service/fidl.dart' as wlan;
 import 'package:lib.app.dart/app.dart';
+import 'package:meta/meta.dart';
 
 import 'setting_controller.dart';
 
@@ -20,19 +21,19 @@ const int _scanTimeout = 25;
 
 const _connectionScanInterval = 3;
 
-// List of APs that we obtained from wireless scanning.
-// Periodically refreshed when there is no connected network.
-List<wlan.Ap> _scannedAps = [];
-
-/// This status is guaranteed to not be null as long as initialize is
-/// called. Periodically refreshed.
-wlan.WlanStatus _status;
-
 class NetworkController extends SettingController {
+  // List of APs that we obtained from wireless scanning.
+  // Periodically refreshed when there is no connected network.
+  List<wlan.Ap> _scannedAps = [];
+
+  /// This status is guaranteed to not be null as long as initialize is
+  /// called. Periodically refreshed.
+  wlan.WlanStatus _status;
+
   Timer _updateTimer;
   Timer _scanTimer;
 
-  wlan.WlanProxy _wlanProxy = wlan.WlanProxy();
+  wlan.WlanProxy _wlanProxy;
 
   @override
   Future<void> close() async {
@@ -45,23 +46,35 @@ class NetworkController extends SettingController {
 
   @override
   Future<void> initialize() async {
+    final proxy = wlan.WlanProxy();
+
+    await initializeWithService(() {
+      connectToService(
+          StartupContext.fromStartupInfo().environmentServices, proxy.ctrl);
+    });
+  }
+
+  /// Initializes the controller with the given [wlan.WlanProxy].
+  ///
+  /// Needed to allow providing a fake proxy for testing.
+  @visibleForTesting
+  Future<void> initializeWithService(
+      Future<wlan.WlanProxy> proxyGetter()) async {
     final Completer<bool> wlanCompleter = Completer();
 
-    _wlanProxy = wlan.WlanProxy();
+    _wlanProxy = await proxyGetter();
 
-    connectToService(
-        StartupContext.fromStartupInfo().environmentServices, _wlanProxy.ctrl);
+    _updateTimer = Timer.periodic(_statusPeriod, (timer) {
+      _wlanProxy.status(_onStatusRefreshed);
+    });
 
     _wlanProxy.status((status) {
       _onStatusRefreshed(status);
       wlanCompleter.complete(true);
     });
-    _updateTimer = Timer.periodic(_statusPeriod, (timer) {
-      _wlanProxy.status(_onStatusRefreshed);
-    });
 
     /// Waits for all initial values and then returns false if any of the futures return false
-    return wlanCompleter.future;
+    return await wlanCompleter.future;
   }
 
   @override
@@ -75,7 +88,8 @@ class NetworkController extends SettingController {
     final accessPoints = value.data.wireless?.accessPoints ?? [];
 
     for (WirelessAccessPoint ap in accessPoints) {
-      if (ap.accessPointId == _accessPointId(_status.currentAp.ssid)) {
+      if (_status.currentAp != null &&
+          ap.accessPointId == _accessPointId(_status.currentAp.ssid)) {
         if (ap.status == ConnectionStatus.disconnected ||
             ap.status == ConnectionStatus.disconnecting) {
           await _disconnect();
@@ -83,7 +97,8 @@ class NetworkController extends SettingController {
       } else {
         if (ap.status == ConnectionStatus.connected ||
             ap.status == ConnectionStatus.connecting) {
-          await _connect(ap.name);
+          await _connect(ap.name,
+              ap.security == WirelessSecurity.secured ? ap.password : null);
         }
       }
     }
@@ -114,7 +129,7 @@ class NetworkController extends SettingController {
 
   SettingsObject _buildSettingsObject() {
     return SettingsObject(
-        settingType: SettingType.unknown,
+        settingType: SettingType.wireless,
         data: SettingData.withWireless(_buildWirelessState()));
   }
 
@@ -122,7 +137,7 @@ class NetworkController extends SettingController {
     return WirelessState(
         accessPoints: _status.currentAp != null
             ? [_buildCurrentAccessPoint()]
-            : _scannedAps.map(_buildAccessPoint));
+            : _scannedAps.map(_buildAccessPoint).toList());
   }
 
   WirelessAccessPoint _buildCurrentAccessPoint() =>

@@ -1,13 +1,16 @@
 import 'dart:async';
 
 import 'package:fidl_fuchsia_setui/fidl.dart';
+import 'package:meta/meta.dart';
 
 /// Controller for a specific setting.
 ///
 /// The service instantiates [SettingController]s mapped to [SettingType]s.
 abstract class SettingController {
   final List<SettingListenerProxy> listeners = [];
-  bool _active = false;
+
+  @visibleForTesting
+  bool active = false;
 
   Future addListener(SettingListenerProxy listener) async {
     if (listeners.isEmpty) {
@@ -35,7 +38,7 @@ abstract class SettingController {
       await _initialize();
     }
 
-    if (!_active)
+    if (!active)
       throw StateError(
           'Attempted to set state with an uninitialized controller!');
 
@@ -59,16 +62,16 @@ abstract class SettingController {
 
   Future<void> _initialize() async {
     await initialize();
-    _active = true;
+    active = true;
   }
 
   Future<void> _close() async {
     await close();
-    _active = false;
+    active = false;
   }
 
   SettingsObject _getValue() {
-    if (!_active)
+    if (!active)
       throw StateError(
           'Attempted to retreive state from an uninitialized controller!');
     return value;

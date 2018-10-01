@@ -23,6 +23,7 @@ dart_library("service") {
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
+    "//zircon/public/fidl/fuchsia-net:fuchsia-net",
   ]
 }
 
@@ -30,6 +31,7 @@ dart_test("lib_setui_service_test") {
 
   sources = [
     "service_test.dart",
+    "network_controller_test.dart",
   ]
 
   deps = [
