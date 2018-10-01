@@ -14,6 +14,13 @@ flutter_app("bluetooth_settings") {
     "src/bluetooth_settings.dart",
   ]
 
+  meta = [
+    {
+      path = rebase_path("meta/bluetooth_settings.cmx")
+      dest = "bluetooth_settings.cmx"
+    },
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//garnet/public/fidl/fuchsia.bluetooth",
