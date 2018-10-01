@@ -52,7 +52,8 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
       friction: depth > 0.0
           ? kDragFrictionInfinite
           : ps.surface.canDismiss()
-              ? kDragFrictionNone
+              ? (Offset offset, Offset delta) =>
+                  Offset(delta.dx * 0.6, delta.dy * 0.2)
               : (Offset offset, Offset delta) =>
                   delta / math.max(1.0, offset.distanceSquared / 100.0),
       onDragStarted: () {},
@@ -171,9 +172,12 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
         if (!placedViewIds.contains(ps.surface.node.value)) {
           _prevForms.removeWhere((Surface surface, SurfaceForm form) =>
               surface.node.value == ps.surface.node.value);
-          FractionalOffset surfaceOrigin = positionedSurfaces.length > 1
+          // if there is already a Surface laid out, then the incoming
+          // surface should default to 'summon'. If there is no Surface being
+          // displayed, then do not animate.
+          FractionalOffset surfaceOrigin = _prevForms.isNotEmpty
               ? offscreen
-              : FractionalOffset.topLeft;
+              : FractionalOffset(0.0, 0.0); //apply no initial translation
           if (ps.surface.relation.arrangement == SurfaceArrangement.ontop) {
             // Surfaces that are ontop will be placed above the current depth
             // TODO(jphsiao): Revisit whether ontop should be placed on top of
