@@ -209,14 +209,25 @@ void VulkanSurfacePool::AgeAndCollectOldBuffers() {
 }
 
 void VulkanSurfacePool::ShrinkToFit() {
+  // Reset all oversized surfaces in |available_surfaces_| so that the old
+  // surfaces and new surfaces don't exist at the same time at any point,
+  // reducing our peak memory footprint.
+  std::vector<SkISize> sizes_to_recreate;
   for (auto& surface : available_surfaces_) {
     if (surface->IsOversized()) {
-      auto size = surface->GetSize();
-      // Reset |surface| first so that the old surface and new surface don't
-      // exist at the same time at any point, reducing our peak memory
-      // footprint.
+      sizes_to_recreate.push_back(surface->GetSize());
       surface.reset();
-      surface = CreateSurface(size);
+    }
+  }
+  available_surfaces_.erase(std::remove(available_surfaces_.begin(),
+                                        available_surfaces_.end(), nullptr),
+                            available_surfaces_.end());
+  for (const auto& size : sizes_to_recreate) {
+    auto surface = CreateSurface(size);
+    if (surface != nullptr) {
+      available_surfaces_.push_back(std::move(surface));
+    } else {
+      FML_DLOG(ERROR) << "Failed to create resized surface";
     }
   }
 
