@@ -7,8 +7,10 @@ library dart_mozart;
 import 'dart:zircon' show Handle;
 
 // Should be set to a |mozart::NativesDelegate*| by the embedder.
+@pragma("vm:entry-point")
 int _context;
 
+@pragma("vm:entry-point")
 Handle _viewContainer;
 
 class ScenicStartupInfo {
