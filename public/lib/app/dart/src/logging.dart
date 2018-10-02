@@ -46,7 +46,7 @@ const int _unexpectedLoggingLevel = 100;
 typedef LogWriter = void Function(LogWriterMessage message);
 
 /// Interim method that sets up the logger using the new-style bindings for service resolution.
-Future<void> setupLoggerAsync({
+void setupLoggerAsync({
   String name,
   Level level,
   bool forceShowCodeLocation,
@@ -54,18 +54,28 @@ Future<void> setupLoggerAsync({
   List<String> globalTags,
   zircon.Socket logSocket,
   LogWriter logWriter,
-}) async {
-  zircon.Socket sock = logSocket;
+}) {
+  FutureOr<zircon.Socket> sock;
   if (logSocket == null) {
     final socketPair = zircon.SocketPair(zircon.Socket.DATAGRAM);
     final logSinkProxy = new logger_async.LogSinkProxy();
-    await app_async.connectToService(
-      new app_async.StartupContext.fromStartupInfo().environmentServices,
-      logSinkProxy.ctrl,
-    );
-    await logSinkProxy.connect(socketPair.second);
-    sock = socketPair.first;
+
+    final completer = Completer<zircon.Socket>();
+
+    app_async
+        .connectToService(
+          new app_async.StartupContext.fromStartupInfo().environmentServices,
+          logSinkProxy.ctrl,
+        )
+        .then((_) => logSinkProxy.connect(socketPair.second))
+        .then((_) => completer.complete(socketPair.first))
+        .catchError(completer.completeError);
+
+    sock = completer.future;
+  } else {
+    sock = logSocket;
   }
+
   setupLogger(
       name: name,
       level: level,
@@ -108,7 +118,7 @@ void setupLogger({
   bool forceShowCodeLocation,
   bool logToStdoutForTest,
   List<String> globalTags,
-  zircon.Socket logSocket,
+  FutureOr<zircon.Socket> logSocket,
   LogWriter logWriter,
 }) {
   final String scopeName = name ??
@@ -208,7 +218,7 @@ FuchsiaLogger log = new FuchsiaLogger(Level.ALL)
 String _loggerName = 'uninitialized';
 
 /// Socket used to write to the universal Zircon logger.
-zircon.Socket _logSocket;
+FutureOr<zircon.Socket> _logSocket;
 
 // Enforce limits on number of global tags and length of each tag
 List<String> _verifyGlobalTags(List<String> globalTags) {
@@ -312,8 +322,22 @@ void writeLogToSocket(LogWriterMessage message) {
   }
   bytes.setUint8(byteOffset++, 0);
   assert(byteOffset <= _socketBufferLength);
-  _logSocket.write(new ByteData.view(bytes.buffer, 0, byteOffset));
+
+  void writeBytes(zircon.Socket sock) {
+    sock.write(new ByteData.view(bytes.buffer, 0, byteOffset));
+  }
+
+  if (_logSocket is Future) {
+    // need to wrap in a function to avoid casting errors
+    _writeToSocketFuture(_logSocket, writeBytes);
+  } else {
+    writeBytes(_logSocket);
+  }
 }
+
+void _writeToSocketFuture(Future<zircon.Socket> socketFuture,
+        void Function(zircon.Socket) writer) =>
+    socketFuture.then(writer);
 
 // Write a string to ByteData with a leading length byte. Return the byteOffstet
 // to use for the next value.
