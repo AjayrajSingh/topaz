@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:meta/meta.dart';
 
 import 'module_state_exception.dart';
@@ -28,7 +30,12 @@ import 'module_state_exception.dart';
 ///         {
 ///           "name": "cat",
 ///           "type": "cat-type"
-///         },
+///         }
+///       ]
+///     },
+///     {
+///       "action": "com.my-pets-app.show_dogs",
+///       "parameters": [
 ///         {
 ///           "name": "dog",
 ///           "type": "dog-type"
@@ -71,6 +78,13 @@ class Intent {
               'required parameters are present. To resolve this issue add '
               'the parameter to your module manifest file.');
         }();
+  }
+
+  @override
+  String toString() {
+    final params =
+        _parameters.values.map((p) => 'Parameter(${p.name}').join(', ');
+    return 'Intent($action): $params';
   }
 }
 
