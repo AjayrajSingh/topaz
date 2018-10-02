@@ -427,7 +427,11 @@ template("_flutter_aot_package") {
     package_name = invoker.pkg_name
     deps = invoker.cmx_deps
     extra = []
-    resources = invoker.invoker_resources
+    resources = []
+
+    if (defined(invoker.invoker_resources)) {
+      resources += invoker.invoker_resources
+    }
 
     foreach(component, invoker.components_with_kernel) {
       extra += [
@@ -447,7 +451,7 @@ template("_flutter_aot_package") {
       }
 
       resources_path = "${component.component_name}/"
-      resources = [
+      resources += [
                     {
                       path = rebase_path(component.vm_snapshot_data_path)
                       dest = "${resources_path}vm_snapshot_data.bin"
@@ -809,7 +813,7 @@ template("_flutter_aot_component") {
         sources = [
           item.path,
           rebase_path(
-              "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime"),
+              "//topaz/runtime/flutter_runner/meta/aot${product_suffix}_runtime"),
         ]
       }
       merged_outputs = get_target_outputs(":$merged")
@@ -825,7 +829,7 @@ template("_flutter_aot_component") {
     cmx_filtered_meta += [
       {
         path = rebase_path(
-                "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime")
+                "//topaz/runtime/flutter_runner/meta/aot${product_suffix}_runtime")
         dest = "deprecated_runtime"
       },
     ]
