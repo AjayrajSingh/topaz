@@ -187,9 +187,13 @@ Application::Application(
   settings_.task_observer_remove = std::bind(
       &CurrentMessageLoopRemoveAfterTaskObserver, std::placeholders::_1);
 
+  // TODO(FL-117): Re-enable causal async stack traces when this issue is
+  // addressed.
+  settings_.dart_flags = { "--no_causal_async_stacks" };
+
   if (ShouldEnableInterpreter(application_directory_.get())) {
     FML_DLOG(INFO) << "Found pkg/data/enable_interpreter. Passing --enable_interpreter";
-    settings_.dart_flags = { "--enable_interpreter" };
+    settings_.dart_flags.push_back("--enable_interpreter");
   } else {
     FML_DLOG(INFO) << "Did NOT find pkg/data/enable_interpreter.";
   }
