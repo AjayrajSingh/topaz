@@ -41,6 +41,31 @@ std::string GetClientId(const std::string& app_client_id) {
   return client_id;
 }
 
+// Sometimes auth codes contain non alpha characters such as a slash. When we
+// receive these in a url parameter they are Hex encoded, but they need to be
+// translated back to UTF-8 before using the auth code.
+//
+// TODO(jsankey): Remove this once we migrate to cookie delivery, or use a
+// common encoding/decoding library if that arrives earlier.
+void NormalizeAuthCode(std::string* code) {
+  // This function uses the following literals:
+  //   1 - The length of '%'
+  //   2 - The length of a hex byte, e.g. '2F'
+  //   3 - The length of a %-prefixed hex byte, e.g. '%2F'
+  //  16 - The base of hexadecimal
+  //  32 - The smallest printable character, i.e. the space character
+  // 127 - The largest single byte UTF-8 codepoint
+  std::string::size_type pos = 0;
+  while ((pos = code->find("%", pos)) != std::string::npos &&
+         pos <= code->length() - 3) {
+    int codepoint = strtol(code->substr(pos + 1, 2).c_str(), nullptr, 16);
+    if (codepoint >= 33 && codepoint <= 127) {
+      code->replace(pos, 3, std::string(1, codepoint));
+    }
+    pos += 3;
+  }
+}
+
 // Checks the supplied Google authentication URL. If the URL indicated the user
 // has aborted the flow or an error occured these are reported as error
 // statuses, otherwise a status of OK is returned. If the URL contains an auth
@@ -60,9 +85,13 @@ fuchsia::auth::AuthProviderStatus ParseAuthCodeFromUrl(const std::string& url,
     return fuchsia::auth::AuthProviderStatus::OK;
   }
 
-  auto code = url.substr(success_prefix.size(), std::string::npos);
-  // There is a '#' character at the end of the url
-  code.pop_back();
+  // Take everything up to the next query parameter or hash fragment.
+  auto end_char = url.find_first_of("#&", success_prefix.size());
+  auto length = end_char == std::string::npos
+                    ? std::string::npos
+                    : end_char - success_prefix.size();
+  auto code = url.substr(success_prefix.size(), length);
+  NormalizeAuthCode(&code);
 
   if (code.empty()) {
     return fuchsia::auth::AuthProviderStatus::OAUTH_SERVER_ERROR;
@@ -132,7 +161,7 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
 
   auth_ui_context_ = auth_ui_context.Bind();
   auth_ui_context_.set_error_handler([this] {
-    FXL_VLOG(1) << "Overlay cancelled by the caller";
+    FXL_LOG(INFO) << "Overlay cancelled by the caller";
     ReleaseResources();
     get_persistent_credential_callback_(AuthProviderStatus::INTERNAL_ERROR,
                                         nullptr, nullptr);
@@ -164,9 +193,9 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
                                           http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-      FXL_VLOG(1) << "Got response: "
-                  << JsonValueToPrettyString(oauth_response.json_response);
+      FXL_LOG(WARNING) << "Got error: " << oauth_response.error_description;
+      FXL_LOG(WARNING) << "Got response: "
+                       << JsonValueToPrettyString(oauth_response.json_response);
       callback(oauth_response.status, nullptr);
       return;
     }
@@ -202,9 +231,9 @@ void GoogleAuthProviderImpl::GetAppIdToken(fidl::StringPtr credential,
                                           http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-      FXL_VLOG(1) << "Got response: "
-                  << JsonValueToPrettyString(oauth_response.json_response);
+      FXL_LOG(WARNING) << "Got error: " << oauth_response.error_description;
+      FXL_LOG(WARNING) << "Got response: "
+                       << JsonValueToPrettyString(oauth_response.json_response);
       callback(oauth_response.status, nullptr);
       return;
     }
@@ -245,9 +274,9 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
                                           http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-      FXL_VLOG(1) << "Got response: "
-                  << JsonValueToPrettyString(oauth_response.json_response);
+      FXL_LOG(WARNING) << "Got error: " << oauth_response.error_description;
+      FXL_LOG(WARNING) << "Got response: "
+                       << JsonValueToPrettyString(oauth_response.json_response);
       callback(oauth_response.status, nullptr);
       return;
     }
@@ -282,9 +311,9 @@ void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
                                           http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-      FXL_VLOG(1) << "Got response: "
-                  << JsonValueToPrettyString(oauth_response.json_response);
+      FXL_LOG(WARNING) << "Got error: " << oauth_response.error_description;
+      FXL_LOG(WARNING) << "Got response: "
+                       << JsonValueToPrettyString(oauth_response.json_response);
       callback(oauth_response.status);
       return;
     }
@@ -397,10 +426,10 @@ void GoogleAuthProviderImpl::ExchangeAuthCode(std::string auth_code) {
   Request(std::move(request_factory), [this](http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_VLOG(1) << "Got error exchanging auth code: "
-                  << oauth_response.error_description;
-      FXL_VLOG(1) << "Got response exchanging auth code: "
-                  << JsonValueToPrettyString(oauth_response.json_response);
+      FXL_LOG(WARNING) << "auth: Got error exchanging auth code: "
+                       << oauth_response.error_description;
+      FXL_LOG(WARNING) << "auth: Got response exchanging auth code: "
+                       << JsonValueToPrettyString(oauth_response.json_response);
       get_persistent_credential_callback_(oauth_response.status, nullptr,
                                           nullptr);
       return;
@@ -408,8 +437,8 @@ void GoogleAuthProviderImpl::ExchangeAuthCode(std::string auth_code) {
 
     if (!oauth_response.json_response.HasMember("refresh_token") ||
         (!oauth_response.json_response.HasMember("access_token"))) {
-      FXL_VLOG(1) << "Got response without refresh and access tokens: "
-                  << JsonValueToPrettyString(oauth_response.json_response);
+      FXL_LOG(WARNING) << "Got response without refresh and access tokens: "
+                       << JsonValueToPrettyString(oauth_response.json_response);
       get_persistent_credential_callback_(
           AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr, nullptr);
     }
@@ -437,10 +466,10 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
 
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_VLOG(1) << "Got error fetching profile: "
-                  << oauth_response.error_description;
-      FXL_VLOG(1) << "Got response fetching profile: "
-                  << JsonValueToPrettyString(oauth_response.json_response);
+      FXL_LOG(WARNING) << "Got error fetching profile: "
+                       << oauth_response.error_description;
+      FXL_LOG(WARNING) << "Got response fetching profile: "
+                       << JsonValueToPrettyString(oauth_response.json_response);
 
       get_persistent_credential_callback_(oauth_response.status, credential,
                                           std::move(user_profile_info));
