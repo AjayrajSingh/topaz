@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fuchsia/services.dart';
 import 'package:meta/meta.dart';
 import 'package:modular/lifecycle.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 
 import '_intent_handler_impl.dart';
 import 'intent.dart';
@@ -20,14 +22,20 @@ class ModuleImpl implements Module {
 
   /// The intent handler host which will proxy intents to the registered
   /// intent handler
-  //ignore: unused_field
+  // ignore: unused_field
   IntentHandlerImpl _intentHandlerImpl;
 
+  // Module context proxy that is lazily instantiated in [_getContext]
+  fidl.ModuleContextProxy _moduleContextProxy;
+
   /// The default constructor for this instance.
-  ModuleImpl(
-      {@required IntentHandlerImpl intentHandlerImpl, Lifecycle lifecycle})
-      : assert(intentHandlerImpl != null) {
+  ModuleImpl({
+    @required IntentHandlerImpl intentHandlerImpl,
+    Lifecycle lifecycle,
+    fidl.ModuleContextProxy moduleContextProxy,
+  }) : assert(intentHandlerImpl != null) {
     (lifecycle ??= Lifecycle()).addTerminateListener(_terminate);
+    _moduleContextProxy ??= moduleContextProxy;
     _intentHandlerImpl = intentHandlerImpl
       ..onHandleIntent = _proxyIntentToIntentHandler;
   }
@@ -42,6 +50,36 @@ class ModuleImpl implements Module {
     _intentHandler = intentHandler;
   }
 
+  @override
+  Future<fidl.ModuleController> addModuleToStory({
+    String name,
+    fidl.Intent intent,
+    fidl.SurfaceRelation surfaceRelation = const fidl.SurfaceRelation(
+      arrangement: fidl.SurfaceArrangement.copresent,
+      dependency: fidl.SurfaceDependency.dependent,
+      emphasis: 0.5,
+    ),
+  }) async {
+    final moduleControllerProxy = fidl.ModuleControllerProxy();
+
+    fidl.StartModuleStatus status = await _getContext().addModuleToStory(
+        name, intent, moduleControllerProxy.ctrl.request(), surfaceRelation);
+
+    switch (status) {
+      case fidl.StartModuleStatus.success:
+        break;
+      case fidl.StartModuleStatus.noModulesFound:
+        throw ModuleResolutionException(
+            'no modules found for intent [$intent]');
+        break;
+      default:
+        throw ModuleStateException(
+            'unknown start module status [$status] for intent [$intent]');
+    }
+
+    return moduleControllerProxy;
+  }
+
   void _proxyIntentToIntentHandler(Intent intent) {
     if (_intentHandler == null) {
       throw ModuleStateException(
@@ -53,8 +91,37 @@ class ModuleImpl implements Module {
     _intentHandler.handleIntent(intent);
   }
 
+  /// Returns the [fidl.ModuleContext] for the running module.
+  ///
+  /// It is safe to call this method multiple times without opening multiple
+  /// connections.
+  ///
+  /// This method is intentionally private until an actual need arises to expose
+  /// it publicly.
+  fidl.ModuleContext _getContext() {
+    if (_moduleContextProxy != null) {
+      return _moduleContextProxy;
+    }
+
+    _moduleContextProxy = fidl.ModuleContextProxy();
+    connectToService(
+      StartupContext.fromStartupInfo().environmentServices,
+      _moduleContextProxy.ctrl,
+    );
+    return _moduleContextProxy;
+  }
+
   // any necessary cleanup should be done in this method.
   Future<void> _terminate() async {
     _intentHandler = null;
   }
+}
+
+/// When Module resolution fails.
+class ModuleResolutionException implements Exception {
+  /// Information about the failure.
+  final String message;
+
+  /// Create a new [ModuleResolutionException].
+  ModuleResolutionException(this.message);
 }

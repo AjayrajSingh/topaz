@@ -39,6 +39,8 @@ dart_library("modular") {
   ]
 }
 
+# Runs these tests using:
+#   fx run-host-tests modular_package_unittests
 dart_test("modular_package_unittests") {
 
   sources = [
@@ -56,10 +58,17 @@ dart_test("modular_package_unittests") {
   ]
 }
 
+# Run tese tests using:
+#  fx set x64 --packages topaz/packages/buildbot
+# Start a qemu emulator (using a real device is also possible):
+#  fx run -kN  (tip: to terminate the emulator press "ctrl+a x")
+# Run integration tests:
+#  fx shell runtests pkgfs/packages/modular_package_integration_tests/0/test
 dart_fuchsia_test("modular_package_integration_tests") {
 
   sources = [
-    "lifecycle/lifecycle_impl_test.dart"
+    "lifecycle/lifecycle_impl_test.dart",
+    "module/module_impl_integ_test.dart"
   ]
 
   deps = [
