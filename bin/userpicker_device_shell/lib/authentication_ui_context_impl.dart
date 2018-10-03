@@ -23,8 +23,8 @@ class AuthenticationUiContextImpl extends AuthenticationUiContext {
   /// start and stop an authentication display overlay.
   AuthenticationUiContextImpl(
       {OnStartOverlay onStartOverlay, VoidCallback onStopOverlay})
-      : this._onStartOverlay = onStartOverlay,
-        this._onStopOverlay = onStopOverlay;
+      : _onStartOverlay = onStartOverlay,
+        _onStopOverlay = onStopOverlay;
 
   @override
   void startOverlay(InterfaceHandle<ViewOwner> viewOwner) =>

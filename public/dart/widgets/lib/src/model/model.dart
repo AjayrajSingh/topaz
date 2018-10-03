@@ -150,13 +150,13 @@ class _InheritedModel<T extends Model> extends InheritedWidget {
   final T model;
   final int version;
   _InheritedModel({Key key, Widget child, this.model})
-      : this.version = model._version,
+      : version = model._version,
         super(key: key, child: child);
 
   /// Used to return the runtime type.
   const _InheritedModel.forRuntimeType()
-      : this.model = null,
-        this.version = 0;
+      : model = null,
+        version = 0;
 
   @override
   bool updateShouldNotify(_InheritedModel<T> oldWidget) =>

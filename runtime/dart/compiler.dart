@@ -7,12 +7,10 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:front_end/src/api_prototype/compiler_options.dart';
-import 'package:front_end/src/api_prototype/file_system.dart' show FileSystem, FileSystemEntity;
-import 'package:front_end/src/api_prototype/standard_file_system.dart'
-    show StandardFileSystem;
+import 'package:front_end/src/api_unstable/vm.dart';
 import 'package:front_end/src/scheme_based_file_system.dart'
     show SchemeBasedFileSystem;
+
 import 'package:build_integration/file_system/single_root.dart'
     show SingleRootFileSystem, SingleRootFileSystemEntity;
 
@@ -49,7 +47,7 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addFlag('verbose', help: 'Run in verbose mode');
 
 String _usage = '''
-Usage: compiler [options] [input.dart]
+Usage: compiler [options] input.dart
 
 Options:
 ${_argParser.usage}
@@ -131,7 +129,10 @@ Future<void> main(List<String> args) async {
     ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
     ..target = target
     ..embedSourceText = embedSources
-    ..onProblem = errorDetector
+    ..onDiagnostic = (DiagnosticMessage m) {
+      printDiagnosticMessage(m, stderr.writeln);
+      errorDetector(m);
+    }
     ..verbose = verbose;
 
   if (aot) {

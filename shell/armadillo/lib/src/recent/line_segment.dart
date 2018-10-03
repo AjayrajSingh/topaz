@@ -62,8 +62,8 @@ class LineSegment extends PanelDragTarget {
     bool initiallyTargetable = true,
     this.directionallyTargetable = false,
     this.validityDistance = double.infinity,
-  })  : this.a = (a.dx < b.dx || a.dy < b.dy) ? a : b,
-        this.b = (a.dx < b.dx || a.dy < b.dy) ? b : a,
+  })  : a = (a.dx < b.dx || a.dy < b.dy) ? a : b,
+        b = (a.dx < b.dx || a.dy < b.dy) ? b : a,
         assert(a.dx == b.dx || a.dy == b.dy),
         super(
           onHover: onHover,

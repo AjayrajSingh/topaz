@@ -72,8 +72,8 @@ class SimulatedPositioned extends StatefulWidget {
     this.onDragEnd,
     this.onRectReached,
     DragOffsetTransform dragOffsetTransform,
-  })  : this.initRect = initRect ?? rect,
-        this.dragOffsetTransform =
+  })  : initRect = initRect ?? rect,
+        dragOffsetTransform =
             dragOffsetTransform ?? _kDirectDragOffsetTransform,
         assert(hitTestBehavior != null),
         super(key: key);
