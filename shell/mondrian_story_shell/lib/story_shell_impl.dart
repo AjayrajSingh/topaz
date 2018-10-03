@@ -38,8 +38,8 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
     _storyShellContext.ctrl.bind(contextHandle);
     _storyShellContext.watchVisualState(_visualStateWatcherBinding.wrap(this));
     surfaceGraph.addListener(() {
-      String viewId = surfaceGraph.focused.node.value;
-      if (viewId != _lastFocusedViewId) {
+      String viewId = surfaceGraph.focused?.node?.value;
+      if (viewId != null && viewId != _lastFocusedViewId) {
         _storyShellBinding.events.onViewFocused(viewId);
         _lastFocusedViewId = viewId;
       }
