@@ -7,7 +7,6 @@
 // FIDL related files here will break some of the host-side flutter tests we
 // have. (See: https://fuchsia.atlassian.net/browse/SO-435)
 
-export 'src/utils/snapshot_manager.dart';
 export 'src/widgets/alphatar.dart';
 export 'src/widgets/conditional_builder.dart';
 export 'src/widgets/fuchsia_spinner.dart';

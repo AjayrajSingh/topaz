@@ -9,7 +9,6 @@ import 'dart:ui' as ui;
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_math/fidl.dart' as fidl;
-import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_ui_viewsv1/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:flutter/rendering.dart';
@@ -197,12 +196,6 @@ class ChildViewConnection {
   void requestFocus() {
     if (_viewKey != null) {
       _viewContainer.requestFocus(_viewKey);
-    }
-  }
-
-  void requestSnapshot(void callback(fuchsia_mem.Buffer data)) {
-    if (_viewKey != null) {
-      _viewContainer.requestSnapshotHack(_viewKey, callback);
     }
   }
 
@@ -547,10 +540,6 @@ class ChildView extends LeafRenderObjectWidget {
   ///
   /// Defaults to true.
   final bool focusable;
-
-  /// Request a snapshot of this |ChildView| in the supplied callback.
-  void requestSnapshot(void callback(fuchsia_mem.Buffer data)) =>
-      connection.requestSnapshot(callback);
 
   @override
   _RenderChildView createRenderObject(BuildContext context) {

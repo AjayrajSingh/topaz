@@ -26,7 +26,6 @@ dart_library("lib.widgets") {
     "src/modular/device_shell_widget.dart",
     "src/modular/user_shell_model.dart",
     "src/modular/user_shell_widget.dart",
-    "src/utils/snapshot_manager.dart",
     "src/widgets/alphatar.dart",
     "src/widgets/conditional_builder.dart",
     "src/widgets/fuchsia_spinner.dart",
