@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 /// Fakes exported for the fuchsia system.
-library fuchsia;
 
 // ignore: unused_import
 import 'src/fakes/fuchsia_fakes.dart' if (dart.library.fuchsia) 'dart:fuchsia';

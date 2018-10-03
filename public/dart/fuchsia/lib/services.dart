@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 
 /// The base-level functionality required by any component on Fuchsia.
-library services;
-
 export 'src/services/connect_to_service.dart';
 export 'src/services/service_provider_impl.dart';
 export 'src/services/startup_context.dart';

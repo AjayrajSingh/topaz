@@ -4,6 +4,4 @@
 
 /// The lifecycle interface defines a service which allows running components
 /// to be notified when lifecycle events happen in the system.
-library lifecycle;
-
 export 'src/lifecycle/lifecycle.dart';

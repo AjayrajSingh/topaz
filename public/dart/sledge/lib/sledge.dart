@@ -3,8 +3,6 @@
 // found in the LICENSE file.
 
 /// Sledge is a utility which aims to simplify interacting with Ledger.
-library sledge;
-
 export 'src/document/document.dart';
 export 'src/document/document_id.dart';
 export 'src/schema/base_type.dart';
