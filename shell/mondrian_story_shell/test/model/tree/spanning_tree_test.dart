@@ -13,17 +13,25 @@ import 'package:mondrian/models/tree/spanning_tree.dart';
 import 'package:mondrian/models/tree/tree.dart';
 
 void main() {
+  SurfaceGraph graph;
+  SurfaceProperties properties = SurfaceProperties();
+  SurfaceRelation depcop = SurfaceRelation(
+    emphasis: 0.12,
+    arrangement: SurfaceArrangement.copresent,
+    dependency: SurfaceDependency.dependent,
+  );
+  SurfaceRelation cop =
+      SurfaceRelation(arrangement: SurfaceArrangement.copresent);
+  SurfaceRelation unrelated =
+      SurfaceRelation(arrangement: SurfaceArrangement.sequential);
+
+  setUp(() {
+    graph = new SurfaceGraph();
+  });
+
   test('getCopresentSpanningTree with one surface in the graph', () {
-    SurfaceGraph graph = new SurfaceGraph();
-    SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
-      emphasis: 0.12,
-      arrangement: SurfaceArrangement.copresent,
-      dependency: SurfaceDependency.dependent,
-    );
     Surface parent =
-        graph.addSurface('value', properties, '', relation, null, '');
+        graph.addSurface('value', properties, '', depcop, null, '');
     Tree<Surface> spanningTree = getCopresentSpanningTree(parent);
     expect(spanningTree.length, 1);
     expect(spanningTree.value, parent);
@@ -31,20 +39,12 @@ void main() {
 
   test('getCopresentSpanningTree from grandchild with 3 surfaces in the graph',
       () {
-    SurfaceGraph graph = new SurfaceGraph();
-    SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
-      emphasis: 0.12,
-      arrangement: SurfaceArrangement.copresent,
-      dependency: SurfaceDependency.dependent,
-    );
     Surface parent =
-        graph.addSurface('parent', properties, '', relation, null, '');
+        graph.addSurface('parent', properties, '', depcop, null, '');
     Surface child =
-        graph.addSurface('child', properties, 'parent', relation, null, '');
+        graph.addSurface('child', properties, 'parent', depcop, null, '');
     Surface grandchild =
-        graph.addSurface('grandchild', properties, 'child', relation, null, '');
+        graph.addSurface('grandchild', properties, 'child', depcop, null, '');
     Tree<Surface> spanningTree = getCopresentSpanningTree(grandchild);
 
     expect(spanningTree.length, 3);
@@ -58,19 +58,11 @@ void main() {
   test(
       'getCopresentSpanningTree from grandchild with 2 other unrelated surfaces in the graph',
       () {
-    SurfaceGraph graph = new SurfaceGraph();
-    SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
-      emphasis: 0.12,
-      arrangement: SurfaceArrangement.copresent,
-      dependency: SurfaceDependency.dependent,
-    );
     graph
-      ..addSurface('parent', properties, '', relation, null, '')
-      ..addSurface('child', properties, '', relation, null, '');
+      ..addSurface('a', properties, '', depcop, null, '')
+      ..addSurface('b', properties, '', depcop, null, '');
     Surface grandchild =
-        graph.addSurface('grandchild', properties, '', relation, null, '');
+        graph.addSurface('c', properties, '', depcop, null, '');
     Tree<Surface> spanningTree = getCopresentSpanningTree(grandchild);
 
     expect(spanningTree.length, 1);
@@ -78,21 +70,13 @@ void main() {
   });
 
   test(
-      'getDependentSpanningTree from grandchild with 2 other unrelated surfaces in the graph',
+      'getDependentSpanningTree from node with 2 unrelated surfaces in the graph',
       () {
-    SurfaceGraph graph = new SurfaceGraph();
-    SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
-      emphasis: 0.12,
-      arrangement: SurfaceArrangement.copresent,
-      dependency: SurfaceDependency.dependent,
-    );
     graph
-      ..addSurface('parent', properties, '', relation, null, '')
-      ..addSurface('child', properties, '', relation, null, '');
+      ..addSurface('a', properties, '', depcop, null, '')
+      ..addSurface('b', properties, '', depcop, null, '');
     Surface grandchild =
-        graph.addSurface('grandchild', properties, '', relation, null, '');
+        graph.addSurface('c', properties, '', depcop, null, '');
     Tree<Surface> spanningTree = getDependentSpanningTree(grandchild);
 
     expect(spanningTree.length, 1);
@@ -100,45 +84,38 @@ void main() {
   });
 
   test(
-      'getDependentSpanningTree from grandchild with 2 other unrelated surfaces in the graph',
+      'getDependentSpanningTree from grandchild with 2 related surfaces in the graph',
       () {
-    SurfaceGraph graph = new SurfaceGraph();
-    SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
-      emphasis: 0.12,
-      arrangement: SurfaceArrangement.copresent,
-      dependency: SurfaceDependency.dependent,
-    );
     graph
-      ..addSurface('parent', properties, '', relation, null, '')
-      ..addSurface('child', properties, '', relation, null, '');
+      ..addSurface('parent', properties, '', depcop, null, '')
+      ..addSurface('child', properties, 'parent', depcop, null, '')
+      ..addSurface('unrelated', properties, 'child', unrelated, null, '');
     Surface grandchild =
-        graph.addSurface('grandchild', properties, '', relation, null, '');
+        graph.addSurface('grandchild', properties, 'child', depcop, null, '');
     Tree<Surface> spanningTree = getDependentSpanningTree(grandchild);
 
-    expect(spanningTree.length, 1);
-    expect(spanningTree.value, grandchild);
+    expect(spanningTree.length, 3);
   });
 
-  test('getDependentSpanningTrees', () {
-    SurfaceGraph graph = new SurfaceGraph();
-    SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
-      emphasis: 0.12,
-      arrangement: SurfaceArrangement.copresent,
-      dependency: SurfaceDependency.dependent,
-    );
+  test('getDependentSpanningTrees with 1 tree', () {
     graph
-      ..addSurface('parent', properties, '', relation, null, '')
-      ..addSurface('child', properties, '', relation, null, '');
+      ..addSurface('parent', properties, '', depcop, null, '')
+      ..addSurface('child', properties, 'parent', depcop, null, '');
     Surface grandchild =
-        graph.addSurface('grandchild', properties, '', relation, null, '');
-    List<Tree<Surface>> spanningTree =
-        getDependentSpanningTrees(grandchild).flatten();
+        graph.addSurface('grandchild', properties, 'child', depcop, null, '');
+    List<Tree<Surface>> spanningTrees = getDependentSpanningTrees(grandchild);
+    expect(spanningTrees.length, 1);
+  });
 
-    expect(spanningTree.length, 1);
-    expect(spanningTree.first.value, grandchild);
+  test('getDependentSpanningTrees with 2 trees', () {
+    Surface firstRoot =
+        graph.addSurface('firstRoot', properties, '', depcop, null, '');
+    graph
+      ..addSurface('child', properties, 'firstRoot', depcop, null, '')
+      ..addSurface('grandchild', properties, 'child', depcop, null, '')
+      ..addSurface('secondRoot', properties, 'firstRoot', cop, null, '')
+      ..addSurface('secondChild', properties, 'secondRoot', depcop, null, '');
+    List<Tree<Surface>> spanningTrees = getDependentSpanningTrees(firstRoot);
+    expect(spanningTrees.length, 2);
   });
 }

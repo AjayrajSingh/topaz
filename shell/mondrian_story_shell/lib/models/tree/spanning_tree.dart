@@ -41,7 +41,7 @@ Tree<Surface> getDependentSpanningTree(Surface surface) {
 }
 
 /// Returns the List (forest) of DependentSpanningTrees in the current graph
-Forest<Surface> getDependentSpanningTrees(Surface surface) {
+List<Tree<Surface>> getDependentSpanningTrees(Surface surface) {
   List<Tree<Surface>> queue = <Tree<Surface>>[];
   Forest<Surface> forest = new Forest<Surface>();
 
@@ -57,7 +57,7 @@ Forest<Surface> getDependentSpanningTrees(Surface surface) {
     }
     forest.add(t);
   }
-  return forest;
+  return forest.roots.toList();
 }
 
 List<Tree<Surface>> _endsOfChain({Tree<Surface> current}) {
