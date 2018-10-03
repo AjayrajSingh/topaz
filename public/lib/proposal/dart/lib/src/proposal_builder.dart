@@ -31,18 +31,25 @@ class ProposalBuilder {
   /// The actions that will be executed if the proposal is accepted.
   List<Action> actions = [];
 
+  /// The affinities to stories and/or modules the proposal can have.
+  List<ProposalAffinity> affinities = [];
+
   /// Adds an action to the proposal.
   void addAction(Action action) => actions.add(action);
+
+  /// Adds an action to the proposal.
+  void addStoryAffinity(String storyName) {
+    final StoryAffinity storyAffinity = StoryAffinity(
+      storyName: storyName,
+    );
+    affinities.add(ProposalAffinity.withStoryAffinity(storyAffinity));
+  }
 
   /// Sets the story name associated with this proposal. The story name is
   /// defined by the creator of the proposal, and can be re-used across
   /// multiple proposals to refer to the same story. If a story with the
   /// given name is not running, one will be created.
   String storyName;
-
-  /// Sets the story affinity of the proposal. If true, the proposal will only
-  /// be shown as a suggestion if the story it's associated with is focused.
-  bool storyAffinity = false;
 
   /// Sets the creator's confidence that the proposal would be selected if it were
   /// the only one presented to the user.
@@ -104,8 +111,8 @@ class ProposalBuilder {
     return Proposal(
         id: _id,
         storyName: storyName,
-        storyAffinity: storyAffinity,
         onSelected: actions,
+        affinity: affinities,
         confidence: confidence,
         display: SuggestionDisplay(
             headline: headline,

@@ -101,7 +101,7 @@ Future<void> _proposeScore(ModuleDriver moduleDriver) async {
       ProposalBuilder(id: 'showScore', headline: 'Show Score')
         ..storyName = storyId
         ..color = suggestionColor
-        ..storyAffinity = true
+        ..addStoryAffinity(storyId)
         ..addAction(Action.withAddModule(addModule));
 
   final intelligenceServices =
