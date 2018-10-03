@@ -14,6 +14,35 @@ import 'package:fidl_fuchsia_modular/fidl.dart'
     show SurfaceRelation, SurfaceArrangement, SurfaceDependency;
 import 'package:flutter/material.dart';
 
+class FakeIntentParameters implements IntentParameters {
+  FakeModuleDriver _driver;
+
+  FakeIntentParameters({
+    ModuleDriver moduleDriver,
+  }) {
+    _driver = moduleDriver;
+  }
+
+  @override
+  Future<T> getParameterData<T>(
+      String parameterName, EntityCodec<T> codec) async {
+    return _driver.getTestLinkCurrentValue(parameterName, codec);
+  }
+
+  @override
+  Stream<T> watchParameterData<T>(String parameterName, EntityCodec<T> codec) {
+    StreamController<T> controller = new StreamController<T>(
+      onListen: () {},
+      onPause: () {},
+      onResume: () {},
+      onCancel: () {},
+    )
+      ..add(_driver.getTestLinkCurrentValue(parameterName, codec))
+      ..close();
+    return controller.stream;
+  }
+}
+
 class LinkStreamController {
   final StreamController<String> controller;
   final bool watchAll;
@@ -27,11 +56,25 @@ class FakeModuleDriver implements ModuleDriver {
   final _startModuleIntents = [];
   final _fakeModuleContext = FakeModuleContext();
   final _fakeModuleControllerClient = FakeModuleControllerClient();
+  OnHandleIntent _onHandleIntent;
+  FakeIntentParameters _parameters;
 
   @override
   // ignore: use_to_and_as_if_applicable
   Future<ModuleDriver> start() {
     return Future.value(this);
+  }
+
+  @override
+  set onHandleIntent(OnHandleIntent onHandleIntent) {
+    _onHandleIntent = onHandleIntent;
+  }
+
+  // Tells the module driver to create fake intent parameters which map to
+  // all the values which have been |putTestValue|'d and send it to the module.
+  void handleIntent() {
+    _parameters = FakeIntentParameters(moduleDriver: this);
+    _onHandleIntent('', _parameters);
   }
 
   // Value is only send to watchers registered with all = true.
