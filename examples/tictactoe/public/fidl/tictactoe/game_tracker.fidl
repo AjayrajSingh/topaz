@@ -17,7 +17,7 @@ enum Status {
 
 // Result a fidl call's indicating success or failure and reason for failure.
 struct ExecuteResult {
-  Status @status;
+  Status status;
   string? error_message;
 };
 
