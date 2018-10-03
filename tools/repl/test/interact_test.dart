@@ -93,4 +93,18 @@ void main() {
       [Output.prompt, '123', 3],
     ]));
   });
+
+  test('multi-line paste', () {
+    expect(interact(Stream.fromIterable([
+      '1', '2\n34\n5',
+      up, up,
+    ])), emitsInOrder([
+      [Output.prompt, '1', 1],
+      [Output.evaluate, '12'],
+      [Output.evaluate, '34'],
+      [Output.prompt, '5', 1],
+      [Output.prompt, '34', 2],
+      [Output.prompt, '12', 2],
+    ]));
+  });
 }

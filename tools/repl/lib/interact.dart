@@ -38,13 +38,6 @@ Stream<List<dynamic>> interact(Stream<String> inputs) async* {
         cursorAt--;
         yield getPrompt();
       }
-    } else if (input == '\u{a}') {
-      // New line
-      yield [Output.evaluate, line];
-      history.add(line);
-      historyAt = history.length;
-      line = '';
-      cursorAt = 0;
     } else if (input == '\u{1b}[A') {
       // Up
       if (historyAt == 0) {
@@ -89,16 +82,28 @@ Stream<List<dynamic>> interact(Stream<String> inputs) async* {
           // figure out characters' display width when moving the cursor.
           var hex = rune.toRadixString(16);
           buffer.write('\\u{$hex}');
+        } else if (rune == 10) {
+          // New line
+          line += buffer.toString();
+          buffer.clear();
+          yield [Output.evaluate, line];
+          history.add(line);
+          historyAt = history.length;
+          line = '';
+          cursorAt = 0;
         } else {
           buffer.writeCharCode(rune);
         }
       }
-      line =
-          line.substring(0, cursorAt) +
-          buffer.toString() +
-          line.substring(cursorAt);
-      cursorAt += buffer.length;
-      yield getPrompt();
+
+      if (buffer.isNotEmpty) {
+        line =
+            line.substring(0, cursorAt) +
+            buffer.toString() +
+            line.substring(cursorAt);
+        cursorAt += buffer.length;
+        yield getPrompt();
+      }
     }
   }
 }
