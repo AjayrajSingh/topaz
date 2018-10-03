@@ -41,7 +41,6 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addFlag('embed-sources',
       help: 'Embed sources in the output dill file', defaultsTo: false)
   ..addFlag('gen-bytecode', help: 'Generate bytecode', defaultsTo: false)
-  ..addFlag('print-dependencies', help: 'Print dependencies to stdout', defaultsTo: false)
   ..addOption('depfile', help: 'Path to output Ninja depfile')
   ..addOption('manifest', help: 'Path to output Fuchsia package manifest')
   ..addOption('output', help: 'Path to output dill file')
@@ -174,13 +173,6 @@ Future<void> main(List<String> args) async {
   final String manifestFilename = options['manifest'];
   if (manifestFilename != null) {
     await writePackages(component, kernelBinaryFilename, manifestFilename, componentName);
-  }
-
-  // Dependencies output.
-  if (options['print-dependencies']) {
-    for (Uri dep in getDependencies(component)) {
-      print(fileSystem.entityForUri(dep).uri.toFilePath());
-    }
   }
 }
 
