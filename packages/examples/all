@@ -4,6 +4,7 @@
         "topaz/packages/examples/dart",
         "topaz/packages/examples/fidl",
         "topaz/packages/examples/misc",
+        "topaz/packages/examples/modular",
         "topaz/packages/examples/mondrian",
         "topaz/packages/examples/noodles",
         "topaz/packages/examples/simple_flutter",

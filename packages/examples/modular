@@ -1,0 +1,6 @@
+{
+    "packages": [
+        "//topaz/examples/modular/shapes_mod",
+        "//topaz/examples/modular/slider_mod"
+    ]
+}

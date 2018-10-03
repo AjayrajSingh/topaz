@@ -1,0 +1,25 @@
+{
+  "@version": 2,
+  "binary": "shapes_mod",
+  "suggestion_headline": "Show a shape",
+  "intent_filters": [
+    {
+      "action": "com.fuchsia.shapes_mod.show_circle",
+      "parameters": [
+        {
+          "name": "radius",
+          "type": "<need_type_here>"
+        }
+      ]
+    },
+    {
+      "action": "com.fuchsia.shapes_mod.show_square",
+      "parameters": [
+        {
+          "name": "length",
+          "type": "<need_type_here>"
+        }
+      ]
+    }
+  ]
+}
