@@ -776,6 +776,15 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
     }
 
     FXL_VLOG(1) << "Fetching access/id tokens for Account_ID:" << account_id_;
+
+    // Use an entry from the cache if one exists
+    bool cacheValid = IsCacheValid();
+    if (cacheValid) {
+      Success(flow);  // fetching tokens from local cache.
+      return;
+    }
+
+    // Check if the user has a stored refesh token
     const std::string refresh_token = GetRefreshTokenFromCredsFile(account_id_);
     if (refresh_token.empty()) {
       // TODO(ukode): Need to differentiate between deleted users, users that
@@ -783,15 +792,9 @@ class OAuthTokenManagerApp::GoogleOAuthTokensCall
       // response in such cases as there is no clear way to differentiate
       // between regular users and guest users.
       Success(flow);
-      return;
-    }
-
-    bool cacheValid = IsCacheValid();
-    if (!cacheValid) {
-      // fetching tokens from server.
-      FetchAccessAndIdToken(refresh_token, flow);
     } else {
-      Success(flow);  // fetching tokens from local cache.
+      // Use this refresh token to generate and cache new short lived tokens.
+      FetchAccessAndIdToken(refresh_token, flow);
     }
   }
 
@@ -1206,6 +1209,10 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
         return;
     }
 
+    // If there is a cache entry always ensure its deleted
+    app_->oauth_tokens_.erase(account_->id);
+
+    // If no credentials exist in the database we are now done.
     const std::string refresh_token =
         GetRefreshTokenFromCredsFile(account_->id);
     if (refresh_token.empty()) {
@@ -1214,17 +1221,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
       return;
     }
 
-    // delete local cache first.
-    if (app_->oauth_tokens_.find(account_->id) != app_->oauth_tokens_.end()) {
-      if (!app_->oauth_tokens_.erase(account_->id)) {
-        Failure(flow, fuchsia::modular::auth::Status::INTERNAL_ERROR,
-                "Unable to delete cached tokens for account:" +
-                    std::string(account_->id));
-        return;
-      }
-    }
-
-    // delete user credentials from local persistent storage.
+    // Delete user credentials from local persistent storage.
     if (!DeleteCredentials()) {
       Failure(flow, fuchsia::modular::auth::Status::INTERNAL_ERROR,
               "Unable to delete persistent credentials for account:" +
@@ -1237,7 +1234,7 @@ class OAuthTokenManagerApp::GoogleRevokeTokensCall
       return;
     }
 
-    // revoke persistent tokens on backend IDP server.
+    // Revoke persistent tokens on backend IDP server.
     app_->startup_context_->ConnectToEnvironmentService(
         http_service_.NewRequest());
     http_service_->CreateURLLoader(url_loader_.NewRequest());
