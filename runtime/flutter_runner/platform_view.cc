@@ -11,9 +11,9 @@
 #include "flutter/lib/ui/window/pointer_data.h"
 #include "lib/component/cpp/connect.h"
 #include "lib/ui/gfx/cpp/math.h"
-#include "third_party/rapidjson/rapidjson/document.h"
-#include "third_party/rapidjson/rapidjson/stringbuffer.h"
-#include "third_party/rapidjson/rapidjson/writer.h"
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 #include "vsync_waiter.h"
 
 namespace flutter {
@@ -116,9 +116,9 @@ PlatformView::PlatformView(
   // Finally! Register the native platform message handlers.
   RegisterPlatformMessageHandlers();
 
-// TODO(SCN-975): Re-enable.
-//   view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
-//                             std::placeholders::_1));
+  // TODO(SCN-975): Re-enable.
+  //   view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
+  //                             std::placeholders::_1));
 }
 
 PlatformView::~PlatformView() = default;

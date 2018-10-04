@@ -7,9 +7,9 @@
 #include <unordered_set>
 
 #include "lib/component/cpp/startup_context.h"
-#include "third_party/rapidjson/rapidjson/document.h"
-#include "third_party/rapidjson/rapidjson/stringbuffer.h"
-#include "third_party/rapidjson/rapidjson/writer.h"
+#include "rapidjson/document.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 namespace flutter {
 

@@ -17,7 +17,7 @@
 #include "lib/fxl/strings/join_strings.h"
 #include "lib/svc/cpp/services.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
-#include "third_party/rapidjson/rapidjson/document.h"
+#include "rapidjson/document.h"
 #include "topaz/auth_providers/google/constants.h"
 #include "topaz/auth_providers/oauth/oauth_request_builder.h"
 #include "topaz/auth_providers/oauth/oauth_response.h"

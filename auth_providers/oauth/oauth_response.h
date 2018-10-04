@@ -8,7 +8,7 @@
 #include <fuchsia/auth/cpp/fidl.h>
 #include <fuchsia/net/oldhttp/cpp/fidl.h>
 
-#include "third_party/rapidjson/rapidjson/document.h"
+#include "rapidjson/document.h"
 
 namespace auth_providers {
 namespace oauth {

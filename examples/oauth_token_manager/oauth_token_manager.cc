@@ -38,12 +38,12 @@
 #include "lib/fxl/strings/string_number_conversions.h"
 #include "lib/fxl/time/time_point.h"
 #include "lib/svc/cpp/services.h"
-#include "third_party/rapidjson/rapidjson/document.h"
-#include "third_party/rapidjson/rapidjson/error/en.h"
-#include "third_party/rapidjson/rapidjson/pointer.h"
-#include "third_party/rapidjson/rapidjson/prettywriter.h"
-#include "third_party/rapidjson/rapidjson/stringbuffer.h"
-#include "third_party/rapidjson/rapidjson/writer.h"
+#include "rapidjson/document.h"
+#include "rapidjson/error/en.h"
+#include "rapidjson/pointer.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 #include "topaz/examples/oauth_token_manager/credentials_generated.h"
 
 namespace {

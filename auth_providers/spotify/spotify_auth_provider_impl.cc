@@ -15,7 +15,7 @@
 #include "lib/fxl/strings/join_strings.h"
 #include "lib/svc/cpp/services.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
-#include "third_party/rapidjson/rapidjson/document.h"
+#include "rapidjson/document.h"
 #include "topaz/auth_providers/oauth/oauth_request_builder.h"
 #include "topaz/auth_providers/oauth/oauth_response.h"
 #include "topaz/auth_providers/spotify/constants.h"
@@ -324,7 +324,8 @@ SpotifyAuthProviderImpl::SetupWebView() {
   view_provider->CreateView(view_owner.NewRequest(),
                             web_view_moz_services.NewRequest());
 
-  component::ConnectToService(web_view_moz_services.get(), web_view_.NewRequest());
+  component::ConnectToService(web_view_moz_services.get(),
+                              web_view_.NewRequest());
 
   return view_owner;
 }

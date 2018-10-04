@@ -7,7 +7,7 @@
 #include "lib/fsl/socket/strings.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/macros.h"
-#include "third_party/rapidjson/rapidjson/error/en.h"
+#include "rapidjson/error/en.h"
 
 namespace auth_providers {
 namespace oauth {
