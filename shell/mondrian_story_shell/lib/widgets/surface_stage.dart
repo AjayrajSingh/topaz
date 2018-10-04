@@ -2,12 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/physics.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
@@ -25,6 +27,10 @@ const SpringDescription _kSimSpringDescription = const SpringDescription(
 );
 
 const double _kGestureWidth = 32.0;
+
+/// Delays the first animation by this amount.  This gives new mods time to
+/// load.
+const _introAnimationDelay = Duration(milliseconds: 750);
 
 /// Stages determine how things move, and how they can be manipulated
 class SurfaceStage extends StatelessWidget {
@@ -114,6 +120,11 @@ class _SurfaceInstance extends StatefulWidget {
   _SurfaceInstanceState createState() => new _SurfaceInstanceState();
 }
 
+class DummyTickerProvider implements TickerProvider {
+  @override
+  Ticker createTicker(TickerCallback onTick) => Ticker((_) {});
+}
+
 class _SurfaceInstanceState extends State<_SurfaceInstance>
     with TickerProviderStateMixin {
   FluxAnimation<Rect> get animation => _animation;
@@ -126,11 +137,23 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
   void initState() {
     super.initState();
     //TODO:(alangardner): figure out elevation layering
-    _animation = new ManualAnimation<Rect>(
+
+    /// Delay the first animation to give time for the mod to load.  We do this
+    /// with a dummy ticker that doesn't tick for the delay period.
+    _animation = _createAnimation(DummyTickerProvider());
+    Timer(_introAnimationDelay, () {
+      setState(() {
+        _animation = _createAnimation(this);
+      });
+    });
+  }
+
+  ManualAnimation<Rect> _createAnimation(TickerProvider tickerProvider) {
+    return ManualAnimation<Rect>(
       value: widget.form.initPosition,
       velocity: Rect.zero,
       builder: (Rect value, Rect velocity) => new MovingTargetAnimation<Rect>(
-              vsync: this,
+              vsync: tickerProvider,
               simulate: _kFormSimulate,
               target: _target,
               value: value,
