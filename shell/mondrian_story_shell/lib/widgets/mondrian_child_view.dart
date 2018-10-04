@@ -8,6 +8,8 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import '../models/surface/surface.dart';
 
+import 'breathing_placeholder.dart';
+
 /// Frame for child views
 class MondrianChildView extends StatelessWidget {
   /// Constructor
@@ -29,9 +31,7 @@ class MondrianChildView extends StatelessWidget {
                         connection: surface.connection,
                         hitTestable: interactable,
                       ),
-                      new Container(
-                        color: getColor(surface.placeholderColor),
-                      )
+                      new BreathingPlaceholder()
                     ],
                   )
                 : new ChildView(
