@@ -9,6 +9,7 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
 import 'package:modular/lifecycle.dart';
 
+import '_fidl_transformers.dart';
 import 'intent.dart';
 
 /// A concrete implementation of the [fidl.IntentHandler] interface.
@@ -49,36 +50,11 @@ class IntentHandlerImpl extends fidl.IntentHandler {
     if (onHandleIntent == null) {
       return null;
     }
-
     // convert to the non-fidl intent.
-    onHandleIntent(Intent(
-      action: intent.action ?? '',
-      parameters:
-          _getIntentParametersFromFidlIntentParameters(intent.parameters),
-    ));
+    onHandleIntent(convertFidlIntentToIntent(intent));
   }
 
-  List<IntentParameter> _getIntentParametersFromFidlIntentParameters(
-          List<fidl.IntentParameter> parameters) =>
-      parameters
-          .map(_intentParameterFromFidlIntentParameter)
-          .toList(growable: false);
-
-  IntentParameter _intentParameterFromFidlIntentParameter(
-      fidl.IntentParameter parameter) {
-    switch (parameter.data.tag) {
-      case fidl.IntentParameterDataTag.entityReference:
-        return EntityIntentParameter(
-          name: parameter.name,
-          entityReference: parameter.data.entityReference,
-        );
-      default:
-        throw Exception(
-            'IntentParameter with type ${parameter.data.tag} is not supported at this time');
-    }
-  }
-
-    // any necessary cleanup should be done in this method.
+  // any necessary cleanup should be done in this method.
   Future<void> _terminate() async {
     _intentHandlerBinding.close();
     onHandleIntent = null;
