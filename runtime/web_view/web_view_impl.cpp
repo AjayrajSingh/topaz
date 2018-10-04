@@ -118,7 +118,7 @@ void WebViewImpl::HandleWebRequestsFocusEvent(bool focused) {
 }
 
 void WebViewImpl::UpdateInputConnection() {
-  if (web_requests_input_ && has_scenic_focus_) {
+  if (web_requests_input_) {
     ime_service_->ShowKeyboard();
 
     fuchsia::ui::input::InputMethodEditorClientPtr client_ptr;
@@ -322,9 +322,6 @@ void WebViewImpl::OnSceneInvalidated(
                metrics().scale_y);  // we asked for square metrics
 
     auto requestCallback = [this](std::string url) {
-      // changing urls MUST cancel focus requests, ensure this happens:
-      HandleWebRequestsFocusEvent(false);
-
       if (webRequestDelegate_) {
         webRequestDelegate_->WillSendRequest(url);
       }
