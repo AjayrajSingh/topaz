@@ -199,6 +199,7 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
             (1.0 - (fractionalOffset.dx + animation.value.size.width));
         double bottom = parentSize.height *
             (1.0 - (fractionalOffset.dy + animation.value.size.height));
+
         double surfaceDepth = isDragging
             ? -2.0
             : lerpDouble(
@@ -328,7 +329,7 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
   }
 }
 
-const double _kEpsilon = 1e-2;
+const double _kEpsilon = 1e-3;
 const Tolerance _kTolerance = const Tolerance(
   distance: _kEpsilon,
   time: _kEpsilon,
