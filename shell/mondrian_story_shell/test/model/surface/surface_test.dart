@@ -20,8 +20,8 @@ void main() {
     Tree child = new Tree<String>(value: 'childValue');
     parent.add(node);
     node.add(child);
-    SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
+    SurfaceProperties properties = new SurfaceProperties(
+        containerLabel: 'containerLabel', source: ModuleSource.external$);
     SurfaceRelation relation = new SurfaceRelation(
       emphasis: 0.12,
       arrangement: SurfaceArrangement.copresent,
@@ -37,6 +37,47 @@ void main() {
     expect(decodedSurface.relation.arrangement, SurfaceArrangement.copresent);
     expect(decodedSurface.relation.dependency, SurfaceDependency.dependent);
     expect(decodedSurface.properties.containerLabel, 'containerLabel');
+    expect(decodedSurface.properties.source, ModuleSource.external$);
+    expect(decodedSurface.compositionPattern, null);
+  });
+
+  test('encode and decode surfaceRelation', () {
+    SurfaceRelation relation = new SurfaceRelation(
+      emphasis: 0.5,
+      arrangement: SurfaceArrangement.copresent,
+      dependency: SurfaceDependency.dependent,
+    );
+    Map<String, String> relationMap = SurfaceRelationUtil.toMap(relation);
+    SurfaceRelation decodedRelation = SurfaceRelationUtil.decode(relationMap);
+    expect(decodedRelation.arrangement, SurfaceArrangement.copresent);
+    expect(decodedRelation.dependency, SurfaceDependency.dependent);
+    expect(decodedRelation.emphasis, 0.5);
+  });
+
+  test('toJson and fromJson with empty surface properties', () {
+    SurfaceGraph graph = new SurfaceGraph();
+    Tree parent = new Tree<String>(value: null);
+    Tree node = new Tree<String>(value: 'value');
+    Tree child = new Tree<String>(value: 'childValue');
+    parent.add(node);
+    node.add(child);
+    SurfaceProperties properties = new SurfaceProperties();
+    SurfaceRelation relation = new SurfaceRelation(
+      emphasis: 0.12,
+      arrangement: SurfaceArrangement.copresent,
+      dependency: SurfaceDependency.dependent,
+    );
+    Surface surface = new Surface(graph, node, properties, relation, null, '');
+    String encoded = json.encode(surface);
+    Map decodedJson = json.decode(encoded);
+    Surface decodedSurface = new Surface.fromJson(decodedJson, graph);
+    expect(decodedSurface.node.value, 'value');
+    expect(decodedSurface.isParentRoot, true);
+    expect(decodedSurface.relation.emphasis, 0.12);
+    expect(decodedSurface.relation.arrangement, SurfaceArrangement.copresent);
+    expect(decodedSurface.relation.dependency, SurfaceDependency.dependent);
+    expect(decodedSurface.properties.containerLabel, null);
+    expect(decodedSurface.properties.source, null);
     expect(decodedSurface.compositionPattern, null);
   });
 

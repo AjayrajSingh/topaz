@@ -12,7 +12,7 @@ class SurfaceProperties {
   SurfaceProperties.fromJson(Map<String, dynamic> json) {
     containerLabel = json['containerLabel'];
     containerMembership = json['containerMembership'];
-    source = json['source'];
+    source = moduleSourceFromString(json['source']);
   }
 
   /// Belongs to a container with label containerLabel
@@ -33,6 +33,18 @@ class SurfaceProperties {
   Map<String, dynamic> toJson() => {
         'containerLabel': containerLabel,
         'containerMembership': containerMembership,
-        'source': source,
+        'source': source.toString(),
       };
+
+  ModuleSource moduleSourceFromString(String str) {
+    if (str == ModuleSource.internal.toString()) {
+      return ModuleSource.internal;
+    } else if (str == ModuleSource.external$.toString()) {
+      return ModuleSource.external$;
+    } else if (str == 'null') {
+      return null;
+    } else {
+      throw new ArgumentError.value(str);
+    }
+  }
 }

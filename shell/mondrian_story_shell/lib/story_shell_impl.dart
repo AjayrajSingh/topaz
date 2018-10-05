@@ -2,7 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
@@ -11,6 +16,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.story_shell/common.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/utils.dart';
+import 'package:zircon/zircon.dart';
 
 import 'models/surface/surface_graph.dart';
 import 'models/surface/surface_properties.dart';
@@ -21,12 +27,14 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
   final StoryShellContextProxy _storyShellContext =
       new StoryShellContextProxy();
+  final LinkProxy _linkProxy = new LinkProxy();
   final PointerEventsListener _pointerEventsListener =
       new PointerEventsListener();
   final KeyListener keyListener;
   final StoryVisualStateWatcherBinding _visualStateWatcherBinding =
       new StoryVisualStateWatcherBinding();
   final SurfaceGraph surfaceGraph;
+  final String _storyShellLinkName = 'story_shell_state';
   StoryVisualState _visualState;
   String _lastFocusedViewId;
 
@@ -34,9 +42,12 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
 
   /// StoryShell
   @override
-  void initialize(InterfaceHandle<StoryShellContext> contextHandle) {
+  void initialize(InterfaceHandle<StoryShellContext> contextHandle) async {
     _storyShellContext.ctrl.bind(contextHandle);
-    _storyShellContext.watchVisualState(_visualStateWatcherBinding.wrap(this));
+    _storyShellContext
+      ..watchVisualState(_visualStateWatcherBinding.wrap(this))
+      ..getLink(_linkProxy.ctrl.request());
+    await reloadStoryState().then(onLinkContentsFetched);
     surfaceGraph.addListener(() {
       String viewId = surfaceGraph.focused?.node?.value;
       if (viewId != null && viewId != _lastFocusedViewId) {
@@ -93,6 +104,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   void focusView(String viewId, String relativeViewId) {
     trace('focusing view $viewId');
     surfaceGraph.focusSurface(viewId, relativeViewId);
+    persistStoryState();
   }
 
   /// Defocus the view with this id
@@ -103,6 +115,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
     // TODO(alangardner, djmurphy): Make Mondrian not crash if the process
     // associated with viewId is closed after callback returns.
     callback();
+    persistStoryState();
   }
 
   /// Add a container node to the graph, with associated layout as a property,
@@ -192,5 +205,31 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
     } else {
       keyListener.stop();
     }
+  }
+
+  Future<fuchsia_mem.Buffer> reloadStoryState() {
+    Completer<fuchsia_mem.Buffer> completer = Completer<fuchsia_mem.Buffer>();
+    _linkProxy.get([_storyShellLinkName], completer.complete);
+    return completer.future;
+  }
+
+  void onLinkContentsFetched(fuchsia_mem.Buffer buffer) {
+    var dataVmo = new SizedVmo(buffer.vmo.handle, buffer.size);
+    var data = dataVmo.read(buffer.size);
+    dataVmo.close();
+    dynamic decoded = jsonDecode(utf8.decode(data.bytesAsUint8List()));
+    if (decoded is Map<String, dynamic>) {
+      surfaceGraph.reload(decoded.cast<String, dynamic>());
+    }
+  }
+
+  void persistStoryState() async {
+    String encoded = json.encode(surfaceGraph);
+    var jsonList = Uint8List.fromList(utf8.encode(encoded));
+    var data = fuchsia_mem.Buffer(
+      vmo: new SizedVmo.fromUint8List(jsonList),
+      size: jsonList.length,
+    );
+    _linkProxy.set([_storyShellLinkName], data);
   }
 }

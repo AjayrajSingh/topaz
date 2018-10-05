@@ -130,7 +130,10 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
     Map<Surface, SurfaceForm> placedSurfaces = <Surface, SurfaceForm>{};
     List<Surface> focusStack = graph.focusStack.toList();
     double depth = 0.0;
-    while (focusStack.isNotEmpty) {
+    while (focusStack.isNotEmpty &&
+        focusStack.any((surface) {
+          return surface.connection != null;
+        })) {
       List<PositionedSurface> positionedSurfaces = <PositionedSurface>[];
       if (focusStack.isNotEmpty) {
         Surface last = focusStack.last;

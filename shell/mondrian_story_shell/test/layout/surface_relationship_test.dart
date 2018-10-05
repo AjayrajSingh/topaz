@@ -2,9 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/mockito.dart';
 import 'package:mondrian/models/layout_model.dart';
 import 'package:mondrian/layout/copresent_layout.dart' as copresent_layout;
 import 'package:mondrian/models/surface/positioned_surface.dart';
@@ -13,6 +16,8 @@ import 'package:mondrian/models/surface/surface_graph.dart';
 import 'package:mondrian/models/surface/surface_properties.dart';
 
 import '../layout_test_utils.dart' as test_util;
+
+class MockInterfaceHandle extends Mock implements InterfaceHandle<ViewOwner> {}
 
 void main() {
   LayoutModel layoutModel = new LayoutModel();
@@ -28,6 +33,7 @@ void main() {
     );
     Surface root = graph.addSurface(
         'root_of_test', properties, '', surfaceRelation, '', '');
+    graph.connectView('root_of_test', new MockInterfaceHandle());
 
     List<Surface> surfaces = [
       root,
@@ -53,6 +59,7 @@ void main() {
     );
     Surface root = graph.addSurface(
         'root_of_test', properties, '', surfaceRelation, '', '');
+    graph.connectView('root_of_test', new MockInterfaceHandle());
 
     // properties for the copresent surface
     properties = new SurfaceProperties();
@@ -63,6 +70,7 @@ void main() {
     );
     Surface copresentSurface = graph.addSurface('copresentSurface', properties,
         'root_of_test', surfaceRelation, '', '');
+    graph.connectView('copresentSurface', new MockInterfaceHandle());
 
     List<Surface> surfaces = [
       root,
@@ -93,6 +101,7 @@ void main() {
     );
     Surface root = graph.addSurface(
         'root_of_test', properties, '', surfaceRelation, '', '');
+    graph.connectView('root_of_test', new MockInterfaceHandle());
 
     // properties for the sequential surface
     properties = new SurfaceProperties();
@@ -103,6 +112,7 @@ void main() {
     );
     Surface sequentialSurface = graph.addSurface('copresentSurface', properties,
         'root_of_test', surfaceRelation, '', '');
+    graph.connectView('copresentSurface', new MockInterfaceHandle());
 
     List<Surface> surfaces = [
       root,
@@ -129,6 +139,7 @@ void main() {
     );
     Surface root = graph.addSurface(
         'root_of_test', properties, '', surfaceRelation, '', '');
+    graph.connectView('root_of_test', new MockInterfaceHandle());
 
     // properties for the ontop surface
     properties = new SurfaceProperties();
@@ -139,6 +150,7 @@ void main() {
     );
     Surface ontopSurface = graph.addSurface(
         'ontop', properties, 'root_of_test', surfaceRelation, '', '');
+    graph.connectView('ontop', new MockInterfaceHandle());
 
     List<Surface> surfaces = [
       root,
@@ -170,6 +182,7 @@ void main() {
     );
     Surface root = graph.addSurface(
         'root_of_test', properties, '', surfaceRelation, '', '');
+    graph.connectView('root_of_test', new MockInterfaceHandle());
 
     // properties for root surface
     properties = new SurfaceProperties();
@@ -180,6 +193,7 @@ void main() {
     );
     Surface copresentSurface = graph.addSurface(
         'copresent', properties, 'root_of_test', surfaceRelation, '', '');
+    graph.connectView('copresent', new MockInterfaceHandle());
 
     // properties for the ontop surface
     properties = new SurfaceProperties();
@@ -190,6 +204,7 @@ void main() {
     );
     Surface ontopSurface = graph.addSurface(
         'ontop', properties, 'root_of_test', surfaceRelation, '', '');
+    graph.connectView('ontop', new MockInterfaceHandle());
 
     List<Surface> surfaces = [
       root,
@@ -227,6 +242,7 @@ void main() {
     );
     Surface root = graph.addSurface(
         'root_of_test', properties, '', surfaceRelation, '', '');
+    graph.connectView('root_of_test', new MockInterfaceHandle());
 
     // properties for root surface
     properties = new SurfaceProperties();
@@ -237,6 +253,7 @@ void main() {
     );
     Surface copresentSurface = graph.addSurface(
         'copresent', properties, 'root_of_test', surfaceRelation, '', '');
+    graph.connectView('copresent', new MockInterfaceHandle());
 
     // properties for the ontop surface
     properties = new SurfaceProperties();
@@ -247,6 +264,7 @@ void main() {
     );
     Surface ontopSurface = graph.addSurface(
         'ontop', properties, 'copresent', surfaceRelation, '', '');
+    graph.connectView('ontop', new MockInterfaceHandle());
 
     List<Surface> surfaces = [
       root,
@@ -282,6 +300,7 @@ void main() {
     );
     Surface root = graph.addSurface(
         'root_of_test', properties, '', surfaceRelation, '', '');
+    graph.connectView('root_of_test', new MockInterfaceHandle());
 
     // properties for root surface
     properties = new SurfaceProperties();
@@ -292,6 +311,8 @@ void main() {
     );
     Surface firstOnTop = graph.addSurface(
         'ontop1', properties, 'root_of_test', surfaceRelation, '', '');
+    graph.connectView('ontop1', new MockInterfaceHandle());
+
     // properties for the ontop surface
     properties = new SurfaceProperties();
     surfaceRelation = const SurfaceRelation(
@@ -301,6 +322,7 @@ void main() {
     );
     Surface secondOntop = graph.addSurface(
         'ontop2', properties, 'ontop1', surfaceRelation, '', '');
+    graph.connectView('ontop2', new MockInterfaceHandle());
 
     List<Surface> surfaces = [
       root,

@@ -34,10 +34,12 @@ List<PositionedSurface> layoutSurfaces(
   List<Surface> focusStack,
   LayoutModel layoutModel,
 ) {
-  if (focusStack.isEmpty) {
+  Surface focused = focusStack.lastWhere((Surface surface) {
+    return surface.connection != null;
+  }, orElse: () => null);
+  if (focusStack.isEmpty || focused == null) {
     return <PositionedSurface>[];
   }
-  Surface focused = focusStack.last;
   SurfaceArrangement focusedArrangement = focused.relation.arrangement;
 
   Tree<Surface> copresTree = getCopresentSpanningTree(focused);
@@ -63,9 +65,9 @@ List<PositionedSurface> layoutSurfaces(
   int focusOrder(Tree<Surface> l, Tree<Surface> r) =>
       _compareByOtherList(l.value, r.value, focusStack);
 
-  // Remove dismissed surfaces and collapse tree
+  // Remove dismissed surfaces and surfaces without views and collapse tree
   for (Tree<Surface> node in copresTree) {
-    if (node.value.dismissed) {
+    if (node.value.dismissed || node.value.connection == null) {
       node.children.forEach(node.parent.add);
       node.detach();
     }

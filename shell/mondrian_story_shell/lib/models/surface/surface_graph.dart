@@ -23,27 +23,7 @@ class SurfaceGraph extends Model {
   }
 
   SurfaceGraph.fromJson(Map<String, dynamic> json) {
-    List<dynamic> decodedSurfaceList = json['surfaceList'];
-    // for the first item we want to attach it to _tree
-    for (dynamic s in decodedSurfaceList) {
-      Map<String, dynamic> item = s.cast<String, dynamic>();
-      Surface surface = new Surface.fromJson(item, this);
-      _surfaces[surface.node.value] = surface;
-    }
-    _surfaces.forEach((String id, Surface surface) {
-      Tree<String> node = surface.node;
-      if (surface.isParentRoot) {
-        _tree.add(node);
-      }
-      if (surface.childIds != null) {
-        for (String id in surface.childIds) {
-          node.add(_surfaces[id].node);
-        }
-      }
-    });
-    dynamic list = json['focusStack'];
-    List<String> focusStack = list.cast<String>();
-    _focusedSurfaces.addAll(focusStack);
+    reload(json);
   }
 
   /// Cache of surfaces
@@ -126,21 +106,24 @@ class SurfaceGraph extends Model {
   /// Removes [Surface] from graph
   void removeSurface(String id) {
     if (_surfaces.keys.contains(id)) {
-      Tree<String> node = _tree.find(id)..detach();
-      // Remove orphaned children
-      for (Tree<String> child in node.children) {
-        child.detach();
-        // As a temporary policy, remove child surfaces when surfaces are
-        // removed. This policy will be revisited when we have a better sense
-        // of what to do with orphaned children.
-        _surfaces[child.value].remove();
-        _focusedSurfaces.remove(child.value);
-        _dismissedSurfaces.remove(child.value);
+      Tree<String> node = _tree.find(id);
+      if (node != null) {
+        node.detach();
+        // Remove orphaned children
+        for (Tree<String> child in node.children) {
+          child.detach();
+          // As a temporary policy, remove child surfaces when surfaces are
+          // removed. This policy will be revisited when we have a better sense
+          // of what to do with orphaned children.
+          _surfaces[child.value].remove();
+          _focusedSurfaces.remove(child.value);
+          _dismissedSurfaces.remove(child.value);
+        }
+        _focusedSurfaces.remove(id);
+        _dismissedSurfaces.remove(id);
+        _surfaces.remove(id);
+        notifyListeners();
       }
-      _focusedSurfaces.remove(id);
-      _dismissedSurfaces.remove(id);
-      _surfaces.remove(id);
-      notifyListeners();
     }
   }
 
@@ -187,9 +170,12 @@ class SurfaceGraph extends Model {
     }
 
     // Also request the input focus through the child view connection.
-    _surfaces[id].connection.requestFocus();
-    _lastFocusedSurface = _surfaces[id];
-    notifyListeners();
+    ChildViewConnection connection = _surfaces[id].connection;
+    if (connection != null) {
+      _surfaces[id].connection.requestFocus();
+      _lastFocusedSurface = _surfaces[id];
+      notifyListeners();
+    }
   }
 
   /// Add a container root to the surface graph
@@ -295,6 +281,32 @@ class SurfaceGraph extends Model {
     }
   }
 
+  void reload(Map<String, dynamic> json) {
+    List<dynamic> decodedSurfaceList = json['surfaceList'];
+    for (dynamic s in decodedSurfaceList) {
+      Map<String, dynamic> item = s.cast<String, dynamic>();
+      Surface surface = new Surface.fromJson(item, this);
+
+      _surfaces.putIfAbsent(surface.node.value, () {
+        return surface;
+      });
+    }
+    _surfaces.forEach((String id, Surface surface) {
+      Tree<String> node = surface.node;
+      if (surface.isParentRoot) {
+        _tree.add(node);
+      }
+      if (surface.childIds != null) {
+        for (String id in surface.childIds) {
+          node.add(_surfaces[id].node);
+        }
+      }
+    });
+    dynamic list = json['focusStack'];
+    List<String> focusStack = list.cast<String>();
+    _focusedSurfaces.addAll(focusStack);
+  }
+
   // Get the SurfaceIds of associated external surfaces
   // (surfaces originating from outside the current story)
   // that are dismissed and associated with the current Surface
@@ -322,7 +334,8 @@ class SurfaceGraph extends Model {
   int get treeSize => _tree.flatten().length;
 
   @override
-  String toString() => 'Tree:\n${_tree.children.map(_toString).join('\n')}';
+  String toString() =>
+      'Tree:\n${_tree.children.map(_toString).join('\n')}\nfocusStack length ${focusStack.length}';
 
   String _toString(Tree<String> node, {String prefix = ''}) {
     String nodeString = '$prefix${_surfaces[node.value]}';

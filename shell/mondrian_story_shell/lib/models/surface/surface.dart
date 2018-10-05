@@ -36,8 +36,8 @@ class Surface extends Model {
         compositionPattern = json['compositionPattern'],
         properties = new SurfaceProperties.fromJson(
             json['surfaceProperties'].cast<String, dynamic>()),
-        relation = SurfaceRelationUtil.decode(
-            json['surfaceRelation'].cast<String, String>()),
+        relation = SurfaceRelationUtil
+            .decode(json['surfaceRelation'].cast<String, String>()),
         childIds = json['children'].cast<String>(),
         isParentRoot = json['parentId'] == null,
         placeholderColor = json['placeholderColor'];
@@ -66,7 +66,7 @@ class Surface extends Model {
   final String placeholderColor;
 
   // Used to track whether this node is attached to the root of the graph
-  bool isParentRoot;
+  bool isParentRoot = false;
 
   // Used for constructing the surface and its associated graph from json.
   // Note: these ids will not stay up to date with what's in the node.
