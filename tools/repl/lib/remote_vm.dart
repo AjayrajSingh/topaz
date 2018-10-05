@@ -17,7 +17,7 @@ Future<WebSocket> _connect(String url,
 
   if (exceptions.isNotEmpty) {
     stderr.writeln(exceptions.last.toString());
-    stderr.writeln('Retrying...');
+    stderr.writeln('Retrying...'); // ignore: cascade_invocations
     sleep(kConnectionRetryDelay);
   }
 
@@ -49,17 +49,17 @@ class RemoteVm {
 
     var streamListenResponse = await request('streamListen',
         {'streamId': 'VM'});
-    if (streamListenResponse['type'] != 'Success') {
+    if (streamListenResponse['result']['type'] != 'Success') {
       throw streamListenResponse;
     }
 
     var vmResponse = await request('getVM', {});
-    isolateId = vmResponse['isolates'][0]['id'];
+    isolateId = vmResponse['result']['isolates'][0]['id'];
   }
 
   void onResponse(dynamic data) {
     var obj = fromJson.convert(data);
-    responses[obj['id']].complete(obj['result']);
+    responses[obj['id']].complete(obj);
   }
 
   Future<dynamic> request(String method, dynamic params) {
@@ -70,12 +70,18 @@ class RemoteVm {
     return completer.future;
   }
 
-  Future<dynamic> evaluate(String expression) {
+  Future<String> evaluate(String expression) async {
     var params = {
       'isolateId': isolateId,
       'frameIndex': 0,
       'expression': expression,
     };
-    return request('evaluateInFrame', params);
+    Map<dynamic, dynamic> response = await request('evaluateInFrame', params);
+
+    if (response.containsKey('error')) {
+      return response['error']['data']['details'];
+    } else {
+      return response['result']['valueAsString'];
+    }
   }
 }

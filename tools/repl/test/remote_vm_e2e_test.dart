@@ -34,7 +34,7 @@ void main(List<String> args) async {
     var vm = RemoteVm();
     await vm.connect('ws://127.0.0.1:$port/ws');
 
-    var response = await vm.evaluate('triple(1)');
-    expect(response['valueAsString'], equals('3'));
+    expect(await vm.evaluate('triple(1)'), equals('3'));
+    expect(await vm.evaluate('nope'), contains('Error:'));
   });
 }
