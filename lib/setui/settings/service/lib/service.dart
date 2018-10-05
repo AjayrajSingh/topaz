@@ -15,17 +15,26 @@ import 'src/local_service.dart';
 class SetUiServiceAdapter implements SettingAdapter {
   final SetUiService _service;
   final SetUiListenerBinder _listenerBinder;
+  final Map<SettingType, SettingSource> _sources = {};
+  final AdapterLogger _logger;
+
+  int nextUpdateId = 0;
 
   factory SetUiServiceAdapter(
-      {SetUiService service, SetUiListenerBinder binder = _bindListener}) {
-    return service != null
-        ? SetUiServiceAdapter.withService(service, binder)
-        : SetUiServiceAdapter._local(binder);
+      {SetUiService service,
+      SetUiListenerBinder binder = _bindListener,
+      AdapterLogger logger}) {
+    final SetUiServiceAdapter adapter = service != null
+        ? SetUiServiceAdapter.withService(service, binder, logger)
+        : SetUiServiceAdapter._local(binder, logger);
+
+    return adapter;
   }
 
-  SetUiServiceAdapter.withService(this._service, this._listenerBinder);
+  SetUiServiceAdapter.withService(
+      this._service, this._listenerBinder, this._logger);
 
-  SetUiServiceAdapter._local(this._listenerBinder)
+  SetUiServiceAdapter._local(this._listenerBinder, this._logger)
       : _service = LocalSetUiService();
 
   /// Gets the setting from the service with the given [SettingType].
@@ -34,21 +43,46 @@ class SetUiServiceAdapter implements SettingAdapter {
   /// as documented in fuchsia.setui.types.fidl.
   @override
   SettingSource<T> fetch<T>(SettingType settingType) {
-    final notifier = SettingSource<T>();
+    if (!_sources.containsKey(settingType)) {
+      _sources[settingType] = ObservableSettingSource<T>(_logger);
+    }
+
+    final ObservableSettingSource<T> notifier = _sources[settingType];
+
     _service.listen(settingType, _listenerBinder(notifier));
+    _logger?.onFetch(FetchLog(settingType));
+
     return notifier;
   }
 
   /// Updates the setting based on [SettingsObject]'s type.
   @override
   Future<UpdateResponse> update(SettingsObject object) async {
+    final int nextUpdateId = this.nextUpdateId++;
+
+    _logger?.onUpdate(UpdateLog(nextUpdateId, object));
+
     Completer<UpdateResponse> c = Completer<UpdateResponse>();
 
     _service.update(object, (response) {
+      _logger?.onResponse(ResponseLog(nextUpdateId, response));
       c.complete(response);
     });
 
     return c.future;
+  }
+}
+
+// A source that can be instrumented to capture updates.
+class ObservableSettingSource<T> extends SettingSource<T> {
+  final AdapterLogger _logger;
+
+  ObservableSettingSource(this._logger);
+
+  @override
+  Future<Null> notify(SettingsObject object) {
+    _logger?.onSettingLog(SettingLog(object));
+    return super.notify(object);
   }
 }
 

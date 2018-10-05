@@ -24,7 +24,7 @@ void main() {
     fakeControllers = FakeSettingControllerCreator();
     service = LocalSetUiService(
         creator: fakeControllers, proxyBinder: _bindListenerProxy);
-    manager = SetUiServiceAdapter.withService(service, _bindListener);
+    manager = SetUiServiceAdapter.withService(service, _bindListener, null);
   });
 
   group('SetUi service', () {
