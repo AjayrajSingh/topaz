@@ -1,0 +1,26 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/bin/dart_fidl_json/dart_fidl_json.gni")
+import("//topaz/runtime/dart/dart_test.gni")
+
+json_fidl("dart_fidl_json_test_fidl_json") {
+  fidl_target = "//topaz//bin/dart_fidl_json/test/fidl/dart.fidl.json.test"
+
+  deps = [
+    "//topaz//bin/dart_fidl_json/test/fidl/dart.fidl.json.test",
+  ]
+}
+
+dart_test("dart_fidl_json_test") {
+  sources = [
+    "json_test.dart",
+  ]
+
+  deps = [
+    ":dart_fidl_json_test_fidl_json",
+    "//third_party/dart-pkg/pub/test",
+    "//topaz/bin/dart_fidl_json/test/fidl/dart.fidl.json.test",
+  ]
+}

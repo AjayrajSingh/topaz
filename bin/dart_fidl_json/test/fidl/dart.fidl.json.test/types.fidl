@@ -1,0 +1,23 @@
+library test.dart.fidl.json;
+
+struct ExampleStruct {
+  string foo;
+  int32 bar;
+  vector<ExampleStruct2> structs;
+  vector<string> vals;
+};
+
+struct ExampleStruct2 {
+  int32 baz;
+};
+
+union ExampleUnion {
+  ExampleStruct struct1;
+  ExampleStruct2 struct2;
+};
+
+enum ExampleEnum {
+  val1 = 1;
+  val2 = 2;
+  val3 = 3;
+};
