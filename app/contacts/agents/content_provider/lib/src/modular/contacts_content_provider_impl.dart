@@ -8,7 +8,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:fidl_fuchsia_contacts_contentprovider/fidl.dart' as fidl;
+import 'package:fidl/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_contacts_contentprovider/fidl.dart';
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:fidl_fuchsia_mem/fidl.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl.dart';
@@ -34,11 +35,11 @@ enum _LedgerOperation {
   delete,
 }
 
-/// Private class to store information about a [fidl.ContactsDataProvider] agent
+/// Private class to store information about a [ContactsDataProvider] agent
 class _DataProvider {
   final String sourceId;
   final String agentUrl;
-  final fidl.ContactsDataProviderProxy dataProviderProxy;
+  final ContactsDataProviderProxy dataProviderProxy;
   final AgentControllerProxy agentControllerProxy;
 
   _DataProvider({
@@ -54,12 +55,12 @@ class _DataProvider {
 
 // TODO: Handle cases where payloads exceeds fidl message size limit SO-1038
 /// Initial stub implementation
-class ContactsContentProviderImpl extends fidl.ContactsContentProvider
+class ContactsContentProviderImpl extends ContactsContentProvider
     implements EntityProvider {
   final entities.ContactEntityCodec _contactCodec =
       new entities.ContactEntityCodec();
 
-  /// Map of [fidl.ContactsDataProvider] sourceIds to the [_DataProvider]
+  /// Map of [ContactsDataProvider] sourceIds to the [_DataProvider]
   /// information
   final Map<String, _DataProvider> _dataProviders = <String, _DataProvider>{};
 
@@ -111,7 +112,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     // Connect to data providers and ledger to grab contacts information
     _connectToDataProviders();
     bool errorReadingLedgerContacts = false;
-    List<fidl.Contact> ledgerContacts;
+    List<Contact> ledgerContacts;
     try {
       ledgerContacts = await _getLedgerContacts(_page);
     } on Exception catch (e, stackTrace) {
@@ -130,7 +131,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   Future<Null> getContactList(
     String prefix,
     String messageQueueToken,
-    void callback(fidl.Status status, List<fidl.Contact> contacts),
+    void callback(Status status, List<Contact> contacts),
   ) async {
     log.fine('getContactList called with prefix = \"$prefix\", '
         'token = \"$messageQueueToken\"');
@@ -138,33 +139,33 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
       _subscribe(messageQueueToken);
     }
 
-    List<fidl.Contact> contactsList;
+    List<Contact> contactsList;
     if (prefix == null || prefix == '') {
       contactsList = _contactsStore.getAllContacts();
     } else {
-      Map<String, Set<fidl.Contact>> contacts = _contactsStore.search(prefix);
+      Map<String, Set<Contact>> contacts = _contactsStore.search(prefix);
 
       // Merge into a set first to avoid duplicates
       contactsList =
-          contacts.values.expand((Set<fidl.Contact> s) => s).toSet().toList();
+          contacts.values.expand((Set<Contact> s) => s).toSet().toList();
     }
-    callback(fidl.Status.ok, contactsList);
+    callback(Status.ok, contactsList);
     return;
   }
 
   @override
   Future<Null> getContact(
     String id,
-    void callback(fidl.Status status, fidl.Contact contact),
+    void callback(Status status, Contact contact),
   ) async {
-    callback(fidl.Status.ok, _contactsStore.getContact(id));
+    callback(Status.ok, _contactsStore.getContact(id));
     return;
   }
 
   @override
   Future<Null> getEntityReference(
     String id,
-    void callback(fidl.Status status, String entityReference),
+    void callback(Status status, String entityReference),
   ) async {
     // Create a proxy to the EntityReferenceFactory that will create the
     // entity reference
@@ -190,10 +191,10 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     );
 
     // Await the result and check the status before passing back to the caller
-    fidl.Status status = fidl.Status.ok;
+    Status status = Status.ok;
     String entityReference = await entityReferenceCompleter.future.catchError(
       (Object error) {
-        status = fidl.Status.error;
+        status = Status.error;
         log.warning('Entity factory completed with error: $error');
       },
     );
@@ -207,8 +208,8 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     if (!_messageSenders.containsKey(messageQueueToken)) {
       // TODO: handle getMessageSender failures and somehow propagate that back
       // to the callers SO-1040
-      var sender = new MessageSenderClient(onConnectionError:
-          (MessageSenderError code, String msg) {
+      var sender = new MessageSenderClient(
+          onConnectionError: (MessageSenderError code, String msg) {
         log.severe('Message sender down for $messageQueueToken: $msg');
       });
       _componentContext.getMessageSender(
@@ -232,44 +233,44 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
 
   @override
   Future<Null> refreshContacts(
-    void callback(fidl.Status status, List<fidl.Contact> contacts),
+    void callback(Status status, List<Contact> contacts),
   ) async {
-    List<fidl.Contact> contacts = await _getContactsFromDataProviders();
+    List<Contact> contacts = await _getContactsFromDataProviders();
     _addContactsToStore(contacts);
-    callback(fidl.Status.ok, _contactsStore.getAllContacts());
+    callback(Status.ok, _contactsStore.getAllContacts());
   }
 
   @override
   void add(
-    List<fidl.Contact> contacts,
-    void callback(fidl.Status status),
+    List<Contact> contacts,
+    void callback(Status status),
   ) {
     log.fine('add called');
     _saveContactsToLedger(contacts).then((bool saved) {
       log.fine('add completed');
-      callback(saved ? fidl.Status.ok : fidl.Status.error);
+      callback(saved ? Status.ok : Status.error);
     });
   }
 
   @override
   void delete(
-    List<fidl.Contact> contacts,
-    void callback(fidl.Status status),
+    List<Contact> contacts,
+    void callback(Status status),
   ) {
     log.fine('delete called');
     _deleteContactsFromLedger(contacts).then((bool deleted) {
       log.fine('delete completed');
-      callback(deleted ? fidl.Status.ok : fidl.Status.error);
+      callback(deleted ? Status.ok : Status.error);
     });
   }
 
   @override
   void getContactsFromSource(
     String sourceId,
-    void callback(fidl.Status status, List<fidl.Contact> contacts),
+    void callback(Status status, List<Contact> contacts),
   ) {
     log.fine('getContactsFromSource called');
-    callback(fidl.Status.ok, _contactsStore.getContactsFromSource(sourceId));
+    callback(Status.ok, _contactsStore.getContactsFromSource(sourceId));
   }
 
   // Entity Provider methods
@@ -295,7 +296,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     log.fine('getData called with cookie = $cookie and type = $type');
 
     String data;
-    fidl.Contact contact = _contactsStore.getContact(cookie);
+    Contact contact = _contactsStore.getContact(cookie);
     if (contact != null && type == _contactCodec.type) {
       data = _contactCodec.encode(getEntityFromContact(contact));
     }
@@ -306,6 +307,18 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
       vmo: SizedVmo.fromUint8List(serializedData),
       size: data.length,
     ));
+  }
+
+  @override
+  void writeData(String cookie, String type, fuchsia_mem.Buffer data,
+      void callback(EntityWriteStatus status)) {
+    callback(EntityWriteStatus.readOnly);
+  }
+
+  @override
+  void watch(
+      String cookie, String type, fidl.InterfaceHandle<EntityWatcher> watcher) {
+    log.severe('EntityProvider.watch is unsupported.');
   }
 
   /// Close all connections
@@ -323,8 +336,8 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     _ledger?.ctrl?.close();
   }
 
-  void _addContactsToStore(List<fidl.Contact> contacts) {
-    for (fidl.Contact contact in contacts) {
+  void _addContactsToStore(List<Contact> contacts) {
+    for (Contact contact in contacts) {
       // Will only add the contact if it has a displayName that can be shown
       // to the user
       if (contact.displayName.trim().isNotEmpty) {
@@ -364,11 +377,11 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     );
   }
 
-  Future<List<fidl.Contact>> _getLedgerContacts(ledger.PageProxy page) async {
+  Future<List<Contact>> _getLedgerContacts(ledger.PageProxy page) async {
     if (page == null) {
       // TODO(meiyili): handle ledger errors gracefully SO-810
       log.warning('getLedgerContacts was called on a null page');
-      return <fidl.Contact>[];
+      return <Contact>[];
     }
     ledger.PageSnapshotProxy snapshot = new ledger.PageSnapshotProxy();
 
@@ -410,32 +423,32 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     return _getContactsFromEntries(await getFullEntries(snapshot));
   }
 
-  List<fidl.Contact> _getContactsFromEntries(List<ledger.Entry> entries) {
-    List<fidl.Contact> contacts = <fidl.Contact>[];
+  List<Contact> _getContactsFromEntries(List<ledger.Entry> entries) {
+    List<Contact> contacts = <Contact>[];
     if (entries.isNotEmpty) {
       contacts = entries.map(_getContactFromEntry);
     }
     return contacts;
   }
 
-  fidl.Contact _getContactFromEntry(ledger.Entry entry) {
+  Contact _getContactFromEntry(ledger.Entry entry) {
     String contactId = utf8.decode(entry.key);
     Map<String, dynamic> decodedValue = decodeLedgerValue(entry.value);
 
-    List<fidl.EmailAddress> emails = <fidl.EmailAddress>[];
+    List<EmailAddress> emails = <EmailAddress>[];
     for (Map<String, String> email in decodedValue['emails']) {
       emails.add(
-        new fidl.EmailAddress(label: email['label'], value: email['value']),
+        new EmailAddress(label: email['label'], value: email['value']),
       );
     }
 
-    List<fidl.PhoneNumber> phoneNumbers = <fidl.PhoneNumber>[];
+    List<PhoneNumber> phoneNumbers = <PhoneNumber>[];
     for (Map<String, String> number in decodedValue['phoneNumbers']) {
       phoneNumbers.add(
-        new fidl.PhoneNumber(label: number['label'], value: number['value']),
+        new PhoneNumber(label: number['label'], value: number['value']),
       );
     }
-    return new fidl.Contact(
+    return new Contact(
         contactId: contactId,
         sourceContactId: decodedValue['sourceContactId'],
         sourceId: decodedValue['sourceId'],
@@ -449,7 +462,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   }
 
   /// Saves the list of contacts to ledger and returns true if it was successful
-  Future<bool> _saveContactsToLedger(List<fidl.Contact> contacts) async {
+  Future<bool> _saveContactsToLedger(List<Contact> contacts) async {
     // TODO(meiyili): add retrieval timestamp to contacts to better resolve
     // ledger conflicts SO-1117
     return await _updateLedgerContacts(contacts, _LedgerOperation.put);
@@ -457,12 +470,12 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
 
   /// Deletes the list of contacts from ledger and returns true if it was
   /// successful
-  Future<bool> _deleteContactsFromLedger(List<fidl.Contact> contacts) async {
+  Future<bool> _deleteContactsFromLedger(List<Contact> contacts) async {
     return await _updateLedgerContacts(contacts, _LedgerOperation.delete);
   }
 
   Future<bool> _updateLedgerContacts(
-    List<fidl.Contact> contacts,
+    List<Contact> contacts,
     _LedgerOperation operation,
   ) async {
     bool updated = false;
@@ -483,7 +496,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     if (startTransactionOk) {
       log.fine('Started ledger transaction');
       List<Future<ledger.Status>> opStatuses = <Future<ledger.Status>>[];
-      for (fidl.Contact contact in (contacts ?? <fidl.Contact>[])) {
+      for (Contact contact in (contacts ?? <Contact>[])) {
         Completer<ledger.Status> statusCompleter =
             new Completer<ledger.Status>();
         opStatuses.add(statusCompleter.future);
@@ -529,9 +542,9 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     return updated;
   }
 
-  Map<String, dynamic> _convertContactToJsonEncodable(fidl.Contact c) {
+  Map<String, dynamic> _convertContactToJsonEncodable(Contact c) {
     List<Map<String, String>> emails = <Map<String, String>>[];
-    for (fidl.EmailAddress e in c.emails) {
+    for (EmailAddress e in c.emails) {
       emails.add(<String, String>{
         'label': e.label,
         'value': e.value,
@@ -539,7 +552,7 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     }
 
     List<Map<String, String>> phoneNumbers = <Map<String, String>>[];
-    for (fidl.PhoneNumber p in c.phoneNumbers) {
+    for (PhoneNumber p in c.phoneNumbers) {
       phoneNumbers.add(<String, String>{
         'label': p.label,
         'value': p.value,
@@ -628,8 +641,8 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
     }
 
     // Connect to the agent
-    fidl.ContactsDataProviderProxy contactsDataProviderProxy =
-        new fidl.ContactsDataProviderProxy();
+    ContactsDataProviderProxy contactsDataProviderProxy =
+        new ContactsDataProviderProxy();
     AgentControllerProxy contactsDataProviderController =
         new AgentControllerProxy();
     ServiceProviderProxy dataProviderService = new ServiceProviderProxy();
@@ -656,29 +669,26 @@ class ContactsContentProviderImpl extends fidl.ContactsContentProvider
   /// than adding them to the store immediately we will wait until the
   /// changes propagate back from Ledger via the page watcher to add them
   /// the store.
-  Future<List<fidl.Contact>> _getContactsFromDataProviders() async {
+  Future<List<Contact>> _getContactsFromDataProviders() async {
     // TODO(meiyili) grab last sync tokens and save those as well so the shape
     // of the content in the future will change and be less ugly
-    List<Future<List<fidl.Contact>>> completers =
-        <Future<List<fidl.Contact>>>[];
+    List<Future<List<Contact>>> completers = <Future<List<Contact>>>[];
     for (_DataProvider provider in _dataProviders.values) {
       log.fine('Connecting to data provider = $provider');
-      Completer<List<fidl.Contact>> completer =
-          new Completer<List<fidl.Contact>>();
+      Completer<List<Contact>> completer = new Completer<List<Contact>>();
       provider.dataProviderProxy.getContactList(
-        (fidl.Status status, List<fidl.Contact> contacts) {
-          if (status == fidl.Status.ok) {
+        (Status status, List<Contact> contacts) {
+          if (status == Status.ok) {
             completer.complete(contacts);
           } else {
-            completer.complete(<fidl.Contact>[]);
+            completer.complete(<Contact>[]);
           }
         },
       );
       completers.add(completer.future);
     }
-    List<fidl.Contact> contacts = (await Future.wait(completers))
-        .expand((List<fidl.Contact> c) => c)
-        .toList();
+    List<Contact> contacts =
+        (await Future.wait(completers)).expand((List<Contact> c) => c).toList();
     await _saveContactsToLedger(contacts);
 
     // TODO (meiyili): this is temporary until I finish SO-891
