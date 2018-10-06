@@ -18,8 +18,7 @@ SkImageInfo MakeSkImageInfo(const fuchsia::images::ImageInfo& image_info) {
                                kBGRA_8888_SkColorType, kOpaque_SkAlphaType);
     case fuchsia::images::PixelFormat::YUY2:
     case fuchsia::images::PixelFormat::NV12:
-    // TODO(dustingreen): Remove after YV12 rolls in.
-    default:
+    case fuchsia::images::PixelFormat::YV12:
       FXL_CHECK(false) << "Not implemented: "
                        << static_cast<int>(image_info.pixel_format);
       return SkImageInfo();
