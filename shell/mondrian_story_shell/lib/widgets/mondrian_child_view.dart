@@ -48,13 +48,14 @@ class MondrianChildView extends StatelessWidget {
 // hexColorString are presented.
   Color getColor(String hexColorString) {
     Color placeholderColor = Colors.white;
-    int colorInt;
-    String parseString = hexColorString.replaceAll('#', '');
-    try {
-      colorInt = int.parse(parseString, radix: 16);
-      placeholderColor = new Color(colorInt).withOpacity(1.0);
-    } on FormatException {
-      log.fine('hexColorString conversion error for string $parseString');
+    if (hexColorString != null && hexColorString.isNotEmpty) {
+      try {
+        String parseString = hexColorString.replaceAll('#', '');
+        int colorInt = int.parse(parseString, radix: 16);
+        placeholderColor = new Color(colorInt).withOpacity(1.0);
+      } on FormatException {
+        log.fine('hexColorString conversion error for string $hexColorString');
+      }
     }
     return placeholderColor;
   }
