@@ -47,7 +47,13 @@ void main() {
 
     const String testPassword = 'TestPassword123';
 
-    controller.connect(accessPoint, testPassword);
+    await controller.connect(accessPoint);
+
+    expect(controller.uiState.passwordShowing, true);
+    expect(controller.uiState.selectedAccessPoint, accessPoint);
+
+    await controller.password(testPassword);
+    expect(controller.uiState.passwordShowing, false);
 
     final WirelessState updatedState =
         verify(adapter.update(captureAny)).captured.single.data.wireless;
@@ -61,5 +67,7 @@ void main() {
     expect(updatedAccessPoint.accessPointId, accessPoint.accessPointId);
     expect(updatedAccessPoint.password, testPassword);
     expect(updatedAccessPoint.status, ConnectionStatus.connected);
+
+    expect(controller.uiState.selectedAccessPoint, null);
   });
 }

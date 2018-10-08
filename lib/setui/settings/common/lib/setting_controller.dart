@@ -37,8 +37,8 @@ class SettingController<T> {
   }
 
   /// Updates the setting state to the provided version.
-  void update(SettingsObject state) {
-    _adapter.update(state);
+  Future<void> update(SettingsObject state) async {
+    await _adapter.update(state);
   }
 
   /// Returns the most current data from source.
