@@ -173,13 +173,6 @@ template("_flutter_jit_component") {
     legacy_component = false
   pkg_name = target_name
   components = []
-
-  if (defined(invoker.flutter_driver_extendable)) {
-    flutter_driver_extendable = invoker.flutter_driver_extendable
-  } else {
-    flutter_driver_extendable = false
-  }
-
   if (defined(invoker.components)) {
     components += invoker.components
   } else {
@@ -244,28 +237,6 @@ template("_flutter_jit_component") {
     kernel_target_name = kernel_name + "_kernel"
     kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
 
-    dart_library_target_name = "${kernel_name}_dart_library"
-    dart_target_gen_dir =
-        get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
-    dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
-
-    if (flutter_driver_extendable) {
-      generated_extension_wrapper = "$dart_target_gen_dir/${kernel_name}__extension_wrapper.dart"
-      generated_extension_wrapper_main_dart = component.main_dart
-
-      action("${kernel_name}_extensions_wrapper") {
-        script = "//topaz/runtime/flutter_runner/build/gen_debug_wrapper_main.py"
-        args = [
-          "--main-dart=" + rebase_path(generated_extension_wrapper_main_dart, dart_target_gen_dir),
-          "--out=" + rebase_path(generated_extension_wrapper),
-        ]
-
-        outputs = [
-          generated_extension_wrapper,
-        ]
-      }
-    }
-
     dart_kernel(kernel_name) {
       platform_name = "flutter_runner"
       platform_deps =
@@ -277,45 +248,27 @@ template("_flutter_jit_component") {
                              [
                                "disable_analysis",
                                "gen_bytecode",
+                               "non_dart_deps",
                                "source_dir",
                                "package_name",
                              ])
       deps = component.deps
       sources = component.sources
 
-      if (flutter_driver_extendable) {
-        main_dart = generated_extension_wrapper
-      } else {
-        main_dart = component.main_dart
-      }
+      main_dart = component.main_dart
       manifest = kernel_manifest
       args = [
         "--component-name",
         component_name,
       ]
-
-      # TODO(CP-140): Should be forwarded from the component.
-      non_dart_deps = []
-      if (defined(invoker.non_dart_deps)) {
-        non_dart_deps = invoker.non_dart_deps
-      }
-
-      if (flutter_driver_extendable) {
-        deps += [
-          "//garnet/public/fidl/fuchsia.testing.runner",
-          "//peridot/public/fidl/fuchsia.modular",
-          "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
-          "//topaz/public/lib/app/dart",
-          "//topaz/public/lib/module/dart",
-        ]
-
-        non_dart_deps += [
-          ":${kernel_name}_extensions_wrapper($target_toolchain)",
-        ]
-      }
     }
 
     asset_manifest = "$target_gen_dir/build/${kernel_name}_pkgassets"
+
+    dart_library_target_name = "${kernel_name}_dart_library"
+    dart_target_gen_dir =
+        get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+    dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
 
     action("${kernel_name}_resources") {
       script = "//topaz/runtime/flutter_runner/build/asset_package.py"
@@ -935,12 +888,6 @@ template("flutter_aot_app") {
 #   product (optional)
 #     A boolean. Whether to build/run the app in a stripped-down Dart VM.
 #     Defaults to !is_debug.
-#
-#   flutter_driver_extendable (optional)
-#     A boolean. Determines if, in a debug build, this package will be built
-#     with a wrapper that auto-enables flutter driver extensions when running
-#     the application in a an environment that includes TestRunner. Does not
-#     affect AOT or release builds.
 #
 #   components (required)
 #     [list of scopes] Defines the components in the package. Either main_dart

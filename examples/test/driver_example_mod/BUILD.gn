@@ -12,10 +12,30 @@ flutter_app("driver_example_mod") {
 
   main_dart = "lib/main.dart"
 
-  flutter_driver_extendable = true
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/widgets/dart",
+  ]
+}
+
+# The tester app, which contains the driver extension code.
+#
+# Note that this AOT compilation is temporary.
+flutter_app("driver_example_mod_wrapper") {
+  package_name = "driver_example_mod_wrapper"
+
+  main_dart = "lib/main_driver_wrapper.dart"
+
+  sources = [
+    "src/driver_example_model.dart",
+  ]
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
+    "//third_party/dart-pkg/git/flutter/packages/fuchsia_remote_debug_protocol",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/widgets/dart",
@@ -32,7 +52,7 @@ dart_remote_test("driver_example_mod_remote_tests") {
   ]
 
   deps = [
-    ":driver_example_mod_dart_library",
+    ":driver_example_mod_wrapper_dart_library",
     "//topaz/public/lib/fuchsia_driver",
     "//third_party/dart-pkg/pub/test",
   ]
@@ -48,7 +68,7 @@ dart_fuchsia_test("driver_example_mod_target_tests") {
 
   sources = []
   deps = [
-    ":driver_example_mod_dart_library",
+    ":driver_example_mod_wrapper_dart_library",
     "//topaz/public/lib/fuchsia_driver",
     "//third_party/dart-pkg/pub/test",
   ]

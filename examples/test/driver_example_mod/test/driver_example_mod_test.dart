@@ -19,11 +19,7 @@ void main() {
     setUpAll(() async {
       Logger.globalLevel = LoggingLevel.all;
       connection = await FuchsiaDriver.connect();
-      // TODO(awdavies): remove once this PR lands:
-      // https://github.com/flutter/flutter/pull/22590
-      //
-      // This will prevent probing the test itself.
-      const Pattern isolatePattern = 'driver_example_mod:main()';
+      const Pattern isolatePattern = 'driver_example_mod_wrapper';
       print('Finding $isolatePattern');
       final List<IsolateRef> refs =
           await connection.getMainIsolatesByPattern(isolatePattern);
