@@ -16,7 +16,7 @@ class IntentHandlerImpl extends fidl.IntentHandler {
   /// Callback for when the system calls [handleIntent].
   final HandleIntentCallback onHandleIntent;
 
-  final _intentHandlerBinding = fidl.IntentHandlerBinding();
+  var _intentHandlerBinding = fidl.IntentHandlerBinding();
 
   /// Creates an [fidl.IntentHandler] which calls [onHandleIntent] when a
   /// new intent is received from the framework.
@@ -51,7 +51,8 @@ class IntentHandlerImpl extends fidl.IntentHandler {
     startupContext.outgoingServices.addServiceForName(
       (InterfaceRequest<fidl.IntentHandler> request) {
         try {
-          _intentHandlerBinding.bind(this, request);
+          _intentHandlerBinding = fidl.IntentHandlerBinding()
+            ..bind(this, request);
         } on Exception catch (err, stackTrace) {
           log.warning('Intent handler connection died', err, stackTrace);
         }
