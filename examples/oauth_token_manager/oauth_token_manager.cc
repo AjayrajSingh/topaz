@@ -134,6 +134,44 @@ std::string UrlEncode(const std::string& value) {
   return escaped.str();
 }
 
+// Checks the supplied Google authentication URL. If the URL indicated the user
+// has aborted the flow or an error occured these are reported as error
+// statuses, otherwise a status of OK is returned. If the URL contains an auth
+// code query parameter, this will be returned in |auth_code|.
+fuchsia::modular::auth::Status ParseAuthCodeFromUrl(const std::string& url,
+                                                    std::string& auth_code) {
+  static const std::string success_prefix =
+      std::string{kRedirectUri} + "?code=";
+  static const std::string cancel_prefix =
+      std::string{kRedirectUri} + "?error=access_denied";
+
+  if (url.find(cancel_prefix) == 0) {
+    return fuchsia::modular::auth::Status::USER_CANCELLED;
+  }
+  if (url.find(success_prefix) != 0) {
+    // The authentication process is still ongoing.
+    return fuchsia::modular::auth::Status::OK;
+  }
+
+  // Take everything up to the next query parameter or hash fragment.
+  auto end_char = url.find_first_of("#&", success_prefix.size());
+  auto length = end_char == std::string::npos
+                    ? std::string::npos
+                    : end_char - success_prefix.size();
+  auto code = url.substr(success_prefix.size(), length);
+
+  // Note: The full auth stack normalizes the code here since the GLIF endpoint
+  // URL-encodes the slash prefix. We omit this normalization since our endpoint
+  // doesn't have that behavior.
+
+  if (code.empty()) {
+    return fuchsia::modular::auth::Status::OAUTH_SERVER_ERROR;
+  } else {
+    auth_code = code;
+    return fuchsia::modular::auth::Status::OK;
+  }
+}
+
 // Read the contents of |kCredentialsFile| into the supplied buffer, validates
 // that these contents are a valid credentials file, and then returns a
 // |::auth::CredentialStore| pointer to the contents.
@@ -990,38 +1028,26 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
 
   // |fuchsia::webview::WebRequestDelegate|
   void WillSendRequest(fidl::StringPtr incoming_url) override {
-    const std::string& uri = incoming_url.get();
-    const std::string prefix = std::string{kRedirectUri} + "?code=";
-    const std::string cancel_prefix =
-        std::string{kRedirectUri} + "?error=access_denied";
+    std::string auth_code;
+    fuchsia::modular::auth::Status status =
+        ParseAuthCodeFromUrl(incoming_url.get(), auth_code);
 
-    auto cancel_pos = uri.find(cancel_prefix);
-    // user denied OAuth permissions
-    if (cancel_pos == 0) {
-      Failure(fuchsia::modular::auth::Status::USER_CANCELLED,
-              "User cancelled OAuth flow");
+    if (status != fuchsia::modular::auth::Status::OK) {
+      Failure(status, "User cancelled OAuth flow");
+    } else if (auth_code.empty()) {
+      // Authentication is ongoing.
       return;
     }
 
-    auto pos = uri.find(prefix);
-    // user performing gaia authentication inside webview, let it pass
-    if (pos != 0) {
-      return;
-    }
-
-    // user accepted OAuth permissions - close the webview and exchange auth
+    // User accepted OAuth permissions - close the webview and exchange auth
     // code to long lived credential.
     // Also, de-register previously registered error callbacks since calling
     // StopOverlay() might cause this connection to be closed.
     auth_context_.set_error_handler([] {});
     auth_context_->StopOverlay();
 
-    auto code = uri.substr(prefix.size(), std::string::npos);
-    // There is a '#' character at the end.
-    code.pop_back();
-
     const std::string request_body =
-        "code=" + code + "&redirect_uri=" + kRedirectUri +
+        "code=" + auth_code + "&redirect_uri=" + kRedirectUri +
         "&client_id=" + kClientId + "&grant_type=authorization_code";
 
     app_->startup_context_->ConnectToEnvironmentService(
