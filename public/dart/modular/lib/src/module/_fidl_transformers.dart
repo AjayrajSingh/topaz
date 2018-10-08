@@ -27,7 +27,12 @@ Intent convertFidlIntentToIntent(fidl.Intent fidlIntent) {
         'of these values before proceeding.');
   }
 
-  intent.parameters.addAll(fidlIntent.parameters);
+  // We shouldn't have null fidl intent parameters but in the case that we
+  // do we avoid adding them as it will cause a crash.
+  if (fidlIntent.parameters != null) {
+    intent.parameters.addAll(fidlIntent.parameters);
+  }
+
   return intent;
 }
 

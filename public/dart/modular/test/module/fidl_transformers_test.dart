@@ -42,6 +42,15 @@ void main() {
       expect(intent.parameters, fidlIntent.parameters);
     });
 
+    test('convertFidlIntentToIntent handles null fidl intent parametsrs', () {
+      final fidlIntent = fidl.Intent(
+        action: 'my-action',
+        parameters: null,
+      );
+      final intent = convertFidlIntentToIntent(fidlIntent);
+      expect(intent.parameters, isNotNull);
+    });
+
     test('Intents with const parameter lists can still be modified', () {
       final fidlIntent = fidl.Intent(
         action: 'action',
