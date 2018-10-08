@@ -7,9 +7,9 @@ set -o errexit
 
 # In the event of previous failures from other scripts or other components using
 # the GPU, ensure that all components using the display have been shut down.
-killall device_runner || true
-killall root_presenter || true
-killall scenic || true
+killall device_runner* || true
+killall root_presenter* || true
+killall scenic* || true
 
 # TODO(bgoldman): Create a separate test instead of driver_example_mod_target_tests
 run_test \

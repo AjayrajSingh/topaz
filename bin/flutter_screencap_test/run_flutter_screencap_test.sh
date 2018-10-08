@@ -6,9 +6,9 @@
 set -o errexit
 
 # The test starts its own device_runner.
-killall device_runner || true
+killall device_runner* || true
 # The test uses set_root_view which won't work if these are already running.
-killall root_presenter || true
-killall scenic || true
+killall root_presenter* || true
+killall scenic* || true
 
 run_integration_tests --test_file=/pkgfs/packages/flutter_screencap_test/0/data/flutter_screencap_test.json "$@"

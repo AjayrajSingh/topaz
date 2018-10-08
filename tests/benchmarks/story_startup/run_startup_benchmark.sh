@@ -41,8 +41,8 @@ DATE=`date +%Y-%m-%dT%H:%M:%S`
 TRACE_FILE=$OUT_DIR/trace.$DATE.json
 
 echo "== $BENCHMARK_LABEL: Killing processes..."
-killall root_presenter; killall scenic; killall device_runner
-killall view_manager; killall flutter*; killall set_root_view
+killall root_presenter*; killall scenic*; killall device_runner*
+killall view_manager*; killall flutter*; killall set_root_view*
 
 echo "== $BENCHMARK_LABEL: Tracing..."
 echo $TRACE_FILE
