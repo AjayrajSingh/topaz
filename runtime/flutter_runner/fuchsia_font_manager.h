@@ -80,7 +80,14 @@ class FuchsiaFontManager final : public SkFontMgr {
   FML_DISALLOW_COPY_AND_ASSIGN(FuchsiaFontManager);
 
  private:
+  class TypefaceCache;
+
+  sk_sp<SkTypeface> FetchTypeface(const char family_name[],
+                                  const SkFontStyle& style, const char* bcp47[],
+                                  int bcp47_count, SkUnichar character) const;
+
   mutable fuchsia::fonts::ProviderSyncPtr font_provider_;
+  std::unique_ptr<TypefaceCache> typeface_cache_;
 };
 
 }  // namespace txt
