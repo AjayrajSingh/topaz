@@ -19,7 +19,7 @@ class Resource {
         new ui_gfx.CreateResourceCmd(id: id, resource: resource)));
   }
 
-  Resource._import(this.session, Handle token, ui_gfx.ImportSpec spec)
+  Resource._import(this.session, EventPair token, ui_gfx.ImportSpec spec)
       : id = session.nextResourceId() {
     session.enqueue(new ui_gfx.Command.withImportResource(
         new ui_gfx.ImportResourceCmd(id: id, token: token, spec: spec)));
@@ -29,11 +29,11 @@ class Resource {
 ui_gfx.Value vector1(double val) => new ui_gfx.Value.withVector1(val);
 
 class ViewHolder extends Resource {
-  ViewHolder(Session session, Handle token, String debugName)
+  ViewHolder(Session session, EventPair token, String debugName)
       : super._create(
             session,
-             ui_gfx.ResourceArgs.withViewHolder(
-                 ui_gfx.ViewHolderArgs(token: token, debugName: debugName)));
+            ui_gfx.ResourceArgs.withViewHolder(
+                ui_gfx.ViewHolderArgs(token: token, debugName: debugName)));
 
   void setViewProperties(ui_gfx.ViewProperties viewProperties) {
     session.enqueue(new ui_gfx.Command.withSetViewProperties(
@@ -46,7 +46,7 @@ class Node extends Resource {
   Node._create(Session session, ui_gfx.ResourceArgs resource)
       : super._create(session, resource);
 
-  Node._import(Session session, Handle token, ui_gfx.ImportSpec spec)
+  Node._import(Session session, EventPair token, ui_gfx.ImportSpec spec)
       : super._import(session, token, spec);
 
   void setRotation(double x, double y, double z, double w) {
@@ -76,7 +76,8 @@ class ContainerNode extends Node {
   ContainerNode._create(Session session, ui_gfx.ResourceArgs resource)
       : super._create(session, resource);
 
-  ContainerNode._import(Session session, Handle token, ui_gfx.ImportSpec spec)
+  ContainerNode._import(
+      Session session, EventPair token, ui_gfx.ImportSpec spec)
       : super._import(session, token, spec);
 
   void addChild(Node child) {
@@ -96,7 +97,7 @@ class ContainerNode extends Node {
 }
 
 class ImportNode extends ContainerNode {
-  ImportNode(Session session, Handle token)
+  ImportNode(Session session, EventPair token)
       : super._import(session, token, ui_gfx.ImportSpec.node);
 }
 

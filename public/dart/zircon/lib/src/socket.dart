@@ -7,6 +7,7 @@ part of zircon;
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: public_member_api_docs
 
+/// Typed wrapper around a Zircon socket object.
 class Socket extends _HandleWrapper<Socket> {
   Socket(Handle handle) : super(handle);
 
@@ -48,6 +49,8 @@ class Socket extends _HandleWrapper<Socket> {
   }
 }
 
+/// Typed wrapper around a linked pair of socket objects and the
+/// zx_socket_create() syscall used to create them.
 class SocketPair extends _HandleWrapperPair<Socket> {
   factory SocketPair([int options = Socket.STREAM]) {
     final HandlePairResult result = System.socketCreate(options);
