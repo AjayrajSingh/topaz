@@ -18,11 +18,10 @@ import 'intent.dart';
 /// and forward intents to handlers. See the Module class for an example of
 /// this in practice.
 ///
-/// Note: This class must be exposed to the framework before the first iteration
-/// of the event loop. Therefore, it must be initialized by the time the Module
-/// is initialize.
+/// Note: This class must be exposed to the framework before it attempts to
+/// call handle intent or there is a risk of missing intents.
 class IntentHandlerImpl extends fidl.IntentHandler {
-  final _intentHandlerBinding = fidl.IntentHandlerBinding();
+  fidl.IntentHandlerBinding _intentHandlerBinding;
 
   /// A function which is invoked when the host receives a [handleIntent] call.
   void Function(Intent intent) onHandleIntent;
@@ -39,8 +38,11 @@ class IntentHandlerImpl extends fidl.IntentHandler {
   // the event loop or the framework will not bind to it.
   void _exposeService(StartupContext startupContext) {
     startupContext.outgoingServices.addServiceForName(
-      (InterfaceRequest<fidl.IntentHandler> request) =>
-          _intentHandlerBinding.bind(this, request),
+      (InterfaceRequest<fidl.IntentHandler> request) {
+        _clearBinding();
+        _intentHandlerBinding = fidl.IntentHandlerBinding()
+          ..bind(this, request);
+      },
       fidl.IntentHandler.$serviceName,
     );
   }
@@ -56,7 +58,14 @@ class IntentHandlerImpl extends fidl.IntentHandler {
 
   // any necessary cleanup should be done in this method.
   Future<void> _terminate() async {
-    _intentHandlerBinding.close();
+    _clearBinding();
     onHandleIntent = null;
+  }
+
+  void _clearBinding() {
+    if (_intentHandlerBinding != null && _intentHandlerBinding.isBound) {
+      _intentHandlerBinding.unbind();
+      _intentHandlerBinding = null;
+    }
   }
 }
