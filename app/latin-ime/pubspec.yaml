@@ -13,8 +13,3 @@ dev_dependencies:
     sdk: flutter
 flutter:
   uses-material-design: true
-  assets:
-    - packages/keyboard/res/ArrowDown.png
-    - packages/keyboard/res/ArrowUp.png
-    - packages/keyboard/res/Delete.png
-    - packages/keyboard/res/Space.png

@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 /// The corner radius of the keyboard and its border.
-const double cornerRadius = 16.0;
+const double cornerRadius = 24.0;
 
 /// The width of the border surrounding the keyboard.
-const double borderWidth = 4.0;
+const double borderWidth = 6.0;
 
 /// The height of a key in the keyboard.
 const double keyHeight = 44.0;

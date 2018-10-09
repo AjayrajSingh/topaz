@@ -9,10 +9,9 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 
 class ImeKeyboard extends StatelessWidget {
-
   const ImeKeyboard({ImeServiceProxy imeService})
-    : _imeService = imeService,
-      super();
+      : _imeService = imeService,
+        super();
 
   final ImeServiceProxy _imeService;
 
@@ -55,9 +54,14 @@ class ImeKeyboard extends StatelessWidget {
     _imeService.injectInput(event);
   }
 
+  void _onHide() {
+    _imeService.hideKeyboard();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Keyboard(onText: _onText, onDelete: _onDelete, onGo: _onGo);
+    return Keyboard(
+        onText: _onText, onDelete: _onDelete, onGo: _onGo, onHide: _onHide);
   }
 }
 
