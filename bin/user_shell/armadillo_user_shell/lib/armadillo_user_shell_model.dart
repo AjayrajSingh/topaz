@@ -6,17 +6,12 @@ import 'package:flutter/widgets.dart';
 import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
-import 'package:fidl_fuchsia_speech/fidl.dart';
 import 'package:home_work_agent/home_work_proposer.dart';
-import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/modular.dart';
 
 import 'active_agents_manager.dart';
 import 'focus_request_watcher_impl.dart';
 import 'initial_focus_setter.dart';
-import 'maxwell_hotword.dart';
-import 'maxwell_voice_model.dart';
-import 'rate_limited_retry.dart';
 import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
 import 'user_logoutter.dart';
@@ -32,9 +27,6 @@ class ArmadilloUserShellModel extends UserShellModel {
   /// Receives the [SuggestionProvider], [FocusController], and
   /// [VisibleStoriesController].
   final SuggestionProviderSuggestionModel suggestionProviderSuggestionModel;
-
-  /// Tracks speech UI state.
-  final MaxwellVoiceModel maxwellVoiceModel;
 
   /// Watches the [FocusController].
   final FocusRequestWatcherImpl focusRequestWatcher;
@@ -77,7 +69,6 @@ class ArmadilloUserShellModel extends UserShellModel {
     StartupContext startupContext,
     this.storyProviderStoryGenerator,
     this.suggestionProviderSuggestionModel,
-    this.maxwellVoiceModel,
     this.focusRequestWatcher,
     this.initialFocusSetter,
     this.userLogoutter,
@@ -129,8 +120,6 @@ class ArmadilloUserShellModel extends UserShellModel {
       ..storyProvider = storyProvider;
 
     suggestionProviderSuggestionModel.suggestionProvider = suggestionProvider;
-    maxwellVoiceModel.suggestionProvider = suggestionProvider;
-    _attachSpeechToText();
 
     ContextQuery query =
         // ignore: prefer_const_constructors
@@ -180,8 +169,6 @@ class ArmadilloUserShellModel extends UserShellModel {
     _contextListenerBinding.close();
     _focusRequestWatcherBinding.close();
     _presentation.ctrl.close();
-    maxwellVoiceModel.close();
-    _speechToText.ctrl.close();
     suggestionProviderSuggestionModel.close();
     storyProviderStoryGenerator.close();
     onUserShellStopped?.call();
@@ -211,23 +198,6 @@ class ArmadilloUserShellModel extends UserShellModel {
       default:
         return 'work';
     }
-  }
-
-  final SpeechToTextProxy _speechToText = new SpeechToTextProxy();
-  final RateLimitedRetry _retry =
-      new RateLimitedRetry(MaxwellHotword.kMaxRetry);
-
-  void _attachSpeechToText() {
-    userShellContext.getSpeechToText(_speechToText.ctrl.request());
-    maxwellVoiceModel.speechToText = _speechToText;
-    _speechToText.ctrl.onConnectionError = () {
-      if (_retry.shouldRetry) {
-        _attachSpeechToText();
-      } else {
-        log.warning(_retry.formatMessage(
-            component: 'speech to text', feature: 'voice input'));
-      }
-    };
   }
 }
 

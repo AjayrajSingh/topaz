@@ -31,7 +31,6 @@ import 'focus_request_watcher_impl.dart';
 import 'focused_stories_tracker.dart';
 import 'hit_test_model.dart';
 import 'initial_focus_setter.dart';
-import 'maxwell_voice_model.dart';
 import 'power_manager_power_model.dart';
 import 'story_provider_story_generator.dart';
 import 'suggestion_provider_suggestion_model.dart';
@@ -189,13 +188,10 @@ Widget buildArmadilloUserShell({
     powerManager: powerManagerProxy,
   );
 
-  MaxwellVoiceModel voiceModel = new MaxwellVoiceModel();
-
   ArmadilloUserShellModel armadilloUserShellModel = new ArmadilloUserShellModel(
     startupContext: startupContext,
     storyProviderStoryGenerator: storyProviderStoryGenerator,
     suggestionProviderSuggestionModel: suggestionProviderSuggestionModel,
-    maxwellVoiceModel: voiceModel,
     focusRequestWatcher: focusRequestWatcher,
     initialFocusSetter: initialFocusSetter,
     userLogoutter: userLogoutter,
@@ -298,10 +294,6 @@ Widget buildArmadilloUserShell({
                 ),
             (_, Widget child) => new ScopedModel<SuggestionModel>(
                   model: suggestionProviderSuggestionModel,
-                  child: child,
-                ),
-            (_, Widget child) => new ScopedModel<VoiceModel>(
-                  model: voiceModel,
                   child: child,
                 ),
             (_, Widget child) => new ScopedModel<QuickSettingsProgressModel>(

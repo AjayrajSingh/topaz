@@ -28,8 +28,6 @@ flutter_app("armadillo_user_shell") {
     "focused_stories_tracker.dart",
     "hit_test_model.dart",
     "initial_focus_setter.dart",
-    "maxwell_hotword.dart",
-    "maxwell_voice_model.dart",
     "power_manager_power_model.dart",
     "rate_limited_retry.dart",
     "story_provider_story_generator.dart",
