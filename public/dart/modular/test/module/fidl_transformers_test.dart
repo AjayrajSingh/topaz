@@ -12,23 +12,9 @@ import '../matchers.dart';
 
 void main() {
   group('intent transformers', () {
-    test('convertFidlIntentToIntent clones correct fields: action', () {
+    test('convertFidlIntentToIntent clones correct fields', () {
       final fidlIntent = fidl.Intent(
         action: 'my-action',
-        parameters: [
-          fidl.IntentParameter(
-              name: 'intent-param',
-              data: fidl.IntentParameterData.withEntityReference('entity-ref')),
-        ],
-      );
-      final intent = convertFidlIntentToIntent(fidlIntent);
-      expect(intent.action, fidlIntent.action);
-      expect(intent.handler, fidlIntent.handler);
-      expect(intent.parameters, fidlIntent.parameters);
-    });
-
-    test('convertFidlIntentToIntent clones correct fields: handler', () {
-      final fidlIntent = fidl.Intent(
         handler: 'my-handler',
         parameters: [
           fidl.IntentParameter(

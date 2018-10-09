@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
+import 'package:meta/meta.dart';
 
 import '_fidl_transformers.dart';
 import 'intent_parameter.dart';
@@ -54,28 +55,14 @@ class Intent extends fidl.Intent {
   /// a module which can handle the specified action.
   /// If an explicit handler is not set the modular framework
   /// will search for an appropriate handler for the given action.
-  Intent.withAction(
-    String action, {
-    String scopedHandler,
-  }) : this._(action: action, handler: scopedHandler);
-
-  /// Creates an [Intent] that is used to start a
-  /// a specific module declared by the handler.
-  Intent.withHandler(String handler) : this._(handler: handler);
-
-  /// Creates an [Intent] with all the required parameters.
-  /// This constructor is only to be used internally. This constructor
-  /// guards against a const parameter list being passed in since we need
-  /// to be able to update the list.
-  Intent._({
-    String action,
+  Intent({
+    @required String action,
     String handler,
-    List<fidl.IntentParameter> parameters = const [],
-  })  : assert(parameters != null),
+  })  : assert(action != null),
         super(
           action: action,
           handler: handler,
-          parameters: List.of(parameters),
+          parameters: [],
         );
 
   /// Appends a [fidl.IntentParameter] to the intent's parameters containing

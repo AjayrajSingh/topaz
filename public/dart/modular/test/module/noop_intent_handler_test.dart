@@ -10,7 +10,7 @@ import 'package:modular/src/module/noop_intent_handler.dart'; // ignore: impleme
 void main() {
   group('no-op intent handler', () {
     test('calling handle intent does nothing', () {
-      NoopIntentHandler().handleIntent(Intent.withAction('foo'));
+      NoopIntentHandler().handleIntent(Intent(action: 'foo'));
     });
   });
 }

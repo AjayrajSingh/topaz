@@ -17,14 +17,15 @@ Intent convertFidlIntentToIntent(fidl.Intent fidlIntent) {
 
   Intent intent;
   if (fidlIntent.action != null) {
-    intent = Intent.withAction(fidlIntent.action);
-  } else if (fidlIntent.handler != null) {
-    intent = Intent.withHandler(fidlIntent.handler);
+    intent = Intent(
+      action: fidlIntent.action,
+      handler: fidlIntent.handler,
+    );
   } else {
     throw ModuleStateException(
-        'Unable to convert Intent. Intents must have either a valid action '
-        'or handler. Ensure that the intent you are trying to convert has one '
-        'of these values before proceeding.');
+        'Unable to convert Intent. Intents must have a valid action. '
+        'Ensure that the intent you are trying to convert has a '
+        'valid action before proceeding.');
   }
 
   // We shouldn't have null fidl intent parameters but in the case that we

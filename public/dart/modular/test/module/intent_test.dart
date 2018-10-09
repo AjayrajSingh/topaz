@@ -10,14 +10,14 @@ import '../matchers.dart';
 
 void main() {
   group('intent constructors', () {
-    test('intentWithAction sets the action', () {
-      final intent = Intent.withAction('my-action')
+    test('intent sets the action', () {
+      final intent = Intent(action: 'my-action')
         ..addParameterFromEntityReference('my-value', 'foo');
       expect(intent.action, 'my-action');
     });
 
-    test('intentWithHandler sets the handler', () {
-      final intent = Intent.withHandler('my-handler');
+    test('intent with jandler sets the handler', () {
+      final intent = Intent(action: '', handler: 'my-handler');
       expect(intent.handler, 'my-handler');
     });
   });
@@ -26,7 +26,7 @@ void main() {
     Intent intent;
 
     setUp(() {
-      intent = Intent.withAction('foo');
+      intent = Intent(action: 'foo');
     });
 
     test('addParameterFromEntityReference it to the list', () {
