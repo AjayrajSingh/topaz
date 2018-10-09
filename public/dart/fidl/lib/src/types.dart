@@ -471,6 +471,23 @@ class ChannelType extends FidlType<Channel> {
       new Channel(_decodeHandle(decoder, offset, nullable));
 }
 
+class EventPairType extends FidlType<EventPair> {
+  const EventPairType({
+    this.nullable,
+  }) : super(encodedSize: 4);
+
+  final bool nullable;
+
+  @override
+  void encode(Encoder encoder, EventPair value, int offset) {
+    _encodeHandle(encoder, value?.handle, offset, nullable);
+  }
+
+  @override
+  EventPair decode(Decoder decoder, int offset) =>
+      new EventPair(_decodeHandle(decoder, offset, nullable));
+}
+
 class SocketType extends FidlType<Socket> {
   const SocketType({
     this.nullable,
@@ -710,11 +727,13 @@ class TableType<T extends Table> extends FidlType<T> {
     int maxOrdinal = 0;
     value.$fields.forEach((ordinal, field) {
       if (!members.containsKey(ordinal)) {
-        throw new FidlError('Cannot encode unknown table member with ordinal: $ordinal');
+        throw new FidlError(
+            'Cannot encode unknown table member with ordinal: $ordinal');
       }
       if (field != null) {
-        if (maxOrdinal < ordinal)
+        if (maxOrdinal < ordinal) {
           maxOrdinal = ordinal;
+        }
       }
     });
 
@@ -724,8 +743,9 @@ class TableType<T extends Table> extends FidlType<T> {
       ..encodeUint64(kAllocPresent, offset + 8);
 
     // Early exit on empty table.
-    if (maxOrdinal == 0)
+    if (maxOrdinal == 0) {
       return;
+    }
 
     // Sizing
     int envelopeOffset = encoder.alloc(maxOrdinal * _kEnvelopeSize);
@@ -793,7 +813,8 @@ class TableType<T extends Table> extends FidlType<T> {
             final claimedHandles = decoder.countClaimedHandles();
             final field = fieldType.decode(decoder, fieldOffset);
             final numBytesConsumed = decoder.nextOffset() - fieldOffset;
-            final numHandlesConsumed = decoder.countClaimedHandles() - claimedHandles;
+            final numHandlesConsumed =
+                decoder.countClaimedHandles() - claimedHandles;
             if (numBytes != numBytesConsumed)
               throw new FidlError('Table field was mis-sized');
             if (numHandles != numHandlesConsumed)

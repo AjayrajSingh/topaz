@@ -563,6 +563,8 @@ func (c *compiler) compileType(val types.Type) Type {
 		switch val.HandleSubtype {
 		case "channel":
 			r.Decl = "Channel"
+		case "eventpair":
+			r.Decl = "EventPair"
 		case "socket":
 			r.Decl = "Socket"
 		case "vmo":

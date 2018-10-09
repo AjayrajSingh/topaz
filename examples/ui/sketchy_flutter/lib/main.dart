@@ -43,7 +43,7 @@ class SketchyExample extends StatefulWidget {
 
 class _SketchyExampleState extends State<SketchyExample> {
   factory _SketchyExampleState(StartupContext startupContext) {
-    final HandlePairResult tokenPair = System.eventpairCreate();
+    final EventPairPair tokenPair = new EventPairPair();
     assert(tokenPair.status == ZX.OK);
 
     return new _SketchyExampleState._internal(
@@ -54,7 +54,7 @@ class _SketchyExampleState extends State<SketchyExample> {
   }
 
   _SketchyExampleState._internal(
-      this.startupContext, this.session, HandlePairResult tokenPair)
+      this.startupContext, this.session, EventPairPair tokenPair)
       : sceneHost = new SceneHost(tokenPair.first),
         rect = new scenic.RoundedRectangle(
             session, 100.0, 100.0, 10.0, 10.0, 10.0, 10.0),

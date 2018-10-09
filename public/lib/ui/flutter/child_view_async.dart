@@ -157,11 +157,14 @@ class ChildViewConnection {
     assert(_viewKey == null);
     assert(_viewInfo == null);
     assert(_sceneHost == null);
-    final HandlePairResult pair = System.eventpairCreate();
-    assert(pair.status == ZX.OK);
-    _sceneHost = new ui.SceneHost(pair.first);
+
+    final EventPairPair sceneTokens = new EventPairPair();
+    assert(sceneTokens.status == ZX.OK);
+
+    // Analyzer doesn't know Handle must be dart:zircon's Handle
+    _sceneHost = new ui.SceneHost(sceneTokens.first.passHandle());
     _viewKey = _nextViewKey++;
-    _viewContainer.addChild(_viewKey, _viewOwner, pair.second);
+    _viewContainer.addChild(_viewKey, _viewOwner, sceneTokens.second);
     _viewOwner = null;
     assert(!_ViewContainerListenerImpl.instance._connections
         .containsKey(_viewKey));

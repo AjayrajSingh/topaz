@@ -6,6 +6,7 @@ part of zircon;
 
 // ignore_for_file: public_member_api_docs
 
+/// Typed wrapper around a Zircon vmo object.
 class Vmo extends _HandleWrapper<Vmo> {
   Vmo(Handle handle) : super(handle);
 
@@ -59,6 +60,7 @@ class Vmo extends _HandleWrapper<Vmo> {
   }
 }
 
+/// Typed wrapper around a Zircon vmo object, which also tracks its size.
 class SizedVmo extends Vmo {
   final int _size;
 
