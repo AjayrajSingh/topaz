@@ -24,7 +24,7 @@ class ModLoadingWidget extends StatelessWidget {
           height: 48.0,
           width: 48.0,
           child: new FuchsiaSpinner(
-            color: Colors.tealAccent[200],
+            color: Colors.blue[700],
           ),
         ),
       ),

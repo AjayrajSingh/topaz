@@ -6,7 +6,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-const Color _kDefaultColor = const Color(0xFF6EFAFA);
+const Color _kDefaultColor = Colors.blue;
 
 const double _kInitialFractionalDiameter = 1.0 / 1.2;
 const double _kTargetFractionalDiameter = 1.0;
@@ -37,12 +37,9 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
   );
   final Tween<double> _fractionalHeightTween = new Tween<double>(
     begin: _kInitialFractionalDiameter,
-    end: _kInitialFractionalDiameter / 2,
+    end: _kInitialFractionalDiameter * 2 / 3,
   );
-  final Tween<double> _hueTween = new Tween<double>(
-    begin: 0.0,
-    end: 90.0,
-  );
+
   final Curve _firstHalfCurve = const Cubic(0.75, 0.25, 0.25, 1.0);
   final Curve _secondHalfCurve = _kDefaultCurve;
 
@@ -93,9 +90,11 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
                     width: width,
                     height: height,
                     child: new Material(
-                      color: _transformHue(
+                      elevation: tweenProgress * 10.0,
+                      color: Color.lerp(
+                        widget.color.withOpacity(0.8),
                         widget.color,
-                        _hueTween.transform(tweenProgress),
+                        tweenProgress,
                       ),
                       borderRadius: new BorderRadius.circular(width / 2),
                     ),
@@ -113,31 +112,5 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
     } else {
       return 1.0 - _secondHalfCurve.transform((_controller.value - 0.5) / 0.5);
     }
-  }
-
-  /// This performs a hue rotation by [hueDegrees].
-  /// See https://beesbuzz.biz/code/hsv_color_transforms.php for information
-  /// about the constants used.
-  Color _transformHue(Color original, double hueDegrees) {
-    double u = math.cos(hueDegrees * math.pi / 180.0);
-    double w = math.sin(hueDegrees * math.pi / 180.0);
-    return new Color.fromARGB(
-      original.alpha,
-      ((.299 + .701 * u + .168 * w) * original.red +
-              (.587 - .587 * u + .330 * w) * original.green +
-              (.114 - .114 * u - .497 * w) * original.blue)
-          .round()
-          .clamp(0, 255),
-      ((.299 - .299 * u - .328 * w) * original.red +
-              (.587 + .413 * u + .035 * w) * original.green +
-              (.114 - .114 * u + .292 * w) * original.blue)
-          .round()
-          .clamp(0, 255),
-      ((.299 - .3 * u + 1.25 * w) * original.red +
-              (.587 - .588 * u - 1.05 * w) * original.green +
-              (.114 + .886 * u - .203 * w) * original.blue)
-          .round()
-          .clamp(0, 255),
-    );
   }
 }
