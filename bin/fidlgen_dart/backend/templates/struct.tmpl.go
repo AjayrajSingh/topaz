@@ -81,6 +81,8 @@ class {{ .Name }} extends $fidl.Struct {
   static {{ .Name }} _ctor(List<Object> argv) => new {{ .Name }}._(argv);
 }
 
+// See FIDL-308:
+// ignore: recursive_compile_time_constant
 const $fidl.StructType<{{ .Name }}> {{ .TypeSymbol }} = {{ .TypeExpr }};
 {{ end }}
 `

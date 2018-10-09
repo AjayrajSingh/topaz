@@ -63,6 +63,8 @@ class {{ .Name }} extends $fidl.Union {
   }
 }
 
+// See FIDL-308:
+// ignore: recursive_compile_time_constant
 const $fidl.UnionType<{{ .Name }}> {{ .TypeSymbol }} = {{ .TypeExpr }};
 {{ end }}
 `
