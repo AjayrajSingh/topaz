@@ -4,13 +4,8 @@
 
 import 'package:modular/module.dart';
 
-void main() {
-  Module().registerIntentHandler(SliderModIntentHandler());
-}
+import 'handlers/root_intent_handler.dart';
 
-class SliderModIntentHandler extends IntentHandler {
-  @override
-  void handleIntent(Intent intent) {
-    print('handle intent: $intent');
-  }
+void main() {
+  Module().registerIntentHandler(RootIntentHandler());
 }

@@ -4,11 +4,8 @@
 
 import 'package:modular/module.dart';
 
-void main() {
-  Module().registerIntentHandler(ShapesIntentHandler());
-}
+import 'src/intent_handlers/root_intent_handler.dart';
 
-class ShapesIntentHandler extends IntentHandler {
-  @override
-  void handleIntent(Intent intent) {}
+void main() {
+  Module().registerIntentHandler(RootIntentHandler());
 }

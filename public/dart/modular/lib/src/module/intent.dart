@@ -54,7 +54,10 @@ class Intent extends fidl.Intent {
   /// a module which can handle the specified action.
   /// If an explicit handler is not set the modular framework
   /// will search for an appropriate handler for the given action.
-  Intent.withAction(String action) : this._(action: action);
+  Intent.withAction(
+    String action, {
+    String scopedHandler,
+  }) : this._(action: action, handler: scopedHandler);
 
   /// Creates an [Intent] that is used to start a
   /// a specific module declared by the handler.
