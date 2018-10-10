@@ -428,6 +428,44 @@ class ModuleDriver {
     return stream;
   }
 
+  /// Watch for Entity updates from Link with the name [key] and return the
+  /// raw bytes in the Link's value.
+  /// decode values using [codec].
+  Stream<Uint8List> watchRaw(String key, {bool all = false}) {
+    StreamController<Uint8List> controller = new StreamController<Uint8List>(
+      onListen: () => log.info('watchRaw stream ($key): listening'),
+      onPause: () => log.info('watchRaw stream ($key): paused'),
+      onResume: () => log.info('watchRaw stream ($key): resuming'),
+      onCancel: () => log.info('watchRaw stream ($key): cancelled'),
+    );
+
+    Future<Uint8List> convert(_) async {
+      fuchsia_mem.Buffer buffer = await link.get();
+      if (buffer == null) {
+        return null;
+      }
+      var dataVmo = new SizedVmo(buffer.vmo.handle, buffer.size);
+      var data = dataVmo.read(buffer.size);
+      dataVmo.close();
+      return data.bytesAsUint8List();
+    }
+
+    // NOTE: do not use await, the controller.stream needs to be returned
+    // synchronously so listeners can be attached without extra async book
+    // keeping.
+    getLink(key).then((LinkClient link) {
+      log.info('watching link "${link.name}" for Entity updates');
+
+      Stream<Uint8List> source = link.watch(all: all).asyncMap(convert);
+      controller.addStream(source, cancelOnError: true).then((_) {
+        log.info('link stream is "done"');
+        controller.close();
+      });
+    }, onError: controller.addError).catchError(controller.addError);
+
+    return controller.stream;
+  }
+
   /// Create or update the Entity's value (translated per [codec]) and persist
   /// it to a Link with name [key].
   Future<String> put<T>(String key, T value, EntityCodec<T> codec) async {
