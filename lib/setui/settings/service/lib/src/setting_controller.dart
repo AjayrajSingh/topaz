@@ -12,7 +12,7 @@ abstract class SettingController {
   @visibleForTesting
   bool active = false;
 
-  Future addListener(SettingListenerProxy listener) async {
+  Future<void> addListener(SettingListenerProxy listener) async {
     if (listeners.isEmpty) {
       await _initialize();
     }
@@ -53,6 +53,10 @@ abstract class SettingController {
   /// by setSettingValue, and return onbce complete.
   Future<bool> setSettingValue(SettingsObject value);
 
+  /// Initializes the controller.
+  ///
+  /// notifyListeners shouldn't be called in this function, or close
+  /// will be immediately called due to lack of listeners.
   Future<void> initialize();
 
   // Close should stop listening to any underlying services.

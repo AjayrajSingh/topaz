@@ -46,11 +46,11 @@ class NetworkController extends SettingController {
 
   @override
   Future<void> initialize() async {
-    final proxy = wlan.WlanProxy();
-
-    await initializeWithService(() {
+    await initializeWithService(() async {
+      final proxy = wlan.WlanProxy();
       connectToService(
           StartupContext.fromStartupInfo().environmentServices, proxy.ctrl);
+      return proxy;
     });
   }
 
@@ -65,7 +65,11 @@ class NetworkController extends SettingController {
     _wlanProxy = await proxyGetter();
 
     _updateTimer = Timer.periodic(_statusPeriod, (timer) {
-      _wlanProxy.status(_onStatusRefreshed);
+      _wlanProxy.status((status) {
+        if (_onStatusRefreshed(status)) {
+          notifyListeners();
+        }
+      });
     });
 
     _wlanProxy.status((status) {
@@ -109,10 +113,13 @@ class NetworkController extends SettingController {
   @override
   SettingsObject get value => _buildSettingsObject();
 
-  void _onStatusRefreshed(wlan.WlanStatus status) {
+  // Returns true if this caused a change in state.
+  bool _onStatusRefreshed(wlan.WlanStatus status) {
+    bool changed = false;
+
     if (_status != status) {
       _status = status;
-      notifyListeners();
+      changed = true;
     }
     if (status.state == wlan.State.associated) {
       _scanTimer?.cancel();
@@ -125,6 +132,8 @@ class NetworkController extends SettingController {
         });
       }
     }
+
+    return changed;
   }
 
   SettingsObject _buildSettingsObject() {
