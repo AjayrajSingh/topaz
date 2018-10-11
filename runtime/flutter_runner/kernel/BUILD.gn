@@ -19,7 +19,6 @@ compile_platform("kernel_platform_files") {
 
   args = [
     "--target=flutter_runner",
-    "--strong",
     "dart:core",
   ]
 }

@@ -61,7 +61,7 @@
     <project name="third_party/dart/third_party/pkg/dartdoc"
              path="third_party/dart/third_party/pkg/dartdoc"
              remote="https://dart.googlesource.com/dartdoc.git"
-             revision="v0.23.0"/>
+             revision="v0.23.1"/>
 
     <project name="third_party/dart/third_party/pkg/file"
              path="third_party/dart/third_party/pkg/file"

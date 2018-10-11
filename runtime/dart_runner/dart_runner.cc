@@ -34,7 +34,6 @@ const char* kDartVMArgs[] = {
     "--precompilation",
 #else
     "--enable_mirrors=false",
-    "--await_is_keyword",
 #endif
 #if !defined(NDEBUG) && !defined(DART_PRODUCT)
     "--enable_asserts",

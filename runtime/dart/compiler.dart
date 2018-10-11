@@ -93,7 +93,7 @@ Future<void> main(List<String> args) async {
 
   Uri platformKernelDill = sdkRoot.resolve('platform_strong.dill');
 
-  TargetFlags targetFlags = new TargetFlags(strongMode: true, syncAsync: true);
+  TargetFlags targetFlags = new TargetFlags(syncAsync: true);
   Target target;
   switch (targetName) {
     case 'dart_runner':
@@ -124,7 +124,6 @@ Future<void> main(List<String> args) async {
   final errorDetector = new ErrorDetector(previousErrorHandler: errorPrinter);
   final CompilerOptions compilerOptions = new CompilerOptions()
     ..sdkSummary = platformKernelDill
-    ..strongMode = true
     ..fileSystem = fileSystem
     ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
     ..target = target

@@ -19,7 +19,7 @@ HOST_ARCH = utils.GuessArchitecture()
 SCRIPT_DIR = os.path.dirname(sys.argv[0])
 DART_ROOT = os.path.realpath(os.path.join(SCRIPT_DIR, '..', '..', 'third_party', 'dart'))
 
-DEFAULT_DART_VERSION = '2.1.0-dev.6.0'
+DEFAULT_DART_VERSION = '2.1.0-dev.7.0'
 BASE_URL = 'http://gsdview.appspot.com/dart-archive/channels/dev/raw/%s/sdk/%s'
 
 # Python's zipfile doesn't preserve file permissions during extraction, so we
