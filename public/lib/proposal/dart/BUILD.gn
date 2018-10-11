@@ -10,6 +10,7 @@ dart_library("dart") {
   sources = [
     "proposal.dart",
     "src/proposal_builder.dart",
+    "src/proposal_builder_async.dart",
   ]
 
   deps = [
