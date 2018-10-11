@@ -63,6 +63,7 @@ dart_test("dart_widget_tests") {
   sources = [
     "alphatar_test.dart",
     "rk4_spring_simulation_test.dart",
+    "providers_test.dart",
   ]
 
   deps = [

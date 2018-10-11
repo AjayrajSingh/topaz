@@ -10,6 +10,7 @@
 export 'src/model/embedder_model.dart';
 export 'src/model/idle_model.dart';
 export 'src/model/model.dart';
+export 'src/model/provider.dart';
 export 'src/model/spring_model.dart';
 export 'src/model/ticking_model.dart';
 export 'src/model/tracing_spring_model.dart';
