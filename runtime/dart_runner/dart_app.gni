@@ -6,13 +6,65 @@ import("//build/package.gni")
 import("//build/tools/json_merge/json_merge.gni")
 import("//third_party/dart/build/dart/dart_action.gni")
 import("//topaz/runtime/dart/config.gni")
-import("//topaz/runtime/dart/dart_component.gni")
 import("//topaz/runtime/dart/dart_kernel.gni")
 
-template("_dart_jit_component") {
+declare_args() {
+  # Controls whether dart_app() targets generate JIT or AOT Dart snapshots.
+  # This defaults to JIT, use `fx set <ARCH> --args
+  # 'dart_default_app="dart_aot_app"' to switch to AOT.
+  dart_default_app = "dart_jit_app"
+}
+
+declare_args() {
+  # When AOT compiling, an app will reference objects in the sharing basis's
+  # snapshot when available instead of writing the objects in its own snapshot.
+  # The snapshot of the sharing basis app will be included in every other app's
+  # package and deduplicated by blobfs.
+  if (dart_default_app == "dart_jit_app") {
+    # module_suggester is not AOT compiled in debug builds
+    dart_aot_sharing_basis = ""
+  } else {
+    dart_aot_sharing_basis =
+        "//topaz/app/maxwell/agents/module_suggester_dart:module_suggester"
+  }
+}
+
+# In product mode, we force all Dart apps to use a specific runtime mode.
+# Currently, we force them all to use JIT, but we might switch to DBC in the
+# future.
+dart_product_app = "_dart_jit_package"
+
+# Defines a Dart package with JIT runtime components
+#
+# Takes a set of dart components and puts them into one fuchsia package with
+# the dart_jit_runner as its runtime. Also supports legacy calls where the
+# components parameter isn't specified, in which we will create one default
+# component for the package.
+#
+# Parameters
+#
+#   components (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the resources list:
+#
+#       component_name (required)
+#         Name of the component.
+#
+#       main_dart (required)
+#         File containing the main function of the component.
+#
+#   main_dart (required)
+#     File containing the main function of the application. Either main_dart or
+#     components must be defined, but not both.
+template("_dart_jit_package") {
   legacy_component = false
   pkg_name = target_name
-  if (!defined(invoker.components)) {
+  components = []
+  if (defined(invoker.components)) {
+    components += invoker.components
+  } else {
     # If components is not specified, we are fitting main_dart into a component
     # scope, and using that for the package.
     #
@@ -29,19 +81,167 @@ template("_dart_jit_component") {
     if (defined(invoker.sources)) {
       pkg_sources = invoker.sources
     }
-    components = [
+    components += [
       {
         main_dart = invoker.main_dart
         component_name = legacy_component_name
-        component_type = "dart"
         deps = invoker.deps
         sources = pkg_sources
       }
     ]
   }
 
-  flutter_dart_jit_component(target_name) {
-    forward_variables_from(invoker, "*")
+  # Build the kernel for each of the components, and bundle them in the same
+  # scope for later packaging.
+  components_with_kernel = []
+  foreach(component, components) {
+    assert(defined(component.main_dart), "Must specify main_dart file")
+
+    product = !is_debug
+    if (defined(invoker.product)) {
+      product = invoker.product
+    }
+
+    if (dart_force_product) {
+      product = true
+    }
+
+    product_suffix = ""
+    if (product) {
+      product_suffix = "_product"
+    }
+
+    dbc = false
+    if (defined(invoker.dbc) && invoker.dbc) {
+      dbc = true
+    }
+
+    component_name = component.component_name
+    if (legacy_component) {
+      kernel_name = target_name
+    } else {
+      kernel_name = component_name
+    }
+    kernel_target_name = kernel_name + "_kernel"
+    kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
+
+    dart_kernel(kernel_name) {
+      platform_name = "dart_runner"
+      platform_deps =
+          [ "//topaz/runtime/dart_runner/kernel:kernel_platform_files" ]
+      platform_path = "$root_out_dir/dart_runner_patched_sdk"
+
+      # TODO(CP-141): These variables should be from the component
+      forward_variables_from(invoker,
+                             [
+                               "disable_analysis",
+                               "non_dart_deps",
+                               "source_dir",
+                               "package_name",
+                             ])
+      deps = component.deps
+      sources = component.sources
+
+      main_dart = component.main_dart
+      manifest = kernel_manifest
+      args = [
+        "--component-name",
+        component_name,
+      ]
+      if (dbc) {
+        args += [
+          "--gen-bytecode",
+          "--drop-ast",
+        ]
+      }
+    }
+    components_with_kernel += [
+      {
+        kernel_target_name = kernel_target_name
+        kernel_manifest = kernel_manifest
+        deps = component.deps
+        sources = component.sources
+      }
+    ]
+  }
+
+  runner_name = "jit"
+  if (dbc) {
+    runner_name = "dbc"
+  }
+
+  # If a component manifest exists, merge in the runtime portion of the
+  # manifest. If it doesn't exist, drop in the deprecated_runtime file.
+  package_meta = []
+  if (defined(invoker.meta)) {
+    package_meta = invoker.meta
+  }
+  cmx_filtered_meta = []
+  cmx_deps = []
+  found_cmx = false
+  foreach(item, package_meta) {
+    dest = item.path
+    if (defined(item.dest)) {
+      dest = item.dest
+    }
+    if (get_path_info(dest, "extension") == "cmx") {
+      found_cmx = true
+      merged = "merged_" + get_path_info(dest, "file")
+      json_merge(merged) {
+        sources = [
+          item.path,
+          rebase_path(
+              "//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime"),
+        ]
+      }
+      merged_outputs = []
+      merged_outputs = get_target_outputs(":$merged")
+      item.path = merged_outputs[0]
+      cmx_deps += [ ":$merged" ]
+    }
+    cmx_filtered_meta += [ item ]
+  }
+
+  if (!found_cmx) {
+    # No cmx to inject to. Inject the runner aspect as a dangling deprecated_runtime.
+    # CP-129: deprecate cmx-less components, then delete this.
+    cmx_filtered_meta += [
+      {
+        path = rebase_path(
+                "//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime")
+        dest = "deprecated_runtime"
+      },
+    ]
+  }
+
+  # We have all components and their kernels generated now. We call package() to
+  # put everything into a fuchsia package, merging deps, extra, meta etc.
+  package(target_name) {
+    forward_variables_from(invoker,
+                           [
+                             "testonly",
+                             "tests",
+                           ])
+
+    package_name = pkg_name
+    non_dart_deps = []
+    if (defined(invoker.non_dart_deps)) {
+      non_dart_deps = invoker.non_dart_deps
+    }
+    deps = non_dart_deps + cmx_deps
+    extra = []
+
+    foreach(component, components_with_kernel) {
+      deps += [ ":${component.kernel_target_name}" ]
+      deps += component.deps
+      extra += [ component.kernel_manifest ]
+    }
+
+    if (defined(invoker.resources)) {
+      resources = invoker.resources
+    }
+
+    meta = cmx_filtered_meta
   }
 }
 
@@ -296,7 +496,6 @@ template("_dart_aot_package") {
               "//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime"),
         ]
       }
-      merged_outputs = []
       merged_outputs = get_target_outputs(":$merged")
       item.path = merged_outputs[0]
       cmx_deps += [ ":$merged" ]
@@ -370,7 +569,7 @@ template("_dart_aot_package") {
 }
 
 template("dart_jit_app") {
-  template_name = "_dart_jit_component"
+  template_name = "_dart_jit_package"
   if (dart_force_product) {
     template_name = dart_product_app
   }

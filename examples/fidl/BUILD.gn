@@ -8,7 +8,6 @@ dart_app("echo_dart") {
   components = [
     {
       component_name = "echo_client_dart"
-      component_type = "dart"
       main_dart = "echo_client_dart/lib/main.dart"
       sources = []
        deps = [
@@ -20,7 +19,6 @@ dart_app("echo_dart") {
     },
     {
       component_name = "echo_server_dart"
-      component_type = "dart"
       main_dart = "echo_server_dart/lib/main.dart"
       sources = []
       deps = [
