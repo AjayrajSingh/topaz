@@ -115,7 +115,8 @@ void main() async {
     });
   });
 
-  test('Check that operations on non-existing documents throw exceptions', () async {
+  test('Check that operations on non-existing documents throw exceptions',
+      () async {
     Schema schema = newSchema();
     final id = new DocumentId(schema);
     Sledge sledge = newSledgeForTesting();

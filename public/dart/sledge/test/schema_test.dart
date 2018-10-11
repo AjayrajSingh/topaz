@@ -113,21 +113,17 @@ void main() {
 
     // Create a new Sledge document.
     Sledge sledge = newSledgeForTesting();
-    dynamic doc;
+    Document doc;
     await sledge.runInTransaction(() async {
       doc = await sledge.getDocument(new DocumentId(schema2));
     });
     // Read and write properties of a Sledge document.
-    expect(doc.foo.someBool.value, equals(false));
-    expect(doc.foo.someInteger.value, equals(0));
     expect(doc['foo']['someBool'].value, equals(false));
     expect(doc['foo']['someInteger'].value, equals(0));
     await sledge.runInTransaction(() async {
-      doc.foo.someBool.value = true;
-      doc.foo.someInteger.value = 42;
+      doc['foo']['someBool'].value = true;
+      doc['foo']['someInteger'].value = 42;
     });
-    expect(doc.foo.someBool.value, equals(true));
-    expect(doc.foo.someInteger.value, equals(42));
     expect(doc['foo']['someBool'].value, equals(true));
     expect(doc['foo']['someInteger'].value, equals(42));
   });
@@ -144,32 +140,23 @@ void main() {
 
     // Create a new Sledge document.
     Sledge sledge = newSledgeForTesting();
-    dynamic doc;
+    Document doc;
     await sledge.runInTransaction(() async {
       doc = await sledge.getDocument(new DocumentId(schema));
     });
 
     // Read and write properties of a Sledge document.
-    expect(doc.someBool.value, equals(false));
-    expect(doc.someInteger.value, equals(0));
-    expect(doc.someDouble.value, equals(0.0));
-    expect(doc.someString.value, equals(''));
-
     expect(doc['someBool'].value, equals(false));
     expect(doc['someInteger'].value, equals(0));
     expect(doc['someDouble'].value, equals(0.0));
     expect(doc['someString'].value, equals(''));
 
     await sledge.runInTransaction(() async {
-      doc.someBool.value = true;
-      doc.someInteger.value = 42;
-      doc.someDouble.value = 10.5;
-      doc.someString.value = 'abacaba';
+      doc['someBool'].value = true;
+      doc['someInteger'].value = 42;
+      doc['someDouble'].value = 10.5;
+      doc['someString'].value = 'abacaba';
     });
-    expect(doc.someBool.value, equals(true));
-    expect(doc.someInteger.value, equals(42));
-    expect(doc.someDouble.value, equals(10.5));
-    expect(doc.someString.value, equals('abacaba'));
 
     expect(doc['someBool'].value, equals(true));
     expect(doc['someInteger'].value, equals(42));

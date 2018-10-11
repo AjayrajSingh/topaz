@@ -16,8 +16,8 @@ flutter_app("todo_list_sledge") {
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/sledge:sledge",
-    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/widgets/dart",
   ]
 }

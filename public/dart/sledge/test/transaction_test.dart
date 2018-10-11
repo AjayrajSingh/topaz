@@ -50,19 +50,19 @@ void main() {
     Schema schema = new Schema(schemaDescription);
 
     Sledge sledge = newSledgeForTesting();
-    dynamic doc;
+    Document doc;
     await sledge.runInTransaction(() async {
       doc = await sledge.getDocument(new DocumentId(schema));
-      doc.written.value = false;
+      doc['written'].value = false;
     });
-    expect(doc.written.value, equals(false));
+    expect(doc['written'].value, equals(false));
 
     bool modificationSucceeded = await sledge.runInTransaction(() async {
-      doc.written.value = true;
+      doc['written'].value = true;
       sledge.abortAndRollback();
     });
     expect(modificationSucceeded, equals(false));
-    expect(doc.written.value, equals(false));
+    expect(doc['written'].value, equals(false));
   });
 
   test('Check that exceptions rollback transactions', () async {
@@ -72,16 +72,16 @@ void main() {
     Schema schema = new Schema(schemaDescription);
 
     Sledge sledge = newSledgeForTesting();
-    dynamic doc;
+    Document doc;
     await sledge.runInTransaction(() async {
       doc = await sledge.getDocument(new DocumentId(schema));
-      doc.written.value = false;
+      doc['written'].value = false;
     });
-    expect(doc.written.value, equals(false));
+    expect(doc['written'].value, equals(false));
 
     try {
       await sledge.runInTransaction(() async {
-        doc.written.value = true;
+        doc['written'].value = true;
         throw _RollbackException();
       });
       // unreachable
@@ -89,7 +89,7 @@ void main() {
     } on _RollbackException {
       //exception intended
     }
-    expect(doc.written.value, equals(false));
+    expect(doc['written'].value, equals(false));
   });
 
   test('Check that exceptions remove transactions from the queue', () async {

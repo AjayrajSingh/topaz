@@ -45,16 +45,6 @@ class ValueNode implements Value {
     return fields;
   }
 
-  /// Intercepts invocations to provide easy access to specific [_childValuesDeprecated].
-  @override
-  dynamic noSuchMethod(Invocation invocation) {
-    Value value = _childValuesDeprecated[invocation.memberName];
-    if (value == null) {
-      super.noSuchMethod(invocation);
-    }
-    return value;
-  }
-
   /// Returns the child Value associated with [fieldName].
   /// If [fieldName] does not have any associated Value, an ArgumentError
   /// exception is thrown.

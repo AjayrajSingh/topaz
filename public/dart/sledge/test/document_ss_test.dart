@@ -23,8 +23,8 @@ class DocumentFleetFactory {
 
 class NameLengthChecker extends Checker<Document> {
   @override
-  void check(dynamic doc) {
-    expect(doc['name'].value.length, equals(doc.length.value));
+  void check(Document doc) {
+    expect(doc['name'].value.length, equals(doc['length'].value));
   }
 }
 
@@ -72,15 +72,15 @@ void main() async {
       });
     }
     fleet
-      ..runInTransaction(0, (dynamic doc) async {
+      ..runInTransaction(0, (Document doc) async {
         doc['name'].value = 'Alice';
       })
       ..synchronize([0, 1, 2])
-      ..runInTransaction(1, (dynamic doc) async {
+      ..runInTransaction(1, (Document doc) async {
         doc['length'].value = 5;
       })
       ..synchronize([0, 1, 2])
-      ..runInTransaction(1, (dynamic doc) async {
+      ..runInTransaction(1, (Document doc) async {
         doc['name'].value = 'Bob';
         doc['length'].value = 3;
       })

@@ -154,12 +154,6 @@ class Document implements ValueObserver {
     currentTransaction.documentWasModified(this);
   }
 
-  @override
-  dynamic noSuchMethod(Invocation invocation) {
-    _checkExistsState();
-    return _value.noSuchMethod(invocation);
-  }
-
   /// Returns the Value associated with [fieldName].
   /// If [fieldName] does not have any associated Value, an ArgumentError
   /// exception is thrown.

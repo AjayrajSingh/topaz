@@ -24,7 +24,7 @@ class VoteListWidgetState extends State<VoteListWidget> {
   static ComponentContext _componentContext;
   sledge.Sledge _sledge;
   final List<VoteItem> _voteItems = <VoteItem>[];
-  dynamic _doc;
+  sledge.Document _doc;
   final ListEquality<int> listEquality = new ListEquality<int>();
 
   static final sledge.Schema _listSchema = new sledge.Schema(
@@ -49,15 +49,15 @@ class VoteListWidgetState extends State<VoteListWidget> {
   void _createItem(String title) {
     _sledge.runInTransaction(() async {
       final id = new sledge.DocumentId(_itemSchema);
-      _doc.items.add(id.subId);
-      dynamic doc = await _sledge.getDocument(id);
-      doc.title.value = title;
+      _doc['items'].add(id.subId);
+      sledge.Document doc = await _sledge.getDocument(id);
+      doc['title'].value = title;
     });
   }
 
   void _deleteItem(sledge.DocumentId id) {
     _sledge.runInTransaction(() async {
-      _doc.items.remove(id.subId);
+      _doc['items'].remove(id.subId);
     });
   }
 
@@ -89,8 +89,8 @@ class VoteListWidgetState extends State<VoteListWidget> {
       _sledge.runInTransaction(() async {
         _doc = await _sledge
             .getDocument(new sledge.DocumentId.fromIntId(_listSchema, 1));
-        await _addItems(_doc.items);
-        _subscribeForChanges(_doc.items.onChange);
+        await _addItems(_doc['items']);
+        _subscribeForChanges(_doc['items'].onChange);
       }).then((bool b) {
         // Redraw widget, when initial list is ready.
         setState(() {});

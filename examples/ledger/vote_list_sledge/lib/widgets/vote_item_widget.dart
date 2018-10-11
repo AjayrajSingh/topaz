@@ -13,7 +13,7 @@ import 'package:sledge/sledge.dart' as sledge;
 
 /// The data representing a single Vote.
 class VoteItem {
-  dynamic _doc;
+  sledge.Document _doc;
   final sledge.Sledge _sledge;
   final void Function(sledge.DocumentId) _deletionCallback;
 
@@ -51,12 +51,12 @@ class VoteItemState extends State<VoteItemWidget> {
   VoteItem _voteItem;
 
   VoteItemState(this._voteItem) {
-    _subscribeForChanges(_voteItem._doc.votes.onChange);
+    _subscribeForChanges(_voteItem._doc['votes'].onChange);
   }
 
   void _handlePlusPressed() {
     _voteItem._sledge.runInTransaction(() async {
-      _voteItem._doc.votes.add(1);
+      _voteItem._doc['votes'].add(1);
     });
   }
 
@@ -79,9 +79,9 @@ class VoteItemState extends State<VoteItemWidget> {
             onPressed: _handlePlusPressed));
 
     final counterCnt =
-        new Container(child: new Text('${_voteItem._doc.votes.value}'));
+        new Container(child: new Text('${_voteItem._doc['votes'].value}'));
 
-    final title = new Container(child: new Text(_voteItem._doc.title.value));
+    final title = new Container(child: new Text(_voteItem._doc['title'].value));
 
     final deleteButton = new Container(
         child: new IconButton(
