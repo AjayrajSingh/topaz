@@ -6,8 +6,7 @@ use failure::{Error, ResultExt};
 use fidl::endpoints::{create_proxy, ClientEnd, RequestStream, ServerEnd, ServiceMarker};
 use fidl_fuchsia_developer_tiles as tiles;
 use fidl_fuchsia_math::SizeF;
-use fidl_fuchsia_modular::{StoryProviderProxy, UserShellContextMarker, UserShellContextProxy,
-                           UserShellMarker, UserShellRequest, UserShellRequestStream};
+use fidl_fuchsia_modular::{StoryProviderProxy, UserShellContextMarker, UserShellContextProxy};
 use fidl_fuchsia_ui_input::{KeyboardEvent, KeyboardEventPhase, MODIFIER_LEFT_CONTROL,
                             MODIFIER_RIGHT_CONTROL};
 use fidl_fuchsia_ui_policy::{KeyboardCaptureListenerHackMarker,
@@ -30,8 +29,8 @@ use crate::view::{ErmineView, ErmineViewPtr};
 pub struct App {
     view_manager: ViewManagerProxy,
     views: Vec<ErmineViewPtr>,
-    user_shell_context: Option<UserShellContextProxy>,
-    story_provider: Option<StoryProviderProxy>,
+    user_shell_context: UserShellContextProxy,
+    story_provider: StoryProviderProxy,
     presentation_proxy: Option<PresentationProxy>,
     next_key: u32,
 }
@@ -45,14 +44,22 @@ lazy_static! {
 impl App {
     pub fn new() -> Result<AppPtr, Error> {
         let view_manager = connect_to_service::<ViewManagerMarker>()?;
-        Ok(Arc::new(Mutex::new(App {
+        let user_shell_context = connect_to_service::<UserShellContextMarker>()?;
+        let (story_provider, story_provider_end) = create_proxy()?;
+        user_shell_context
+            .clone()
+            .get_story_provider(story_provider_end)?;
+
+        let app = Arc::new(Mutex::new(App {
             view_manager,
             views: vec![],
-            user_shell_context: None,
-            story_provider: None,
+            user_shell_context,
+            story_provider,
             presentation_proxy: None,
             next_key: 1,
-        })))
+        }));
+        app.lock().setup_keyboard_hack()?;
+        Ok(app)
     }
 
     pub fn spawn_view_provider_server(chan: fasync::Channel) {
@@ -91,7 +98,6 @@ impl App {
         let (presentation_proxy, presentation_request) = create_proxy()?;
         self.user_shell_context
             .clone()
-            .unwrap()
             .get_presentation(presentation_request)?;
         self.presentation_proxy = Some(presentation_proxy);
 
@@ -128,37 +134,6 @@ impl App {
         Ok(())
     }
 
-    pub fn take_user_shell_context(
-        &mut self, user_shell_context: ClientEnd<UserShellContextMarker>,
-    ) -> Result<(), Error> {
-        self.user_shell_context = Some(user_shell_context.into_proxy().unwrap());
-        let (story_provider, story_provider_end) = create_proxy()?;
-        self.user_shell_context
-            .clone()
-            .unwrap()
-            .get_story_provider(story_provider_end)?;
-
-        self.story_provider = Some(story_provider);
-        self.setup_keyboard_hack()?;
-
-        Ok(())
-    }
-
-    pub fn spawn_user_shell_server(chan: fasync::Channel) {
-        fasync::spawn(
-            UserShellRequestStream::from_channel(chan)
-                .try_for_each(move |req| {
-                    let UserShellRequest::Initialize {
-                        user_shell_context, ..
-                    } = req;
-                    APP.lock()
-                        .take_user_shell_context(user_shell_context)
-                        .unwrap();
-                    futures::future::ready(Ok(()))
-                }).unwrap_or_else(|e| eprintln!("error running user shell server: {:?}", e)),
-        )
-    }
-
     fn next_story_key(&mut self) -> u32 {
         let next_key = self.next_key;
         self.next_key += 1;
@@ -173,7 +148,7 @@ impl App {
             story_id,
             module_name,
             allow_focus,
-            self.story_provider.as_ref().unwrap(),
+            &self.story_provider,
         )?;
 
         Ok(())
@@ -181,7 +156,7 @@ impl App {
 
     pub fn add_story(&mut self, module_name: String, allow_focus: bool) -> u32 {
         let key_to_use = self.next_story_key();
-        let f = self.story_provider.as_ref().unwrap().create_story(None);
+        let f = self.story_provider.create_story(None);
         fasync::spawn(
             f.map_ok(move |r| {
                 APP.lock()
@@ -239,9 +214,7 @@ fn main() -> Result<(), Error> {
     let mut executor = fasync::Executor::new().context("Error creating executor")?;
 
     let fut = component::server::ServicesServer::new()
-        .add_service((UserShellMarker::NAME, move |channel| {
-            App::spawn_user_shell_server(channel);
-        })).add_service((ViewProviderMarker::NAME, move |channel| {
+        .add_service((ViewProviderMarker::NAME, move |channel| {
             App::spawn_view_provider_server(channel);
         })).add_service((tiles::ControllerMarker::NAME, move |chan| {
             App::spawn_tiles_server(chan)
