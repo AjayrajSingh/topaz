@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl/fidl.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.story.dart/story.dart';
 
 /// Called when [UserShell.initialize] occurs.
@@ -28,7 +28,7 @@ typedef OnUserShellStop = void Function();
 
 /// Implements a UserShell for receiving the services a [UserShell] needs to
 /// operate.
-class UserShellImpl implements UserShell, Lifecycle {
+class UserShellImpl implements Lifecycle {
   /// Binding for the actual UserShell interface object.
   final UserShellContextProxy _userShellContextProxy =
       new UserShellContextProxy();
@@ -68,19 +68,19 @@ class UserShellImpl implements UserShell, Lifecycle {
 
   /// Constructor.
   UserShellImpl({
+    startupContext,
     this.onReady,
     this.onStopping,
     this.onStop,
     this.onNotify,
     bool watchAll,
-  }) : watchAll = watchAll ?? false;
+  }) : watchAll = watchAll ?? false {
+    connectToService(startupContext.environmentServices, _userShellContextProxy.ctrl);
+    _initialize();
+  }
 
-  @override
-  void initialize(
-    InterfaceHandle<UserShellContext> userShellContextHandle,
-  ) {
+  void _initialize() {
     if (onReady != null) {
-      _userShellContextProxy.ctrl.bind(userShellContextHandle);
       _userShellContextProxy
         ..getStoryProvider(
           _storyProviderProxy.ctrl.request(),

@@ -28,9 +28,6 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
   /// The [StartupContext] to [advertise] its [UserShell] services to.
   final StartupContext _startupContext;
 
-  /// The binding for the [UserShell] service implemented by [UserShellImpl].
-  final UserShellBinding _userShellBinding;
-
   /// The binding for the [Lifecycle] service implemented by [UserShellImpl].
   final LifecycleBinding _lifecycleBinding;
 
@@ -58,7 +55,6 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
         userShellModel: userShellModel,
         onWindowMetricsChanged: onWindowMetricsChanged,
         child: child,
-        userShellBinding: new UserShellBinding(),
         lifecycleBinding: new LifecycleBinding(),
       );
 
@@ -67,21 +63,19 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
     T userShellModel,
     VoidCallback onWindowMetricsChanged,
     Widget child,
-    UserShellBinding userShellBinding,
     LifecycleBinding lifecycleBinding,
   })  : _startupContext = startupContext,
         _userShellModel = userShellModel,
         _onWindowMetricsChanged = onWindowMetricsChanged,
         _child = child,
-        _userShellBinding = userShellBinding,
         _lifecycleBinding = lifecycleBinding,
         _userShell = new UserShellImpl(
+          startupContext: startupContext,
           onReady: userShellModel?.onReady,
           onStopping: userShellModel?.onStop,
           onNotify: userShellModel?.onNotify,
           watchAll: userShellModel?.watchAll,
           onStop: () {
-            userShellBinding.close();
             lifecycleBinding.close();
             fuchsia.exit(0);
           },
@@ -116,16 +110,11 @@ class UserShellWidget<T extends UserShellModel> extends StatelessWidget {
         ),
       );
 
-  /// Advertises [_userShell] as a [UserShell] to the rest of the system via
+  /// Advertises [_userShell] as a [LifeCycle] to the rest of the system via
   /// the [StartupContext].
   void advertise() {
     _startupContext.outgoingServices
-      ..addServiceForName(
-        (InterfaceRequest<UserShell> request) =>
-            _userShellBinding.bind(_userShell, request),
-        UserShell.$serviceName,
-      )
-      ..addServiceForName(
+      .addServiceForName(
         (InterfaceRequest<Lifecycle> request) =>
             _lifecycleBinding.bind(_userShell, request),
         Lifecycle.$serviceName,
