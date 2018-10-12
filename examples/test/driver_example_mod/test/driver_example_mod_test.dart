@@ -5,46 +5,30 @@
 import 'dart:async';
 import 'dart:core';
 
-import 'package:fuchsia_driver/fuchsia_driver.dart';
 import 'package:flutter_driver/flutter_driver.dart';
-import 'package:fuchsia_remote_debug_protocol/fuchsia_remote_debug_protocol.dart';
 import 'package:fuchsia_remote_debug_protocol/logging.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('driver example tests', () {
     FlutterDriver driver;
-    FuchsiaRemoteConnection connection;
 
     setUpAll(() async {
+      // TODO(DX-561): Update logging messages in
+      // fuchsia_remote_debug_protocol so that this doesn't need to be set to
+      // `all`.
       Logger.globalLevel = LoggingLevel.all;
-      connection = await FuchsiaDriver.connect();
-      // TODO(awdavies): remove once this PR lands:
-      // https://github.com/flutter/flutter/pull/22590
-      //
-      // This will prevent probing the test itself.
-      const Pattern isolatePattern = 'driver_example_mod:main()';
-      print('Finding $isolatePattern');
-      final List<IsolateRef> refs =
-          await connection.getMainIsolatesByPattern(isolatePattern);
-      final IsolateRef ref = refs.first;
+      const Pattern isolatePattern = 'driver_example_mod';
       // Occasionally this will crash if this delay isn't here.
       await new Future<Null>.delayed(const Duration(milliseconds: 500));
       driver = await FlutterDriver.connect(
-          dartVmServiceUrl: ref.dartVm.uri.toString(),
-          isolateNumber: ref.number,
+          fuchsiaModuleTarget: isolatePattern,
           printCommunication: true,
           logCommunicationToFile: false);
     });
 
     tearDownAll(() async {
-      if (driver != null) {
-        await driver.close();
-      }
-      if (connection != null) {
-        await connection.stop();
-      }
-      await FuchsiaDriver.cleanup();
+      await driver?.close();
     });
 
     test('add to counter. remove from counter', () async {

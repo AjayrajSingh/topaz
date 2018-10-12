@@ -6,12 +6,14 @@ import("//build/dart/dart_remote_test.gni")
 import("//build/dart/dart_fuchsia_test.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
-# The main app (does not support any test code, and is not drivable).
+# The main app.
 flutter_app("driver_example_mod") {
   package_name = "driver_example_mod"
 
   main_dart = "lib/main.dart"
 
+  # This creates a flutter_driver enabled binary that will enable extensions for
+  # testing when run in an environment along with TestRunner.
   flutter_driver_extendable = true
 
   deps = [
@@ -19,22 +21,6 @@ flutter_app("driver_example_mod") {
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/widgets/dart",
-  ]
-}
-
-# Example of a remote test. This can be run on the host machine, which creates a
-# connection with a Fuchsia device to run tests.
-#
-# The target application must be runnning on the machine.
-dart_remote_test("driver_example_mod_remote_tests") {
-  sources = [
-    "driver_example_mod_test.dart",
-  ]
-
-  deps = [
-    ":driver_example_mod_dart_library",
-    "//topaz/public/lib/fuchsia_driver",
-    "//third_party/dart-pkg/pub/test",
   ]
 }
 
@@ -49,7 +35,7 @@ dart_fuchsia_test("driver_example_mod_target_tests") {
   sources = []
   deps = [
     ":driver_example_mod_dart_library",
-    "//topaz/public/lib/fuchsia_driver",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
     "//third_party/dart-pkg/pub/test",
   ]
 
