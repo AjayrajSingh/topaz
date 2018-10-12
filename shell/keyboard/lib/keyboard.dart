@@ -117,7 +117,7 @@ class Keyboard extends StatefulWidget {
 ///
 class KeyboardState extends State<Keyboard> {
   int _currentKeyboard;
-  final List<Widget> _keyboards = [];
+  final Map<int, Widget> _keyboards = {};
 
   @override
   void initState() {
@@ -145,7 +145,9 @@ class KeyboardState extends State<Keyboard> {
             color: _backgroundColor,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: _sidePadding),
-              child: _keyboards[_currentKeyboard],
+              child: _keyboards.containsKey(_currentKeyboard)
+                  ? _keyboards[_currentKeyboard]
+                  : Offstage(),
             ),
           ),
         ),
@@ -313,8 +315,8 @@ class KeyboardState extends State<Keyboard> {
       );
 
   void _onSelectKeyboard(int keyboard) {
-    if (!_keyboards.asMap().containsKey(keyboard))
-      _keyboards.insert(keyboard, _buildKeyboard(keyboard));
+    if (!_keyboards.containsKey(keyboard))
+      _keyboards[keyboard] = _buildKeyboard(keyboard);
     setState(() => _currentKeyboard = keyboard);
   }
 
