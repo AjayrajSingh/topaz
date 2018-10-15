@@ -88,6 +88,13 @@ class RK4SpringSimulation {
     }
   }
 
+  /// You can only set velocity when the spring is in motion.
+  set velocity(double velocity) {
+    if (!_isDone) {
+      _velocity = velocity;
+    }
+  }
+
   /// Returns true if the simulation is done - it's reached its target and has
   /// no velocity.
   bool get isDone => _isDone;
@@ -116,7 +123,7 @@ class RK4SpringSimulation {
       if (_evaluateRK(stepSize)) {
         _curT = 1.0;
         _value = _targetValue;
-        _velocity = 0.0;
+        velocity = 0.0;
         _isDone = true;
         _accelerationMultipler = 0.0;
         return;

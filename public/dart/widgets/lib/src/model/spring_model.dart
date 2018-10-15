@@ -35,6 +35,16 @@ class SpringModel extends TickingModel {
     notifyListeners();
   }
 
+  /// Sets the new velocity for the simulation to [velocity].
+  /// Note when setting this value, this velocity needs to be in the direction
+  /// of the current target and should be from the frame of reference of going
+  /// from 0.0 to 1.0 instead of the absolute values of value and target.
+  /// Note also that you can only set velocity if the spring is in motion.
+  set velocity(double velocity) {
+    _simulation.velocity = velocity;
+    startTicking();
+  }
+
   /// Sets the new target for the simulation to [target].
   set target(double target) {
     if (_simulation.target != target) {
