@@ -106,10 +106,7 @@ class ModuleImpl implements Module {
     }
 
     _moduleContextProxy = fidl.ModuleContextProxy();
-    connectToService(
-      StartupContext.fromStartupInfo().environmentServices,
-      _moduleContextProxy.ctrl,
-    );
+    connectToEnvironmentService(_moduleContextProxy);
     return _moduleContextProxy;
   }
 

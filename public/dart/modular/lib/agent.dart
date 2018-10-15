@@ -3,4 +3,3 @@
 // found in the LICENSE file.
 
 /// A collection of utilities simplifying module interactions.
-library agent;

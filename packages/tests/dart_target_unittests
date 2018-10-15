@@ -1,6 +1,7 @@
 {
     "packages": [
         "//topaz/public/dart-pkg/zircon:dart_zircon_test",
-        "//topaz/public/dart/modular:modular_package_integration_tests"
+        "//topaz/public/dart/modular:modular_package_integration_tests",
+        "//topaz/public/dart/fuchsia:fuchsia_package_integration_tests"
     ]
 }

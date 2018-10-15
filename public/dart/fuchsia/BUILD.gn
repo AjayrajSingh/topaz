@@ -4,8 +4,11 @@
 
 import("//build/dart/dart_library.gni")
 import("//topaz/runtime/dart/dart_test.gni")
+import("//build/dart/dart_fuchsia_test.gni")
 
 library_deps = [
+  "//third_party/dart-pkg/pub/stack_trace",
+  "//peridot/public/fidl/fuchsia.modular",
   "//garnet/public/fidl/fuchsia.sys",
   "//third_party/dart-pkg/pub/meta",
   "//topaz/public/dart/fidl",
@@ -23,11 +26,9 @@ dart_library("fuchsia") {
     "media.dart",
     "services.dart",
     "src/fakes/fuchsia_fakes.dart",
-    "src/services/connect_to_service.dart",
+    "src/services/service_connection.dart",
     "src/services/service_provider_impl.dart",
     "src/services/startup_context.dart",
-    "testing/stub_async_proxy_controller.dart",
-    "testing/stub_service_provider.dart",
   ]
 
   deps = library_deps
@@ -36,9 +37,20 @@ dart_library("fuchsia") {
 dart_test("fuchsia_package_unittests") {
 
   sources = [
-    "services/connect_to_service_test.dart",
+    "services/service_connection_test.dart",
     "services/service_provider_impl_test.dart",
     "services/startup_context_test.dart",
+  ]
+
+  deps = library_deps + [
+    ":fuchsia",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}
+
+dart_fuchsia_test("fuchsia_package_integration_tests") {
+  sources = [
+    "services/component_context_test.dart",
   ]
 
   deps = library_deps + [

@@ -37,7 +37,7 @@ class ServiceProviderImpl implements fidl.ServiceProvider {
 
   /// See [fidl.ServiceProvider#connectToService].
   @override
-  Future<Null> connectToService(String serviceName, Channel channel) async {
+  Future<void> connectToService(String serviceName, Channel channel) async {
     final connectorThunk = _connectorThunks[serviceName];
     if (connectorThunk != null) {
       connectorThunk(channel);

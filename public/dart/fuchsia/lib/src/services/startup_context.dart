@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async';
 
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl;
 import 'package:meta/meta.dart';
@@ -71,16 +70,11 @@ class StartupContext {
 
     final Handle environmentHandle = MxStartupInfo.takeEnvironment();
     if (environmentHandle != null) {
-      environmentProxy.ctrl
-          .bind(InterfaceHandle<fidl.Environment>(Channel(environmentHandle)));
-
-      Future.wait([
-        environmentProxy.getLauncher(launcherProxy.ctrl.request()),
-        environmentProxy.getServices(environmentServicesProxy.ctrl.request())
-      ]).catchError((err, stackTrace) {
-        //log.severe(...); // need to port logger over before we can call this
-        throw err;
-      });
+      environmentProxy
+       ..ctrl
+          .bind(InterfaceHandle<fidl.Environment>(Channel(environmentHandle)))
+        ..getLauncher(launcherProxy.ctrl.request())
+        ..getServices(environmentServicesProxy.ctrl.request());
     }
 
     final Handle outgoingServicesHandle = MxStartupInfo.takeOutgoingServices();
