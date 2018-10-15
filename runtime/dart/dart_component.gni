@@ -1,0 +1,521 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/package.gni")
+import("//build/tools/json_merge/json_merge.gni")
+import("//peridot/build/module_manifest.gni")
+import("//third_party/dart/build/dart/dart_action.gni")
+import("//topaz/runtime/dart/config.gni")
+import("//topaz/runtime/dart/dart_kernel.gni")
+
+declare_args() {
+  flutter_default_app = "flutter_jit_app"
+}
+
+declare_args() {
+  # Controls whether dart_app() targets generate JIT or AOT Dart snapshots.
+  # This defaults to JIT, use `fx set <ARCH> --args
+  # 'dart_default_app="dart_aot_app"' to switch to AOT.
+  dart_default_app = "dart_jit_app"
+}
+
+declare_args() {
+  # When AOT compiling, an app will reference objects in the sharing basis's
+  # snapshot when available instead of writing the objects in its own snapshot.
+  # The snapshot of the sharing basis app will be included in every other app's
+  # package and deduplicated by blobfs.
+  if (flutter_default_app == "flutter_jit_app") {
+    # Armadillo is not AOT compiled in debug builds
+    flutter_aot_sharing_basis = ""
+  } else {
+    flutter_aot_sharing_basis = "//topaz/bin/user_shell/armadillo_user_shell"
+  }
+
+  # Enable profiling and tracing. Default is true in Debug builds and false
+  # in release builds.
+  if (is_debug) {
+    flutter_profile = true
+  } else {
+    flutter_profile = false
+  }
+}
+
+declare_args() {
+  # When AOT compiling, an app will reference objects in the sharing basis's
+  # snapshot when available instead of writing the objects in its own snapshot.
+  # The snapshot of the sharing basis app will be included in every other app's
+  # package and deduplicated by blobfs.
+  if (dart_default_app == "dart_jit_app") {
+    # module_suggester is not AOT compiled in debug builds
+    dart_aot_sharing_basis = ""
+  } else {
+    dart_aot_sharing_basis =
+        "//topaz/app/maxwell/agents/module_suggester_dart:module_suggester"
+  }
+}
+
+# In product mode, we force all Flutter apps to use a specific runtime mode.
+# Currently, we force them all to use JIT, but we might switch to DBC in the
+# future.
+flutter_product_app = "flutter_dart_jit_component"
+
+flutter_base = "//third_party/dart-pkg/git/flutter"
+flutter_tools_label =
+    "$flutter_base/packages/flutter_tools:fuchsia_builder($host_toolchain)"
+flutter_tools_out_dir = get_label_info(flutter_tools_label, "root_out_dir")
+flutter_tools_bin = "$flutter_tools_out_dir/dart-tools/fuchsia_builder"
+
+flutter_asset_tools_label = "$flutter_base/packages/flutter_tools:fuchsia_asset_builder($host_toolchain)"
+flutter_asset_tools_out_dir =
+    get_label_info(flutter_asset_tools_label, "root_out_dir")
+flutter_asset_tools_bin =
+    "$flutter_asset_tools_out_dir/dart-tools/fuchsia_asset_builder"
+
+# In product mode, we force all Dart apps to use a specific runtime mode.
+# Currently, we force them all to use JIT, but we might switch to DBC in the
+# future.
+dart_product_app = "flutter_dart_jit_component"
+
+# Defines a Flutter package with JIT runtime components
+#
+# After Flutter JIT runtime components are calculated in
+# flutter_dart_jit_component, put them all into one Fuchsia package.
+#
+# Parameters
+#
+#   components_with_kernel (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the components_with_kernel list:
+#
+#       kernel_target_name (required)
+#         Name of the kernel target.
+#
+#       kernel_manifest (required)
+#         Manifest file for the dart kernel.
+#
+#       deps (required)
+#         Dependencies of this component.
+#
+#       sources (required)
+#         Source files of this component.
+#
+#       component_resources (required)
+#         Resources of this component.
+#
+#       component_copy_manifest (required)
+#         Copy of the module manifest of this component.
+#
+#       component_verify_manifest (required)
+#         Verify target of the module manifest of this component.
+template("_flutter_dart_jit_package") {
+  package(target_name) {
+    forward_variables_from(invoker,
+                       [
+                         "testonly",
+                         "tests",
+                       ])
+    package_name = invoker.pkg_name
+    deps = invoker.cmx_deps
+    extra = []
+    public_deps = []
+
+    foreach(component, invoker.components_with_kernel) {
+      deps += [ ":${component.kernel_target_name}" ]
+      deps += component.deps
+      extra += [ component.kernel_manifest ]
+
+
+      if (component.component_type == "flutter") {
+        extra += [ component.asset_manifest ]
+
+        # TODO(rmacnak): Remove core_jit_cheat_target.
+        public_deps += [
+          ":${component.kernel_target_name}",
+        ]
+
+        deps += [ ":${component.component_resources}" ]
+        if (defined(invoker.module_manifest)) {
+          deps += [
+            ":${component.component_copy_manifest}",
+            ":${component.component_verify_manifest}",
+          ]
+        }
+      }
+    }
+
+    if (defined(invoker.non_dart_deps)) {
+      deps += invoker.non_dart_deps
+    }
+
+    resources = []
+    if (defined(invoker.resources)) {
+      resources += invoker.resources
+    }
+    if (defined(invoker.invoker_resources)) {
+      resources += invoker.invoker_resources
+    }
+
+    if (defined(invoker.interpreter) && invoker.interpreter) {
+      resources += [
+          {
+            path = rebase_path("//topaz/runtime/dart/enable_interpreter")
+            dest = "enable_interpreter"
+          }
+      ]
+    }
+
+    meta = invoker.cmx_filtered_meta
+
+    # TODO(CP-140): Support module_manifest per component.
+    if (defined(invoker.module_manifest)) {
+      meta += [
+        {
+          path = rebase_path(invoker.module_manifest)
+          dest = "module.json"
+        },
+      ]
+    }
+  }
+}
+
+template("_flutter_jit_asset_manifest") {
+  action("${target_name}_resources") {
+    script = "//topaz/runtime/flutter_runner/build/asset_package.py"
+
+    args = [
+      "--flutter-root",
+      rebase_path(flutter_base),
+      "--flutter-tools",
+      rebase_path(flutter_asset_tools_bin),
+      "--asset-dir",
+      rebase_path("$target_gen_dir/build"),
+      "--app-dir",
+      rebase_path("."),
+      "--packages",
+      rebase_path(invoker.dot_packages),
+      "--asset-manifest-out",
+      rebase_path(invoker.asset_manifest),
+      "--component-name",
+      invoker.component_name,
+    ]
+
+    if (defined(invoker.manifest)) {
+      args += [
+        "--manifest",
+        rebase_path(invoker.manifest),
+      ]
+    }
+
+    deps = [
+      ":${invoker.dart_library_target_name}",
+      flutter_asset_tools_label,
+    ]
+
+    outputs = [
+      invoker.asset_manifest,
+    ]
+  }
+}
+
+# Defines JIT runtime components to be further distributed in one package.
+#
+# Takes a set of flutter components and puts them into one fuchsia package with
+# the flutter_jit_runner as its runtime. Also supports legacy calls where the
+# components parameter isn't specified, in which we will create one default
+# component for the package.
+#
+# Parameters
+#
+#   components (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the resources list:
+#
+#       component_name (required)
+#         Name of the component.
+#
+#       main_dart (required)
+#         File containing the main function of the component.
+#
+#   main_dart (required)
+#     File containing the main function of the application. Either main_dart or
+#     components must be defined, but not both.
+template("flutter_dart_jit_component") {
+  pkg_name = invoker.pkg_name
+  legacy_component = invoker.legacy_component
+  components = []
+  components += invoker.components
+
+  if (defined(invoker.flutter_driver_extendable)) {
+    flutter_driver_extendable = invoker.flutter_driver_extendable
+  } else {
+    flutter_driver_extendable = false
+  }
+
+  package_meta = []
+  if (defined(invoker.meta)) {
+    package_meta = invoker.meta
+  }
+  # Inject appropriate "runner" into Component manifests
+  cmx_filtered_meta = []
+  cmx_deps = []
+
+  # Build the kernel for each of the components, and bundle them in the same
+  # scope for later packaging.
+  components_with_kernel = []
+  foreach(component, components) {
+    assert(defined(component.main_dart), "Must specify main_dart file")
+
+    if (component.component_type == "flutter") {
+      product = !flutter_profile
+      if (defined(invoker.product)) {
+        product = invoker.product
+      }
+      if (dart_force_product) {
+        product = true
+      }
+
+      gen_bytecode = false
+      interpreter = false
+      if (defined(invoker.space_dart) && invoker.space_dart) {
+        gen_bytecode = true
+        interpreter = true
+      }
+
+      product_suffix = ""
+      if (product) {
+        product_suffix = "_product"
+      }
+
+      dbc = false
+      runtime_meta = "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime"
+    } else if (component.component_type == "dart") {
+      product = !is_debug
+      if (defined(invoker.product)) {
+        product = invoker.product
+      }
+
+      if (dart_force_product) {
+        product = true
+      }
+
+      product_suffix = ""
+      if (product) {
+        product_suffix = "_product"
+      }
+
+      dbc = false
+      if (defined(invoker.dbc) && invoker.dbc) {
+        dbc = true
+      }
+      runner_name = "jit"
+      if (dbc) {
+        runner_name = "dbc"
+      }
+      runtime_meta = "//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime"
+    }
+
+    # Look through the package meta for cmx file for this component, and merge
+    # in the runner.
+    foreach(item, package_meta) {
+      dest = item.path
+      if (defined(item.dest)) {
+        dest = item.dest
+      }
+      if (get_path_info(dest, "file") == "${component.component_name}.cmx") {
+        merged = "merged_" + get_path_info(dest, "file")
+        json_merge(merged) {
+          sources = [
+            item.path,
+            rebase_path(runtime_meta),
+          ]
+        }
+        merged_outputs = []
+        merged_outputs += get_target_outputs(":$merged")
+        item.path = merged_outputs[0]
+        cmx_deps += [ ":$merged" ]
+        cmx_filtered_meta += [ item ]
+      }
+    }
+
+    component_name = component.component_name
+    if (legacy_component) {
+      kernel_name = target_name
+    } else {
+      kernel_name = component_name
+    }
+    kernel_target_name = kernel_name + "_kernel"
+    kernel_manifest = "$target_gen_dir/${kernel_target_name}.dilpmanifest"
+
+
+    if (component.component_type == "flutter") {
+      dart_library_target_name = "${kernel_name}_dart_library"
+      dart_target_gen_dir =
+          get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
+      dot_packages = "$dart_target_gen_dir/$dart_library_target_name.packages"
+    }
+
+    if (flutter_driver_extendable) {
+      generated_extension_wrapper = "$dart_target_gen_dir/${kernel_name}__extension_wrapper.dart"
+      generated_extension_wrapper_main_dart = component.main_dart
+
+      action("${kernel_name}_extensions_wrapper") {
+        script = "//topaz/runtime/flutter_runner/build/gen_debug_wrapper_main.py"
+        args = [
+          "--main-dart=" + rebase_path(generated_extension_wrapper_main_dart, dart_target_gen_dir),
+          "--out=" + rebase_path(generated_extension_wrapper),
+        ]
+
+        outputs = [
+          generated_extension_wrapper,
+        ]
+      }
+    }
+
+    dart_kernel(kernel_name) {
+      if (component.component_type == "flutter") {
+        platform_name = "flutter_runner"
+        platform_deps =
+            [ "//topaz/runtime/flutter_runner/kernel:kernel_platform_files" ]
+        platform_path = "$root_out_dir/flutter_runner_patched_sdk"
+      } else if (component.component_type == "dart") {
+        platform_name = "dart_runner"
+        platform_deps =
+            [ "//topaz/runtime/dart_runner/kernel:kernel_platform_files" ]
+        platform_path = "$root_out_dir/dart_runner_patched_sdk"
+      }
+
+      # TODO(CP-140): These variables should be from the component
+      forward_variables_from(invoker,
+                             [
+                               "disable_analysis",
+                               "gen_bytecode",
+                               "source_dir",
+                               "package_name",
+                             ])
+      deps = component.deps
+      sources = component.sources
+
+      if (flutter_driver_extendable) {
+        main_dart = generated_extension_wrapper
+      } else {
+        main_dart = component.main_dart
+      }
+      manifest = kernel_manifest
+      args = [
+        "--component-name",
+        component_name,
+      ]
+
+      # TODO(CP-140): Should be forwarded from the component.
+      non_dart_deps = []
+      if (defined(invoker.non_dart_deps)) {
+        non_dart_deps = invoker.non_dart_deps
+      }
+
+      if (flutter_driver_extendable) {
+        deps += [
+          "//garnet/public/fidl/fuchsia.testing.runner",
+          "//peridot/public/fidl/fuchsia.modular",
+          "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
+          "//topaz/public/lib/app/dart",
+          "//topaz/public/lib/module/dart",
+        ]
+
+        non_dart_deps += [
+          ":${kernel_name}_extensions_wrapper($target_toolchain)",
+        ]
+      }
+
+      if (dbc) {
+        args += [
+          "--gen-bytecode",
+          "--drop-ast",
+        ]
+      }
+    }
+
+    if (component.component_type == "flutter") {
+      asset_manifest = "$target_gen_dir/build/${kernel_name}_pkgassets"
+
+      _flutter_jit_asset_manifest(kernel_name) {
+        forward_variables_from(invoker, ["manifest", "component_name", "asset_manifest", "dart_library_target_name", "dot_packages"])
+      }
+
+      # The module manifest verify & copy targets.
+      if (defined(invoker.module_manifest)) {
+        verify_module_manifest("${kernel_name}_verify_manifest") {
+          original_target_name = kernel_name
+          module_manifest = invoker.module_manifest
+        }
+        copy_module_manifest("${kernel_name}_copy_manifest") {
+          package_name = kernel_name
+          module_manifest = rebase_path(invoker.module_manifest)
+        }
+      }
+
+      components_with_kernel += [
+        {
+          component_type = component.component_type
+          kernel_target_name = kernel_target_name
+          kernel_manifest = kernel_manifest
+          asset_manifest = asset_manifest
+          deps = component.deps
+          sources = component.sources
+          component_resources = "${kernel_name}_resources"
+          component_copy_manifest = "${kernel_name}_copy_manifest"
+          component_verify_manifest = "${kernel_name}_verify_manifest"
+        }
+      ]
+    } else if (component.component_type == "dart") {
+      components_with_kernel += [
+        {
+          component_type = component.component_type
+          kernel_target_name = kernel_target_name
+          kernel_manifest = kernel_manifest
+          deps = component.deps
+          sources = component.sources
+        }
+      ]
+    }
+  }
+
+  invoker_resources = []
+  if (defined(invoker.resources)) {
+    invoker_resources += invoker.resources
+  }
+
+  found_cmx = false
+  foreach(item, package_meta) {
+    dest = item.path
+    if (defined(item.dest)) {
+      dest = item.dest
+    }
+    if (get_path_info(dest, "extension") == "cmx") {
+      found_cmx = true
+    } else {
+      cmx_filtered_meta += [ item ]
+    }
+  }
+
+  if (!found_cmx) {
+    # No cmx to inject to. Inject the runner aspect as a dangling deprecated_runtime.
+    # CP-129: deprecate cmx-less components, then delete this.
+    cmx_filtered_meta += [
+      {
+        path = rebase_path(runtime_meta)
+        dest = "deprecated_runtime"
+      },
+    ]
+  }
+
+  # We have all components and their kernels generated now. We call package() to
+  # put everything into a fuchsia package, merging deps, extra, meta etc.
+  _flutter_dart_jit_package(target_name) {
+    forward_variables_from(invoker, "*")
+  }
+}
