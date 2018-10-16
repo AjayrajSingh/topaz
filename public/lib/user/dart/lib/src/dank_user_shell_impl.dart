@@ -6,21 +6,24 @@ import 'package:fuchsia/fuchsia.dart' as fuchsia;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:fidl/fidl.dart';
+import 'package:lib.app.dart/app.dart';
 
 /// Called when [UserShell.initialize] occurs.
 typedef OnDankUserShellReady = void Function(UserShellContext userShellContext);
 
-/// Implements a [UserShell].
-/// This is a lightweight version that passes the [UserShellContextProxy]
-/// through the [onReady] callback.
+/// This is a lightweight class that acquires a [UserShellContextProxy]
+/// and passes it to the [onReady] callback. It also implements other
+/// lifecycle and focus watcher functionality.
 class DankUserShellImpl
     implements
-        UserShell,
         UserShellPresentationProvider,
         FocusWatcher,
         Lifecycle {
   /// Constructor.
-  DankUserShellImpl({this.onReady});
+  DankUserShellImpl({startupContext, this.onReady}) {
+    connectToService(startupContext.environmentServices, _userShellContextProxy.ctrl);
+    _initialize();
+  }
 
   /// Binding for the actual UserShell interface object.
   final _userShellContextProxy = UserShellContextProxy();
@@ -39,10 +42,8 @@ class DankUserShellImpl
 
   String _lastFocusedStoryId;
 
-  @override
-  void initialize(InterfaceHandle<UserShellContext> userShellContextHandle) {
+  void _initialize() {
     if (onReady != null) {
-      _userShellContextProxy.ctrl.bind(userShellContextHandle);
       _userShellContextProxy
           .getFocusProvider(_focusProviderProxy.ctrl.request());
       _focusProviderProxy.watch(_focusWatcherBinding.wrap(this));

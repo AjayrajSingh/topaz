@@ -20,9 +20,6 @@ class DankUserShellWidget extends StatelessWidget {
   /// The [StartupContext] to [advertise] its [UserShell] services to.
   final StartupContext _startupContext;
 
-  /// The binding for the [UserShell] service implemented by [UserShellImpl].
-  final UserShellBinding _userShellBinding;
-
   /// The binding for the [Lifecycle] service implemented by [UserShellImpl].
   final LifecycleBinding _lifecycleBinding;
 
@@ -50,7 +47,6 @@ class DankUserShellWidget extends StatelessWidget {
       startupContext: startupContext,
       child: child,
       onReady: onReady,
-      userShellBinding: new UserShellBinding(),
       lifecycleBinding: new LifecycleBinding(),
       presentationProviderBindings:
           new _UserShellPresentationProviderBindings(),
@@ -59,16 +55,15 @@ class DankUserShellWidget extends StatelessWidget {
 
   DankUserShellWidget._create({
     StartupContext startupContext,
-    UserShellBinding userShellBinding,
     LifecycleBinding lifecycleBinding,
     _UserShellPresentationProviderBindings presentationProviderBindings,
     this.child,
     this.onReady,
   })  : _startupContext = startupContext,
-        _userShellBinding = userShellBinding,
         _lifecycleBinding = lifecycleBinding,
         _presentationProviderBindings = presentationProviderBindings,
         _userShell = new DankUserShellImpl(
+          startupContext: startupContext,
           onReady: (UserShellContext userShellContext) {
             onReady?.call(userShellContext);
           },
@@ -81,11 +76,6 @@ class DankUserShellWidget extends StatelessWidget {
   /// the [StartupContext].
   void advertise() {
     _startupContext.outgoingServices
-      ..addServiceForName(
-        (InterfaceRequest<UserShell> request) =>
-            _userShellBinding.bind(_userShell, request),
-        UserShell.$serviceName,
-      )
       ..addServiceForName(
         (InterfaceRequest<Lifecycle> request) =>
             _lifecycleBinding.bind(_userShell, request),
