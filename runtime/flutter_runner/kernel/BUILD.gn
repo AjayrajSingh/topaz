@@ -45,16 +45,12 @@ template("core_snapshot") {
           "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
       deps += [ ":kernel_platform_files" ]
       compilation_trace = "//topaz/runtime/flutter_runner/compilation_trace.txt"
-      # TODO(zra): When JIT mode with and without the interpreter enabled can
-      # use the same core-jit snapshot, change this to core-jit.
-      snapshot_kind = "core"
     } else {
       # TODO(rmacnak): Remove core_jit_cheat_target.
       platform_dill = get_label_info(core_jit_cheat_target, "target_gen_dir") + "/" +
                       get_label_info(core_jit_cheat_target, "name") + "_kernel.dil"
       deps += [ core_jit_cheat_target ]
       compilation_trace = core_jit_cheat_trace
-      snapshot_kind = "core-jit"
     }
 
     inputs = [
@@ -80,12 +76,14 @@ template("core_snapshot") {
       script = gen_snapshot
     }
     args = [
+      # TODO(zra): remove this when the interpreter supports field guards.
+      "--no_use_field_guards",
       # TODO(FL-117): Re-enable causal async stack traces when this issue is
       # addressed.
       "--no_causal_async_stacks",
       "--enable_mirrors=false",
       "--deterministic",
-      "--snapshot_kind=$snapshot_kind",
+      "--snapshot_kind=core-jit",
       "--load_compilation_trace=" + rebase_path(compilation_trace, root_build_dir),
       "--vm_snapshot_data=" + rebase_path(vm_snapshot_data, root_build_dir),
       "--vm_snapshot_instructions=" +

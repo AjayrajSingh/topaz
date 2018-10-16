@@ -196,6 +196,7 @@ Application::Application(
     settings_.dart_flags.push_back("--enable_interpreter");
   } else {
     FML_DLOG(INFO) << "Did NOT find pkg/data/enable_interpreter.";
+    settings_.dart_flags.push_back("--no_use_field_guards");
   }
 
   AttemptVMLaunchWithCurrentSettings(settings_);
