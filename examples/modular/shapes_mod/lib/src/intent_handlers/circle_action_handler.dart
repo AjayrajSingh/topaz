@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:modular/module.dart';
+import 'package:fuchsia_modular/module.dart';
 
 class CircleActionHandler {
   void handleIntent(Intent intent) {

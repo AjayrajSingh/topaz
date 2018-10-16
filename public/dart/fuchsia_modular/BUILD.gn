@@ -6,8 +6,8 @@ import("//build/dart/dart_library.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 import("//build/dart/dart_fuchsia_test.gni")
 
-dart_library("modular") {
-  package_name = "modular"
+dart_library("fuchsia_modular") {
+  package_name = "fuchsia_modular"
 
   sdk_category = "partner"
 
@@ -43,8 +43,8 @@ dart_library("modular") {
 }
 
 # Runs these tests using:
-#   fx run-host-tests modular_package_unittests
-dart_test("modular_package_unittests") {
+#   fx run-host-tests fuchsia_modular_package_unittests
+dart_test("fuchsia_modular_package_unittests") {
 
   sources = [
     "lifecycle/lifecycle_test.dart",
@@ -58,7 +58,7 @@ dart_test("modular_package_unittests") {
   ]
 
   deps = [
-    ":modular",
+    ":fuchsia_modular",
     "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",
   ]
@@ -69,8 +69,8 @@ dart_test("modular_package_unittests") {
 # Start a qemu emulator (using a real device is also possible):
 #  fx run -kN  (tip: to terminate the emulator press "ctrl+a x")
 # Run integration tests:
-#  fx shell runtests pkgfs/packages/modular_package_integration_tests/0/test
-dart_fuchsia_test("modular_package_integration_tests") {
+#  fx shell runtests pkgfs/packages/fuchsia_modular_package_integration_tests/0/test
+dart_fuchsia_test("fuchsia_modular_package_integration_tests") {
 
   sources = [
     "lifecycle/lifecycle_impl_test.dart",
@@ -78,7 +78,7 @@ dart_fuchsia_test("modular_package_integration_tests") {
   ]
 
   deps = [
-    ":modular",
+    ":fuchsia_modular",
     "//third_party/dart-pkg/pub/mockito", # Remove after DX-470 is fixed
     "//third_party/dart-pkg/pub/test",
   ]

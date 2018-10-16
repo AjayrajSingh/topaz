@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
-import 'package:modular/src/module/intent.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/intent.dart'; // ignore: implementation_imports
 import 'package:test/test.dart';
 
 import '../matchers.dart';

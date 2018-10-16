@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:modular/module.dart';
+import 'package:fuchsia_modular/module.dart';
 
 import 'circle_action_handler.dart';
 import 'square_action_handler.dart';

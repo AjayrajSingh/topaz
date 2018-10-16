@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
-import 'package:modular/lifecycle.dart';
+import 'package:fuchsia_modular/lifecycle.dart';
 
 import '_fidl_transformers.dart';
 import 'intent.dart';

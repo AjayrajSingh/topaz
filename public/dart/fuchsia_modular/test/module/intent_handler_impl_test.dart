@@ -6,8 +6,8 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
 import 'package:test/test.dart';
 
-import 'package:modular/src/module/_intent_handler_impl.dart'; // ignore: implementation_imports
-import 'package:modular/src/module/intent.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/_intent_handler_impl.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/intent.dart'; // ignore: implementation_imports
 
 void main() {
   group('intent handler impl', () {

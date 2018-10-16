@@ -4,12 +4,10 @@
 
 import 'package:test/test.dart';
 
-import 'package:modular/src/module/module.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/lifecycle/lifecycle.dart'; // ignore: implementation_imports
 
 void main() {
-  group('module tests', () {
-    test('factory returns same instance', () {
-      expect(Module(), Module());
-    });
+  test('factory should return same instance', () {
+    expect(Lifecycle(), Lifecycle());
   });
 }

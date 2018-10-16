@@ -6,7 +6,7 @@ import 'dart:async';
 
 import 'package:fuchsia/services.dart';
 import 'package:meta/meta.dart';
-import 'package:modular/lifecycle.dart';
+import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 
 import '_intent_handler_impl.dart';

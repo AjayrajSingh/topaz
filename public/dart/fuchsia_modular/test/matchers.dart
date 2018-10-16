@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
-import 'package:modular/src/module/intent_parameter.dart';
-import 'package:modular/src/module/module_state_exception.dart';
+import 'package:fuchsia_modular/src/module/intent_parameter.dart';
+import 'package:fuchsia_modular/src/module/module_state_exception.dart';
 import 'package:test/test.dart';
 
 /// A matcher which matches on the IntentParameter type.

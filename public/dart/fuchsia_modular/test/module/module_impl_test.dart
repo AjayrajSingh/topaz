@@ -4,15 +4,15 @@
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
-import 'package:modular/lifecycle.dart';
+import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import 'package:modular/src/module/_intent_handler_impl.dart'; // ignore: implementation_imports
-import 'package:modular/src/module/_module_impl.dart'; // ignore: implementation_imports
-import 'package:modular/src/module/intent.dart'; // ignore: implementation_imports
-import 'package:modular/src/module/intent_handler.dart'; // ignore: implementation_imports
-import 'package:modular/src/module/noop_intent_handler.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/_intent_handler_impl.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/_module_impl.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/intent.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/intent_handler.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/noop_intent_handler.dart'; // ignore: implementation_imports
 
 const fidl.Intent _emptyIntent = fidl.Intent(
   action: '',

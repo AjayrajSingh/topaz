@@ -4,8 +4,8 @@
 
 import 'package:test/test.dart';
 
-import 'package:modular/src/module/intent.dart'; // ignore: implementation_imports
-import 'package:modular/src/module/noop_intent_handler.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/intent.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/noop_intent_handler.dart'; // ignore: implementation_imports
 
 void main() {
   group('no-op intent handler', () {
