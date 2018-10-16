@@ -12,6 +12,7 @@ dart_app("documents_content_provider") {
   ]
 
   deps = [
+    "//garnet/public/fidl/fuchsia.auth",
     "//peridot/public/fidl/fuchsia.modular",
     "//topaz/app/documents/services:services",
     "//topaz/public/dart/entity_schemas:entity_schemas",

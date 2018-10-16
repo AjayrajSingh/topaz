@@ -5,8 +5,8 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_auth/fidl.dart';
 import 'package:fidl_fuchsia_documents/fidl.dart' as doc_fidl;
-import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.agent.dart/agent.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
@@ -33,7 +33,7 @@ class DocumentsAgent extends AgentImpl {
     StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
-    TokenProvider tokenProvider,
+    TokenManager tokenManager,
     ServiceProviderImpl outgoingServices,
   ) async {
     log.fine('onReady fired');

@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:home_work_agent/home_work_proposer.dart';
 import 'package:lib.widgets/modular.dart';

@@ -16,6 +16,7 @@ dart_app("xi_session_agent") {
   main_dart = "lib/main.dart"
 
   deps = [
+    "//garnet/public/fidl/fuchsia.auth",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/agent/dart",

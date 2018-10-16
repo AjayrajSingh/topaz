@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_auth/fidl.dart';
 import 'package:fidl_fuchsia_contacts_contentprovider/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.agent.dart/agent.dart';
@@ -56,7 +57,7 @@ class ContactsContentProviderAgent extends AgentImpl {
     StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
-    TokenProvider tokenProvider,
+    TokenManager tokenManager,
     ServiceProviderImpl outgoingServices,
   ) async {
     log.fine('onReady start');

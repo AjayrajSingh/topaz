@@ -6,14 +6,14 @@ import 'dart:async';
 
 import 'package:fuchsia/fuchsia.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:fidl_fuchsia_auth/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_modular_auth/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl/fidl.dart';
 import 'package:meta/meta.dart';
 
 export 'package:fidl_fuchsia_modular/fidl.dart';
-export 'package:fidl_fuchsia_modular_auth/fidl.dart';
+export 'package:fidl_fuchsia_auth/fidl.dart' show TokenManager;
 
 /// A base class for implementing an [Agent] which receives common services and
 /// also helps exposing services through an outgoing [ServiceProvider].
@@ -24,7 +24,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
 
   final AgentContextProxy _agentContext = new AgentContextProxy();
   final ComponentContextProxy _componentContext = new ComponentContextProxy();
-  final TokenProviderProxy _tokenProvider = new TokenProviderProxy();
+  final TokenManagerProxy _tokenManager = new TokenManagerProxy();
 
   final ServiceProviderImpl _outgoingServicesImpl = new ServiceProviderImpl();
   final List<ServiceProviderBinding> _outgoingServicesBindings =
@@ -39,13 +39,13 @@ abstract class AgentImpl implements Agent, Lifecycle {
     connectToService(_startupContext.environmentServices, _agentContext.ctrl);
     _agentContext
       ..getComponentContext(_componentContext.ctrl.request())
-      ..getTokenProvider(_tokenProvider.ctrl.request());
+      ..getTokenManager(_tokenManager.ctrl.request());
 
     onReady(
       _startupContext,
       _agentContext,
       _componentContext,
-      _tokenProvider,
+      _tokenManager,
       _outgoingServicesImpl,
     ).catchError((e) => throw e).whenComplete(_readyCompleter.complete);
   }
@@ -73,7 +73,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
   void terminate() {
     _agentBinding.close();
     onStop().catchError((e) => throw e).whenComplete(() {
-      _tokenProvider.ctrl.close();
+      _tokenManager.ctrl.close();
       _componentContext.ctrl.close();
       _agentContext.ctrl.close();
       _lifecycleBinding.close();
@@ -111,7 +111,7 @@ abstract class AgentImpl implements Agent, Lifecycle {
     StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
-    TokenProvider tokenProvider,
+    TokenManager tokenManager,
     ServiceProviderImpl outgoingServices,
   ) async =>
       null;

@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:lib.app.dart/app.dart';
+import 'package:fidl_fuchsia_auth/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.agent.dart/agent.dart';
 import 'package:meta/meta.dart';
@@ -30,7 +31,7 @@ class HomeWorkAgent extends AgentImpl {
     StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
-    TokenProvider tokenProvider,
+    TokenManager tokenManager,
     ServiceProviderImpl outgoingServices,
   ) async {
     agentContext.getIntelligenceServices(_intelligenceServices.ctrl.request());

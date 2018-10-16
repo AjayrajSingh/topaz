@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_auth/fidl.dart';
 import 'package:fidl_fuchsia_xi_session/fidl.dart' as fidl_xi_session;
 
 import 'package:lib.app.dart/app.dart';
@@ -38,11 +39,12 @@ class XiSessionAgent extends AgentImpl {
 
   @override
   Future<Null> onReady(
-      StartupContext startupContext,
-      AgentContext agentContext,
-      ComponentContext componentContext,
-      TokenProvider tokenProvider,
-      ServiceProviderImpl outgoingServices) async {
+    StartupContext startupContext,
+    AgentContext agentContext,
+    ComponentContext componentContext,
+    TokenManager tokenManager,
+    ServiceProviderImpl outgoingServices,
+  ) async {
     outgoingServices.addServiceForName(
       (InterfaceRequest<fidl_xi_session.XiSessionManager> request) {
         log.info('got request $request');

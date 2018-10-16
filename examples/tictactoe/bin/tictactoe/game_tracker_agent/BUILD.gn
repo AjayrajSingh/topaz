@@ -13,6 +13,7 @@ dart_app("game_tracker_agent") {
   ]
 
   deps = [
+    "//garnet/public/fidl/fuchsia.auth",
     "//peridot/public/fidl/fuchsia.modular",
     "//topaz/examples/tictactoe/lib/tictactoe/common",
     "//topaz/examples/tictactoe/public/fidl/tictactoe:game_tracker_service",

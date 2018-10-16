@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_auth/fidl_async.dart';
 import 'package:fidl_fuchsia_tictactoe/fidl_async.dart';
 import 'package:lib.agent.dart/agent_async.dart';
 import 'package:lib.app.dart/app_async.dart';
@@ -24,7 +25,7 @@ class GameTrackerAgent extends AgentImpl {
     StartupContext startupContext,
     AgentContext agentContext,
     ComponentContext componentContext,
-    TokenProvider tokenProvider,
+    TokenManager tokenManager,
     ServiceProviderImpl outgoingServices,
   ) async {
     // Adds this agent's service to the outgoingServices so that it can accessed

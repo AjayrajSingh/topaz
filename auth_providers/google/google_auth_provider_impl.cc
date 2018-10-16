@@ -353,10 +353,13 @@ void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
   if (status != AuthProviderStatus::OK || !auth_code.empty()) {
     // Also, de-register previously registered error callbacks since calling
     // StopOverlay() might cause this connection to be closed.
+    FXL_LOG(INFO) << "Received auth code: " << auth_code;
     auth_ui_context_.set_error_handler(nullptr);
+    FXL_LOG(INFO) << "Calling stop overlay..";
     auth_ui_context_->StopOverlay();
 
     if (status != AuthProviderStatus::OK) {
+      FXL_LOG(INFO) << "Encountered error while fetching auth code..";
       get_persistent_credential_callback_(status, nullptr, nullptr);
     } else if (!auth_code.empty()) {
       ExchangeAuthCode(auth_code);
@@ -567,7 +570,9 @@ ViewOwnerPtr GoogleAuthProviderImpl::SetupChromium() {
 void GoogleAuthProviderImpl::ReleaseResources() {
   // Close any open view
   if (auth_ui_context_) {
+    FXL_LOG(INFO) << "Releasing auth UI context..";
     auth_ui_context_.set_error_handler(nullptr);
+    FXL_LOG(INFO) << " Inside ReleaseResources: Stopping overlay";
     auth_ui_context_->StopOverlay();
     auth_ui_context_ = nullptr;
   }
