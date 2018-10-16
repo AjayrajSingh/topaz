@@ -26,6 +26,7 @@ dart_library("fuchsia") {
     "media.dart",
     "services.dart",
     "src/fakes/fuchsia_fakes.dart",
+    "src/services/component_context.dart",
     "src/services/service_connection.dart",
     "src/services/service_provider_impl.dart",
     "src/services/startup_context.dart",
