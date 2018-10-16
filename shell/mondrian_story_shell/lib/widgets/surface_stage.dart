@@ -42,14 +42,18 @@ class SurfaceStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List children = <Widget>[]
-      ..addAll(
+    // If there is only one surface, do not fight for horizontal gestures,
+    // assume User Shell will handle story dismissal.
+    final useGestures = forms.flatten().length > 1;
+
+    final children = <Widget>[]..addAll(
         forms
             .reduceForest(
               (SurfaceForm f, Iterable<_SurfaceInstance> children) =>
                   new _SurfaceInstance(
                     form: f,
                     dependents: children.toList(),
+                    useGestures: useGestures,
                   ),
             )
             .toList()
@@ -57,14 +61,16 @@ class SurfaceStage extends StatelessWidget {
                 (_SurfaceInstance a, _SurfaceInstance b) =>
                     b.form.depth.compareTo(a.form.depth),
               ),
-      )
+      );
+
+    if (useGestures) {
       // We add ignoring unidirectional horizontal drag detectors on the
       // edges so the ones added by the surfaces along the edges have
       // something to fight in the gesture arena (otherwise they always win
       // and accept gestures in the wrong direction).  This prevents drags
       // toward the edges of the screen from moving or dismissing the
       // associated surfaces.
-      ..addAll([
+      children.addAll(<Widget>[
         new Positioned(
           left: -_kGestureWidth,
           top: _kGestureWidth,
@@ -80,6 +86,7 @@ class SurfaceStage extends StatelessWidget {
           child: _createIgnoringGestureDetector(Direction.right),
         ),
       ]);
+    }
     return new Stack(
       fit: StackFit.expand,
       children: children,
@@ -106,6 +113,7 @@ class _SurfaceInstance extends StatefulWidget {
     @required this.form,
     this.isDebugMode = false,
     this.dependents = const <_SurfaceInstance>[],
+    this.useGestures,
   }) : super(key: form.key);
 
   /// The form of this Surface
@@ -115,6 +123,8 @@ class _SurfaceInstance extends StatefulWidget {
   final List<_SurfaceInstance> dependents;
 
   final bool isDebugMode;
+
+  final bool useGestures;
 
   @override
   _SurfaceInstanceState createState() => new _SurfaceInstanceState();
@@ -207,21 +217,24 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
                 depth,
                 fractionalOffset.dy.abs(),
               );
-        return new Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            new Positioned(
-              left: left,
-              top: top,
-              bottom: bottom,
-              right: right,
-              child: new SurfaceFrame(
-                child: form.parts.keys.first,
-                depth: surfaceDepth,
-                // HACK(alangardner): May need explicit interactable parameter
-                interactable: form.dragFriction != kDragFrictionInfinite,
-              ),
+
+        final stackChildren = <Widget>[
+          new Positioned(
+            left: left,
+            top: top,
+            bottom: bottom,
+            right: right,
+            child: new SurfaceFrame(
+              child: form.parts.keys.first,
+              depth: surfaceDepth,
+              // HACK(alangardner): May need explicit interactable parameter
+              interactable: form.dragFriction != kDragFrictionInfinite,
             ),
+          )
+        ];
+
+        if (widget.useGestures) {
+          stackChildren.addAll([
             new Positioned(
               left: left - _kGestureWidth,
               top: top + _kGestureWidth,
@@ -244,7 +257,11 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
                 Direction.left,
               ),
             ),
-          ]..addAll(widget.dependents),
+          ]);
+        }
+        return new Stack(
+          fit: StackFit.expand,
+          children: stackChildren..addAll(widget.dependents),
         );
       },
     );
