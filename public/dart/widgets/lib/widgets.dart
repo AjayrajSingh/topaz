@@ -11,6 +11,7 @@ export 'src/widgets/alphatar.dart';
 export 'src/widgets/conditional_builder.dart';
 export 'src/widgets/fuchsia_spinner.dart';
 export 'src/widgets/future_widget.dart';
+export 'src/widgets/lottie_player.dart';
 export 'src/widgets/mondrian_spinner.dart';
 export 'src/widgets/rk4_spring_simulation.dart';
 export 'src/widgets/screen_container.dart';

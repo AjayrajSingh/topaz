@@ -26,6 +26,7 @@
         "topaz/packages/prod/mondrian",
         "topaz/packages/prod/oauth_token_manager",
         "topaz/packages/prod/perspective",
+        "topaz/packages/prod/skottie_viewer",
         "topaz/packages/prod/spotify_auth_provider",
         "topaz/packages/prod/system_dashboard",
         "topaz/packages/prod/sysui",
