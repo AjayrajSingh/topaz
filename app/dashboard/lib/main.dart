@@ -121,13 +121,8 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
       'web_view',
     ],
     const <String>[
-      'jiri-x64-linux',
-      'x64-linux',
       'jiri',
-    ],
-    const <String>[
-      'jiri-x64-mac',
-      'x64-mac',
+      'jiri',
       'jiri',
     ],
   ],
