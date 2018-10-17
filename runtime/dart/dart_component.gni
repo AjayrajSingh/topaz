@@ -346,6 +346,9 @@ template("flutter_dart_jit_component") {
     }
 
     component_name = component.component_name
+    # TODO(CP-142): Should be renamed to component_root
+    package_root = component.package_root
+
     if (legacy_component) {
       kernel_name = target_name
     } else {
@@ -445,7 +448,13 @@ template("flutter_dart_jit_component") {
       asset_manifest = "$target_gen_dir/build/${kernel_name}_pkgassets"
 
       _flutter_jit_asset_manifest(kernel_name) {
-        forward_variables_from(invoker, ["manifest", "component_name", "asset_manifest", "dart_library_target_name", "dot_packages"])
+        forward_variables_from(invoker, [
+            "manifest",
+            "component_name",
+            "asset_manifest",
+            "dart_library_target_name",
+            "dot_packages"
+        ])
       }
 
       # The module manifest verify & copy targets.
@@ -738,6 +747,9 @@ template("flutter_dart_aot_component") {
     }
 
     component_name = component.component_name
+    # TODO(CP-142): Should be renamed to component_root
+    package_root = component.package_root
+
     if (legacy_component) {
       kernel_name = target_name
     } else {

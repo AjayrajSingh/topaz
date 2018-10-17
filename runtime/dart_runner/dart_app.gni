@@ -34,6 +34,7 @@ template("_dart_jit_component") {
         main_dart = invoker.main_dart
         component_name = legacy_component_name
         component_type = "dart"
+        package_root = "."
         deps = invoker.deps
         sources = pkg_sources
       }
@@ -70,6 +71,7 @@ template("_dart_aot_component") {
         main_dart = invoker.main_dart
         component_name = legacy_component_name
         component_type = "dart"
+        package_root = "."
         deps = invoker.deps
         sources = pkg_sources
       }

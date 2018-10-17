@@ -55,6 +55,7 @@ template("dart_kernel") {
     forward_variables_from(invoker,
                            [
                              "deps",
+                             "package_root",
                              "disable_analysis",
                              "non_dart_deps",
                              "source_dir",

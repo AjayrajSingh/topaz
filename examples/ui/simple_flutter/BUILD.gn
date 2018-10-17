@@ -9,6 +9,7 @@ flutter_app("simple_flutter") {
     {
       component_name = "simple_flutter"
       component_type = "flutter"
+      package_root = "."
       main_dart = "lib/main.dart"
       sources = []
       deps = [
@@ -23,6 +24,7 @@ flutter_app("simple_flutter") {
     {
       component_name = "leaf_flutter"
       component_type = "flutter"
+      package_root = "."
       main_dart = "lib/leaf.dart"
       sources = [
         "leaf.dart",
