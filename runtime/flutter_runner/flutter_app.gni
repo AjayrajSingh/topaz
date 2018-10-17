@@ -208,3 +208,44 @@ template("flutter_app") {
     forward_variables_from(invoker, "*", [ "aot" ])
   }
 }
+
+# Defines multiple Flutter/Dart applications in one fuchsia package
+#
+# Parameters
+#
+#   components (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the resources list:
+#
+#       component_name (required)
+#         Name of the component.
+#
+#       main_dart (required)
+#         File containing the main function of the component.
+#
+template("flutter_dart_apps") {
+  assert((defined(invoker.components) && !defined(invoker.main_dart)),
+         "components must be defined. Use main_dart under components instead.")
+
+  pkg_name = target_name
+  legacy_component = false
+  if (flutter_default_app == "flutter_jit_app") {
+    template_name = "flutter_dart_jit_component"
+    if (dart_force_product) {
+      template_name = flutter_product_app
+    }
+    target(template_name, target_name) {
+      forward_variables_from(invoker, "*", [ "aot" ])
+    }
+  } else {
+    template_name = "flutter_dart_aot_component"
+    if (dart_force_product) {
+      template_name = flutter_product_app
+    }
+    target(template_name, target_name) {
+      forward_variables_from(invoker, "*", [ "aot", "space_dart" ])
+    }
+  }
+}
