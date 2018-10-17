@@ -45,37 +45,10 @@ template("_dart_jit_component") {
   }
 }
 
-# Defines a Dart package with AOT runtime components
-#
-# Takes a set of dart components and puts them into one fuchsia package with
-# the dart_aot_runner as its runtime. Also supports legacy calls where the
-# components parameter isn't specified, in which we will create one default
-# component for the package.
-#
-# Parameters
-#
-#   components (required)
-#     [list of scopes] Defines the components in the package. Either main_dart
-#     or components must be defined, but not both.
-#
-#     Entries in a scope in the resources list:
-#
-#       component_name (required)
-#         Name of the component.
-#
-#       main_dart (required)
-#         File containing the main function of the component.
-#
-#   main_dart (required)
-#     File containing the main function of the application. Either main_dart or
-#     components must be defined, but not both.
-template("_dart_aot_package") {
+template("_dart_aot_component") {
   legacy_component = false
   pkg_name = target_name
-  components = []
-  if (defined(invoker.components)) {
-    components += invoker.components
-  } else {
+  if (!defined(invoker.components)) {
     # If components is not specified, we are fitting main_dart into a component
     # scope, and using that for the package.
     #
@@ -92,280 +65,19 @@ template("_dart_aot_package") {
     if (defined(invoker.sources)) {
       pkg_sources = invoker.sources
     }
-    components += [
+    components = [
       {
         main_dart = invoker.main_dart
         component_name = legacy_component_name
+        component_type = "dart"
         deps = invoker.deps
         sources = pkg_sources
       }
     ]
   }
 
-  # Build the kernel for each of the components, and bundle them in the same
-  # scope for later packaging.
-  components_with_kernel = []
-  foreach(component, components) {
-    assert(defined(component.main_dart), "Must specify main_dart file")
-
-    product = !is_debug
-    if (defined(invoker.product)) {
-      product = invoker.product
-    }
-
-    product_suffix = ""
-    if (product) {
-      product_suffix = "_product"
-    }
-
-    if (dart_force_product) {
-      product = true
-    }
-
-    component_name = component.component_name
-    if (legacy_component) {
-      kernel_name = target_name
-    } else {
-      kernel_name = component_name
-    }
-    kernel_target_name = kernel_name + "_kernel"
-    kernel_path = "$target_gen_dir/${kernel_target_name}.dil"
-
-    dart_kernel(kernel_name) {
-      platform_name = "dart_runner"
-      platform_deps =
-          [ "//topaz/runtime/dart_runner/kernel:kernel_platform_files" ]
-      platform_path = "$root_out_dir/dart_runner_patched_sdk"
-
-      forward_variables_from(invoker,
-                             [
-                               "disable_analysis",
-                               "non_dart_deps",
-                               "source_dir",
-                               "package_name",
-                             ])
-      deps = component.deps
-      sources = component.sources
-
-      main_dart = component.main_dart
-      args = [ "--aot", "--tfa" ]
-    }
-
-
-    # TODO(rmacnak): VM snapshot is ignored. Allow skipping its generation.
-    vm_snapshot_data_path = "$target_gen_dir/${kernel_name}_vm_data.aotsnapshot"
-    vm_snapshot_instructions_path =
-        "$target_gen_dir/${kernel_name}_vm_instructions.aotsnapshot"
-    snapshot_data_path = "$target_gen_dir/${kernel_name}_data.aotsnapshot"
-    snapshot_instructions_path =
-        "$target_gen_dir/${kernel_name}_instructions.aotsnapshot"
-    snapshot_target_name = kernel_name + "_snapshot"
-
-    if (dart_aot_sharing_basis != "" &&
-        get_label_info(":$kernel_name", "label_no_toolchain") !=
-        get_label_info(dart_aot_sharing_basis, "label_no_toolchain")) {
-      # Note: The use of "label_no_toolchain" is to ensure we are comparing fully
-      # qualified target names. We don't actually care about the toolchain.
-      shared_snapshot_deps = []
-      shared_snapshot_deps =
-          [ get_label_info(dart_aot_sharing_basis, "label_no_toolchain") +
-            "_snapshot" ]
-      prefix = get_label_info(dart_aot_sharing_basis, "target_gen_dir") + "/" +
-               get_label_info(dart_aot_sharing_basis, "name")
-      shared_snapshot_data_path = "${prefix}_data.aotsnapshot"
-      shared_snapshot_instructions_path = "${prefix}_instructions.aotsnapshot"
-    } else {
-      shared_snapshot_deps = []
-      shared_snapshot_data_path = "//topaz/runtime/dart_runner/empty"
-      shared_snapshot_instructions_path = "//topaz/runtime/dart_runner/empty"
-    }
-
-    stats_target_name = "${kernel_name}_stats"
-    stats_json_path = "$target_gen_dir/${kernel_name}/stats/symbol_sizes.json"
-    stats_html_dir = "$target_gen_dir/${kernel_name}/stats"
-
-    action(snapshot_target_name) {
-      if (defined(invoker.testonly)) {
-        testonly = invoker.testonly
-      }
-
-      deps = gen_snapshot_deps + shared_snapshot_deps + [ ":$kernel_target_name" ]
-      inputs = [
-                 shared_snapshot_data_path,
-                 shared_snapshot_instructions_path,
-                 kernel_path,
-               ]
-      outputs = [
-        vm_snapshot_data_path,
-        vm_snapshot_instructions_path,
-        snapshot_data_path,
-        snapshot_instructions_path,
-        stats_json_path,
-      ]
-
-      if (product) {
-        script = gen_snapshot_product
-      } else {
-        script = gen_snapshot
-      }
-
-      args = [
-        "--deterministic",
-        "--snapshot_kind=app-aot-blobs",
-        "--vm_snapshot_data=" + rebase_path(vm_snapshot_data_path),
-        "--vm_snapshot_instructions=" +
-            rebase_path(vm_snapshot_instructions_path),
-        "--isolate_snapshot_data=" + rebase_path(snapshot_data_path),
-        "--isolate_snapshot_instructions=" +
-            rebase_path(snapshot_instructions_path),
-        "--shared_data=" + rebase_path(shared_snapshot_data_path),
-        "--shared_instructions=" + rebase_path(shared_snapshot_instructions_path),
-        "--print-instructions-sizes-to=" + rebase_path(stats_json_path),
-      ]
-      if (is_debug && !product) {
-        args += [ "--enable_asserts" ]
-      }
-      args += [ rebase_path(kernel_path) ]
-
-      pool = "//build/dart:dart_pool($dart_toolchain)"
-    }
-
-    dart_action(stats_target_name) {
-      if (defined(invoker.testonly)) {
-        testonly = invoker.testonly
-      }
-
-      deps = [
-        ":$snapshot_target_name",
-      ]
-      script = "//third_party/dart/pkg/vm/bin/run_binary_size_analysis.dart"
-      inputs = [
-        stats_json_path,
-      ]
-      outputs = [
-        "$stats_html_dir/index.html",
-      ]
-      args = [
-        rebase_path(stats_json_path),
-        rebase_path(stats_html_dir),
-      ]
-    }
-
-    components_with_kernel += [
-      {
-        kernel_target_name = kernel_target_name
-        component_name = component_name
-
-        snapshot_target_name = snapshot_target_name
-        stats_target_name = stats_target_name
-        snapshot_data_path = snapshot_data_path
-        snapshot_instructions_path = snapshot_instructions_path
-        shared_snapshot_data_path = shared_snapshot_data_path
-        shared_snapshot_instructions_path = shared_snapshot_instructions_path
-
-        component_shared_snapshot_deps = shared_snapshot_deps
-        deps = component.deps
-        sources = component.sources
-      }
-    ]
-  }
-
-  # If a component manifest exists, merge in the runtime portion of the
-  # manifest. If it doesn't exist, drop in the deprecated_runtime file.
-  package_meta = []
-  if (defined(invoker.meta)) {
-    package_meta = invoker.meta
-  }
-
-  # Inject appropriate "runner" into Component manifests
-  cmx_filtered_meta = []
-  cmx_deps = []
-  found_cmx = false
-  foreach(item, package_meta) {
-    dest = item.path
-    if (defined(item.dest)) {
-      dest = item.dest
-    }
-    if (get_path_info(dest, "extension") == "cmx") {
-      found_cmx = true
-      merged = "merged_" + get_path_info(dest, "file")
-      json_merge(merged) {
-        sources = [
-          item.path,
-          rebase_path(
-              "//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime"),
-        ]
-      }
-      merged_outputs = []
-      merged_outputs = get_target_outputs(":$merged")
-      item.path = merged_outputs[0]
-      cmx_deps += [ ":$merged" ]
-    }
-    cmx_filtered_meta += [ item ]
-  }
-
-  if (!found_cmx) {
-    # No cmx to inject to. Inject the runner aspect as a dangling deprecated_runtime.
-    # CP-129: deprecate cmx-less components, then delete this.
-    cmx_filtered_meta += [
-      {
-        path = rebase_path(
-                "//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime")
-        dest = "deprecated_runtime"
-      },
-    ]
-  }
-
-  # We have all components and their kernels generated now. We call package() to
-  # put everything into a fuchsia package, merging deps, extra, meta etc.
-  package(target_name) {
-    forward_variables_from(invoker,
-                           [
-                             "testonly",
-                             "tests",
-                           ])
-
-    package_name = pkg_name
-
-    non_dart_deps = []
-    if (defined(invoker.non_dart_deps)) {
-      non_dart_deps = invoker.non_dart_deps
-    }
-    deps = non_dart_deps + cmx_deps
-    resources = []
-
-    foreach(component, components_with_kernel) {
-      deps += [
-             ":${component.snapshot_target_name}",
-             ":${component.stats_target_name}",
-           ] + component.component_shared_snapshot_deps + component.deps
-
-      resources_path = "${component.component_name}/"
-      resources += [
-        {
-          path = rebase_path(component.snapshot_data_path)
-          dest = "${resources_path}isolate_snapshot_data.bin"
-        },
-        {
-          path = rebase_path(component.snapshot_instructions_path)
-          dest = "${resources_path}isolate_snapshot_instructions.bin"
-        },
-        {
-          path = rebase_path(component.shared_snapshot_data_path)
-          dest = "${resources_path}shared_snapshot_data.bin"
-        },
-        {
-          path = rebase_path(component.shared_snapshot_instructions_path)
-          dest = "${resources_path}shared_snapshot_instructions.bin"
-        },
-      ]
-    }
-
-    if (defined(invoker.resources)) {
-      resources += invoker.resources
-    }
-
-    meta = cmx_filtered_meta
+  flutter_dart_aot_component(target_name) {
+    forward_variables_from(invoker, "*")
   }
 }
 
@@ -381,7 +93,7 @@ template("dart_jit_app") {
 }
 
 template("dart_aot_app") {
-  template_name = "_dart_aot_package"
+  template_name = "_dart_aot_component"
   if (dart_force_product) {
     template_name = dart_product_app
   }
