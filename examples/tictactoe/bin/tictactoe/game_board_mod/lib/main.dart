@@ -84,8 +84,8 @@ Future<void> _proposeScore(ModuleDriver moduleDriver) async {
 
   final Intent intent = Intent(handler: scoreBoardModUrl);
 
-  final AddModule addModule = AddModule(
-    moduleName: 'ScoreBoard',
+  final AddMod addMod = AddMod(
+    modName: ['ScoreBoard'],
     surfaceRelation: const SurfaceRelation(
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
@@ -94,7 +94,7 @@ Future<void> _proposeScore(ModuleDriver moduleDriver) async {
     intent: intent,
     // This parameter is the parent module. In our case, it would be
     // game board mod. We would use 'root' to denote that.
-    surfaceParentModulePath: ['root'],
+    surfaceParentModName: ['root'],
   );
 
   final proposalBuilder =
@@ -102,7 +102,7 @@ Future<void> _proposeScore(ModuleDriver moduleDriver) async {
         ..storyName = storyId
         ..color = suggestionColor
         ..addStoryAffinity(storyId)
-        ..addAction(Action.withAddModule(addModule));
+        ..addStoryCommand(StoryCommand.withAddMod(addMod));
 
   final intelligenceServices =
       await moduleDriver.moduleContext.getIntelligenceServices();

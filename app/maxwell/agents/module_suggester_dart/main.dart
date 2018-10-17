@@ -672,10 +672,10 @@ Future<Proposal> _createProposal({
     ..imageUrl = imageUrl
     ..imageType = imageType
     ..annoyanceType = annoyanceType
-    ..addAction(Action.withAddModule(new AddModule(
+    ..addStoryCommand(StoryCommand.withAddMod(new AddMod(
       intent: intentBuilder.intent,
-      moduleName: 'root',
-      surfaceParentModulePath: [],
+      modName: ['root'],
+      surfaceParentModName: [],
       surfaceRelation: const SurfaceRelation(),
     )));
 

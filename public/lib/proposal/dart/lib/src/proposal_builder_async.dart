@@ -28,16 +28,16 @@ class ProposalBuilder {
         assert(headline != null && headline.isNotEmpty),
         _id = id;
 
-  /// The actions that will be executed if the proposal is accepted.
-  List<Action> actions = [];
+  /// The commands that will be executed if the proposal is accepted.
+  List<StoryCommand> commands = [];
 
   /// The affinities to stories and/or modules the proposal can have.
   List<ProposalAffinity> affinities = [];
 
-  /// Adds an action to the proposal.
-  void addAction(Action action) => actions.add(action);
+  /// Adds an command to the proposal.
+  void addStoryCommand(StoryCommand command) => commands.add(command);
 
-  /// Adds an action to the proposal.
+  /// Adds an affinity to the proposal.
   void addStoryAffinity(String storyName) {
     final StoryAffinity storyAffinity = StoryAffinity(
       storyName: storyName,
@@ -111,7 +111,7 @@ class ProposalBuilder {
     return Proposal(
         id: _id,
         storyName: storyName,
-        onSelected: actions,
+        onSelected: commands,
         affinity: affinities,
         confidence: confidence,
         display: SuggestionDisplay(

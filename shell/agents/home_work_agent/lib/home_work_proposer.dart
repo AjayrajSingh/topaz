@@ -366,16 +366,16 @@ class _QueryHandlerImpl extends QueryHandler {
       headline: 'Launch everything',
     )
       ..color = 0xFFFF0080
-      ..actions = askProposals
-          .map((Map<String, String> proposal) => new Action.withAddModule(
-                new AddModule(
+      ..commands = askProposals
+          .map((Map<String, String> proposal) => new StoryCommand.withAddMod(
+                new AddMod(
                   intent:
                       (new IntentBuilder.handler(proposal['module_url'] ?? '')
                             ..addParameter(null, proposal['module_data']))
                           .intent,
-                  moduleName: 'root',
+                  modName: ['root'],
                   surfaceRelation: const SurfaceRelation(),
-                  surfaceParentModulePath: [],
+                  surfaceParentModName: [],
                 ),
               ))
           .toList();
@@ -401,14 +401,12 @@ Future<Proposal> _createProposal(Map<String, String> proposal) async {
     ..imageType = 'person' == proposal['type']
         ? SuggestionImageType.person
         : SuggestionImageType.other
-    ..actions = <Action>[
-      Action.withAddModule(new AddModule(
-        intent: intentBuilder.intent,
-        moduleName: 'root',
-        surfaceRelation: null,
-        surfaceParentModulePath: [],
-      ))
-    ];
+    ..addStoryCommand(new StoryCommand.withAddMod(new AddMod(
+      intent: intentBuilder.intent,
+      modName: ['root'],
+      surfaceRelation: null,
+      surfaceParentModName: [],
+    )));
 
   return proposalBuilder.build();
 }
@@ -432,11 +430,11 @@ Future<Proposal> _createAppProposal({
     ..imageUrl = imageUrl
     ..imageType = imageType
     ..annoyanceType = annoyanceType
-    ..addAction(new Action.withAddModule(new AddModule(
+    ..addStoryCommand(new StoryCommand.withAddMod(new AddMod(
       intent: (new IntentBuilder.handler(appUrl)).intent,
-      moduleName: 'root',
+      modName: ['root'],
       surfaceRelation: null,
-      surfaceParentModulePath: [],
+      surfaceParentModName: [],
     )));
   return proposalBuilder.build();
 }

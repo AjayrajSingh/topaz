@@ -38,7 +38,7 @@ class WallpaperChooser {
   /// Called when different wallpaper is chosen.
   final ValueChanged<List<String>> onWallpaperChosen;
 
-  _CustomAction _customAction;
+  _ProposalListener _proposalListener;
 
   /// Constructor.
   WallpaperChooser({this.onWallpaperChosen});
@@ -50,7 +50,7 @@ class WallpaperChooser {
     IntelligenceServices intelligenceServices,
     Link link,
   ) {
-    _customAction = new _CustomAction(
+    _proposalListener = new _ProposalListener(
       storyProvider: storyProvider,
       linkProxy: _changeWallpaperLink,
       focusProvider: focusProvider,
@@ -69,7 +69,7 @@ class WallpaperChooser {
 
     _proposer.start(
       intelligenceServices: intelligenceServices,
-      customAction: _customAction,
+      proposalListener: _proposalListener,
     );
   }
 
@@ -86,7 +86,7 @@ class WallpaperChooser {
 
   /// Closes any open handles.
   void stop() {
-    _customAction.stop();
+    _proposalListener.stop();
     _proposer.stop();
     _changeWallpaperLink.ctrl.close();
   }
@@ -98,9 +98,10 @@ class _Proposer {
 
   void start({
     IntelligenceServices intelligenceServices,
-    CustomAction customAction,
+    ProposalListener proposalListener,
   }) {
-    _queryHandlerImpl = new _QueryHandlerImpl(customAction: customAction);
+    _queryHandlerImpl =
+        new _QueryHandlerImpl(proposalListener: proposalListener);
     intelligenceServices.registerQueryHandler(
       _queryHandlerBinding.wrap(_queryHandlerImpl),
     );
@@ -113,11 +114,12 @@ class _Proposer {
 }
 
 class _QueryHandlerImpl extends QueryHandler {
-  final Set<CustomActionBinding> _bindings = new Set<CustomActionBinding>();
+  final Set<ProposalListenerBinding> _bindings =
+      new Set<ProposalListenerBinding>();
 
-  final CustomAction customAction;
+  final ProposalListener proposalListener;
 
-  _QueryHandlerImpl({this.customAction});
+  _QueryHandlerImpl({this.proposalListener});
 
   @override
   Future<Null> onQuery(
@@ -129,7 +131,7 @@ class _QueryHandlerImpl extends QueryHandler {
     if ((query.text?.toLowerCase()?.startsWith('wal') ?? false) ||
         (query.text?.toLowerCase()?.contains('wallpaper') ?? false) ||
         (query.text?.toLowerCase()?.contains('change') ?? false)) {
-      CustomActionBinding binding = new CustomActionBinding();
+      ProposalListenerBinding binding = new ProposalListenerBinding();
       _bindings.add(binding);
       proposals.add(await (ProposalBuilder(
         id: _kChooseWallpaperSuggestionHeadline,
@@ -137,7 +139,7 @@ class _QueryHandlerImpl extends QueryHandler {
       )
             ..color = _kChooseWallpaperSuggestionColor
             ..imageUrl = _kChooseWallpaperSuggestionImageUrl
-            ..addAction(Action.withCustomAction(binding.wrap(customAction))))
+            ..listener = binding.wrap(proposalListener))
           .build());
     }
 
@@ -145,13 +147,13 @@ class _QueryHandlerImpl extends QueryHandler {
   }
 
   void stop() {
-    for (CustomActionBinding binding in _bindings) {
+    for (ProposalListenerBinding binding in _bindings) {
       binding.close();
     }
   }
 }
 
-class _CustomAction extends CustomAction {
+class _ProposalListener extends ProposalListener {
   final StoryProvider storyProvider;
   final FocusProvider focusProvider;
   final LinkProxy linkProxy;
@@ -160,7 +162,7 @@ class _CustomAction extends CustomAction {
   LinkWatcherBinding _linkWatcherBinding;
   dynamic _lastDecodedJson;
 
-  _CustomAction({
+  _ProposalListener({
     this.storyProvider,
     this.focusProvider,
     this.linkProxy,
@@ -168,7 +170,7 @@ class _CustomAction extends CustomAction {
   });
 
   @override
-  void execute() {
+  void onProposalAccepted(String proposalId, String preloadedStoryId) {
     stop();
 
     storyProvider.createStoryWithInfo(

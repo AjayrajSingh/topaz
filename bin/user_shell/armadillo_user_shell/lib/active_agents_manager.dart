@@ -26,7 +26,7 @@ class ActiveAgentsManager {
   final AgentProviderWatcherBinding _agentProviderWatcherBinding =
       new AgentProviderWatcherBinding();
 
-  _CustomAction _customAction;
+  _ProposalListener _proposalListener;
 
   /// Starts listening for active agent changes and begins proposing the agent
   /// module be run.
@@ -41,7 +41,7 @@ class ActiveAgentsManager {
       _agentProviderWatcherBinding.wrap(_agentProviderWatcherImpl),
     );
 
-    _customAction = new _CustomAction(
+    _proposalListener = new _ProposalListener(
       storyProvider: storyProvider,
       agentProviderWatcherImpl: _agentProviderWatcherImpl,
       focusProvider: focusProvider,
@@ -49,13 +49,13 @@ class ActiveAgentsManager {
 
     _activeAgentProposer.start(
       intelligenceServices: intelligenceServices,
-      customAction: _customAction,
+      proposalListener: _proposalListener,
     );
   }
 
   /// Closes any open handles.
   void stop() {
-    _customAction.stop();
+    _proposalListener.stop();
     _activeAgentProposer.stop();
     _agentProviderWatcherBinding.close();
     _agentProvider.ctrl.close();
@@ -91,10 +91,10 @@ class _ActiveAgentProposer {
 
   void start({
     IntelligenceServices intelligenceServices,
-    CustomAction customAction,
+    ProposalListener proposalListener,
   }) {
     _queryHandlerImpl = new _QueryHandlerImpl(
-      customAction: customAction,
+      proposalListener: proposalListener,
     );
     intelligenceServices.registerQueryHandler(
       _queryHandlerBinding.wrap(
@@ -110,11 +110,12 @@ class _ActiveAgentProposer {
 }
 
 class _QueryHandlerImpl extends QueryHandler {
-  final Set<CustomActionBinding> _bindings = new Set<CustomActionBinding>();
+  final Set<ProposalListenerBinding> _bindings =
+      new Set<ProposalListenerBinding>();
 
-  final CustomAction customAction;
+  final ProposalListener proposalListener;
 
-  _QueryHandlerImpl({this.customAction});
+  _QueryHandlerImpl({this.proposalListener});
 
   @override
   Future<Null> onQuery(
@@ -125,7 +126,7 @@ class _QueryHandlerImpl extends QueryHandler {
         (query.text?.toLowerCase()?.startsWith('age') ?? false) ||
         (query.text?.toLowerCase()?.contains('agent') ?? false) ||
         (query.text?.toLowerCase()?.contains('active') ?? false)) {
-      CustomActionBinding binding = new CustomActionBinding();
+      ProposalListenerBinding binding = new ProposalListenerBinding();
       _bindings.add(binding);
       proposals.add(await (ProposalBuilder(
         id: 'View Active Agents',
@@ -133,33 +134,33 @@ class _QueryHandlerImpl extends QueryHandler {
       )
             ..color = 0xFFA5A700
             ..addIconUrl('/system/data/sysui/AgentIcon.png')
-            ..addAction(Action.withCustomAction(binding.wrap(customAction))))
+            ..listener = binding.wrap(proposalListener))
           .build());
     }
     callback(new QueryResponse(proposals: proposals));
   }
 
   void stop() {
-    for (CustomActionBinding binding in _bindings) {
+    for (ProposalListenerBinding binding in _bindings) {
       binding.close();
     }
   }
 }
 
-class _CustomAction extends CustomAction {
+class _ProposalListener extends ProposalListener {
   final StoryProvider storyProvider;
   final FocusProvider focusProvider;
   final _AgentProviderWatcherImpl agentProviderWatcherImpl;
   StoryControllerProxy storyControllerProxy;
 
-  _CustomAction({
+  _ProposalListener({
     this.storyProvider,
     this.focusProvider,
     this.agentProviderWatcherImpl,
   });
 
   @override
-  void execute() {
+  void onProposalAccepted(String proposalId, String preloadedStoryId) {
     stop();
 
     storyProvider.createStoryWithInfo(
