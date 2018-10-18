@@ -183,11 +183,6 @@ class BaseDeviceShellModel extends DeviceShellModel
       return;
     }
 
-    // Internet is needed to log in unless the user is a guest.
-    if (accountId != null) {
-      await waitForInternetConnection();
-    }
-
     trace('logging in $accountId');
     logger.startTimer(
       _kUserShellLoginTimeMetricId,
