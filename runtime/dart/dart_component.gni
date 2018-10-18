@@ -39,6 +39,9 @@ declare_args() {
   } else {
     flutter_profile = false
   }
+
+  # Whether experimental space dart mode is enabled for Flutter applications.
+  flutter_space_dart = false
 }
 
 declare_args() {
@@ -280,7 +283,8 @@ template("flutter_dart_jit_component") {
 
       gen_bytecode = false
       interpreter = false
-      if (defined(invoker.space_dart) && invoker.space_dart) {
+      if ((defined(invoker.space_dart) && invoker.space_dart) ||
+          flutter_space_dart) {
         gen_bytecode = true
         interpreter = true
       }
