@@ -1,6 +1,6 @@
 # Topaz Integration Tests
 
-The topaz integration tests use the device runner to launch a module, then run a
+The topaz integration tests use the basemgr to launch a module, then run a
 test against said module.
 
 ## Adding Tests

@@ -7,7 +7,7 @@ set -o errexit
 
 # In the event of previous failures from other scripts or other components using
 # the GPU, ensure that all components using the display have been shut down.
-killall device_runner* || true
+killall basemgr* || true
 killall root_presenter* || true
 killall scenic* || true
 

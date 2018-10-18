@@ -7,13 +7,13 @@ set -o errexit
 
 # In the event of previous failures from other scripts or other components using
 # the GPU, ensure that all components using the display have been shut down.
-killall device_runner* || true
+killall basemgr* || true
 killall root_presenter* || true
 killall scenic* || true
 
 # TODO(bgoldman): Create a separate test instead of driver_example_mod_target_tests
 run_test \
-  device_runner --test --enable_presenter \
+  basemgr --test --enable_presenter \
   --account_provider=dev_token_manager \
   --device_shell=dev_device_shell \
   --device_shell_args=--test_timeout_ms=3600000 \

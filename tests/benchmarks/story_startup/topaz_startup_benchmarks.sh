@@ -15,7 +15,7 @@
 bench() {
     MODULE=$1
     BENCHMARK=$2
-    COMMAND="run device_runner --test --enable_presenter --account_provider=dev_token_manager "`
+    COMMAND="run basemgr --test --enable_presenter --account_provider=dev_token_manager "`
       `"--device_shell=dev_device_shell --device_shell_args=--test_timeout_ms=60000 "`
       `"--user_shell=dev_user_shell --user_shell_args=--root_module=${MODULE} --story_shell=mondrian"
 

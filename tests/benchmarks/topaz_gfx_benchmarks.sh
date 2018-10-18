@@ -122,7 +122,7 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --moment_shadow_map --clipping_enabled
 
 # choreography
-CHOREOGRAPHY_COMMAND="run device_runner --test --enable_presenter --account_provider=dev_token_manager --device_shell=dev_device_shell --device_shell_args=--test_timeout_ms=60000 --user_shell=dev_user_shell --user_shell_args=--root_module=choreography --story_shell=mondrian"
+CHOREOGRAPHY_COMMAND="run basemgr --test --enable_presenter --account_provider=dev_token_manager --device_shell=dev_device_shell --device_shell_args=--test_timeout_ms=60000 --user_shell=dev_user_shell --user_shell_args=--root_module=choreography --story_shell=mondrian"
 BENCHMARK="fuchsia.scenic.choreography_noclipping_noshadows"
 runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     "${RUN_SCENIC_BENCHMARK}"                 \

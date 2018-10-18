@@ -78,10 +78,10 @@ terminal session you can run email two different ways.
 
 Running with the full sysui
 
-    fx shell device_runner
+    fx shell basemgr
 
 Running the email story directly
 
-    fx shell "device_runner --user_shell=dev_user_shell --user_shell_args=--root_module=<target>"
+    fx shell "basemgr --user_shell=dev_user_shell --user_shell_args=--root_module=<target>"
 
 [get-started]: https://fuchsia.googlesource.com/docs/+/master/getting_started.md
