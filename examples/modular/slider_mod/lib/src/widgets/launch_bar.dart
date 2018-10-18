@@ -19,6 +19,7 @@ class LaunchBar extends StatelessWidget {
           child: Text('Launch Circle!'),
           onPressed: bloc.launchCircle,
         ),
+        Padding(padding: EdgeInsets.all(8.0)),
         RaisedButton(
           child: Text('Launch Square!'),
           onPressed: bloc.launchSquare,

@@ -29,6 +29,11 @@ void connectToAgentService<T>(
   final serviceProviderProxy = fidl_sys.ServiceProviderProxy();
   final agentControllerProxy = fidl.AgentControllerProxy();
 
+  // Creates an interface request and binds one of the channels. Binding this
+  // channel prior to connecting to the agent allows the developer to make
+  // proxy calls without awaiting for the connection to actually establish.
+  final serviceProxyRequest = serviceProxy.ctrl.request();
+
   // Connect to the agent with agentUrl
   getComponentContext()
       .connectToAgent(
@@ -38,7 +43,12 @@ void connectToAgentService<T>(
   )
       .then((_) {
     // Connect to the service
-    _connectToService(serviceProviderProxy, serviceProxy.ctrl).then((_) {
+    _connectToService(
+      serviceProviderProxy,
+      serviceProxy.ctrl.$serviceName,
+      serviceProxy.ctrl.$interfaceName,
+      serviceProxyRequest,
+    ).then((_) {
       // Close agent controller when the service proxy is closed
       serviceProxy.ctrl.whenClosed.then((_) {
         // TODO change to log.info when available
@@ -50,6 +60,11 @@ void connectToAgentService<T>(
       // Close all unnecessary bindings
       serviceProviderProxy.ctrl.close();
     });
+  }).catchError((e) {
+    serviceProviderProxy.ctrl.close();
+    agentControllerProxy.ctrl.close();
+    serviceProxyRequest.close();
+    throw e;
   });
 }
 
@@ -62,24 +77,34 @@ void connectToEnvironmentService<T>(AsyncProxy<T> serviceProxy) {
     throw Exception(
         'serviceProxy must not be null in call to connectToEnvironmentService');
   }
-
+  // Creates an interface request and binds one of the channels. Binding this
+  // channel prior to connecting to the agent allows the developer to make
+  // proxy calls without awaiting for the connection to actually establish.
+  final serviceProxyRequest = serviceProxy.ctrl.request();
+  
   _connectToService(
-      StartupContext.fromStartupInfo().environmentServices, serviceProxy.ctrl);
+    StartupContext.fromStartupInfo().environmentServices,
+    serviceProxy.ctrl.$serviceName,
+    serviceProxy.ctrl.$interfaceName,
+    serviceProxyRequest,
+  ).catchError((e) {
+    serviceProxyRequest.close();
+    throw e;
+  });
 }
 
-/// Registers the service connection specified by the [proxyServiceController] argument
-/// with the given [serviceProvider].
 Future<void> _connectToService<T>(
   fidl_sys.ServiceProvider serviceProvider,
-  AsyncProxyController<T> proxyServiceController,
+  String serviceName,
+  String interfaceName,
+  InterfaceRequest<T> interfaceRequest,
 ) async {
-  final String serviceName = proxyServiceController.$serviceName;
   if (serviceName == null) {
-    throw Exception("${proxyServiceController.$interfaceName}'s "
+    throw Exception("$interfaceName's "
         'proxyServiceController.\$serviceName must not be null. Check the FIDL '
         'file for a missing [Discoverable]');
   }
 
   return serviceProvider.connectToService(
-      serviceName, proxyServiceController.request().passChannel());
+      serviceName, interfaceRequest.passChannel());
 }

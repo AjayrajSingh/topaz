@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/dart/dart_fuchsia_test.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("slider_mod") {
@@ -10,12 +11,55 @@ flutter_app("slider_mod") {
 
   fuchsia_package_name = "slider_mod"
 
-  sources = [
+  # This creates a flutter_driver enabled binary that will enable extensions for
+  # testing when run in an environment along with TestRunner.
+  # flutter_driver_extendable = true # TODO uncomment this test after DX-625 is fixed
 
+  sources = [
+    "src/widgets/slider_scaffold.dart",
+    "src/widgets/value_slider.dart",
+    "src/widgets/launch_bar.dart",
+    "src/blocs/app_bloc.dart",
+    "src/blocs/bloc_provider.dart",
+    "src/blocs/slider_bloc.dart",
+    "src/blocs/fibonacci_bloc.dart",
+    "src/handlers/root_intent_handler.dart",
   ]
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fuchsia_modular",
+    "//topaz/examples/modular/fidl:fibonacci_service",
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/slider_mod.cmx")
+      dest = "slider_mod.cmx"
+    },
+  ]
+}
+
+# Runs these tests using:
+#   fx shell /pkgfs/packages/topaz_modular_integration_tests/0/bin/run_topaz_modular_integration_tests.sh slider_mod_tests
+dart_fuchsia_test("slider_mod_tests") {
+
+  package_only = true
+
+  sources = [
+    "slider_mod_widget_test.dart",
+  ]
+
+  deps = [
+    ":slider_mod_dart_library",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
+    "//third_party/dart-pkg/pub/test",
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/slider_mod_tests.cmx")
+      dest = "slider_mod_tests.cmx"
+    },
   ]
 }

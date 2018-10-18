@@ -10,10 +10,10 @@ import 'bloc_provider.dart';
 /// the onscreen slider.
 class SliderBloc implements BlocBase {
   final _valueController = StreamController<double>.broadcast();
-  double _lastKnownValue = 0.3;
+  double _lastKnownValue = 3.0;
 
   final double minValue = 0.0;
-  final double maxValue = 1.0;
+  final double maxValue = 10.0;
 
   Stream<double> get valueStream => _valueController.stream;
   double get currentValue => _lastKnownValue;

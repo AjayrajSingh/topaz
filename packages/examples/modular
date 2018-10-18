@@ -1,5 +1,6 @@
 {
     "packages": [
+        "//topaz/examples/modular/fibonacci_agent",
         "//topaz/examples/modular/shapes_mod",
         "//topaz/examples/modular/slider_mod"
     ]

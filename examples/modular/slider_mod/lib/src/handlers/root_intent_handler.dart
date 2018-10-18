@@ -7,7 +7,7 @@ import 'package:fuchsia_modular/module.dart';
 
 import '../blocs/app_bloc.dart';
 import '../blocs/bloc_provider.dart';
-import '../widgets/scaffold.dart';
+import '../widgets/slider_scaffold.dart';
 
 class RootIntentHandler extends IntentHandler {
   @override

@@ -1,0 +1,12 @@
+{
+    "program": {
+        "data": "data/slider_mod_tests"
+    },
+    "sandbox": {
+        "features": [
+            "deprecated-all-services",
+            "root-ssl-certificates",
+            "system-temp"
+        ]
+    }
+}

@@ -20,6 +20,12 @@ class SliderScaffold extends StatelessWidget {
             Flexible(
               child: Container(
                 color: Colors.blue,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    LaunchBar(),
+                  ],
+                ),
               ),
             ),
             Flexible(
@@ -28,7 +34,6 @@ class SliderScaffold extends StatelessWidget {
                 child: Column(
                   children: [
                     ValueSlider(),
-                    LaunchBar(),
                   ],
                 ),
               ),
