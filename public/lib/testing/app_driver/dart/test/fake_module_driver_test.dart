@@ -44,6 +44,13 @@ void main() async {
     expect(moduleDriver.start(), completion(moduleDriver));
   });
 
+  test('put() and get() put and retrieve a Link value', () {
+    moduleDriver.put(_key1, _value1, _StringCodec());
+    moduleDriver.get(_key1, _StringCodec()).then((String key) {
+      expect(key, _value1);
+    });
+  });
+
   test('test put and getTestLinkValue', () {
     moduleDriver.put(_key1, _value1, _StringCodec());
     expect(

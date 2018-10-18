@@ -96,6 +96,11 @@ class FakeModuleDriver implements ModuleDriver {
   ModuleContextClient get moduleContext => _fakeModuleContext;
 
   @override
+  Future<T> get<T>(String linkName, EntityCodec<T> codec) async {
+    return codec.decode(_linkValue[linkName]);
+  }
+
+  @override
   Stream<T> watch<T>(String key, EntityCodec<T> codec, {bool all = false}) {
     // Do not combine the next two lines or dart gets confused about types.
     // ignore: close_sinks
