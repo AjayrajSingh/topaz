@@ -116,9 +116,9 @@ class ScreenPositionModel extends SpringModel {
     /// Otherwise show.
     if (value < _resetDistance ||
         horizontalPixelsPerSecond < -_flingMinPixelsPerSecond) {
-      target = 0.0;
+      show();
     } else {
-      target = screenSize.value.width;
+      hide();
     }
     if (value != target) {
       velocity = (horizontalPixelsPerSecond / (value - target)).abs();
@@ -128,4 +128,20 @@ class ScreenPositionModel extends SpringModel {
 
   /// True if the offset indicates the screen is offscreen.
   bool get isOffscreen => offset.dx >= screenSize.value.width;
+
+  /// Causes the screen to be shown.
+  void show() {
+    target = 0.0;
+  }
+
+  /// Causes the screen to be hidden.
+  void hide() {
+    target = screenSize.value.width;
+  }
+
+  /// True if the screen is showing or in the process of showing.
+  bool get isShowing => target == 0.0;
+
+  /// True if the screen is hiding or in the process of hiding.
+  bool get isHiding => target == screenSize.value.width;
 }
