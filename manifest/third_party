@@ -16,7 +16,7 @@
              path="third_party/cairo"
              remote="https://fuchsia.googlesource.com/third_party/cairo"
              gerrithost="https://fuchsia-review.googlesource.com"
-             historydepth="5"/>
+             historydepth="50"/>
     <project name="third_party/harfbuzz"
              path="third_party/harfbuzz"
              remote="https://fuchsia.googlesource.com/third_party/harfbuzz"
@@ -36,7 +36,7 @@
              path="third_party/pixman"
              remote="https://fuchsia.googlesource.com/third_party/pixman"
              gerrithost="https://fuchsia-review.googlesource.com"
-             historydepth="5"/>
+             historydepth="50"/>
     <project name="third_party/sqlite"
              path="third_party/sqlite"
              remote="https://fuchsia.googlesource.com/third_party/sqlite"
@@ -56,6 +56,6 @@
              path="third_party/webkit"
              remote="https://fuchsia.googlesource.com/third_party/webkit"
              gerrithost="https://fuchsia-review.googlesource.com"
-             historydepth="5"/>
+             historydepth="50"/>
   </projects>
 </manifest>
