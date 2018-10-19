@@ -22,9 +22,12 @@ class StoryProviderWatcherImpl extends StoryProviderWatcher {
   StoryProviderWatcherImpl({this.onStoryChanged, this.onStoryDeleted});
 
   @override
-  void onChange(StoryInfo storyInfo,
-                StoryState storyState,
-                StoryVisibilityState storyVisibilityState) {
+  void onChange(
+    StoryInfo storyInfo,
+    StoryState storyState,
+    StoryVisibilityState storyVisibilityState,
+    bool handleBackGesture,
+  ) {
     // TODO(SY-684): Handle story visibility state changes.
     onStoryChanged?.call(storyInfo, storyState);
   }
