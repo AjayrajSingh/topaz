@@ -18,6 +18,7 @@ import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/utils.dart';
 import 'package:zircon/zircon.dart';
 
+import 'models/surface/surface.dart';
 import 'models/surface/surface_graph.dart';
 import 'models/surface/surface_properties.dart';
 
@@ -48,13 +49,24 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
       ..watchVisualState(_visualStateWatcherBinding.wrap(this))
       ..getLink(_linkProxy.ctrl.request());
     await reloadStoryState().then(onLinkContentsFetched);
-    surfaceGraph.addListener(() {
-      String surfaceId = surfaceGraph.focused?.node?.value;
-      if (surfaceId != null && surfaceId != _lastFocusedSurfaceId) {
-        _storyShellBinding.events.onSurfaceFocused(surfaceId);
-        _lastFocusedSurfaceId = surfaceId;
-      }
-    });
+    surfaceGraph
+      ..addListener(() {
+        String surfaceId = surfaceGraph.focused?.node?.value;
+        if (surfaceId != null && surfaceId != _lastFocusedSurfaceId) {
+          _storyShellBinding.events.onSurfaceFocused(surfaceId);
+          _lastFocusedSurfaceId = surfaceId;
+        }
+      })
+      ..addListener(() {
+        Surface focusedSurface = surfaceGraph.focused;
+        // Check whether the story has a dismissible surface, and so should handle
+        // the back gesture or not
+        if (focusedSurface != null) {
+          _storyShellBinding.events.onHandlingBackGesture(
+            focusedSurface.canDismiss(),
+          );
+        }
+      });
   }
 
   /// Bind an [InterfaceRequest] for a [StoryShell] interface to this object.
