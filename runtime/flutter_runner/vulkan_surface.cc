@@ -85,13 +85,17 @@ VulkanSurface::VulkanSurface(vulkan::VulkanProvider& vulkan_provider,
     return;
   }
 
+  uint64_t vmo_size;
+  zx_status_t status = exported_vmo.get_size(&vmo_size);
+  FML_DCHECK(status == ZX_OK);
+
   if (!CreateFences()) {
     FML_DLOG(INFO) << "Could not create signal fences.";
     return;
   }
 
   scenic_memory_ = std::make_unique<scenic::Memory>(
-      session, std::move(exported_vmo),
+      session, std::move(exported_vmo), vmo_size,
       fuchsia::images::MemoryType::VK_DEVICE_MEMORY);
   if (!PushSessionImageSetupOps(session)) {
     FML_DLOG(INFO) << "Could not push session image setup ops.";
