@@ -65,16 +65,18 @@ void View::Load(fuchsia::mem::Buffer payload,
   skottie::Animation::Builder builder;
   animation_ = builder.setLogger(logger).make(
       reinterpret_cast<const char*>(data.data()), data.size());
-  duration_ = animation_->duration();
-
-  fuchsia::skia::skottie::PlayerPtr player;
-  if (animation_) {
-    player_binding_.Bind(player.NewRequest());
-  }
 
   fuchsia::skia::skottie::Status status;
   status.error = logger->has_errors();
   status.message = logger->log();
+
+  fuchsia::skia::skottie::PlayerPtr player;
+  if (animation_) {
+    duration_ = animation_->duration();
+    status.duration = animation_->duration();
+    player_binding_.Bind(player.NewRequest());
+  }
+
   callback(std::move(status), player);
 }
 
