@@ -33,9 +33,20 @@ import("//topaz/runtime/dart/dart_kernel.gni")
 #       main_dart (required)
 #         File containing the main function of the component.
 #
+#       dart_package_name (optional)
+#         Name of the dart package for the component. If not provided, it will
+#         be inferred from the component name.
+#
 #   main_dart (required)
 #     File containing the main function of the application. Either main_dart or
 #     components must be defined, but not both.
+#
+#   package_name (optional)
+#     Name of the Dart package. This is used as an identifier in code that
+#     depends on the dart library that the *one and only* component generates.
+#     Only compatible when components is not specified (use
+#     components.dart_package_name).
+#
 template("_flutter_jit_component") {
   pkg_name = target_name
   legacy_component = false
@@ -93,9 +104,20 @@ template("_flutter_jit_component") {
 #       main_dart (required)
 #         File containing the main function of the component.
 #
+#       dart_package_name (optional)
+#         Name of the dart package for the component. If not provided, it will
+#         be inferred from the component name.
+#
 #   main_dart (required)
 #     File containing the main function of the application. Either main_dart or
 #     components must be defined, but not both.
+#
+#   package_name (optional)
+#     Name of the Dart package. This is used as an identifier in code that
+#     depends on the dart library that the *one and only* component generates.
+#     Only compatible when components is not specified (use
+#     components.dart_package_name).
+#
 template("_flutter_aot_component") {
   # This variable isn't needed in AOT builds.
   if (defined(invoker.flutter_driver_extendable)) {
@@ -202,6 +224,7 @@ template("flutter_aot_app") {
 #
 #       main_dart (required)
 #         File containing the main function of the component.
+#
 template("flutter_app") {
   assert((defined(invoker.components) && !defined(invoker.main_dart)) ||
          (!defined(invoker.components) && defined(invoker.main_dart)),
@@ -226,6 +249,10 @@ template("flutter_app") {
 #
 #       main_dart (required)
 #         File containing the main function of the component.
+#
+#       dart_package_name (optional)
+#         Name of the dart package for the component. If not provided, it will
+#         be inferred from the component name.
 #
 template("flutter_dart_apps") {
   assert((defined(invoker.components) && !defined(invoker.main_dart)),

@@ -26,7 +26,7 @@ _compiler_path = get_label_info(_compiler_label, "root_out_dir") + "/dart-tools/
 #    Path to Dart source file containing main().
 #
 #  package_name (optional)
-#    The name of the package. If not provided it will be inferred from the
+#    The name of the dart package. If not provided it will be inferred from the
 #    target name.
 #
 #  sources (optional)

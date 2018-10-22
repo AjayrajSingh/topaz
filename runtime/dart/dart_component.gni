@@ -243,9 +243,26 @@ template("_flutter_jit_asset_manifest") {
 #       main_dart (required)
 #         File containing the main function of the component.
 #
+#       dart_package_name (optional)
+#         Name of the dart package for the component. If not provided, it will
+#         be inferred from the component name.
+#
 #   main_dart (required)
 #     File containing the main function of the application. Either main_dart or
 #     components must be defined, but not both.
+#
+#   pkg_name (required)
+#     Name of the fuchsia package these components shall reside in.
+#
+#   legacy_component (required)
+#     True if this template is invoked with an inferred components field, for
+#     legacy calls that assume just one component per fuchsia package.
+#
+#   package_name (optional)
+#     Name of the Dart package. This is used as an identifier in code that
+#     depends on the dart library that the *one and only* component generates.
+#     Only compatible when legacy_component = true.
+#
 template("flutter_dart_jit_component") {
   pkg_name = invoker.pkg_name
   legacy_component = invoker.legacy_component
@@ -400,10 +417,14 @@ template("flutter_dart_jit_component") {
                                "disable_analysis",
                                "gen_bytecode",
                                "source_dir",
-                               "package_name",
                              ])
       deps = component.deps
       sources = component.sources
+      if (defined(component.dart_package_name)) {
+        package_name = component.dart_package_name
+      } else if (defined(invoker.package_name)) {
+        package_name = invoker.package_name
+      }
 
       if (flutter_driver_extendable) {
         main_dart = generated_extension_wrapper
@@ -674,9 +695,26 @@ template("_flutter_dart_aot_package") {
 #       main_dart (required)
 #         File containing the main function of the component.
 #
+#       dart_package_name (optional)
+#         Name of the dart package for the component. If not provided, it will
+#         be inferred from the component name.
+#
 #   main_dart (required)
 #     File containing the main function of the application. Either main_dart or
 #     components must be defined, but not both.
+#
+#   pkg_name (required)
+#     Name of the fuchsia package these components shall reside in.
+#
+#   legacy_component (required)
+#     True if this template is invoked with an inferred components field, for
+#     legacy calls that assume just one component per fuchsia package.
+#
+#   package_name (optional)
+#     Name of the Dart package. This is used as an identifier in code that
+#     depends on the dart library that the *one and only* component generates.
+#     Only compatible when legacy_component = true.
+#
 template("flutter_dart_aot_component") {
   pkg_name = invoker.pkg_name
   legacy_component = invoker.legacy_component
@@ -781,10 +819,14 @@ template("flutter_dart_aot_component") {
                                "disable_analysis",
                                "non_dart_deps",
                                "source_dir",
-                               "package_name",
                              ])
       deps = component.deps
       sources = component.sources
+      if (defined(component.dart_package_name)) {
+        package_name = component.dart_package_name
+      } else if (defined(invoker.package_name)) {
+        package_name = invoker.package_name
+      }
 
       main_dart = component.main_dart
       args = [ "--aot", "--tfa" ]

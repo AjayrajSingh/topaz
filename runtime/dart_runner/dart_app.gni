@@ -9,6 +9,41 @@ import("//topaz/runtime/dart/config.gni")
 import("//topaz/runtime/dart/dart_component.gni")
 import("//topaz/runtime/dart/dart_kernel.gni")
 
+# Defines JIT runtime components to be further distributed in one package.
+#
+# Takes a set of dart components and puts them into one fuchsia package with
+# the dart_jit_runner as its runtime. Also supports legacy calls where the
+# components parameter isn't specified, in which we will create one default
+# component for the package.
+#
+# Parameters
+#
+#   components (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the resources list:
+#
+#       component_name (required)
+#         Name of the component.
+#
+#       main_dart (required)
+#         File containing the main function of the component.
+#
+#       dart_package_name (optional)
+#         Name of the dart package for the component. If not provided, it will
+#         be inferred from the component name.
+#
+#   main_dart (required)
+#     File containing the main function of the application. Either main_dart or
+#     components must be defined, but not both.
+#
+#   package_name (optional)
+#     Name of the Dart package. This is used as an identifier in code that
+#     depends on the dart library that the *one and only* component generates.
+#     Only compatible when components is not specified (use
+#     components.dart_package_name).
+#
 template("_dart_jit_component") {
   legacy_component = false
   pkg_name = target_name
@@ -46,6 +81,41 @@ template("_dart_jit_component") {
   }
 }
 
+# Defines AOT runtime components to be further distributed in one package.
+#
+# Takes a set of dart components and puts them into one fuchsia package with
+# the dart_aot_runner as its runtime. Also supports legacy calls where the
+# components parameter isn't specified, in which we will create one default
+# component for the package.
+#
+# Parameters
+#
+#   components (required)
+#     [list of scopes] Defines the components in the package. Either main_dart
+#     or components must be defined, but not both.
+#
+#     Entries in a scope in the resources list:
+#
+#       component_name (required)
+#         Name of the component.
+#
+#       main_dart (required)
+#         File containing the main function of the component.
+#
+#       dart_package_name (optional)
+#         Name of the dart package for the component. If not provided, it will
+#         be inferred from the component name.
+#
+#   main_dart (required)
+#     File containing the main function of the application. Either main_dart or
+#     components must be defined, but not both.
+#
+#   package_name (optional)
+#     Name of the Dart package. This is used as an identifier in code that
+#     depends on the dart library that the *one and only* component generates.
+#     Only compatible when components is not specified (use
+#     components.dart_package_name).
+#
 template("_dart_aot_component") {
   legacy_component = false
   pkg_name = target_name
@@ -109,31 +179,31 @@ template("dart_aot_app") {
 #
 # Parameters
 #
-#   package_name (optional)
-#     Name of the dart package.
-#
 #   main_dart (required)
-#     File containing the main function of the application. Either main_dart or
+#     Name of the Dart file containing the main function. Either main_dart or
 #     components must be defined, but not both.
 #
-#   deps (optional)
-#     Dependencies of this application
+#   package_name (optional)
+#     Name of the Dart package.
 #
 #   fuchsia_package_name (optional)
-#     Name of the output Fuchsia package to generate. Defaults to ${target_name}
+#     Name of the Fuchsia package.
+#
+#   deps (optional)
+#     List of Dart packages the application depends on.
 #
 #   disable_analysis (optional)
 #     Prevents analysis from being run on this target.
+#
+#   product (optional)
+#     A boolean. Whether to build/run the app in a stripped-down Dart VM.
+#     Defaults to !is_debug.
 #
 #   resources (optional)
 #     Resources for the package (see //build/package.gni)
 #
 #   tests (optional)
 #     List of tests forwarded for the package. See the definition in //build/package.gni.
-#
-#   product (optional)
-#     A boolean. Whether to build/run the app in a stripped-down Dart VM.
-#     Defaults to !is_debug.
 #
 #   components (required)
 #     [list of scopes] Defines the components in the package. Either main_dart
@@ -146,6 +216,7 @@ template("dart_aot_app") {
 #
 #       main_dart (required)
 #         File containing the main function of the component.
+#
 template("dart_app") {
   assert((defined(invoker.components) && !defined(invoker.main_dart)) ||
          (!defined(invoker.components) && defined(invoker.main_dart)),
