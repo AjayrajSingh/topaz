@@ -7,7 +7,6 @@ import("//topaz/runtime/dart/dart_test.gni")
 import("//build/dart/dart_fuchsia_test.gni")
 
 library_deps = [
-  "//third_party/dart-pkg/pub/stack_trace",
   "//peridot/public/fidl/fuchsia.modular",
   "//garnet/public/fidl/fuchsia.sys",
   "//third_party/dart-pkg/pub/meta",
