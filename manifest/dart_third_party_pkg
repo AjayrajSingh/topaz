@@ -56,12 +56,12 @@
     <project name="third_party/dart/third_party/pkg/dart2js_info"
              path="third_party/dart/third_party/pkg/dart2js_info"
              remote="https://dart.googlesource.com/dart2js_info.git"
-             revision="0.5.6+4"/>
+             revision="0.5.13"/>
 
     <project name="third_party/dart/third_party/pkg/dartdoc"
              path="third_party/dart/third_party/pkg/dartdoc"
              remote="https://dart.googlesource.com/dartdoc.git"
-             revision="v0.23.1"/>
+             revision="v0.24.1"/>
 
     <project name="third_party/dart/third_party/pkg/file"
              path="third_party/dart/third_party/pkg/file"
@@ -126,7 +126,7 @@
     <project name="third_party/dart/third_party/pkg/linter"
              path="third_party/dart/third_party/pkg/linter"
              remote="https://dart.googlesource.com/linter.git"
-             revision="0.1.68"/>
+             revision="0.1.70"/>
 
     <project name="third_party/dart/third_party/pkg/logging"
              path="third_party/dart/third_party/pkg/logging"
@@ -271,7 +271,7 @@
     <project name="third_party/dart/third_party/pkg/test"
              path="third_party/dart/third_party/pkg/test"
              remote="https://dart.googlesource.com/test.git"
-             revision="1.0.0"/>
+             revision="1.3.4"/>
 
     <project name="third_party/dart/third_party/pkg/test_descriptor"
              path="third_party/dart/third_party/pkg/test_descriptor"
