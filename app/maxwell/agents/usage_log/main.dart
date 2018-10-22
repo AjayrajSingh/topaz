@@ -26,7 +26,7 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:zircon/zircon.dart';
 
 // Path to Config proto
-const String _cobaltConfigBinProtoPath = '/pkg/data/cobalt_config.binproto';
+const String _cobaltConfigBinProtoPath = '/pkg/data/cobalt_config.pb';
 
 // The IDs of the Cobalt metric and encoding we are using.
 // These specify objects within our Cobalt project configuration.

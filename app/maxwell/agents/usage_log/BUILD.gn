@@ -6,6 +6,7 @@ import("//third_party/cobalt_config/cobalt_config.gni")
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 cobalt_config("generate_module_usage_tracking_config") {
+  output_name = "cobalt_config.pb"
   project_id = 101
 }
 
@@ -33,8 +34,8 @@ dart_app("usage_log") {
               get_label_info(
                              ":generate_module_usage_tracking_config",
                              "target_gen_dir")
-              + "/cobalt_config.binproto")
-      dest = "cobalt_config.binproto"
+              + "/cobalt_config.pb")
+      dest = "cobalt_config.pb"
     }
   ]
 }

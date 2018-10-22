@@ -7,6 +7,7 @@ import("//topaz/runtime/dart/dart_test.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 cobalt_config("generate_sysui_config") {
+  output_name = "cobalt_config.pb"
   project_id = 103
 }
 
@@ -26,8 +27,8 @@ flutter_app("userpicker_device_shell") {
               get_label_info(
                              ":generate_sysui_config",
                              "target_gen_dir")
-              + "/cobalt_config.binproto")
-      dest = "cobalt_config.binproto"
+              + "/cobalt_config.pb")
+      dest = "cobalt_config.pb"
     }
   ]
 

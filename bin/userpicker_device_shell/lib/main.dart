@@ -25,7 +25,7 @@ import 'user_picker_device_shell_screen.dart';
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
 
-const String _kCobaltConfigBinProtoPath = '/pkg/data/cobalt_config.binproto';
+const String _kCobaltConfigBinProtoPath = '/pkg/data/cobalt_config.pb';
 
 /// The main device shell widget.
 DeviceShellWidget<UserPickerDeviceShellModel> _deviceShellWidget;
