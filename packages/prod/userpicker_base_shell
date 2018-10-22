@@ -4,6 +4,6 @@
     ],
 
     "packages": [
-        "//topaz/bin/userpicker_device_shell"
+        "//topaz/bin/userpicker_base_shell"
     ]
 }

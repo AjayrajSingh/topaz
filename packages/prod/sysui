@@ -1,6 +1,6 @@
 {
     "imports": [
-        "topaz/packages/prod/userpicker_device_shell",
+        "topaz/packages/prod/userpicker_base_shell",
         "topaz/packages/prod/wifi_settings"
     ],
     "packages": [

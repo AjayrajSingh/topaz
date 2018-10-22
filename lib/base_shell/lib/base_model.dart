@@ -15,7 +15,7 @@ import 'package:fidl_fuchsia_ui_input/fidl.dart' as input;
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:lib.app.dart/app.dart' as app;
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.device_shell/user_shell_chooser.dart';
+import 'package:lib.base_shell/user_shell_chooser.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
@@ -38,11 +38,11 @@ const int _kKeyModifierLeftCtrl = 8;
 const int _kKeyModifierRightAlt = 64;
 const int _kUserShellLoginTimeMetricId = 14;
 
-/// Provides common features needed by all device shells.
+/// Provides common features needed by all base shells.
 ///
 /// This includes user management, presentation handling,
 /// and keyboard shortcuts.
-class BaseDeviceShellModel extends DeviceShellModel
+class CommonBaseShellModel extends BaseShellModel
     implements
         Presentation,
         ServiceProvider,
@@ -52,7 +52,7 @@ class BaseDeviceShellModel extends DeviceShellModel
   /// Handles login, logout, and adding/removing users.
   ///
   /// Shouldn't be used before onReady.
-  DeviceShellUserManager _userManager;
+  BaseShellUserManager _userManager;
 
   NetstackModel _netstackModel;
 
@@ -78,7 +78,7 @@ class BaseDeviceShellModel extends DeviceShellModel
   ShadowTechnique _currentShadowTechnique = ShadowTechnique.unshadowed;
   bool _currentClippingEnabled = true;
 
-  // Because this device shell only supports a single user logged in at a time,
+  // Because this base shell only supports a single user logged in at a time,
   // we don't need to maintain separate ServiceProvider for each logged-in user.
   final ServiceProviderBinding _serviceProviderBinding =
       ServiceProviderBinding();
@@ -86,7 +86,7 @@ class BaseDeviceShellModel extends DeviceShellModel
       <PresentationBinding>[];
 
   /// Constructor
-  BaseDeviceShellModel(this.logger) : super();
+  CommonBaseShellModel(this.logger) : super();
 
   List<Account> get accounts => _accounts;
 
@@ -115,7 +115,7 @@ class BaseDeviceShellModel extends DeviceShellModel
         ..bind(this, InterfaceRequest<Presentation>(channel)));
     } else {
       log.warning(
-          'UserPickerDeviceShell: received request for unknown service: $serviceName !');
+          'UserPickerBaseShell: received request for unknown service: $serviceName !');
       channel.close();
     }
   }
@@ -213,13 +213,13 @@ class BaseDeviceShellModel extends DeviceShellModel
       viewOwnerHandle,
       onAvailable: (ChildViewConnection connection) {
         trace('user shell available');
-        log.info('DeviceShell: Child view connection available!');
+        log.info('BaseShell: Child view connection available!');
         connection.requestFocus();
         notifyListeners();
       },
       onUnavailable: (ChildViewConnection connection) {
-        trace('DeviceShell: Child view connection now unavailable!');
-        log.info('DeviceShell: Child view connection now unavailable!');
+        trace('BaseShell: Child view connection now unavailable!');
+        log.info('BaseShell: Child view connection now unavailable!');
         onLogout();
         notifyListeners();
       },
@@ -230,7 +230,7 @@ class BaseDeviceShellModel extends DeviceShellModel
   /// |KeyboardCaptureListener|.
   @override
   void onEvent(input.KeyboardEvent ev) {
-    log.info('Keyboard captured in device shell!');
+    log.info('Keyboard captured in base shell!');
     if (ev.codePoint == _kKeyCodeSpacebar && _userShellChooser != null) {
       if (_userShellChooser.swapUserShells()) {
         _updatePresentation(_userShellChooser.currentUserShell);
@@ -295,16 +295,16 @@ class BaseDeviceShellModel extends DeviceShellModel
   void onPointerEvent(input.PointerEvent event) {}
 
   // |Presentation|.
-  // Delegate to the Presentation received by DeviceShell.Initialize().
+  // Delegate to the Presentation received by BaseShell.Initialize().
   // TODO: revert to default state when client logs out.
   @mustCallSuper
   @override
   Future<void> onReady(
     UserProvider userProvider,
-    DeviceShellContext deviceShellContext,
+    BaseShellContext baseShellContext,
     Presentation presentation,
   ) async {
-    super.onReady(userProvider, deviceShellContext, presentation);
+    super.onReady(userProvider, baseShellContext, presentation);
 
     final netstackProxy = NetstackProxy();
     app.connectToService(StartupContext.fromStartupInfo().environmentServices,
@@ -329,7 +329,7 @@ class BaseDeviceShellModel extends DeviceShellModel
 
     await _userShellChooser.init();
 
-    _userManager = DeviceShellUserManager(userProvider, _userShellChooser);
+    _userManager = BaseShellUserManager(userProvider, _userShellChooser);
 
     _userManager.onLogout.listen((_) {
       logger.endTimer(
@@ -345,7 +345,7 @@ class BaseDeviceShellModel extends DeviceShellModel
           }
         },
       );
-      log.info('UserPickerDeviceShell: User logged out!');
+      log.info('UserPickerBaseShell: User logged out!');
       onLogout();
     });
 
@@ -360,7 +360,7 @@ class BaseDeviceShellModel extends DeviceShellModel
   }
 
   // |Presentation|.
-  // Delegate to the Presentation received by DeviceShell.Initialize().
+  // Delegate to the Presentation received by BaseShell.Initialize().
   // TODO: revert to default state when client logs out.
   @override
   void onStop() {
@@ -373,7 +373,7 @@ class BaseDeviceShellModel extends DeviceShellModel
   }
 
   // |Presentation|.
-  // Delegate to the Presentation received by DeviceShell.Initialize().
+  // Delegate to the Presentation received by BaseShell.Initialize().
   // TODO: revert to default state when client logs out.
   /// Refreshes the list of users.
   Future<void> refreshUsers() async {
@@ -382,7 +382,7 @@ class BaseDeviceShellModel extends DeviceShellModel
   }
 
   // |Presentation|.
-  // Delegate to the Presentation received by DeviceShell.Initialize().
+  // Delegate to the Presentation received by BaseShell.Initialize().
   // TODO: revert to default state when client logs out.
   /// Permanently removes the user.
   Future removeUser(Account account) async {

@@ -7,26 +7,26 @@ import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 
 import 'clock.dart';
-import 'user_picker_device_shell_model.dart';
+import 'user_picker_base_shell_model.dart';
 import 'user_picker_screen.dart';
 
 /// The root widget which displays all the other windows of this app.
-class UserPickerDeviceShellScreen extends StatelessWidget {
+class UserPickerBaseShellScreen extends StatelessWidget {
   /// Launcher to launch the kernel panic module if needed.
   final Launcher launcher;
 
   /// Constructor.
-  const UserPickerDeviceShellScreen({
+  const UserPickerBaseShellScreen({
     @required this.launcher,
     Key key,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<UserPickerDeviceShellModel>(
+    return new ScopedModelDescendant<UserPickerBaseShellModel>(
       builder: (
         BuildContext context,
         Widget child,
-        UserPickerDeviceShellModel model,
+        UserPickerBaseShellModel model,
       ) {
         List<Widget> stackChildren = <Widget>[];
 

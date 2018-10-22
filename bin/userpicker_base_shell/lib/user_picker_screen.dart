@@ -8,7 +8,7 @@ import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:flutter/material.dart';
 
 import 'user_list.dart';
-import 'user_picker_device_shell_model.dart';
+import 'user_picker_base_shell_model.dart';
 
 const double _kRemovalTargetSize = 112.0;
 
@@ -17,11 +17,11 @@ const double _kRemovalTargetSize = 112.0;
 class UserPickerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<UserPickerDeviceShellModel>(
+    return new ScopedModelDescendant<UserPickerBaseShellModel>(
       builder: (
         BuildContext context,
         Widget child,
-        UserPickerDeviceShellModel model,
+        UserPickerBaseShellModel model,
       ) {
         return new Material(
           color: Colors.grey[900],

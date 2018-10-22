@@ -27,7 +27,7 @@ the relevant flags you'll probably want:
     required if you wish to simulate touching, scrolling, etc, via
     `flutter_driver`.
 
-*   `--device_shell_args=--test_timeout_ms=[timeout]` This will set the timeout
+*   `--base_shell_args=--test_timeout_ms=[timeout]` This will set the timeout
     for the test. It is recommended to set this to at least 60000 (one minute),
     as in its curret state, the integration testing framework is in its early
     stages and can take a while to complete.
@@ -45,7 +45,7 @@ the relevant flags you'll probably want:
         under test is running on, then run integration tests, like sending touch
         events or testing specific widgets.
 
-The account provider, device shell, user shell, etc, will likely remain
+The account provider, base shell, user shell, etc, will likely remain
 unchanged except under specific circumstances beyond the scope of this readme.
 
 ## Running Tests Manually

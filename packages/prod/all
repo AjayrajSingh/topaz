@@ -31,7 +31,7 @@
         "topaz/packages/prod/system_dashboard",
         "topaz/packages/prod/sysui",
         "topaz/packages/prod/term",
-        "topaz/packages/prod/userpicker_device_shell",
+        "topaz/packages/prod/userpicker_base_shell",
         "topaz/packages/prod/web_runner_prototype",
         "topaz/packages/prod/web_view",
         "topaz/packages/prod/webkit",

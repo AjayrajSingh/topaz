@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
-import 'user_picker_device_shell_model.dart';
+import 'user_picker_base_shell_model.dart';
 
 const double _kUserAvatarSizeLarge = 56.0;
 const double _kUserAvatarSizeSmall = 48.0;
@@ -104,7 +104,7 @@ class UserList extends StatelessWidget {
   }
 
   Widget _buildExpandedUserActions({
-    UserPickerDeviceShellModel model,
+    UserPickerBaseShellModel model,
     bool isSmall,
   }) {
     double fontSize = isSmall ? _kButtonFontSizeSmall : _kButtonFontSizeLarge;
@@ -232,7 +232,7 @@ class UserList extends StatelessWidget {
     VoidCallback onTap,
     bool removable = true,
     bool isSmall,
-    UserPickerDeviceShellModel model,
+    UserPickerBaseShellModel model,
   }) {
     Widget userCard = _buildUserCircle(
       account: account,
@@ -283,7 +283,7 @@ class UserList extends StatelessWidget {
     }
   }
 
-  Widget _buildUserList(UserPickerDeviceShellModel model) {
+  Widget _buildUserList(UserPickerBaseShellModel model) {
     return new LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         List<Widget> children = <Widget>[];
@@ -358,10 +358,10 @@ class UserList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      new ScopedModelDescendant<UserPickerDeviceShellModel>(builder: (
+      new ScopedModelDescendant<UserPickerBaseShellModel>(builder: (
         BuildContext context,
         Widget child,
-        UserPickerDeviceShellModel model,
+        UserPickerBaseShellModel model,
       ) {
         if (model.showingLoadingSpinner) {
           return new Stack(

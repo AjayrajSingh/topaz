@@ -12,7 +12,7 @@ import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:lib.device_shell/base_model.dart';
+import 'package:lib.base_shell/base_model.dart';
 import 'package:lib.widgets/model.dart';
 
 export 'package:lib.widgets/model.dart'
@@ -24,7 +24,7 @@ typedef GetPresentationModeCallback = void Function(PresentationMode mode);
 const Duration _kShowLoadingSpinnerDelay = const Duration(milliseconds: 500);
 
 /// Model that provides common state
-class UserPickerDeviceShellModel extends BaseDeviceShellModel
+class UserPickerBaseShellModel extends CommonBaseShellModel
     with TickerProviderModelMixin
     implements
         Presentation,
@@ -32,8 +32,8 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
         KeyboardCaptureListenerHack,
         PointerCaptureListenerHack,
         PresentationModeListener {
-  /// Called when the device shell stops.
-  final VoidCallback onDeviceShellStopped;
+  /// Called when the base shell stops.
+  final VoidCallback onBaseShellStopped;
 
   /// Called when wifi is tapped.
   final VoidCallback onWifiTapped;
@@ -47,8 +47,8 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
   final Set<Account> _draggedUsers = new Set<Account>();
 
   /// Constructor
-  UserPickerDeviceShellModel({
-    this.onDeviceShellStopped,
+  UserPickerBaseShellModel({
+    this.onBaseShellStopped,
     this.onWifiTapped,
     this.onLogin,
     cobalt.Logger logger,
@@ -56,7 +56,7 @@ class UserPickerDeviceShellModel extends BaseDeviceShellModel
 
   @override
   void onStop() {
-    onDeviceShellStopped?.call();
+    onBaseShellStopped?.call();
     super.dispose();
     super.onStop();
   }

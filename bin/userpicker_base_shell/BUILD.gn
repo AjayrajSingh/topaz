@@ -11,13 +11,13 @@ cobalt_config("generate_sysui_config") {
   project_id = 103
 }
 
-flutter_app("userpicker_device_shell") {
+flutter_app("userpicker_base_shell") {
   main_dart = "lib/main.dart"
 
   meta = [
     {
-      path = rebase_path("meta/userpicker_device_shell.cmx")
-      dest = "userpicker_device_shell.cmx"
+      path = rebase_path("meta/userpicker_base_shell.cmx")
+      dest = "userpicker_base_shell.cmx"
     },
   ]
 
@@ -32,7 +32,7 @@ flutter_app("userpicker_device_shell") {
     }
   ]
 
-  package_name = "userpicker_device_shell"
+  package_name = "userpicker_base_shell"
 
   manifest = "pubspec.yaml"
 
@@ -43,8 +43,8 @@ flutter_app("userpicker_device_shell") {
     "circular_button.dart",
     "clock.dart",
     "user_list.dart",
-    "user_picker_device_shell_model.dart",
-    "user_picker_device_shell_screen.dart",
+    "user_picker_base_shell_model.dart",
+    "user_picker_base_shell_screen.dart",
     "user_picker_screen.dart",
   ]
 
@@ -60,7 +60,7 @@ flutter_app("userpicker_device_shell") {
     "//peridot/public/fidl/fuchsia.modular.auth",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/http",
-    "//topaz/lib/device_shell:lib.device_shell",
+    "//topaz/lib/base_shell:lib.base_shell",
     "//topaz/lib/settings:lib.settings",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",

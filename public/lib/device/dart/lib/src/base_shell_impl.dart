@@ -9,21 +9,21 @@ import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:meta/meta.dart';
 
-/// Called when [DeviceShell.initialize] occurs.
-typedef OnDeviceShellReady = void Function(
+/// Called when [BaseShell.initialize] occurs.
+typedef OnBaseShellReady = void Function(
   UserProvider userProvider,
-  DeviceShellContext deviceShellContext,
+  BaseShellContext baseShellContext,
   Presentation presentation,
 );
 
 /// Called when [Lifecycle.terminate] occurs.
-typedef OnDeviceShellStop = void Function();
+typedef OnBaseShellStop = void Function();
 
-/// Implements a DeviceShell for receiving the services a [DeviceShell] needs to
+/// Implements a BaseShell for receiving the services a [BaseShell] needs to
 /// operate.
-class DeviceShellImpl implements DeviceShell, Lifecycle {
-  final DeviceShellContextProxy _deviceShellContextProxy =
-      new DeviceShellContextProxy();
+class BaseShellImpl implements BaseShell, Lifecycle {
+  final BaseShellContextProxy _baseShellContextProxy =
+      new BaseShellContextProxy();
   final UserProviderProxy _userProviderProxy = new UserProviderProxy();
   final PresentationProxy _presentationProxy = new PresentationProxy();
   final Set<AuthenticationContextBinding> _bindingSet =
@@ -32,10 +32,10 @@ class DeviceShellImpl implements DeviceShell, Lifecycle {
       new Set<AuthenticationUiContextBinding>();
 
   /// Called when [initialize] occurs.
-  final OnDeviceShellReady onReady;
+  final OnBaseShellReady onReady;
 
-  /// Called when the [DeviceShell] terminates.
-  final OnDeviceShellStop onStop;
+  /// Called when the [BaseShell] terminates.
+  final OnBaseShellStop onStop;
 
   /// The [AuthenticationContext] to provide when requested.
   final AuthenticationContext authenticationContext;
@@ -46,7 +46,7 @@ class DeviceShellImpl implements DeviceShell, Lifecycle {
   final AuthenticationUiContext authenticationUiContext;
 
   /// Constructor.
-  DeviceShellImpl({
+  BaseShellImpl({
     @required this.authenticationContext,
     this.authenticationUiContext,
     this.onReady,
@@ -55,17 +55,16 @@ class DeviceShellImpl implements DeviceShell, Lifecycle {
 
   @override
   void initialize(
-    InterfaceHandle<DeviceShellContext> deviceShellContextHandle,
-    DeviceShellParams deviceShellParams,
+    InterfaceHandle<BaseShellContext> baseShellContextHandle,
+    BaseShellParams baseShellParams,
   ) {
     if (onReady != null) {
-      _deviceShellContextProxy.ctrl.bind(deviceShellContextHandle);
-      _deviceShellContextProxy
-          .getUserProvider(_userProviderProxy.ctrl.request());
-      if (deviceShellParams.presentation.channel != null) {
-        _presentationProxy.ctrl.bind(deviceShellParams.presentation);
+      _baseShellContextProxy.ctrl.bind(baseShellContextHandle);
+      _baseShellContextProxy.getUserProvider(_userProviderProxy.ctrl.request());
+      if (baseShellParams.presentation.channel != null) {
+        _presentationProxy.ctrl.bind(baseShellParams.presentation);
       }
-      onReady(_userProviderProxy, _deviceShellContextProxy, _presentationProxy);
+      onReady(_userProviderProxy, _baseShellContextProxy, _presentationProxy);
     }
   }
 
@@ -73,7 +72,7 @@ class DeviceShellImpl implements DeviceShell, Lifecycle {
   void terminate() {
     onStop?.call();
     _userProviderProxy.ctrl.close();
-    _deviceShellContextProxy.ctrl.close();
+    _baseShellContextProxy.ctrl.close();
     for (AuthenticationContextBinding binding in _bindingSet) {
       binding.close();
     }

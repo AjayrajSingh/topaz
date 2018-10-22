@@ -1020,7 +1020,7 @@ class OAuthTokenManagerApp::GoogleUserCredsCall
         account_->id, auth_context_.NewRequest());
 
     auth_context_.set_error_handler([this] {
-      callback_(nullptr, "Overlay cancelled by device shell.");
+      callback_(nullptr, "Overlay cancelled by base shell.");
       Done();
     });
     auth_context_->StartOverlay(std::move(view_owner));

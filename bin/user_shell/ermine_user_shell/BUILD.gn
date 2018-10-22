@@ -47,7 +47,7 @@ package("launch_ermine") {
   resources = [
     {
       path = rebase_path("assets/launch_ermine.json")
-      dest = "sysui/device_shell_config.json"
+      dest = "sysui/base_shell_config.json"
     },
   ]
 }

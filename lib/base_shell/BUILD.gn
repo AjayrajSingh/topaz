@@ -4,8 +4,8 @@
 
 import("//build/dart/dart_library.gni")
 
-dart_library("lib.device_shell") {
-  package_name = "lib.device_shell"
+dart_library("lib.base_shell") {
+  package_name = "lib.base_shell"
 
   sources = [
     "base_model.dart",

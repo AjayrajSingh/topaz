@@ -13,45 +13,45 @@ import 'package:lib.device.dart/device.dart';
 import 'package:meta/meta.dart';
 
 import '../widgets/window_media_query.dart';
-import 'device_shell_model.dart';
+import 'base_shell_model.dart';
 
 /// A wrapper widget intended to be the root of the application that is
-/// a [DeviceShell].  Its main purpose is to hold the [StartupContext] and
-/// [DeviceShell] instances so they aren't garbage collected.
+/// a [BaseShell].  Its main purpose is to hold the [StartupContext] and
+/// [BaseShell] instances so they aren't garbage collected.
 /// For convenience, [advertise] does the advertising of the app as a
-/// [DeviceShell] to the rest of the system via the [StartupContext].
-/// Also for convienence, the [DeviceShellModel] given to this widget
+/// [BaseShell] to the rest of the system via the [StartupContext].
+/// Also for convienence, the [BaseShellModel] given to this widget
 /// will be made available to [child] and [child]'s descendants.
-class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
-  /// The [StartupContext] to [advertise] its [DeviceShell] services to.
+class BaseShellWidget<T extends BaseShellModel> extends StatelessWidget {
+  /// The [StartupContext] to [advertise] its [BaseShell] services to.
   final StartupContext startupContext;
 
-  /// The bindings for the [DeviceShell] service implemented by [DeviceShellImpl].
-  final Set<DeviceShellBinding> _deviceShellBindingSet =
-      new Set<DeviceShellBinding>();
+  /// The bindings for the [BaseShell] service implemented by [BaseShellImpl].
+  final Set<BaseShellBinding> _baseShellBindingSet =
+      new Set<BaseShellBinding>();
 
-  /// The bindings for the [Lifecycle] service implemented by [DeviceShellImpl].
+  /// The bindings for the [Lifecycle] service implemented by [BaseShellImpl].
   final Set<LifecycleBinding> _lifecycleBindingSet =
       new Set<LifecycleBinding>();
 
-  /// The [DeviceShell] to [advertise].
-  final DeviceShellImpl _deviceShell;
+  /// The [BaseShell] to [advertise].
+  final BaseShellImpl _baseShell;
 
   /// The rest of the application.
   final Widget child;
 
-  final T _deviceShellModel;
+  final T _baseShellModel;
 
   /// Constructor.
-  DeviceShellWidget({
+  BaseShellWidget({
     @required this.startupContext,
-    T deviceShellModel,
+    T baseShellModel,
     AuthenticationContext authenticationContext,
     AuthenticationUiContext authenticationUiContext,
     this.child,
-  })  : _deviceShellModel = deviceShellModel,
-        _deviceShell = _createDeviceShell(
-          deviceShellModel,
+  })  : _baseShellModel = baseShellModel,
+        _baseShell = _createBaseShell(
+          baseShellModel,
           authenticationContext,
           authenticationUiContext,
         );
@@ -62,47 +62,47 @@ class DeviceShellWidget<T extends DeviceShellModel> extends StatelessWidget {
           child: new Directionality(
             textDirection: TextDirection.ltr,
             child: new WindowMediaQuery(
-              child: _deviceShellModel == null
+              child: _baseShellModel == null
                   ? child
-                  : new ScopedModel<T>(model: _deviceShellModel, child: child),
+                  : new ScopedModel<T>(model: _baseShellModel, child: child),
             ),
           ),
         ),
       );
 
-  /// Advertises [_deviceShell] as a [DeviceShell] to the rest of the system via
+  /// Advertises [_baseShell] as a [BaseShell] to the rest of the system via
   /// the [StartupContext].
   void advertise() {
     startupContext.outgoingServices
-      ..addServiceForName((InterfaceRequest<DeviceShell> request) {
-        DeviceShellBinding binding = new DeviceShellBinding()
-          ..bind(_deviceShell, request);
-        _deviceShellBindingSet.add(binding);
-      }, DeviceShell.$serviceName)
+      ..addServiceForName((InterfaceRequest<BaseShell> request) {
+        BaseShellBinding binding = new BaseShellBinding()
+          ..bind(_baseShell, request);
+        _baseShellBindingSet.add(binding);
+      }, BaseShell.$serviceName)
       ..addServiceForName((InterfaceRequest<Lifecycle> request) {
         LifecycleBinding binding = new LifecycleBinding()
-          ..bind(_deviceShell, request);
+          ..bind(_baseShell, request);
         _lifecycleBindingSet.add(binding);
       }, Lifecycle.$serviceName);
   }
 
-  static DeviceShell _createDeviceShell(
-    DeviceShellModel deviceShellModel,
+  static BaseShell _createBaseShell(
+    BaseShellModel baseShellModel,
     AuthenticationContext authenticationContext,
     AuthenticationUiContext authenticationUiContext,
   ) {
-    return new DeviceShellImpl(
+    return new BaseShellImpl(
       authenticationContext: authenticationContext,
       authenticationUiContext: authenticationUiContext,
-      onReady: deviceShellModel?.onReady,
+      onReady: baseShellModel?.onReady,
       onStop: () {
-        deviceShellModel?.onStop?.call();
+        baseShellModel?.onStop?.call();
       },
     );
   }
 
   /// Cancels any authentication flow currently in progress.
   void cancelAuthenticationFlow() {
-    _deviceShell.closeAuthenticationContextBindings();
+    _baseShell.closeAuthenticationContextBindings();
   }
 }

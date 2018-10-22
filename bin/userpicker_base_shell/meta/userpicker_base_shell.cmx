@@ -1,6 +1,6 @@
 {
     "program": {
-        "data": "data/userpicker_device_shell"
+        "data": "data/userpicker_base_shell"
     },
     "sandbox": {
         "features": [ "deprecated-all-services" ],

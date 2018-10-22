@@ -24,7 +24,7 @@ class UserShellChooser {
   /// Load available shells from the filesystem.
   Future<void> init() async {
     try {
-      File file = new File('/system/data/sysui/device_shell_config.json');
+      File file = new File('/system/data/sysui/base_shell_config.json');
       if (file.existsSync()) {
         dynamic decodedJson = json.decode(await file.readAsString());
 

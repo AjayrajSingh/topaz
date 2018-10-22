@@ -8,7 +8,7 @@ import 'package:fidl_fuchsia_netstack/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.device_shell/netstack_model.dart';
+import 'package:lib.base_shell/netstack_model.dart';
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
@@ -19,19 +19,19 @@ import 'authentication_context_impl.dart';
 import 'authentication_overlay.dart';
 import 'authentication_overlay_model.dart';
 import 'authentication_ui_context_impl.dart';
-import 'user_picker_device_shell_model.dart';
-import 'user_picker_device_shell_screen.dart';
+import 'user_picker_base_shell_model.dart';
+import 'user_picker_base_shell_screen.dart';
 
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
 
 const String _kCobaltConfigBinProtoPath = '/pkg/data/cobalt_config.pb';
 
-/// The main device shell widget.
-DeviceShellWidget<UserPickerDeviceShellModel> _deviceShellWidget;
+/// The main base shell widget.
+BaseShellWidget<UserPickerBaseShellModel> _baseShellWidget;
 
 void main() {
-  setupLogger(name: 'userpicker_device_shell');
+  setupLogger(name: 'userpicker_base_shell');
   trace('starting');
   StartupContext startupContext = new StartupContext.fromStartupInfo();
 
@@ -62,9 +62,9 @@ void main() {
 
   final AuthenticationOverlayModel authModel = AuthenticationOverlayModel();
 
-  UserPickerDeviceShellModel userPickerDeviceShellModel =
-      new UserPickerDeviceShellModel(
-    onDeviceShellStopped: () {
+  UserPickerBaseShellModel userPickerBaseShellModel =
+      new UserPickerBaseShellModel(
+    onBaseShellStopped: () {
       netstackProxy.ctrl.close();
       netstackModel.dispose();
     },
@@ -80,7 +80,7 @@ void main() {
   Widget mainWidget = new Stack(
     fit: StackFit.passthrough,
     children: <Widget>[
-      new UserPickerDeviceShellScreen(
+      new UserPickerBaseShellScreen(
         launcher: startupContext.launcher,
       ),
       new ScopedModel<AuthenticationOverlayModel>(
@@ -116,9 +116,9 @@ void main() {
     ),
   ];
 
-  _deviceShellWidget = new DeviceShellWidget<UserPickerDeviceShellModel>(
+  _baseShellWidget = new BaseShellWidget<UserPickerBaseShellModel>(
     startupContext: startupContext,
-    deviceShellModel: userPickerDeviceShellModel,
+    baseShellModel: userPickerBaseShellModel,
     authenticationContext: new AuthenticationContextImpl(
         onStartOverlay: authModel.onStartOverlay,
         onStopOverlay: authModel.onStopOverlay),
@@ -136,9 +136,9 @@ void main() {
     ),
   );
 
-  runApp(_deviceShellWidget);
+  runApp(_baseShellWidget);
 
-  _deviceShellWidget.advertise();
+  _baseShellWidget.advertise();
   trace('started');
 }
 

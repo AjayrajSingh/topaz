@@ -9,35 +9,35 @@ import 'package:meta/meta.dart';
 
 export 'package:lib.widgets/model.dart' show ScopedModel, ScopedModelDescendant;
 
-/// The [Model] that provides a [DeviceShellContext] and [UserProvider].
-class DeviceShellModel extends Model {
-  DeviceShellContext _deviceShellContext;
+/// The [Model] that provides a [BaseShellContext] and [UserProvider].
+class BaseShellModel extends Model {
+  BaseShellContext _baseShellContext;
   UserProvider _userProvider;
   Presentation _presentation;
 
-  /// The [DeviceShellContext] given to this app's [DeviceShell].
-  DeviceShellContext get deviceShellContext => _deviceShellContext;
+  /// The [BaseShellContext] given to this app's [BaseShell].
+  BaseShellContext get baseShellContext => _baseShellContext;
 
-  /// The [UserProvider] given to this app's [DeviceShell].
+  /// The [UserProvider] given to this app's [BaseShell].
   UserProvider get userProvider => _userProvider;
 
-  /// The [Presentation] given to this app's [DeviceShell].
+  /// The [Presentation] given to this app's [BaseShell].
   Presentation get presentation => _presentation;
 
-  /// Called when this app's [DeviceShell] is given its [DeviceShellContext],
+  /// Called when this app's [BaseShell] is given its [BaseShellContext],
   /// and [UserProvider], and (optionally) its [Presentation].
   @mustCallSuper
   void onReady(
     UserProvider userProvider,
-    DeviceShellContext deviceShellContext,
+    BaseShellContext baseShellContext,
     Presentation presentation,
   ) {
     _userProvider = userProvider;
-    _deviceShellContext = deviceShellContext;
+    _baseShellContext = baseShellContext;
     _presentation = presentation;
     notifyListeners();
   }
 
-  /// Called when the app's [DeviceShell] stops.
+  /// Called when the app's [BaseShell] stops.
   void onStop() => null;
 }

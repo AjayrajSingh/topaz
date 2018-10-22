@@ -11,7 +11,7 @@ dart_library("dart") {
 
   sources = [
     "device.dart",
-    "src/device_shell_impl.dart",
+    "src/base_shell_impl.dart",
   ]
 
   deps = [

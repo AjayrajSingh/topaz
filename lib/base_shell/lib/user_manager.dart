@@ -5,13 +5,13 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.device_shell/user_shell_chooser.dart';
+import 'package:lib.base_shell/user_shell_chooser.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 
 import 'user_watcher_impl.dart';
 
 /// Handles adding, removing, and logging, and controlling users.
-class DeviceShellUserManager {
+class BaseShellUserManager {
   final UserProvider _userProvider;
   final UserShellChooser _userShellChooser;
 
@@ -21,14 +21,14 @@ class DeviceShellUserManager {
   final StreamController<void> _userLogoutController =
       StreamController<void>.broadcast();
 
-  DeviceShellUserManager(this._userProvider, this._userShellChooser);
+  BaseShellUserManager(this._userProvider, this._userShellChooser);
 
   Stream<void> get onLogout => _userLogoutController.stream;
 
   /// Adds a new user, displaying UI as required.
   ///
   /// The UI will be displayed in the space provided to authenticationContext
-  /// in the device shell widget.
+  /// in the base shell widget.
   Future<String> addUser() {
     final completer = Completer<String>();
 
@@ -50,7 +50,7 @@ class DeviceShellUserManager {
   /// Logs in the user given by [accountId].
   ///
   /// Takes in [serviceProviderHandle] which gets passed to the user shell.
-  /// Returns a handle to the [ViewOwner] that the device shell should use
+  /// Returns a handle to the [ViewOwner] that the base shell should use
   /// to open a [ChildViewConnection] to display the user shell.
   InterfaceHandle<ViewOwner> login(String accountId,
       InterfaceHandle<ServiceProvider> serviceProviderHandle) {
