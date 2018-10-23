@@ -3,6 +3,19 @@
     "binary": "bin/app"
   },
   "sandbox": {
-    "features": [ "deprecated-all-services", "root-ssl-certificates" ]
+    "features": [ "root-ssl-certificates" ],
+    "services": [
+          "fuchsia.fonts.Provider",
+          "fuchsia.media.Audio",
+          "fuchsia.net.LegacySocketProvider",
+          "fuchsia.netstack.Netstack",
+          "fuchsia.process.Launcher",
+          "fuchsia.ui.input.ImeService",
+          "fuchsia.ui.input.ImeVisibilityService",
+          "fuchsia.ui.policy.Presenter",
+          "fuchsia.ui.scenic.Scenic",
+          "fuchsia.ui.viewsv1.ViewManager",
+          "fuchsia.vulkan.loader.Loader"
+      ]
   }
 }
