@@ -55,6 +55,9 @@ class ProposalBuilder {
   /// the only one presented to the user.
   double confidence = 0.0;
 
+  /// Sets whether the proposal is for a rich suggestion.
+  bool wantsRichSuggestion = false;
+
   /// Sets the headline of the display information associated with the Proposal.
   String headline = '';
 
@@ -114,6 +117,7 @@ class ProposalBuilder {
         onSelected: commands,
         affinity: affinities,
         confidence: confidence,
+        wantsRichSuggestion: wantsRichSuggestion,
         display: SuggestionDisplay(
             headline: headline,
             subheadline: subheadline,
