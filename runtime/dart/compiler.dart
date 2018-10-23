@@ -78,7 +78,7 @@ Future<void> main(List<String> args) async {
   final Uri sdkRoot = _ensureFolderPath(options['sdk-root']);
   final String singleRootScheme = options['single-root-scheme'];
   final Uri singleRootBase = new Uri.file(options['single-root-base']);
-  final String packages = options['packages'];
+  final Uri packagesUri = Uri.base.resolve(options['packages']);
   final bool aot = options['aot'];
   final bool tfa = options['tfa'];
   final bool embedSources = options['embed-sources'];
@@ -88,8 +88,7 @@ Future<void> main(List<String> args) async {
   final String componentName = options['component-name'];
   final bool verbose = options['verbose'];
 
-  final String filename = options.rest[0];
-  final Uri filenameUri = Uri.parse(filename);
+  Uri mainUri = Uri.parse(options.rest[0]);
 
   Uri platformKernelDill = sdkRoot.resolve('platform_strong.dill');
 
@@ -120,12 +119,36 @@ Future<void> main(List<String> args) async {
     });
   }
 
+  // fuchsia-source:///x/y/main.dart -> file:///a/b/x/y/main.dart
+  String mainUriString;
+  if (mainUri.scheme == singleRootScheme) {
+    String mainPath = mainUri.path;
+    if (mainPath.startsWith('/')) {
+      mainPath = mainPath.substring(1);
+    }
+    mainUriString = singleRootBase.resolve(mainPath).toString();
+  } else {
+    mainUriString = mainUri.toString();
+  }
+  // file:///a/b/x/y/main.dart -> package:x.y/main.dart
+  for (var line in await new File(packagesUri.toFilePath()).readAsLines()) {
+    var colon = line.indexOf(':');
+    if (colon == -1)
+      continue;
+    var packageName = line.substring(0, colon);
+    var packagePath = line.substring(colon + 1);
+    if (mainUriString.startsWith(packagePath)) {
+      mainUri = Uri.parse('package:$packageName/${mainUriString.substring(packagePath.length)}');
+      break;
+    }
+  }
+
   final errorPrinter = new ErrorPrinter();
   final errorDetector = new ErrorDetector(previousErrorHandler: errorPrinter);
   final CompilerOptions compilerOptions = new CompilerOptions()
     ..sdkSummary = platformKernelDill
     ..fileSystem = fileSystem
-    ..packagesFileUri = packages != null ? Uri.base.resolve(packages) : null
+    ..packagesFileUri = packagesUri
     ..target = target
     ..embedSourceText = embedSources
     ..onDiagnostic = (DiagnosticMessage m) {
@@ -140,7 +163,7 @@ Future<void> main(List<String> args) async {
   }
 
   Component component = await compileToKernel(
-    filenameUri,
+    mainUri,
     compilerOptions,
     aot: aot,
     useGlobalTypeFlowAnalysis: tfa,
@@ -148,7 +171,7 @@ Future<void> main(List<String> args) async {
     dropAST: dropAST,
   );
 
-  errorPrinter.printCompilationMessages(filenameUri);
+  errorPrinter.printCompilationMessages(mainUri);
   if (errorDetector.hasCompilationErrors || (component == null)) {
     exitCode = 1;
     return;
