@@ -4,7 +4,6 @@
     },
     "sandbox": {
         "features": [
-            "deprecated-all-services",
             "root-ssl-certificates",
             "system-temp"
         ]
