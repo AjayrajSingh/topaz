@@ -2,13 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#![feature(
-    async_await,
-    await_macro,
-    futures_api,
-    pin,
-    arbitrary_self_types
-)]
+#![feature(async_await, await_macro, futures_api, pin, arbitrary_self_types)]
 
 use failure::{format_err, Error, ResultExt};
 use fidl_fuchsia_developer_tiles::ControllerMarker;
@@ -53,10 +47,19 @@ fn first_entry_at_path(path: &Path) -> Result<PathBuf, Error> {
         .path())
 }
 
+fn find_r_directory() -> Result<PathBuf, Error> {
+    let sys = PathBuf::from("/hub/r/sys");
+    if sys.exists() {
+        Ok(first_entry_at_path(&sys).context("No entry in /hub/r/sys")?.join("r"))
+    } else {
+        Ok(PathBuf::from("/hub/r"))
+    }
+}
+
 fn main() -> Result<(), Error> {
     let options = Options::from_args();
 
-    let hub = PathBuf::from("/hub/r");
+    let hub = find_r_directory().context("Can't find hub directory")?;
     let user = first_entry_at_path(&hub)
         .context("Can't find user entry at path '/hub/r'. Did you not yet log in?")?;
     let proc =
