@@ -203,7 +203,7 @@ Engine::Engine(
 
   // Get the task runners from the managed threads. The current thread will be
   // used as the "platform" thread.
-  blink::TaskRunners task_runners(
+  const blink::TaskRunners task_runners(
       thread_label_,  // Dart thread labels
       CreateFMLTaskRunner(deprecated_loop::MessageLoop::GetCurrent()
                               ->task_runner()),            // platform
@@ -281,8 +281,8 @@ Engine::Engine(
   shell_->GetPlatformView()->NotifyCreated();
 
   // Launch the engine in the appropriate configuration.
-  auto run_configuration =
-      shell::RunConfiguration::InferFromSettings(settings_);
+  auto run_configuration = shell::RunConfiguration::InferFromSettings(
+      settings_, task_runners.GetIOTaskRunner());
 
   auto on_run_failure =
       [weak = weak_factory_.GetWeakPtr(),                                  //
