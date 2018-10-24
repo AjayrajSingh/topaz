@@ -3,7 +3,7 @@
         "data": "data/armadillo_user_shell"
     },
     "sandbox": {
-        "features": [ "deprecated-all-services" ],
+        "features": [ ],
         "system": [ "bin", "pkgs", "data" ],
         "pkgfs": [ "packages" ]
     }

@@ -3,7 +3,20 @@
         "data": "data/userpicker_base_shell"
     },
     "sandbox": {
-        "features": [ "deprecated-all-services" ],
+        "services": [
+            "fuchsia.cobalt.LoggerFactory",
+            "fuchsia.fonts.Provider",
+            "fuchsia.logger.LogSink",
+            "fuchsia.modular.Clipboard",
+            "fuchsia.modular.ContextWriter",
+            "fuchsia.net.Connectivity",
+            "fuchsia.netstack.Netstack",
+            "fuchsia.sys.Environment",
+            "fuchsia.ui.input.ImeService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.ui.viewsv1.ViewManager"
+        ],
         "dev": [ "misc" ],
         "system": [ "data/sysui" ]
     }
