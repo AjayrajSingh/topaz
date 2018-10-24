@@ -28,9 +28,8 @@ Looks like you didn't have one of the following libraries installed:
   * pandas
   * scipy
   * seaborn
-Try either installing them, or using Anaconda Python3 \
-(https://www.anaconda.com/download/#linux), which has them preinstalled."""
-       )
+Try installing them with:
+  $ sudo apt install python3-matplotlib python3-numpy python3-pandas python3-scipy python3-seaborn""")
   raise e
 
 parser = argparse.ArgumentParser(
@@ -38,7 +37,7 @@ parser = argparse.ArgumentParser(
 Compare the distribution of event durations between two (groups of) trace files.
 
 Example usage:
-  ~/anaconda3/bin/python3 topaz/tools/uiperf/trace-cmp.py \\
+  ./topaz/tools/uiperf/trace-cmp.py \\
     --event_name 'vsync callback' \\
     --thread_names 'assistant_card_image_grid.ui' \\
     --before trace-2018-10-09T21:00:25.json trace-2018-10-09T21:08:14.json \\
@@ -76,6 +75,14 @@ parser.add_argument(
     help=
     'A list of after (a build with your changes) json trace files.  Example: "trace-2018-10-09T22:25:01.json".'
 )
+# TODO: Add cdf as a graph option.
+valid_graph_args = {'none', 'density'}
+parser.add_argument(
+    '--graph',
+    default='none',
+    nargs='?',
+    help='Optionally display a density plot of the distribution of event durations.  Must be one of {}'.format(valid_graph_args)
+)
 
 args = parser.parse_args()
 
@@ -83,6 +90,20 @@ target_event_name = args.event_name
 target_thread_names = set(args.thread_names)
 before_filenames = args.before
 after_filenames = args.after
+
+if len(before_filenames) == 0:
+  print('List of before tracefiles must be non-empty.')
+  parser.print_usage()
+  sys.exit(1)
+if len(after_filenames) == 0:
+  parser.print_usage()
+  print('List of after tracefiles must be non-empty.')
+  sys.exit(1)
+
+if args.graph not in valid_graph_args:
+  parser.print_usage()
+  print('Invalid --graph argument, must be one of {}'.format(valid_graph_args))
+  sys.exit(1)
 
 # {
 #   pthread:0x1234: {'Before': [e0, e1, ...], 'After': [e0, e1, ...]},
@@ -207,6 +228,7 @@ for thread_name, groups in thread_name_to_groups.items():
 
     df = df.append(row, ignore_index=True)
   print('Results for {}:'.format(thread_name))
+  print('Units: Microseconds')
   print(df.to_string(index=False, float_format='%.2f', justify='center'))
 
   # https://en.wikipedia.org/wiki/Mann%E2%80%93Whitney_U_test
@@ -219,14 +241,15 @@ for thread_name, groups in thread_name_to_groups.items():
       'The distributions of the two groups {} significantly (Mann-Whitney U={:.2f}, P={:.2f}, cutoff={:.2f}).'
       .format(report_result, u_statistic, p_value, cutoff))
 
-  plt.title('{}: Before/After {} Durations'.format(thread_name,
-                                                   target_event_name))
-  plt.xlabel('Microseconds')
-  plt.ylabel('Density')
-  before_patch = matplotlib.patches.Patch(color='blue', label='Before')
-  after_patch = matplotlib.patches.Patch(color='orange', label='After')
-  plt.legend(handles=[before_patch, after_patch])
-  plt.show()
+  if args.graph == 'density':
+    plt.title('{}: Before/After {} Durations'.format(thread_name,
+                                                     target_event_name))
+    plt.xlabel('Microseconds')
+    plt.ylabel('Density')
+    before_patch = matplotlib.patches.Patch(color='blue', label='Before')
+    after_patch = matplotlib.patches.Patch(color='orange', label='After')
+    plt.legend(handles=[before_patch, after_patch])
+    plt.show()
 
   print('')
   print('===')
