@@ -4,7 +4,7 @@
     <project name="external/github.com/flutter/flutter"
              path="third_party/dart-pkg/git/flutter"
              remote="https://chromium.googlesource.com/external/github.com/flutter/flutter"
-             revision="9dfc0f3aaa4c31557826fc32bb8b04e3f18ac4d3"/>
+             revision="381f16ed537cbcc5a0637ea30d72a5ae3c0e3f50"/>
     <project name="external/github.com/flutter/engine"
              path="third_party/flutter"
              remote="https://chromium.googlesource.com/external/github.com/flutter/engine"
