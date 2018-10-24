@@ -92,7 +92,12 @@ template("dart_kernel") {
       kernel_path,
     ]
     if (defined(invoker.manifest)) {
-      outputs += [ invoker.manifest ]
+      outputs += [
+        # Explicit output when using --manifest.
+        invoker.manifest,
+        # Implicit output when using --manifest; see writePackages in compiler.dart.
+        invoker.manifest + ".dilplist",
+      ]
     }
 
     dart_target_gen_dir =
