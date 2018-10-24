@@ -3,7 +3,18 @@
         "data": "data/device_settings"
     },
     "sandbox": {
-        "features": [ "deprecated-all-services" ],
+        "services": [
+            "fuchsia.modular.Clipboard",
+            "fuchsia.amber.Control",
+            "fuchsia.fonts.Provider",
+            "fuchsia.logger.LogSink",
+            "fuchsia.sys.Environment",
+            "fuchsia.modular.ContextWriter",
+            "fuchsia.ui.input.ImeService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.ui.viewsv1.ViewManager"
+            ],
         "dev": [ "misc" ],
         "system": [ "data" ]
     }
