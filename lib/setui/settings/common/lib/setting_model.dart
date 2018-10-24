@@ -10,7 +10,7 @@ class SettingModel<T> extends Model {
   SettingSource<T> _source;
 
   SettingModel(this._source) {
-    _source.addListener(notifyListeners);
+    _source.addListener((value) => notifyListeners());
   }
 
   T get state => _source.state;

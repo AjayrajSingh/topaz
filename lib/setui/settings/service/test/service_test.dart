@@ -106,15 +106,19 @@ Future<void> awaitForSetting(SettingSource source, Object expectedValue) async {
   }
 
   final Completer<void> completer = Completer<void>();
-  source.addListener(completer.complete);
+
+  final StreamSubscription subscription =
+      source.addListener(completer.complete);
   await completer.future;
-  source.removeListener(completer.complete);
+  await subscription.cancel();
 }
 
 Future<void> listenForNextChange(SettingSource notifier) async {
   final completer = Completer();
-  notifier.addListener(completer.complete);
+  final StreamSubscription subscription =
+      notifier.addListener(completer.complete);
   await completer.future;
+  await subscription.cancel();
 }
 
 class FakeSettingControllerCreator implements SettingControllerCreator {
