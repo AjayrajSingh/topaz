@@ -106,7 +106,9 @@ bool DartComponentController::Setup() {
   } else if (SetupFromKernel()) {
     FXL_LOG(INFO) << url_ << " is running from kernel";
   } else {
-    FXL_LOG(ERROR) << "Could not find a program in " << url_;
+    FXL_LOG(ERROR)
+        << "Could not find a program in " << url_
+        << ". Was data specified correctly in the component manifest?";
     return false;
   }
 
