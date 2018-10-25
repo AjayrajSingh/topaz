@@ -1,0 +1,22 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+flutter_app("crasher_flutter") {
+  main_dart = "lib/main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/crasher_flutter.cmx")
+      dest = "crasher_flutter.cmx"
+    },
+  ]
+
+  manifest = "pubspec.yaml"
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+  ]
+}

@@ -1,0 +1,17 @@
+{
+    "program": {
+        "data": "data/crasher_flutter"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.modular.Clipboard",
+            "fuchsia.modular.ContextWriter",
+            "fuchsia.sys.Environment",
+            "fuchsia.fonts.Provider",
+            "fuchsia.ui.input.ImeService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.ui.viewsv1.ViewManager"
+        ]
+    }
+}

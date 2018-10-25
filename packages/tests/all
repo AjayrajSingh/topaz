@@ -4,6 +4,7 @@
         "topaz/packages/tests/auth_provider_tests",
         "topaz/packages/tests/bindings_tests",
         "topaz/packages/tests/crasher_dart",
+        "topaz/packages/tests/crasher_flutter",
         "topaz/packages/tests/dart",
         "topaz/packages/tests/dart_target_unittests",
         "topaz/packages/tests/dart_target_integration_tests",
