@@ -260,7 +260,12 @@ func docStringLink(nameWithBars string) string {
 
 var reLink = regexp.MustCompile("\\|([^\\|]+)\\|")
 
-func docString(node types.Annotated) Documented {
+// TODO(pascallouis): rethink how we depend on the types package.
+type Annotated interface {
+	LookupAttribute(types.Identifier) (types.Attribute, bool)
+}
+
+func docString(node Annotated) Documented {
 	attribute, ok := node.LookupAttribute("Doc")
 	if !ok {
 		return Documented{nil}
