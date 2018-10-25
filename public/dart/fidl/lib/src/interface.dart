@@ -461,7 +461,8 @@ class ProxyController<T> {
   void close() {
     if (isBound) {
       if (_pendingResponsesCount > 0) {
-        proxyError('The proxy is closed.');
+        proxyError('Proxy with interface name [${$interfaceName}] and '
+            'service name [${$serviceName}] is closed.');
       }
       _reset();
       _reader.close();
@@ -542,7 +543,8 @@ class ProxyController<T> {
   /// Used by subclasses of [Proxy<T>] to send encoded messages.
   void sendMessage(Message message) {
     if (!_reader.isBound) {
-      proxyError('The proxy is closed.');
+      proxyError('Proxy with interface name [${$interfaceName}] and '
+            'service name [${$serviceName}] is closed.');
       return;
     }
     final int status = _reader.channel.write(message.data, message.handles);
