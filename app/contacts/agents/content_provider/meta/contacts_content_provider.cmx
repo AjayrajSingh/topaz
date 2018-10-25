@@ -3,7 +3,12 @@
         "data": "data/contacts_content_provider"
     },
     "sandbox": {
-        "features": [ "deprecated-all-services" ],
+        "services": [
+            "fuchsia.cobalt.LoggerFactory",
+            "fuchsia.logger.LogSink",
+            "fuchsia.modular.AgentContext",
+            "fuchsia.sys.Environment",
+        ],
         "system": [ "data/contacts" ]
     }
 }
