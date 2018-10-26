@@ -20,7 +20,7 @@ POSTAMBLE = ''']
 '''
 
 def main():
-    topaz_to_fidl_path = os.path.join('third_party', 'chromium', 'fidl', 'chromium.web')
+    topaz_to_fidl_path = os.path.join('third_party', 'chromium', 'fidl', 'chromium.web', 'web')
     fidl_gn_path_prefix = '//topaz/' + topaz_to_fidl_path
     fidl_path = os.path.join(TOPAZ_ROOT, topaz_to_fidl_path)
 
