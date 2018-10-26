@@ -7,6 +7,7 @@
     "services": [
           "fuchsia.fonts.Provider",
           "fuchsia.media.Audio",
+          "fuchsia.modular.ModuleContext",
           "fuchsia.net.LegacySocketProvider",
           "fuchsia.netstack.Netstack",
           "fuchsia.process.Launcher",
