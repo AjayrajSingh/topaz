@@ -77,17 +77,20 @@ class FuchsiaFontManager final : public SkFontMgr {
   sk_sp<SkTypeface> onLegacyMakeTypeface(const char familyName[],
                                          SkFontStyle) const override;
 
-  FML_DISALLOW_COPY_AND_ASSIGN(FuchsiaFontManager);
-
  private:
   class TypefaceCache;
+  class FontStyleSet;
+  friend class FontStyleSet;
 
   sk_sp<SkTypeface> FetchTypeface(const char family_name[],
                                   const SkFontStyle& style, const char* bcp47[],
-                                  int bcp47_count, SkUnichar character) const;
+                                  int bcp47_count, SkUnichar character,
+                                  uint32_t flags = 0) const;
 
   mutable fuchsia::fonts::ProviderSyncPtr font_provider_;
   std::unique_ptr<TypefaceCache> typeface_cache_;
+
+  FML_DISALLOW_COPY_AND_ASSIGN(FuchsiaFontManager);
 };
 
 }  // namespace txt

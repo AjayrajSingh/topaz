@@ -77,18 +77,27 @@ sk_sp<SkData> MakeSkDataFromBuffer(const fuchsia::mem::Buffer& data,
                               ReleaseSkData, context);
 }
 
-fuchsia::fonts::Slant ToFontSlant(SkFontStyle::Slant slant) {
+fuchsia::fonts::Slant SkToFuchsiaSlant(SkFontStyle::Slant slant) {
   switch (slant) {
     case SkFontStyle::kOblique_Slant:
       return fuchsia::fonts::Slant::OBLIQUE;
-      break;
     case SkFontStyle::kItalic_Slant:
       return fuchsia::fonts::Slant::ITALIC;
-      break;
     case SkFontStyle::kUpright_Slant:
     default:
       return fuchsia::fonts::Slant::UPRIGHT;
-      break;
+  }
+}
+
+SkFontStyle::Slant FuchsiaToSkSlant(fuchsia::fonts::Slant slant) {
+  switch (slant) {
+    case fuchsia::fonts::Slant::OBLIQUE:
+      return SkFontStyle::kOblique_Slant;
+    case fuchsia::fonts::Slant::ITALIC:
+      return SkFontStyle::kItalic_Slant;
+    case fuchsia::fonts::Slant::UPRIGHT:
+    default:
+      return SkFontStyle::kUpright_Slant;
   }
 }
 
@@ -280,6 +289,58 @@ sk_sp<SkTypeface> FuchsiaFontManager::TypefaceCache::GetOrCreateTypeface(
   return CreateSkTypeface(id, std::move(data));
 }
 
+class FuchsiaFontManager::FontStyleSet : public SkFontStyleSet {
+ public:
+  FontStyleSet(sk_sp<FuchsiaFontManager> font_manager, std::string family_name,
+               std::vector<SkFontStyle> styles)
+      : font_manager_(font_manager),
+        family_name_(family_name),
+        styles_(styles) {}
+
+  ~FontStyleSet() override = default;
+
+  int count() override { return styles_.size(); }
+
+  void getStyle(int index, SkFontStyle* style, SkString* style_name) override {
+    FXL_DCHECK(index >= 0 && index < static_cast<int>(styles_.size()));
+    if (style)
+      *style = styles_[index];
+
+    // We don't have style names. Return an empty name.
+    if (style_name)
+      style_name->reset();
+  }
+
+  SkTypeface* createTypeface(int index) override {
+    FXL_DCHECK(index >= 0 && index < static_cast<int>(styles_.size()));
+
+    if (typefaces_.empty())
+      typefaces_.resize(styles_.size());
+
+    if (!typefaces_[index]) {
+      typefaces_[index] = font_manager_->FetchTypeface(
+          family_name_.c_str(), styles_[index], /*bcp47=*/nullptr,
+          /*bcp47_count=*/0, /*character=*/0,
+          fuchsia::fonts::REQUEST_FLAG_NO_FALLBACK |
+              fuchsia::fonts::REQUEST_FLAG_EXACT_MATCH);
+    }
+
+    return SkSafeRef(typefaces_[index].get());
+  }
+
+  SkTypeface* matchStyle(const SkFontStyle& pattern) override {
+    return matchStyleCSS3(pattern);
+  }
+
+ private:
+  sk_sp<FuchsiaFontManager> font_manager_;
+  std::string family_name_;
+  std::vector<SkFontStyle> styles_;
+  std::vector<sk_sp<SkTypeface>> typefaces_;
+
+  FXL_DISALLOW_COPY_AND_ASSIGN(FontStyleSet);
+};
+
 FuchsiaFontManager::FuchsiaFontManager(fuchsia::fonts::ProviderSyncPtr provider)
     : font_provider_(std::move(provider)),
       typeface_cache_(new FuchsiaFontManager::TypefaceCache()) {}
@@ -303,15 +364,26 @@ SkFontStyleSet* FuchsiaFontManager::onCreateStyleSet(int index) const {
 
 SkFontStyleSet* FuchsiaFontManager::onMatchFamily(
     const char family_name[]) const {
-  sk_sp<SkTypeface> typeface(onMatchFamilyStyle(family_name, SkFontStyle()));
-  if (!typeface)
+  fuchsia::fonts::FamilyInfoPtr family_info;
+  int err = font_provider_->GetFamilyInfo(family_name, &family_info);
+  if (err != ZX_OK) {
+    FML_DLOG(ERROR) << "Error fetching family from provider [err=" << err
+                    << "]. Did you run Flutter in an environment that"
+                    << " has a font manager? ";
+    return nullptr;
+  }
+
+  if (!family_info)
     return nullptr;
 
-  sk_sp<txt::TypefaceFontStyleSet> font_style_set(
-      sk_make_sp<txt::TypefaceFontStyleSet>());
-  font_style_set->registerTypeface(typeface);
+  std::vector<SkFontStyle> styles;
+  for (auto& style : *(family_info->styles)) {
+    styles.push_back(
+        SkFontStyle(style.weight, style.width, FuchsiaToSkSlant(style.slant)));
+  }
 
-  return font_style_set.release();
+  return new FontStyleSet(sk_ref_sp(this), family_info->name,
+                                 std::move(styles));
 }
 
 SkTypeface* FuchsiaFontManager::onMatchFamilyStyle(
@@ -364,18 +436,17 @@ sk_sp<SkTypeface> FuchsiaFontManager::onLegacyMakeTypeface(
   return nullptr;
 }
 
-sk_sp<SkTypeface> FuchsiaFontManager::FetchTypeface(const char family_name[],
-                                                    const SkFontStyle& style,
-                                                    const char* bcp47[],
-                                                    int bcp47_count,
-                                                    SkUnichar character) const {
+sk_sp<SkTypeface> FuchsiaFontManager::FetchTypeface(
+    const char family_name[], const SkFontStyle& style, const char* bcp47[],
+    int bcp47_count, SkUnichar character, uint32_t flags) const {
   fuchsia::fonts::Request request;
   request.family = family_name;
   request.weight = style.weight();
   request.width = style.width();
-  request.slant = ToFontSlant(style.slant());
+  request.slant = SkToFuchsiaSlant(style.slant());
   request.language = BuildLanguageList(bcp47, bcp47_count);
   request.character = character;
+  request.flags = flags;
 
   fuchsia::fonts::ResponsePtr response;
   int err = font_provider_->GetFont(std::move(request), &response);
