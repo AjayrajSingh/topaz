@@ -81,7 +81,8 @@ class _Layer extends Layer {
   bool hitTestable;
 
   @override
-  void addToScene(SceneBuilder builder, [Offset layerOffset]) {
+  EngineLayer addToScene(SceneBuilder builder,
+                            [Offset layerOffset = Offset.zero]) {
     builder.addChildScene(
       offset: offset + layerOffset,
       width: width,
@@ -89,6 +90,7 @@ class _Layer extends Layer {
       sceneHost: sceneHost,
       hitTestable: hitTestable,
     );
+    return null;
   }
 
   @override

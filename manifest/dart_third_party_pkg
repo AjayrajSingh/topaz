@@ -91,7 +91,7 @@
     <project name="third_party/dart/third_party/pkg/http"
              path="third_party/dart/third_party/pkg/http"
              remote="https://dart.googlesource.com/http.git"
-             revision="0.11.3+17"/>
+             revision="0.12.0"/>
 
     <project name="third_party/dart/third_party/pkg/http_multi_server"
              path="third_party/dart/third_party/pkg/http_multi_server"

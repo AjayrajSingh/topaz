@@ -192,7 +192,7 @@ class ScopedModelDescendant<T extends Model> extends StatelessWidget {
 }
 
 /// Mixin to enable a model to provide tickers for animations.
-abstract class TickerProviderModelMixin extends Model
+mixin TickerProviderModelMixin on Model
     implements TickerProvider {
   final _tickers = Set<Ticker>();
 
