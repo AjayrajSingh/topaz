@@ -4,9 +4,9 @@
 # found in the LICENSE file.
 
 chromium_web_sources = [
-  "//topaz/third_party/chromium/fidl/chromium.web/context.fidl",
-  "//topaz/third_party/chromium/fidl/chromium.web/context_provider.fidl",
-  "//topaz/third_party/chromium/fidl/chromium.web/frame.fidl",
-  "//topaz/third_party/chromium/fidl/chromium.web/navigation_controller.fidl",
-  "//topaz/third_party/chromium/fidl/chromium.web/navigation_event_observer.fidl",
+  "//topaz/third_party/chromium/fidl/chromium.web/web/context.fidl",
+  "//topaz/third_party/chromium/fidl/chromium.web/web/context_provider.fidl",
+  "//topaz/third_party/chromium/fidl/chromium.web/web/frame.fidl",
+  "//topaz/third_party/chromium/fidl/chromium.web/web/navigation_controller.fidl",
+  "//topaz/third_party/chromium/fidl/chromium.web/web/navigation_event_observer.fidl",
 ]
