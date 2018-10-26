@@ -4,4 +4,4 @@
 
 name: dashboard
 dependencies:
-  buildbucket: ^0.3.0
+  buildbucket: ^0.4.0

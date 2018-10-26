@@ -10,7 +10,7 @@ dependencies:
   http: any
   flutter:
     sdk: flutter
-  buildbucket: ^0.1.0-dev
+  buildbucket: ^0.4.0
 
 # The following section is specific to Flutter.
 flutter:

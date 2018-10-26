@@ -8,7 +8,7 @@ dependencies:
   flutter_flux: ^4.1.2
   flutter_markdown: ^0.2.0
   googleapis_auth: ^0.2.5+2
-  googleapis: ^0.51.1
+  googleapis: ^0.52.0+1
   html_unescape: ^1.0.1
   markdown: ^2.0.2
   protobuf: ^0.9.1
