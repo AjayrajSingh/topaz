@@ -20,6 +20,6 @@
              path="third_party/dart-pkg/pub"
              remote="https://fuchsia.googlesource.com/third_party/dart-pkg"
              gerrithost="https://fuchsia-review.googlesource.com"
-             revision="8ade94964199b6a7f5c42d2753ae133af21b1304"/>
+             revision="50e97caf755083b4748bc501efd24918579945a7"/>
   </projects>
 </manifest>
