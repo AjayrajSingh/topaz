@@ -58,8 +58,7 @@ class Intent extends fidl.Intent {
   Intent({
     @required String action,
     String handler,
-  })  : assert(action != null),
-        super(
+  }) : super(
           action: action,
           handler: handler,
           parameters: [],

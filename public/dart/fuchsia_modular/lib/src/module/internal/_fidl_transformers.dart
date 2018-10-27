@@ -29,18 +29,10 @@ Intent convertFidlIntentToIntent(fidl.Intent fidlIntent) {
     throw Exception('fidlIntent must not be null in convertFidlIntentToIntent');
   }
 
-  Intent intent;
-  if (fidlIntent.action != null) {
-    intent = Intent(
-      action: fidlIntent.action,
-      handler: fidlIntent.handler,
-    );
-  } else {
-    throw ModuleStateException(
-        'Unable to convert Intent. Intents must have a valid action. '
-        'Ensure that the intent you are trying to convert has a '
-        'valid action before proceeding.');
-  }
+  Intent intent = Intent(
+    action: fidlIntent.action,
+    handler: fidlIntent.handler,
+  );
 
   // We shouldn't have null fidl intent parameters but in the case that we
   // do we avoid adding them as it will cause a crash.

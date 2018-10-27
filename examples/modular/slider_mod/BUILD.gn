@@ -13,7 +13,7 @@ flutter_app("slider_mod") {
 
   # This creates a flutter_driver enabled binary that will enable extensions for
   # testing when run in an environment along with TestRunner.
-  # flutter_driver_extendable = true # TODO uncomment this test after DX-625 is fixed
+  flutter_driver_extendable = true
 
   sources = [
     "src/widgets/slider_scaffold.dart",

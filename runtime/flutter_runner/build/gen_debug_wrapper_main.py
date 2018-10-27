@@ -29,56 +29,45 @@ def main():
   outfile.write('''
 
 
-// ignore_for_file: directives_ordering
 // ignore_for_file: avoid_relative_lib_imports
-// ignore_for_file: unawaited_futures
 import 'dart:async';
 
-import 'package:fidl/fidl.dart';
-
-import 'package:fidl_fuchsia_sys/fidl.dart';
-import 'package:fidl_fuchsia_testing_runner/fidl.dart';
+import 'package:fidl_fuchsia_testing_runner/fidl_async.dart';
+import 'package:fuchsia/services.dart';
 import 'package:flutter_driver/driver_extension.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.module.dart/module.dart';
 ''')
   outfile.write("import '%s' as flutter_app_main;\n" % args.main_dart)
   outfile.write('''
 void main(List<String> args) async {
-
   assert(await (() async {
-    final StartupContext startupContext = new StartupContext.fromStartupInfo();
-    final ServiceProviderProxy envServices = startupContext.environmentServices;
-    final TestRunnerProxy testRunner = new TestRunnerProxy();
-    final ModuleContextClient moduleContext = new ModuleContextClient();
-    connectToService(envServices, moduleContext.proxy.ctrl);
-    try {
-      connectToService(envServices, testRunner.ctrl);
-    } on Exception catch (e) {
-      // TODO(awdavies): Use the logger instead.
-      print(e.toString());
-    }
-    final Completer<Null> completer = new Completer<Null>();
-    testRunner.ctrl.error.then((ProxyError err) {
-      if (!completer.isCompleted) {
-        completer.completeError(err);
-      }
-    });
-    testRunner.done(completer.complete);
-    await completer.future.timeout(
-        const Duration(seconds: 5)).then((_) {
+    // TODO(awdavies): Use the logger instead.
+    print('Overriding app main method because flutter_driver_extendable '
+        'is enabled in the build file');
 
+    // TODO(DX-634): don't reply on testRunner if possible
+    final TestRunnerProxy testRunner = TestRunnerProxy();
+    connectToEnvironmentService(testRunner);
+    try {
+      await testRunner.done();
+
+      // Enables Flutter Driver VM service extension
+      //
+      // This extension is required for tests that use package:flutter_driver
+      // to drive applications from a separate process.
       enableFlutterDriverExtension();
+
       // TODO(awdavies): Use the logger instead.
       print('flutter driver extensions enabled.');
-    }, onError: (_) {
+      //ignore: avoid_catches_without_on_clauses
+    } catch (e) {
       // TODO(awdavies): Use the logger instead.
       // Noop.
-      print('flutter driver extensions not enabled.');
-    });
+      print('flutter driver extensions not enabled. $e');
+    }
     // Always return true so that the assert succeeds.
     return true;
   }()));
+  // Execute the main method of the app under test
   var res = (flutter_app_main.main as dynamic)();
   if (res != null && res is Future) {
     await res;

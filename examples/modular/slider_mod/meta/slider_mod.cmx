@@ -13,7 +13,8 @@
             "fuchsia.ui.policy.Presenter",
             "fuchsia.modular.Clipboard",
             "fuchsia.modular.ComponentContext",
-            "fuchsia.modular.ModuleContext"
+            "fuchsia.modular.ModuleContext",
+            "fuchsia.testing.runner.TestRunner"
         ]
     }
 }
