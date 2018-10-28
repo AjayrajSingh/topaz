@@ -5,6 +5,8 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_app("fidl_bindings_test_server") {
+  deprecated_no_cmx = "//build"
+
   fuchsia_package_name = "fidl_bindings_test_server"
 
   main_dart = "lib/main.dart"

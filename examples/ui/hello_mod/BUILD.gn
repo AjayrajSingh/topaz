@@ -5,6 +5,8 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("hello_mod") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "main.dart"
   package_name = "hello_mod"
 
@@ -19,6 +21,8 @@ flutter_app("hello_mod") {
 
 
 flutter_app("hello_space_dart") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "main.dart"
   package_name = "hello_space_dart"
   fuchsia_package_name = "hello_space_dart"

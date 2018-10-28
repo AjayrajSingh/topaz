@@ -5,6 +5,8 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("link_viewer") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "lib/main.dart"
 
   sources = [

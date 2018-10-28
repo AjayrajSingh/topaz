@@ -5,6 +5,8 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("mine_digger") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "main.dart"
 
   source_dir = "."

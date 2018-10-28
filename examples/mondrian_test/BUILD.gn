@@ -5,6 +5,8 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("mondrian_test") {
+  deprecated_no_cmx = "//build"
+
   package_name = "mondrian_test"
   main_dart = "lib/main.dart"
   module_manifest = "manifest.json"

@@ -10,6 +10,8 @@ cobalt_config("generate_module_usage_tracking_config") {
 }
 
 dart_app("usage_log") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "main.dart"
 
   source_dir = "."

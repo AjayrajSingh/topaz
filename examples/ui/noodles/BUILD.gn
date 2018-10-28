@@ -28,6 +28,7 @@ executable("bin") {
 }
 
 package("noodles") {
+  deprecated_no_cmx = "//build"
 
   deps = [
     ":bin",

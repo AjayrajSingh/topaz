@@ -48,6 +48,8 @@ executable("web_runner_unittests") {
 }
 
 package("web_runner_prototype") {
+  deprecated_no_cmx = "//build"
+
   deps = [
     ":bin",
   ]

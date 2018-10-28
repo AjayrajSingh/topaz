@@ -34,6 +34,8 @@ rustc_binary("bin") {
 }
 
 package("ermine") {
+  deprecated_no_cmx = "//build"
+
   deps = [
     ":bin",
   ]

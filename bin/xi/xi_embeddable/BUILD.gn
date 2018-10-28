@@ -6,6 +6,8 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
 flutter_app("xi_embeddable") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "lib/main.dart"
 
   sources = []

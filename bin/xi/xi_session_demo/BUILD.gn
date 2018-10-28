@@ -6,6 +6,8 @@ import("//build/dart/dart_library.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("xi_session_demo") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "lib/main.dart"
 
   deps = [

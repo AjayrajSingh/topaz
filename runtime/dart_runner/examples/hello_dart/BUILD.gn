@@ -5,6 +5,8 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_jit_app("hello_dart_jit") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
@@ -19,6 +21,8 @@ dart_jit_app("hello_dart_jit") {
 }
 
 dart_jit_app("hello_dart_dbc") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
@@ -35,6 +39,8 @@ dart_jit_app("hello_dart_dbc") {
 }
 
 dart_aot_app("hello_dart_aot") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
@@ -49,6 +55,8 @@ dart_aot_app("hello_dart_aot") {
 }
 
 dart_jit_app("hello_dart_jit_product") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
@@ -63,6 +71,8 @@ dart_jit_app("hello_dart_jit_product") {
 }
 
 dart_aot_app("hello_dart_aot_product") {
+  deprecated_no_cmx = "//build"
+
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
