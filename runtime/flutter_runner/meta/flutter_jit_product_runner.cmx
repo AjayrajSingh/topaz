@@ -4,10 +4,15 @@
     },
     "sandbox": {
         "features": [
-            "deprecated-all-services",
             "root-ssl-certificates",
-            "system-temp",
             "vulkan"
+        ],
+        "services": [
+            "fuchsia.fonts.Provider",
+            "fuchsia.net.LegacySocketProvider",
+            "fuchsia.timezone.Timezone",
+            "fuchsia.tracelink.Registry",
+            "fuchsia.vulkan.loader.Loader"
         ]
     }
 }

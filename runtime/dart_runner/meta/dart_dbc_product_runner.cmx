@@ -4,9 +4,12 @@
     },
     "sandbox": {
         "features": [
-            "deprecated-all-services",
-            "root-ssl-certificates",
-            "system-temp"
+            "root-ssl-certificates"
+        ],
+        "services": [
+            "fuchsia.net.LegacySocketProvider",
+            "fuchsia.timezone.Timezone",
+            "fuchsia.tracelink.Registry"
         ]
     }
 }
