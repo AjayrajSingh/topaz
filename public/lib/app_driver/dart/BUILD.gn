@@ -2,13 +2,16 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//third_party/cobalt_config/cobalt_config_dart.gni")
+import("//third_party/cobalt_config/cobalt_config.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 import("//build/dart/dart_library.gni")
 
-cobalt_config_dart("modules_config") {
+cobalt_config("modules_config") {
   project_id = 104
   sdk_category = "partner"
+
+  generate_binarypb = false
+  generate_dart = true
 }
 
 dart_library("dart") {
@@ -25,7 +28,7 @@ dart_library("dart") {
   ]
 
   deps = [
-    ":modules_config",
+    ":modules_config_dartlib",
     "//peridot/public/fidl/fuchsia.modular",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
