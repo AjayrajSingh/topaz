@@ -4,11 +4,11 @@
 
 // ignore_for_file: implementation_imports
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
-import 'package:fuchsia_modular/src/module/_fidl_transformers.dart';
-import 'package:fuchsia_modular/src/module/_entity_intent_parameter_data_transformer.dart';
+import 'package:fuchsia_modular/src/module/internal/_fidl_transformers.dart';
+import 'package:fuchsia_modular/src/module/internal/_entity_intent_parameter_data_transformer.dart';
 import 'package:test/test.dart';
 
-import '../matchers.dart';
+import '../../matchers.dart';
 
 void main() {
   group('intent transformers', () {

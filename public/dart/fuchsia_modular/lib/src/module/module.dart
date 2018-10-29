@@ -8,9 +8,9 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
 import 'package:meta/meta.dart';
 
-import '_intent_handler_impl.dart';
-import '_module_impl.dart';
 import 'intent_handler.dart';
+import 'internal/_intent_handler_impl.dart';
+import 'internal/_module_impl.dart';
 
 /// The [Module] class provides a mechanism for module authors
 /// to interact with the underlying framework. The main responsibilities

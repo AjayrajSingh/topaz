@@ -8,8 +8,8 @@ import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import 'package:fuchsia_modular/src/module/_intent_handler_impl.dart'; // ignore: implementation_imports
-import 'package:fuchsia_modular/src/module/_module_impl.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/internal/_intent_handler_impl.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/module/internal/_module_impl.dart'; // ignore: implementation_imports
 import 'package:fuchsia_modular/src/module/intent.dart'; // ignore: implementation_imports
 import 'package:fuchsia_modular/src/module/intent_handler.dart'; // ignore: implementation_imports
 import 'package:fuchsia_modular/src/module/noop_intent_handler.dart'; // ignore: implementation_imports

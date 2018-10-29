@@ -4,10 +4,24 @@
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 
+import '../intent.dart';
+import '../intent_parameter.dart';
+import '../module_state_exception.dart';
 import '_entity_intent_parameter_data_transformer.dart';
-import 'intent.dart';
-import 'intent_parameter.dart';
-import 'module_state_exception.dart';
+
+/// Converts the supplied [fidl.IntentParameter] into an [IntentParameter]
+/// object. This method will throw a [ModuleStateException] if the parameter
+/// data type is not supported.
+///
+/// Currently, the entityReference is the only supported type.
+IntentParameter convertFidlIntentParameterToIntentParameter(
+    fidl.IntentParameter fidlIntentParameter) {
+  return IntentParameter(
+    name: fidlIntentParameter.name,
+    data: fidlIntentParameter.data,
+    dataTransformer: _transformerForDataTag(fidlIntentParameter.data.tag),
+  );
+}
 
 /// Converts the [fidlIntent] to an [Intent] object.
 Intent convertFidlIntentToIntent(fidl.Intent fidlIntent) {
@@ -35,20 +49,6 @@ Intent convertFidlIntentToIntent(fidl.Intent fidlIntent) {
   }
 
   return intent;
-}
-
-/// Converts the supplied [fidl.IntentParameter] into an [IntentParameter]
-/// object. This method will throw a [ModuleStateException] if the parameter
-/// data type is not supported.
-///
-/// Currently, the entityReference is the only supported type.
-IntentParameter convertFidlIntentParameterToIntentParameter(
-    fidl.IntentParameter fidlIntentParameter) {
-  return IntentParameter(
-    name: fidlIntentParameter.name,
-    data: fidlIntentParameter.data,
-    dataTransformer: _transformerForDataTag(fidlIntentParameter.data.tag),
-  );
 }
 
 IntentParameterDataTransformer _transformerForDataTag(

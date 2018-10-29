@@ -4,7 +4,7 @@
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 
-import 'intent_parameter.dart';
+import '../intent_parameter.dart';
 
 /// A [IntentParameterDataTransformer] for IntentParameter objects backed by
 /// entity references

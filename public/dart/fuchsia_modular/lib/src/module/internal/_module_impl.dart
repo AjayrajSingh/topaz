@@ -4,16 +4,16 @@
 
 import 'dart:async';
 
-import 'package:fuchsia/services.dart';
-import 'package:meta/meta.dart';
-import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
+import 'package:fuchsia/services.dart';
+import 'package:fuchsia_modular/lifecycle.dart';
+import 'package:meta/meta.dart';
 
+import '../intent.dart';
+import '../intent_handler.dart';
+import '../module.dart';
+import '../module_state_exception.dart';
 import '_intent_handler_impl.dart';
-import 'intent.dart';
-import 'intent_handler.dart';
-import 'module.dart';
-import 'module_state_exception.dart';
 
 /// A concrete implementation of the [Module] interface. This class
 /// is not intended to be used directly by authors but instead should
@@ -40,16 +40,6 @@ class ModuleImpl implements Module {
     _moduleContextProxy ??= moduleContextProxy;
     _intentHandlerImpl = intentHandlerImpl
       ..onHandleIntent = _proxyIntentToIntentHandler;
-  }
-
-  @override
-  void registerIntentHandler(IntentHandler intentHandler) {
-    if (_intentHandler != null) {
-      throw ModuleStateException(
-          'Intent handler registration failed because a handler is already registered.');
-    }
-
-    _intentHandler = intentHandler;
   }
 
   @override
@@ -82,15 +72,14 @@ class ModuleImpl implements Module {
     return moduleControllerProxy;
   }
 
-  void _proxyIntentToIntentHandler(Intent intent) {
-    if (_intentHandler == null) {
+  @override
+  void registerIntentHandler(IntentHandler intentHandler) {
+    if (_intentHandler != null) {
       throw ModuleStateException(
-          'Module received an intent but no intent handler was registered to '
-          'receive it. If you do not intend to handle intents but you still '
-          'need to use the module functionality register a NoopIntentHandler '
-          'to explicitly declare that you will not handle the intent.');
+          'Intent handler registration failed because a handler is already registered.');
     }
-    _intentHandler.handleIntent(intent);
+
+    _intentHandler = intentHandler;
   }
 
   /// Returns the [fidl.ModuleContext] for the running module.
@@ -108,6 +97,17 @@ class ModuleImpl implements Module {
     _moduleContextProxy = fidl.ModuleContextProxy();
     connectToEnvironmentService(_moduleContextProxy);
     return _moduleContextProxy;
+  }
+
+  void _proxyIntentToIntentHandler(Intent intent) {
+    if (_intentHandler == null) {
+      throw ModuleStateException(
+          'Module received an intent but no intent handler was registered to '
+          'receive it. If you do not intend to handle intents but you still '
+          'need to use the module functionality register a NoopIntentHandler '
+          'to explicitly declare that you will not handle the intent.');
+    }
+    _intentHandler.handleIntent(intent);
   }
 
   // any necessary cleanup should be done in this method.

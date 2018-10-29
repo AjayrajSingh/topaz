@@ -9,7 +9,7 @@ import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
 
-import 'lifecycle.dart';
+import '../lifecycle.dart';
 
 /// Allows running components to be notified when lifecycle events happen in the
 /// system.

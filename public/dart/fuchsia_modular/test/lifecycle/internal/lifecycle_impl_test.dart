@@ -4,7 +4,7 @@
 
 import 'package:test/test.dart';
 
-import 'package:fuchsia_modular/src/lifecycle/_lifecycle_impl.dart'; // ignore: implementation_imports
+import 'package:fuchsia_modular/src/lifecycle/internal/_lifecycle_impl.dart'; // ignore: implementation_imports
 
 Future<void> terminateListener1() async {
   print('terminateListener1');

@@ -9,8 +9,8 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
 import 'package:fuchsia_modular/lifecycle.dart';
 
+import '../intent.dart';
 import '_fidl_transformers.dart';
-import 'intent.dart';
 
 /// A concrete implementation of the [fidl.IntentHandler] interface.
 /// This class not intended to be used directly by authors but instead should
@@ -36,6 +36,23 @@ class IntentHandlerImpl extends fidl.IntentHandler {
 
   // Note: this method needs to run before the first iteration of
   // the event loop or the framework will not bind to it.
+  @override
+  Future<void> handleIntent(fidl.Intent intent) async {
+    if (onHandleIntent == null) {
+      return null;
+    }
+    // convert to the non-fidl intent.
+    onHandleIntent(convertFidlIntentToIntent(intent));
+  }
+
+  void _clearBinding() {
+    if (_intentHandlerBinding != null && _intentHandlerBinding.isBound) {
+      _intentHandlerBinding.unbind();
+      _intentHandlerBinding = null;
+    }
+  }
+
+  // any necessary cleanup should be done in this method.
   void _exposeService(StartupContext startupContext) {
     startupContext.outgoingServices.addServiceForName(
       (InterfaceRequest<fidl.IntentHandler> request) {
@@ -47,25 +64,8 @@ class IntentHandlerImpl extends fidl.IntentHandler {
     );
   }
 
-  @override
-  Future<void> handleIntent(fidl.Intent intent) async {
-    if (onHandleIntent == null) {
-      return null;
-    }
-    // convert to the non-fidl intent.
-    onHandleIntent(convertFidlIntentToIntent(intent));
-  }
-
-  // any necessary cleanup should be done in this method.
   Future<void> _terminate() async {
     _clearBinding();
     onHandleIntent = null;
-  }
-
-  void _clearBinding() {
-    if (_intentHandlerBinding != null && _intentHandlerBinding.isBound) {
-      _intentHandlerBinding.unbind();
-      _intentHandlerBinding = null;
-    }
   }
 }

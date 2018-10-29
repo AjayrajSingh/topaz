@@ -20,15 +20,15 @@ dart_library("fuchsia_modular") {
     "lifecycle.dart",
     "logger.dart",
     "module.dart",
-    "src/lifecycle/_lifecycle_impl.dart",
+    "src/lifecycle/internal/_lifecycle_impl.dart",
     "src/lifecycle/lifecycle.dart",
-    "src/module/_entity_intent_parameter_data_transformer.dart",
-    "src/module/_fidl_transformers.dart",
-    "src/module/_intent_handler_impl.dart",
-    "src/module/_module_impl.dart",
     "src/module/intent_handler.dart",
     "src/module/intent_parameter.dart",
     "src/module/intent.dart",
+    "src/module/internal/_entity_intent_parameter_data_transformer.dart",
+    "src/module/internal/_fidl_transformers.dart",
+    "src/module/internal/_intent_handler_impl.dart",
+    "src/module/internal/_module_impl.dart",
     "src/module/module_state_exception.dart",
     "src/module/module.dart",
     "src/module/noop_intent_handler.dart",
@@ -49,10 +49,10 @@ dart_test("fuchsia_modular_package_unittests") {
   sources = [
     "lifecycle/lifecycle_test.dart",
     "matchers.dart",
-    "module/fidl_transformers_test.dart",
-    "module/intent_handler_impl_test.dart",
     "module/intent_test.dart",
-    "module/module_impl_test.dart",
+    "module/internal/fidl_transformers_test.dart",
+    "module/internal/intent_handler_impl_test.dart",
+    "module/internal/module_impl_test.dart",
     "module/module_test.dart",
     "module/noop_intent_handler_test.dart",
   ]
@@ -73,8 +73,8 @@ dart_test("fuchsia_modular_package_unittests") {
 dart_fuchsia_test("fuchsia_modular_package_integration_tests") {
 
   sources = [
-    "lifecycle/lifecycle_impl_test.dart",
-    "module/module_impl_integ_test.dart"
+    "lifecycle/internal/lifecycle_impl_test.dart",
+    "module/internal/module_impl_integ_test.dart"
   ]
 
   deps = [

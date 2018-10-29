@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import '_lifecycle_impl.dart';
+import 'internal/_lifecycle_impl.dart';
 
 /// Allows running components to be notified when lifecycle events happen in the
 /// system.

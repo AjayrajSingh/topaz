@@ -5,8 +5,8 @@
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:meta/meta.dart';
 
-import '_fidl_transformers.dart';
 import 'intent_parameter.dart';
+import 'internal/_fidl_transformers.dart';
 import 'module_state_exception.dart';
 
 /// An [Intent] is a fundamental building block of module development.
