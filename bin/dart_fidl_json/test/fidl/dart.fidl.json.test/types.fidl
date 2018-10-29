@@ -5,6 +5,7 @@ struct ExampleStruct {
   int32 bar;
   vector<ExampleStruct2> structs;
   vector<string> vals;
+  vector<uint32> integers;
 };
 
 struct ExampleStruct2 {
