@@ -20,6 +20,8 @@ class SetUiServiceAdapter implements SettingAdapter {
 
   int nextUpdateId = 0;
 
+  int _nextMutationId = 0;
+
   factory SetUiServiceAdapter(
       {SetUiService service,
       SetUiListenerBinder binder = _bindListener,
@@ -70,6 +72,27 @@ class SetUiServiceAdapter implements SettingAdapter {
     });
 
     return c.future;
+  }
+
+  @override
+  Future<MutationResponse> mutate(SettingType settingType, Mutation mutation,
+      {MutationHandles handles}) async {
+    final int nextMutationId = _nextMutationId++;
+
+    _logger?.onMutation(MutationLog(nextMutationId, settingType, mutation));
+
+    Completer<MutationResponse> completer = Completer<MutationResponse>();
+
+    void callback(MutationResponse response) {
+      completer.complete(response);
+    }
+
+    if (handles != null) {
+      _service.interactiveMutate(settingType, mutation, handles, callback);
+    } else {
+      _service.mutate(settingType, mutation, callback);
+    }
+    return completer.future;
   }
 }
 

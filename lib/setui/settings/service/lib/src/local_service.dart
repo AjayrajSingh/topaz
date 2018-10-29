@@ -31,20 +31,21 @@ class LocalSetUiService implements SetUiService {
   }
 
   @override
-  // STOPSHIP(brycelee): remove ignore once FIDL definition lands.
-  // ignore: override_on_non_overriding_method
   void mutate(SettingType settingType, Mutation mutation,
-          void Function(MutationResponse response) callback) =>
-      interactiveMutate(settingType, mutation, null /*handles*/, callback);
+      void Function(MutationResponse response) callback) {
+    interactiveMutate(settingType, mutation, null /*handles*/, callback);
+  }
 
   @override
-  // STOPSHIP(brycelee): remove ignore once FIDL definition lands.
-  // ignore: override_on_non_overriding_method
   void interactiveMutate(
       SettingType settingType,
       Mutation mutation,
       MutationHandles handles,
-      void Function(MutationResponse response) callback) {}
+      void Function(MutationResponse response) callback) {
+    _getController(settingType).mutate(mutation, handles: handles).then((code) {
+      callback(MutationResponse(returnCode: code));
+    });
+  }
 
   SettingController _getController(SettingType type) =>
       controllers.putIfAbsent(type, () => creator.createController(type));

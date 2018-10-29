@@ -60,6 +60,20 @@ void main() {
           fakeControllers.fakes[SettingType.unknown];
       expect(controller.open, false);
     });
+    test('mutates a value', () async {
+      final object = manager.fetch<String>(SettingType.unknown);
+
+      await awaitForSetting(object, defaultValue);
+      expect(object.state, defaultValue);
+
+      final response = await manager.mutate(
+          SettingType.unknown,
+          Mutation.withStringMutationValue(StringMutation(
+              operation: StringOperation.update, value: value1)));
+      expect(response.returnCode, ReturnCode.ok);
+
+      expect(object.state, value1);
+    });
     test('calls initialize and close depending on listeners', () async {
       final object = manager.fetch<String>(SettingType.unknown);
 
@@ -137,6 +151,17 @@ class FakeStringSettingController extends SettingController {
   Future<bool> setSettingValue(SettingsObject value) async {
     item.value = value.data.stringValue;
     return true;
+  }
+
+  @override
+  Future<ReturnCode> mutate(Mutation mutation,
+      {MutationHandles handles}) async {
+    if (mutation.tag != MutationTag.stringMutationValue) {
+      return ReturnCode.unsupported;
+    }
+
+    item.value = mutation.stringMutationValue.value;
+    return ReturnCode.ok;
   }
 
   @override

@@ -15,6 +15,7 @@ typedef LogExecutor = void Function(Duration delay, LogAction action);
 class MockSettingAdapter implements SettingAdapter {
   final Map<SettingType, SettingSource> _sources = {};
   final Map<int, Completer<UpdateResponse>> _activeResponses = {};
+  final Map<int, Completer<MutationResponse>> _activeMutationResponses = {};
   final List<AdapterLog> logs;
   final LogExecutor executor;
 
@@ -64,6 +65,30 @@ class MockSettingAdapter implements SettingAdapter {
     return completer.future;
   }
 
+  @override
+  Future<MutationResponse> mutate(SettingType settingType, Mutation mutation,
+      {MutationHandles handles}) {
+    final Completer<MutationResponse> completer = Completer<MutationResponse>();
+
+    // Unwind to the matching update log.
+    _unwindTo((AdapterLog log) {
+      return log.type == AdapterLogType.mutation &&
+          log.mutationLog.settingType == settingType;
+    });
+
+    if (logs.isEmpty) {
+      completer.complete(null);
+    } else {
+      final AdapterLog log = logs.removeAt(0);
+
+      _activeMutationResponses[log.mutationLog.id] = completer;
+
+      // Unwind to the next client log.
+      _unwindTo((AdapterLog log) => log.fromClient, keyFrame: log.time);
+    }
+    return completer.future;
+  }
+
   /// Replays logs up to the log which matches the conditions provided by the
   /// input match function. The keyframe provides a time reference which events
   /// will be temporally executed against.
@@ -86,6 +111,17 @@ class MockSettingAdapter implements SettingAdapter {
           }
 
           completer.complete(log.responseLog.response);
+        };
+        break;
+      case AdapterLogType.mutationResponse:
+        action = () {
+          final Completer completer =
+              _activeMutationResponses[log.mutationResponseLog.mutationId];
+          if (completer == null) {
+            return;
+          }
+
+          completer.complete(log.mutationResponseLog.response);
         };
         break;
       case AdapterLogType.setting:
