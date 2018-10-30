@@ -27,7 +27,7 @@ int _compareByOtherList(Surface l, Surface r, List<Surface> otherList) {
   return ri - li;
 }
 
-/// Returns in the order they should stacked
+/// Returns in the order they should be stacked
 List<PositionedSurface> layoutSurfaces(
   BuildContext context,
   SurfaceGraph graph,
