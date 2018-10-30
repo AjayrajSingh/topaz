@@ -26,10 +26,7 @@ use std::sync::Arc;
 struct ViewData {
     key: u32,
     url: String,
-    // not currently used, as the Tiles FIDL interface doesn't have
-    // any way to ruturn it but I hope to expose it via ermine_ctl
-    // soon.
-    _story_id: String,
+    story_id: String,
     allow_focus: bool,
     bounds: Option<RectF>,
     host_node: EntityNode,
@@ -42,7 +39,7 @@ impl ViewData {
         ViewData {
             key: key,
             url: url,
-            _story_id: story_id,
+            story_id: story_id,
             bounds: None,
             allow_focus: allow_focus,
             host_node: host_node,
@@ -132,7 +129,8 @@ impl ErmineView {
                         view_controller.lock().handle_session_events(events)
                     }
                     _ => (),
-                }).try_collect::<()>()
+                })
+                .try_collect::<()>()
                 .unwrap_or_else(|e| eprintln!("session listener error: {:?}", e)),
         );
     }
@@ -153,7 +151,8 @@ impl ErmineView {
                         view_controller.lock().handle_properies_changed(&properties);
                         fready(responder.send())
                     },
-                ).unwrap_or_else(|e| eprintln!("view listener error: {:?}", e)),
+                )
+                .unwrap_or_else(|e| eprintln!("view listener error: {:?}", e)),
         );
     }
 
@@ -186,7 +185,8 @@ impl ErmineView {
                         view_controller.lock().remove_story(child_key);
                         fready(responder.send())
                     }
-                }).unwrap_or_else(|e| eprintln!("view listener error: {:?}", e)),
+                })
+                .unwrap_or_else(|e| eprintln!("view listener error: {:?}", e)),
         );
 
         Ok(())
@@ -210,7 +210,8 @@ impl ErmineView {
                 .unwrap()
                 .try_for_each(move |event| match event {
                     InputListenerRequest::OnEvent { responder, .. } => fready(responder.send(true)),
-                }).unwrap_or_else(|e| eprintln!("view listener error: {:?}", e)),
+                })
+                .unwrap_or_else(|e| eprintln!("view listener error: {:?}", e)),
         );
 
         Ok(())
@@ -293,6 +294,30 @@ impl ErmineView {
         self.views.insert(key, view_data);
         self.update();
         self.layout();
+    }
+
+    pub fn display_story(
+        &mut self, key: u32, url: String, story_id: &String, story_provider: &StoryProviderProxy,
+    ) -> Result<(), Error> {
+        let (story_controller, story_controller_end) = create_proxy()?;
+        story_provider.get_controller(story_id, story_controller_end)?;
+        let (view_owner_client, view_owner_server) = Channel::create()?;
+        story_controller.start(ServerEnd::new(view_owner_client))?;
+        self.add_child_view_for_story(key, url, story_id.to_string(), true, view_owner_server);
+        Ok(())
+    }
+
+    pub fn remove_view_for_story(&mut self, story_id: &String) -> Result<(), Error> {
+        let result = self
+            .views
+            .iter()
+            .find(|(_key, view)| view.story_id == *story_id);
+
+        if let Some((key, _view)) = result {
+            self.remove_story(*key);
+        }
+
+        Ok(())
     }
 
     pub fn setup_story(

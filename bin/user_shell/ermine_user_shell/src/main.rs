@@ -3,10 +3,13 @@
 // found in the LICENSE file.
 
 use failure::{Error, ResultExt};
-use fidl::endpoints::{create_proxy, ClientEnd, RequestStream, ServerEnd, ServiceMarker};
+use fidl::endpoints::{create_endpoints, create_proxy, ClientEnd, RequestStream, ServerEnd,
+                      ServiceMarker};
 use fidl_fuchsia_developer_tiles as tiles;
 use fidl_fuchsia_math::SizeF;
-use fidl_fuchsia_modular::{StoryProviderProxy, UserShellContextMarker, UserShellContextProxy};
+use fidl_fuchsia_modular::{StoryProviderProxy, StoryProviderWatcherMarker,
+                           StoryProviderWatcherRequest, StoryState, UserShellContextMarker,
+                           UserShellContextProxy};
 use fidl_fuchsia_ui_input::{KeyboardEvent, KeyboardEventPhase, MODIFIER_LEFT_CONTROL,
                             MODIFIER_RIGHT_CONTROL};
 use fidl_fuchsia_ui_policy::{KeyboardCaptureListenerHackMarker,
@@ -58,6 +61,7 @@ impl App {
             presentation_proxy: None,
             next_key: 1,
         }));
+        app.lock().spawn_story_watcher()?;
         app.lock().setup_keyboard_hack()?;
         Ok(app)
     }
@@ -71,7 +75,8 @@ impl App {
                         .create_view(view_owner)
                         .expect("Create view failed");
                     futures::future::ready(Ok(()))
-                }).unwrap_or_else(|e| eprintln!("error running view_provider server: {:?}", e)),
+                })
+                .unwrap_or_else(|e| eprintln!("error running view_provider server: {:?}", e)),
         )
     }
 
@@ -128,7 +133,8 @@ impl App {
                         println!("ermine: hotkey support goes here");
                         futures::future::ready(Ok(()))
                     }
-                }).unwrap_or_else(|e| eprintln!("keyboard hack listener error: {:?}", e)),
+                })
+                .unwrap_or_else(|e| eprintln!("keyboard hack listener error: {:?}", e)),
         );
 
         Ok(())
@@ -162,9 +168,23 @@ impl App {
                 APP.lock()
                     .setup_story(key_to_use, &r, module_name, allow_focus)
                     .unwrap();
-            }).unwrap_or_else(|e| eprintln!("create_story error: {:?}", e)),
+            })
+            .unwrap_or_else(|e| eprintln!("create_story error: {:?}", e)),
         );
         key_to_use
+    }
+
+    pub fn add_view_for_story(&mut self, story_id: String) -> Result<(), Error> {
+        let key_to_use = self.next_story_key();
+        self.views[0]
+            .lock()
+            .display_story(key_to_use, "".to_string(), &story_id, &self.story_provider)
+            .context("display_story failed")?;
+        Ok(())
+    }
+
+    pub fn remove_view_for_story(&mut self, story_id: String) -> Result<(), Error> {
+        self.views[0].lock().remove_view_for_story(&story_id)
     }
 
     pub fn remove_story(&mut self, key: u32) {
@@ -205,8 +225,59 @@ impl App {
                             &mut focusabilties.iter_mut().map(|a| *a),
                         ))
                     }
-                }).unwrap_or_else(|e| eprintln!("error running Tiles controller server: {:?}", e)),
+                })
+                .unwrap_or_else(|e| eprintln!("error running Tiles controller server: {:?}", e)),
         )
+    }
+
+    pub fn spawn_story_watcher(&mut self) -> Result<(), Error> {
+        let (story_watcher, story_watcher_request) =
+            create_endpoints::<StoryProviderWatcherMarker>()?;
+
+        fasync::spawn(
+            story_watcher_request
+                .into_stream()
+                .unwrap()
+                .map_ok(move |request| match request {
+                    StoryProviderWatcherRequest::OnChange {
+                        story_info,
+                        story_state,
+                        ..
+                    } => {
+                        if story_state == StoryState::Stopped {
+                            APP.lock()
+                                .add_view_for_story(story_info.id.to_string())
+                                .unwrap_or_else(|e| {
+                                    eprintln!("error adding story {}: {:?}", story_info.id, e);
+                                });
+                        }
+                    }
+                    StoryProviderWatcherRequest::OnDelete { story_id, .. } => {
+                        APP.lock()
+                            .remove_view_for_story(story_id.to_string())
+                            .unwrap_or_else(|e| {
+                                eprintln!("error removing story {}: {:?}", story_id, e);
+                            });
+                    }
+                })
+                .try_collect::<()>()
+                .unwrap_or_else(|e| eprintln!("story watcher error: {:?}", e)),
+        );
+
+        let f = self.story_provider.get_stories(Some(story_watcher));
+        fasync::spawn(
+            f.map_ok(move |r| {
+                for story in r {
+                    APP.lock()
+                        .add_view_for_story(story.id.to_string())
+                        .unwrap_or_else(|e| {
+                            eprintln!("error adding view for initial story {}: {:?}", story.id, e);
+                        });
+                }
+            })
+            .unwrap_or_else(|e| eprintln!("get_stories error: {:?}", e)),
+        );
+        Ok(())
     }
 }
 
@@ -216,9 +287,11 @@ fn main() -> Result<(), Error> {
     let fut = component::server::ServicesServer::new()
         .add_service((ViewProviderMarker::NAME, move |channel| {
             App::spawn_view_provider_server(channel);
-        })).add_service((tiles::ControllerMarker::NAME, move |chan| {
+        }))
+        .add_service((tiles::ControllerMarker::NAME, move |chan| {
             App::spawn_tiles_server(chan)
-        })).start()
+        }))
+        .start()
         .context("Error starting services server")?;
 
     executor.run_singlethreaded(fut)?;
