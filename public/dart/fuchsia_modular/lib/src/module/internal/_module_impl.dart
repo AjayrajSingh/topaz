@@ -5,10 +5,13 @@
 import 'dart:async';
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
+import 'package:fidl_fuchsia_ui_viewsv1token/fidl_async.dart' as views_fidl;
 import 'package:fuchsia/services.dart';
+import 'package:fidl/fidl.dart';
 import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:meta/meta.dart';
 
+import '../embedded_module.dart';
 import '../intent.dart';
 import '../intent_handler.dart';
 import '../module.dart';
@@ -44,8 +47,8 @@ class ModuleImpl implements Module {
 
   @override
   Future<fidl.ModuleController> addModuleToStory({
-    String name,
-    fidl.Intent intent,
+    @required String name,
+    @required fidl.Intent intent,
     fidl.SurfaceRelation surfaceRelation = const fidl.SurfaceRelation(
       arrangement: fidl.SurfaceArrangement.copresent,
       dependency: fidl.SurfaceDependency.dependent,
@@ -57,6 +60,33 @@ class ModuleImpl implements Module {
     fidl.StartModuleStatus status = await _getContext().addModuleToStory(
         name, intent, moduleControllerProxy.ctrl.request(), surfaceRelation);
 
+    _validateStartModuleStatus(status, name, intent);
+
+    return moduleControllerProxy;
+  }
+
+  @override
+  Future<EmbeddedModule> embedModule({
+    @required String name,
+    @required fidl.Intent intent,
+  }) async {
+    if (name == null || name.isEmpty) {
+      throw ArgumentError.value(
+          name, 'name', 'embedModule should be called with a valid name');
+    }
+    final moduleController = fidl.ModuleControllerProxy();
+    final viewOwner = new InterfacePair<views_fidl.ViewOwner>();
+    final status = await _getContext().embedModule(
+        name, intent, moduleController.ctrl.request(), viewOwner.passRequest());
+
+    _validateStartModuleStatus(status, name, intent);
+
+    return EmbeddedModule(
+        moduleController: moduleController, viewOwner: viewOwner.passHandle());
+  }
+
+  void _validateStartModuleStatus(
+      fidl.StartModuleStatus status, String name, fidl.Intent intent) {
     switch (status) {
       case fidl.StartModuleStatus.success:
         break;
@@ -68,8 +98,6 @@ class ModuleImpl implements Module {
         throw ModuleStateException(
             'unknown start module status [$status] for intent [$intent]');
     }
-
-    return moduleControllerProxy;
   }
 
   @override

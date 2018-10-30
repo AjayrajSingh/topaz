@@ -8,6 +8,7 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia/services.dart';
 import 'package:meta/meta.dart';
 
+import 'embedded_module.dart';
 import 'intent_handler.dart';
 import 'internal/_intent_handler_impl.dart';
 import 'internal/_module_impl.dart';
@@ -26,19 +27,6 @@ abstract class Module {
           IntentHandlerImpl(startupContext: StartupContext.fromStartupInfo()),
     );
   }
-
-  /// Registers the [intentHandler] with this.
-  ///
-  /// This method must be called in the main function of the module
-  /// so the framework has a chance to connect the intent handler.
-  ///
-  /// ```
-  /// void main() {
-  ///   Module()
-  ///     ..registerIntentHandler(MyHandler());
-  /// }
-  /// ```
-  void registerIntentHandler(IntentHandler intentHandler);
 
   /// Starts a new Module instance and adds it to the story. The Module to
   /// execute is identified by the contents of [intent] and the Module instance
@@ -72,4 +60,34 @@ abstract class Module {
     @required fidl.Intent intent,
     fidl.SurfaceRelation surfaceRelation,
   });
+
+  /// This method functions similarly to [addModuleToStory()], but instead
+  /// of relying on the story shell for display it is up to the caller to
+  /// display the view from the new module.
+  ///
+  /// The method will complete with an [EmbeddedModule] which contains the
+  /// [fidl.ModuleController] and the [InterfaceHandle<views_fidl.ViewOwner>].
+  /// The view owner handle can be used to create view to display in your
+  /// module's view hierarchy. This is commonly done in Flutter modules with
+  /// the ChildView widget.
+  ///
+  /// If no modules are found a [ModuleResolutionException] will be thrown.
+  @experimental
+  Future<EmbeddedModule> embedModule({
+    @required String name,
+    @required fidl.Intent intent,
+  });
+
+  /// Registers the [intentHandler] with this.
+  ///
+  /// This method must be called in the main function of the module
+  /// so the framework has a chance to connect the intent handler.
+  ///
+  /// ```
+  /// void main() {
+  ///   Module()
+  ///     ..registerIntentHandler(MyHandler());
+  /// }
+  /// ```
+  void registerIntentHandler(IntentHandler intentHandler);
 }

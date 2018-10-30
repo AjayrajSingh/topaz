@@ -62,6 +62,11 @@ void main() {
     ModuleImpl(intentHandlerImpl: handlerImpl, lifecycle: mockLifecycle);
     verify(mockLifecycle.addTerminateListener(any));
   });
+
+  test('embed module throws for empty name', () {
+    expect(
+        mod.embedModule(name: '', intent: _emptyIntent), throwsArgumentError);
+  });
 }
 
 class _StubIntentHandler implements IntentHandler {

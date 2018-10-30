@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 /// A collection of utilities simplifying module interactions
+export 'src/module/embedded_module.dart';
 export 'src/module/intent.dart';
 export 'src/module/intent_handler.dart';
 export 'src/module/intent_parameter.dart';

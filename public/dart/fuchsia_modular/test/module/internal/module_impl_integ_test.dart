@@ -69,4 +69,42 @@ void main() {
     expect(moduleImpl.addModuleToStory(name: 'testMod', intent: _emptyIntent),
         throwsA(const TypeMatcher<ModuleStateException>()));
   });
+
+  /// Embed Module
+  test('embedModule should throw ModuleResolutionException if no module found',
+      () {
+    final context = MockModuleContext();
+    when(context.embedModule(any, any, any, any))
+        .thenAnswer((_) => Future.value(fidl.StartModuleStatus.noModulesFound));
+
+    final moduleImpl =
+        ModuleImpl(intentHandlerImpl: handlerImpl, moduleContextProxy: context);
+
+    expect(moduleImpl.embedModule(name: 'testMod', intent: _emptyIntent),
+        throwsA(const TypeMatcher<ModuleResolutionException>()));
+  });
+
+  test('embedModule should throw ModuleStateException for unknown errors', () {
+    final context = MockModuleContext();
+    when(context.embedModule(any, any, any, any))
+        .thenAnswer((_) => Future.value(fidl.StartModuleStatus.success));
+
+    final moduleImpl =
+        ModuleImpl(intentHandlerImpl: handlerImpl, moduleContextProxy: context);
+
+    expect(moduleImpl.embedModule(name: '', intent: _emptyIntent),
+        throwsArgumentError);
+  });
+
+  test('embedModule should throw ArgumentError for invalid name', () {
+    final context = MockModuleContext();
+    when(context.embedModule(any, any, any, any))
+        .thenAnswer((_) => Future.value(fidl.StartModuleStatus(-99)));
+
+    final moduleImpl =
+        ModuleImpl(intentHandlerImpl: handlerImpl, moduleContextProxy: context);
+
+    expect(moduleImpl.embedModule(name: 'testMod', intent: _emptyIntent),
+        throwsA(const TypeMatcher<ModuleStateException>()));
+  });
 }
