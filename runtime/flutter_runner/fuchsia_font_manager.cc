@@ -386,6 +386,12 @@ sk_sp<SkTypeface> FuchsiaFontManager::FetchTypeface(const char family_name[],
     return nullptr;
   }
 
+  // The service may return null response if there is no font matching the
+  // request.
+  if (!response) {
+    return nullptr;
+  }
+
   return typeface_cache_->GetOrCreateTypeface(
       response->buffer_id, response->font_index, response->buffer);
 }
