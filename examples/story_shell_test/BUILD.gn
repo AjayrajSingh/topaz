@@ -15,11 +15,4 @@ dart_fuchsia_test("key_listener_device_tests") {
     "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",
   ]
-
-  meta = [
-    {
-      path = rebase_path("meta/key_listener_device_tests.cmx")
-      dest = "key_listener_device_tests.cmx"
-    },
-  ]
 }
