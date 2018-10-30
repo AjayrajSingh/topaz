@@ -466,6 +466,7 @@ class AsyncProxyController<T> extends _Stateful {
     while (txid == 0 || _completerMap.containsKey(txid))
       txid = _nextTxid++ & _userspaceTxidMask;
     message.txid = txid;
+    _completerMap[message.txid] = completer;
     final int status = _reader.channel.write(message.data, message.handles);
 
     if (status != ZX.OK) {
@@ -473,8 +474,6 @@ class AsyncProxyController<T> extends _Stateful {
           'AsyncProxyController<${$interfaceName}> failed to write to channel: ${_reader.channel} (status: $status)'));
       return;
     }
-
-    _completerMap[message.txid] = completer;
   }
 
   /// Returns the completer associated with the given response message.
