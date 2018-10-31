@@ -60,8 +60,16 @@ class Schema implements BaseType {
 
   /// Default constructor. Note that the values of the map can be other
   /// schemas.
+  /// Throws an error if a field's name contains the '.' character.
   Schema(Map<String, BaseType> schemaDescription)
-      : _schemaDescription = new SplayTreeMap.from(schemaDescription);
+      : _schemaDescription = new SplayTreeMap.from(schemaDescription) {
+    _schemaDescription.forEach((String name, dynamic value) {
+      if (name.contains('.')) {
+        throw new ArgumentError(
+            'The field `$name` must not contain the `.` character.');
+      }
+    });
+  }
 
   /// Builds a Schema from a JSON object.
   Schema.fromJson(Map<String, dynamic> map)
@@ -91,6 +99,41 @@ class Schema implements BaseType {
   /// Returns a description of the schema.
   Map<String, BaseType> get schemaDescription {
     return _schemaDescription;
+  }
+
+  /// Returns whether the given field path exists for this Schema.  
+  /// A field path is a concatenation of field names that fully identify
+  /// a field.
+  /// # Example:
+  ///  Given the schema X, and the schema Y that embeds X:
+  ///     X : { 'a' : String }
+  ///     Y : { 'b' : X , 'c' : String}
+  ///  The valid field paths of Y are:
+  ///     'b.a', 'c'
+  bool fieldPathExists(String fieldPath) {
+    if (fieldPath == null) {
+      return false;
+    }
+    final indexOfFirstPeriod = fieldPath.indexOf('.');
+    if (indexOfFirstPeriod == -1) {
+      // The path contains a single field name.
+      final fieldType = _schemaDescription[fieldPath];
+      return fieldType != null && !(fieldType is Schema);
+    } else {
+      // The path contains multiple field names.
+      // The code extracts the top most field name, verifies that it points
+      // to an other Schema, and verify that the Schema contains the rest of
+      // the field path.
+      final topLevelFieldName = fieldPath.substring(0, indexOfFirstPeriod);
+      final fieldType = _schemaDescription[topLevelFieldName];
+      if (fieldType is Schema) {
+        Schema subSchema = fieldType;
+        final subPath = fieldPath.substring(indexOfFirstPeriod + 1);
+        return subSchema.fieldPathExists(subPath);
+      } else {
+        return false;
+      }
+    }
   }
 
   /// Returns a 20 byte hash of the schema.

@@ -25,7 +25,7 @@ Map<String, BaseType> flatSchema() {
 
 Map<String, BaseType> schemaWithEmbeddedSchema() {
   Schema schema = new Schema(flatSchema());
-  return <String, BaseType>{'foo': schema};
+  return <String, BaseType>{'foo': schema, 'bar': new LastOneWinsString()};
 }
 
 void main() {
@@ -97,6 +97,29 @@ void main() {
     schemaDescription['foo'] = new Integer();
     Uint8List hash2 = schema.hash;
     expect(hash1, equals(hash2));
+  });
+
+  test('Verify exception with invalid field names', () {
+    Map<String, BaseType> schemaDescription = <String, BaseType>{
+      'foo.bar': new Boolean(),
+    };
+    expect(() {
+      new Schema(schemaDescription);
+    }, throwsA(const TypeMatcher<ArgumentError>()));
+  });
+
+  test('Verify fieldPathExists', () {
+    final schema = new Schema(schemaWithEmbeddedSchema());
+    expect(schema.fieldPathExists(null), equals(false));
+    expect(schema.fieldPathExists(''), equals(false));
+    expect(schema.fieldPathExists('.'), equals(false));
+    expect(schema.fieldPathExists('..'), equals(false));
+    expect(schema.fieldPathExists('foo'), equals(false));
+    expect(schema.fieldPathExists('bar'), equals(true));
+    expect(schema.fieldPathExists('foo.'), equals(false));
+    expect(schema.fieldPathExists('bar.'), equals(false));
+    expect(schema.fieldPathExists('foo.someBool'), equals(true));
+    expect(schema.fieldPathExists('foo.someBool.'), equals(false));
   });
 
   test('Instantiate and initialize a Sledge document', () async {
