@@ -6,6 +6,7 @@
         "services": [
             "fuchsia.modular.Clipboard",
             "fuchsia.amber.Control",
+            "fuchsia.devicesettings.DeviceSettingsManager",
             "fuchsia.fonts.Provider",
             "fuchsia.logger.LogSink",
             "fuchsia.sys.Environment",
