@@ -81,6 +81,19 @@ void WebViewProvider::Terminate() { loop_->Quit(); }
 void WebViewProvider::Notify(fuchsia::mem::Buffer json) {
   std::string json_string;
   FXL_CHECK(fsl::StringFromVmo(json, &json_string));
+
+  // Echo back the input URL to our "output_url" link. This is useful for
+  // testing.
+  {
+    fuchsia::mem::Buffer output_json;
+    FXL_CHECK(fsl::VmoFromString(json_string, &output_json));
+
+    fuchsia::modular::LinkPtr output_url_link;
+    module_context_->GetLink("output_url", output_url_link.NewRequest());
+    output_url_link->Set(nullptr, std::move(output_json));
+    output_url_link->Sync([] {});
+  }
+
   modular::JsonDoc parsed_json;
   parsed_json.Parse(json_string);
 
