@@ -7,6 +7,9 @@
             "root-ssl-certificates",
             "system-temp"
         ],
-        "services": [ "fuchsia.sys.Environment" ]
+        "services": [
+            "fuchsia.sys.Environment",
+            "fuchsia.testing.runner.TestRunner"
+        ]
     }
 }
