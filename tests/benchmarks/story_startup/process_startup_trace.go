@@ -81,8 +81,8 @@ func reportStartupMetrics(model benchmarking.Model, appName string, testSuite st
 	createStoryCallStr := "SessionStorage::CreateStoryCall"
 	createStoryCallEvent := model.FindEvents(benchmarking.EventsFilter{Name: &createStoryCallStr})[0]
 	storyStartTime := createStoryCallEvent.Start
-	addIntentCallStr := "StoryControllerImpl::AddIntentCall"
-	addIntentCallEvent := model.FindEvents(benchmarking.EventsFilter{Name: &addIntentCallStr})[0]
+	addModStr := "StoryCommand::AddMod"
+	addModEvent := model.FindEvents(benchmarking.EventsFilter{Name: &addModStr})[0]
 
 	flutterUIThread := getThreadsWithName(model, appName+".ui")[0]
 
@@ -114,7 +114,7 @@ func reportStartupMetrics(model benchmarking.Model, appName string, testSuite st
 	fileGetVmoEvents := model.FindEvents(benchmarking.EventsFilter{Name: &fileGetVmoStr})
 
 	reportEvent(createStoryCallEvent, "CreateStoryCall", testSuite, testResultsFile)
-	reportEvent(addIntentCallEvent, "AddIntentCall", testSuite, testResultsFile)
+	reportEvent(addModEvent, "AddMod", testSuite, testResultsFile)
 	if serviceIsolateStartupEvent.Name != "" {
 		reportEvent(serviceIsolateStartupEvent, "ServiceIsolateStartup", testSuite, testResultsFile)
 	}

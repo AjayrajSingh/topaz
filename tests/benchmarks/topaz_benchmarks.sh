@@ -17,9 +17,7 @@ runbench_read_arguments "$@"
 if `run vulkan_is_supported`; then
   # Run these benchmarks in the current shell environment, because they write
   # to (hidden) global state used by runbench_finish.
-
-  # TODO(FL-134): Benchmarks are currently failing; see bug for details.
-  #. /pkgfs/packages/startup_benchmarks/0/bin/startup_benchmarks.sh "$@"
+  . /pkgfs/packages/startup_benchmarks/0/bin/startup_benchmarks.sh "$@"
   . /pkgfs/packages/topaz_benchmarks/0/bin/gfx_benchmarks.sh "$@"
 else
   echo "Vulkan not supported; graphics tests skipped."
