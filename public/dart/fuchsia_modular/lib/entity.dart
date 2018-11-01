@@ -2,5 +2,5 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-/// The logger used within the modular system.
-export 'package:fuchsia/logger.dart';
+/// The classes required for working with enities
+export 'src/entity/entity.dart';
