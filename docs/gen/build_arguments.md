@@ -1516,7 +1516,7 @@ From //third_party/dart/runtime/runtime_args.gni:9
 ### flutter_space_dart
 Whether experimental space dart mode is enabled for Flutter applications.
 
-**Current value (from the default):** `false`
+**Current value (from the default):** `true`
 
 From [//topaz/runtime/dart/dart_component.gni:44](https://fuchsia.googlesource.com/topaz/+/3deb9ec4ec5405b26055860edc6b798e1ffa874d/runtime/dart/dart_component.gni#44)
 

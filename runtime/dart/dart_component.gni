@@ -41,7 +41,7 @@ declare_args() {
   }
 
   # Whether experimental space dart mode is enabled for Flutter applications.
-  flutter_space_dart = false
+  flutter_space_dart = true
 }
 
 declare_args() {
