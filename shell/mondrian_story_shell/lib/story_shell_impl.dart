@@ -36,7 +36,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   final SurfaceGraph surfaceGraph;
   final String _storyShellLinkName = 'story_shell_state';
   StoryVisualState _visualState;
-  String _lastFocusedViewId;
+  String _lastFocusedSurfaceId;
 
   StoryShellImpl({this.surfaceGraph, this.keyListener});
 
@@ -49,10 +49,10 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
       ..getLink(_linkProxy.ctrl.request());
     await reloadStoryState().then(onLinkContentsFetched);
     surfaceGraph.addListener(() {
-      String viewId = surfaceGraph.focused?.node?.value;
-      if (viewId != null && viewId != _lastFocusedViewId) {
-        _storyShellBinding.events.onViewFocused(viewId);
-        _lastFocusedViewId = viewId;
+      String surfaceId = surfaceGraph.focused?.node?.value;
+      if (surfaceId != null && surfaceId != _lastFocusedSurfaceId) {
+        _storyShellBinding.events.onSurfaceFocused(surfaceId);
+        _lastFocusedSurfaceId = surfaceId;
       }
     });
   }
@@ -67,53 +67,55 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
     _lifecycleBinding.bind(this, request);
   }
 
-  /// Introduce a new [ViewOwner] to the current Story, with relationship
-  /// of viewType between this view and the [ViewOwner] of id parentId
-  /// @params view The [ViewOwner]
-  /// @params viewId The ID of the view being added
-  /// @params parentId The ID of the parent view
-  /// @params surfaceRelation The relationship between this view and its parent
+  /// Introduce a new Surface and corresponding [ViewOwner] to the current
+  /// Story.
+  ///
+  /// The Surface may have a relationship with its parent surface.
+  /// @params viewConnection holds the [ViewOwner]
+  /// @params surfaceInfo contains metadata relating to the surface
   @override
-  void addView(
-    InterfaceHandle<ViewOwner> view,
-    String viewId,
-    String parentId,
-    SurfaceRelation surfaceRelation,
-    ModuleManifest manifest,
-    ModuleSource source,
+  void addSurface(
+    ViewConnection viewConnection,
+    SurfaceInfo surfaceInfo,
   ) {
-    trace('connecting view $viewId with parent $parentId');
-    log.fine('Connecting view $viewId with parent $parentId');
+    trace(
+        'connecting surface ${viewConnection.surfaceId} with parent ${surfaceInfo.parentId}');
+    log.fine(
+        'Connecting surface ${viewConnection.surfaceId} with parent ${surfaceInfo.parentId}');
 
     /// ignore: cascade_invocations
-    log.fine('Were passed manifest: $manifest');
+    log.fine('Were passed manifest: $surfaceInfo.moduleManifest');
     surfaceGraph
       ..addSurface(
-        viewId,
-        new SurfaceProperties(source: source),
-        parentId,
-        surfaceRelation ?? const SurfaceRelation(),
-        manifest != null ? manifest.compositionPattern : '',
-        manifest != null ? manifest.placeholderColor : '',
+        viewConnection.surfaceId,
+        new SurfaceProperties(source: surfaceInfo.moduleSource),
+        surfaceInfo.parentId,
+        surfaceInfo.surfaceRelation ?? const SurfaceRelation(),
+        surfaceInfo.moduleManifest != null
+            ? surfaceInfo.moduleManifest.compositionPattern
+            : '',
+        surfaceInfo.moduleManifest != null
+            ? surfaceInfo.moduleManifest.placeholderColor
+            : '',
       )
-      ..connectView(viewId, view);
+      ..connectView(viewConnection.surfaceId, viewConnection.owner);
   }
 
-  /// Focus the view with this id
+  /// Focus the surface with this id
   @override
-  void focusView(String viewId, String relativeViewId) {
-    trace('focusing view $viewId');
-    surfaceGraph.focusSurface(viewId, relativeViewId);
+  void focusSurface(String surfaceId) {
+    trace('focusing view $surfaceId');
+    surfaceGraph.focusSurface(surfaceId);
     persistStoryState();
   }
 
-  /// Defocus the view with this id
+  /// Defocus the surface with this id
   @override
-  void defocusView(String viewId, void callback()) {
-    trace('defocusing view $viewId');
-    surfaceGraph.dismissSurface(viewId);
+  void defocusSurface(String surfaceId, void callback()) {
+    trace('defocusing view $surfaceId');
+    surfaceGraph.dismissSurface(surfaceId);
     // TODO(alangardner, djmurphy): Make Mondrian not crash if the process
-    // associated with viewId is closed after callback returns.
+    // associated with surfaceId is closed after callback returns.
     callback();
     persistStoryState();
   }
@@ -169,7 +171,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
           addedParents.add(nodeId);
           surfaceGraph.connectView(nodeId, viewMap[nodeId]);
           nodeQueue.remove(nodeId);
-          surfaceGraph.focusSurface(nodeId, null);
+          surfaceGraph.focusSurface(nodeId);
         }
         i = 0;
       } else {
@@ -182,6 +184,24 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
         }
       }
     }
+  }
+
+  @override
+  void removeSurface(String surfaceId) {
+    surfaceGraph.removeSurface(surfaceId);
+  }
+
+  @override
+  void reconnectView(ViewConnection viewConnection) {
+    // TODO (jphsiao): implement
+  }
+
+  @override
+  void updateSurface(
+    ViewConnection viewConnection,
+    SurfaceInfo surfaceInfo,
+  ) {
+    // TODO (jphsiao): implement
   }
 
   /// Terminate the StoryShell.

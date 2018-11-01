@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:math' as math;
-
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
@@ -128,46 +126,15 @@ class SurfaceGraph extends Model {
   }
 
   /// Move the surface up in the focus stack, undismissing it if needed.
-  ///
-  /// If relativeId is null, the surface is re-inserted  at the top of the stack
-  /// If relativeId is provided, the surface is re-inserted at the higher of
-  /// above the relative surface or any of its direct children, or its original
-  /// position.
-  void focusSurface(String id, String relativeId) {
+  void focusSurface(String id) {
     if (!_surfaces.containsKey(id)) {
       log.warning('Invalid surface id "$id"');
       return;
     }
-    int currentIndex = _focusedSurfaces.indexOf(id);
     _dismissedSurfaces.remove(id);
-    _focusedSurfaces.remove(id);
-    if (relativeId == null || relativeId == kNoParent) {
-      _focusedSurfaces.add(id);
-    } else {
-      int relativeIndex = -1;
-      final Tree<String> relative = _tree.find(relativeId);
-      if (relative != null) {
-        relativeIndex = _focusedSurfaces.indexOf(relative.value);
-        // Use the highest index of relative or its children
-        for (Tree<String> childNode in relative.children) {
-          String childId = childNode.value;
-          relativeIndex =
-              math.max(relativeIndex, _focusedSurfaces.indexOf(childId));
-        }
-        // If none of those are focused, find the closest ancestor that is focused
-        Tree<String> ancestor = relative.parent;
-        while (relativeIndex < 0 && ancestor.value != null) {
-          relativeIndex = _focusedSurfaces.indexOf(ancestor.value);
-          ancestor = ancestor.parent;
-        }
-      }
-      // Insert to the highest of one past relative index, or the original index
-      int index =
-          math.max(relativeIndex < 0 ? -1 : relativeIndex + 1, currentIndex);
-      if (index >= 0) {
-        _focusedSurfaces.insert(index, id);
-      }
-    }
+    _focusedSurfaces
+      ..remove(id)
+      ..add(id);
 
     // Also request the input focus through the child view connection.
     ChildViewConnection connection = _surfaces[id].connection;
