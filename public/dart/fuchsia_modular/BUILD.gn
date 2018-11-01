@@ -30,6 +30,7 @@ dart_library("fuchsia_modular") {
     "src/module/internal/_entity_intent_parameter_data_transformer.dart",
     "src/module/internal/_fidl_transformers.dart",
     "src/module/internal/_intent_handler_impl.dart",
+    "src/module/internal/_module_context.dart",
     "src/module/internal/_module_impl.dart",
     "src/module/module_state_exception.dart",
     "src/module/module.dart",

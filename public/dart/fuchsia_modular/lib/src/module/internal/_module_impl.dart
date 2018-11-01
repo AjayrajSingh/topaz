@@ -4,10 +4,9 @@
 
 import 'dart:async';
 
+import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl_async.dart' as views_fidl;
-import 'package:fuchsia/services.dart';
-import 'package:fidl/fidl.dart';
 import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:meta/meta.dart';
 
@@ -17,6 +16,7 @@ import '../intent_handler.dart';
 import '../module.dart';
 import '../module_state_exception.dart';
 import '_intent_handler_impl.dart';
+import '_module_context.dart';
 
 /// A concrete implementation of the [Module] interface. This class
 /// is not intended to be used directly by authors but instead should
@@ -30,7 +30,7 @@ class ModuleImpl implements Module {
   // ignore: unused_field
   IntentHandlerImpl _intentHandlerImpl;
 
-  // Module context proxy that is lazily instantiated in [_getContext]
+  /// The [fidl.ModuleContext] for the running module.
   fidl.ModuleContextProxy _moduleContextProxy;
 
   /// The default constructor for this instance.
@@ -40,7 +40,7 @@ class ModuleImpl implements Module {
     fidl.ModuleContextProxy moduleContextProxy,
   }) : assert(intentHandlerImpl != null) {
     (lifecycle ??= Lifecycle()).addTerminateListener(_terminate);
-    _moduleContextProxy ??= moduleContextProxy;
+    _moduleContextProxy = moduleContextProxy;
     _intentHandlerImpl = intentHandlerImpl
       ..onHandleIntent = _proxyIntentToIntentHandler;
   }
@@ -65,6 +65,17 @@ class ModuleImpl implements Module {
     return moduleControllerProxy;
   }
 
+  /// Returns the [fidl.ModuleContext] for the running module.
+  ///
+  /// It is safe to call this method multiple times without opening multiple
+  /// connections.
+  ///
+  /// This method is intentionally lazy as to avoid connecting to the
+  /// ModuleContext until it is needed. We use this method instead of
+  /// just using [geModuleContext] directly to allow for testing.
+  fidl.ModuleContext _getContext() =>
+      _moduleContextProxy ??= getModuleContext();
+
   @override
   Future<EmbeddedModule> embedModule({
     @required String name,
@@ -85,21 +96,6 @@ class ModuleImpl implements Module {
         moduleController: moduleController, viewOwner: viewOwner.passHandle());
   }
 
-  void _validateStartModuleStatus(
-      fidl.StartModuleStatus status, String name, fidl.Intent intent) {
-    switch (status) {
-      case fidl.StartModuleStatus.success:
-        break;
-      case fidl.StartModuleStatus.noModulesFound:
-        throw ModuleResolutionException(
-            'no modules found for intent [$intent]');
-        break;
-      default:
-        throw ModuleStateException(
-            'unknown start module status [$status] for intent [$intent]');
-    }
-  }
-
   @override
   void registerIntentHandler(IntentHandler intentHandler) {
     if (_intentHandler != null) {
@@ -108,23 +104,6 @@ class ModuleImpl implements Module {
     }
 
     _intentHandler = intentHandler;
-  }
-
-  /// Returns the [fidl.ModuleContext] for the running module.
-  ///
-  /// It is safe to call this method multiple times without opening multiple
-  /// connections.
-  ///
-  /// This method is intentionally private until an actual need arises to expose
-  /// it publicly.
-  fidl.ModuleContext _getContext() {
-    if (_moduleContextProxy != null) {
-      return _moduleContextProxy;
-    }
-
-    _moduleContextProxy = fidl.ModuleContextProxy();
-    connectToEnvironmentService(_moduleContextProxy);
-    return _moduleContextProxy;
   }
 
   void _proxyIntentToIntentHandler(Intent intent) {
@@ -138,9 +117,24 @@ class ModuleImpl implements Module {
     _intentHandler.handleIntent(intent);
   }
 
-  // any necessary cleanup should be done in this method.
   Future<void> _terminate() async {
     _intentHandler = null;
+  }
+
+  // any necessary cleanup should be done in this method.
+  void _validateStartModuleStatus(
+      fidl.StartModuleStatus status, String name, fidl.Intent intent) {
+    switch (status) {
+      case fidl.StartModuleStatus.success:
+        break;
+      case fidl.StartModuleStatus.noModulesFound:
+        throw ModuleResolutionException(
+            'no modules found for intent [$intent]');
+        break;
+      default:
+        throw ModuleStateException(
+            'unknown start module status [$status] for intent [$intent]');
+    }
   }
 }
 
