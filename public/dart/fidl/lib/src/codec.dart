@@ -63,6 +63,14 @@ class Encoder {
     return offset;
   }
 
+  int nextOffset() {
+    return _extent;
+  }
+
+  int countHandles() {
+    return _handles.length;
+  }
+
   void addHandle(Handle value) {
     _handles.add(value);
   }
@@ -131,6 +139,10 @@ class Decoder {
   int _nextOffset = 0;
   int _nextHandle = 0;
 
+  int nextOffset() {
+    return _nextOffset;
+  }
+
   int claimMemory(int size) {
     final int result = _nextOffset;
     _nextOffset += _align(size);
@@ -138,6 +150,10 @@ class Decoder {
       throw new FidlError('Cannot access out of range memory');
     }
     return result;
+  }
+
+  int countClaimedHandles() {
+    return _nextHandle;
   }
 
   Handle claimHandle() {

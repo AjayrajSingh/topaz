@@ -46,5 +46,34 @@ void main() async {
       expect(threeReply.z.bar, equals(1729));
       expect(threeReply.z.baz, unorderedEquals(primes));
     });
+
+    test('table', () async {
+      final primes =
+          new Uint8List.fromList([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]);
+      await server.proxy.oneWayExampleTable(
+          new ExampleTable(foo: 'hello', bar: 1729, baz: primes));
+      final received = await server.proxy.receivedOneWayExampleTable();
+      expect(received.foo, equals('hello'));
+      expect(received.bar, equals(1729));
+      expect(received.baz, unorderedEquals(primes));
+    });
+
+    test('partial table', () async {
+      await server.proxy.oneWayExampleTable(
+          new ExampleTable(bar: 1729)); // not seting foo, nor baz
+      final received = await server.proxy.receivedOneWayExampleTable();
+      expect(received.foo, equals(null));
+      expect(received.bar, equals(1729));
+      expect(received.baz, equals(null));
+    });
+
+    test('empty table', () async {
+      await server.proxy.oneWayExampleTable(
+          new ExampleTable());
+      final received = await server.proxy.receivedOneWayExampleTable();
+      expect(received.foo, equals(null));
+      expect(received.bar, equals(null));
+      expect(received.baz, equals(null));
+    });
   });
 }

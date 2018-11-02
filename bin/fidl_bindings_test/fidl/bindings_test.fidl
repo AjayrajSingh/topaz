@@ -16,6 +16,12 @@ struct ExampleStruct {
     vector<uint8>? baz;
 };
 
+table ExampleTable {
+    1: string foo;
+    2: int32 bar;
+    3: vector<uint8> baz;
+};
+
 [Discoverable]
 interface TestServer {
   1: OneWayNoArgs();
@@ -26,6 +32,9 @@ interface TestServer {
 
   5: OneWayThreeArgs(int32 x, uint64 y, NoHandleStruct z);
   6: ReceivedOneWayThreeArgs() -> (int32 x, uint64 y, NoHandleStruct z);
+
+  21: OneWayExampleTable(ExampleTable value);
+  22: ReceivedOneWayExampleTable() -> (ExampleTable received);
 
   7: TwoWayNoArgs() -> ();
   8: TwoWayStringArg(string value) -> (string value);

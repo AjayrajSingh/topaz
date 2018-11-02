@@ -14,5 +14,6 @@ export 'src/interface.dart';
 export 'src/interface_async.dart';
 export 'src/message.dart';
 export 'src/struct.dart';
+export 'src/table.dart';
 export 'src/types.dart';
 export 'src/union.dart';

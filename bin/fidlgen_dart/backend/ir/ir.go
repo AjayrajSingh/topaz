@@ -94,6 +94,25 @@ type StructMember struct {
 	Documented
 }
 
+// Table represents a table declaration.
+type Table struct {
+	Name       string
+	Members    []TableMember
+	TypeSymbol string
+	TypeExpr   string
+	Documented
+}
+
+// TableMember represents a member of a table declaration.
+type TableMember struct {
+	Ordinal      int
+	Type         Type
+	Name         string
+	DefaultValue string
+	typeExpr     string
+	Documented
+}
+
 // Interface represents an interface declaration.
 type Interface struct {
 	Name        string
@@ -149,6 +168,7 @@ type Root struct {
 	Enums       []Enum
 	Interfaces  []Interface
 	Structs     []Struct
+	Tables      []Table
 	Unions      []Union
 }
 
@@ -321,6 +341,20 @@ func formatStructMemberList(members []StructMember) string {
 	}
 
 	return fmt.Sprintf("const <$fidl.MemberType>[\n%s  ]", strings.Join(lines, ""))
+}
+
+func formatTableMemberList(members []TableMember) string {
+	if len(members) == 0 {
+		return "const <int, $fidl.FidlType>{}"
+	}
+
+	lines := []string{}
+
+	for _, v := range members {
+		lines = append(lines, fmt.Sprintf("    %d: %s,\n", v.Ordinal, v.Type.typeExpr))
+	}
+
+	return fmt.Sprintf("const <int, $fidl.FidlType>{\n%s  }", strings.Join(lines, ""))
 }
 
 func formatUnionMemberList(members []UnionMember) string {
@@ -571,6 +605,8 @@ func (c *compiler) compileType(val types.Type) Type {
 			fallthrough
 		case types.StructDeclType:
 			fallthrough
+		case types.TableDeclType:
+			fallthrough
 		case types.UnionDeclType:
 			r.Decl = t
 			if c.inExternalLibrary(compound) {
@@ -788,6 +824,43 @@ func (c *compiler) compileStruct(val types.Struct) Struct {
 	return r
 }
 
+func (c *compiler) compileTableMember(val types.TableMember) TableMember {
+	t := c.compileType(val.Type)
+
+	defaultValue := ""
+	if val.MaybeDefaultValue != nil {
+		defaultValue = c.compileConstant(*val.MaybeDefaultValue, &t)
+	}
+
+	return TableMember{
+		Ordinal:      val.Ordinal,
+		Type:         t,
+		Name:         c.compileLowerCamelIdentifier(val.Name),
+		DefaultValue: defaultValue,
+		Documented:   docString(val),
+	}
+}
+
+func (c *compiler) compileTable(val types.Table) Table {
+	ci := types.ParseCompoundIdentifier(val.Name)
+	r := Table{
+		Name:       c.compileUpperCamelCompoundIdentifier(ci, ""),
+		TypeSymbol: c.typeSymbolForCompoundIdentifier(ci),
+		Documented: docString(val),
+	}
+
+	for _, v := range val.Members {
+		r.Members = append(r.Members, c.compileTableMember(v))
+	}
+
+	r.TypeExpr = fmt.Sprintf(`const $fidl.TableType<%s>(
+  encodedSize: %v,
+  members: %s,
+  ctor: %s._ctor,
+)`, r.Name, val.Size, formatTableMemberList(r.Members), r.Name)
+	return r
+}
+
 func (c *compiler) compileUnionMember(val types.UnionMember) UnionMember {
 	t := c.compileType(val.Type)
 	typeStr := fmt.Sprintf("type: %s", t.typeExpr)
@@ -846,6 +919,10 @@ func Compile(r types.Root) Root {
 
 	for _, v := range r.Structs {
 		root.Structs = append(root.Structs, c.compileStruct(v))
+	}
+
+	for _, v := range r.Tables {
+		root.Tables = append(root.Tables, c.compileTable(v))
 	}
 
 	for _, v := range r.Unions {

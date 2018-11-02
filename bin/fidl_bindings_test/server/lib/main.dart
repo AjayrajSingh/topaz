@@ -53,6 +53,18 @@ class TestServerImpl extends TestServer {
         _oneWayThreeArgX, _oneWayThreeArgY, _oneWayThreeArgZ);
   }
 
+  ExampleTable _oneWayExampleTable;
+
+  @override
+  Future<void> oneWayExampleTable(ExampleTable value) async {
+    _oneWayExampleTable = value;
+  }
+
+  @override
+  Future<ExampleTable> receivedOneWayExampleTable() async {
+    return _oneWayExampleTable;
+  }
+
   @override
   Future<void> twoWayNoArgs() async {}
 

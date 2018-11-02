@@ -38,26 +38,56 @@ int deepHash(Iterable<Object> arguments) {
   return _Jenkins.finish(result);
 }
 
+/// Deep equality helper function.
+bool deepEquals(dynamic a, dynamic b) {
+  // iterable
+  if (a is Iterable) {
+    // ignore: avoid_bool_literals_in_conditional_expressions
+    return (b is Iterable) ?
+        _deepEqualsOfIterable(a, b) :
+        false;
+  }
+
+  // map
+  if (a is Map) {
+    // ignore: avoid_bool_literals_in_conditional_expressions
+    return (b is Map) ?
+        _deepEqualsOfMap(a, b) :
+        false;
+  }
+
+  // default
+  return a == b;
+}
+
 /// Deep equality helper function for Iterables.
-bool deepEquals(Iterable<Object> a, Iterable<Object> b) {
+bool _deepEqualsOfIterable(Iterable<Object> a, Iterable<Object> b) {
   if (a.length != b.length) {
     return false;
   }
   final ai = a.iterator;
   final bi = b.iterator;
   while (ai.moveNext() && bi.moveNext()) {
-    if (ai.current is Iterable) {
-      if (bi.current is Iterable) {
-        if (!deepEquals(ai.current, bi.current)) {
-          return false;
-        }
-      } else {
-        return false;
-      }
-    } else {
-      if (ai.current != bi.current) {
-        return false;
-      }
+    if (!deepEquals(ai.current, bi.current)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/// Deep equality helper function for Maps.
+bool _deepEqualsOfMap(Map a, Map b) {
+  if (a.length != b.length) {
+    return false;
+  }
+  for (var key in a.keys) {
+    if (!b.containsKey(key)) {
+      return false;
+    }
+    final aCurrent = a[key];
+    final bCurrent = b[key];
+    if (!deepEquals(aCurrent, bCurrent)) {
+      return false;
     }
   }
   return true;
