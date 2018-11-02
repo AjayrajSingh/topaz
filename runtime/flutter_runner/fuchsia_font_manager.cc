@@ -17,8 +17,8 @@
 #include "fuchsia_font_manager.h"
 
 #include <zx/vmar.h>
+#include <unordered_map>
 
-#include "flutter/fml/logging.h"
 #include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/macros.h"
@@ -26,7 +26,6 @@
 #include "third_party/icu/source/common/unicode/uchar.h"
 #include "third_party/skia/src/core/SkFontDescriptor.h"
 #include "third_party/skia/src/ports/SkFontMgr_custom.h"
-#include "txt/typeface_font_asset_provider.h"
 
 namespace txt {
 
@@ -234,13 +233,13 @@ class FuchsiaFontManager::TypefaceCache {
 
 void FuchsiaFontManager::TypefaceCache::OnSkDataDeleted(int buffer_id) const {
   bool was_found = buffer_cache_.erase(buffer_id) != 0;
-  FML_DCHECK(was_found);
+  FXL_DCHECK(was_found);
 }
 
 void FuchsiaFontManager::TypefaceCache::OnTypefaceDeleted(
     TypefaceId typeface_id) const {
   bool was_found = typeface_cache_.erase(typeface_id) != 0;
-  FML_DCHECK(was_found);
+  FXL_DCHECK(was_found);
 }
 
 sk_sp<SkData> FuchsiaFontManager::TypefaceCache::GetOrCreateSkData(
@@ -348,17 +347,17 @@ FuchsiaFontManager::FuchsiaFontManager(fuchsia::fonts::ProviderSyncPtr provider)
 FuchsiaFontManager::~FuchsiaFontManager() = default;
 
 int FuchsiaFontManager::onCountFamilies() const {
-  FML_DCHECK(false);
+  FXL_DCHECK(false);
   return 0;
 }
 
 void FuchsiaFontManager::onGetFamilyName(int index,
                                          SkString* familyName) const {
-  FML_DCHECK(false);
+  FXL_DCHECK(false);
 }
 
 SkFontStyleSet* FuchsiaFontManager::onCreateStyleSet(int index) const {
-  FML_DCHECK(false);
+  FXL_DCHECK(false);
   return nullptr;
 }
 
@@ -367,7 +366,7 @@ SkFontStyleSet* FuchsiaFontManager::onMatchFamily(
   fuchsia::fonts::FamilyInfoPtr family_info;
   int err = font_provider_->GetFamilyInfo(family_name, &family_info);
   if (err != ZX_OK) {
-    FML_DLOG(ERROR) << "Error fetching family from provider [err=" << err
+    FXL_DLOG(ERROR) << "Error fetching family from provider [err=" << err
                     << "]. Did you run Flutter in an environment that"
                     << " has a font manager? ";
     return nullptr;
@@ -383,7 +382,7 @@ SkFontStyleSet* FuchsiaFontManager::onMatchFamily(
   }
 
   return new FontStyleSet(sk_ref_sp(this), family_info->name,
-                                 std::move(styles));
+                          std::move(styles));
 }
 
 SkTypeface* FuchsiaFontManager::onMatchFamilyStyle(
@@ -402,37 +401,37 @@ SkTypeface* FuchsiaFontManager::onMatchFamilyStyleCharacter(
 
 SkTypeface* FuchsiaFontManager::onMatchFaceStyle(const SkTypeface*,
                                                  const SkFontStyle&) const {
-  FML_DCHECK(false);
+  FXL_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromData(sk_sp<SkData>,
                                                      int ttcIndex) const {
-  FML_DCHECK(false);
+  FXL_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromStreamIndex(
     std::unique_ptr<SkStreamAsset>, int ttcIndex) const {
-  FML_DCHECK(false);
+  FXL_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromStreamArgs(
     std::unique_ptr<SkStreamAsset>, const SkFontArguments&) const {
-  FML_DCHECK(false);
+  FXL_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onMakeFromFile(const char path[],
                                                      int ttcIndex) const {
-  FML_DCHECK(false);
+  FXL_DCHECK(false);
   return nullptr;
 }
 
 sk_sp<SkTypeface> FuchsiaFontManager::onLegacyMakeTypeface(
     const char familyName[], SkFontStyle) const {
-  FML_DCHECK(false);
+  FXL_DCHECK(false);
   return nullptr;
 }
 
@@ -451,7 +450,7 @@ sk_sp<SkTypeface> FuchsiaFontManager::FetchTypeface(
   fuchsia::fonts::ResponsePtr response;
   int err = font_provider_->GetFont(std::move(request), &response);
   if (err != ZX_OK) {
-    FML_DLOG(ERROR) << "Error fetching font from provider [err=" << err
+    FXL_DLOG(ERROR) << "Error fetching font from provider [err=" << err
                     << "]. Did you run Flutter in an environment that"
                     << " has a font manager? ";
     return nullptr;

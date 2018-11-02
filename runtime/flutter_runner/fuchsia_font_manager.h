@@ -19,7 +19,8 @@
 
 #include <fuchsia/fonts/cpp/fidl.h>
 #include <memory>
-#include "flutter/fml/macros.h"
+
+#include "lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkFontMgr.h"
 #include "third_party/skia/include/core/SkStream.h"
 #include "third_party/skia/include/core/SkTypeface.h"
@@ -90,7 +91,7 @@ class FuchsiaFontManager final : public SkFontMgr {
   mutable fuchsia::fonts::ProviderSyncPtr font_provider_;
   std::unique_ptr<TypefaceCache> typeface_cache_;
 
-  FML_DISALLOW_COPY_AND_ASSIGN(FuchsiaFontManager);
+  FXL_DISALLOW_COPY_AND_ASSIGN(FuchsiaFontManager);
 };
 
 }  // namespace txt
