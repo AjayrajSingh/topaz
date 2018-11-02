@@ -73,7 +73,7 @@ This will clean and create a release build. To do this manually you can use:
 
 # Run
 
-Assuming you have an Acer properly networked and running `fx boot` in another
+Assuming you have an Acer properly networked and running `fx pave` in another
 terminal session you can run email two different ways.
 
 Running with the full sysui
