@@ -3,13 +3,22 @@
 # found in the LICENSE file.
 
 import("//build/fidl/fidl.gni")
+import("//build/packages/prebuilt_package.gni")
 import("//topaz/runtime/chromium/chromium_web_sources.gni")
 
 fidl("chromium.web") {
   sources = chromium_web_sources
 
   deps = [
-    "//garnet/public/fidl/fuchsia.ui.viewsv1token",
     "//garnet/public/fidl/fuchsia.sys",
+    "//garnet/public/fidl/fuchsia.ui.viewsv1token",
   ]
+}
+
+prebuilt_package("chromium") {
+  archive = "//topaz/third_party/chromium/arch/$target_cpu/chromium.far"
+}
+
+prebuilt_package("web_runner") {
+  archive = "//topaz/third_party/chromium/arch/$target_cpu/web_runner.far"
 }
