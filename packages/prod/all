@@ -4,6 +4,7 @@
         "topaz/packages/prod/color",
         "topaz/packages/prod/device_settings",
         "topaz/packages/prod/display_settings",
+        "topaz/packages/prod/dart",
         "topaz/packages/prod/dart_aot_runner",
         "topaz/packages/prod/dart_jit_runner",
         "topaz/packages/prod/dart_dbc_runner",

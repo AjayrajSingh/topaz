@@ -1,0 +1,12 @@
+{
+    "program": {
+        "data": "data"
+    },
+    "sandbox": {
+        "features": [
+            "deprecated-all-services",
+            "root-ssl-certificates",
+            "system-temp"
+        ]
+    }
+}

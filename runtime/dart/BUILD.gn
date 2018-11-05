@@ -4,6 +4,7 @@
 
 import("//build/dart/dart.gni")
 import("//build/dart/dart_tool.gni")
+import("//build/package.gni")
 import("//build/sdk/sdk_atom.gni")
 
 dart_tool("kernel_compiler") {
@@ -81,5 +82,20 @@ sdk_atom("kernel_compiler_sdk") {
     ":kernel_compiler_snapshot($host_toolchain)",
     "//topaz/runtime/dart_runner/kernel:kernel_platform_files",
     "//topaz/runtime/flutter_runner/kernel:kernel_platform_files",
+  ]
+}
+
+package("dart") {
+  deps = [
+    "//third_party/dart/runtime/bin:dart",
+  ]
+
+  binary = "dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/dart.cmx")
+      dest = "dart.cmx"
+    },
   ]
 }
