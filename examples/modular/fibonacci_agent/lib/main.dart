@@ -2,11 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'src/fibonacci_agent.dart';
+import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_fibonacci/fidl_async.dart' as fidl_fib;
 
-//ignore: unused_element
-FibonacciAgent _agent;
+import 'package:fuchsia_modular/agent.dart';
+import 'src/fibonacci_service_impl.dart';
 
 void main(List<String> args) {
-  _agent = new FibonacciAgent();
+  final FibonacciServiceImpl fibonacciServiceImpl = FibonacciServiceImpl();
+  final _bindings = Agent().getIncomingBindings();
+  
+  // TODO(nkorsote): replace the following temporary way to add a service
+  Agent().addService(
+    (InterfaceRequest<fidl_fib.FibonacciService> request) => _bindings.add(
+        fidl_fib.FibonacciServiceBinding()
+          ..bind(fibonacciServiceImpl, request)),
+    fidl_fib.FibonacciService.$serviceName,
+  );
 }

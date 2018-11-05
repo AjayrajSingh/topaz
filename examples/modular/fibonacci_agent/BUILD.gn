@@ -13,7 +13,6 @@ dart_app("fibonacci_agent") {
   package_name = "fibonacci_agent"
 
   sources = [
-    "src/fibonacci_agent.dart",
     "src/fibonacci_service_impl.dart",
   ]
 
