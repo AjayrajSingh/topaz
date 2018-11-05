@@ -34,7 +34,13 @@ rustc_binary("bin") {
 }
 
 package("ermine") {
-  deprecated_no_cmx = "//build"
+
+  meta = [
+    {
+      path = rebase_path("meta/ermine_user_shell.cmx")
+      dest = "ermine_user_shell.cmx"
+    },
+  ]
 
   deps = [
     ":bin",
