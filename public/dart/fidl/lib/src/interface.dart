@@ -461,8 +461,7 @@ class ProxyController<T> {
   void close() {
     if (isBound) {
       if (_pendingResponsesCount > 0) {
-        proxyError('Proxy with interface name [${$interfaceName}] and '
-            'service name [${$serviceName}] is closed.');
+        proxyError('The proxy is closed.');
       }
       _reset();
       _reader.close();
@@ -543,8 +542,7 @@ class ProxyController<T> {
   /// Used by subclasses of [Proxy<T>] to send encoded messages.
   void sendMessage(Message message) {
     if (!_reader.isBound) {
-      proxyError('Proxy with interface name [${$interfaceName}] and '
-            'service name [${$serviceName}] is closed.');
+      proxyError('The proxy is closed.');
       return;
     }
     final int status = _reader.channel.write(message.data, message.handles);
@@ -596,16 +594,15 @@ class ProxyController<T> {
 
   /// Complete the [error] future with the given message.
   void proxyError(String message) {
-    // In debug builds always print the proxy error.
-    assert(() {
-      print(message);
-      return true;
-    }());
+    final fullMessage =
+        'Error in proxy with interface name [${$interfaceName}] and '
+        'service name [${$serviceName}]: $message';
+    print(fullMessage);
     if (!_errorCompleter.isCompleted) {
       error.whenComplete(() {
         _errorCompleter = new Completer<ProxyError>();
       });
-      _errorCompleter.complete(new ProxyError(message));
+      _errorCompleter.complete(new ProxyError(fullMessage));
     }
   }
 }
