@@ -27,13 +27,15 @@ constexpr char kAccessibilityChannel[] = "flutter/accessibility";
 template <class T>
 void SetInterfaceErrorHandler(fidl::InterfacePtr<T>& interface,
                               std::string name) {
-  interface.set_error_handler(
-      [name] { FML_LOG(ERROR) << "Interface error on: " << name; });
+  interface.set_error_handler([name](zx_status_t status) {
+    FML_LOG(ERROR) << "Interface error on: " << name;
+  });
 }
 template <class T>
 void SetInterfaceErrorHandler(fidl::Binding<T>& binding, std::string name) {
-  binding.set_error_handler(
-      [name] { FML_LOG(ERROR) << "Interface error on: " << name; });
+  binding.set_error_handler([name](zx_status_t status) {
+    FML_LOG(ERROR) << "Interface error on: " << name;
+  });
 }
 
 PlatformView::PlatformView(

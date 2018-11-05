@@ -70,7 +70,7 @@ void WebViewProvider::CreateView(
   }
 #endif
 
-  view_->SetReleaseHandler([this] {
+  view_->SetReleaseHandler([this](zx_status_t status) {
     FXL_LOG(INFO) << "release handler";
     view_ = nullptr;
   });

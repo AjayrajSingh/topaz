@@ -67,7 +67,8 @@ Application::Application(
     : termination_callback_(std::move(termination_callback)),
       debug_label_(DebugLabelForURL(startup_info.launch_info.url)),
       application_controller_(this) {
-  application_controller_.set_error_handler([this]() { Kill(); });
+  application_controller_.set_error_handler(
+      [this](zx_status_t status) { Kill(); });
 
   FML_DCHECK(fdio_ns_.is_valid());
   // LaunchInfo::url non-optional.

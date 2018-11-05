@@ -41,7 +41,7 @@ ViewController::ViewController(
       params_(term_params) {
   FXL_DCHECK(context_);
 
-  SetReleaseHandler([this] { disconnect_(this); });
+  SetReleaseHandler([this](zx_status_t status) { disconnect_(this); });
 
   fuchsia::fonts::Request font_request;
   font_request.family = "RobotoMono";

@@ -67,7 +67,7 @@ DartComponentController::DartComponentController(
   }
   if (controller.is_valid()) {
     binding_.Bind(std::move(controller));
-    binding_.set_error_handler([this] { Kill(); });
+    binding_.set_error_handler([this](zx_status_t status) { Kill(); });
   }
 
   zx_status_t status =
@@ -412,7 +412,7 @@ void DartComponentController::Kill() {
 }
 
 void DartComponentController::Detach() {
-  binding_.set_error_handler(fit::closure());
+  binding_.set_error_handler([](zx_status_t status) {});
 }
 
 void DartComponentController::SendReturnCode() {

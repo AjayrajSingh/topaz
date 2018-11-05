@@ -32,7 +32,10 @@ SessionConnection::SessionConnection(
       scene_update_context_(&session_wrapper_, surface_producer_.get()),
       vsync_event_handle_(vsync_event_handle) {
 
-  session_wrapper_.set_error_handler(std::move(session_error_callback));
+  session_wrapper_.set_error_handler(
+      [callback = std::move(session_error_callback)](zx_status_t status) {
+        callback();
+      });
 
 #ifndef SCENIC_VIEWS2
   root_node_.Bind(std::move(import_token));

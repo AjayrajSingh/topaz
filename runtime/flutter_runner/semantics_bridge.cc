@@ -60,7 +60,7 @@ fuchsia::accessibility::Node SerializeNode(blink::SemanticsNode node,
 SemanticsBridge::SemanticsBridge(shell::PlatformView* platform_view,
                                  blink::LogicalMetrics* metrics)
     : binding_(this), platform_view_(platform_view), metrics_(metrics) {
-  root_.set_error_handler([this]() {
+  root_.set_error_handler([this](zx_status_t status) {
     FXL_LOG(INFO) << "A11y bridge disconnected from a11y manager";
     binding_.Unbind();
     root_.Unbind();
@@ -72,7 +72,7 @@ SemanticsBridge::SemanticsBridge(shell::PlatformView* platform_view,
   // a11y support.
   a11y_toggle_.events().OnAccessibilityToggle =
       fit::bind_member(this, &SemanticsBridge::OnAccessibilityToggle);
-  a11y_toggle_.set_error_handler([this]() {
+  a11y_toggle_.set_error_handler([this](zx_status_t status) {
     FXL_LOG(INFO) << "Disconnected from a11y toggle broadcaster.";
     binding_.Unbind();
     root_.Unbind();

@@ -42,7 +42,7 @@ SpotifyAuthProviderImpl::SpotifyAuthProviderImpl(
   FXL_DCHECK(network_wrapper_);
 
   // The class shuts down when the client connection is disconnected.
-  binding_.set_error_handler([this] {
+  binding_.set_error_handler([this](zx_status_t status) {
     if (on_empty_) {
       on_empty_();
     }
@@ -86,11 +86,11 @@ void SpotifyAuthProviderImpl::GetPersistentCredential(
   web_view_->SetUrl(url);
 
   auth_ui_context_ = auth_ui_context.Bind();
-  auth_ui_context_.set_error_handler([this] {
+  auth_ui_context_.set_error_handler([this](zx_status_t status) {
     FXL_VLOG(1) << "Overlay cancelled by the caller";
     // close any open web view
     if (auth_ui_context_) {
-      auth_ui_context_.set_error_handler([] {});
+      auth_ui_context_.set_error_handler([](zx_status_t status) {});
       auth_ui_context_->StopOverlay();
     }
     auth_ui_context_ = nullptr;
@@ -214,7 +214,7 @@ void SpotifyAuthProviderImpl::WillSendRequest(
   // code to long lived credential.
   // Also, de-register previously registered error callbacks since calling
   // StopOverlay() might cause this connection to be closed.
-  auth_ui_context_.set_error_handler([] {});
+  auth_ui_context_.set_error_handler([](zx_status_t status) {});
   auth_ui_context_->StopOverlay();
 
   auto code = uri.substr(prefix.size(), std::string::npos);
@@ -313,7 +313,7 @@ SpotifyAuthProviderImpl::SetupWebView() {
   web_view_launch_info.directory_request = web_view_services.NewRequest();
   context_->launcher()->CreateComponent(std::move(web_view_launch_info),
                                         web_view_controller_.NewRequest());
-  web_view_controller_.set_error_handler([this] {
+  web_view_controller_.set_error_handler([this](zx_status_t status) {
     FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
   });
 

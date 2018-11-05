@@ -30,7 +30,7 @@ void ComponentController::Start(
     fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   if (controller.is_valid()) {
     binding_.Bind(std::move(controller));
-    binding_.set_error_handler([this] { Kill(); });
+    binding_.set_error_handler([this](zx_status_t status) { Kill(); });
   }
 
   service_provider_.ServeDirectory(
@@ -44,7 +44,8 @@ void ComponentController::Start(
   launch_info.directory_request = services.NewRequest();
   runner_->launcher()->CreateComponent(std::move(launch_info),
                                        web_view_controller_.NewRequest());
-  web_view_controller_.set_error_handler([this] { Kill(); });
+  web_view_controller_.set_error_handler(
+      [this](zx_status_t status) { Kill(); });
   services.ConnectToService(web_view_provider_.NewRequest());
 }
 
