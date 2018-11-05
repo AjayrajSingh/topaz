@@ -17,7 +17,7 @@ import 'document/document.dart';
 import 'document/document_id.dart';
 import 'ledger_helpers.dart';
 import 'modification_queue.dart';
-import 'schema/schema.dart';
+import 'query/query.dart';
 import 'sledge_connection_id.dart';
 import 'sledge_errors.dart';
 import 'sledge_page_id.dart';
@@ -168,12 +168,12 @@ class Sledge {
     });
   }
 
-  /// Returns the list of all documents of the given [schema].
-  Future<List<Document>> getDocuments(Schema schema) async {
+  /// Returns the list of all documents matching the given [query].
+  Future<List<Document>> getDocuments(Query query) async {
     _verifyThatTransactionHasStarted();
 
     List<DocumentId> documentIds =
-        await currentTransaction.getDocumentIds(schema);
+        await currentTransaction.getDocumentIds(query);
     List<Future<Document>> documents = <Future<Document>>[];
     for (final documentId in documentIds) {
       documents.add(getDocument(documentId));

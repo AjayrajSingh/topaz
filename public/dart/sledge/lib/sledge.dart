@@ -6,6 +6,7 @@
 export 'src/document/document.dart';
 export 'src/document/document_id.dart';
 export 'src/query/index_definition.dart';
+export 'src/query/query.dart';
 export 'src/schema/base_type.dart';
 export 'src/schema/schema.dart';
 export 'src/sledge.dart';

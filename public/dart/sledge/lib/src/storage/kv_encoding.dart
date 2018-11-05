@@ -18,9 +18,14 @@ enum KeyValueType {
   /// The type used to identify KVs that store Documents data.
   document,
 
-  /// The type used to identify KVs that store the Schemas used
-  /// in Sledge.
-  schema
+  /// The type used to identify KVs that store the Schemas used in Sledge.
+  schema,
+
+  /// The type used to identify KVs that store the IndexDefinitions.
+  indexDefinition,
+
+  /// The type used to identify KVs that store the Indexes.
+  indexEntry
 }
 
 /// The length of the prefix storing the Type of data.

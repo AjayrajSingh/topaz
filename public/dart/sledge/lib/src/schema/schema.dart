@@ -101,7 +101,7 @@ class Schema implements BaseType {
     return _schemaDescription;
   }
 
-  /// Returns whether the given field path exists for this Schema.  
+  /// Returns whether the given field path exists for this Schema.
   /// A field path is a concatenation of field names that fully identify
   /// a field.
   /// # Example:

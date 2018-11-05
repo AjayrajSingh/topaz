@@ -37,7 +37,8 @@ class TestModel {
     final intsReceivedInStream = <int>[];
 
     await sledge.runInTransaction(() async {
-      final List<Document> documents = await sledge.getDocuments(schema);
+      final List<Document> documents =
+          await sledge.getDocuments(new Query(schema));
       assert(documents.isEmpty);
       assert(await sledge.documentExists(id) == false);
 
@@ -56,7 +57,8 @@ class TestModel {
     // Verify that the document is still present in a separate
     // transaction.
     await sledge.runInTransaction(() async {
-      final List<Document> documents = await sledge.getDocuments(schema);
+      final List<Document> documents =
+          await sledge.getDocuments(new Query(schema));
       assert(documents.length == 1);
       // TODO(nellyv): Fix [getDocuments]'s implementation:
       // documents[0]['someBool'].value == true

@@ -12,7 +12,7 @@ import 'document/document.dart';
 import 'document/document_id.dart';
 import 'document/values/key_value.dart';
 import 'ledger_helpers.dart';
-import 'schema/schema.dart';
+import 'query/query.dart';
 import 'sledge.dart';
 import 'storage/document_storage.dart';
 import 'storage/kv_encoding.dart' as sledge_storage;
@@ -150,27 +150,36 @@ class Transaction {
     return document;
   }
 
-  /// Returns the list of the ids of all documents of the given [schema].
+  /// Returns the list of the ids of all documents matching the given [query].
   /// The result will not contain any updates in progress in the current transaction.
-  Future<List<DocumentId>> getDocumentIds(Schema schema) async {
-    Uint8List keyPrefix = concatUint8Lists(
-        sledge_storage.prefixForType(sledge_storage.KeyValueType.document),
-        schema.hash);
-
-    // Get all entries that correspond to the given schema.
+  Future<List<DocumentId>> getDocumentIds(Query query) async {
     final documentIds = <DocumentId>[];
 
-    List<KeyValue> keyValues =
-        await getEntriesFromSnapshotWithPrefix(_pageSnapshotProxy, keyPrefix);
-    // Entries are sorted by key, thus entries corresponding to the same
-    // document will be in consecutive positions.
-    Uint8List currentDocumentSubId;
-    for (KeyValue keyValue in keyValues) {
-      final newDocumentSubId =
-          sledge_storage.documentSubIdFromKey(keyValue.key);
-      if (!uint8ListsAreEqual(currentDocumentSubId, newDocumentSubId)) {
-        documentIds.add(new DocumentId(schema, newDocumentSubId));
-        currentDocumentSubId = newDocumentSubId;
+    if (query.requiresIndex()) {
+      Uint8List keyPrefix = query.prefixInIndex();
+      List<KeyValue> keyValues =
+          await getEntriesFromSnapshotWithPrefix(_pageSnapshotProxy, keyPrefix);
+      for (KeyValue keyValue in keyValues) {
+        documentIds.add(new DocumentId(query.schema, keyValue.value));
+      }
+    } else {
+      Uint8List keyPrefix = concatUint8Lists(
+          sledge_storage.prefixForType(sledge_storage.KeyValueType.document),
+          query.schema.hash);
+
+      // Get all entries that correspond to the given schema.
+      List<KeyValue> keyValues =
+          await getEntriesFromSnapshotWithPrefix(_pageSnapshotProxy, keyPrefix);
+      // Entries are sorted by key, thus entries corresponding to the same
+      // document will be in consecutive positions.
+      Uint8List currentDocumentSubId;
+      for (KeyValue keyValue in keyValues) {
+        final newDocumentSubId =
+            sledge_storage.documentSubIdFromKey(keyValue.key);
+        if (!uint8ListsAreEqual(currentDocumentSubId, newDocumentSubId)) {
+          documentIds.add(new DocumentId(query.schema, newDocumentSubId));
+          currentDocumentSubId = newDocumentSubId;
+        }
       }
     }
     return documentIds;
