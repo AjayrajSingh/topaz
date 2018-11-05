@@ -11,7 +11,7 @@ dart_library("lib.base_shell") {
     "base_model.dart",
     "netstack_model.dart",
     "user_manager.dart",
-    "user_shell_chooser.dart",
+    "session_shell_chooser.dart",
     "user_watcher_impl.dart",
   ]
 

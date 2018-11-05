@@ -4,9 +4,9 @@
         "topaz/packages/prod/wifi_settings"
     ],
     "packages": [
-        "//topaz/bin/user_shell/armadillo_user_shell",
-        "//topaz/bin/user_shell/capybara_user_shell",
-        "//topaz/bin/user_shell/ermine_user_shell:ermine",
+        "//topaz/bin/session_shell/armadillo_session_shell",
+        "//topaz/bin/session_shell/capybara_session_shell",
+        "//topaz/bin/session_shell/ermine_session_shell:ermine",
         "//topaz/bin/ermine_ctl:ermine_ctl",
         "//topaz/shell/agents/home_work_agent",
         "//topaz/shell/kernel_panic",

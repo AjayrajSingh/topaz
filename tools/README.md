@@ -82,6 +82,6 @@ Running with the full sysui
 
 Running the email story directly
 
-    fx shell "basemgr --user_shell=dev_user_shell --user_shell_args=--root_module=<target>"
+    fx shell "basemgr --session_shell=dev_session_shell --session_shell_args=--root_module=<target>"
 
 [get-started]: https://fuchsia.googlesource.com/docs/+/master/getting_started.md

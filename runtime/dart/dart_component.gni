@@ -29,7 +29,7 @@ declare_args() {
     # Armadillo is not AOT compiled in debug builds
     flutter_aot_sharing_basis = ""
   } else {
-    flutter_aot_sharing_basis = "//topaz/bin/user_shell/armadillo_user_shell"
+    flutter_aot_sharing_basis = "//topaz/bin/session_shell/armadillo_session_shell"
   }
 
   # Enable profiling and tracing. Default is true in Debug builds and false

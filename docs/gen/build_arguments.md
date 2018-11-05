@@ -77,7 +77,7 @@ From [//garnet/bin/mediaplayer/ffmpeg/BUILD.gn:14](https://fuchsia.googlesource.
 
 ### armadillo_path_context_config
 
-**Current value (from the default):** `"../bin/user_shell/armadillo_user_shell/assets/contextual_config.json"`
+**Current value (from the default):** `"../bin/session_shell/armadillo_session_shell/assets/contextual_config.json"`
 
 From [//topaz/shell/BUILD.gn:14](https://fuchsia.googlesource.com/topaz/+/3deb9ec4ec5405b26055860edc6b798e1ffa874d/shell/BUILD.gn#14)
 

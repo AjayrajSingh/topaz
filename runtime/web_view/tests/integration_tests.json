@@ -2,7 +2,7 @@
   "tests": [
     {
       "name": "web_view_provider_test",
-      "exec": "basemgr --test --account_provider=dev_token_manager --base_shell=dev_base_shell --base_shell_args=--test_timeout_ms=10000 --user_shell=dev_user_shell --user_shell_args=--root_module=web_view_provider_test --story_shell=dev_story_shell"
+      "exec": "basemgr --test --account_provider=dev_token_manager --base_shell=dev_base_shell --base_shell_args=--test_timeout_ms=10000 --session_shell=dev_session_shell --session_shell_args=--root_module=web_view_provider_test --story_shell=dev_story_shell"
     }
   ]
 }

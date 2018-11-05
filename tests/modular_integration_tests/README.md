@@ -32,7 +32,7 @@ the relevant flags you'll probably want:
     as in its curret state, the integration testing framework is in its early
     stages and can take a while to complete.
 
-*   `--user_shell_args` These will be broken down based on what they do:
+*   `--session_shell_args` These will be broken down based on what they do:
 
     *   `--root_module` This should almost always be `test_driver_module`, which
         will run you module as well as the testing application.
@@ -45,7 +45,7 @@ the relevant flags you'll probably want:
         under test is running on, then run integration tests, like sending touch
         events or testing specific widgets.
 
-The account provider, base shell, user shell, etc, will likely remain
+The account provider, base shell, session shell, etc, will likely remain
 unchanged except under specific circumstances beyond the scope of this readme.
 
 ## Running Tests Manually

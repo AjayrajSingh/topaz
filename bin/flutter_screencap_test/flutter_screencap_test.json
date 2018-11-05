@@ -2,7 +2,7 @@
   "tests": [
     {
       "name": "flutter_screencap",
-      "exec": "basemgr --account_provider=dev_token_manager --base_shell=dev_base_shell --user_shell=dev_user_shell --user_shell_args=--root_module=flutter_screencap_test_app --story_shell=dev_story_shell"
+      "exec": "basemgr --account_provider=dev_token_manager --base_shell=dev_base_shell --session_shell=dev_session_shell --session_shell_args=--root_module=flutter_screencap_test_app --story_shell=dev_story_shell"
     }
   ]
 }

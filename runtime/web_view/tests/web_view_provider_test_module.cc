@@ -75,8 +75,8 @@ class TestModule : fuchsia::modular::LinkWatcher {
         << "Unexpected output url. Actual = " << output_link_value;
     output_link_value_point_.Pass();
 
-    // signal that we want to shutdown (our user shell integration test driver
-    // looks for this signal and then terminates us.)
+    // signal that we want to shutdown (our session shell integration test
+    // driver looks for this signal and then terminates us.)
     modular::testing::Signal(modular::testing::kTestShutdown);
   }
 

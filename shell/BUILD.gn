@@ -11,7 +11,7 @@ declare_args() {
   # directory. If the path starts with a single slash it will be treated as an
   # absolute path
   armadillo_path_context_config =
-      "../bin/user_shell/armadillo_user_shell/assets/contextual_config.json"
+      "../bin/session_shell/armadillo_session_shell/assets/contextual_config.json"
 }
 
 assert(armadillo_path_context_config != "")
@@ -27,27 +27,27 @@ package("sysui") {
     },
 
     {
-      path = rebase_path("../bin/user_shell/armadillo_user_shell/assets/AgentIcon.png")
+      path = rebase_path("../bin/session_shell/armadillo_session_shell/assets/AgentIcon.png")
       dest = "sysui/AgentIcon.png"
     },
 
     {
-      path = rebase_path("../bin/user_shell/armadillo_user_shell/assets/aparna-home.jpg")
+      path = rebase_path("../bin/session_shell/armadillo_session_shell/assets/aparna-home.jpg")
       dest = "sysui/aparna-home.jpg"
     },
 
     {
-      path = rebase_path("../bin/user_shell/armadillo_user_shell/assets/aparna-sf.jpg")
+      path = rebase_path("../bin/session_shell/armadillo_session_shell/assets/aparna-sf.jpg")
       dest = "sysui/aparna-sf.jpg"
     },
 
     {
-      path = rebase_path("../bin/user_shell/armadillo_user_shell/assets/aparna-work.jpg")
+      path = rebase_path("../bin/session_shell/armadillo_session_shell/assets/aparna-work.jpg")
       dest = "sysui/aparna-work.jpg"
     },
 
     {
-      path = rebase_path("../bin/user_shell/armadillo_user_shell/assets/danielle-home.jpg")
+      path = rebase_path("../bin/session_shell/armadillo_session_shell/assets/danielle-home.jpg")
       dest = "sysui/danielle-home.jpg"
     },
 
@@ -292,7 +292,7 @@ group("tests") {
 
   deps = [
     # "armadillo:armadillo_tests",
-    # "../bin/user_shell/capybara_user_shell:capybara_user_shell_tests",
+    # "../bin/session_shell/capybara_session_shell:capybara_session_shell_tests",
     # "keyboard:keyboard_tests",
     "mondrian_story_shell:mondrian_story_shell_tests",
   ]

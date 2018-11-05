@@ -5,7 +5,7 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.base_shell/user_shell_chooser.dart';
+import 'package:lib.base_shell/session_shell_chooser.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 
 import 'user_watcher_impl.dart';
@@ -13,7 +13,7 @@ import 'user_watcher_impl.dart';
 /// Handles adding, removing, and logging, and controlling users.
 class BaseShellUserManager {
   final UserProvider _userProvider;
-  final UserShellChooser _userShellChooser;
+  final SessionShellChooser _sessionShellChooser;
 
   UserControllerProxy _userControllerProxy;
   UserWatcherImpl _userWatcherImpl;
@@ -21,7 +21,7 @@ class BaseShellUserManager {
   final StreamController<void> _userLogoutController =
       StreamController<void>.broadcast();
 
-  BaseShellUserManager(this._userProvider, this._userShellChooser);
+  BaseShellUserManager(this._userProvider, this._sessionShellChooser);
 
   Stream<void> get onLogout => _userLogoutController.stream;
 
@@ -49,9 +49,9 @@ class BaseShellUserManager {
 
   /// Logs in the user given by [accountId].
   ///
-  /// Takes in [serviceProviderHandle] which gets passed to the user shell.
+  /// Takes in [serviceProviderHandle] which gets passed to the session shell.
   /// Returns a handle to the [ViewOwner] that the base shell should use
-  /// to open a [ChildViewConnection] to display the user shell.
+  /// to open a [ChildViewConnection] to display the session shell.
   InterfaceHandle<ViewOwner> login(String accountId,
       InterfaceHandle<ServiceProvider> serviceProviderHandle) {
     _userControllerProxy?.ctrl?.close();
@@ -61,14 +61,14 @@ class BaseShellUserManager {
       _userLogoutController.add(null);
     });
 
-    UserShellInfo info = _userShellChooser.currentUserShell;
+    SessionShellInfo info = _sessionShellChooser.currentSessionShell;
     final InterfacePair<ViewOwner> viewOwner = InterfacePair<ViewOwner>();
     final UserLoginParams params = UserLoginParams(
       accountId: accountId,
       viewOwner: viewOwner.passRequest(),
       services: serviceProviderHandle,
       userController: _userControllerProxy.ctrl.request(),
-      userShellConfig: AppConfig(url: info.name),
+      sessionShellConfig: AppConfig(url: info.name),
     );
 
     _userProvider.login(params);
@@ -107,13 +107,13 @@ class BaseShellUserManager {
     _userWatcherImpl.close();
   }
 
-  /// If a user is logged in, set the user shell to the current user shell,
+  /// If a user is logged in, set the session shell to the current session shell,
   /// otherwise, do nothing.
-  Future<void> setUserShell() {
+  Future<void> setSessionShell() {
     final completer = Completer<void>();
 
-    _userControllerProxy?.swapUserShell(
-        new AppConfig(url: _userShellChooser.currentUserShell.name),
+    _userControllerProxy?.swapSessionShell(
+        new AppConfig(url: _sessionShellChooser.currentSessionShell.name),
         completer.complete);
     return completer.future;
   }

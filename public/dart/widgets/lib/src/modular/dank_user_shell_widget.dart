@@ -11,6 +11,8 @@ import 'package:lib.user.dart/user.dart';
 
 export 'package:lib.app.dart/app.dart' show StartupContext;
 
+// DEPRECATED: Use DankSessionShellWidget instead.
+//
 /// A wrapper widget intended to be the root of the application that is
 /// a [UserShell].  Its main purpose is to hold the [StartupContext] and
 /// [UserShell] instances so they aren't garbage collected.
@@ -30,11 +32,11 @@ class DankUserShellWidget extends StatelessWidget {
   /// The [UserShellImpl] whose services to [advertise].
   final DankUserShellImpl _userShell;
 
-  /// [Widget] for the rest of the User Shell
+  /// [Widget] for the rest of the Session Shell
   final Widget child;
 
   /// Callback that is fired when the [DankUserShellImpl] is initialized and
-  /// passes the [UserShellContext]
+  /// passes the [userShellContext]
   final OnDankUserShellReady onReady;
 
   /// Constructor.
@@ -92,11 +94,13 @@ class DankUserShellWidget extends StatelessWidget {
 /// Handles bindings for [UserShellPresentationProviderBinding].
 class _UserShellPresentationProviderBindings {
   final List<UserShellPresentationProviderBinding>
-      _presentationProviderBindings = <UserShellPresentationProviderBinding>[];
+      _presentationProviderBindings =
+      <UserShellPresentationProviderBinding>[];
 
   void bind(DankUserShellImpl userShell,
       InterfaceRequest<UserShellPresentationProvider> request) {
     _presentationProviderBindings.add(
-        new UserShellPresentationProviderBinding()..bind(userShell, request));
+        new UserShellPresentationProviderBinding()
+          ..bind(userShell, request));
   }
 }

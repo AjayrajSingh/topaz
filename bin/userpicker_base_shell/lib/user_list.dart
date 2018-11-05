@@ -136,7 +136,7 @@ class UserList extends StatelessWidget {
           ),
           _buildUserActionButton(
             child: new Text(
-              'LOGIN DISABLED => No UserShell configured',
+              'LOGIN DISABLED => No SessionShell configured',
               style: new TextStyle(
                 fontSize: fontSize,
                 color: Colors.white,

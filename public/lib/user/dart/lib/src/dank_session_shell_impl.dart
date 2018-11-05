@@ -8,26 +8,24 @@ import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 
-// DEPRECATED: Use DankSessionShellImpl instead.
-//
-/// Called when [UserShell.initialize] occurs.
-typedef OnDankUserShellReady = void Function(
-    UserShellContext userShellContext);
+/// Called when [SessionShell.initialize] occurs.
+typedef OnDankSessionShellReady = void Function(
+    SessionShellContext sessionShellContext);
 
-/// This is a lightweight class that acquires a [UserShellContextProxy]
+/// This is a lightweight class that acquires a [SessionShellContextProxy]
 /// and passes it to the [onReady] callback. It also implements other
 /// lifecycle and focus watcher functionality.
-class DankUserShellImpl
-    implements UserShellPresentationProvider, FocusWatcher, Lifecycle {
+class DankSessionShellImpl
+    implements SessionShellPresentationProvider, FocusWatcher, Lifecycle {
   /// Constructor.
-  DankUserShellImpl({startupContext, this.onReady}) {
+  DankSessionShellImpl({startupContext, this.onReady}) {
     connectToService(
-        startupContext.environmentServices, _userShellContextProxy.ctrl);
+        startupContext.environmentServices, _sessionShellContextProxy.ctrl);
     _initialize();
   }
 
-  /// Binding for the actual UserShell interface object.
-  final _userShellContextProxy = UserShellContextProxy();
+  /// Binding for the actual SessionShell interface object.
+  final _sessionShellContextProxy = SessionShellContextProxy();
 
   /// Binding for the [FocusProvider] proxy.
   final _focusProviderProxy = FocusProviderProxy();
@@ -35,21 +33,21 @@ class DankUserShellImpl
   /// Mapping of story id to [StoryVisualStateWatcher] handle.
   final _visualStateWatchers = <String, StoryVisualStateWatcherProxy>{};
 
-  /// Binding for [FocusWatcher] implemented by this UserShell.
+  /// Binding for [FocusWatcher] implemented by this SessionShell.
   final _focusWatcherBinding = FocusWatcherBinding();
 
   /// Called when [initialize] occurs.
-  final OnDankUserShellReady onReady;
+  final OnDankSessionShellReady onReady;
 
   String _lastFocusedStoryId;
 
   void _initialize() {
     if (onReady != null) {
-      _userShellContextProxy
+      _sessionShellContextProxy
           .getFocusProvider(_focusProviderProxy.ctrl.request());
       _focusProviderProxy.watch(_focusWatcherBinding.wrap(this));
 
-      onReady(_userShellContextProxy);
+      onReady(_sessionShellContextProxy);
     }
   }
 
@@ -61,7 +59,7 @@ class DankUserShellImpl
     String storyId,
     InterfaceRequest<Presentation> request,
   ) =>
-      _userShellContextProxy.getPresentation(request);
+      _sessionShellContextProxy.getPresentation(request);
 
   @override
   void watchVisualState(

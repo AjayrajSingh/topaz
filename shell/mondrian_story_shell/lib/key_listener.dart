@@ -4,7 +4,7 @@
 
 /*
   In the absence of a guaranteed device-level provider of key events
-  Story Shell should listen for its own events, independent of User Shell 
+  Story Shell should listen for its own events, independent of Session Shell 
   implementation. 
 */
 

@@ -43,7 +43,7 @@ class SurfaceStage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // If there is only one surface, do not fight for horizontal gestures,
-    // assume User Shell will handle story dismissal.
+    // assume Session Shell will handle story dismissal.
     final useGestures = forms.flatten().length > 1;
 
     final children = <Widget>[]..addAll(

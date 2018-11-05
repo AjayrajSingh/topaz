@@ -17,7 +17,7 @@ bench() {
     BENCHMARK=$2
     COMMAND="run basemgr --test --enable_presenter --account_provider=dev_token_manager "`
       `"--base_shell=dev_base_shell --base_shell_args=--test_timeout_ms=60000 "`
-      `"--user_shell=dev_user_shell --user_shell_args=--root_module=${MODULE} --story_shell=mondrian"
+      `"--session_shell=dev_session_shell --session_shell_args=--root_module=${MODULE} --story_shell=mondrian"
 
     runbench_exec "${OUT_DIR}/${BENCHMARK}.json"                           \
       "/pkgfs/packages/startup_benchmarks/0/bin/run_startup_benchmark.sh"  \

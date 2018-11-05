@@ -15,14 +15,14 @@ This repository contains System UI bits for the Fuchsia operating system.
 
 [Armadillo](armadillo)  is currently the default system UI for Fuchsia.
 [Armadillo](armadillo)  is written in Flutter and is split into two separate
-apps: [Armadillo](armadillo) and [Armadillo User Shell](armadillo_user_shell).
+apps: [Armadillo](armadillo) and [Armadillo Session Shell](armadillo_session_shell).
 
 [Armadillo](armadillo) is a library of Flutter code.
 
-[Armadillo User Shell](armadillo_user_shell) is a thin wrapper around
+[Armadillo Session Shell](armadillo_session_shell) is a thin wrapper around
 [Armadillo](armadillo) that obtains its data from the Fuchsia system and
 interacts with the Fuchsia system's services via FIDL interfaces.  Thus,
-[Armadillo User Shell](armadillo_user_shell) only runs on Fuchsia.
+[Armadillo Session Shell](armadillo_session_shell) only runs on Fuchsia.
 
 ## Important Armadillo Non-Widget Classes
 
@@ -142,16 +142,16 @@ time and react together.
 
 1. **Abstraction**. Models provide a simple and standard way of abstracting the
 source of a Widget's dependent data and the Widget itself.  One example of this
-is how [Armadillo](armadillo) and [Armadillo User Shell](armadillo_user_shell)
+is how [Armadillo](armadillo) and [Armadillo Session Shell](armadillo_session_shell)
 use different sources for their [StoryModel](armadillo/lib/story_model.dart) and
 [SuggestionModel](armadillo/lib/suggestion_model.dart).
 [Armadillo](armadillo) reads its data from JSON files (via
 [JsonStoryGenerator](armadillo/lib/json_story_generator.dart) and
 [JsonSuggestionModel](armadillo/lib/json_suggestion_model.dart)) while
-[Armadillo User Shell](armadillo_user_shell) gets its data from the Fuchsia
+[Armadillo Session Shell](armadillo_session_shell) gets its data from the Fuchsia
 framework (via
 [StoryProviderStoryGenerator](
-armadillo_user_shell/lib/story_provider_story_generator.dart) and
+armadillo_session_shell/lib/story_provider_story_generator.dart) and
 [SuggestionProviderSuggestionModel](
   armadillo/lib/suggestion_provider_suggestion_model.dart)).
 

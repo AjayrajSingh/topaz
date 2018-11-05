@@ -1,0 +1,10 @@
+{
+    "program": {
+        "data": "data/armadillo_session_shell"
+    },
+    "sandbox": {
+        "features": [ ],
+        "system": [ "bin", "pkgs", "data" ],
+        "pkgfs": [ "packages" ]
+    }
+}

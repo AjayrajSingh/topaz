@@ -15,7 +15,7 @@ import 'package:fidl_fuchsia_ui_input/fidl.dart' as input;
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:lib.app.dart/app.dart' as app;
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.base_shell/user_shell_chooser.dart';
+import 'package:lib.base_shell/session_shell_chooser.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
@@ -36,7 +36,7 @@ const int _kKeyCodeS = 115;
 const int _kKeyCodeSpacebar = 32;
 const int _kKeyModifierLeftCtrl = 8;
 const int _kKeyModifierRightAlt = 64;
-const int _kUserShellLoginTimeMetricId = 14;
+const int _kSessionShellLoginTimeMetricId = 14;
 
 /// Provides common features needed by all base shells.
 ///
@@ -64,9 +64,9 @@ class CommonBaseShellModel extends BaseShellModel
   /// Only updated after [refreshUsers] is called.
   List<Account> _accounts;
 
-  final UserShellChooser _userShellChooser = UserShellChooser();
+  final SessionShellChooser _sessionShellChooser = SessionShellChooser();
 
-  /// Childview connection that contains the user shell.
+  /// Childview connection that contains the session shell.
   ChildViewConnection _childViewConnection;
 
   final List<KeyboardCaptureListenerHackBinding> _keyBindings = [];
@@ -185,17 +185,17 @@ class CommonBaseShellModel extends BaseShellModel
 
     trace('logging in $accountId');
     logger.startTimer(
-      _kUserShellLoginTimeMetricId,
+      _kSessionShellLoginTimeMetricId,
       0,
       '',
-      'user_shell_login_timer_id',
+      'session_shell_login_timer_id',
       DateTime.now().millisecondsSinceEpoch,
       _kCobaltTimerTimeout.inSeconds,
       (cobalt.Status status) {
         if (status != cobalt.Status.ok) {
           log.warning(
             'Failed to start timer metric '
-                '$_kUserShellLoginTimeMetricId: $status. ',
+                '$_kSessionShellLoginTimeMetricId: $status. ',
           );
         }
       },
@@ -212,7 +212,7 @@ class CommonBaseShellModel extends BaseShellModel
     _childViewConnection = ChildViewConnection(
       viewOwnerHandle,
       onAvailable: (ChildViewConnection connection) {
-        trace('user shell available');
+        trace('session shell available');
         log.info('BaseShell: Child view connection available!');
         connection.requestFocus();
         notifyListeners();
@@ -231,10 +231,10 @@ class CommonBaseShellModel extends BaseShellModel
   @override
   void onEvent(input.KeyboardEvent ev) {
     log.info('Keyboard captured in base shell!');
-    if (ev.codePoint == _kKeyCodeSpacebar && _userShellChooser != null) {
-      if (_userShellChooser.swapUserShells()) {
-        _updatePresentation(_userShellChooser.currentUserShell);
-        _userManager.setUserShell();
+    if (ev.codePoint == _kKeyCodeSpacebar && _sessionShellChooser != null) {
+      if (_sessionShellChooser.swapSessionShells()) {
+        _updatePresentation(_sessionShellChooser.currentSessionShell);
+        _userManager.setSessionShell();
       }
     } else if (ev.codePoint == _kKeyCodeS) {
       // Toggles from unshadowed -> screenSpace -> shadowMap
@@ -256,7 +256,7 @@ class CommonBaseShellModel extends BaseShellModel
     }
   }
 
-  /// Called when the the user shell logs out.
+  /// Called when the the session shell logs out.
   @mustCallSuper
   Future<void> onLogout() async {
     trace('logout');
@@ -327,20 +327,20 @@ class CommonBaseShellModel extends BaseShellModel
       ..setPresentationModeListener(
           _presentationModeListenerBinding.wrap(this));
 
-    await _userShellChooser.init();
+    await _sessionShellChooser.init();
 
-    _userManager = BaseShellUserManager(userProvider, _userShellChooser);
+    _userManager = BaseShellUserManager(userProvider, _sessionShellChooser);
 
     _userManager.onLogout.listen((_) {
       logger.endTimer(
-        'user_shell_log_out_timer_id',
+        'session_shell_log_out_timer_id',
         DateTime.now().millisecondsSinceEpoch,
         _kCobaltTimerTimeout.inSeconds,
         (cobalt.Status status) {
           if (status != cobalt.Status.ok) {
             log.warning(
               'Failed to end timer metric '
-                  'user_shell_log_out_timer_id: $status. ',
+                  'session_shell_log_out_timer_id: $status. ',
             );
           }
         },
@@ -349,9 +349,9 @@ class CommonBaseShellModel extends BaseShellModel
       onLogout();
     });
 
-    _updatePresentation(_userShellChooser.currentUserShell);
+    _updatePresentation(_sessionShellChooser.currentSessionShell);
 
-    if (_userShellChooser.currentUserShell.autoLogin) {
+    if (_sessionShellChooser.currentSessionShell.autoLogin) {
       await login(null);
       return;
     }
@@ -454,7 +454,7 @@ class CommonBaseShellModel extends BaseShellModel
     _keyBindings.add(binding);
   }
 
-  void _updatePresentation(UserShellInfo info) {
+  void _updatePresentation(SessionShellInfo info) {
     setDisplayUsage(info.displayUsage);
     setDisplaySizeInMm(info.screenWidthMm, info.screenHeightMm);
   }

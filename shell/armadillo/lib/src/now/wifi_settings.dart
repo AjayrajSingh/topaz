@@ -27,11 +27,11 @@ class WifiSettings extends StatelessWidget {
                     contextModel.isWifiManagerShowing = false;
                   },
                 )),
-        new ScopedModelDescendant<UserShellModel>(
+        new ScopedModelDescendant<SessionShellModel>(
           builder: (
             BuildContext context,
             Widget child,
-            UserShellModel userShellModel,
+            SessionShellModel sessionShellModel,
           ) =>
               new Center(
                 child: new FractionallySizedBox(
@@ -45,7 +45,7 @@ class WifiSettings extends StatelessWidget {
                       borderRadius: new BorderRadius.circular(4.0),
                       child: new ApplicationWidget(
                         url: 'wifi_settings',
-                        launcher: userShellModel.startupContext.launcher,
+                        launcher: sessionShellModel.startupContext.launcher,
                       ),
                     ),
                   ),
