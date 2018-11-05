@@ -30,17 +30,18 @@ class ModuleImpl implements Module {
   // ignore: unused_field
   IntentHandlerImpl _intentHandlerImpl;
 
-  /// The [fidl.ModuleContext] for the running module.
-  fidl.ModuleContextProxy _moduleContextProxy;
+  /// Returns the [fidl.ModuleContext] for the running module.
+  /// We allow injecting this method for testing purposes.
+  fidl.ModuleContext Function() _getContext;
 
   /// The default constructor for this instance.
   ModuleImpl({
     @required IntentHandlerImpl intentHandlerImpl,
     Lifecycle lifecycle,
-    fidl.ModuleContextProxy moduleContextProxy,
+    fidl.ModuleContextProxy Function() moduleContextFactory,
   }) : assert(intentHandlerImpl != null) {
     (lifecycle ??= Lifecycle()).addTerminateListener(_terminate);
-    _moduleContextProxy = moduleContextProxy;
+    _getContext = moduleContextFactory ?? getModuleContext;
     _intentHandlerImpl = intentHandlerImpl
       ..onHandleIntent = _proxyIntentToIntentHandler;
   }
@@ -107,17 +108,6 @@ class ModuleImpl implements Module {
 
     _intentHandler = intentHandler;
   }
-
-  /// Returns the [fidl.ModuleContext] for the running module.
-  ///
-  /// It is safe to call this method multiple times without opening multiple
-  /// connections.
-  ///
-  /// This method is intentionally lazy as to avoid connecting to the
-  /// ModuleContext until it is needed. We use this method instead of
-  /// just using [geModuleContext] directly to allow for testing.
-  fidl.ModuleContext _getContext() =>
-      _moduleContextProxy ??= getModuleContext();
 
   void _proxyIntentToIntentHandler(Intent intent) {
     if (_intentHandler == null) {

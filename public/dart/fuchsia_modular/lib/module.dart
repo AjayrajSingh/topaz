@@ -6,7 +6,6 @@
 export 'src/module/embedded_module.dart';
 export 'src/module/intent.dart';
 export 'src/module/intent_handler.dart';
-export 'src/module/intent_parameter.dart';
 export 'src/module/module.dart';
 export 'src/module/module_state_exception.dart';
 export 'src/module/noop_intent_handler.dart';

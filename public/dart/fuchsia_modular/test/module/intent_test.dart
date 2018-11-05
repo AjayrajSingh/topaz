@@ -4,6 +4,7 @@
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia_modular/src/module/intent.dart'; // ignore: implementation_imports
+// import 'package:fuchsia_modular/src/entity/entity_codec.dart'; // ignore: implementation_imports
 import 'package:test/test.dart';
 
 import '../matchers.dart';
@@ -16,7 +17,7 @@ void main() {
       expect(intent.action, 'my-action');
     });
 
-    test('intent with jandler sets the handler', () {
+    test('intent with handler sets the handler', () {
       final intent = Intent(action: '', handler: 'my-handler');
       expect(intent.handler, 'my-handler');
     });
@@ -29,31 +30,25 @@ void main() {
       intent = Intent(action: 'foo');
     });
 
-    test('addParameterFromEntityReference it to the list', () {
+    test('addParameterFromEntityReference adds it to the list', () {
       intent.addParameterFromEntityReference('name', 'ref');
       final result = intent.parameters.firstWhere((p) => p.name == 'name');
       expect(result, isNotNull);
     });
 
-    test('getParameter throws for missing name', () {
+    test('getEntity throws for missing name', () {
       expect(() {
-        intent.getParameter('not-a-name');
+        intent.getEntity(name: 'not-a-name', codec: null);
       }, throwsModuleStateException);
     });
 
-    test('getParameter returns the transformed intent', () {
-      intent.addParameterFromEntityReference('name', 'ref');
-      expect(intent.getParameter('name'), isIntentParameter);
-    });
-
-    test('getParameter throws for unsupported union type', () {
+    test('getEntity returns valid entity for link entity', () {
+      //NOTE: this test can be deleted when _link_entity goes away.
       intent.parameters.add(fidl.IntentParameter(
           name: 'name',
-          data: fidl.IntentParameterData.withLinkName('my-link')));
-
-      expect(() {
-        intent.getParameter('name');
-      }, throwsModuleStateException);
+          data: fidl.IntentParameterData.withLinkName('foo-link')));
+      final entity = intent.getEntity(name: 'name', codec: null);
+      expect(entity, isNotNull);
     });
   });
 }
