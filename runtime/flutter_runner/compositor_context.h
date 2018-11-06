@@ -9,6 +9,7 @@
 #include <lib/fit/function.h>
 
 #include "flutter/flow/compositor_context.h"
+#include "flutter/flow/embedded_views.h"
 #include "flutter/fml/macros.h"
 #include "session_connection.h"
 
@@ -40,7 +41,9 @@ class CompositorContext final : public flow::CompositorContext {
 
   // |flow::CompositorContext|
   std::unique_ptr<ScopedFrame> AcquireFrame(
-      GrContext* gr_context, SkCanvas* canvas,
+      GrContext* gr_context,
+      SkCanvas* canvas,
+      flow::ExternalViewEmbedder* view_embedder,
       const SkMatrix& root_surface_transformation,
       bool instrumentation_enabled) override;
 

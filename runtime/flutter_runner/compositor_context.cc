@@ -15,7 +15,7 @@ class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
               const SkMatrix& root_surface_transformation,
               bool instrumentation_enabled,
               SessionConnection& session_connection)
-      : flow::CompositorContext::ScopedFrame(context, nullptr, nullptr,
+      : flow::CompositorContext::ScopedFrame(context, nullptr, nullptr, nullptr,
                                              root_surface_transformation,
                                              instrumentation_enabled),
         session_connection_(session_connection) {}
@@ -89,7 +89,9 @@ void CompositorContext::OnSessionSizeChangeHint(float width_change_factor,
 CompositorContext::~CompositorContext() = default;
 
 std::unique_ptr<flow::CompositorContext::ScopedFrame>
-CompositorContext::AcquireFrame(GrContext* gr_context, SkCanvas* canvas,
+CompositorContext::AcquireFrame(GrContext* gr_context,
+                                SkCanvas* canvas,
+                                flow::ExternalViewEmbedder* view_embedder,
                                 const SkMatrix& root_surface_transformation,
                                 bool instrumentation_enabled) {
   // TODO: The AcquireFrame interface is too broad and must be refactored to get
