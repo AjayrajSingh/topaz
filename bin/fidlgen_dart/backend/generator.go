@@ -70,5 +70,10 @@ func GenerateFidl(fidl types.Root, config *types.Config, dartfmt string) error {
 		return err
 	}
 
-	return writeFile(config.OutputBase+"/fidl_async.dart", "GenerateAsyncFile", tmpls, tree, dartfmt)
+	err = writeFile(config.OutputBase+"/fidl_async.dart", "GenerateAsyncFile", tmpls, tree, dartfmt)
+	if err != nil {
+		return err
+	}
+
+	return writeFile(config.OutputBase+"/fidl_test.dart", "GenerateTestFile", tmpls, tree, dartfmt)
 }

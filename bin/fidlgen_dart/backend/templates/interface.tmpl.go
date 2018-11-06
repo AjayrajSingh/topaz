@@ -626,4 +626,27 @@ class {{ .BindingName }} extends $fidl.AsyncBinding<{{ .Name }}> {
 }
 
 {{ end }}
+
+
+
+{{- define "InterfaceTestDeclaration" -}}
+
+class {{ .Name }}$TestBase extends {{ .Name }} {
+  {{- range .Methods }}
+  @override
+  {{- if .HasRequest }}
+  {{ template "AsyncReturn" . }} {{ .Name }}({{ template "AsyncParams" .Request }}) {
+    return Future.error(UnimplementedError());
+  }
+  {{- else }}
+  Stream<{{ .AsyncResponseType}}> get {{ .Name }} {
+    return Stream.fromFuture(Future.error(UnimplementedError()));
+  }
+  {{- end }}
+{{- end }}
+
+}
+
+{{ end }}
+
 `
