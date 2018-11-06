@@ -10,6 +10,8 @@ import("//build/sdk/sdk_atom.gni")
 dart_tool("kernel_compiler") {
   main_dart = "compiler.dart"
 
+  force_prebuilt_dart = true
+
   source_dir = "."
   sources = [
     "compiler.dart",
@@ -65,7 +67,7 @@ sdk_atom("kernel_compiler_sdk") {
       dest = "tools/dart_prebuilts/kernel_compiler.snapshot"
     },
     {
-      source = "$dart_sdk/bin/dart"
+      source = prebuilt_dart
       dest = "tools/dart"
     },
     {
@@ -78,7 +80,7 @@ sdk_atom("kernel_compiler_sdk") {
     },
   ]
 
-  non_sdk_deps = dart_sdk_deps + [
+  non_sdk_deps = [
     ":kernel_compiler_snapshot($host_toolchain)",
     "//topaz/runtime/dart_runner/kernel:kernel_platform_files",
     "//topaz/runtime/flutter_runner/kernel:kernel_platform_files",
