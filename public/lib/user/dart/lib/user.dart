@@ -3,5 +3,4 @@
 // found in the LICENSE file.
 
 export 'src/dank_session_shell_impl.dart';
-export 'src/dank_user_shell_impl.dart';
 export 'src/session_shell_impl.dart';

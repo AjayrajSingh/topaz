@@ -11,7 +11,6 @@ dart_library("dart") {
 
   sources = [
     "src/dank_session_shell_impl.dart",
-    "src/dank_user_shell_impl.dart",
     "src/session_shell_impl.dart",
     "user.dart",
   ]
