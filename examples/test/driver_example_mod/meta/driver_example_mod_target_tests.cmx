@@ -6,6 +6,9 @@
         "features": [
             "root-ssl-certificates",
             "system-temp"
+        ],
+        "services": [
+            "fuchsia.sys.Environment"
         ]
     }
 }
