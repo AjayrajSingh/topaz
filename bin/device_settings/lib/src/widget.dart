@@ -11,12 +11,21 @@ import 'model.dart';
 
 Widget _buildDeviceSettings(
     {@required DeviceSettingsModel model, @required double scale}) {
-  final settingsPage = SettingsPage(
-      scale: scale,
-      sections: [_buildInfo(model, scale), _update(model, scale)]);
-  return model.showResetConfirmation
-      ? Stack(children: [settingsPage, _buildResetBox(model, scale)])
-      : settingsPage;
+  final widgets = <Widget>[
+    SettingsPage(
+        scale: scale,
+        sections: [_buildInfo(model, scale), _update(model, scale)])
+  ];
+
+  if (model.showResetConfirmation) {
+    widgets.add(_buildResetBox(model, scale));
+  }
+
+  if (model.channelPopupShowing.value) {
+    widgets.add(_buildSelectPopup(model, scale));
+  }
+
+  return Stack(children: widgets);
 }
 
 SettingsSection _buildInfo(DeviceSettingsModel model, double scale) {
@@ -47,13 +56,58 @@ SettingsSection _update(DeviceSettingsModel model, double scale) {
     scale: scale,
   );
 
+  final currentSourceText = SettingsText(
+      scale: scale, text: 'Current source: ${model.selectedChannels}');
+
+  final changeSourceButton = SettingsButton(
+    text: 'Change source',
+    onTap: () => model.channelPopupShowing.value = true,
+    scale: scale,
+  );
+
   return SettingsSection(
       title: 'Update',
       scale: scale,
       child: SettingsItemList(
-        items: [lastUpdatedText, updateButton, factoryResetButton],
+        items: [
+          lastUpdatedText,
+          updateButton,
+          currentSourceText,
+          changeSourceButton,
+          factoryResetButton
+        ],
       ),
       topSection: false);
+}
+
+Widget _buildSelectPopup(DeviceSettingsModel model, double scale) {
+  return SettingsPopup(
+      onDismiss: () => model.channelPopupShowing.value = false,
+      child: Material(
+          borderRadius: BorderRadius.all(Radius.circular(16.0 * scale)),
+          color: Colors.white,
+          child: FractionallySizedBox(
+            widthFactor: 0.8,
+            heightFactor: 0.8,
+            child: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              padding: EdgeInsets.all(16.0),
+              child: SettingsSection(
+                  title: 'Select channel',
+                  scale: scale,
+                  child: Column(
+                      children: model.channels
+                          .map((channel) => SettingsButton(
+                              onTap: () => model.selectChannel(channel),
+                              scale: scale,
+                              text: '${channel?.id ?? 'None'}'))
+                          .toList()
+                            ..add(SettingsButton(
+                                onTap: () => model.selectChannel(null),
+                                scale: scale,
+                                text: 'None')))),
+            ),
+          )));
 }
 
 Widget _buildResetBox(DeviceSettingsModel model, double scale) {
@@ -93,14 +147,13 @@ class DeviceSettings extends StatelessWidget {
   const DeviceSettings();
 
   @override
-  Widget build(BuildContext context) =>
-      new ScopedModelDescendant<DeviceSettingsModel>(
+  Widget build(BuildContext context) => Provide<DeviceSettingsModel>(
           builder: (
         BuildContext context,
         Widget child,
         DeviceSettingsModel model,
       ) =>
-              new LayoutBuilder(
+              LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) =>
                       Material(
                           child: _buildDeviceSettings(

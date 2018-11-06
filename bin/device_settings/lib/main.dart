@@ -4,19 +4,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'src/model.dart';
 import 'src/widget.dart';
 
 /// Main entry point to the device settings module.
 void main() {
-  setupLogger();
+  setupLoggerAsync();
 
-  Widget app = new MaterialApp(
-    home: new Container(
-      child: new ScopedModel<DeviceSettingsModel>(
-        model: new DeviceSettingsModel(),
+  Providers providers = Providers()..provideValue(DeviceSettingsModel());
+
+  Widget app = MaterialApp(
+    home: Container(
+      child: ProviderNode(
+        providers: providers,
         child: const DeviceSettings(),
       ),
     ),
