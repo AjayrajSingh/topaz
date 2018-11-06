@@ -19,15 +19,6 @@ use structopt::StructOpt;
     about = "Send commands to ermine."
 )]
 enum Options {
-    #[structopt(name = "add")]
-    /// Add a mod to Ermine
-    Add {
-        /// Disable focus for this mod
-        #[structopt(long = "disable-focus")]
-        disable_focus: bool,
-        /// URL for mod to add. Try a package name without scheme.
-        url: String,
-    },
     #[structopt(name = "remove")]
     /// Remove a mod from Ermine
     Remove {
@@ -76,12 +67,6 @@ fn main() -> Result<(), Error> {
 
     let fut = async {
         match options {
-            Options::Add {
-                url, disable_focus, ..
-            } => {
-                let key = await!(ermine_svc.add_tile_from_url(&url, !disable_focus, None));
-                println!("key = {}", key.expect("Add mod failed"));
-            }
             Options::Remove { key } => {
                 ermine_svc
                     .remove_tile(key as u32)

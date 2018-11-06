@@ -160,20 +160,6 @@ impl App {
         Ok(())
     }
 
-    pub fn add_story(&mut self, module_name: String, allow_focus: bool) -> u32 {
-        let key_to_use = self.next_story_key();
-        let f = self.story_provider.create_story(None);
-        fasync::spawn(
-            f.map_ok(move |r| {
-                APP.lock()
-                    .setup_story(key_to_use, &r, module_name, allow_focus)
-                    .unwrap();
-            })
-            .unwrap_or_else(|e| eprintln!("create_story error: {:?}", e)),
-        );
-        key_to_use
-    }
-
     pub fn add_view_for_story(&mut self, story_id: String) -> Result<(), Error> {
         let key_to_use = self.next_story_key();
         self.views[0]
@@ -199,17 +185,15 @@ impl App {
         fasync::spawn(
             tiles::ControllerRequestStream::from_channel(chan)
                 .try_for_each(move |req| match req {
-                    tiles::ControllerRequest::AddTileFromUrl {
-                        url,
-                        allow_focus,
-                        responder,
-                        ..
-                    } => {
-                        let key = APP.lock().add_story(url, allow_focus);
-                        fready(responder.send(key))
+                    tiles::ControllerRequest::AddTileFromUrl { responder, .. } => {
+                        eprintln!("error AddTileFromUrl no longr supported");
+                        responder.control_handle().shutdown();
+                        fready(Ok(()))
                     }
                     tiles::ControllerRequest::AddTileFromViewProvider { responder, .. } => {
-                        fready(responder.send(0))
+                        eprintln!("error AddTileFromViewProvider no longr supported");
+                        responder.control_handle().shutdown();
+                        fready(Ok(()))
                     }
                     tiles::ControllerRequest::RemoveTile { key, .. } => {
                         APP.lock().remove_story(key);
