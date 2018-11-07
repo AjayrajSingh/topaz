@@ -20,7 +20,11 @@ Schema _newSchema2() {
 }
 
 Schema _newSchema3() {
-  final schemaDescription = <String, BaseType>{'i1': new Integer()};
+  final schemaDescription = <String, BaseType>{
+    'i1': new Integer(),
+    'i2': new Integer(),
+    's3': new LastOneWinsString(),
+  };
   return new Schema(schemaDescription);
 }
 
@@ -33,7 +37,6 @@ void main() async {
       Sledge sledge = newSledgeForTesting();
       await sledge.runInTransaction(() async {
         final query = new Query(schema);
-        expect(query.requiresIndex(), equals(false));
         final docs = await sledge.getDocuments(query);
         expect(docs.length, equals(0));
       });
@@ -77,9 +80,63 @@ void main() async {
       await sledge.runInTransaction(() async {
         final equalities = <String, FieldValue>{'i1': new IntFieldValue(42)};
         final query = new Query(schema, equalities: equalities);
-        expect(query.requiresIndex(), equals(true));
         final docs = await sledge.getDocuments(query);
         expect(docs.length, equals(0));
+      });
+    });
+
+    test('Verify that getDocuments returns documents', () async {
+      Schema schema = _newSchema3();
+      Sledge sledge = newSledgeForTesting();
+      // Create 5 documents.
+      Document doc1;
+      Document doc2;
+      Document doc3;
+      Document doc4;
+      Document doc5;
+      await sledge.runInTransaction(() async {
+        doc1 = await sledge.getDocument(new DocumentId(schema));
+        doc1['i1'].value = 1;
+        doc1['i2'].value = 10;
+        doc2 = await sledge.getDocument(new DocumentId(schema));
+        doc2['i1'].value = 2;
+        doc2['i2'].value = 20;
+        doc3 = await sledge.getDocument(new DocumentId(schema));
+        doc3['i1'].value = 1;
+        doc3['i2'].value = 30;
+        doc4 = await sledge.getDocument(new DocumentId(schema));
+        doc4['i1'].value = 2;
+        doc4['i2'].value = 30;
+        doc5 = await sledge.getDocument(new DocumentId(schema));
+        doc5['i1'].value = 2;
+        doc5['i2'].value = 20;
+      });
+      // Run 3 queries and verify that the results are correct.
+      await sledge.runInTransaction(() async {
+        {
+          final equalities = <String, FieldValue>{'i1': new IntFieldValue(1)};
+          final query = new Query(schema, equalities: equalities);
+          final docs = await sledge.getDocuments(query);
+          expect(docs.length, equals(2));
+          expect(docs, containsAll([doc1, doc3]));
+        }
+        {
+          final equalities = <String, FieldValue>{'i2': new IntFieldValue(30)};
+          final query = new Query(schema, equalities: equalities);
+          final docs = await sledge.getDocuments(query);
+          expect(docs.length, equals(2));
+          expect(docs, containsAll([doc3, doc4]));
+        }
+        {
+          final equalities = <String, FieldValue>{
+            'i1': new IntFieldValue(2),
+            'i2': new IntFieldValue(30)
+          };
+          final query = new Query(schema, equalities: equalities);
+          final docs = await sledge.getDocuments(query);
+          expect(docs.length, equals(1));
+          expect(docs, containsAll([doc4]));
+        }
       });
     });
   });

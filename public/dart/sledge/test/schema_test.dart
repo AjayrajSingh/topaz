@@ -108,18 +108,19 @@ void main() {
     }, throwsA(const TypeMatcher<ArgumentError>()));
   });
 
-  test('Verify fieldPathExists', () {
+  test('Verify fieldAtPath', () {
     final schema = new Schema(schemaWithEmbeddedSchema());
-    expect(schema.fieldPathExists(null), equals(false));
-    expect(schema.fieldPathExists(''), equals(false));
-    expect(schema.fieldPathExists('.'), equals(false));
-    expect(schema.fieldPathExists('..'), equals(false));
-    expect(schema.fieldPathExists('foo'), equals(false));
-    expect(schema.fieldPathExists('bar'), equals(true));
-    expect(schema.fieldPathExists('foo.'), equals(false));
-    expect(schema.fieldPathExists('bar.'), equals(false));
-    expect(schema.fieldPathExists('foo.someBool'), equals(true));
-    expect(schema.fieldPathExists('foo.someBool.'), equals(false));
+    expect(schema.fieldAtPath(null), equals(null));
+    expect(schema.fieldAtPath(''), equals(null));
+    expect(schema.fieldAtPath('.'), equals(null));
+    expect(schema.fieldAtPath('..'), equals(null));
+    expect(schema.fieldAtPath('xyz'), equals(null));
+    expect(schema.fieldAtPath('foo'), TypeMatcher<Schema>());
+    expect(schema.fieldAtPath('bar'), TypeMatcher<LastOneWinsString>());
+    expect(schema.fieldAtPath('foo.'), equals(null));
+    expect(schema.fieldAtPath('bar.'), equals(null));
+    expect(schema.fieldAtPath('foo.someBool'), TypeMatcher<Boolean>());
+    expect(schema.fieldAtPath('foo.someBool.'), equals(null));
   });
 
   test('Instantiate and initialize a Sledge document', () async {

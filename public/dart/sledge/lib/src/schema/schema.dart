@@ -101,7 +101,8 @@ class Schema implements BaseType {
     return _schemaDescription;
   }
 
-  /// Returns whether the given field path exists for this Schema.
+  /// Returns the type of the field stored at the given field path.
+  /// Returns null if the field path does not match any field.
   /// A field path is a concatenation of field names that fully identify
   /// a field.
   /// # Example:
@@ -110,28 +111,26 @@ class Schema implements BaseType {
   ///     Y : { 'b' : X , 'c' : String}
   ///  The valid field paths of Y are:
   ///     'b.a', 'c'
-  bool fieldPathExists(String fieldPath) {
+  BaseType fieldAtPath(String fieldPath) {
     if (fieldPath == null) {
-      return false;
+      return null;
     }
     final indexOfFirstPeriod = fieldPath.indexOf('.');
     if (indexOfFirstPeriod == -1) {
       // The path contains a single field name.
-      final fieldType = _schemaDescription[fieldPath];
-      return fieldType != null && !(fieldType is Schema);
+      return _schemaDescription[fieldPath];
     } else {
       // The path contains multiple field names.
       // The code extracts the top most field name, verifies that it points
-      // to an other Schema, and verify that the Schema contains the rest of
-      // the field path.
+      // to an other Schema, and calls `fieldAtPath` again on the new Schema.
       final topLevelFieldName = fieldPath.substring(0, indexOfFirstPeriod);
       final fieldType = _schemaDescription[topLevelFieldName];
       if (fieldType is Schema) {
         Schema subSchema = fieldType;
         final subPath = fieldPath.substring(indexOfFirstPeriod + 1);
-        return subSchema.fieldPathExists(subPath);
+        return subSchema.fieldAtPath(subPath);
       } else {
-        return false;
+        return null;
       }
     }
   }

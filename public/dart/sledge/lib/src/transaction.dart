@@ -155,12 +155,30 @@ class Transaction {
   Future<List<DocumentId>> getDocumentIds(Query query) async {
     final documentIds = <DocumentId>[];
 
-    if (query.requiresIndex()) {
-      Uint8List keyPrefix = query.prefixInIndex();
-      List<KeyValue> keyValues =
-          await getEntriesFromSnapshotWithPrefix(_pageSnapshotProxy, keyPrefix);
-      for (KeyValue keyValue in keyValues) {
-        documentIds.add(new DocumentId(query.schema, keyValue.value));
+    if (query.filtersDocuments()) {
+      // TODO: actually check if index is present.
+      bool indexIsPresent = false;
+      if (indexIsPresent) {
+        Uint8List keyPrefix = query.prefixInIndex();
+        List<KeyValue> keyValues = await getEntriesFromSnapshotWithPrefix(
+            _pageSnapshotProxy, keyPrefix);
+        for (KeyValue keyValue in keyValues) {
+          documentIds.add(new DocumentId(query.schema, keyValue.value));
+        }
+      } else {
+        print('getDocumentIds called with missing index');
+        List<DocumentId> documentIds =
+            await getDocumentIds(new Query(query.schema));
+        final filteredDocumentIds = <DocumentId>[];
+        for (final documentId in documentIds) {
+          // TODO(LE-638): Avoid discarding the documents after reading them.
+          final doc = await getDocument(documentId);
+          if (query.documentMatchesQuery(doc)) {
+            filteredDocumentIds.add(documentId);
+          }
+        }
+        return filteredDocumentIds;
+        // TODO: schedule a transaction that builds the index.
       }
     } else {
       Uint8List keyPrefix = concatUint8Lists(

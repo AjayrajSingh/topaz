@@ -5,6 +5,7 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
+import '../document/document.dart';
 import '../schema/schema.dart';
 import '../storage/kv_encoding.dart' as sledge_storage;
 import '../uint8list_ops.dart' as utils;
@@ -28,22 +29,31 @@ class Query {
     // TODO: throw an exception if `equalities` references fields not part of
     // `schema`.
     equalities ??= <String, FieldValue>{};
+    equalities.forEach((fieldPath, fieldValue) {
+      final expectedType = schema.fieldAtPath(fieldPath);
+      if (!fieldValue.comparableTo(expectedType)) {
+        String runtimeType = expectedType.runtimeType.toString();
+        throw new ArgumentError(
+            'Field `$fieldPath` of type `$runtimeType` is not comparable with `$fieldValue`.');
+      }
+    });
     _equalities = new SplayTreeMap<String, FieldValue>.from(equalities);
   }
 
   /// The Schema of documents returned by this query.
   Schema get schema => _schema;
 
-  /// Returns whether running this query requires an index.
-  bool requiresIndex() {
+  /// Returns whether this query filters the Documents based on the content of
+  /// their fields.
+  bool filtersDocuments() {
     return _equalities.isNotEmpty;
   }
 
-  /// The prefix of the key values encoding the index needed to compute the
+  /// The prefix of the key values encoding the index that helps compute the
   /// results of this query.
-  /// Must only be called if `requiresIndex()` returns true.
+  /// Must only be called if `filtersDocuments()` returns true.
   Uint8List prefixInIndex() {
-    assert(requiresIndex());
+    assert(filtersDocuments());
     List<Uint8List> hashes = <Uint8List>[];
     _equalities.forEach((field, value) {
       hashes.add(value.hash);
@@ -61,5 +71,21 @@ class Query {
     ]);
 
     return prefix;
+  }
+
+  /// Returns whether [doc] is matched by the query.
+  /// Throws an error if [doc] is not of the same Schema the query was created
+  /// with.
+  bool documentMatchesQuery(Document doc) {
+    if (doc.documentId.schema != _schema) {
+      throw new ArgumentError(
+          'The Document `doc` is of a incorrect Schema type.');
+    }
+    for (final fieldName in _equalities.keys) {
+      if (!_equalities[fieldName].equalsTo(doc[fieldName])) {
+        return false;
+      }
+    }
+    return true;
   }
 }
