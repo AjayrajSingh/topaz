@@ -25,7 +25,7 @@ class ProposalBuilder {
     @required String id,
     @required this.headline,
   })  : assert(id != null && id.isNotEmpty),
-        assert(headline != null && headline.isNotEmpty),
+        assert(headline != null),
         _id = id;
 
   /// The commands that will be executed if the proposal is accepted.
@@ -110,6 +110,7 @@ class ProposalBuilder {
       url: imageUrl,
       imageType: imageType,
     );
+    assert(headline.isNotEmpty || wantsRichSuggestion);
 
     return Proposal(
         id: _id,
