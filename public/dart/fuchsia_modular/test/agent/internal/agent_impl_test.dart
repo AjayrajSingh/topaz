@@ -36,4 +36,13 @@ void main() {
     AgentImpl(lifecycle: mockLifecycle);
     verify(mockLifecycle.addTerminateListener(any));
   });
+
+  test('verify exposeService arguments', () {
+    expect(() {
+      AgentImpl().exposeService(null, fidl.AgentData());
+    }, throwsArgumentError);
+    expect(() {
+      AgentImpl().exposeService(fidl.Agent, null);
+    }, throwsArgumentError);
+  });
 }

@@ -117,6 +117,7 @@ type TableMember struct {
 type Interface struct {
 	Name        string
 	ServiceName string
+	ServiceData string
 	ProxyName   string
 	BindingName string
 	EventsName  string
@@ -712,6 +713,7 @@ func (c *compiler) compileInterface(val types.Interface) Interface {
 	r := Interface{
 		c.compileUpperCamelCompoundIdentifier(ci, ""),
 		val.GetServiceName(),
+		c.compileUpperCamelCompoundIdentifier(ci, "Data"),
 		c.compileUpperCamelCompoundIdentifier(ci, "Proxy"),
 		c.compileUpperCamelCompoundIdentifier(ci, "Binding"),
 		c.compileUpperCamelCompoundIdentifier(ci, "Events"),

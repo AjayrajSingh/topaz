@@ -17,16 +17,24 @@ abstract class Agent<T> {
     return _agent ??= AgentImpl();
   }
 
-  /// Registers the [connector] function with the given [serviceName]. The
-  /// [connector] function is invoked when the service provider is asked by the
-  /// framework to connect to the service.
-  void addService<T>(
-      void Function(InterfaceRequest<T>) connector, String serviceName);
-
-  /// TODO(nkorsote): remove this temporary funtion when the new addService
-  /// method is ready.
+  /// Associate [serviceImpl] to this [Agent] and exposes it to the rest of the
+  /// system so that it can be discovered and connected to.
   ///
-  /// Returns a list of incoming bindings to use as part of the your connector
-  /// function used for in [#addServices] method.
-  List<AsyncBinding<Object>> getIncomingBindings();
+  /// [serviceData] can be found as part of the generated FIDL bindings, it
+  /// holds the service runtime name and bindings object used for establishing
+  /// a connection.
+  ///
+  /// Note: Multiple connections will be allowed to this [serviceImpl].
+  ///
+  /// Usage example:
+  /// ```
+  /// import 'package:fidl_fuchsia_foo/fidl_async.dart' as fidl;
+  /// import 'package:fuchsia_modular/agent.dart';
+  /// import 'src/foo_service_impl.dart';
+  ///
+  /// void main(List<String> args) {
+  ///   Agent().exposeService(FooServiceImpl(), fidl.FooServiceData());
+  /// }
+  /// ```
+  void exposeService<T>(T serviceImpl, ServiceData<T> serviceData);
 }

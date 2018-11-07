@@ -246,6 +246,15 @@ abstract class AsyncBinding<T> extends _Stateful {
   final ChannelReader _reader = new ChannelReader();
 }
 
+/// Exposes the ability to get a hold of the service runtime name and bindings.
+abstract class ServiceData<T> {
+  /// Returns the generated runtime service name.
+  String getName();
+
+  /// Returns the generated runtime service bindings.
+  AsyncBinding getBinding();
+}
+
 /// Sends messages to a remote implementation of [T]
 class AsyncProxy<T> {
   /// Creates a proxy object with the given [ctrl].

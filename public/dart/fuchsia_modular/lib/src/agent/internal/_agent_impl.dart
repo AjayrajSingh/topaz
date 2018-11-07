@@ -18,24 +18,24 @@ class AgentImpl<T> implements Agent<T>, fidl.Agent {
   /// Holds the framework binding connection to this agent.
   final fidl.AgentBinding _agentBinding = fidl.AgentBinding();
 
-  /// Holds the incoming connection of other components to the services provided
-  /// by this agent.
-  final List<AsyncBinding<Object>> _incomingServicesBindings =
-      <AsyncBinding<Object>>[];
+  /// The service provider which can be used to expose outgoing services
+  final ServiceProviderImpl _serviceProvider = ServiceProviderImpl();
 
-  /// Holds the outgoing connection to services provided to this agent from
-  /// other connected components.
-  final List<fidl_sys.ServiceProviderBinding> _outgoingServicesBindings =
+  /// Holds the connection of other components to this agent's service provider
+  final List<fidl_sys.ServiceProviderBinding> _serviceProviderBindings =
       <fidl_sys.ServiceProviderBinding>[];
 
-  final ServiceProviderImpl _outgoingServicesImpl = ServiceProviderImpl();
+  /// Holds the outgoing connection of other components to the services provided
+  /// by this agent.
+  final List<AsyncBinding<Object>> _outgoingServicesBindings =
+      <AsyncBinding<Object>>[];
 
   /// The default constructor for this instance.
   AgentImpl({Lifecycle lifecycle, StartupContext startupContext}) {
     (lifecycle ??= Lifecycle()).addTerminateListener(_terminate);
     startupContext ??= StartupContext.fromStartupInfo();
 
-    _exposeService(startupContext);
+    _exposeAgent(startupContext);
   }
 
   @override
@@ -43,36 +43,50 @@ class AgentImpl<T> implements Agent<T>, fidl.Agent {
     String requestorUrl,
     InterfaceRequest<fidl_sys.ServiceProvider> services,
   ) {
-    _outgoingServicesBindings.add(fidl_sys.ServiceProviderBinding()
-      ..bind(_outgoingServicesImpl, services));
+    // Bind this agent's serviceProvider to the client request.
+    //
+    // Note: currently we're ignoring the [requestorUrl] and providing the same
+    // set of services to all clients.
+    _serviceProviderBindings.add(
+        fidl_sys.ServiceProviderBinding()..bind(_serviceProvider, services));
     return null;
   }
 
   @override
-  void addService<T>(
-      void Function(InterfaceRequest<T>) connector, String serviceName) {
-    // Adds this agent's services to the outgoingServices so that it can
-    // accessed from elsewhere.
-    _outgoingServicesImpl.addServiceForName<T>(connector, serviceName);
-  }
+  void exposeService<T>(T serviceImpl, ServiceData<T> serviceData) {
+    if (serviceImpl == null) {
+      throw ArgumentError.notNull('serviceImpl');
+    }
+    if (serviceData == null) {
+      throw ArgumentError.notNull('serviceData');
+    }
 
-  @override
-  List<AsyncBinding<Object>> getIncomingBindings() {
-    return _incomingServicesBindings;
+    // Add this [serviceImpl] to this agent's serviceProvider so that it can
+    // be accessed the connected clients of this agent.
+    _serviceProvider.addServiceForName(
+      (InterfaceRequest<T> request) {
+        _outgoingServicesBindings
+            .add(serviceData.getBinding()..bind(serviceImpl, request));
+      },
+      serviceData.getName(),
+    );
   }
 
   @override
   Future<void> runTask(String taskId) {
+    if (taskId == null) {
+      throw ArgumentError.notNull('taskId');
+    }
     // TODO impl this method.
     throw UnimplementedError('runTask method is not yet implemented');
   }
 
   /// Exposes this [fidl.Agent] instance to the
   /// [StartupContext#outgoingServices]. In other words, advertises this as an
-  /// [Agent] to the rest of the system via the [StartupContext].
+  /// [fidl.Agent] to the rest of the system via the [StartupContext].
   ///
   /// This class be must called before the first iteration of the event loop.
-  void _exposeService(StartupContext startupContext) {
+  void _exposeAgent(StartupContext startupContext) {
     startupContext.outgoingServices.addServiceForName(
       (InterfaceRequest<fidl.Agent> request) {
         assert(!_agentBinding.isBound);
@@ -85,7 +99,10 @@ class AgentImpl<T> implements Agent<T>, fidl.Agent {
   // Any necessary cleanup should be done here.
   Future<void> _terminate() async {
     _agentBinding.close();
-    for (fidl_sys.ServiceProviderBinding binding in _outgoingServicesBindings) {
+    for (fidl_sys.ServiceProviderBinding binding in _serviceProviderBindings) {
+      binding.close();
+    }
+    for (AsyncBinding<Object> binding in _outgoingServicesBindings) {
       binding.close();
     }
   }

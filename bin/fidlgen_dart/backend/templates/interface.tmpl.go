@@ -411,6 +411,18 @@ abstract class {{ .Name }} {
 {{- end }}
 }
 
+class {{ .ServiceData }} implements $fidl.ServiceData<{{ .Name }}> {
+  @override
+  String getName() {
+    return {{ .Name }}.$serviceName;
+  }
+
+  @override
+  $fidl.AsyncBinding getBinding() {
+    return {{ .BindingName }}();
+  }
+}
+
 {{- range .Doc }}
 ///{{ . -}}
 {{- end }}
