@@ -19,11 +19,11 @@
 #include "lib/url/gurl.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
-#include "topaz/examples/mediaplayer/mediaplayer_skia/mediaplayer_params.h"
 
 namespace examples {
 
 namespace {
+
 constexpr uint32_t kVideoChildKey = 0u;
 
 constexpr int32_t kDefaultWidth = 640;
@@ -51,13 +51,10 @@ bool Contains(const fuchsia::math::RectF& rect, float x, float y) {
 
 }  // namespace
 
-MediaPlayerView::MediaPlayerView(
-    async::Loop* loop, fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
-        view_owner_request,
-    component::StartupContext* startup_context, const MediaPlayerParams& params)
-    : mozart::BaseView(std::move(view_manager), std::move(view_owner_request),
-                       "Media Player"),
+MediaPlayerView::MediaPlayerView(scenic::ViewContext view_context,
+                                 async::Loop* loop,
+                                 const MediaPlayerParams& params)
+    : V1BaseView(std::move(view_context), "Media Player"),
 
       loop_(loop),
       background_node_(session()),
@@ -79,26 +76,26 @@ MediaPlayerView::MediaPlayerView(
   pixel_aspect_ratio_.width = 1;
   pixel_aspect_ratio_.height = 1;
 
-  player_ = startup_context
+  player_ = startup_context()
                 ->ConnectToEnvironmentService<fuchsia::mediaplayer::Player>();
   player_.events().OnStatusChanged =
       [this](fuchsia::mediaplayer::PlayerStatus status) {
         HandleStatusChanged(status);
       };
 
-  fuchsia::ui::viewsv1token::ViewOwnerPtr video_view_owner;
-  player_->CreateView(
-      startup_context
-          ->ConnectToEnvironmentService<fuchsia::ui::viewsv1::ViewManager>()
-          .Unbind(),
-      video_view_owner.NewRequest());
+  zx::eventpair video_view_owner_token, video_view_token;
+  if (zx::eventpair::create(0u, &video_view_owner_token, &video_view_token) !=
+      ZX_OK)
+    FXL_NOTREACHED() << "failed to create tokens.";
+  player_->CreateView2(std::move(video_view_token));
 
   zx::eventpair video_host_import_token;
   video_host_node_.reset(new scenic::EntityNode(session()));
   video_host_node_->ExportAsRequest(&video_host_import_token);
   parent_node().AddChild(*video_host_node_);
-  GetViewContainer()->AddChild(kVideoChildKey, std::move(video_view_owner),
-                               std::move(video_host_import_token));
+  GetViewContainer()->AddChild2(kVideoChildKey,
+                                std::move(video_view_owner_token),
+                                std::move(video_host_import_token));
 
   if (!params.url().empty()) {
     url::GURL url = url::GURL(params.url());

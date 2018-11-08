@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef GARNET_EXAMPLES_UI_NOODLES_NOODLES_VIEW_H_
-#define GARNET_EXAMPLES_UI_NOODLES_NOODLES_VIEW_H_
+#ifndef TOPAZ_EXAMPLES_UI_NOODLES_NOODLES_VIEW_H_
+#define TOPAZ_EXAMPLES_UI_NOODLES_NOODLES_VIEW_H_
 
 #include "examples/ui/lib/skia_view.h"
 #include "lib/fxl/macros.h"
@@ -15,15 +15,13 @@ namespace examples {
 class Frame;
 class Rasterizer;
 
-class NoodlesView : public mozart::SkiaView {
+class NoodlesView : public scenic::SkiaView {
  public:
-  NoodlesView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-              fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request);
-
-  ~NoodlesView() override;
+  NoodlesView(scenic::ViewContext view_context);
+  ~NoodlesView() override = default;
 
  private:
-  // |BaseView|:
+  // |scenic::V1BaseView|
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
 
@@ -38,4 +36,4 @@ class NoodlesView : public mozart::SkiaView {
 
 }  // namespace examples
 
-#endif  // GARNET_EXAMPLES_UI_NOODLES_NOODLES_VIEW_H_
+#endif  // TOPAZ_EXAMPLES_UI_NOODLES_NOODLES_VIEW_H_

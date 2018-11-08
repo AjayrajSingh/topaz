@@ -14,14 +14,8 @@
 
 namespace examples {
 
-PaintView::PaintView(
-    fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request)
-    : SkiaView(std::move(view_manager),
-               std::move(view_owner_request),
-               "Paint") {}
-
-PaintView::~PaintView() = default;
+PaintView::PaintView(scenic::ViewContext view_context)
+    : SkiaView(std::move(view_context), "Paint") {}
 
 void PaintView::OnSceneInvalidated(
     fuchsia::images::PresentationInfo presentation_info) {
@@ -86,8 +80,7 @@ bool PaintView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
           if (!points_.count(pointer_id)) {
             points_[pointer_id] = std::vector<SkPoint>();
           }
-          points_.at(pointer_id)
-              .push_back(SkPoint::Make(pointer.x, pointer.y));
+          points_.at(pointer_id).push_back(SkPoint::Make(pointer.x, pointer.y));
         }
         handled = true;
         break;

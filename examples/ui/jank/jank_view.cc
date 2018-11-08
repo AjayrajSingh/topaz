@@ -28,10 +28,9 @@ const JankView::Button JankView::kButtons[] = {
     {"Crash!", Action::kCrash},
 };
 
-JankView::JankView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-                   fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request,
+JankView::JankView(scenic::ViewContext view_context,
                    fuchsia::fonts::ProviderPtr font_provider)
-    : SkiaView(std::move(view_manager), std::move(view_owner_request), "Jank"),
+    : SkiaView(std::move(view_context), "Jank"),
       font_loader_(std::move(font_provider)) {
   font_loader_.LoadDefaultFont([this](sk_sp<SkTypeface> typeface) {
     FXL_CHECK(typeface);  // TODO(jeffbrown): Fail gracefully.
@@ -39,8 +38,6 @@ JankView::JankView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
     InvalidateScene();
   });
 }
-
-JankView::~JankView() = default;
 
 void JankView::OnSceneInvalidated(
     fuchsia::images::PresentationInfo presentation_info) {
@@ -77,8 +74,7 @@ void JankView::DrawContent(SkCanvas* canvas) {
   }
 }
 
-void JankView::DrawButton(SkCanvas* canvas,
-                          const char* label,
+void JankView::DrawButton(SkCanvas* canvas, const char* label,
                           const SkRect& bounds) {
   SkPaint boxPaint;
   boxPaint.setColor(SkColorSetRGB(200, 200, 200));

@@ -24,18 +24,17 @@ executable("bin") {
   ]
 
   deps = [
+    "//garnet/public/fidl/fuchsia.fonts",
+    "//garnet/public/fidl/fuchsia.math",
+    "//garnet/public/fidl/fuchsia.ui.input",
+    "//garnet/public/fidl/fuchsia.ui.scenic",
+    "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//garnet/public/lib/component/cpp",
     "//garnet/public/lib/fidl/cpp",
-    "//garnet/public/fidl/fuchsia.fonts",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
-    "//garnet/public/fidl/fuchsia.math",
     "//garnet/public/lib/ui/input/cpp",
-    "//garnet/public/fidl/fuchsia.ui.input",
     "//garnet/public/lib/ui/scenic/cpp",
-    "//garnet/public/fidl/fuchsia.ui.scenic",
-    "//garnet/public/lib/ui/view_framework:view_provider",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//third_party/libteken",
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_fonts",

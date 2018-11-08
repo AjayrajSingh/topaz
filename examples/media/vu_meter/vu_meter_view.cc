@@ -13,30 +13,23 @@
 #include "lib/media/audio/types.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkPath.h"
-#include "topaz/examples/media/vu_meter/vu_meter_params.h"
 
 constexpr zx_duration_t kCaptureDuration = ZX_MSEC(20);
 constexpr uint64_t kBytesPerFrame = 4;
 
 namespace examples {
 
-VuMeterView::VuMeterView(
-    async::Loop* loop, fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
-        view_owner_request,
-    component::StartupContext* startup_context, const VuMeterParams& params)
-    : mozart::SkiaView(std::move(view_manager), std::move(view_owner_request),
-                       "VU Meter"),
+VuMeterView::VuMeterView(scenic::ViewContext view_context, async::Loop* loop)
+    : SkiaView(std::move(view_context), "VU Meter"),
       loop_(loop),
       fast_left_(kFastDecay),
       fast_right_(kFastDecay),
       slow_left_(kSlowDecay),
       slow_right_(kSlowDecay) {
   FXL_DCHECK(loop);
-  FXL_DCHECK(params.is_valid());
 
   auto audio =
-      startup_context->ConnectToEnvironmentService<fuchsia::media::Audio>();
+      startup_context()->ConnectToEnvironmentService<fuchsia::media::Audio>();
   audio->CreateAudioCapturer(audio_capturer_.NewRequest(), false);
 
   audio_capturer_.set_error_handler([this](zx_status_t status) {
@@ -48,8 +41,6 @@ VuMeterView::VuMeterView(
     OnDefaultFormatFetched(std::move(type));
   });
 }
-
-VuMeterView::~VuMeterView() {}
 
 bool VuMeterView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   bool handled = false;

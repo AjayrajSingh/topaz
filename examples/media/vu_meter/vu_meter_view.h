@@ -15,20 +15,13 @@
 #include "examples/ui/lib/skia_view.h"
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fxl/macros.h"
-#include "topaz/examples/media/vu_meter/vu_meter_params.h"
 
 namespace examples {
 
-class VuMeterView : public mozart::SkiaView {
+class VuMeterView : public scenic::SkiaView {
  public:
-  VuMeterView(async::Loop* loop,
-              fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-              fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
-                  view_owner_request,
-              component::StartupContext* startup_context,
-              const VuMeterParams& params);
-
-  ~VuMeterView() override;
+  VuMeterView(scenic::ViewContext view_context, async::Loop* loop);
+  ~VuMeterView() override = default;
 
  private:
   static constexpr float kVuFullWidth = 35000.0f;
@@ -55,7 +48,7 @@ class VuMeterView : public mozart::SkiaView {
     float current_ = 0;
   };
 
-  // |BaseView|:
+  // |scenic::V1BaseView|
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;

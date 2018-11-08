@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef GARNET_EXAMPLES_UI_JANK_JANK_VIEW_H_
-#define GARNET_EXAMPLES_UI_JANK_JANK_VIEW_H_
+#ifndef TOPAZ_EXAMPLES_UI_JANK_JANK_VIEW_H_
+#define TOPAZ_EXAMPLES_UI_JANK_JANK_VIEW_H_
 
 #include "examples/ui/lib/skia_font_loader.h"
 #include "examples/ui/lib/skia_view.h"
@@ -16,12 +16,11 @@
 
 namespace examples {
 
-class JankView : public mozart::SkiaView {
+class JankView : public scenic::SkiaView {
  public:
-  JankView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-           fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request,
+  JankView(scenic::ViewContext view_context,
            fuchsia::fonts::ProviderPtr font_provider);
-  ~JankView() override;
+  ~JankView() override = default;
 
  private:
   enum class Action {
@@ -37,7 +36,7 @@ class JankView : public mozart::SkiaView {
 
   static const Button kButtons[];
 
-  // |BaseView|:
+  // |scenic::V1BaseView|
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
@@ -56,4 +55,4 @@ class JankView : public mozart::SkiaView {
 
 }  // namespace examples
 
-#endif  // GARNET_EXAMPLES_UI_JANK_JANK_VIEW_H_
+#endif  // TOPAZ_EXAMPLES_UI_JANK_JANK_VIEW_H_

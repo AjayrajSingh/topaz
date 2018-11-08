@@ -10,7 +10,6 @@
 
 #include "examples/ui/lib/skia_font_loader.h"
 #include "examples/ui/lib/skia_view.h"
-#include "lib/component/cpp/startup_context.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 #include "topaz/app/term/pty_server.h"
@@ -19,23 +18,20 @@
 
 namespace term {
 
-class ViewController : public mozart::SkiaView, public TermModel::Delegate {
+class ViewController : public scenic::SkiaView, public TermModel::Delegate {
  public:
   using DisconnectCallback = fit::function<void(ViewController*)>;
 
-  ViewController(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-                 fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
-                     view_owner_request,
-                 component::StartupContext* context,
+  ViewController(scenic::ViewContext view_context,
                  const TermParams& term_params,
                  DisconnectCallback disconnect_handler);
-  ~ViewController() override;
+  ~ViewController() override = default;
 
   ViewController(const ViewController&) = delete;
   ViewController& operator=(const ViewController&) = delete;
 
  private:
-  // |BaseView|:
+  // |scenic::V1BaseView|
   void OnPropertiesChanged(
       fuchsia::ui::viewsv1::ViewProperties old_properties) override;
   void OnSceneInvalidated(
@@ -69,7 +65,6 @@ class ViewController : public mozart::SkiaView, public TermModel::Delegate {
   // If we skip drawing despite being forced to, we should force the next draw.
   bool force_next_draw_;
 
-  component::StartupContext* context_;
   mozart::SkiaFontLoader font_loader_;
   sk_sp<SkTypeface> regular_typeface_;
 

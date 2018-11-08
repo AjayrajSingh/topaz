@@ -12,22 +12,9 @@ namespace skottie {
 
 constexpr float kSecondsPerNanosecond = .000'000'001f;
 
-View::View(
-    async::Loop* loop, component::StartupContext* startup_context,
-    ::fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<::fuchsia::ui::viewsv1token::ViewOwner>
-        view_owner_request,
-    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services)
-    : SkiaView(std::move(view_manager), std::move(view_owner_request),
-               "Skottie View"),
-      player_binding_(this) {
-  if (outgoing_services) {
-    service_namespace_.AddService(loader_bindings_.GetHandler(this));
-    service_namespace_.AddBinding(std::move(outgoing_services));
-  } else {
-    startup_context->outgoing().AddPublicService(
-        loader_bindings_.GetHandler(this));
-  }
+View::View(scenic::ViewContext view_context)
+    : SkiaView(std::move(view_context), "Skottie View"), player_binding_(this) {
+  outgoing_services().AddService(loader_bindings_.GetHandler(this));
 }
 
 void View::Load(fuchsia::mem::Buffer payload,

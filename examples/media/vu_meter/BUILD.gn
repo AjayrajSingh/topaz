@@ -7,8 +7,6 @@ import("//build/package.gni")
 executable("vu_meter") {
   sources = [
     "main.cc",
-    "vu_meter_params.cc",
-    "vu_meter_params.h",
     "vu_meter_view.cc",
     "vu_meter_view.h",
   ]
@@ -16,12 +14,13 @@ executable("vu_meter") {
   deps = [
     "//garnet/public/fidl/fuchsia.media",
     "//garnet/public/lib/media/audio",
-    "//garnet/public/lib/ui/view_framework:view_provider",
+    "//garnet/public/lib/ui/base_view/cpp",
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_view",
     "//zircon/public/lib/async-loop-cpp",
     "//zircon/public/lib/fzl",
     "//zircon/public/lib/hid",
+    "//zircon/public/lib/trace-provider",
   ]
 }
 

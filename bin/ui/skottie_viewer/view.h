@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef GARNET_EXAMPLES_UI_SKOTTIE_VIEWER_VIEW_H_
-#define GARNET_EXAMPLES_UI_SKOTTIE_VIEWER_VIEW_H_
-
-#include <lib/async-loop/cpp/loop.h>
+#ifndef TOPAZ_BIN_UI_SKOTTIE_VIEWER_VIEW_H_
+#define TOPAZ_BIN_UI_SKOTTIE_VIEWER_VIEW_H_
 
 #include <fuchsia/skia/skottie/cpp/fidl.h>
 
@@ -13,23 +11,17 @@
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fxl/macros.h"
-#include "lib/ui/view_framework/base_view.h"
 //#if defined(SK_ENABLE_SKOTTIE)
 #include "third_party/skia/modules/skottie/include/Skottie.h"
 //#endif
 namespace skottie {
 
 // A view that plays Skottie animations.
-class View final : public mozart::SkiaView,
+class View final : public scenic::SkiaView,
                    public fuchsia::skia::skottie::Loader,
                    public fuchsia::skia::skottie::Player {
  public:
-  View(async::Loop* loop, component::StartupContext* startup_context,
-       ::fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-       fidl::InterfaceRequest<::fuchsia::ui::viewsv1token::ViewOwner>
-           view_owner_request,
-       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services);
-
+  View(scenic::ViewContext view_context);
   ~View() override = default;
 
   // |fuchsia::skia::skottie::Loader|.
@@ -42,7 +34,7 @@ class View final : public mozart::SkiaView,
   virtual void Play() override;
   virtual void Pause() override;
 
-  // |BaseView|:
+  // |scenic::V1BaseView|
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
 
@@ -69,4 +61,4 @@ class View final : public mozart::SkiaView,
 
 }  // namespace skottie
 
-#endif  // GARNET_EXAMPLES_UI_SKOTTIE_VIEWER_VIEW_H_
+#endif  // TOPAZ_BIN_UI_SKOTTIE_VIEWER_VIEW_H_

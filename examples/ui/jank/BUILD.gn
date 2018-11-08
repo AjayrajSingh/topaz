@@ -14,11 +14,12 @@ executable("jank") {
   ]
 
   deps = [
+    "//garnet/public/fidl/fuchsia.ui.app",
+    "//garnet/public/fidl/fuchsia.ui.scenic",
+    "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl",
-    "//garnet/public/fidl/fuchsia.ui.scenic",
-    "//garnet/public/lib/ui/view_framework:view_provider",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1",
+    "//garnet/public/lib/ui/base_view/cpp",
     "//third_party/skia",
     "//topaz/examples/ui/lib:skia_fonts",
     "//topaz/examples/ui/lib:skia_view",

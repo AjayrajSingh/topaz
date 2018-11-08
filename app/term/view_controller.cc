@@ -25,22 +25,16 @@ constexpr char kShell[] = "/boot/bin/sh";
 
 }  // namespace
 
-ViewController::ViewController(
-    fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
-        view_owner_request,
-    component::StartupContext* context, const TermParams& term_params,
-    DisconnectCallback disconnect_handler)
-    : SkiaView(std::move(view_manager), std::move(view_owner_request), "Term"),
+ViewController::ViewController(scenic::ViewContext view_context,
+                               const TermParams& term_params,
+                               DisconnectCallback disconnect_handler)
+    : SkiaView(std::move(view_context), "Term"),
       disconnect_(std::move(disconnect_handler)),
       model_(TermModel::Size(24, 80), this),
-      context_(context),
       font_loader_(
-          context_
+          startup_context()
               ->ConnectToEnvironmentService<fuchsia::fonts::Provider>()),
       params_(term_params) {
-  FXL_DCHECK(context_);
-
   SetReleaseHandler([this](zx_status_t status) { disconnect_(this); });
 
   fuchsia::fonts::Request font_request;
@@ -53,8 +47,6 @@ ViewController::ViewController(
         StartCommandIfNeeded();
       });
 }
-
-ViewController::~ViewController() {}
 
 void ViewController::ComputeMetrics() {
   if (!regular_typeface_)

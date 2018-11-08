@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef GARNET_EXAMPLES_UI_PAINT_PAINT_VIEW_H_
-#define GARNET_EXAMPLES_UI_PAINT_PAINT_VIEW_H_
+#ifndef TOPAZ_EXAMPLES_UI_PAINT_PAINT_VIEW_H_
+#define TOPAZ_EXAMPLES_UI_PAINT_PAINT_VIEW_H_
 
 #include <map>
 #include <vector>
@@ -15,14 +15,13 @@
 
 namespace examples {
 
-class PaintView : public mozart::SkiaView {
+class PaintView : public scenic::SkiaView {
  public:
-  PaintView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-            fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request);
-  ~PaintView() override;
+  PaintView(scenic::ViewContext view_context);
+  ~PaintView() override = default;
 
  private:
-  // |BaseView|:
+  // |scenic::V1BaseView|
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
@@ -38,4 +37,4 @@ class PaintView : public mozart::SkiaView {
 
 }  // namespace examples
 
-#endif  // GARNET_EXAMPLES_UI_PAINT_PAINT_VIEW_H_
+#endif  // TOPAZ_EXAMPLES_UI_PAINT_PAINT_VIEW_H_

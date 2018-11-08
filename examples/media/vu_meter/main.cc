@@ -3,27 +3,27 @@
 // found in the LICENSE file.
 
 #include <lib/async-loop/cpp/loop.h>
+#include <trace-provider/provider.h>
 
 #include "lib/fxl/command_line.h"
-#include "lib/ui/view_framework/view_provider_app.h"
+#include "lib/fxl/log_settings_command_line.h"
+#include "lib/ui/base_view/cpp/view_provider_component.h"
 #include "topaz/examples/media/vu_meter/vu_meter_view.h"
 
 int main(int argc, const char** argv) {
-  auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);
-  examples::VuMeterParams params(command_line);
-  if (!params.is_valid()) {
-    return 1;
-  }
-
   async::Loop loop(&kAsyncLoopConfigAttachToThread);
+  trace::TraceProvider trace_provider(loop.dispatcher());
 
-  mozart::ViewProviderApp app(
-      [&loop, &params](mozart::ViewContext view_context) {
-        return std::make_unique<examples::VuMeterView>(
-            &loop, std::move(view_context.view_manager),
-            std::move(view_context.view_owner_request),
-            view_context.startup_context, params);
-      });
+  auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);
+  if (!fxl::SetLogSettingsFromCommandLine(command_line))
+    return 1;
+
+  scenic::ViewProviderComponent component(
+      [&loop](scenic::ViewContext view_context) {
+        return std::make_unique<examples::VuMeterView>(std::move(view_context),
+                                                       &loop);
+      },
+      &loop);
 
   loop.Run();
   return 0;

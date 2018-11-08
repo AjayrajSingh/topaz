@@ -8,13 +8,13 @@
 #include <string>
 
 #include "lib/fxl/command_line.h"
-#include "lib/fxl/macros.h"
 
 namespace examples {
 
 class MediaPlayerParams {
  public:
   MediaPlayerParams(const fxl::CommandLine& command_line);
+  ~MediaPlayerParams() = default;
 
   bool is_valid() const { return is_valid_; }
 
@@ -27,8 +27,6 @@ class MediaPlayerParams {
 
   std::string path_;
   std::string url_;
-
-  FXL_DISALLOW_COPY_AND_ASSIGN(MediaPlayerParams);
 };
 
 }  // namespace examples

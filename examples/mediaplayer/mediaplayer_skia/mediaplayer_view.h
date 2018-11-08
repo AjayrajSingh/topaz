@@ -16,26 +16,22 @@
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fxl/macros.h"
 #include "lib/media/timeline/timeline_function.h"
-#include "lib/ui/view_framework/base_view.h"
-#include "topaz/examples/mediaplayer/mediaplayer_skia/mediaplayer_params.h"
+#include "lib/ui/base_view/cpp/v1_base_view.h"
+
+#include "mediaplayer_params.h"
 
 namespace examples {
 
-class MediaPlayerView : public mozart::BaseView {
+class MediaPlayerView : public scenic::V1BaseView {
  public:
-  MediaPlayerView(async::Loop* loop,
-                  fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-                  fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
-                      view_owner_request,
-                  component::StartupContext* startup_context,
+  MediaPlayerView(scenic::ViewContext view_context, async::Loop* loop,
                   const MediaPlayerParams& params);
-
   ~MediaPlayerView() override;
 
  private:
   enum class State { kPaused, kPlaying, kEnded };
 
-  // |BaseView|:
+  // |scenic::V1BaseView|
   void OnPropertiesChanged(
       fuchsia::ui::viewsv1::ViewProperties old_properties) override;
   void OnSceneInvalidated(

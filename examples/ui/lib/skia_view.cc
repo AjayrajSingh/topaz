@@ -4,13 +4,10 @@
 
 #include "examples/ui/lib/skia_view.h"
 
-namespace mozart {
+namespace scenic {
 
-SkiaView::SkiaView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-                   fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request,
-                   const std::string& label)
-    : BaseView(std::move(view_manager), std::move(view_owner_request), label),
-      canvas_cycler_(session()) {
+SkiaView::SkiaView(scenic::ViewContext view_context, const std::string& label)
+    : V1BaseView(std::move(view_context), label), canvas_cycler_(session()) {
   parent_node().AddChild(canvas_cycler_);
 }
 
@@ -31,8 +28,6 @@ SkCanvas* SkiaView::AcquireCanvas() {
   return canvas;
 }
 
-void SkiaView::ReleaseAndSwapCanvas() {
-  canvas_cycler_.ReleaseAndSwapCanvas();
-}
+void SkiaView::ReleaseAndSwapCanvas() { canvas_cycler_.ReleaseAndSwapCanvas(); }
 
-}  // namespace mozart
+}  // namespace scenic

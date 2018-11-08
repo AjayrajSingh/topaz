@@ -2,22 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef LIB_UI_VIEW_FRAMEWORK_SKIA_VIEW_H_
-#define LIB_UI_VIEW_FRAMEWORK_SKIA_VIEW_H_
+#ifndef TOPAZ_EXAMPLES_UI_LIB_SKIA_VIEW_H_
+#define TOPAZ_EXAMPLES_UI_LIB_SKIA_VIEW_H_
 
 #include "examples/ui/lib/host_canvas_cycler.h"
 #include "lib/fxl/macros.h"
-#include "lib/ui/view_framework/base_view.h"
+#include "lib/ui/base_view/cpp/v1_base_view.h"
 
-namespace mozart {
+namespace scenic {
 
 // Abstract base class for views which use Skia software rendering to a
 // single full-size surface.
-class SkiaView : public BaseView {
+class SkiaView : public scenic::V1BaseView {
  public:
-  SkiaView(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-           fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner_request,
-           const std::string& label);
+  SkiaView(scenic::ViewContext view_context, const std::string& label);
   ~SkiaView() override;
 
   // Acquires a canvas for rendering.
@@ -41,6 +39,6 @@ class SkiaView : public BaseView {
   FXL_DISALLOW_COPY_AND_ASSIGN(SkiaView);
 };
 
-}  // namespace mozart
+}  // namespace scenic
 
-#endif  // LIB_UI_VIEW_FRAMEWORK_SKIA_VIEW_H_
+#endif  // TOPAZ_EXAMPLES_UI_LIB_SKIA_VIEW_H_
