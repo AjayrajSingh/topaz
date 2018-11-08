@@ -63,9 +63,23 @@ void main() {
     verify(mockLifecycle.addTerminateListener(any));
   });
 
-  test('embed module throws for empty name', () {
+  test('embedModule throws for empty name', () {
     expect(
         mod.embedModule(name: '', intent: _emptyIntent), throwsArgumentError);
+  });
+
+  test('embedModule throws for null intent', () {
+    expect(mod.embedModule(name: 'foo', intent: null), throwsArgumentError);
+  });
+
+  test('addModuleToStory throws for empty name', () {
+    expect(mod.addModuleToStory(name: '', intent: _emptyIntent),
+        throwsArgumentError);
+  });
+
+  test('addModuleToStory throws for null intent', () {
+    expect(
+        mod.addModuleToStory(name: 'foo', intent: null), throwsArgumentError);
   });
 }
 

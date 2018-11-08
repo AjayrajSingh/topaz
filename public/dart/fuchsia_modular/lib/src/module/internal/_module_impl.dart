@@ -55,6 +55,14 @@ class ModuleImpl implements Module {
       emphasis: 0.5,
     ),
   }) async {
+    if (name == null || name.isEmpty) {
+      throw ArgumentError.value(
+          name, 'name', 'addModuleToStory should be called with a valid name');
+    }
+    if (intent == null) {
+      throw ArgumentError.notNull('intent');
+    }
+
     final moduleControllerProxy = fidl.ModuleControllerProxy();
 
     fidl.StartModuleStatus status = await _getContext().addModuleToStory(
@@ -65,17 +73,6 @@ class ModuleImpl implements Module {
     return moduleControllerProxy;
   }
 
-  /// Returns the [fidl.ModuleContext] for the running module.
-  ///
-  /// It is safe to call this method multiple times without opening multiple
-  /// connections.
-  ///
-  /// This method is intentionally lazy as to avoid connecting to the
-  /// ModuleContext until it is needed. We use this method instead of
-  /// just using [geModuleContext] directly to allow for testing.
-  fidl.ModuleContext _getContext() =>
-      _moduleContextProxy ??= getModuleContext();
-
   @override
   Future<EmbeddedModule> embedModule({
     @required String name,
@@ -85,6 +82,10 @@ class ModuleImpl implements Module {
       throw ArgumentError.value(
           name, 'name', 'embedModule should be called with a valid name');
     }
+    if (intent == null) {
+      throw ArgumentError.notNull('intent');
+    }
+
     final moduleController = fidl.ModuleControllerProxy();
     final viewOwner = new InterfacePair<views_fidl.ViewOwner>();
     final status = await _getContext().embedModule(
@@ -100,11 +101,23 @@ class ModuleImpl implements Module {
   void registerIntentHandler(IntentHandler intentHandler) {
     if (_intentHandler != null) {
       throw ModuleStateException(
-          'Intent handler registration failed because a handler is already registered.');
+          'Intent handler registration failed because a handler is already '
+          'registered.');
     }
 
     _intentHandler = intentHandler;
   }
+
+  /// Returns the [fidl.ModuleContext] for the running module.
+  ///
+  /// It is safe to call this method multiple times without opening multiple
+  /// connections.
+  ///
+  /// This method is intentionally lazy as to avoid connecting to the
+  /// ModuleContext until it is needed. We use this method instead of
+  /// just using [geModuleContext] directly to allow for testing.
+  fidl.ModuleContext _getContext() =>
+      _moduleContextProxy ??= getModuleContext();
 
   void _proxyIntentToIntentHandler(Intent intent) {
     if (_intentHandler == null) {
