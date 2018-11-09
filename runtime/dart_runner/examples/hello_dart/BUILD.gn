@@ -5,8 +5,6 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_jit_app("hello_dart_jit") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
@@ -18,11 +16,16 @@ dart_jit_app("hello_dart_jit") {
     "//topaz/public/dart/zircon",
     "//topaz/runtime/dart_runner/examples/greeting",
   ]
+
+  meta = [
+    {
+      path = "meta/hello_dart_jit.cmx"
+      dest = "hello_dart_jit.cmx"
+    },
+  ]
 }
 
 dart_jit_app("hello_dart_dbc") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
@@ -36,11 +39,16 @@ dart_jit_app("hello_dart_dbc") {
     "//topaz/public/dart/zircon",
     "//topaz/runtime/dart_runner/examples/greeting",
   ]
+
+  meta = [
+    {
+      path = "meta/hello_dart_dbc.cmx"
+      dest = "hello_dart_dbc.cmx"
+    },
+  ]
 }
 
 dart_aot_app("hello_dart_aot") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
@@ -52,11 +60,16 @@ dart_aot_app("hello_dart_aot") {
     "//topaz/public/dart/zircon",
     "//topaz/runtime/dart_runner/examples/greeting",
   ]
+
+  meta = [
+    {
+      path = "meta/hello_dart_aot.cmx"
+      dest = "hello_dart_aot.cmx"
+    },
+  ]
 }
 
 dart_jit_app("hello_dart_jit_product") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
@@ -68,11 +81,16 @@ dart_jit_app("hello_dart_jit_product") {
     "//topaz/public/dart/zircon",
     "//topaz/runtime/dart_runner/examples/greeting",
   ]
+
+  meta = [
+    {
+      path = "meta/hello_dart_jit_product.cmx"
+      dest = "hello_dart_jit_product.cmx"
+    },
+  ]
 }
 
 dart_aot_app("hello_dart_aot_product") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "bin/hello_dart.dart"
 
   source_dir = "."
@@ -83,5 +101,12 @@ dart_aot_app("hello_dart_aot_product") {
   deps = [
     "//topaz/public/dart/zircon",
     "//topaz/runtime/dart_runner/examples/greeting",
+  ]
+
+  meta = [
+    {
+      path = "meta/hello_dart_aot_product.cmx"
+      dest = "hello_dart_aot_product.cmx"
+    },
   ]
 }

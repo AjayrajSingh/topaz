@@ -5,8 +5,6 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_jit_app("goodbye_dart_jit") {
-  deprecated_no_cmx = "//build"
-
   sources = [
     "goodbye_dart.dart",
   ]
@@ -16,12 +14,17 @@ dart_jit_app("goodbye_dart_jit") {
   deps = [
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
+  ]
+
+  meta = [
+    {
+      path = "meta/goodbye_dart_jit.cmx"
+      dest = "goodbye_dart_jit.cmx"
+    },
   ]
 }
 
 dart_aot_app("goodbye_dart_aot") {
-  deprecated_no_cmx = "//build"
-
   sources = [
     "goodbye_dart.dart",
   ]
@@ -31,6 +34,13 @@ dart_aot_app("goodbye_dart_aot") {
   deps = [
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
+  ]
+
+  meta = [
+    {
+      path = "meta/goodbye_dart_aot.cmx"
+      dest = "goodbye_dart_aot.cmx"
+    },
   ]
 }
 
