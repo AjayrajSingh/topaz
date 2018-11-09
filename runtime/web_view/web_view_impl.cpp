@@ -314,7 +314,6 @@ void WebViewImpl::OnSceneInvalidated(
                   physical_size().height, physical_size().width * 4u);
   if (!url_set_) {
     const char* urlToOpen = url_.c_str();
-    FXL_LOG(INFO) << "Loading " << urlToOpen;
     web_view_.setURL(urlToOpen);
     url_set_ = true;
 
