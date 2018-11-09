@@ -15,15 +15,15 @@ import 'package:lib.story.dart/story.dart';
 import 'package:zircon/zircon.dart';
 
 const String _kWallpapersLinkKey = 'wallpapers';
-const String _kImageSelectorModulePath = 'gallery';
-const List<String> _kImageSelectorLinkPath = const <String>['root'];
-const String _kImageSelectorLinkName = 'selection';
-const String _kImageSelectorRootKey = 'image selection';
-const String _kImageSelectorImageListKey = 'selected images';
-const List<StoryInfoExtraEntry> _kImageSelectorStoryExtraInfo =
-    const <StoryInfoExtraEntry>[
-  const StoryInfoExtraEntry(key: 'color', value: '0xFFA5A700'),
-];
+// const String _kImageSelectorModulePath = 'gallery';
+// const List<String> _kImageSelectorLinkPath = const <String>['root'];
+// const String _kImageSelectorLinkName = 'selection';
+// const String _kImageSelectorRootKey = 'image selection';
+// const String _kImageSelectorImageListKey = 'selected images';
+// const List<StoryInfoExtraEntry> _kImageSelectorStoryExtraInfo =
+//     const <StoryInfoExtraEntry>[
+//   const StoryInfoExtraEntry(key: 'color', value: '0xFFA5A700'),
+// ];
 const int _kChooseWallpaperSuggestionColor = 0xFFA5A700;
 const String _kChooseWallpaperSuggestionHeadline = 'Change Wallpaper';
 const String _kChooseWallpaperSuggestionImageUrl =
@@ -160,7 +160,7 @@ class _ProposalListener extends ProposalListener {
   final ValueChanged<List<String>> onWallpaperChosen;
   StoryControllerProxy storyControllerProxy;
   LinkWatcherBinding _linkWatcherBinding;
-  dynamic _lastDecodedJson;
+//  dynamic _lastDecodedJson;
 
   _ProposalListener({
     this.storyProvider,
@@ -173,6 +173,10 @@ class _ProposalListener extends ProposalListener {
   void onProposalAccepted(String proposalId, String preloadedStoryId) {
     stop();
 
+    // Per MF-13, this method is deprecated. PuppetMaster, which is available
+    // to Session Shells (like Armadillo) expose the same functionality with
+    // a slightly different API.
+    /*
     storyProvider.createStoryWithInfo(
       _kImageSelectorModulePath,
       _kImageSelectorStoryExtraInfo,
@@ -220,6 +224,7 @@ class _ProposalListener extends ProposalListener {
         });
       },
     );
+    */
   }
 
   void stop() {

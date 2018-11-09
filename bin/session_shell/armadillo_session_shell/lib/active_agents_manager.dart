@@ -163,6 +163,10 @@ class _ProposalListener extends ProposalListener {
   void onProposalAccepted(String proposalId, String preloadedStoryId) {
     stop();
 
+    // Per MF-13, this method is deprecated. PuppetMaster, which is available
+    // to Session Shells (like Armadillo) expose the same functionality with
+    // a slightly different API.
+    /*
     storyProvider.createStoryWithInfo(
       'link_viewer',
       <StoryInfoExtraEntry>[
@@ -189,6 +193,7 @@ class _ProposalListener extends ProposalListener {
         });
       },
     );
+    */
   }
 
   void stop() {
