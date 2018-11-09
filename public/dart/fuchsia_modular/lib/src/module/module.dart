@@ -55,6 +55,28 @@ abstract class Module {
   /// Module instance. Closing this connection doesn't affect its Module
   /// instance; it just relinquishes the ability of the caller to control the
   /// Module instance.
+  ///
+  /// The [name] parameter can be used identify a view in the resulting story
+  /// and can be used to either update a running module with a new [intent] or
+  /// can be used to replace an existing module in the same space if the intent
+  /// resolves to a new module instance.
+  /// ```
+  /// // This code will result in one view being displayed on
+  /// // screen with either one module receiving two intents if the
+  /// // intents resolve to the same module binaries or one module
+  /// // being started and then torn down to start a new module.
+  /// Module().addModuleToStory(name: 'foo', intent: foo_intent);
+  /// Module().addModuleToStory(name: 'foo', intent: bar_intent);
+  /// ```
+  ///
+  /// ```
+  /// // This code will result in two views being displayed on
+  /// // screen. They may be the same binary but two different processes
+  /// // or they may be two binaries depending on how what modules
+  /// // are resolved.
+  /// Module().addModuleToStory(name: 'foo', intent: foo_intent);
+  /// Module().addModuleToStory(name: 'bar', intent: bar_intent);
+  /// ```
   Future<fidl.ModuleController> addModuleToStory({
     @required String name,
     @required fidl.Intent intent,
