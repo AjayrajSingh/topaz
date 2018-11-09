@@ -77,6 +77,8 @@ class SessionShellImpl implements Lifecycle {
   }) : watchAll = watchAll ?? false {
     connectToService(
         startupContext.environmentServices, _sessionShellContextProxy.ctrl);
+    connectToService(
+        startupContext.environmentServices, _intelligenceServicesProxy.ctrl);
     _initialize();
   }
 
@@ -98,10 +100,8 @@ class SessionShellImpl implements Lifecycle {
         ..getFocusProvider(
           _focusProviderProxy.ctrl.request(),
         )
-        ..getIntelligenceServices(
-          _intelligenceServicesProxy.ctrl.request(),
-        )
         ..getLink(_linkProxy.ctrl.request());
+
       _intelligenceServicesProxy
         ..getContextReader(_contextReaderProxy.ctrl.request())
         ..getContextWriter(_contextWriterProxy.ctrl.request());

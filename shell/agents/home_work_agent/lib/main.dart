@@ -34,7 +34,8 @@ class HomeWorkAgent extends AgentImpl {
     TokenManager tokenManager,
     ServiceProviderImpl outgoingServices,
   ) async {
-    agentContext.getIntelligenceServices(_intelligenceServices.ctrl.request());
+    connectToService(
+        startupContext.environmentServices, _intelligenceServices.ctrl);
     _intelligenceServices.getContextReader(_contextReader.ctrl.request());
 
     _homeWorkProposer.start(
