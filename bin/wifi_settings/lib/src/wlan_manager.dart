@@ -17,12 +17,6 @@ TextStyle _titleTextStyle(double scale) => TextStyle(
       fontWeight: FontWeight.w200,
     );
 
-TextStyle _textStyle(double scale) => TextStyle(
-      color: Colors.grey[900],
-      fontSize: 36.0 * scale,
-      fontWeight: FontWeight.w200,
-    );
-
 /// Displays WLAN info.
 class WlanManager extends StatelessWidget {
   /// Const constructor.
@@ -172,13 +166,13 @@ class WlanManager extends StatelessWidget {
                     style: _titleTextStyle(scale),
                   ),
                   ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 400.0 * scale),
+                    constraints: BoxConstraints(
+                        maxWidth: 400.0 * scale, minHeight: 48.0),
                     child: Container(
                       padding: EdgeInsets.only(top: 16.0 * scale),
                       child: TextField(
                         obscureText: true,
                         autofocus: true,
-                        style: _textStyle(scale),
                         onSubmitted: model.onPasswordEntered,
                       ),
                     ),
