@@ -31,17 +31,22 @@ class ModuleImpl implements Module {
   IntentHandlerImpl _intentHandlerImpl;
 
   /// Returns the [fidl.ModuleContext] for the running module.
-  /// We allow injecting this method for testing purposes.
-  fidl.ModuleContext Function() _getContext;
+  /// This varible should not be used directly. Use the
+  /// [getContext()] method instead
+  fidl.ModuleContext _moduleContext;
 
   /// The default constructor for this instance.
+  ///
+  /// the [moduleContext] is an optional parameter that
+  /// can be supplied to override the default module context.
+  /// This is mainly useful in testing scenarios.
   ModuleImpl({
     @required IntentHandlerImpl intentHandlerImpl,
     Lifecycle lifecycle,
-    fidl.ModuleContextProxy Function() moduleContextFactory,
-  }) : assert(intentHandlerImpl != null) {
+    fidl.ModuleContext moduleContext,
+  })  : _moduleContext = moduleContext,
+        assert(intentHandlerImpl != null) {
     (lifecycle ??= Lifecycle()).addTerminateListener(_terminate);
-    _getContext = moduleContextFactory ?? getModuleContext;
     _intentHandlerImpl = intentHandlerImpl
       ..onHandleIntent = _proxyIntentToIntentHandler;
   }
@@ -108,6 +113,8 @@ class ModuleImpl implements Module {
 
     _intentHandler = intentHandler;
   }
+
+  fidl.ModuleContext _getContext() => _moduleContext ??= getModuleContext();
 
   void _proxyIntentToIntentHandler(Intent intent) {
     if (_intentHandler == null) {

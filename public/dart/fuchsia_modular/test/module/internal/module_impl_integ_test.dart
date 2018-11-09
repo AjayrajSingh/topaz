@@ -35,8 +35,8 @@ void main() {
     when(context.addModuleToStory(any, any, any, any))
         .thenAnswer((_) => Future.value(fidl.StartModuleStatus.success));
 
-    final moduleImpl = ModuleImpl(
-        intentHandlerImpl: handlerImpl, moduleContextFactory: () => context);
+    final moduleImpl =
+        ModuleImpl(intentHandlerImpl: handlerImpl, moduleContext: context);
 
     final ctrl = await moduleImpl.addModuleToStory(
         name: 'testMod', intent: _emptyIntent);
@@ -50,8 +50,8 @@ void main() {
     when(context.addModuleToStory(any, any, any, any))
         .thenAnswer((_) => Future.value(fidl.StartModuleStatus.noModulesFound));
 
-    final moduleImpl = ModuleImpl(
-        intentHandlerImpl: handlerImpl, moduleContextFactory: () => context);
+    final moduleImpl =
+        ModuleImpl(intentHandlerImpl: handlerImpl, moduleContext: context);
 
     expect(moduleImpl.addModuleToStory(name: 'testMod', intent: _emptyIntent),
         throwsA(const TypeMatcher<ModuleResolutionException>()));
@@ -63,8 +63,8 @@ void main() {
     when(context.addModuleToStory(any, any, any, any))
         .thenAnswer((_) => Future.value(fidl.StartModuleStatus(-99)));
 
-    final moduleImpl = ModuleImpl(
-        intentHandlerImpl: handlerImpl, moduleContextFactory: () => context);
+    final moduleImpl =
+        ModuleImpl(intentHandlerImpl: handlerImpl, moduleContext: context);
 
     expect(moduleImpl.addModuleToStory(name: 'testMod', intent: _emptyIntent),
         throwsA(const TypeMatcher<ModuleStateException>()));
@@ -77,8 +77,8 @@ void main() {
     when(context.embedModule(any, any, any, any))
         .thenAnswer((_) => Future.value(fidl.StartModuleStatus.noModulesFound));
 
-    final moduleImpl = ModuleImpl(
-        intentHandlerImpl: handlerImpl, moduleContextFactory: () => context);
+    final moduleImpl =
+        ModuleImpl(intentHandlerImpl: handlerImpl, moduleContext: context);
 
     expect(moduleImpl.embedModule(name: 'testMod', intent: _emptyIntent),
         throwsA(const TypeMatcher<ModuleResolutionException>()));
@@ -89,8 +89,8 @@ void main() {
     when(context.embedModule(any, any, any, any))
         .thenAnswer((_) => Future.value(fidl.StartModuleStatus.success));
 
-    final moduleImpl = ModuleImpl(
-        intentHandlerImpl: handlerImpl, moduleContextFactory: () => context);
+    final moduleImpl =
+        ModuleImpl(intentHandlerImpl: handlerImpl, moduleContext: context);
 
     expect(moduleImpl.embedModule(name: '', intent: _emptyIntent),
         throwsArgumentError);
@@ -101,8 +101,8 @@ void main() {
     when(context.embedModule(any, any, any, any))
         .thenAnswer((_) => Future.value(fidl.StartModuleStatus(-99)));
 
-    final moduleImpl = ModuleImpl(
-        intentHandlerImpl: handlerImpl, moduleContextFactory: () => context);
+    final moduleImpl =
+        ModuleImpl(intentHandlerImpl: handlerImpl, moduleContext: context);
 
     expect(moduleImpl.embedModule(name: 'testMod', intent: _emptyIntent),
         throwsA(const TypeMatcher<ModuleStateException>()));
