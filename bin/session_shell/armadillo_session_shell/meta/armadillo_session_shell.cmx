@@ -3,7 +3,7 @@
         "data": "data/armadillo_session_shell"
     },
     "sandbox": {
-        "features": [ ],
+        "features": [ "build-info" ],
         "system": [ "bin", "pkgs", "data" ],
         "pkgfs": [ "packages" ]
     }

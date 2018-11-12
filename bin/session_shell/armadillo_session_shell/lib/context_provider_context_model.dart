@@ -23,7 +23,7 @@ const List<String> _kTopics = const <String>[
 
 const String _kContextConfig = '/system/data/sysui/contextual_config.json';
 
-const String _kLastUpdate = '/system/data/build/last-update';
+const String _kLastUpdate = '/config/build-info/last-update';
 
 const String _kMode = 'mode';
 const String _kModeNormal = 'normal';

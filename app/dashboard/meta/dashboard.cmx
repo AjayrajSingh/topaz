@@ -3,8 +3,7 @@
         "data": "data/dashboard"
     },
     "sandbox": {
-        "system": [ "data" ],
-        "features": [ "persistent-storage" ],
+        "features": [ "build-info", "persistent-storage" ],
         "services": [
             "fuchsia.cobalt.LoggerFactory",
             "fuchsia.fonts.Provider",

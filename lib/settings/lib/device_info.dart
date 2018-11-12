@@ -5,7 +5,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 
-const String _lastUpdateFilePath = '/system/data/build/last-update';
+const String _lastUpdateFilePath = '/config/build-info/last-update';
 const String _factoryResetKey = 'FactoryReset';
 
 /// Class to provide device-specific details, such as build information.

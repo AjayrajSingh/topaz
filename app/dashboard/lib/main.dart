@@ -145,7 +145,7 @@ const List<List<List<String>>> _kTargetsMap = const <List<List<String>>>[
   ]
 ];
 
-const String _kLastUpdate = '/system/data/build/last-update';
+const String _kLastUpdate = '/config/build-info/last-update';
 const String _testName = 'dashboard_boot_test';
 
 TestRunnerProxy runnerProxy;
