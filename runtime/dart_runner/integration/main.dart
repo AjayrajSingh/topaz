@@ -20,7 +20,9 @@ void main(List<String> args) {
       () => new Future<Null>.delayed(const Duration(seconds: 1)));
 
   test('start hello_dart', () {
-    const LaunchInfo info = const LaunchInfo(url: 'hello_dart_jit');
+    const LaunchInfo info = const LaunchInfo(
+        url:
+            'fuchsia-pkg://fuchsia.com/hello_dart_jit#meta/hello_dart_jit.cmx');
     context.launcher.createComponent(info, null);
   });
 
@@ -31,7 +33,9 @@ void main(List<String> args) {
     final ComponentControllerProxy actl = new ComponentControllerProxy();
 
     final LaunchInfo info = new LaunchInfo(
-        url: 'hello_app_dart_jit', directoryRequest: services.request());
+        url:
+            'fuchsia-pkg://fuchsia.com/hello_app_dart_jit#meta/hello_app_dart_jit.cmx',
+        directoryRequest: services.request());
     context.launcher.createComponent(info, actl.ctrl.request());
     services
       ..connectToService(service.ctrl)

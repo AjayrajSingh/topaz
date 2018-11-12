@@ -11,6 +11,13 @@ dart_jit_app("dart_jit_runner_test") {
 
   source_dir = "."
 
+  meta = [
+    {
+      path = rebase_path("meta/dart_jit_runner_test.cmx")
+      dest = "dart_jit_runner_test.cmx"
+    },
+  ]
+
   sources = []
   deps = [
     "//third_party/dart-pkg/pub/test",
@@ -25,6 +32,13 @@ dart_aot_app("dart_aot_runner_test") {
   main_dart = "main.dart"
 
   source_dir = "."
+
+  meta = [
+    {
+      path = rebase_path("meta/dart_aot_runner_test.cmx")
+      dest = "dart_aot_runner_test.cmx"
+    },
+  ]
 
   sources = []
   deps = [

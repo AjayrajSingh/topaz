@@ -5,9 +5,14 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("color") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/color.cmx")
+      dest = "color.cmx"
+    },
+  ]
 
   sources = [
     "src/color_model.dart",

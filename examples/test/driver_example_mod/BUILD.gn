@@ -14,6 +14,13 @@ flutter_app("driver_example_mod") {
 
   main_dart = "lib/main.dart"
 
+  meta = [
+    {
+      path = rebase_path("meta/driver_example_mod.cmx")
+      dest = "driver_example_mod.cmx"
+    },
+  ]
+
   # This creates a flutter_driver enabled binary that will enable extensions for
   # testing when run in an environment along with TestRunner.
   flutter_driver_extendable = true

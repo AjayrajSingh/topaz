@@ -5,19 +5,24 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("display_settings") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
 
   manifest = "pubspec.yaml"
+
+  meta = [
+    {
+      path = rebase_path("meta/display_settings.cmx")
+      dest = "display_settings.cmx"
+    },
+  ]
 
   sources = [
     "src/widget.dart",
   ]
 
   deps = [
-    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//garnet/public/fidl/fuchsia.amber",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/lib/settings:lib.settings",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

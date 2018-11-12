@@ -5,21 +5,26 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("ble_scanner") {
-  deprecated_no_cmx = "//build"
-
   package_name = "ble_scanner"
 
   main_dart = "lib/main.dart"
 
+  meta = [
+    {
+      path = rebase_path("meta/ble_scanner.cmx")
+      dest = "ble_scanner.cmx"
+    },
+  ]
+
   deps = [
+    "//garnet/public/fidl/fuchsia.bluetooth",
     "//garnet/public/fidl/fuchsia.bluetooth.gatt",
     "//garnet/public/fidl/fuchsia.bluetooth.le",
-    "//garnet/public/fidl/fuchsia.bluetooth",
     "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/widgets/dart",
   ]
 }
