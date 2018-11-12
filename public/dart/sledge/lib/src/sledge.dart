@@ -6,7 +6,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
-import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger_async;
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular_async;
 import 'package:fidl/fidl.dart' as fidl;
@@ -51,14 +50,7 @@ class Sledge {
   /// Default constructor.
   factory Sledge(ComponentContext componentContext, [SledgePageId pageId]) {
     fidl.InterfacePair<ledger.Ledger> ledgerPair = new fidl.InterfacePair();
-    componentContext.getLedger(ledgerPair.passRequest(),
-        (ledger.Status status) {
-      if (status != ledger.Status.ok) {
-        throw new Exception(
-            'Sledge failed to connect to Ledger with status `$status`.');
-      }
-    });
-
+    componentContext.getLedgerNew(ledgerPair.passRequest());
     return new Sledge._(ledgerPair.passHandle(), pageId);
   }
 
@@ -75,7 +67,7 @@ class Sledge {
 
     _ledgerProxy.ctrl.onConnectionError = () {
       initializationCompleter.complete(false);
-      throw new Exception('Sledge failed to connect to Ledger.');
+      throw new Exception('Sledge was disconnected from the Ledger.');
     };
 
     _ledgerProxy.getPage(pageId.id, _pageProxy.ctrl.request(),
@@ -97,15 +89,7 @@ class Sledge {
   factory Sledge.forAsync(modular_async.ComponentContext componentContext,
       [SledgePageId pageId]) {
     final pair = new ChannelPair();
-    componentContext
-        .getLedger(new fidl.InterfaceRequest(pair.first))
-        .then((status) async {
-      if (status != ledger_async.Status.ok) {
-        throw new Exception(
-            'Sledge failed to connect to Ledger with status `$status`.');
-      }
-    });
-
+    componentContext.getLedgerNew(new fidl.InterfaceRequest(pair.first));
     return new Sledge._(new fidl.InterfaceHandle(pair.second), pageId);
   }
 

@@ -18,14 +18,6 @@ import 'package:xi_client/client.dart';
 /// If `true`, draws the editor with a watermarked background.
 const bool kDrawDebugBackground = false;
 
-dynamic _handleResponse(String description) {
-  return (Status status) {
-    if (status != Status.ok) {
-      log.info('$description: $status');
-    }
-  };
-}
-
 /// An implementation of the [Lifecycle] interface, which controls the lifetime
 /// of the module. Also manages the ModuleContext connection.
 class ModuleImpl implements Lifecycle {
@@ -34,7 +26,7 @@ class ModuleImpl implements Lifecycle {
     log.info('ModuleImpl::init call');
     connectToService(kContext.environmentServices, _moduleContext.ctrl);
     _moduleContext.getComponentContext(_componentContext.ctrl.request());
-    _componentContext.getLedger(_ledgerRequest, _handleResponse('getLedger'));
+    _componentContext.getLedgerNew(_ledgerRequest);
   }
 
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();

@@ -351,21 +351,16 @@ class ContactsContentProviderImpl extends ContactsContentProvider
     // Connect to ledger
     _ledger?.ctrl?.close();
     _ledger = new ledger.LedgerProxy();
-    Completer<ledger.Status> statusCompleter = new Completer<ledger.Status>();
-    _componentContext.getLedger(
-      _ledger.ctrl.request(),
-      statusCompleter.complete,
-    );
-    ledger.Status status = await statusCompleter.future;
-    _handleLedgerResponseStatus(
-      status: status,
-      ledgerCall: '_componentContext.getLedger()',
-    );
+    _ledger.ctrl.onConnectionError = () {
+      log.severe('Ledger disconnected.');
+      throw new Exception('Contacts Content Provider Ledger disconnected.');
+    };
+    _componentContext.getLedgerNew(_ledger.ctrl.request());
 
     // Grab the page of contacts
     _page?.ctrl?.close();
     _page = new ledger.PageProxy();
-    statusCompleter = new Completer<ledger.Status>();
+    Completer<ledger.Status> statusCompleter = new Completer<ledger.Status>();
     _ledger.getRootPage(
       _page.ctrl.request(),
       statusCompleter.complete,
