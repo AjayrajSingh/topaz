@@ -90,4 +90,14 @@ abstract class Module {
   /// }
   /// ```
   void registerIntentHandler(IntentHandler intentHandler);
+
+  /// Requests that the current story and module gain focus. It's up to the
+  /// story shell and session shell to honor that request.
+  void requestFocus();
+
+  /// When [RemoveSelfFromStory()] is called the framework will stop the
+  /// module and remove it from the story. If there are no more running modules
+  /// in the story the story will be stopped.
+  void removeSelfFromStory();
+
 }

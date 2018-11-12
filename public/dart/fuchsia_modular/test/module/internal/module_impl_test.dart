@@ -23,6 +23,8 @@ const fidl.Intent _emptyIntent = fidl.Intent(
 // Mock classes
 class MockLifecycle extends Mock implements Lifecycle {}
 
+class MockModuleContext extends Mock implements fidl.ModuleContext {}
+
 void main() {
   ModuleImpl mod;
   IntentHandlerImpl handlerImpl;
@@ -80,6 +82,21 @@ void main() {
   test('addModuleToStory throws for null intent', () {
     expect(
         mod.addModuleToStory(name: 'foo', intent: null), throwsArgumentError);
+  });
+
+  test('verify requestFocus should call context.requestFocus', () {
+    final mockContext = MockModuleContext();
+    ModuleImpl(intentHandlerImpl: handlerImpl, moduleContext: mockContext)
+        .requestFocus();
+    verify(mockContext.requestFocus());
+  });
+
+  test('verify removeSelfFromStory should call context.removeSelfFromStory',
+      () {
+    final mockContext = MockModuleContext();
+    ModuleImpl(intentHandlerImpl: handlerImpl, moduleContext: mockContext)
+        .removeSelfFromStory();
+    verify(mockContext.removeSelfFromStory());
   });
 }
 

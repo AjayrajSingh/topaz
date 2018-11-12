@@ -31,7 +31,7 @@ class ModuleImpl implements Module {
   IntentHandlerImpl _intentHandlerImpl;
 
   /// Returns the [fidl.ModuleContext] for the running module.
-  /// This varible should not be used directly. Use the
+  /// This variable should not be used directly. Use the
   /// [getContext()] method instead
   fidl.ModuleContext _moduleContext;
 
@@ -112,6 +112,16 @@ class ModuleImpl implements Module {
     }
 
     _intentHandler = intentHandler;
+  }
+
+  @override
+  void requestFocus() {
+    _getContext().requestFocus();
+  }
+
+  @override
+  void removeSelfFromStory() {
+    _getContext().removeSelfFromStory();
   }
 
   fidl.ModuleContext _getContext() => _moduleContext ??= getModuleContext();
