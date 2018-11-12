@@ -34,7 +34,7 @@ class IntentParameters {
     List<IntentParameter> parameters,
   }) {
     _driver = moduleDriver;
-    for (var parameter in parameters) {
+    for (var parameter in parameters ?? []) {
       _parameters[parameter.name] = parameter.data;
     }
   }
