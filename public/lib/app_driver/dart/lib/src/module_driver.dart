@@ -23,7 +23,7 @@ import 'package:lib.story.dart/story.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
-import 'package:modules_config/cobalt_config.dart' as cobalt_config;
+import 'package:modules_metrics_registry/modules_metrics_registry.dart' as modules_metrics_registry;
 
 import 'service_client.dart';
 
@@ -701,7 +701,7 @@ class ModuleDriver {
     connectToService(environmentServices, loggerFactory.ctrl);
 
     SizedVmo configVmo =
-        SizedVmo.fromUint8List(base64.decode(cobalt_config.config));
+        SizedVmo.fromUint8List(base64.decode(modules_metrics_registry.config));
     ProjectProfile profile = ProjectProfile(
       config: fuchsia_mem.Buffer(vmo: configVmo, size: configVmo.size),
       releaseStage: ReleaseStage.ga,

@@ -25,7 +25,7 @@ import 'user_picker_base_shell_screen.dart';
 const double _kMousePointerElevation = 800.0;
 const double _kIndicatorElevation = _kMousePointerElevation - 1.0;
 
-const String _kCobaltConfigBinProtoPath = '/pkg/data/cobalt_config.pb';
+const String _kCobaltConfigBinProtoPath = '/pkg/data/sysui_metrics_config.pb';
 
 /// The main base shell widget.
 BaseShellWidget<UserPickerBaseShellModel> _baseShellWidget;

@@ -6,9 +6,10 @@ import("//third_party/cobalt_config/cobalt_config.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 import("//build/dart/dart_library.gni")
 
-cobalt_config("modules_config") {
+cobalt_config("modules_metrics_registry") {
   project_id = 104
   sdk_category = "partner"
+  use_target_name = true
 
   generate_binarypb = false
   generate_dart = true
@@ -28,7 +29,7 @@ dart_library("dart") {
   ]
 
   deps = [
-    ":modules_config_dartlib",
+    ":modules_metrics_registry_dartlib",
     "//peridot/public/fidl/fuchsia.modular",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
