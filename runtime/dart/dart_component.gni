@@ -535,16 +535,7 @@ template("flutter_dart_jit_component") {
     }
   }
 
-  if (!found_cmx) {
-    # No cmx to inject to. Inject the runner aspect as a dangling deprecated_runtime.
-    # CP-129: deprecate cmx-less components, then delete this.
-    cmx_filtered_meta += [
-      {
-        path = rebase_path(runtime_meta)
-        dest = "deprecated_runtime"
-      },
-    ]
-  }
+  assert(found_cmx, "Failed to inject runner for ${target_name}; missing cmx")
 
   # We have all components and their kernels generated now. We call package() to
   # put everything into a fuchsia package, merging deps, extra, meta etc.
@@ -1074,17 +1065,7 @@ template("flutter_dart_aot_component") {
     }
   }
 
-  if (!found_cmx) {
-    # No cmx to inject to. Inject the runner aspect as a dangling
-    # deprecated_runtime.
-    # CP-129: deprecate cmx-less components, then delete this.
-    cmx_filtered_meta += [
-      {
-        path = rebase_path(runtime_meta)
-        dest = "deprecated_runtime"
-      },
-    ]
-  }
+  assert(found_cmx, "Failed to inject runner for ${target_name}; missing cmx")
 
   # We have all components and their kernels generated now. We call package() to
   # put everything into a fuchsia package, merging deps, extra, meta etc.
