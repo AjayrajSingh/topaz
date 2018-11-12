@@ -5,9 +5,14 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("infinite_scroller") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/infinite_scroller.cmx")
+      dest = "infinite_scroller.cmx"
+    },
+  ]
 
   sources = []
   deps = [

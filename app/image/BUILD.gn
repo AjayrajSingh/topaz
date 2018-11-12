@@ -5,11 +5,16 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("image") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
 
   module_manifest = "manifest.json"
+
+  meta = [
+    {
+      path = rebase_path("meta/image.cmx")
+      dest = "image.cmx"
+    },
+  ]
 
   sources = [
     "src/models/image_model.dart",

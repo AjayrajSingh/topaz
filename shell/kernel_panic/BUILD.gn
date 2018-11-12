@@ -5,13 +5,18 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("kernel_panic") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
 
   package_name = "kernel_panic"
 
   manifest = "pubspec.yaml"
+
+  meta = [
+    {
+      path = rebase_path("meta/kernel_panic.cmx")
+      dest = "kernel_panic.cmx"
+    },
+  ]
 
   sources = [
     "kernel_panic.dart",

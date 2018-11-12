@@ -6,6 +6,12 @@ import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
 
 dart_fuchsia_test("key_listener_device_tests") {
+  meta = [
+    {
+      path = rebase_path("meta/key_listener_device_tests.cmx")
+      dest = "key_listener_device_tests.cmx"
+    },
+  ]
 
   package_only = true
 

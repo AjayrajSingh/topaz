@@ -5,11 +5,16 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("image_grid_flutter") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
 
   fuchsia_package_name = "image_grid_flutter"
+
+  meta = [
+    {
+      path = rebase_path("meta/image_grid_flutter.cmx")
+      dest = "image_grid_flutter.cmx"
+    },
+  ]
 
   sources = []
   deps = [
