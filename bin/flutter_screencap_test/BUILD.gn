@@ -6,9 +6,14 @@ import("//build/package.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("flutter_screencap_test_app") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/flutter_screencap_test_app.cmx")
+      dest = "flutter_screencap_test_app.cmx"
+    },
+  ]
 
   sources = []
 

@@ -18,7 +18,7 @@ const List<String> kDefaultServers = [
   'echo2_server_rust',
   'echo2_server_go',
   'fuchsia-pkg://fuchsia.com/echo_dart#meta/echo_server_dart.cmx',
-  'echo_server_async_dart'
+  'fuchsia-pkg://fuchsia.com/echo_server_async_dart#meta/echo_server_async_dart.cmx'
 ];
 const List<int> kDefaultCalls = [1000, 10000];
 const String kMessage = 'hello';
@@ -64,11 +64,12 @@ Future<int> runTest(String server, void ready(Echo echo, void complete())) {
       echo.ctrl.close();
       controller.ctrl.onConnectionError = complete;
       controller.ctrl.onClose = complete;
-      controller..kill()
+      controller
+        ..kill()
         ..onTerminated = (unusedReturnCode, unusedTerminationReason) {
-            // Now we're done...
-            complete();
-            controller.ctrl.close();
+          // Now we're done...
+          complete();
+          controller.ctrl.close();
         };
     }
 
@@ -98,6 +99,7 @@ Future<int> testSerialPerf(String server, int number) async {
         }
       });
     }
+
     callServer();
   });
 }
@@ -158,7 +160,7 @@ void main(List<String> argv) async {
     StringBuffer line = new StringBuffer(server);
     for (final int count in numCalls) {
       final int microseconds = results[server][count] ?? 0;
-      line.write(',${(microseconds/count)}');
+      line.write(',${(microseconds / count)}');
     }
     print(line);
   }

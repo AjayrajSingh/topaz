@@ -5,11 +5,16 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("example_manual_relationships") {
-  deprecated_no_cmx = "//build"
-
   package_name = "example_manual_relationships"
   main_dart = "lib/main.dart"
   module_manifest = "manifest.json"
+
+  meta = [
+    {
+      path = rebase_path("meta/example_manual_relationships.cmx")
+      dest = "example_manual_relationships.cmx"
+    },
+  ]
 
   sources = [
     "grouping.dart",

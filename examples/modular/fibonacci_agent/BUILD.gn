@@ -5,21 +5,26 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_app("fibonacci_agent") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
 
   fuchsia_package_name = "fibonacci_agent"
   package_name = "fibonacci_agent"
+
+  meta = [
+    {
+      path = rebase_path("meta/fibonacci_agent.cmx")
+      dest = "fibonacci_agent.cmx"
+    },
+  ]
 
   sources = [
     "src/fibonacci_service_impl.dart",
   ]
 
   deps = [
-      "//topaz/public/dart/fuchsia",
-      "//topaz/public/dart/fidl",
-      "//topaz/public/dart/fuchsia_modular",
-      "//topaz/examples/modular/fidl:fibonacci_service",
+    "//topaz/examples/modular/fidl:fibonacci_service",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/dart/fuchsia",
+    "//topaz/public/dart/fuchsia_modular",
   ]
 }

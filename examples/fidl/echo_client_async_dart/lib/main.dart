@@ -12,7 +12,8 @@ StartupContext _context;
 EchoProxy _echo;
 
 Future<Null> main(List<String> args) async {
-  String server = 'echo_server_async_dart';
+  String server =
+      'fuchsia-pkg://fuchsia.com/echo_server_async_dart#meta/echo_server_async_dart.cmx';
   if (args.length >= 2 && args[0] == '--server') {
     server = args[1];
   }

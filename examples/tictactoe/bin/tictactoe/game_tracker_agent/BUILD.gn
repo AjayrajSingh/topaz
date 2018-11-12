@@ -5,9 +5,14 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_app("game_tracker_agent") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/game_tracker_agent.cmx")
+      dest = "game_tracker_agent.cmx"
+    },
+  ]
 
   sources = [
     "src/agent.dart",

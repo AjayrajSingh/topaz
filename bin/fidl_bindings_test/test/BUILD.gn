@@ -2,11 +2,18 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//topaz/runtime/dart_runner/dart_app.gni")
 import("//build/dart/dart_fuchsia_test.gni")
+import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_fuchsia_test("fidl_bindings_test") {
   source_dir = "test/"
+
+  meta = [
+    {
+      path = rebase_path("meta/fidl_bindings_test.cmx")
+      dest = "fidl_bindings_test.cmx"
+    },
+  ]
 
   deps = [
     "//third_party/dart-pkg/pub/collection",
