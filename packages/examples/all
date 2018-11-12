@@ -3,6 +3,7 @@
         "topaz/packages/examples/bluetooth",
         "topaz/packages/examples/dart",
         "topaz/packages/examples/fidl",
+        "topaz/packages/examples/flutter_gallery",
         "topaz/packages/examples/misc",
         "topaz/packages/examples/modular",
         "topaz/packages/examples/mondrian",
