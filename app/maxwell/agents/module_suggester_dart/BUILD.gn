@@ -5,9 +5,14 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_app("module_suggester") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/module_suggester.cmx")
+      dest = "module_suggester.cmx"
+    },
+  ]
 
   source_dir = "."
   sources = []

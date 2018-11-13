@@ -5,12 +5,17 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("perspective") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
   package_name = "perspective"
 
   manifest = "pubspec.yaml"
+
+  meta = [
+    {
+      path = rebase_path("meta/perspective.cmx")
+      dest = "perspective.cmx"
+    },
+  ]
 
   sources = []
 

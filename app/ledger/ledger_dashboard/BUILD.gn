@@ -6,9 +6,14 @@ import("//build/package.gni")
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_app("ledger_dashboard") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/ledger_dashboard.cmx")
+      dest = "ledger_dashboard.cmx"
+    },
+  ]
 
   source_dir = "."
   sources = [

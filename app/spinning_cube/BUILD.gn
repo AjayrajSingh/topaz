@@ -5,11 +5,16 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("spinning_cube") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
 
   manifest = "pubspec.yaml"
+
+  meta = [
+    {
+      path = rebase_path("meta/spinning_cube.cmx")
+      dest = "spinning_cube.cmx"
+    },
+  ]
 
   sources = [
     "spinning_cube_gem.dart",

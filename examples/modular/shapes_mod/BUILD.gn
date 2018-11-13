@@ -5,12 +5,17 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("shapes_mod") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
   package_name = "shapes_mod"
 
   fuchsia_package_name = "shapes_mod"
+
+  meta = [
+    {
+      path = rebase_path("meta/shapes_mod.cmx")
+      dest = "shapes_mod.cmx"
+    },
+  ]
 
   sources = [
 

@@ -5,9 +5,14 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("link_viewer") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/link_viewer.cmx")
+      dest = "link_viewer.cmx"
+    },
+  ]
 
   sources = [
     "src/models/link_viewer_model.dart",
