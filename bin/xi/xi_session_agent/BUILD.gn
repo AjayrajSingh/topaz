@@ -13,9 +13,14 @@ fidl("xi_session_services") {
 }
 
 dart_app("xi_session_agent") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/xi_session_agent.cmx")
+      dest = "xi_session_agent.cmx"
+    },
+  ]
 
   deps = [
     "//garnet/public/fidl/fuchsia.auth",

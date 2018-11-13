@@ -5,9 +5,14 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("vote_list_sledge") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/vote_list_sledge.cmx")
+      dest = "vote_list_sledge.cmx"
+    },
+  ]
 
   sources = [
     "widgets/vote_item_widget.dart",

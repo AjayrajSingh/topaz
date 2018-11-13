@@ -5,9 +5,14 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("todo_list") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/todo_list.cmx")
+      dest = "todo_list.cmx"
+    },
+  ]
 
   sources = [
     "src/ledger_helpers.dart",

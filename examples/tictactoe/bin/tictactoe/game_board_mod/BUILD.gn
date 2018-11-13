@@ -7,12 +7,17 @@ import("//topaz/runtime/dart/dart_test.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("tictactoe_game_board_mod") {
-  deprecated_no_cmx = "//build"
-
   main_dart = "lib/main.dart"
 
   fuchsia_package_name = "tictactoe_game_board_mod"
   module_manifest = "manifest.json"
+
+  meta = [
+    {
+      path = rebase_path("meta/tictactoe_game_board_mod.cmx")
+      dest = "tictactoe_game_board_mod.cmx"
+    },
+  ]
 
   sources = [
     "src/model/tictactoe_model.dart",
