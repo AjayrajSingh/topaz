@@ -7,8 +7,7 @@
 #include <fuchsia/fonts/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 #include <lib/component/cpp/startup_context.h>
-#include <lib/fidl/cpp/binding.h>
-#include <lib/fxl/files/file.h>
+#include <lib/component/cpp/testing/test_with_environment.h>
 
 #include "gtest/gtest.h"
 #include "third_party/skia/include/core/SkFontMgr.h"
@@ -18,120 +17,54 @@ namespace txt {
 
 namespace {
 
-constexpr zx_rights_t kFontDataRights =
-    ZX_RIGHTS_BASIC | ZX_RIGHT_READ | ZX_RIGHT_MAP;
+// A codepoint guaranteed to be unknown in any font/family.
+constexpr SkUnichar kUnknownUnicodeCharacter = 0xFFF0;
 
-// Guaranteed to be an unassigned unicode codepoint.
-constexpr SkUnichar kUnicodeNonCharacter = 0x10FFFF;
-
-fuchsia::mem::Buffer LoadFont(std::string file_path) {
-  std::string file_content;
-  FXL_CHECK(files::ReadFileToString(file_path, &file_content));
-  fuchsia::mem::Buffer buffer;
-  zx_status_t status = zx::vmo::create(file_content.size(), 0, &buffer.vmo);
-  FXL_CHECK(status == ZX_OK);
-  status = buffer.vmo.write(file_content.data(), 0, file_content.size());
-  FXL_CHECK(status == ZX_OK);
-  buffer.size = file_content.size();
-  return buffer;
-}
-
-// Fake fuchsia::fonts::Provider implementation.
-// TODO(wleshner): Use the real font provider instead of this fake.
-class FakeFontProvider : public fuchsia::fonts::Provider {
+class FuchsiaFontManagerTest : public component::testing::TestWithEnvironment {
  public:
-  void GetFont(fuchsia::fonts::Request request,
-               GetFontCallback callback) override {
-    if (request.character == kUnicodeNonCharacter) {
-      // Special "unknown character" case.
-      callback(nullptr);
-      return;
-    }
+  FuchsiaFontManagerTest() : loop_(&kAsyncLoopConfigNoAttachToThread) {
+    // Grab the current Environment. We'll need it to create a new set of
+    // services on a background thread.
+    auto context = component::StartupContext::CreateFromStartupInfo();
+    fuchsia::sys::EnvironmentPtr parent_env;
+    context->ConnectToEnvironmentService(parent_env.NewRequest());
 
-    // This just has to be unique for the font data returned so that the font
-    // manager will cache the fonts properly.
-    int buffer_id;
-
-    fuchsia::mem::Buffer* font_buffer = nullptr;
-    if (*request.family == "Roboto") {
-      AssureFontData(&roboto_,
-                     "/pkgfs/packages/fonts/0/data/fonts/Roboto-Regular.ttf");
-      font_buffer = &roboto_;
-      buffer_id = 1;
-    } else if (*request.family == "RobotoSlab") {
-      AssureFontData(
-          &roboto_slab_,
-          "/pkgfs/packages/fonts/0/data/fonts/RobotoSlab-Regular.ttf");
-      font_buffer = &roboto_slab_;
-      buffer_id = 2;
-    }
-
-    if (!font_buffer) {
-      callback(nullptr);
-      return;
-    }
-
-    auto response = fuchsia::fonts::Response::New();
-    EXPECT_EQ(
-        font_buffer->vmo.duplicate(kFontDataRights, &(response->buffer.vmo)),
-        ZX_OK);
-    response->buffer.size = font_buffer->size;
-    response->buffer_id = buffer_id;
-    // Since there is only one font in our "collection", font_index is always 0.
-    response->font_index = 0;
-    callback(std::move(response));
-  }
-
-  void GetFamilyInfo(::fidl::StringPtr family,
-                     GetFamilyInfoCallback callback) override {
-    if (family != "Roboto") {
-      callback(nullptr);
-      return;
-    }
-
-    auto response = fuchsia::fonts::FamilyInfo::New();
-    response->name = "Roboto";
-    response->styles = ::fidl::VectorPtr<fuchsia::fonts::Style>::New(0);
-    response->styles.push_back(
-        CreateStyle(400, 5, fuchsia::fonts::Slant::UPRIGHT));
-    callback(std::move(response));
-  }
-
- private:
-  void AssureFontData(fuchsia::mem::Buffer* buffer, std::string file_path) {
-    if (buffer->size == 0) {
-      *buffer = LoadFont(file_path);
-    }
-  }
-
-  static fuchsia::fonts::Style CreateStyle(int weight, int width,
-                                           fuchsia::fonts::Slant slant) {
-    fuchsia::fonts::Style style;
-    style.weight = weight;
-    style.width = width;
-    style.slant = slant;
-    return style;
-  }
-
-  fuchsia::mem::Buffer roboto_;
-  fuchsia::mem::Buffer roboto_slab_;
-};
-
-class FuchsiaFontManagerTest : public testing::Test {
- public:
-  FuchsiaFontManagerTest()
-      : loop_(&kAsyncLoopConfigNoAttachToThread), binding_(&font_provider_) {
+    // Create a new set of services running on a newly started (background)
+    // thread.
     loop_.StartThread();
-    fuchsia::fonts::ProviderSyncPtr ptr;
-    ptr.Bind(binding_.NewBinding(loop_.dispatcher()));
-    font_manager_ = sk_make_sp<FuchsiaFontManager>(std::move(ptr));
+    auto services = component::testing::EnvironmentServices::Create(
+        parent_env, loop_.dispatcher());
+
+    // Add the font provider service to the newly created set of services.
+    fuchsia::sys::LaunchInfo launch_info{
+        "fuchsia-pkg://fuchsia.com/fonts#meta/fonts.cmx"};
+    zx_status_t status = services->AddServiceWithLaunchInfo(
+        std::move(launch_info), fuchsia::fonts::Provider::Name_);
+    EXPECT_EQ(ZX_OK, status);
+
+    // Create an enclosing environment wrapping the new set of services.
+    environment_ = CreateNewEnclosingEnvironment("font_manager_tests",
+                                                 std::move(services));
+    EXPECT_TRUE(WaitForEnclosingEnvToStart(environment_.get()));
+
+    // Connect to the font provider service through the enclosing environment
+    // (so that it runs on the background thread), and then wrap it inside the
+    // font manager we will be testing.
+    fuchsia::fonts::ProviderSyncPtr provider_ptr;
+    environment_->ConnectToService(provider_ptr.NewRequest());
+    font_manager_ = sk_make_sp<FuchsiaFontManager>(std::move(provider_ptr));
+  }
+
+  void TearDown() override {
+    // Make sure the background thread terminates before tearing down the
+    // enclosing environment (otherwise we get a crash).
+    loop_.Quit();
   }
 
  protected:
   async::Loop loop_;
+  std::unique_ptr<component::testing::EnclosingEnvironment> environment_;
   sk_sp<SkFontMgr> font_manager_;
-  FakeFontProvider font_provider_;
-  fidl::Binding<fuchsia::fonts::Provider> binding_;
 };
 
 // Verify that a typeface is returned for a found character.
@@ -145,7 +78,7 @@ TEST_F(FuchsiaFontManagerTest, ValidResponseWhenCharacterFound) {
 // an empty typeface.
 TEST_F(FuchsiaFontManagerTest, EmptyResponseWhenCharacterNotFound) {
   sk_sp<SkTypeface> sans(font_manager_->matchFamilyStyleCharacter(
-      "", SkFontStyle(), nullptr, 0, kUnicodeNonCharacter));
+      "", SkFontStyle(), nullptr, 0, kUnknownUnicodeCharacter));
   EXPECT_TRUE(sans.get() == nullptr);
 }
 

@@ -3,6 +3,10 @@
         "binary": "test/flutter_runner_unittests"
     },
     "sandbox": {
-        "services": []
+        "services": [
+            "fuchsia.fonts.Provider",
+            "fuchsia.sys.Environment",
+            "fuchsia.sys.Loader"
+        ]
     }
 }

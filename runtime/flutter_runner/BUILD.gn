@@ -333,8 +333,8 @@ executable("flutter_runner_unittests") {
   deps = [
     "//garnet/public/fidl/fuchsia.fonts",
     "//garnet/public/lib/component/cpp",
+    "//garnet/public/lib/component/cpp/testing",
     "//garnet/public/lib/fsl",
-    "//garnet/public/lib/gtest",
     "//third_party/googletest:gtest_main",
     "//third_party/icu",
     "//third_party/skia",
