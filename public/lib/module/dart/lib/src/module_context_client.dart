@@ -57,8 +57,6 @@ class EmbeddedModule {
 /// TODO(SO-1125): implement all methods for ModuleContextClient
 class ModuleContextClient {
   ComponentContextClient _componentContext;
-  final IntelligenceServicesProxy _intelligenceServices =
-      new IntelligenceServicesProxy();
   final OngoingActivityProxy _ongoingActivityProxy = new OngoingActivityProxy();
 
   /// The underlying [Proxy] used to send client requests to the
@@ -320,24 +318,6 @@ class ModuleContextClient {
     return completer.future;
   }
 
-  /// See [fidl.ModuleContext#getIntelligenceServices].
-  Future<IntelligenceServicesProxy> getIntelligenceServices() async {
-    await bound;
-    Completer<IntelligenceServicesProxy> completer =
-        new Completer<IntelligenceServicesProxy>();
-
-    try {
-      if (!_intelligenceServices.ctrl.isBound) {
-        proxy.getIntelligenceServices(_intelligenceServices.ctrl.request());
-      }
-      completer.complete(_intelligenceServices);
-    } on Exception catch (err, stackTrace) {
-      completer.completeError(err, stackTrace);
-    }
-
-    return completer.future;
-  }
-
   /// See [fidl:ModuleContext#active].
   Future<Null> active() async {
     Completer<Null> completer = new Completer<Null>();
@@ -439,7 +419,6 @@ class ModuleContextClient {
   Future<Null> terminate() async {
     log.fine('terminate called');
     proxy.ctrl.close();
-    _intelligenceServices.ctrl.close();
     return Future.wait(
             _links.map((LinkClient link) => link.terminate()).toList())
         .then((_) => null);

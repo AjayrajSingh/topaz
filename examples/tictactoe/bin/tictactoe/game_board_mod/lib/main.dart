@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:fidl_fuchsia_tictactoe/fidl_async.dart';
 import 'package:flutter/material.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.proposal.dart/proposal.dart';
@@ -35,7 +36,7 @@ void main() {
         _recordWinner(await gameTracker, gameState),
   );
 
-  _proposeScore(moduleDriver);
+  _proposeScore(StartupContext.fromStartupInfo(), moduleDriver);
 
   runApp(
     MaterialApp(
@@ -79,7 +80,8 @@ void _recordWinner(
   }
 }
 
-Future<void> _proposeScore(ModuleDriver moduleDriver) async {
+Future<void> _proposeScore(
+    StartupContext startupContext, ModuleDriver moduleDriver) async {
   final storyId = await moduleDriver.getStoryId();
 
   final Intent intent = Intent(handler: scoreBoardModUrl);
@@ -104,9 +106,10 @@ Future<void> _proposeScore(ModuleDriver moduleDriver) async {
         ..addStoryAffinity(storyId)
         ..addStoryCommand(StoryCommand.withAddMod(addMod));
 
-  final intelligenceServices =
-      await moduleDriver.moduleContext.getIntelligenceServices();
-
+  final IntelligenceServicesProxy intelligenceServices =
+      new IntelligenceServicesProxy();
+  connectToService(
+      startupContext.environmentServices, intelligenceServices.ctrl);
   final ProposalPublisherProxy proposalPublisher = ProposalPublisherProxy();
   intelligenceServices.getProposalPublisher(proposalPublisher.ctrl.request());
   proposalPublisher.propose(await proposalBuilder.build());

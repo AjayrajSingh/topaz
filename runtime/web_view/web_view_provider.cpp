@@ -38,7 +38,7 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
 
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   fuchsia::modular::IntelligenceServicesPtr intelligence_services;
-  module_context_->GetIntelligenceServices(intelligence_services.NewRequest());
+  context_->ConnectToEnvironmentService(intelligence_services.NewRequest());
   intelligence_services->GetContextWriter(context_writer_.NewRequest());
   context_ptr->GetComponentContext(component_context_.NewRequest());
 

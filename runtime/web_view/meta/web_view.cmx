@@ -1,22 +1,25 @@
 {
-  "program": {
-    "binary": "bin/app"
-  },
-  "sandbox": {
-    "features": [ "root-ssl-certificates" ],
-    "services": [
-          "fuchsia.fonts.Provider",
-          "fuchsia.media.Audio",
-          "fuchsia.modular.ModuleContext",
-          "fuchsia.net.LegacySocketProvider",
-          "fuchsia.netstack.Netstack",
-          "fuchsia.process.Launcher",
-          "fuchsia.ui.input.ImeService",
-          "fuchsia.ui.input.ImeVisibilityService",
-          "fuchsia.ui.policy.Presenter",
-          "fuchsia.ui.scenic.Scenic",
-          "fuchsia.ui.viewsv1.ViewManager",
-          "fuchsia.vulkan.loader.Loader"
-      ]
-  }
+    "program": {
+        "binary": "bin/app"
+    },
+    "sandbox": {
+        "features": [
+            "root-ssl-certificates"
+        ],
+        "services": [
+            "fuchsia.fonts.Provider",
+            "fuchsia.media.Audio",
+            "fuchsia.modular.IntelligenceServices",
+            "fuchsia.modular.ModuleContext",
+            "fuchsia.net.LegacySocketProvider",
+            "fuchsia.netstack.Netstack",
+            "fuchsia.process.Launcher",
+            "fuchsia.ui.input.ImeService",
+            "fuchsia.ui.input.ImeVisibilityService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.ui.viewsv1.ViewManager",
+            "fuchsia.vulkan.loader.Loader"
+        ]
+    }
 }
