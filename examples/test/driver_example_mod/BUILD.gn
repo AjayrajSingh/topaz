@@ -8,8 +8,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 # The main app.
 flutter_app("driver_example_mod") {
-  deprecated_no_cmx = "//build"
-
   package_name = "driver_example_mod"
 
   main_dart = "lib/main.dart"
