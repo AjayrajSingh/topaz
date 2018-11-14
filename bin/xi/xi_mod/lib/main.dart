@@ -26,7 +26,7 @@ class ModuleImpl implements Lifecycle {
     log.info('ModuleImpl::init call');
     connectToService(kContext.environmentServices, _moduleContext.ctrl);
     _moduleContext.getComponentContext(_componentContext.ctrl.request());
-    _componentContext.getLedgerNew(_ledgerRequest);
+    _componentContext.getLedger(_ledgerRequest);
   }
 
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();

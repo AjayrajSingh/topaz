@@ -50,7 +50,7 @@ class Sledge {
   /// Default constructor.
   factory Sledge(ComponentContext componentContext, [SledgePageId pageId]) {
     fidl.InterfacePair<ledger.Ledger> ledgerPair = new fidl.InterfacePair();
-    componentContext.getLedgerNew(ledgerPair.passRequest());
+    componentContext.getLedger(ledgerPair.passRequest());
     return new Sledge._(ledgerPair.passHandle(), pageId);
   }
 
@@ -89,7 +89,7 @@ class Sledge {
   factory Sledge.forAsync(modular_async.ComponentContext componentContext,
       [SledgePageId pageId]) {
     final pair = new ChannelPair();
-    componentContext.getLedgerNew(new fidl.InterfaceRequest(pair.first));
+    componentContext.getLedger(new fidl.InterfaceRequest(pair.first));
     return new Sledge._(new fidl.InterfaceHandle(pair.second), pageId);
   }
 

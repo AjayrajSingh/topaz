@@ -36,7 +36,7 @@ class TodoListModel extends Model implements ledger.PageWatcher {
     _ledger.ctrl.onConnectionError = () {
       print('[Todo List] Ledger disconnected.');
     };
-    componentContext.getLedgerNew(
+    componentContext.getLedger(
       _ledger.ctrl.request(),
     );
     _ledger.getRootPage(

@@ -355,7 +355,7 @@ class ContactsContentProviderImpl extends ContactsContentProvider
       log.severe('Ledger disconnected.');
       throw new Exception('Contacts Content Provider Ledger disconnected.');
     };
-    _componentContext.getLedgerNew(_ledger.ctrl.request());
+    _componentContext.getLedger(_ledger.ctrl.request());
 
     // Grab the page of contacts
     _page?.ctrl?.close();
