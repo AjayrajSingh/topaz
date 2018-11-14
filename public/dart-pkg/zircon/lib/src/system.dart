@@ -7,6 +7,7 @@ part of zircon;
 // ignore_for_file: native_function_body_in_non_sdk_code
 // ignore_for_file: public_member_api_docs
 
+@pragma('vm:entry-point')
 class _Namespace { // ignore: unused_element
   // No public constructor - this only has static methods.
   _Namespace._();
@@ -38,6 +39,7 @@ class _Result {
   const _Result(this.status);
 }
 
+@pragma('vm:entry-point')
 class HandleResult extends _Result {
   final Handle handle;
   @pragma('vm:entry-point')
@@ -46,6 +48,7 @@ class HandleResult extends _Result {
   String toString() => 'HandleResult(status=$status, handle=$handle)';
 }
 
+@pragma('vm:entry-point')
 class HandlePairResult extends _Result {
   final Handle first;
   final Handle second;
@@ -57,6 +60,7 @@ class HandlePairResult extends _Result {
       'HandlePairResult(status=$status, first=$first, second=$second)';
 }
 
+@pragma('vm:entry-point')
 class ReadResult extends _Result {
   final ByteData bytes;
   final int numBytes;
@@ -72,6 +76,7 @@ class ReadResult extends _Result {
       'ReadResult(status=$status, bytes=$bytes, numBytes=$numBytes, handles=$handles)';
 }
 
+@pragma('vm:entry-point')
 class WriteResult extends _Result {
   final int numBytes;
   @pragma('vm:entry-point')
@@ -80,6 +85,7 @@ class WriteResult extends _Result {
   String toString() => 'WriteResult(status=$status, numBytes=$numBytes)';
 }
 
+@pragma('vm:entry-point')
 class GetSizeResult extends _Result {
   final int size;
   @pragma('vm:entry-point')
@@ -88,6 +94,7 @@ class GetSizeResult extends _Result {
   String toString() => 'GetSizeResult(status=$status, size=$size)';
 }
 
+@pragma('vm:entry-point')
 class FromFileResult extends _Result {
   final Handle handle;
   final int numBytes;
@@ -99,6 +106,7 @@ class FromFileResult extends _Result {
       'FromFileResult(status=$status, handle=$handle, numBytes=$numBytes)';
 }
 
+@pragma('vm:entry-point')
 class MapResult extends _Result {
   final Uint8List data;
   @pragma('vm:entry-point')
@@ -107,6 +115,7 @@ class MapResult extends _Result {
   String toString() => 'MapResult(status=$status, data=$data)';
 }
 
+@pragma('vm:entry-point')
 class System extends NativeFieldWrapperClass2 {
   // No public constructor - this only has static methods.
   System._();

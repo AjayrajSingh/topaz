@@ -7,6 +7,7 @@ part of zircon;
 // ignore_for_file: native_function_body_in_non_sdk_code
 // ignore_for_file: public_member_api_docs
 
+@pragma('vm:entry-point')
 class Handle extends NativeFieldWrapperClass2 {
   // No public constructor - this can only be created from native code.
   @pragma('vm:entry-point')

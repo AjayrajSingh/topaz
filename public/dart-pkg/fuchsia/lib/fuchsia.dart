@@ -9,10 +9,10 @@ import 'dart:zircon';
 
 // ignore_for_file: native_function_body_in_non_sdk_code
 // ignore_for_file: public_member_api_docs
-@pragma("vm:entry-point")
+@pragma('vm:entry-point')
 Handle _environment;
 
-@pragma("vm:entry-point")
+@pragma('vm:entry-point')
 Handle _outgoingServices;
 
 class MxStartupInfo {
