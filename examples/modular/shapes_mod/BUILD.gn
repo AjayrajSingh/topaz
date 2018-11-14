@@ -23,6 +23,7 @@ flutter_app("shapes_mod") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/examples/modular/models",
     "//topaz/public/dart/fuchsia_modular",
   ]
 }

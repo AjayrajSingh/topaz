@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_mem/fidl_async.dart' as fuchsia_mem;
@@ -32,7 +34,8 @@ class LinkEntity<T> implements Entity<T> {
   LinkEntity({
     @required this.linkName,
     @required this.codec,
-  });
+  })  : assert(linkName != null),
+        assert(codec != null);
 
   @override
   Future<T> getData() async => _getSnapshot();
@@ -64,9 +67,22 @@ class LinkEntity<T> implements Entity<T> {
   }
 
   @override
-  Future<void> write(T value) {
-    // TODO: implement write
-    return null;
+  Future<void> write(T value) async {
+    final link = _getLink();
+
+    // Convert the object to raw bytes
+    final bytes = codec.encode(value);
+
+    // need to base64 encode so we can encode it as json.
+    final b64ByteString = base64.encode(bytes);
+    final jsonString = json.encode(b64ByteString);
+
+    // convert the json encoded string into bytes so we can put it in a vmo
+    final jsonData = Uint8List.fromList(utf8.encode(jsonString));
+    final vmo = SizedVmo.fromUint8List(jsonData);
+    final buffer = fuchsia_mem.Buffer(vmo: vmo, size: jsonData.length);
+
+    await link.set(null, buffer);
   }
 
   Future<T> _getEntityData<T>(String entityReference) async {
@@ -94,18 +110,27 @@ class LinkEntity<T> implements Entity<T> {
     return codec.decode(result.bytesAsUint8List());
   }
 
-  // Returns a [fidl.Link] proxy object which is connected via the
-  // module context. Callers of this method are responsible for closing
-  // the link connection when they are done.
-  T _getJsonData<T>(fuchsia_mem.Buffer json) {
-    final vmo = SizedVmo(json.vmo.handle, json.size);
-    final result = vmo.read(json.size);
+  T _getJsonData<T>(fuchsia_mem.Buffer jsonBuffer) {
+    final vmo = SizedVmo(jsonBuffer.vmo.handle, jsonBuffer.size);
+    final result = vmo.read(jsonBuffer.size);
     if (result.status != 0) {
       throw Exception('Failed to read VMO');
     }
     vmo.close();
 
-    return codec.decode(result.bytesAsUint8List());
+    final resultBytes = result.bytesAsUint8List();
+    Uint8List bytesToDecode;
+
+    try {
+      // Try to decode the values in the format that this entity encoded them
+      final utf8String = utf8.decode(resultBytes);
+      final jsonDecoded = json.decode(utf8String);
+      bytesToDecode = base64.decode(jsonDecoded);
+    } on Exception catch (_) {
+      bytesToDecode = resultBytes;
+    }
+
+    return codec.decode(bytesToDecode);
   }
 
   fidl.Link _getLink() {
@@ -124,16 +149,15 @@ class LinkEntity<T> implements Entity<T> {
   Future<T> _getSnapshot() async {
     final link = _getLink();
 
-    final entityReference = await link.getEntity();
-    if (entityReference == null) {
-      final buffer = await link.get(null);
-      if (buffer == null) {
+    final buffer = await link.get(null);
+    if (buffer == null) {
+      final entityReference = await link.getEntity();
+      if (entityReference == null) {
         return null;
       }
-      return _getJsonData(buffer);
+      return _getEntityData(entityReference);
     }
-
-    return _getEntityData(entityReference);
+    return _getJsonData(buffer);
   }
 }
 

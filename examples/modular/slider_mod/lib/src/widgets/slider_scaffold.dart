@@ -2,7 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:example_modular_models/shape.dart';
 import 'package:flutter/material.dart';
+import 'package:fuchsia_modular/entity.dart';
 
 import '../blocs/bloc_provider.dart';
 import '../blocs/slider_bloc.dart';
@@ -10,11 +12,16 @@ import 'launch_bar.dart';
 import 'value_slider.dart';
 
 class SliderScaffold extends StatelessWidget {
+  final Entity<Shape> shapeEntity;
+  final Shape shape;
+
+  const SliderScaffold(this.shapeEntity, this.shape);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocProvider<SliderBloc>(
-        bloc: SliderBloc(),
+        bloc: SliderBloc(shapeEntity, shape),
         child: Column(
           children: [
             Flexible(

@@ -16,21 +16,22 @@ flutter_app("slider_mod") {
   flutter_driver_extendable = true
 
   sources = [
-    "src/widgets/slider_scaffold.dart",
-    "src/widgets/value_slider.dart",
-    "src/widgets/launch_bar.dart",
     "src/blocs/app_bloc.dart",
     "src/blocs/bloc_provider.dart",
-    "src/blocs/slider_bloc.dart",
     "src/blocs/fibonacci_bloc.dart",
+    "src/blocs/slider_bloc.dart",
     "src/handlers/root_intent_handler.dart",
+    "src/widgets/launch_bar.dart",
+    "src/widgets/slider_scaffold.dart",
+    "src/widgets/value_slider.dart",
   ]
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/examples/modular/fidl:fibonacci_service",
+    "//topaz/examples/modular/models",
     "//topaz/public/dart/fuchsia_logger",
     "//topaz/public/dart/fuchsia_modular",
-    "//topaz/examples/modular/fidl:fibonacci_service",
   ]
 
   meta = [

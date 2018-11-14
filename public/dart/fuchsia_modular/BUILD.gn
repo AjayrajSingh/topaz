@@ -42,6 +42,7 @@ dart_library("fuchsia_modular") {
   deps = [
     "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/pub/meta",
+    "//third_party/dart-pkg/pub/uuid",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
   ]

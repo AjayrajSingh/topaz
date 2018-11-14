@@ -7,8 +7,8 @@
       "action": "com.fuchsia.shapes_mod.show_circle",
       "parameters": [
         {
-          "name": "radius",
-          "type": "<need_type_here>"
+          "name": "shape",
+          "type": "com.fuchsia.shapes_mod.shape"
         }
       ]
     },
@@ -16,8 +16,8 @@
       "action": "com.fuchsia.shapes_mod.show_square",
       "parameters": [
         {
-          "name": "length",
-          "type": "<need_type_here>"
+          "name": "shape",
+          "type": "com.fuchsia.shape_mod.shape"
         }
       ]
     }

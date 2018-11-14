@@ -66,7 +66,18 @@ class Intent extends fidl.Intent {
         );
 
   /// Appends a [fidl.IntentParameter] to the intent's parameters containing
-  /// the [reference] as its data value and the [name] as its name value.
+  /// the [entity] as its data value and the [name] as its name value.
+  void addParameterFromEntity(String name, Entity entity) {
+    if (entity is LinkEntity) {
+      _addParameterFromLinkEntity(name, entity);
+    } else {
+      throw UnimplementedError('Only link entities are supported at this time');
+    }
+  }
+
+  /// Appends a [fidl.IntentParameter] to the intent's parameters containing
+  /// the [reference] to an entity as its data value and the [name] as its
+  /// name value.
   void addParameterFromEntityReference(String name, String reference) =>
       _addParameter(
           name, fidl.IntentParameterData.withEntityReference(reference));
@@ -92,6 +103,10 @@ class Intent extends fidl.Intent {
 
   void _addParameter(String name, fidl.IntentParameterData parameterData) =>
       parameters.add(fidl.IntentParameter(name: name, data: parameterData));
+
+  void _addParameterFromLinkEntity(String name, LinkEntity entity) =>
+      _addParameter(
+          name, fidl.IntentParameterData.withLinkName(entity.linkName));
 
   Entity _entityFromIntentParameter({
     fidl.IntentParameter parameter,
