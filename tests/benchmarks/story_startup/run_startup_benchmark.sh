@@ -48,7 +48,7 @@ echo "== $BENCHMARK_LABEL: Tracing..."
 echo $TRACE_FILE
 
 trace record --categories=dart,flutter,ledger,modular,vfs --duration=10 \
-  --buffer-size=12 --output-file=$TRACE_FILE run $CMD
+  --buffer-size=12 --output-file=$TRACE_FILE $CMD
 
 echo "== $BENCHMARK_LABEL: Processing trace..."
 /pkgfs/packages/startup_benchmarks/0/bin/process_startup_trace  \
