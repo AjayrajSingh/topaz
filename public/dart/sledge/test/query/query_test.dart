@@ -13,6 +13,7 @@ Schema _newSchema() {
   final schemaDescription = <String, BaseType>{
     'a': new Integer(),
     'b': new LastOneWinsString(),
+    'c': new Integer(),
   };
   return new Schema(schemaDescription);
 }
@@ -29,47 +30,90 @@ void main() {
 
   test('Verify that creating invalid queries throws an error', () async {
     Schema schema = _newSchema();
-    final equalitiesWithNonExistantField = <String, FieldValue>{
-      'foo': new IntFieldValue(42)
+
+    // Test invalid comparisons
+    final comparisonWithNonExistantField = <String, QueryFieldComparison>{
+      'foo':
+          new QueryFieldComparison(new IntFieldValue(42), ComparisonType.equal)
     };
-    expect(() => new Query(schema, equalities: equalitiesWithNonExistantField),
+    expect(() => new Query(schema, comparisons: comparisonWithNonExistantField),
         throwsArgumentError);
-    final equalitiesWithWrongType = <String, FieldValue>{
-      'b': new IntFieldValue(42)
+    final comparisonWithWrongType = <String, QueryFieldComparison>{
+      'b': new QueryFieldComparison(new IntFieldValue(42), ComparisonType.equal)
     };
-    expect(() => new Query(schema, equalities: equalitiesWithWrongType),
+    expect(() => new Query(schema, comparisons: comparisonWithWrongType),
+        throwsArgumentError);
+
+    // Test too many inequalities
+    final comparisonWithMultipleInequalities = <String, QueryFieldComparison>{
+      'a': new QueryFieldComparison(
+          new IntFieldValue(42), ComparisonType.greater),
+      'c': new QueryFieldComparison(
+          new IntFieldValue(42), ComparisonType.greater)
+    };
+    expect(
+        () =>
+            new Query(schema, comparisons: comparisonWithMultipleInequalities),
         throwsArgumentError);
   });
 
   test('Verify `filtersDocuments`', () async {
     Schema schema = _newSchema();
-    final equalities = <String, FieldValue>{'a': new IntFieldValue(42)};
 
-    final query2 = new Query(schema);
-    expect(query2.filtersDocuments(), equals(false));
-    final query1 = new Query(schema, equalities: equalities);
-    expect(query1.filtersDocuments(), equals(true));
+    final query1 = new Query(schema);
+    expect(query1.filtersDocuments(), equals(false));
+
+    // Test with equalities
+    final equality = <String, QueryFieldComparison>{
+      'a': new QueryFieldComparison(new IntFieldValue(42), ComparisonType.equal)
+    };
+    final query2 = new Query(schema, comparisons: equality);
+    expect(query2.filtersDocuments(), equals(true));
+
+    // Test with inequality
+    final inequality = <String, QueryFieldComparison>{
+      'a': new QueryFieldComparison(
+          new IntFieldValue(42), ComparisonType.greater)
+    };
+    final query3 = new Query(schema, comparisons: inequality);
+    expect(query3.filtersDocuments(), equals(true));
   });
 
   test('Verify `documentMatchesQuery`', () async {
     Sledge sledge = newSledgeForTesting();
     Schema schema = _newSchema();
-    final equalities = <String, FieldValue>{'a': new IntFieldValue(42)};
-    final query1 = new Query(schema);
-    final query2 = new Query(schema, equalities: equalities);
+    final equality = <String, QueryFieldComparison>{
+      'a': new QueryFieldComparison(new IntFieldValue(42), ComparisonType.equal)
+    };
+    final inequality = <String, QueryFieldComparison>{
+      'a': new QueryFieldComparison(
+          new IntFieldValue(42), ComparisonType.greater)
+    };
+    final queryWithoutFilter = new Query(schema);
+    final queryWithEqualities = new Query(schema, comparisons: equality);
+    final queryWithInequality = new Query(schema, comparisons: inequality);
     await sledge.runInTransaction(() async {
       Document doc1 = await sledge.getDocument(new DocumentId(schema));
       doc1['a'].value = 1;
       Document doc2 = await sledge.getDocument(new DocumentId(schema));
       doc2['a'].value = 42;
-      Document doc3 = await sledge.getDocument(new DocumentId(_newSchema2()));
-      doc3['a'].value = 42;
-      expect(query1.documentMatchesQuery(doc1), equals(true));
-      expect(query1.documentMatchesQuery(doc2), equals(true));
-      expect(query2.documentMatchesQuery(doc1), equals(false));
-      expect(query2.documentMatchesQuery(doc2), equals(true));
-      expect(() => query1.documentMatchesQuery(doc3), throwsArgumentError);
-      expect(() => query2.documentMatchesQuery(doc3), throwsArgumentError);
+      Document doc3 = await sledge.getDocument(new DocumentId(schema));
+      doc3['a'].value = 43;
+      Document doc4 = await sledge.getDocument(new DocumentId(_newSchema2()));
+      doc4['a'].value = 42;
+      expect(queryWithoutFilter.documentMatchesQuery(doc1), equals(true));
+      expect(queryWithoutFilter.documentMatchesQuery(doc2), equals(true));
+      expect(queryWithEqualities.documentMatchesQuery(doc1), equals(false));
+      expect(queryWithEqualities.documentMatchesQuery(doc2), equals(true));
+      expect(queryWithInequality.documentMatchesQuery(doc1), equals(false));
+      expect(queryWithInequality.documentMatchesQuery(doc2), equals(false));
+      expect(queryWithInequality.documentMatchesQuery(doc3), equals(true));
+      expect(() => queryWithoutFilter.documentMatchesQuery(doc4),
+          throwsArgumentError);
+      expect(() => queryWithEqualities.documentMatchesQuery(doc4),
+          throwsArgumentError);
+      expect(() => queryWithInequality.documentMatchesQuery(doc4),
+          throwsArgumentError);
     });
   });
 }

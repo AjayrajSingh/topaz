@@ -9,35 +9,37 @@ import '../document/document.dart';
 import '../schema/schema.dart';
 import '../storage/kv_encoding.dart' as sledge_storage;
 import '../uint8list_ops.dart' as utils;
-import 'field_value.dart';
+import 'query_field_comparison.dart';
 
 /// Represents a query for retrieving documents from Sledge.
-/// TODO: Add support for inequality.
 class Query {
   final Schema _schema;
 
-  /// Stores the value each document's field needs to have in order to be
-  /// returned by the query.
-  SplayTreeMap<String, FieldValue> _equalities;
+  /// Stores a QueryFieldComparison each document's field needs respect in
+  /// order to be returned by the query.
+  SplayTreeMap<String, QueryFieldComparison> _comparisons;
 
   /// Default constructor.
-  /// `schema` describes the type of documents the query returns.
-  /// `equalities` associates field names with their expected values.
-  /// Throws an exception if `equalities` references a field not part of
-  /// `schema`.
-  Query(this._schema, {Map<String, FieldValue> equalities}) {
-    // TODO: throw an exception if `equalities` references fields not part of
-    // `schema`.
-    equalities ??= <String, FieldValue>{};
-    equalities.forEach((fieldPath, fieldValue) {
-      final expectedType = schema.fieldAtPath(fieldPath);
-      if (!fieldValue.comparableTo(expectedType)) {
-        String runtimeType = expectedType.runtimeType.toString();
-        throw new ArgumentError(
-            'Field `$fieldPath` of type `$runtimeType` is not comparable with `$fieldValue`.');
+  /// [schema] describes the type of documents the query returns.
+  /// [comparisons] associates field names with constraints documents returned
+  /// by the query respects.
+  /// Throws an exception if [comparisons] references a field  not part of
+  /// [schema], or if multiple inequalities are present.
+  Query(this._schema, {Map<String, QueryFieldComparison> comparisons}) {
+    comparisons ??= <String, QueryFieldComparison>{};
+    final fieldsWithInequalities = <String>[];
+    comparisons.forEach((fieldPath, comparison) {
+      if (comparison.comparisonType != ComparisonType.equal) {
+        fieldsWithInequalities.add(fieldPath);
       }
+      _checkComparisonWithField(fieldPath, comparison);
     });
-    _equalities = new SplayTreeMap<String, FieldValue>.from(equalities);
+    if (fieldsWithInequalities.length > 1) {
+      throw new ArgumentError(
+          'Queries can have at most one inequality. Inequalities founds: $fieldsWithInequalities.');
+    }
+    _comparisons =
+        new SplayTreeMap<String, QueryFieldComparison>.from(comparisons);
   }
 
   /// The Schema of documents returned by this query.
@@ -46,7 +48,7 @@ class Query {
   /// Returns whether this query filters the Documents based on the content of
   /// their fields.
   bool filtersDocuments() {
-    return _equalities.isNotEmpty;
+    return _comparisons.isNotEmpty;
   }
 
   /// The prefix of the key values encoding the index that helps compute the
@@ -54,16 +56,20 @@ class Query {
   /// Must only be called if `filtersDocuments()` returns true.
   Uint8List prefixInIndex() {
     assert(filtersDocuments());
-    List<Uint8List> hashes = <Uint8List>[];
-    _equalities.forEach((field, value) {
-      hashes.add(value.hash);
+    final equalityValueHashes = <Uint8List>[];
+    _comparisons.forEach((field, comparison) {
+      if (comparison.comparisonType == ComparisonType.equal) {
+        equalityValueHashes.add(utils.getUint8ListFromString(field));
+      }
     });
 
-    Uint8List equalityHash = utils.hash(utils.concatListOfUint8Lists(hashes));
+    Uint8List equalityHash =
+        utils.hash(utils.concatListOfUint8Lists(equalityValueHashes));
 
     // TODO: get the correct index hash.
     Uint8List indexHash = new Uint8List(20);
 
+    // TODO: take into account the inequality to compute the prefix.
     Uint8List prefix = utils.concatListOfUint8Lists([
       sledge_storage.prefixForType(sledge_storage.KeyValueType.indexEntry),
       indexHash,
@@ -81,11 +87,21 @@ class Query {
       throw new ArgumentError(
           'The Document `doc` is of a incorrect Schema type.');
     }
-    for (final fieldName in _equalities.keys) {
-      if (!_equalities[fieldName].equalsTo(doc[fieldName])) {
+    for (final fieldName in _comparisons.keys) {
+      if (!_comparisons[fieldName].valueMatchesComparison(doc[fieldName])) {
         return false;
       }
     }
     return true;
+  }
+
+  void _checkComparisonWithField(
+      String fieldPath, QueryFieldComparison comparison) {
+    final expectedType = _schema.fieldAtPath(fieldPath);
+    if (!comparison.comparisonValue.comparableTo(expectedType)) {
+      String runtimeType = expectedType.runtimeType.toString();
+      throw new ArgumentError(
+          'Field `$fieldPath` of type `$runtimeType` is not comparable with `$comparison.comparisonValue`.');
+    }
   }
 }

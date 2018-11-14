@@ -78,8 +78,11 @@ void main() async {
       Schema schema = _newSchema3();
       Sledge sledge = newSledgeForTesting();
       await sledge.runInTransaction(() async {
-        final equalities = <String, FieldValue>{'i1': new IntFieldValue(42)};
-        final query = new Query(schema, equalities: equalities);
+        final comparisons = <String, QueryFieldComparison>{
+          'i1': new QueryFieldComparison(
+              new IntFieldValue(42), ComparisonType.equal)
+        };
+        final query = new Query(schema, comparisons: comparisons);
         final docs = await sledge.getDocuments(query);
         expect(docs.length, equals(0));
       });
@@ -111,31 +114,82 @@ void main() async {
         doc5['i1'].value = 2;
         doc5['i2'].value = 20;
       });
-      // Run 3 queries and verify that the results are correct.
+      // Verify the resuts of queries with equalities.
       await sledge.runInTransaction(() async {
         {
-          final equalities = <String, FieldValue>{'i1': new IntFieldValue(1)};
-          final query = new Query(schema, equalities: equalities);
+          final comparisons = <String, QueryFieldComparison>{
+            'i1': new QueryFieldComparison(
+                new IntFieldValue(1), ComparisonType.equal)
+          };
+          final query = new Query(schema, comparisons: comparisons);
           final docs = await sledge.getDocuments(query);
           expect(docs.length, equals(2));
           expect(docs, containsAll([doc1, doc3]));
         }
         {
-          final equalities = <String, FieldValue>{'i2': new IntFieldValue(30)};
-          final query = new Query(schema, equalities: equalities);
+          final comparisons = <String, QueryFieldComparison>{
+            'i2': new QueryFieldComparison(
+                new IntFieldValue(30), ComparisonType.equal)
+          };
+          final query = new Query(schema, comparisons: comparisons);
           final docs = await sledge.getDocuments(query);
           expect(docs.length, equals(2));
           expect(docs, containsAll([doc3, doc4]));
         }
         {
-          final equalities = <String, FieldValue>{
-            'i1': new IntFieldValue(2),
-            'i2': new IntFieldValue(30)
+          final comparisons = <String, QueryFieldComparison>{
+            'i1': new QueryFieldComparison(
+                new IntFieldValue(2), ComparisonType.equal),
+            'i2': new QueryFieldComparison(
+                new IntFieldValue(30), ComparisonType.equal)
           };
-          final query = new Query(schema, equalities: equalities);
+          final query = new Query(schema, comparisons: comparisons);
           final docs = await sledge.getDocuments(query);
           expect(docs.length, equals(1));
           expect(docs, containsAll([doc4]));
+        }
+      });
+      // Verify the resuts of queries with inequalities.
+      await sledge.runInTransaction(() async {
+        final less = <String, QueryFieldComparison>{
+          'i2': new QueryFieldComparison(
+              new IntFieldValue(20), ComparisonType.less)
+        };
+        final lessOrEqual = <String, QueryFieldComparison>{
+          'i2': new QueryFieldComparison(
+              new IntFieldValue(20), ComparisonType.lessOrEqual)
+        };
+        final greaterOrEqual = <String, QueryFieldComparison>{
+          'i2': new QueryFieldComparison(
+              new IntFieldValue(20), ComparisonType.greaterOrEqual)
+        };
+        final greater = <String, QueryFieldComparison>{
+          'i2': new QueryFieldComparison(
+              new IntFieldValue(20), ComparisonType.greater)
+        };
+        {
+          final docs =
+              await sledge.getDocuments(new Query(schema, comparisons: less));
+          expect(docs.length, equals(1));
+          expect(docs, containsAll([doc1]));
+        }
+        {
+          final docs = await sledge
+              .getDocuments(new Query(schema, comparisons: lessOrEqual));
+          expect(docs.length, equals(3));
+          expect(docs, containsAll([doc1, doc2, doc5]));
+        }
+        {
+          final docs = await sledge
+              .getDocuments(new Query(schema, comparisons: greaterOrEqual));
+          expect(docs.length, equals(4));
+          expect(docs, containsAll([doc2, doc3, doc4, doc5]));
+        }
+        {
+          final docs = await sledge
+              .getDocuments(new Query(schema, comparisons: greater));
+          expect(docs.length, equals(2));
+          expect(docs, containsAll([doc3, doc4]));
         }
       });
     });

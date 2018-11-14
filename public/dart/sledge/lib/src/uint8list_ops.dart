@@ -10,6 +10,8 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart';
 
+import 'document/values/converter.dart';
+
 // TODO: consider short function names and importing with prefix.
 
 /// Concatenate two byte arrays.
@@ -45,6 +47,12 @@ Uint8List getSublistView(Uint8List x, {int start = 0, int end}) {
 /// [string] must be non-null.
 Uint8List getUint8ListFromString(String string) {
   return new Uint8List.fromList(utf8.encode(string));
+}
+
+/// Returns a Uint8List created from the binary encoding of [number].
+Uint8List getUint8ListFromNumber(num number) {
+  IntConverter converter = new IntConverter();
+  return converter.serialize(number);
 }
 
 /// Returns a new HashMap with Uint8Lists as a keys.

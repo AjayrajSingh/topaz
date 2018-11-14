@@ -13,17 +13,12 @@ import '../schema/types/pos_neg_counter_type.dart';
 import '../schema/types/trivial_types.dart';
 
 /// Stores the value of a field in queries.
-abstract class FieldValue {
+abstract class FieldValue implements Comparable<Value> {
   /// The hash of the field's value.
   Uint8List get hash;
 
   /// Returns whether this can be compared to [type].
   bool comparableTo(BaseType type);
-
-  /// Returns whether this is equal to [value].
-  /// If `value` is not instantiated from a BaseType comparable to this,
-  /// an exception is thrown.
-  bool equalsTo(Value value);
 }
 
 /// Template to ease the implementation of FieldValue specializations.
@@ -51,14 +46,12 @@ class IntFieldValue extends _TemplatedFieldValue<int> {
   }
 
   @override
-  bool equalsTo(Value documentValue) {
+  int compareTo(Value documentValue) {
     if (documentValue is PosNegCounterValue<int>) {
-      PosNegCounterValue<int> downcastedValue = documentValue;
-      return _value == downcastedValue.value;
+      return _value.compareTo(documentValue.value);
     }
     if (documentValue is LastOneWinsValue<int>) {
-      LastOneWinsValue<int> downcastedValue = documentValue;
-      return _value == downcastedValue.value;
+      return _value.compareTo(documentValue.value);
     }
     throw new ArgumentError('`documentValue` is not comparable to a integer.');
   }
