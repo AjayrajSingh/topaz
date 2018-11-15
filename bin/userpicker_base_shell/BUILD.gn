@@ -8,7 +8,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 metrics_registry("sysui_metrics_config") {
   project_id = 103
-  use_target_name = true
 }
 
 flutter_app("userpicker_base_shell") {

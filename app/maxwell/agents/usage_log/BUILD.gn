@@ -7,7 +7,6 @@ import("//topaz/runtime/dart_runner/dart_app.gni")
 
 metrics_registry("module_usage_tracking_metrics_registry") {
   project_id = 101
-  use_target_name = true
 }
 
 dart_app("usage_log") {
