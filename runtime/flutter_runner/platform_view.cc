@@ -383,10 +383,46 @@ void PlatformView::OnScenicEvent(
 #endif
             break;
           }
-          default: {
+          case fuchsia::ui::gfx::Event::Tag::kImportUnbound:
             FML_LOG(WARNING)
-                << "Flutter PlatformView::OnScenicEvent: Unhandled GFX event.";
-          }
+                << "Flutter PlatformView::OnScenicEvent: Unhandled GFX event "
+                   "(fuchsia.ui.gfx.ImportUnboundEvent).";
+            break;
+          case fuchsia::ui::gfx::Event::Tag::kViewConnected:
+            FML_LOG(WARNING)
+                << "Flutter PlatformView::OnScenicEvent: Unhandled GFX event "
+                   "(fuchsia.ui.gfx.ViewConnectedEvent).";
+            break;
+          case fuchsia::ui::gfx::Event::Tag::kViewDisconnected:
+            FML_LOG(WARNING)
+                << "Flutter PlatformView::OnScenicEvent: Unhandled GFX event "
+                   "(fuchsia.ui.gfx.ViewDisconnectedEvent).";
+            break;
+          case fuchsia::ui::gfx::Event::Tag::kViewHolderDisconnected:
+            FML_LOG(WARNING)
+                << "Flutter PlatformView::OnScenicEvent: Unhandled GFX event "
+                   "(fuchsia.ui.gfx.ViewHolderDisconnectedEvent).";
+            break;
+          case fuchsia::ui::gfx::Event::Tag::kViewAttachedToScene:
+            FML_LOG(WARNING)
+                << "Flutter PlatformView::OnScenicEvent: Unhandled GFX event "
+                   "(fuchsia.ui.gfx.ViewAttachedToScene).";
+            break;
+          case fuchsia::ui::gfx::Event::Tag::kViewDetachedFromScene:
+            FML_LOG(WARNING)
+                << "Flutter PlatformView::OnScenicEvent: Unhandled GFX event "
+                   "(fuchsia.ui.gfx.ViewDetachedFromScene).";
+            break;
+          case fuchsia::ui::gfx::Event::Tag::kViewStateChanged:
+            FML_LOG(WARNING)
+                << "Flutter PlatformView::OnScenicEvent: Unhandled GFX event "
+                   "(fuchsia.ui.gfx.ViewStateChanged).";
+            break;
+          case fuchsia::ui::gfx::Event::Tag::Invalid:
+            FXL_DCHECK(false)
+                << "Flutter PlatformView::OnScenicEvent: Got an invalid GFX "
+                   "event.";
+            break;
         }
         break;
       case fuchsia::ui::scenic::Event::Tag::kInput:
