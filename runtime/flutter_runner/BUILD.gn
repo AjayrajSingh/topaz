@@ -5,8 +5,8 @@
 assert(is_fuchsia)
 
 import("//build/vulkan/config.gni")
-import("$flutter_root/shell/gpu/gpu.gni")
 import("//garnet/bin/ui/scenic/config.gni")
+import("$flutter_root/shell/gpu/gpu.gni")
 
 shell_gpu_configuration("fuchsia_gpu_configuration") {
   enable_software = false
@@ -117,7 +117,9 @@ template("flutter_runner") {
     deps = [
              "//garnet/public/fidl/fuchsia.accessibility",
              "//garnet/public/fidl/fuchsia.fonts",
+             "//garnet/public/fidl/fuchsia.ui.app",
              "//garnet/public/fidl/fuchsia.ui.input",
+             "//garnet/public/fidl/fuchsia.ui.viewsv1",
              "//garnet/public/lib/component/cpp",
              "//garnet/public/lib/fsl",
              "//garnet/public/lib/fxl",
@@ -141,9 +143,6 @@ template("flutter_runner") {
 
     if (scenic_use_views2) {
       defines += [ "SCENIC_VIEWS2" ]
-      deps += [ "//garnet/public/fidl/fuchsia.ui.app" ]
-    } else {
-      deps += [ "//garnet/public/fidl/fuchsia.ui.viewsv1" ]
     }
 
     # The flags below are needed so that Dart's CPU profiler can walk the
@@ -224,22 +223,28 @@ template("aot_runner") {
 
     binary = "flutter_aot${product_suffix}_runner"
 
-    resources = [ {
-          path = rebase_path("//third_party/icu/common/icudtl.dat")
-          dest = "icudtl.dat"
-        } ]
+    resources = [
+      {
+        path = rebase_path("//third_party/icu/common/icudtl.dat")
+        dest = "icudtl.dat"
+      },
+    ]
 
     if (!product) {
-      resources += [ {
-            path = rebase_path(observatory_archive_file)
-            dest = "observatory.tar"
-          } ]
+      resources += [
+        {
+          path = rebase_path(observatory_archive_file)
+          dest = "observatory.tar"
+        },
+      ]
     }
 
-    meta = [ {
-          path = rebase_path("meta/flutter_aot${product_suffix}_runner.cmx")
-          dest = "flutter_aot${product_suffix}_runner.cmx"
-        } ]
+    meta = [
+      {
+        path = rebase_path("meta/flutter_aot${product_suffix}_runner.cmx")
+        dest = "flutter_aot${product_suffix}_runner.cmx"
+      },
+    ]
   }
 }
 
@@ -251,8 +256,7 @@ template("jit_runner") {
   }
 
   package(target_name) {
-    snapshot_label =
-        "//topaz/runtime/flutter_runner/kernel:kernel_core_snapshot${product_suffix}"
+    snapshot_label = "//topaz/runtime/flutter_runner/kernel:kernel_core_snapshot${product_suffix}"
     snapshot_gen_dir = get_label_info(snapshot_label, "target_gen_dir")
 
     deps = [
@@ -268,16 +272,18 @@ template("jit_runner") {
 
     resources = [
       {
-        path = rebase_path("$snapshot_gen_dir/vm_isolate_snapshot${product_suffix}.bin")
+        path = rebase_path(
+                "$snapshot_gen_dir/vm_isolate_snapshot${product_suffix}.bin")
         dest = "vm_snapshot_data.bin"
       },
       {
-        path =
-            rebase_path("$snapshot_gen_dir/vm_snapshot_instructions${product_suffix}.bin")
+        path = rebase_path(
+                "$snapshot_gen_dir/vm_snapshot_instructions${product_suffix}.bin")
         dest = "vm_snapshot_instructions.bin"
       },
       {
-        path = rebase_path("$snapshot_gen_dir/isolate_snapshot${product_suffix}.bin")
+        path = rebase_path(
+                "$snapshot_gen_dir/isolate_snapshot${product_suffix}.bin")
         dest = "isolate_core_snapshot_data.bin"
       },
       {
@@ -292,16 +298,20 @@ template("jit_runner") {
     ]
 
     if (!product) {
-      resources += [ {
-            path = rebase_path(observatory_archive_file)
-            dest = "observatory.tar"
-          } ]
+      resources += [
+        {
+          path = rebase_path(observatory_archive_file)
+          dest = "observatory.tar"
+        },
+      ]
     }
 
-    meta = [ {
-          path = rebase_path("meta/flutter_jit${product_suffix}_runner.cmx")
-          dest = "flutter_jit${product_suffix}_runner.cmx"
-        } ]
+    meta = [
+      {
+        path = rebase_path("meta/flutter_jit${product_suffix}_runner.cmx")
+        dest = "flutter_jit${product_suffix}_runner.cmx"
+      },
+    ]
   }
 }
 
@@ -325,9 +335,9 @@ executable("flutter_runner_unittests") {
   testonly = true
 
   sources = [
-    "fuchsia_font_manager_unittest.cc",
     "fuchsia_font_manager.cc",
     "fuchsia_font_manager.h",
+    "fuchsia_font_manager_unittest.cc",
   ]
 
   deps = [
@@ -340,9 +350,7 @@ executable("flutter_runner_unittests") {
     "//third_party/skia",
   ]
 
-  configs += [
-    "//third_party/skia:skia_private",
-  ]
+  configs += [ "//third_party/skia:skia_private" ]
 }
 
 package("flutter_runner_tests") {

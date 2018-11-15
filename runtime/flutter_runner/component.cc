@@ -55,8 +55,8 @@ static std::string DebugLabelForURL(const std::string& url) {
 
 static bool ShouldEnableInterpreter(int appdir_fd) {
   struct stat stat_buffer = {};
-  return
-      fstatat(appdir_fd, "pkg/data/enable_interpreter", &stat_buffer, 0) == 0;
+  return fstatat(appdir_fd, "pkg/data/enable_interpreter", &stat_buffer, 0) ==
+         0;
 }
 
 Application::Application(
@@ -131,12 +131,17 @@ Application::Application(
   // final settings configuration. The next call will be to create a view
   // for this application.
 
-#ifndef SCENIC_VIEWS2
   service_provider_bridge_.AddService<fuchsia::ui::viewsv1::ViewProvider>(
-#else
+      [this](fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider>
+                 view_provider_request) {
+        v1_shells_bindings_.AddBinding(this, std::move(view_provider_request));
+      });
+
   service_provider_bridge_.AddService<fuchsia::ui::app::ViewProvider>(
-#endif
-      std::bind(&Application::CreateShellForView, this, std::placeholders::_1));
+      [this](fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider>
+                 view_provider_request) {
+        shells_bindings_.AddBinding(this, std::move(view_provider_request));
+      });
 
   fuchsia::sys::ServiceProviderPtr outgoing_services;
   outgoing_services_request_ = outgoing_services.NewRequest();
@@ -190,10 +195,11 @@ Application::Application(
 
   // TODO(FL-117): Re-enable causal async stack traces when this issue is
   // addressed.
-  settings_.dart_flags = { "--no_causal_async_stacks" };
+  settings_.dart_flags = {"--no_causal_async_stacks"};
 
   if (ShouldEnableInterpreter(application_directory_.get())) {
-    FML_DLOG(INFO) << "Found pkg/data/enable_interpreter. Passing --enable_interpreter";
+    FML_DLOG(INFO)
+        << "Found pkg/data/enable_interpreter. Passing --enable_interpreter";
     settings_.dart_flags.push_back("--enable_interpreter");
   } else {
     FML_DLOG(INFO) << "Did NOT find pkg/data/enable_interpreter.";
@@ -351,28 +357,19 @@ void Application::OnEngineTerminate(const Engine* shell_holder) {
   }
 }
 
-void Application::CreateShellForView(
-#ifndef SCENIC_VIEWS2
-    fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider>
-#else
-    fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider>
-#endif
-        view_provider_request) {
-  shells_bindings_.AddBinding(this, std::move(view_provider_request));
-}
-
-#ifndef SCENIC_VIEWS2
 // |fuchsia::ui::viewsv1::ViewProvider|
 void Application::CreateView(
     fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
-    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>) {
-#else
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> services) {
+  CreateView(zx::eventpair(view_owner.TakeChannel().release()),
+             std::move(services), nullptr);
+}
+
 // |fuchsia::ui::app::ViewProvider|
 void Application::CreateView(
     zx::eventpair view_token,
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> incoming_services,
     fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> outgoing_services) {
-#endif
   if (!startup_context_) {
     FML_DLOG(ERROR) << "Application context was invalid when attempting to "
                        "create a shell for a view provider request.";
@@ -380,17 +377,13 @@ void Application::CreateView(
   }
 
   shell_holders_.emplace(std::make_unique<Engine>(
-      *this,                         // delegate
-      debug_label_,                  // thread label
-      *startup_context_,             // application context
-      settings_,                     // settings
-      std::move(isolate_snapshot_),  // isolate snapshot
-      std::move(shared_snapshot_),   // shared snapshot
-#ifndef SCENIC_VIEWS2
-      std::move(view_owner),  // view owner
-#else
-      std::move(view_token),  // view token
-#endif
+      *this,                                 // delegate
+      debug_label_,                          // thread label
+      *startup_context_,                     // application context
+      settings_,                             // settings
+      std::move(isolate_snapshot_),          // isolate snapshot
+      std::move(shared_snapshot_),           // shared snapshot
+      std::move(view_token),                 // view token
       std::move(fdio_ns_),                   // FDIO namespace
       std::move(outgoing_services_request_)  // outgoing request
       ));

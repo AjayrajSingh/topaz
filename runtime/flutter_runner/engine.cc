@@ -36,19 +36,14 @@ static void UpdateNativeThreadLabelNames(const std::string& label,
   set_thread_name(runners.GetIOTaskRunner(), label, ".io");
 }
 
-Engine::Engine(
-    Delegate& delegate, std::string thread_label,
-    component::StartupContext& startup_context, blink::Settings settings,
-    fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
-    fml::RefPtr<blink::DartSnapshot> shared_snapshot,
-#ifndef SCENIC_VIEWS2
-    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
-#else
-    zx::eventpair view_token,
-#endif
-    UniqueFDIONS fdio_ns,
-    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-        outgoing_services_request)
+Engine::Engine(Delegate& delegate, std::string thread_label,
+               component::StartupContext& startup_context,
+               blink::Settings settings,
+               fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
+               fml::RefPtr<blink::DartSnapshot> shared_snapshot,
+               zx::eventpair view_token, UniqueFDIONS fdio_ns,
+               fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
+                   outgoing_services_request)
     : delegate_(delegate),
       thread_label_(std::move(thread_label)),
       settings_(std::move(settings)),
@@ -122,7 +117,7 @@ Engine::Engine(
   shell::Shell::CreateCallback<shell::PlatformView> on_create_platform_view =
       fml::MakeCopyable([debug_label = thread_label_,
                          parent_environment_service_provider =
-                             std::move(parent_environment_service_provider),  //
+                             std::move(parent_environment_service_provider),
                          session_listener_request =
                              std::move(session_listener_request),
                          on_session_listener_error_callback =
@@ -132,14 +127,14 @@ Engine::Engine(
                          on_session_size_change_hint_callback =
                              std::move(on_session_size_change_hint_callback),
 #ifndef SCENIC_VIEWS2
-                         view_manager = view_manager.Unbind(),    //
-                         view_owner = std::move(view_owner),      //
-                         export_token = std::move(export_token),  //
+                         view_manager = view_manager.Unbind(),
+                         view_token = std::move(view_token),
+                         export_token = std::move(export_token),
 #endif
                          accessibility_context_writer =
-                             std::move(accessibility_context_writer),  //
-                         vsync_handle = vsync_event_.get()             //
-  ](shell::Shell& shell) mutable {
+                             std::move(accessibility_context_writer),
+                         vsync_handle =
+                             vsync_event_.get()](shell::Shell& shell) mutable {
         return std::make_unique<flutter::PlatformView>(
             shell,                                           // delegate
             debug_label,                                     // debug label
@@ -151,7 +146,7 @@ Engine::Engine(
             std::move(on_session_size_change_hint_callback),
 #ifndef SCENIC_VIEWS2
             std::move(view_manager),  // view manager
-            std::move(view_owner),    // view owner
+            std::move(view_token),    // view token
             std::move(export_token),  // export token
 #endif
             std::move(
@@ -182,7 +177,8 @@ Engine::Engine(
       std::make_unique<flutter::CompositorContext>(
           thread_label_,  // debug label
 #ifndef SCENIC_VIEWS2
-          std::move(import_token),  // import token
+          std::move(import_token),  // import token (scenic node we attach our
+                                    // tree to)
 #else
           std::move(view_token),  // scenic view we attach our tree to
 #endif

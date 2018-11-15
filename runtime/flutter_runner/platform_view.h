@@ -13,9 +13,9 @@
 #include <fuchsia/ui/input/cpp/fidl.h>
 #ifndef SCENIC_VIEWS2
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
-#include <fuchsia/ui/viewsv1token/cpp/fidl.h>
 #endif
 #include <lib/fit/function.h>
+#include <zx/eventpair.h>
 
 #include "context_writer_bridge.h"
 #include "flutter/fml/macros.h"
@@ -53,8 +53,7 @@ class PlatformView final : public shell::PlatformView,
       OnSizeChangeHint session_size_change_hint_callback,
 #ifndef SCENIC_VIEWS2
       fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewManager> view_manager,
-      fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
-      zx::eventpair export_token,
+      zx::eventpair view_token, zx::eventpair export_token,
 #endif
       fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
           accessibility_context_writer,

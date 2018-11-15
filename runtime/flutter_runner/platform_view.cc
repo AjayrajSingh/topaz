@@ -51,8 +51,7 @@ PlatformView::PlatformView(
 #ifndef SCENIC_VIEWS2
     fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewManager>
         view_manager_handle,
-    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
-    zx::eventpair export_token,
+    zx::eventpair view_token, zx::eventpair export_token,
 #endif
     fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
         accessibility_context_writer,
@@ -91,11 +90,11 @@ PlatformView::PlatformView(
 
 #ifndef SCENIC_VIEWS2
   // Create the view.
-  view_manager_->CreateView(view_.NewRequest(),           // view
-                            std::move(view_owner),        // view owner
-                            view_listener_.NewBinding(),  // view listener
-                            std::move(export_token),      // export token
-                            debug_label_                  // diagnostic label
+  view_manager_->CreateView2(view_.NewRequest(),           // view
+                             std::move(view_token),        // view token
+                             view_listener_.NewBinding(),  // view listener
+                             std::move(export_token),      // export token
+                             debug_label_                  // diagnostic label
   );
 
   // Get the services from the created view.

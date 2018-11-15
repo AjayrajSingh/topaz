@@ -5,11 +5,9 @@
 #ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_
 #define TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_
 
-#ifndef SCENIC_VIEWS2
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
-#include <fuchsia/ui/viewsv1token/cpp/fidl.h>
-#endif
 #include <zx/event.h>
+#include <zx/eventpair.h>
 
 #include "flutter/fml/macros.h"
 #include "flutter/shell/common/shell.h"
@@ -30,19 +28,13 @@ class Engine final : public mozart::NativesDelegate {
     virtual void OnEngineTerminate(const Engine* holder) = 0;
   };
 
-  Engine(
-      Delegate& delegate, std::string thread_label,
-      component::StartupContext& startup_context, blink::Settings settings,
-      fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
-      fml::RefPtr<blink::DartSnapshot> shared_snapshot,
-#ifndef SCENIC_VIEWS2
-      fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
-#else
-      zx::eventpair view_token,
-#endif
-      UniqueFDIONS fdio_ns,
-      fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-          outgoing_services_request);
+  Engine(Delegate& delegate, std::string thread_label,
+         component::StartupContext& startup_context, blink::Settings settings,
+         fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
+         fml::RefPtr<blink::DartSnapshot> shared_snapshot,
+         zx::eventpair view_token, UniqueFDIONS fdio_ns,
+         fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
+             outgoing_services_request);
   ~Engine();
 
   // Returns the Dart return code for the root isolate if one is present. This
