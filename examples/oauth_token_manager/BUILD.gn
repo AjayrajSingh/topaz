@@ -36,8 +36,6 @@ executable("bin") {
 }
 
 package("oauth_token_manager") {
-  deprecated_system_image = true
-
   deps = [
     ":bin",
   ]
@@ -45,6 +43,13 @@ package("oauth_token_manager") {
   binaries = [
     {
       name = "oauth_token_manager"
+    },
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/oauth_token_manager.cmx")
+      dest = "oauth_token_manager.cmx"
     },
   ]
 }
