@@ -78,7 +78,7 @@ class BluetoothSettingsModel extends Model implements PairingDelegate {
         _removeDeviceFromList(device.identifier);
         _remoteDevices
           ..add(device)
-          ..sort((a, b) => b.rssi?.value ?? 0.compareTo(a.rssi?.value ?? 0));
+          ..sort((a, b) => (b.rssi?.value ?? 0).compareTo(a.rssi?.value ?? 0));
         notifyListeners();
       }
       ..onDeviceRemoved = (deviceId) {
