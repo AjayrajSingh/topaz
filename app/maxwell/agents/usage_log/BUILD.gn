@@ -2,10 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//third_party/cobalt_config/cobalt_config.gni")
+import("//third_party/cobalt_config/metrics_registry.gni")
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
-cobalt_config("module_usage_tracking_metrics_registry") {
+metrics_registry("module_usage_tracking_metrics_registry") {
   project_id = 101
   use_target_name = true
 }
