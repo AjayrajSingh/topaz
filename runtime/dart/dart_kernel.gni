@@ -105,7 +105,7 @@ template("dart_kernel") {
     rebased_packages_path =
         rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
 
-    single_root = "fuchsia-source"
+    multi_root_scheme = "fuchsia-source"
 
     script = _compiler_path
     args = invoker.args + [
@@ -113,9 +113,9 @@ template("dart_kernel") {
              invoker.platform_name,
              "--sdk-root",
              rebase_path(invoker.platform_path),
-             "--single-root-scheme",
-             single_root,
-             "--single-root-base",
+             "--multi-root-scheme",
+             multi_root_scheme,
+             "--multi-root",
              rebase_path("//"),
              "--packages",
              rebased_packages_path,
@@ -140,6 +140,6 @@ template("dart_kernel") {
     }
 
     rebased_main_dart = rebase_path(invoker.main_dart, "//")
-    args += [ "$single_root:///$rebased_main_dart" ]
+    args += [ "$multi_root_scheme:///$rebased_main_dart" ]
   }
 }

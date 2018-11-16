@@ -7,3 +7,4 @@ analyzer:
   errors:
     implementation_imports: ignore
     cascade_invocations: ignore
+    prefer_conditional_assignment: ignore

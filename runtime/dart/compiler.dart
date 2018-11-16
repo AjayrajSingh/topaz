@@ -11,8 +11,8 @@ import 'package:front_end/src/api_unstable/vm.dart';
 import 'package:front_end/src/scheme_based_file_system.dart'
     show SchemeBasedFileSystem;
 
-import 'package:build_integration/file_system/single_root.dart'
-    show SingleRootFileSystem, SingleRootFileSystemEntity;
+import 'package:build_integration/file_system/multi_root.dart'
+    show MultiRootFileSystem, MultiRootFileSystemEntity;
 
 import 'package:kernel/ast.dart';
 import 'package:kernel/binary/ast_to_binary.dart';
@@ -26,8 +26,11 @@ import 'package:vm/target/flutter_runner.dart' show FlutterRunnerTarget;
 
 ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addOption('sdk-root', help: 'Path to runner_patched_sdk')
-  ..addOption('single-root-scheme', help: 'The URI scheme for the single root')
-  ..addOption('single-root-base', help: 'The base for the single root')
+  ..addOption('single-root-scheme', help: 'Deprecated')
+  ..addOption('single-root-base', help: 'Deprecated')
+  ..addOption('multi-root-scheme', help: 'The URI scheme for the multi root')
+  ..addMultiOption('multi-root',
+      help: 'A base for the multi root. Can be given multiple times to build an overlay')
   ..addFlag('aot',
       help: 'Run compiler in AOT mode (enables whole-program transformations)',
       defaultsTo: false)
@@ -61,6 +64,15 @@ Uri _ensureFolderPath(String path) {
   return Uri.base.resolve(uriPath);
 }
 
+Future<Uri> _asFileUri(FileSystem fileSystem, Uri uri) async {
+  FileSystemEntity fse = fileSystem.entityForUri(uri);
+  if (fse is MultiRootFileSystemEntity) {
+    MultiRootFileSystemEntity mrfse = fse;
+    fse = await mrfse.delegate;
+  }
+  return fse.uri;
+}
+
 Future<void> main(List<String> args) async {
   ArgResults options;
   try {
@@ -76,8 +88,6 @@ Future<void> main(List<String> args) async {
   }
 
   final Uri sdkRoot = _ensureFolderPath(options['sdk-root']);
-  final String singleRootScheme = options['single-root-scheme'];
-  final Uri singleRootBase = new Uri.file(options['single-root-base']);
   final Uri packagesUri = Uri.base.resolve(options['packages']);
   final bool aot = options['aot'];
   final bool tfa = options['tfa'];
@@ -108,28 +118,29 @@ Future<void> main(List<String> args) async {
   }
 
   FileSystem fileSystem = StandardFileSystem.instance;
-  if (singleRootScheme != null) {
-    SingleRootFileSystem singleRootFS =
-        new SingleRootFileSystem(singleRootScheme, singleRootBase, fileSystem);
+  String multiRootScheme = options['multi-root-scheme'];
+  if (multiRootScheme == null) {
+    multiRootScheme = options['single-root-scheme'];
+  }
+  if (multiRootScheme != null) {
+    final rootUris = <Uri>[];
+    for (String root in options['multi-root']) {
+      rootUris.add(Uri.base.resolveUri(new Uri.file(root)));
+    }
+    if (options['single-root-base'] != null) {
+      rootUris.add(Uri.base.resolveUri(new Uri.file(options['single-root-base'])));
+    }
+    final multiRootFS = new MultiRootFileSystem(multiRootScheme, rootUris, fileSystem);
     fileSystem = new SchemeBasedFileSystem({
       'file': fileSystem,
       'data': fileSystem,
       '': fileSystem,
-      singleRootScheme: singleRootFS,
+      multiRootScheme: multiRootFS,
     });
   }
 
   // fuchsia-source:///x/y/main.dart -> file:///a/b/x/y/main.dart
-  String mainUriString;
-  if (mainUri.scheme == singleRootScheme) {
-    String mainPath = mainUri.path;
-    if (mainPath.startsWith('/')) {
-      mainPath = mainPath.substring(1);
-    }
-    mainUriString = singleRootBase.resolve(mainPath).toString();
-  } else {
-    mainUriString = mainUri.toString();
-  }
+  String mainUriString = (await _asFileUri(fileSystem, mainUri)).toString();
   // file:///a/b/x/y/main.dart -> package:x.y/main.dart
   for (var line in await new File(packagesUri.toFilePath()).readAsLines()) {
     var colon = line.indexOf(':');
@@ -225,12 +236,7 @@ Future<void> writeDepfile(FileSystem fileSystem,
   file.write(escapePath(output));
   file.write(':');
   for (Uri dep in getDependencies(component)) {
-    FileSystemEntity fse = fileSystem.entityForUri(dep);
-    if (fse is SingleRootFileSystemEntity) {
-      SingleRootFileSystemEntity srfse = fse;
-      fse = srfse.delegate;
-    }
-    Uri uri = fse.uri;
+    Uri uri = await _asFileUri(fileSystem, dep);
     file.write(' ');
     file.write(escapePath(uri.toFilePath()));
   }
