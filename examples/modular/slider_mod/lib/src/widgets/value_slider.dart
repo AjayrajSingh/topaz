@@ -11,10 +11,11 @@ import '../blocs/fibonacci_bloc.dart';
 import '../blocs/slider_bloc.dart';
 
 class ValueSlider extends StatelessWidget {
+  final _fibBloc = FibonacciBloc();
+
   @override
   Widget build(BuildContext context) {
     final sliderBloc = BlocProvider.of<SliderBloc>(context);
-    final fibBloc = FibonacciBloc();
 
     return Column(
       children: <Widget>[
@@ -41,18 +42,12 @@ class ValueSlider extends StatelessWidget {
         RaisedButton(
           child: Text('Calc Fibonacci'),
           onPressed: () {
-            // connect to fib agent
-            final _proxy = fidl_fib.FibonacciServiceProxy();
-            connectToAgentService('fibonacci_agent', _proxy);
-            // calculate fib number
-            _proxy
-                .calcFibonacci(sliderBloc.currentValue.toInt())
-                .then(fibBloc.updateValue);
+            _onCalcFibBtnPressed(sliderBloc);
           },
         ),
         Container(
           alignment: Alignment.center,
-          child: _buildFibResultWidget(fibBloc),
+          child: _buildFibResultWidget(_fibBloc),
         ),
       ],
     );
@@ -75,5 +70,21 @@ class ValueSlider extends StatelessWidget {
             );
           }
         });
+  }
+
+  void _onCalcFibBtnPressed(SliderBloc sliderBloc) {
+    // recreating the proxy for every button press just to illustrate
+    final _proxy = fidl_fib.FibonacciServiceProxy();
+    connectToAgentService('fibonacci_agent', _proxy);
+
+    _proxy
+        .calcFibonacci(sliderBloc.currentValue.toInt())
+        .then(_fibBloc.updateValue)
+        .catchError(
+      (e, s) {
+        print('Something went wrong: $e $s');
+        throw e;
+      },
+    );
   }
 }

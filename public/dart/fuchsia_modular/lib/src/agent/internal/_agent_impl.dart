@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file
 
+import 'dart:async';
+
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia_services/services.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
@@ -14,12 +16,12 @@ import '../agent.dart';
 ///
 /// This class is not intended to be used directly by authors but instead
 /// should be used by the [Agent] factory constructor.
-class AgentImpl<T> implements Agent<T>, fidl.Agent {
+class AgentImpl implements Agent, fidl.Agent {
   /// Holds the framework binding connection to this agent.
   final fidl.AgentBinding _agentBinding = fidl.AgentBinding();
 
   /// The service provider which can be used to expose outgoing services
-  final ServiceProviderImpl _serviceProvider = ServiceProviderImpl();
+  final ServiceProviderImpl _serviceProvider;
 
   /// Holds the connection of other components to this agent's service provider
   final List<fidl_sys.ServiceProviderBinding> _serviceProviderBindings =
@@ -31,7 +33,11 @@ class AgentImpl<T> implements Agent<T>, fidl.Agent {
       <AsyncBinding<Object>>[];
 
   /// The default constructor for this instance.
-  AgentImpl({Lifecycle lifecycle, StartupContext startupContext}) {
+  AgentImpl(
+      {Lifecycle lifecycle,
+      StartupContext startupContext,
+      ServiceProviderImpl serviceProviderImpl})
+      : _serviceProvider = serviceProviderImpl ?? ServiceProviderImpl() {
     (lifecycle ??= Lifecycle()).addTerminateListener(_terminate);
     startupContext ??= StartupContext.fromStartupInfo();
 
@@ -53,20 +59,34 @@ class AgentImpl<T> implements Agent<T>, fidl.Agent {
   }
 
   @override
-  void exposeService<T>(T serviceImpl, ServiceData<T> serviceData) {
+  void exposeService<T>(FutureOr<T> serviceImpl, ServiceData<T> serviceData) {
     if (serviceImpl == null) {
       throw ArgumentError.notNull('serviceImpl');
+    }
+
+    exposeServiceProvider(
+        Future.value(serviceImpl).then((T service) => () => service),
+        serviceData);
+  }
+
+  @override
+  void exposeServiceProvider<T>(FutureOr<ServiceProvider<T>> serviceProvider,
+      ServiceData<T> serviceData) {
+    if (serviceProvider == null) {
+      throw ArgumentError.notNull('serviceProvider');
     }
     if (serviceData == null) {
       throw ArgumentError.notNull('serviceData');
     }
 
     // Add this [serviceImpl] to this agent's serviceProvider so that it can
-    // be accessed the connected clients of this agent.
+    // be accessed the `connected clients of this agent.
     _serviceProvider.addServiceForName(
       (InterfaceRequest<T> request) {
-        _outgoingServicesBindings
-            .add(serviceData.getBinding()..bind(serviceImpl, request));
+        Future.value(serviceProvider)
+            .then((ServiceProvider<T> providerFunc) => providerFunc())
+            .then((T service) => _outgoingServicesBindings
+                .add(serviceData.getBinding()..bind(service, request)));
       },
       serviceData.getName(),
     );
