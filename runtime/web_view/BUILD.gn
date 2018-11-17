@@ -3,205 +3,226 @@
 # found in the LICENSE file.
 
 import("//build/package.gni")
+import("//topaz/runtime/chromium/chromium.gni")
 import("//topaz/runtime/web_view/config.gni")
 
-executable("web_view_bin") {
-  output_name = "web_view"
-
-  sources = [
-    "main.cpp",
-    "web_view_impl.cpp",
-    "web_view_impl.h",
-    "web_view_provider.cpp",
-    "web_view_provider.h",
-  ]
-
-  deps = [
-    ":webkit",
-    "//garnet/public/fidl/fuchsia.math",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1",
-    "//garnet/public/lib/component/cpp",
-    "//garnet/public/lib/fxl",
-    "//garnet/public/lib/icu_data/cpp",
-    "//garnet/public/lib/ui/view_framework:view_provider",
-    "//garnet/public/lib/url",
-    "//peridot/lib/rapidjson",
-    "//peridot/public/fidl/fuchsia.modular",
-    "//third_party/boringssl",
-    "//third_party/rapidjson",
-    "//topaz/runtime/web_runner/services",
-    "//zircon/public/lib/async-loop-cpp",
-    "//zircon/public/lib/hid",
-  ]
-
-  if (experimental_web_entity_extraction) {
-    sources += [
-      "schema_org_context.cpp",
-      "schema_org_context.h",
-    ]
-    defines = [ "EXPERIMENTAL_WEB_ENTITY_EXTRACTION" ]
+if (enable_chromium_based_web_runner) {
+# If chromium is the web runner, we don't need any of these targets.
+# Leave empty build & package targets for package configurations that still
+# reference these.
+  package("web_view") {
+    deprecated_system_image = true
+    # Empty
   }
 
-  ldflags = [ "-Wl,-z,stack-size=1048576" ]
-}
+  group("webkit") {
+    # Empty
+  }
 
-group("webkit") {
-  visibility = [
-    # Allow the webkit library to be built as a standalone.
-    "//build/gn/*",
-    "//topaz/*",
-    "//vendor/google/*",
-  ]
+  package("web_view_link_test_package") {
+    deprecated_system_image = true
+    # Empty
+  }
+} else {
+  executable("web_view_bin") {
+    output_name = "web_view"
 
-  if (use_prebuilt_webkit) {
-    public_configs = [ ":prebuilt_webkit_config" ]
+    sources = [
+      "main.cpp",
+      "web_view_impl.cpp",
+      "web_view_impl.h",
+      "web_view_provider.cpp",
+      "web_view_provider.h",
+    ]
+
     deps = [
-      ":copy_prebuilt_webkit($shlib_toolchain)",
-      "//third_party/boringssl:ssl",
-      "//third_party/cairo",
-      "//third_party/curl:libcurl",
-      "//third_party/freetype2",
-      "//third_party/harfbuzz",
-      "//third_party/icu:icui18n",
-      "//third_party/icu:icuuc",
-      "//third_party/libjpeg-turbo:libjpeg",
-      "//third_party/libpng",
-      "//third_party/libxml2",
-      "//third_party/sqlite",
-      "//third_party/zlib",
+      ":webkit",
+      "//garnet/public/fidl/fuchsia.math",
+      "//garnet/public/fidl/fuchsia.ui.viewsv1",
+      "//garnet/public/lib/component/cpp",
+      "//garnet/public/lib/fxl",
+      "//garnet/public/lib/icu_data/cpp",
+      "//garnet/public/lib/ui/view_framework:view_provider",
+      "//garnet/public/lib/url",
+      "//peridot/lib/rapidjson",
+      "//peridot/public/fidl/fuchsia.modular",
+      "//third_party/boringssl",
+      "//third_party/rapidjson",
+      "//topaz/runtime/web_runner/services",
+      "//zircon/public/lib/async-loop-cpp",
+      "//zircon/public/lib/hid",
     ]
-  } else {
-    public_deps = [
-      "//third_party/webkit",
-    ]
-  }
-}
 
-if (use_prebuilt_webkit) {
-  assert(toolchain_variant.name == "" || toolchain_variant.name == "debug" ||
-             toolchain_variant.name == "release",
-         "Set use_prebuilt_webkit=false when selecting variants for web_view.")
-
-  if (target_cpu == "x64") {
-    webkit_arch = "x86_64"
-  } else if (target_cpu == "arm64") {
-    webkit_arch = "aarch64"
-  } else {
-    assert(false, "Target architecture not supported")
-  }
-  prebuilt_webkit = "prebuilt/${webkit_arch}/libwebkit.so"
-
-  config("prebuilt_webkit_config") {
-    include_dirs = [
-      "//third_party/webkit/DerivedSources/ForwardingHeaders",
-      "//third_party/webkit/DerivedSources/ForwardingHeaders/JavaScriptCore",
-      "//third_party/webkit/DerivedSources/ForwardingHeaders/WebCore",
-      "//third_party/webkit/DerivedSources/WebCore",
-      "//third_party/webkit/Source",
-      "//third_party/webkit/Source/WTF",
-      "//third_party/webkit/Source/WebCore/ForwardingHeaders/",
-      "//third_party/webkit/Source/WebCore/cssjit",
-      "//third_party/webkit/Source/WebKit/fuchsia",
-    ]
-    libs = [ prebuilt_webkit ]
-    cflags = [ "-includeWebKitPrefix.h" ]
-    configs = [ "//third_party/icu:icu_config" ]
-  }
-
-  if (current_toolchain == shlib_toolchain) {
-    # This is needed to get the prebuilt into the place that package.gni
-    # wants to find it.
-    copy("copy_prebuilt_webkit") {
-      sources = [
-        prebuilt_webkit,
+    if (experimental_web_entity_extraction) {
+      sources += [
+        "schema_org_context.cpp",
+        "schema_org_context.h",
       ]
-      outputs = [
-        "$root_out_dir/libwebkit.so",
+      defines = [ "EXPERIMENTAL_WEB_ENTITY_EXTRACTION" ]
+    }
+
+    ldflags = [ "-Wl,-z,stack-size=1048576" ]
+  }
+
+  group("webkit") {
+    visibility = [
+      # Allow the webkit library to be built as a standalone.
+      "//build/gn/*",
+      "//topaz/*",
+      "//vendor/google/*",
+    ]
+
+    if (use_prebuilt_webkit) {
+      public_configs = [ ":prebuilt_webkit_config" ]
+      deps = [
+        ":copy_prebuilt_webkit($shlib_toolchain)",
+        "//third_party/boringssl:ssl",
+        "//third_party/cairo",
+        "//third_party/curl:libcurl",
+        "//third_party/freetype2",
+        "//third_party/harfbuzz",
+        "//third_party/icu:icui18n",
+        "//third_party/icu:icuuc",
+        "//third_party/libjpeg-turbo:libjpeg",
+        "//third_party/libpng",
+        "//third_party/libxml2",
+        "//third_party/sqlite",
+        "//third_party/zlib",
+      ]
+    } else {
+      public_deps = [
+        "//third_party/webkit",
       ]
     }
   }
-}
 
-package("web_view") {
-  deps = [
-    ":web_view_bin",
-  ]
+  if (use_prebuilt_webkit) {
+    assert(
+        toolchain_variant.name == "" || toolchain_variant.name == "debug" ||
+            toolchain_variant.name == "release",
+        "Set use_prebuilt_webkit=false when selecting variants for web_view.")
 
-  binary = "web_view"
+    if (target_cpu == "x64") {
+      webkit_arch = "x86_64"
+    } else if (target_cpu == "arm64") {
+      webkit_arch = "aarch64"
+    } else {
+      assert(false, "Target architecture not supported")
+    }
+    prebuilt_webkit = "prebuilt/${webkit_arch}/libwebkit.so"
 
-  resources = [
-    {
-      path = rebase_path(
-              "//garnet/bin/fonts/third_party/roboto/Roboto-Regular.ttf")
-      dest = "webkit/Roboto-Regular.ttf"
-    },
-    {
-      path = rebase_path("//third_party/icu/common/icudtl.dat")
-      dest = "icudtl.dat"
-    },
-  ]
+    config("prebuilt_webkit_config") {
+      include_dirs = [
+        "//third_party/webkit/DerivedSources/ForwardingHeaders",
+        "//third_party/webkit/DerivedSources/ForwardingHeaders/JavaScriptCore",
+        "//third_party/webkit/DerivedSources/ForwardingHeaders/WebCore",
+        "//third_party/webkit/DerivedSources/WebCore",
+        "//third_party/webkit/Source",
+        "//third_party/webkit/Source/WTF",
+        "//third_party/webkit/Source/WebCore/ForwardingHeaders/",
+        "//third_party/webkit/Source/WebCore/cssjit",
+        "//third_party/webkit/Source/WebKit/fuchsia",
+      ]
+      libs = [ prebuilt_webkit ]
+      cflags = [ "-includeWebKitPrefix.h" ]
+      configs = [ "//third_party/icu:icu_config" ]
+    }
 
-  meta = [
-    {
-      path = rebase_path("meta/web_view.cmx")
-      dest = "web_view.cmx"
-    },
-  ]
+    if (current_toolchain == shlib_toolchain) {
+      # This is needed to get the prebuilt into the place that package.gni
+      # wants to find it.
+      copy("copy_prebuilt_webkit") {
+        sources = [
+          prebuilt_webkit,
+        ]
+        outputs = [
+          "$root_out_dir/libwebkit.so",
+        ]
+      }
+    }
+  }
 
-  if (experimental_web_entity_extraction) {
-    resources += [
+  package("web_view") {
+    deps = [
+      ":web_view_bin",
+    ]
+
+    binary = "web_view"
+
+    resources = [
       {
-        path = rebase_path("js/dist/bundle.js")
-        dest = "js/extract_schema_org.js"
+        path = rebase_path(
+                "//garnet/bin/fonts/third_party/roboto/Roboto-Regular.ttf")
+        dest = "webkit/Roboto-Regular.ttf"
+      },
+      {
+        path = rebase_path("//third_party/icu/common/icudtl.dat")
+        dest = "icudtl.dat"
+      },
+    ]
+
+    meta = [
+      {
+        path = rebase_path("meta/web_view.cmx")
+        dest = "web_view.cmx"
+      },
+    ]
+
+    if (experimental_web_entity_extraction) {
+      resources += [
+        {
+          path = rebase_path("js/dist/bundle.js")
+          dest = "js/extract_schema_org.js"
+        },
+      ]
+    }
+  }
+
+  executable("web_view_test") {
+    sources = [
+      "test_webview.cpp",
+    ]
+
+    deps = [
+      ":webkit",
+    ]
+  }
+
+  package("web_view_test_package") {
+    deprecated_system_image = true
+
+    deps = [
+      ":web_view_test",
+    ]
+
+    binaries = [
+      {
+        name = "web_view_test"
       },
     ]
   }
-}
 
-executable("web_view_test") {
-  sources = [
-    "test_webview.cpp",
-  ]
+  executable("web_view_link_test") {
+    sources = [
+      "test_webview_link.cpp",
+    ]
 
-  deps = [
-    ":webkit",
-  ]
-}
+    deps = [
+      ":webkit",
+    ]
+  }
 
-package("web_view_test_package") {
-  deprecated_system_image = true
+  package("web_view_link_test_package") {
+    deprecated_system_image = true
 
-  deps = [
-    ":web_view_test",
-  ]
+    deps = [
+      ":web_view_link_test",
+    ]
 
-  binaries = [
-    {
-      name = "web_view_test"
-    },
-  ]
-}
-
-executable("web_view_link_test") {
-  sources = [
-    "test_webview_link.cpp",
-  ]
-
-  deps = [
-    ":webkit",
-  ]
-}
-
-package("web_view_link_test_package") {
-  deprecated_system_image = true
-
-  deps = [
-    ":web_view_link_test",
-  ]
-
-  tests = [
-    {
-      name = "web_view_link_test"
-    },
-  ]
+    tests = [
+      {
+        name = "web_view_link_test"
+      },
+    ]
+  }
 }

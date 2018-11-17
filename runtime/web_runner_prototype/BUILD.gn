@@ -3,70 +3,78 @@
 # found in the LICENSE file.
 
 import("//build/package.gni")
+import("//topaz/runtime/chromium/chromium.gni")
 
-source_set("lib") {
-  sources = [
-    "component_controller.cc",
-    "component_controller.h",
-    "runner.cc",
-    "runner.h",
-  ]
+if (enable_chromium_based_web_runner) {
+  package("web_runner_prototype") {
+    deprecated_system_image = true
+    # Empty
+  }
+} else {
+  source_set("lib") {
+    sources = [
+      "component_controller.cc",
+      "component_controller.h",
+      "runner.cc",
+      "runner.h",
+    ]
 
-  public_deps = [
-    "//garnet/public/lib/component/cpp",
-    "//garnet/public/fidl/fuchsia.sys",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1",
-    "//topaz/runtime/web_runner/services",
- ]
-}
+    public_deps = [
+      "//garnet/public/fidl/fuchsia.sys",
+      "//garnet/public/fidl/fuchsia.ui.viewsv1",
+      "//garnet/public/lib/component/cpp",
+      "//topaz/runtime/web_runner/services",
+    ]
+  }
 
-executable("bin") {
-  output_name = "web_runner_prototype"
+  executable("bin") {
+    output_name = "web_runner_prototype"
 
-  sources = [
-    "main.cc",
-  ]
+    sources = [
+      "main.cc",
+    ]
 
-  deps = [
-    ":lib",
-    "//zircon/public/lib/async-loop-cpp",
-  ]
-}
+    deps = [
+      ":lib",
+      "//zircon/public/lib/async-loop-cpp",
+    ]
+  }
 
-executable("web_runner_unittests") {
-  testonly = true
+  executable("web_runner_unittests") {
+    testonly = true
 
-  sources = [
-    "runner_unittest.cc",
-  ]
+    sources = [
+      "runner_unittest.cc",
+    ]
 
-  deps = [
-    ":lib",
-    "//garnet/public/lib/component/cpp/testing",
-    "//third_party/googletest:gtest_main",
-  ]
-}
+    deps = [
+      ":lib",
+      "//garnet/public/lib/component/cpp/testing",
+      "//third_party/googletest:gtest_main",
+    ]
+  }
 
-package("web_runner_prototype") {
-  deprecated_no_cmx = "//build"
+  package("web_runner_prototype") {
+    deprecated_no_cmx = "//build"
 
-  deps = [
-    ":bin",
-  ]
+    deps = [
+      ":bin",
+    ]
 
-  binary = "web_runner_prototype"
-}
+    binary = "web_runner_prototype"
+  }
 
-package("web_runner_tests") {
-  testonly = true
+  package("web_runner_tests") {
+    testonly = true
 
-  deps = [
-    ":web_runner_unittests",
-  ]
+    deps = [
+      ":web_runner_unittests",
+    ]
 
-  tests = [
-    {
-      name = "web_runner_unittests"
-    },
-  ]
+    tests = [
+      {
+        name = "web_runner_unittests"
+      },
+    ]
+  }
 }
