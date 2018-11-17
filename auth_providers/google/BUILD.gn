@@ -4,6 +4,14 @@
 
 import("//build/package.gni")
 
+import("//topaz/runtime/chromium/chromium.gni")
+
+config("config") {
+  if (enable_chromium_based_web_runner) {
+    defines = [ "DEFAULT_USE_CHROMIUM" ]
+  }
+}
+
 executable("bin") {
   output_name = "google_auth_provider"
 
@@ -37,6 +45,8 @@ source_set("lib") {
     "google_auth_provider_impl.h",
     "settings.h",
   ]
+
+  public_configs = [ ":config" ]
 
   deps = [
     "//garnet/public/fidl/fuchsia.net.oldhttp",
