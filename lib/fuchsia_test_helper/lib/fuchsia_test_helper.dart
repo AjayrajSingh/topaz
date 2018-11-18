@@ -7,16 +7,16 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:fuchsia/fuchsia.dart' as fuchsia;
-import 'package:test/src/backend/declarer.dart';
-import 'package:test/src/backend/group.dart';
-import 'package:test/src/backend/suite_platform.dart';
-import 'package:test/src/backend/operating_system.dart';
-import 'package:test/src/backend/runtime.dart';
-import 'package:test/src/runner/runner_suite.dart';
-import 'package:test/src/runner/configuration/suite.dart';
-import 'package:test/src/runner/engine.dart';
-import 'package:test/src/runner/plugin/environment.dart';
-import 'package:test/src/runner/reporter/expanded.dart';
+import 'package:test_api/src/backend/declarer.dart';
+import 'package:test_api/src/backend/group.dart';
+import 'package:test_api/src/backend/suite_platform.dart';
+import 'package:test_api/src/backend/operating_system.dart';
+import 'package:test_api/src/backend/runtime.dart';
+import 'package:test_core/src/runner/runner_suite.dart';
+import 'package:test_core/src/runner/suite.dart';
+import 'package:test_core/src/runner/engine.dart';
+import 'package:test_core/src/runner/plugin/environment.dart';
+import 'package:test_core/src/runner/reporter/expanded.dart';
 
 typedef MainFunction = void Function();
 

@@ -12,6 +12,8 @@ dart_library("fuchsia_test_helper") {
   ]
 
   deps = [
+    "//third_party/dart-pkg/pub/test_api",
+    "//third_party/dart-pkg/pub/test_core",
     "//third_party/dart-pkg/pub/test",
     "//topaz/public/dart/fuchsia",
   ]
