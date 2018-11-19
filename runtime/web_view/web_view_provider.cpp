@@ -13,6 +13,7 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
     : loop_(loop),
       url_(url),
       context_(component::StartupContext::CreateFromStartupInfo()),
+      old_view_provider_binding_(this),
       view_provider_binding_(this),
       lifecycle_binding_(this),
       main_link_watcher_binding_(this) {
@@ -21,10 +22,16 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
     FXL_LOG(WARNING) << "Could not load ICU data";
   }
 
-  context_->outgoing().AddPublicService<fuchsia::ui::viewsv1::ViewProvider>(
-      [this](fidl::InterfaceRequest<ViewProvider> request) {
+  context_->outgoing().AddPublicService<fuchsia::ui::app::ViewProvider>(
+      [this](fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider> request) {
         FXL_LOG(INFO) << "Add ViewProvider binding";
         view_provider_binding_.Bind(std::move(request));
+      });
+  context_->outgoing().AddPublicService<fuchsia::ui::viewsv1::ViewProvider>(
+      [this](
+          fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider> request) {
+        FXL_LOG(INFO) << "Add V1 ViewProvider binding";
+        old_view_provider_binding_.Bind(std::move(request));
       });
   context_->outgoing().AddPublicService<fuchsia::modular::Lifecycle>(
       [this](fidl::InterfaceRequest<fuchsia::modular::Lifecycle> request) {
@@ -50,17 +57,26 @@ WebViewProvider::WebViewProvider(async::Loop* loop, const std::string url)
 }
 
 void WebViewProvider::CreateView(
-    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
-        view_owner_request,
-    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> view_services) {
+    zx::eventpair view_token,
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> incoming_services,
+    fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> outgoing_services) {
   FXL_LOG(INFO) << "CreateView";
   FXL_DCHECK(!view_);
+
+  auto scenic =
+      context_->ConnectToEnvironmentService<fuchsia::ui::scenic::Scenic>();
+  scenic::ViewContext view_context = {
+      .session_and_listener_request =
+          scenic::CreateScenicSessionPtrAndListenerRequest(scenic.get()),
+      .view_token = std::move(view_token),
+      .incoming_services = std::move(incoming_services),
+      .outgoing_services = std::move(outgoing_services),
+      .startup_context = context_.get(),
+  };
   view_ = std::make_unique<WebViewImpl>(
-      context_
-          ->ConnectToEnvironmentService<fuchsia::ui::viewsv1::ViewManager>(),
-      std::move(view_owner_request),
+      std::move(view_context),
       context_->ConnectToEnvironmentService<fuchsia::ui::input::ImeService>(),
-      std::move(view_services), url_);
+      url_);
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   if (context_writer_) {
     view_->set_context_writer(std::move(context_writer_));
@@ -74,6 +90,14 @@ void WebViewProvider::CreateView(
     FXL_LOG(INFO) << "release handler";
     view_ = nullptr;
   });
+}
+
+void WebViewProvider::CreateView(
+    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
+        view_owner_request,
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> view_services) {
+  CreateView(zx::eventpair(view_owner_request.TakeChannel().release()),
+             std::move(view_services), nullptr);
 }
 
 void WebViewProvider::Terminate() { loop_->Quit(); }

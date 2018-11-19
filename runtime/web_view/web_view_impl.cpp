@@ -63,16 +63,10 @@ void TouchTracker::HandleEvent(const fuchsia::ui::input::PointerEvent& pointer,
   }
 }
 
-WebViewImpl::WebViewImpl(
-    fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-    fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
-        view_owner_request,
-    fuchsia::ui::input::ImeServicePtr ime_service,
-    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-        outgoing_services_request,
-    const std::string& url)
-    : BaseView(std::move(view_manager), std::move(view_owner_request),
-               "WebView"),
+WebViewImpl::WebViewImpl(scenic::ViewContext view_context,
+                         fuchsia::ui::input::ImeServicePtr ime_service,
+                         const std::string& url)
+    : V1BaseView(std::move(view_context), "WebView"),
       ime_service_(std::move(ime_service)),
       ime_client_binding_(this),
       weak_factory_(this),
@@ -85,7 +79,7 @@ WebViewImpl::WebViewImpl(
   web_view_.setup_once();
 
   std::function<void(bool)> focusDelegate = [=](bool focused) {
-      this->HandleWebRequestsFocusEvent(focused);
+    this->HandleWebRequestsFocusEvent(focused);
   };
 
   web_view_.setInputFocusDelegate(focusDelegate);
@@ -93,26 +87,23 @@ WebViewImpl::WebViewImpl(
   SetNeedSquareMetrics(true);
   parent_node().AddChild(image_cycler_);
 
-  if (outgoing_services_request) {
-    // Expose |WebView| interface to caller
-    outgoing_services_.AddService<fuchsia::webview::WebView>(
-        [this](fidl::InterfaceRequest<fuchsia::webview::WebView> request) {
-          FXL_LOG(INFO) << "web view service request";
-          web_view_interface_bindings_.AddBinding(this, std::move(request));
-        });
-    outgoing_services_.AddBinding(std::move(outgoing_services_request));
-  }
+  // Expose |WebView| interface to caller.
+  outgoing_services().AddService<fuchsia::webview::WebView>(
+      [this](fidl::InterfaceRequest<fuchsia::webview::WebView> request) {
+        FXL_LOG(INFO) << "web view service request";
+        web_view_interface_bindings_.AddBinding(this, std::move(request));
+      });
 
-  async::PostTask(async_get_default_dispatcher(), ([weak = weak_factory_.GetWeakPtr()]() {
+  async::PostTask(async_get_default_dispatcher(),
+                  ([weak = weak_factory_.GetWeakPtr()]() {
                     if (weak)
                       weak->CallIdle();
                   }));
 }
 
-WebViewImpl::~WebViewImpl() {}
-
 void WebViewImpl::HandleWebRequestsFocusEvent(bool focused) {
-  FXL_LOG(INFO) << "WebView: web requests input focus:" << (focused ? "focused" : "unfocused");
+  FXL_LOG(INFO) << "WebView: web requests input focus:"
+                << (focused ? "focused" : "unfocused");
   web_requests_input_ = focused;
   UpdateInputConnection();
 }
@@ -125,9 +116,10 @@ void WebViewImpl::UpdateInputConnection() {
     ime_client_binding_.Bind(client_ptr.NewRequest());
     auto state = fuchsia::ui::input::TextInputState{};
     state.text = "";
-    ime_service_->GetInputMethodEditor(fuchsia::ui::input::KeyboardType::TEXT, fuchsia::ui::input::InputMethodAction::SEND,
-                                       std::move(state), std::move(client_ptr),
-                                       ime_.NewRequest());
+    ime_service_->GetInputMethodEditor(
+        fuchsia::ui::input::KeyboardType::TEXT,
+        fuchsia::ui::input::InputMethodAction::SEND, std::move(state),
+        std::move(client_ptr), ime_.NewRequest());
   } else if (ime_client_binding_.is_bound()) {
     ime_service_->HideKeyboard();
     ime_client_binding_.Unbind();
@@ -136,7 +128,7 @@ void WebViewImpl::UpdateInputConnection() {
 
 // |fuchsia::ui::input::InputMethodEditorClient|
 void WebViewImpl::DidUpdateState(fuchsia::ui::input::TextInputState state,
-                    fuchsia::ui::input::InputEventPtr event) {
+                                 fuchsia::ui::input::InputEventPtr event) {
   if (event != nullptr && event->is_keyboard() && has_scenic_focus_) {
     HandleKeyboardEvent(*event);
   }
@@ -157,8 +149,6 @@ void WebViewImpl::OnAction(fuchsia::ui::input::InputMethodAction action) {
     HandleKeyboardEvent(event);
   }
 }
-
-
 
 // |WebView|:
 void WebViewImpl::SetUrl(fidl::StringPtr url) {
@@ -266,13 +256,14 @@ void WebViewImpl::HandleTouchEvent(
   }
 }
 
-void WebViewImpl::HandleFocusEvent(const fuchsia::ui::input::FocusEvent& focus) {
+void WebViewImpl::HandleFocusEvent(
+    const fuchsia::ui::input::FocusEvent& focus) {
   has_scenic_focus_ = focus.focused;
   web_view_.setFocused(focus.focused);
   UpdateInputConnection();
 }
 
-// |BaseView|:
+// |scenic::V1BaseView|
 bool WebViewImpl::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   bool handled = false;
   web_view_.setVisible(true);
@@ -296,7 +287,7 @@ bool WebViewImpl::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   return handled;
 }
 
-// |BaseView|:
+// |scenic::V1BaseView|
 void WebViewImpl::OnSceneInvalidated(
     fuchsia::images::PresentationInfo presentation_info) {
   if (!has_physical_size())
@@ -346,7 +337,8 @@ void WebViewImpl::OnSceneInvalidated(
 void WebViewImpl::CallIdle() {
   web_view_.iterateEventLoop();
   InvalidateScene();
-  async::PostTask(async_get_default_dispatcher(), ([weak = weak_factory_.GetWeakPtr()]() {
+  async::PostTask(async_get_default_dispatcher(),
+                  ([weak = weak_factory_.GetWeakPtr()]() {
                     if (weak)
                       weak->CallIdle();
                   }));

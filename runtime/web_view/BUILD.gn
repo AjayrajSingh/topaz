@@ -7,9 +7,9 @@ import("//topaz/runtime/chromium/chromium.gni")
 import("//topaz/runtime/web_view/config.gni")
 
 if (enable_chromium_based_web_runner) {
-# If chromium is the web runner, we don't need any of these targets.
-# Leave empty build & package targets for package configurations that still
-# reference these.
+  # If chromium is the web runner, we don't need any of these targets.
+  # Leave empty build & package targets for package configurations that still
+  # reference these.
   package("web_view") {
     deprecated_system_image = true
     # Empty
@@ -38,11 +38,12 @@ if (enable_chromium_based_web_runner) {
     deps = [
       ":webkit",
       "//garnet/public/fidl/fuchsia.math",
+      "//garnet/public/fidl/fuchsia.ui.app",
       "//garnet/public/fidl/fuchsia.ui.viewsv1",
       "//garnet/public/lib/component/cpp",
       "//garnet/public/lib/fxl",
       "//garnet/public/lib/icu_data/cpp",
-      "//garnet/public/lib/ui/view_framework:view_provider",
+      "//garnet/public/lib/ui/base_view/cpp",
       "//garnet/public/lib/url",
       "//peridot/lib/rapidjson",
       "//peridot/public/fidl/fuchsia.modular",

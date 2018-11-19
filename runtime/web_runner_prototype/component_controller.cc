@@ -12,10 +12,15 @@ constexpr char kWebView[] = "web_view";
 
 ComponentController::ComponentController(Runner* runner)
     : runner_(runner), binding_(this) {
+  service_provider_.AddService<fuchsia::ui::app::ViewProvider>(
+      [this](fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider> request) {
+        view_provider_bindings_.AddBinding(this, std::move(request));
+      });
+
   service_provider_.AddService<fuchsia::ui::viewsv1::ViewProvider>(
       [this](
           fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider> request) {
-        view_provider_bindings_.AddBinding(this, std::move(request));
+        v1_view_provider_bindings_.AddBinding(this, std::move(request));
       });
 }
 
@@ -47,6 +52,15 @@ void ComponentController::Start(
   web_view_controller_.set_error_handler(
       [this](zx_status_t status) { Kill(); });
   services.ConnectToService(web_view_provider_.NewRequest());
+}
+
+void ComponentController::CreateView(
+    zx::eventpair view_token,
+    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> incoming_services,
+    fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> outgoing_services) {
+  CreateView(fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>(
+                 zx::channel(view_token.release())),
+             std::move(incoming_services));
 }
 
 void ComponentController::CreateView(

@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <fuchsia/ui/app/cpp/fidl.h>
+#include <fuchsia/ui/viewsv1/cpp/fidl.h>
+
 #include <lib/app_driver/cpp/module_driver.h>
 #include <lib/async-loop/cpp/loop.h>
 #include <lib/fsl/vmo/strings.h>
@@ -19,15 +22,22 @@ constexpr char kOutputUrlLinkName[] = "output_url";
 // root/null Link) back into an output link ("output_url").
 class TestModule : fuchsia::modular::LinkWatcher {
  public:
-  TestModule(modular::ModuleHost* const module_host,
+  TestModule(modular::ModuleHost* module_host,
              fidl::InterfaceRequest<
-                 fuchsia::ui::viewsv1::ViewProvider> /*view_provider_request*/)
+                 fuchsia::ui::app::ViewProvider> /*view_provider_request*/)
       : module_host_(module_host),
         module_context_(module_host_->module_context()),
         output_url_link_watcher_binding_(this) {
     modular::testing::Init(module_host->startup_context(), __FILE__);
     StartTest();
   }
+
+  TestModule(modular::ModuleHost* const module_host,
+             fidl::InterfaceRequest<
+                 fuchsia::ui::viewsv1::ViewProvider> /*view_provider_request*/)
+      : TestModule(
+            module_host,
+            fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider>(nullptr)) {}
 
   // Step 1: Start `web_view` and give it a URL (via root link), and setup
   // observation for output URL (via "output_url" link).

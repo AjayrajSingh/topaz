@@ -21,6 +21,7 @@ if (enable_chromium_based_web_runner) {
 
     public_deps = [
       "//garnet/public/fidl/fuchsia.sys",
+      "//garnet/public/fidl/fuchsia.ui.app",
       "//garnet/public/fidl/fuchsia.ui.viewsv1",
       "//garnet/public/lib/component/cpp",
       "//topaz/runtime/web_runner/services",

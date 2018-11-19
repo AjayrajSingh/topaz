@@ -5,15 +5,15 @@
 #ifndef TOPAZ_RUNTIME_WEB_VIEW_WEB_VIEW_IMPL_H_
 #define TOPAZ_RUNTIME_WEB_VIEW_WEB_VIEW_IMPL_H_
 
-#include <fuchsia/webview/cpp/fidl.h>
 #include <fuchsia/ui/input/cpp/fidl.h>
+#include <fuchsia/webview/cpp/fidl.h>
 
 #include "lib/component/cpp/service_provider_impl.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
+#include "lib/ui/base_view/cpp/v1_base_view.h"
 #include "lib/ui/scenic/cpp/host_image_cycler.h"
-#include "lib/ui/view_framework/base_view.h"
 
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
 #include "topaz/runtime/web_view/schema_org_context.h"
@@ -36,18 +36,14 @@ class TouchTracker {
   bool is_drag_;
 };
 
-class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView,
+class WebViewImpl : public scenic::V1BaseView,
+                    public fuchsia::webview::WebView,
                     fuchsia::ui::input::InputMethodEditorClient {
  public:
-  WebViewImpl(fuchsia::ui::viewsv1::ViewManagerPtr view_manager,
-              fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
-                  view_owner_request,
+  WebViewImpl(scenic::ViewContext view_context,
               fuchsia::ui::input::ImeServicePtr ime_service,
-              fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-                  outgoing_services_request,
               const std::string& url);
-
-  ~WebViewImpl();
+  ~WebViewImpl() = default;
 
 #ifdef EXPERIMENTAL_WEB_ENTITY_EXTRACTION
   void set_context_writer(fuchsia::modular::ContextWriterPtr context_writer) {
@@ -85,10 +81,8 @@ class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView,
   void HandleWebRequestsFocusEvent(bool focused);
   void UpdateInputConnection();
 
-  // |BaseView|:
+  // |scenic::V1BaseView|
   bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
-
-  // |BaseView|:
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
 
@@ -99,7 +93,8 @@ class WebViewImpl : public mozart::BaseView, public fuchsia::webview::WebView,
   ::WebView web_view_;
   fuchsia::ui::input::ImeServicePtr ime_service_;
   fuchsia::ui::input::InputMethodEditorPtr ime_ = nullptr;
-  fidl::Binding<fuchsia::ui::input::InputMethodEditorClient> ime_client_binding_;
+  fidl::Binding<fuchsia::ui::input::InputMethodEditorClient>
+      ime_client_binding_;
   fxl::WeakPtrFactory<WebViewImpl> weak_factory_;
   bool url_set_ = false;
   bool has_scenic_focus_ = false;

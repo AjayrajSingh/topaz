@@ -6,6 +6,7 @@
 #define TOPAZ_RUNTIME_WEB_RUNNER_PROTOTYPE_COMPONENT_CONTROLLER_H_
 
 #include <fuchsia/sys/cpp/fidl.h>
+#include <fuchsia/ui/app/cpp/fidl.h>
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 
@@ -17,9 +18,11 @@
 #include "lib/svc/cpp/service_provider_bridge.h"
 
 namespace web {
+
 class Runner;
 
 class ComponentController : public fuchsia::sys::ComponentController,
+                            public fuchsia::ui::app::ViewProvider,
                             public fuchsia::ui::viewsv1::ViewProvider {
  public:
   explicit ComponentController(Runner* runner);
@@ -37,6 +40,13 @@ class ComponentController : public fuchsia::sys::ComponentController,
   void Kill() final;
   void Detach() final;
 
+  // |fuchsia::ui::app::ViewProvider|:
+  void CreateView(
+      zx::eventpair view_token,
+      fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> incoming_services,
+      fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> outgoing_services)
+      final;
+
   // |fuchsia::ui::viewsv1::ViewProvider|:
   void CreateView(
       fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
@@ -45,7 +55,9 @@ class ComponentController : public fuchsia::sys::ComponentController,
   Runner* runner_;
   component::ServiceProviderBridge service_provider_;
   fidl::Binding<fuchsia::sys::ComponentController> binding_;
-  fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider> view_provider_bindings_;
+  fidl::BindingSet<fuchsia::ui::app::ViewProvider> view_provider_bindings_;
+  fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider>
+      v1_view_provider_bindings_;
   std::string url_;
 
   fuchsia::sys::ComponentControllerPtr web_view_controller_;

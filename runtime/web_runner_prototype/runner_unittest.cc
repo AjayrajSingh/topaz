@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <fuchsia/ui/app/cpp/fidl.h>
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 
@@ -12,11 +13,13 @@
 namespace web {
 namespace testing {
 
-class FakeWebView : public fuchsia::ui::viewsv1::ViewProvider,
+class FakeWebView : public fuchsia::ui::app::ViewProvider,
+                    public fuchsia::ui::viewsv1::ViewProvider,
                     public fuchsia::webview::WebView {
  public:
   FakeWebView() {
     component_.AddPublicService(view_provider_bindings_.GetHandler(this));
+    component_.AddPublicService(v1_view_provider_bindings_.GetHandler(this));
     service_provider_.AddService(web_view_bindings_.GetHandler(this));
   }
 
@@ -24,12 +27,23 @@ class FakeWebView : public fuchsia::ui::viewsv1::ViewProvider,
     component_.Register("web_view", fake_launcher);
   }
 
+  // |fuchsia::ui::app::ViewProvider|:
+  void CreateView(
+      zx::eventpair view_token,
+      fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> incoming_services,
+      fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> outgoing_services)
+      final {
+    ++create_view_count_;
+    service_provider_.AddBinding(std::move(incoming_services));
+  }
+
   // |fuchsia::ui::viewsv1::ViewProvider|:
   void CreateView(
-      fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner> view_owner,
+      fidl::InterfaceRequest<fuchsia::ui::viewsv1token::ViewOwner>
+          view_owner_request,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> services) final {
-    ++create_view_count_;
-    service_provider_.AddBinding(std::move(services));
+    CreateView(zx::eventpair(view_owner_request.TakeChannel().release()),
+               std::move(services), nullptr);
   }
 
   // |fuchsia::webview::WebView|:
@@ -46,7 +60,9 @@ class FakeWebView : public fuchsia::ui::viewsv1::ViewProvider,
 
  private:
   component::testing::FakeComponent component_;
-  fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider> view_provider_bindings_;
+  fidl::BindingSet<fuchsia::ui::app::ViewProvider> view_provider_bindings_;
+  fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider>
+      v1_view_provider_bindings_;
   fidl::BindingSet<fuchsia::webview::WebView> web_view_bindings_;
   component::ServiceProviderImpl service_provider_;
 };
