@@ -85,7 +85,7 @@ class Query {
   bool documentMatchesQuery(Document doc) {
     if (doc.documentId.schema != _schema) {
       throw new ArgumentError(
-          'The Document `doc` is of a incorrect Schema type.');
+          'The Document `doc` is of an incorrect Schema type.');
     }
     for (final fieldName in _comparisons.keys) {
       if (!_comparisons[fieldName].valueMatchesComparison(doc[fieldName])) {

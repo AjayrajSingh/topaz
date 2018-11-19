@@ -22,37 +22,54 @@ abstract class FieldValue implements Comparable<Value> {
 }
 
 /// Template to ease the implementation of FieldValue specializations.
-abstract class _TemplatedFieldValue<T> implements FieldValue {
+abstract class _TemplatedFieldValue<T extends Comparable<T>>
+    implements FieldValue {
   final _converter = new Converter<T>();
   T _value;
 
   _TemplatedFieldValue(this._value);
 
   @override
+  int compareTo(Value documentValue) {
+    return _value.compareTo(_extractValue(documentValue));
+  }
+
+  T _extractValue(Value documentValue);
+
+  @override
   Uint8List get hash => _converter.serialize(_value);
 }
 
-/// Specialization of `FieldValue` for integers.
-class IntFieldValue extends _TemplatedFieldValue<int> {
+/// Specialization of `FieldValue` for numbers.
+class NumFieldValue extends _TemplatedFieldValue<num> {
   /// Default constructor.
-  IntFieldValue(int value) : super(value);
+  NumFieldValue(num value) : super(value);
 
   @override
   bool comparableTo(BaseType type) {
-    if (type is Integer || type is IntCounter) {
+    if (type is Integer ||
+        type is IntCounter ||
+        type is Double ||
+        type is DoubleCounter) {
       return true;
     }
     return false;
   }
 
   @override
-  int compareTo(Value documentValue) {
+  num _extractValue(Value documentValue) {
     if (documentValue is PosNegCounterValue<int>) {
-      return _value.compareTo(documentValue.value);
+      return documentValue.value;
     }
     if (documentValue is LastOneWinsValue<int>) {
-      return _value.compareTo(documentValue.value);
+      return documentValue.value;
     }
-    throw new ArgumentError('`documentValue` is not comparable to a integer.');
+    if (documentValue is PosNegCounterValue<double>) {
+      return documentValue.value;
+    }
+    if (documentValue is LastOneWinsValue<double>) {
+      return documentValue.value;
+    }
+    throw new ArgumentError('`documentValue` does not store a num.');
   }
 }

@@ -12,55 +12,66 @@ import 'package:test/test.dart';
 
 import 'matchers.dart';
 
+void _testSerializationAndDeserialization<T>(T value) {
+  Converter<T> converter = new Converter<T>();
+  expect(converter.deserialize(converter.serialize(value)), equals(value));
+}
+
+void _testValues<T>(List<T> values) {
+  values.forEach(_testSerializationAndDeserialization);
+}
+
 void main() {
   setupLogger();
 
-  Converter<int> intConverter = new Converter<int>();
-  Converter<bool> boolConverter = new Converter<bool>();
-  Converter<double> doubleConverter = new Converter<double>();
-  Converter<String> stringConverter = new Converter<String>();
+  final boolConverter = new Converter<bool>();
+  final doubleConverter = new Converter<double>();
+  final numConverter = new Converter<num>();
+  final stringConverter = new Converter<String>();
 
   group('Correct convertions', () {
     test('int converter', () {
-      expect(intConverter.deserialize(intConverter.serialize(0)), equals(0));
-      expect(intConverter.deserialize(intConverter.serialize(23)), equals(23));
-      expect(intConverter.deserialize(intConverter.serialize(-7)), equals(-7));
-      expect(intConverter.deserialize(intConverter.serialize(113124324)),
-          equals(113124324));
-
-      const maxInt = (1 << 63) - 1;
-      expect(intConverter.deserialize(intConverter.serialize(maxInt)),
-          equals(maxInt));
-
-      const minInt = 1 << 63;
-      expect(intConverter.deserialize(intConverter.serialize(minInt)),
-          equals(minInt));
+      _testValues<int>(<int>[0, 23, -7, 113124324, (1 << 63) - 1, 1 << 63]);
     });
 
     test('bool converter', () {
-      expect(boolConverter.deserialize(boolConverter.serialize(false)),
-          equals(false));
-      expect(boolConverter.deserialize(boolConverter.serialize(true)),
-          equals(true));
+      _testValues<bool>(<bool>[false, true]);
     });
 
     test('double converter', () {
-      expect(doubleConverter.deserialize(doubleConverter.serialize(0.0)),
-          equals(0.0));
-      expect(doubleConverter.deserialize(doubleConverter.serialize(23.5)),
-          equals(23.5));
-      expect(doubleConverter.deserialize(doubleConverter.serialize(-0.001)),
-          equals(-0.001));
+      _testValues<double>(<double>[
+        0.0,
+        0,
+        23.5,
+        -0.001,
+        double.negativeInfinity,
+        double.maxFinite
+      ]);
+      // expect/equals does not work with NaN.
+      expect(
+          doubleConverter
+              .deserialize(doubleConverter.serialize(double.nan))
+              .isNaN,
+          equals(true));
+    });
+
+    test('num converter', () {
+      _testValues<num>(<num>[
+        0.0,
+        0,
+        23.5,
+        -0.001,
+        113124324,
+        double.negativeInfinity,
+        double.maxFinite
+      ]);
+      // expect/equals does not work with NaN.
+      expect(numConverter.deserialize(numConverter.serialize(double.nan)).isNaN,
+          equals(true));
     });
 
     test('string converter', () {
-      expect(stringConverter.deserialize(stringConverter.serialize('')),
-          equals(''));
-      expect(stringConverter.deserialize(stringConverter.serialize('foo')),
-          equals('foo'));
-      expect(
-          stringConverter.deserialize(stringConverter.serialize('"?123 x  ')),
-          equals('"?123 x  '));
+      _testValues<String>(<String>['', 'foo', '?123 x  ']);
     });
 
     test('data converter', () {

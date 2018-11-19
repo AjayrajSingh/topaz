@@ -124,21 +124,24 @@ class IntConverter implements Converter<int> {
   /// Constructor.
   const IntConverter();
 
+  static const int _serializationLength = 8;
+
   @override
   int get defaultValue => 0;
 
   @override
   int deserialize(final Uint8List x) {
-    if (x.length != 8) {
+    if (x.length != _serializationLength) {
       throw new InternalSledgeError(
-          "Can't parse int: Length should be 8, found ${x.length} instead for input: `$x`.");
+          "Can't parse int: Length should be $_serializationLength, "
+          'found ${x.length} instead for input: `$x`.');
     }
     return x.buffer.asByteData().getInt64(x.offsetInBytes);
   }
 
   @override
   Uint8List serialize(final int x) =>
-      new Uint8List(8)..buffer.asByteData().setInt64(0, x);
+      new Uint8List(_serializationLength)..buffer.asByteData().setInt64(0, x);
 }
 
 /// Converter for double.
@@ -146,21 +149,24 @@ class DoubleConverter implements Converter<double> {
   /// Constructor.
   const DoubleConverter();
 
+  static const int _serializationLength = 8;
+
   @override
   double get defaultValue => 0.0;
 
   @override
   double deserialize(final Uint8List x) {
-    if (x.length != 8) {
+    if (x.length != _serializationLength) {
       throw new InternalSledgeError(
-          "Can't parse double: Length should be 8, found ${x.length} instead for input: `$x`.");
+          "Can't parse double: Length should be $_serializationLength, "
+          'found ${x.length} instead for input: `$x`.');
     }
     return x.buffer.asByteData().getFloat64(x.offsetInBytes);
   }
 
   @override
   Uint8List serialize(final double x) =>
-      new Uint8List(8)..buffer.asByteData().setFloat64(0, x);
+      new Uint8List(_serializationLength)..buffer.asByteData().setFloat64(0, x);
 }
 
 /// Converter for bool.
@@ -175,11 +181,13 @@ class BoolConverter implements Converter<bool> {
   bool deserialize(final Uint8List x) {
     if (x.lengthInBytes != 1) {
       throw new InternalSledgeError(
-          "Can't parse bool. Length should be 1, found ${x.lengthInBytes} bytes instead.");
+          "Can't parse bool. Length should be 1,"
+          'found ${x.lengthInBytes} bytes instead.');
     }
     if (x[0] != 0 && x[0] != 1) {
       throw new InternalSledgeError(
-          "Can't parse bool. Value should be 0 or 1, found ${x[0]} bytes instead.");
+          "Can't parse bool. Value should be 0 or 1, "
+          'found ${x[0]} bytes instead.');
     }
     return x[0] == 1;
   }
@@ -206,10 +214,71 @@ class Uint8ListConverter implements Converter<Uint8List> {
   Uint8List serialize(final Uint8List x) => x;
 }
 
+enum _NumInternalType { _int, _double }
+
+/// Converter for num.
+class NumConverter implements Converter<num> {
+  /// Constructor.
+  const NumConverter();
+
+  @override
+  num get defaultValue => 0;
+
+  // The length of the serialization:
+  // 1 byte for the type of the number (_int or _double)
+  //
+  // 8 bytes for number itself (64 bit integer or 64 bit double).
+  static const int _serializationLength = 9;
+
+  @override
+  num deserialize(final Uint8List x) {
+    if (x.length != _serializationLength) {
+      throw new InternalSledgeError(
+          "Can't parse double: Length should be $_serializationLength, "
+          'found ${x.length} instead for input: `$x`.');
+    }
+
+    if (x[0] >= _NumInternalType.values.length) {
+      throw new InternalSledgeError(
+          "Can't parse double: First byte should be 0 or 1, "
+          'found ${x[0]} instead.');
+    }
+
+    _NumInternalType type = _NumInternalType.values[x[0]];
+    num value;
+    switch (type) {
+      case _NumInternalType._int:
+        value = x.buffer.asByteData().getInt64(x.offsetInBytes + 1);
+        break;
+      case _NumInternalType._double:
+        value = x.buffer.asByteData().getFloat64(x.offsetInBytes + 1);
+        break;
+    }
+    return value;
+  }
+
+  @override
+  Uint8List serialize(final num x) {
+    final list = new Uint8List(_serializationLength);
+    final byteData = list.buffer.asByteData();
+    if (x.runtimeType == int) {
+      byteData
+        ..setInt8(0, _NumInternalType._int.index)
+        ..setInt64(1, x);
+    } else {
+      byteData
+        ..setInt8(0, _NumInternalType._double.index)
+        ..setFloat64(1, x);
+    }
+    return list;
+  }
+}
+
 const _converters = const <Type, Converter>{
   int: const IntConverter(),
   String: const StringConverter(),
   double: const DoubleConverter(),
   bool: const BoolConverter(),
-  Uint8List: const Uint8ListConverter()
+  Uint8List: const Uint8ListConverter(),
+  num: const NumConverter(),
 };

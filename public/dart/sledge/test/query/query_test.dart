@@ -34,12 +34,12 @@ void main() {
     // Test invalid comparisons
     final comparisonWithNonExistantField = <String, QueryFieldComparison>{
       'foo':
-          new QueryFieldComparison(new IntFieldValue(42), ComparisonType.equal)
+          new QueryFieldComparison(new NumFieldValue(42), ComparisonType.equal)
     };
     expect(() => new Query(schema, comparisons: comparisonWithNonExistantField),
         throwsArgumentError);
     final comparisonWithWrongType = <String, QueryFieldComparison>{
-      'b': new QueryFieldComparison(new IntFieldValue(42), ComparisonType.equal)
+      'b': new QueryFieldComparison(new NumFieldValue(42), ComparisonType.equal)
     };
     expect(() => new Query(schema, comparisons: comparisonWithWrongType),
         throwsArgumentError);
@@ -47,9 +47,9 @@ void main() {
     // Test too many inequalities
     final comparisonWithMultipleInequalities = <String, QueryFieldComparison>{
       'a': new QueryFieldComparison(
-          new IntFieldValue(42), ComparisonType.greater),
+          new NumFieldValue(42), ComparisonType.greater),
       'c': new QueryFieldComparison(
-          new IntFieldValue(42), ComparisonType.greater)
+          new NumFieldValue(42), ComparisonType.greater)
     };
     expect(
         () =>
@@ -65,7 +65,7 @@ void main() {
 
     // Test with equalities
     final equality = <String, QueryFieldComparison>{
-      'a': new QueryFieldComparison(new IntFieldValue(42), ComparisonType.equal)
+      'a': new QueryFieldComparison(new NumFieldValue(42), ComparisonType.equal)
     };
     final query2 = new Query(schema, comparisons: equality);
     expect(query2.filtersDocuments(), equals(true));
@@ -73,7 +73,7 @@ void main() {
     // Test with inequality
     final inequality = <String, QueryFieldComparison>{
       'a': new QueryFieldComparison(
-          new IntFieldValue(42), ComparisonType.greater)
+          new NumFieldValue(42), ComparisonType.greater)
     };
     final query3 = new Query(schema, comparisons: inequality);
     expect(query3.filtersDocuments(), equals(true));
@@ -83,11 +83,11 @@ void main() {
     Sledge sledge = newSledgeForTesting();
     Schema schema = _newSchema();
     final equality = <String, QueryFieldComparison>{
-      'a': new QueryFieldComparison(new IntFieldValue(42), ComparisonType.equal)
+      'a': new QueryFieldComparison(new NumFieldValue(42), ComparisonType.equal)
     };
     final inequality = <String, QueryFieldComparison>{
       'a': new QueryFieldComparison(
-          new IntFieldValue(42), ComparisonType.greater)
+          new NumFieldValue(42), ComparisonType.greater)
     };
     final queryWithoutFilter = new Query(schema);
     final queryWithEqualities = new Query(schema, comparisons: equality);

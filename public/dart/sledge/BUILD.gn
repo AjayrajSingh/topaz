@@ -85,6 +85,7 @@ dart_test("dart_sledge_tests") {
     "helpers.dart",
     "ledger_helpers_test.dart",
     "query/index_definition_test.dart",
+    "query/query_builder_test.dart",
     "query/query_test.dart",
     "schema_test.dart",
     "schemas_obtainer_test.dart",
