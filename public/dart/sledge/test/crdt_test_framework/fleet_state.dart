@@ -33,10 +33,8 @@ class FleetState<T extends dynamic> {
       if (T == Sledge) {
         _storageStates[i] = _instances[i].fakeLedgerPage.storageState;
       } else if (T == Document) {
-        _storageStates[i] = new StorageState((change) => Document.applyChange(
-            // ignore: argument_type_not_assignable
-            _instances.cast<Document>()[i],
-            change));
+        _storageStates[i] = new StorageState(
+            (change) => _instances.cast<Document>()[i].applyChange(change));
       } else {
         _storageStates[i] = new StorageState(_instances[i].applyChange);
       }
@@ -69,11 +67,8 @@ class FleetState<T extends dynamic> {
       await modification(_instances[id]);
       if (T == Document) {
         _storageStates[id]
-            // ignore: argument_type_not_assignable
-            .applyChange(
-                Document.getChange(_instances.cast<Document>()[id]), time);
-        // ignore: argument_type_not_assignable
-        Document.completeTransaction(_instances.cast<Document>()[id]);
+            .applyChange(_instances.cast<Document>()[id].getChange(), time);
+        _instances.cast<Document>()[id].completeTransaction();
       } else {
         _storageStates[id].applyChange(_instances[id].getChange(), time);
         _instances[id].completeTransaction();

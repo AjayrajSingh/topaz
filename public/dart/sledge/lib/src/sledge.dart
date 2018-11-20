@@ -195,7 +195,7 @@ class Sledge {
     for (final documentChange in splittedDocumentChange.entries) {
       final prefix = documentChange.key;
       _documentByPrefix[prefix]?.then((document) {
-        Document.applyChange(document, documentChange.value);
+        document.applyChange(documentChange.value);
       });
     }
   }

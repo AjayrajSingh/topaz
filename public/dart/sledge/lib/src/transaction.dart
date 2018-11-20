@@ -109,7 +109,7 @@ class Transaction {
 
     // Notify the documents that the transaction has been completed.
     _documents
-      ..forEach(Document.completeTransaction)
+      ..forEach((Document document) => document.completeTransaction())
       ..clear();
     return true;
   }
@@ -144,7 +144,7 @@ class Transaction {
 
     if (kvs.isNotEmpty) {
       final change = new Change(kvs);
-      Document.applyChange(document, change);
+      document.applyChange(change);
     }
 
     return document;
@@ -216,7 +216,7 @@ class Transaction {
   /// Rollback the documents that were modified during the transaction.
   Future _rollbackModification() async {
     _documents
-      ..forEach(Document.rollbackChange)
+      ..forEach((Document document) => document.rollbackChange())
       ..clear();
     final completer = new Completer<ledger.Status>();
     _pageProxy.rollback(completer.complete);

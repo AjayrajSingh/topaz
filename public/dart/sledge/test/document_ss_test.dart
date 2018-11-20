@@ -61,9 +61,9 @@ void main() async {
   test('Document. Stream', () async {
     final fleet = documentFleetFactory.newFleet(3);
     for (int id = 0; id < 3; id++) {
-      fleet.runInTransaction(id, (dynamic cnt) async {
+      fleet.runInTransaction(id, (Document cnt) async {
         expect(
-            Document.getOnChangeStream(cnt),
+            cnt.onChange,
             emitsInOrder([
               anything,
               anything,

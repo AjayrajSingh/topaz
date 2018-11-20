@@ -73,28 +73,8 @@ class Document implements ValueObserver {
   /// Returns this document's documentId.
   DocumentId get documentId => _documentId;
 
-  /// Get the change for all fields of [doc].
-  static Change getChange(final Document doc) {
-    return doc._getChange();
-  }
-
-  /// Ends the transaction for all fields of [doc].
-  static void completeTransaction(final Document doc) {
-    doc._completeTransaction();
-  }
-
-  /// Applies [change] to fields of [doc].
-  static void applyChange(final Document doc, final Change change) {
-    doc._applyChange(change);
-  }
-
-  /// Rolls back all local modifications on all fields of [doc].
-  static void rollbackChange(final Document doc) {
-    doc._rollbackChange();
-  }
-
   /// Gets the change for all fields of this document.
-  Change _getChange() {
+  Change getChange() {
     Change result = new Change();
     for (final field in _fields.entries) {
       result.addAll(field.value.getChange().withPrefix(field.key));
@@ -103,14 +83,14 @@ class Document implements ValueObserver {
   }
 
   /// Ends the transaction for all fields of this document.
-  void _completeTransaction() {
+  void completeTransaction() {
     for (final leafValue in _fields.values) {
       leafValue.completeTransaction();
     }
   }
 
-  /// Applies change to fields of this document.
-  void _applyChange(final Change change) {
+  /// Applies [change] to fields of this document.
+  void applyChange(final Change change) {
     Map<Uint8List, Change> splittedChanges =
         change.splitByPrefix(_identifierLength);
     for (final splittedChange in splittedChanges.entries) {
@@ -119,13 +99,11 @@ class Document implements ValueObserver {
     _changeController.add(null);
   }
 
-  Stream<void> get _onChange => _changeController.stream;
-
-  /// Returns a stream, generating an event each time a document changes.
-  static Stream<void> getOnChangeStream(final Document doc) => doc._onChange;
+  /// Returns a stream generating an event each time a document changes.
+  Stream<void> get onChange => _changeController.stream;
 
   /// Rolls back all local modifications on all fields of this document.
-  void _rollbackChange() {
+  void rollbackChange() {
     for (final leafValue in _fields.values) {
       leafValue.rollbackChange();
     }

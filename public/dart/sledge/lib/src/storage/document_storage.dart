@@ -31,7 +31,7 @@ List<Future<ledger.Status>> saveDocumentToPage(
   final updateLedgerFutures = <Future<ledger.Status>>[];
 
   final Uint8List documentPrefix = _documentStorageKeyPrefix(document);
-  final Change change = Document.getChange(document);
+  final Change change = document.getChange();
 
   // Forward the "deletes".
   for (Uint8List deletedKey in change.deletedKeys) {

@@ -280,10 +280,10 @@ void main() {
         ..['number'].value = 5
         ..['cnt'].add(1);
 
-      c1 = Document.getChange(docA);
+      c1 = docA.getChange();
     });
 
-    Document.applyChange(docB, c1);
+    docB.applyChange(c1);
 
     expect(docB['name'].value, equals('value + counter'));
     expect(docB['number'].value, equals(5));
@@ -312,10 +312,10 @@ void main() {
     Change c1;
     await sledgeA.runInTransaction(() async {
       docA['names'].add(largeList);
-      c1 = Document.getChange(docA);
+      c1 = docA.getChange();
     });
 
-    Document.applyChange(docB, c1);
+    docB.applyChange(c1);
     expect(docB['names'].single, equals(largeList));
   });
 
