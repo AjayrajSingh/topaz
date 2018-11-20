@@ -16,3 +16,4 @@ unlikely the code will build or work correctly. Code can be checked out with:
 * topaz/app/chat: 9f6c31d2ceb8353f229a9ef6b53ba2386ff31867
 * topaz/app/color: 5a023ccb054104846e3e913951bcc7dc277d2274
 * topaz/app/contacts: 80378fe470817750188707de29237282892a3142
+* topaz/app/image: 5e731a943a907cf960ecfbda1c391958f9093afa
