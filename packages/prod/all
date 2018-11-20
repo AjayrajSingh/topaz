@@ -2,7 +2,6 @@
     "imports": [
         "topaz/packages/prod/bluetooth_settings",
         "topaz/packages/prod/chromium",
-        "topaz/packages/prod/color",
         "topaz/packages/prod/device_settings",
         "topaz/packages/prod/display_settings",
         "topaz/packages/prod/dart",
