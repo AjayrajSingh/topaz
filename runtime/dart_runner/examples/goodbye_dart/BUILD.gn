@@ -45,15 +45,21 @@ dart_aot_app("goodbye_dart_aot") {
 }
 
 copy("copy_goodbye_dart_test") {
-  sources = [ "goodbye_dart_test.sh" ]
-  outputs = [ "${root_build_dir}/goodbye_dart_test.sh" ]
+  sources = [ "goodbye_dart_test" ]
+  outputs = [ "${root_build_dir}/goodbye_dart_test" ]
 }
 
 package("goodbye_dart_test") {
   testonly = true
   tests = [{
-    name = "goodbye_dart_test.sh"
+    name = "goodbye_dart_test"
   }]
+  meta = [
+    {
+      dest = "goodbye_dart_test.cmx"
+      path = rebase_path("meta/" + dest)
+    },
+  ]
   deps = [
     ":copy_goodbye_dart_test"
   ]
