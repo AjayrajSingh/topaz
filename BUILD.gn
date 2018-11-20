@@ -8,7 +8,6 @@ group("dart_unittests") {
   testonly = true
 
   deps = [
-    "app/contacts:tests",
     # "app/dashboard:tests",
     "app/documents/packages/utils:document_util_tests",
     "examples/test/flutter_widget_test:flutter_widget_test",
@@ -29,7 +28,6 @@ group("dart_unittests") {
 # manifests indexed by the on-device module resolver when the user logs in.
 initial_module_packages("topaz_modules_index") {
   packages = [
-    "contacts_picker",
     "documents_info",
     "image",
     "video",

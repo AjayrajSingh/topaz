@@ -1,6 +1,5 @@
 {
     "host_tests" : [
-      "//topaz/app/contacts/agents/content_provider:contacts_content_provider_tests",
       "//topaz/app/dashboard:dashboard_tests",
       "//topaz/app/documents/packages/utils:document_util_tests",
       "//topaz/bin/dart_fidl_json/test:dart_fidl_json_test",
