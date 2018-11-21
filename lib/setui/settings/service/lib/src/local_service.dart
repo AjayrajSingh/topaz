@@ -3,16 +3,16 @@ import 'package:fidl_fuchsia_setui/fidl.dart';
 
 import 'connectivity_controller.dart';
 import 'network_controller.dart';
-import 'setting_controller.dart';
+import 'setui_setting_controller.dart';
 import 'timezone_controller.dart';
 
 class LocalSetUiService implements SetUiService {
-  Map<SettingType, SettingController> controllers = {};
-  final SettingControllerCreator creator;
+  Map<SettingType, SetUiSettingController> controllers = {};
+  final SetUiSettingControllerCreator creator;
   final SetUiListenerProxyBinder proxyBinder;
 
   LocalSetUiService(
-      {this.creator = SettingControllerCreator.instance,
+      {this.creator = SetUiSettingControllerCreator.instance,
       this.proxyBinder = _bindListenerProxy});
 
   @override
@@ -47,16 +47,17 @@ class LocalSetUiService implements SetUiService {
     });
   }
 
-  SettingController _getController(SettingType type) =>
+  SetUiSettingController _getController(SettingType type) =>
       controllers.putIfAbsent(type, () => creator.createController(type));
 }
 
-class SettingControllerCreator {
-  static const SettingControllerCreator instance = SettingControllerCreator();
+class SetUiSettingControllerCreator {
+  static const SetUiSettingControllerCreator instance =
+      SetUiSettingControllerCreator();
 
-  const SettingControllerCreator();
+  const SetUiSettingControllerCreator();
 
-  SettingController createController(SettingType type) {
+  SetUiSettingController createController(SettingType type) {
     switch (type) {
       case SettingType.timeZone:
         return TimeZoneController();

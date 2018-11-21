@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 /// Controller for a specific setting.
 ///
 /// The service instantiates [SettingController]s mapped to [SettingType]s.
-abstract class SettingController {
+abstract class SetUiSettingController {
   final List<SettingListenerProxy> listeners = [];
 
   @visibleForTesting

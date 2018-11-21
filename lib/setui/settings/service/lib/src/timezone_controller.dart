@@ -4,9 +4,10 @@ import 'package:fidl_fuchsia_setui/fidl.dart';
 import 'package:fidl_fuchsia_timezone/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 
-import 'setting_controller.dart';
+import 'setui_setting_controller.dart';
 
-class TimeZoneController extends SettingController implements TimezoneWatcher {
+class TimeZoneController extends SetUiSettingController
+    implements TimezoneWatcher {
   TimezoneProxy _timeZoneProxy;
 
   static const Map<String, TimeZone> _timeZones = {

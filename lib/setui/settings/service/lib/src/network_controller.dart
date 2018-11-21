@@ -6,9 +6,9 @@ import 'dart:async';
 
 import 'package:fidl_fuchsia_setui/fidl.dart';
 
-import 'setting_controller.dart';
+import 'setui_setting_controller.dart';
 
-class NetworkController extends SettingController {
+class NetworkController extends SetUiSettingController {
   @override
   Future<void> close() async {
     // TODO: implement close
@@ -41,7 +41,7 @@ class NetworkController extends SettingController {
 
 // const _connectionScanInterval = 3;
 
-// class NetworkController extends SettingController {
+// class NetworkController extends SetUiSettingController {
 //   // List of APs that we obtained from wireless scanning.
 //   // Periodically refreshed when there is no connected network.
 //   List<wlan.Ap> _scannedAps = [];

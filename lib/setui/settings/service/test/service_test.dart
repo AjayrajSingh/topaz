@@ -5,7 +5,7 @@ import 'package:fidl_fuchsia_setui/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:lib_setui_service/service.dart';
 import 'package:lib_setui_service/src/local_service.dart';
-import 'package:lib_setui_service/src/setting_controller.dart';
+import 'package:lib_setui_service/src/setui_setting_controller.dart';
 import 'package:lib_setui_settings_common/setting_source.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
@@ -18,10 +18,10 @@ const String value1 = 'value1';
 void main() {
   SetUiServiceAdapter manager;
   LocalSetUiService service;
-  FakeSettingControllerCreator fakeControllers;
+  FakeSetUiSettingControllerCreator fakeControllers;
 
   setUp(() {
-    fakeControllers = FakeSettingControllerCreator();
+    fakeControllers = FakeSetUiSettingControllerCreator();
     service = LocalSetUiService(
         creator: fakeControllers, proxyBinder: _bindListenerProxy);
     manager = SetUiServiceAdapter.withService(service, _bindListener, null);
@@ -121,15 +121,16 @@ Future<void> listenForNextChange(SettingSource notifier) async {
   await subscription.cancel();
 }
 
-class FakeSettingControllerCreator implements SettingControllerCreator {
+class FakeSetUiSettingControllerCreator
+    implements SetUiSettingControllerCreator {
   Map<SettingType, FakeStringSettingController> fakes = {};
 
   @override
-  SettingController createController(SettingType type) =>
+  SetUiSettingController createController(SettingType type) =>
       fakes.putIfAbsent(type, () => FakeStringSettingController());
 }
 
-class FakeStringSettingController extends SettingController {
+class FakeStringSettingController extends SetUiSettingController {
   final ValueNotifier<String> item = ValueNotifier<String>(defaultValue);
   bool open = false;
 

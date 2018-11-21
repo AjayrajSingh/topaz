@@ -4,9 +4,9 @@ import 'package:fidl_fuchsia_setui/fidl.dart';
 import 'package:fidl_fuchsia_net/fidl.dart' as net;
 import 'package:lib.app.dart/app.dart';
 
-import 'setting_controller.dart';
+import 'setui_setting_controller.dart';
 
-class ConnectivityController extends SettingController {
+class ConnectivityController extends SetUiSettingController {
   net.ConnectivityProxy _connectivity;
   bool _reachable;
 
