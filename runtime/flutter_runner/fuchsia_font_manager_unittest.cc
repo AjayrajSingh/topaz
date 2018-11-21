@@ -118,6 +118,20 @@ TEST_F(FuchsiaFontManagerTest, ReleaseThenCreateAgain) {
   EXPECT_TRUE(serif2 != nullptr);
 }
 
+// Verify that we get a new typeface instance after releasing a previous
+// instance of the same typeface (i.e. the cache purges the released typeface).
+TEST_F(FuchsiaFontManagerTest, ReleasedTypefaceIsPurged) {
+  sk_sp<SkTypeface> serif(
+      font_manager_->matchFamilyStyle("RobotoSlab", SkFontStyle()));
+  EXPECT_TRUE(serif != nullptr);
+  serif.reset();
+
+  sk_sp<SkTypeface> serif2(
+      font_manager_->matchFamilyStyle("RobotoSlab", SkFontStyle()));
+  EXPECT_TRUE(serif2 != nullptr);
+  EXPECT_NE(serif.get(), serif2.get());
+}
+
 // Verify that unknown font families are handled correctly.
 TEST_F(FuchsiaFontManagerTest, MatchUnknownFamily) {
   SkFontStyleSet* style_set = font_manager_->matchFamily("unknown");

@@ -24,8 +24,6 @@
 #include "lib/fxl/macros.h"
 #include "lib/fxl/memory/weak_ptr.h"
 #include "third_party/icu/source/common/unicode/uchar.h"
-#include "third_party/skia/src/core/SkFontDescriptor.h"
-#include "third_party/skia/src/ports/SkFontMgr_custom.h"
 
 namespace txt {
 
@@ -110,63 +108,8 @@ fidl::VectorPtr<fidl::StringPtr> BuildLanguageList(const char* bcp47[],
   return languages;
 }
 
-// SkTypeface with an "on deleted" callback.
-class CachedTypeface : public SkTypeface_Stream {
- public:
-  CachedTypeface(std::unique_ptr<SkFontData> font_data,
-                 const SkFontStyle& style, bool is_fixed_pitch,
-                 const SkString family_name,
-                 const std::function<void()>& on_deleted)
-      : SkTypeface_Stream(std::move(font_data), style, is_fixed_pitch,
-                          /*sys_font=*/true, family_name),
-        on_deleted_(on_deleted) {}
-
-  ~CachedTypeface() override {
-    if (on_deleted_)
-      on_deleted_();
-  }
-
- private:
-  std::function<void()> on_deleted_;
-
-  FXL_DISALLOW_COPY_AND_ASSIGN(CachedTypeface);
-};
-
-sk_sp<SkTypeface> CreateTypefaceFromSkStream(
-    std::unique_ptr<SkStreamAsset> stream, const SkFontArguments& args,
-    const std::function<void()>& on_deleted) {
-  using Scanner = SkTypeface_FreeType::Scanner;
-  Scanner scanner;
-  bool is_fixed_pitch;
-  SkFontStyle style;
-  SkString name;
-  Scanner::AxisDefinitions axis_definitions;
-  if (!scanner.scanFont(stream.get(), args.getCollectionIndex(), &name, &style,
-                        &is_fixed_pitch, &axis_definitions)) {
-    return nullptr;
-  }
-
-  const SkFontArguments::VariationPosition position =
-      args.getVariationDesignPosition();
-  SkAutoSTMalloc<4, SkFixed> axis_values(axis_definitions.count());
-  Scanner::computeAxisValues(axis_definitions, position, axis_values, name);
-
-  auto font_data =
-      std::make_unique<SkFontData>(std::move(stream), args.getCollectionIndex(),
-                                   axis_values.get(), axis_definitions.count());
-  return sk_make_sp<CachedTypeface>(std::move(font_data), style, is_fixed_pitch,
-                                    name, on_deleted);
-}
-
-sk_sp<SkTypeface> CreateTypefaceFromSkData(
-    sk_sp<SkData> data, int font_index,
-    const std::function<void()>& on_deleted) {
-  SkFontArguments args;
-  args.setCollectionIndex(font_index);
-
-  return CreateTypefaceFromSkStream(
-      std::make_unique<SkMemoryStream>(std::move(data)),
-      SkFontArguments().setCollectionIndex(font_index), on_deleted);
+sk_sp<SkTypeface> CreateTypefaceFromSkData(sk_sp<SkData> data, int font_index) {
+  return SkFontMgr::RefDefault()->makeFromData(std::move(data), font_index);
 }
 
 }  // anonymous namespace
@@ -174,6 +117,7 @@ sk_sp<SkTypeface> CreateTypefaceFromSkData(
 class FuchsiaFontManager::TypefaceCache {
  public:
   TypefaceCache() : weak_factory_(this) {}
+  ~TypefaceCache();
 
   // Get an SkTypeface with the given buffer id, font index, and buffer
   // data. Creates a new SkTypeface if one does not already exist.
@@ -206,9 +150,6 @@ class FuchsiaFontManager::TypefaceCache {
     }
   };
 
-  // Callback called when an SkTypeface with the given TypefaceId is deleted.
-  void OnTypefaceDeleted(TypefaceId typeface_id) const;
-
   // Callback called when an SkData with the given buffer id is deleted.
   void OnSkDataDeleted(int buffer_id) const;
 
@@ -231,14 +172,14 @@ class FuchsiaFontManager::TypefaceCache {
   FXL_DISALLOW_COPY_AND_ASSIGN(TypefaceCache);
 };
 
-void FuchsiaFontManager::TypefaceCache::OnSkDataDeleted(int buffer_id) const {
-  bool was_found = buffer_cache_.erase(buffer_id) != 0;
-  FXL_DCHECK(was_found);
+FuchsiaFontManager::TypefaceCache::~TypefaceCache() {
+  for (const auto& entry : typeface_cache_) {
+    entry.second->weak_unref();
+  }
 }
 
-void FuchsiaFontManager::TypefaceCache::OnTypefaceDeleted(
-    TypefaceId typeface_id) const {
-  bool was_found = typeface_cache_.erase(typeface_id) != 0;
+void FuchsiaFontManager::TypefaceCache::OnSkDataDeleted(int buffer_id) const {
+  bool was_found = buffer_cache_.erase(buffer_id) != 0;
   FXL_DCHECK(was_found);
 }
 
@@ -263,13 +204,8 @@ sk_sp<SkData> FuchsiaFontManager::TypefaceCache::GetOrCreateSkData(
 
 sk_sp<SkTypeface> FuchsiaFontManager::TypefaceCache::CreateSkTypeface(
     TypefaceId id, sk_sp<SkData> buffer) const {
-  auto weak_this = weak_factory_.GetWeakPtr();
-  auto result = CreateTypefaceFromSkData(std::move(buffer), id.font_index,
-                                         [weak_this, id] {
-                                           if (weak_this) {
-                                             weak_this->OnTypefaceDeleted(id);
-                                           }
-                                         });
+  auto result = CreateTypefaceFromSkData(std::move(buffer), id.font_index);
+  result->weak_ref();
   typeface_cache_[id] = result.get();
   return result;
 }
@@ -279,7 +215,12 @@ sk_sp<SkTypeface> FuchsiaFontManager::TypefaceCache::GetOrCreateTypeface(
   auto id = TypefaceId{buffer_id, font_index};
   auto iter = typeface_cache_.find(id);
   if (iter != typeface_cache_.end()) {
-    return sk_ref_sp(iter->second);
+    if (iter->second->try_ref()) {
+      return sk_ref_sp(iter->second);
+    } else {
+      iter->second->weak_unref();
+      typeface_cache_.erase(iter);
+    }
   }
   sk_sp<SkData> data = GetOrCreateSkData(buffer_id, buffer);
   if (!data) {
