@@ -83,9 +83,15 @@ class Transaction {
     // forward the updates (puts and deletes) to Ledger.
     final updateLedgerFutures = <Future<ledger.Status>>[];
     for (final document in _documents) {
-      updateLedgerFutures
-        ..addAll(saveDocumentToPage(document, _pageProxy))
-        ..add(saveSchemaToPage(document.documentId.schema, _pageProxy));
+      if (document.state == DocumentState.available) {
+        updateLedgerFutures
+          ..addAll(saveDocumentToPage(document, _pageProxy))
+          ..add(saveSchemaToPage(document.documentId.schema, _pageProxy));
+      } else {
+        final futures = await deleteDocumentFromPage(
+            document, _pageProxy, _pageSnapshotProxy);
+        updateLedgerFutures.addAll(futures);
+      }
     }
 
     // Await until all updates have been succesfully executed.

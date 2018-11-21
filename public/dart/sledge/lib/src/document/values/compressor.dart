@@ -13,7 +13,7 @@ import 'key_value.dart';
 /// Class to compress long keys.
 ///
 /// Instead of directly storing (key, value) pairs in Ledger, we store
-/// ({hash(key)}, {|key|}{key}{value}) instead.
+/// ({hash(key)}, {|key|}{key}{value}).
 /// {|key|} is an Uint64 and takes 8 bytes to store.
 class Compressor {
   static const _listEquality = const ListEquality();

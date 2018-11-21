@@ -73,6 +73,7 @@ dart_test("dart_sledge_tests") {
     "crdt_test_framework_test/evaluation_order_test.dart",
     "crdt_test_framework_test/storage_state_test.dart",
     "crdt_test_framework_test/thrown_error_test.dart",
+    "document_deletion_test.dart",
     "document_id_test.dart",
     "document_ss_test.dart",
     "document_test.dart",

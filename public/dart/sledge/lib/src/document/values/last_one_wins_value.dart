@@ -29,6 +29,7 @@ class _LastOneWinsValue<T> {
 
   ConvertedChange<int, T> getChange() {
     if (_valueToRollback == null) {
+      // If there's nothing to rollback, no changes have been done.
       return new ConvertedChange<int, T>();
     }
     return new ConvertedChange<int, T>(<int, T>{0: _value});
