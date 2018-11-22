@@ -31,12 +31,12 @@ class PosNegCounterValue<T extends num> implements LeafValue {
   final StreamController<T> _changeController =
       new StreamController<T>.broadcast();
   static final _listEquality = new ListEquality();
-  final DataConverter<Uint8List, T> _converter;
+  final MapToKVListConverter<Uint8List, T> _converter;
 
   /// Default constructor.
   PosNegCounterValue(this._currentInstanceId)
       : _defaultValue = new Converter<T>().defaultValue,
-        _converter = new DataConverter<Uint8List, T>(),
+        _converter = new MapToKVListConverter<Uint8List, T>(),
         _storage = new KeyValueStorage<Uint8List, T>(
             equals: _listEquality.equals, hashCode: _listEquality.hash) {
     _sum = _defaultValue;

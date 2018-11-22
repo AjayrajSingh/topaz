@@ -17,7 +17,7 @@ class SetValue<E> extends SetBase<E> implements LeafValue {
   // Stores elements of [this]. Each element is stored both in a key and in a
   // value. It's done to provide an appropriate [lookup] method.
   final KeyValueStorage<E, E> _map;
-  final DataConverter<E, bool> _converter;
+  final MapToKVListConverter<E, bool> _converter;
   final StreamController<SetChange<E>> _changeController =
       new StreamController<SetChange<E>>.broadcast();
 
@@ -26,7 +26,7 @@ class SetValue<E> extends SetBase<E> implements LeafValue {
   /// It should be coherent with encoding of [E] done by Converter.
   SetValue({bool equals(E entry1, E entry2), int hashCode(E entry)})
       : _map = new KeyValueStorage<E, E>(equals: equals, hashCode: hashCode),
-        _converter = new DataConverter<E, bool>();
+        _converter = new MapToKVListConverter<E, bool>();
 
   @override
   Change getChange() => _converter.serialize(_removeValue(_map.getChange()));

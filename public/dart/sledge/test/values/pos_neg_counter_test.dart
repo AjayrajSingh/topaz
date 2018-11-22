@@ -68,7 +68,7 @@ void main() {
   });
 
   test('PosNegCounterValue construction', () {
-    DataConverter conv = new DataConverter<Uint8List, int>();
+    final conv = new MapToKVListConverter<Uint8List, int>();
     final cnt = new PosNegCounterValue<int>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
           _newIntMap()
@@ -78,7 +78,7 @@ void main() {
   });
 
   test('PosNegCounterValue construction 2', () {
-    DataConverter conv = new DataConverter<Uint8List, int>();
+    final conv = new MapToKVListConverter<Uint8List, int>();
     final cnt = new PosNegCounterValue<int>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
           _newIntMap()
@@ -90,7 +90,7 @@ void main() {
   });
 
   test('PosNegCounterValue construction double', () {
-    DataConverter conv = new DataConverter<Uint8List, double>();
+    final conv = new MapToKVListConverter<Uint8List, double>();
     final cnt = new PosNegCounterValue<double>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, double>(
           newUint8ListMap<double>()
@@ -102,7 +102,7 @@ void main() {
   });
 
   test('PosNegCounterValue applyChange', () {
-    DataConverter conv = new DataConverter<Uint8List, int>();
+    final conv = new MapToKVListConverter<Uint8List, int>();
     final cnt = new PosNegCounterValue<int>(id1);
     expect(cnt.value, equals(0));
     cnt.applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
@@ -117,7 +117,7 @@ void main() {
   });
 
   test('PosNegCounterValue onChange stream', () {
-    DataConverter conv = new DataConverter<Uint8List, int>();
+    final conv = new MapToKVListConverter<Uint8List, int>();
     final cnt = new PosNegCounterValue<int>(id1)
       ..applyChange(conv.serialize(new ConvertedChange<Uint8List, int>(
           _newIntMap()

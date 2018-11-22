@@ -130,12 +130,12 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   final OrderedListTreePath _root = new OrderedListTreePath.root();
   final StreamController<OrderedListChange<E>> _changeController =
       new StreamController<OrderedListChange<E>>.broadcast();
-  final DataConverter _converter;
+  final MapToKVListConverter _converter;
   final bool Function(E, E) _equals;
 
   /// Default constructor.
   OrderedListValue(this._instanceId, {bool equals(E element1, E element2)})
-      : _converter = new DataConverter<OrderedListTreePath, E>(
+      : _converter = new MapToKVListConverter<OrderedListTreePath, E>(
             keyConverter: orderedListTreePathConverter),
         _storage = new KeyValueStorage<OrderedListTreePath, E>(),
         _equals = equals ?? ((E element1, E element2) => element1 == element2);

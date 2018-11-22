@@ -64,7 +64,7 @@ void main() {
     });
 
     test('data converter', () {
-      final conv = new DataConverter<String, int>();
+      final conv = new MapToKVListConverter<String, int>();
       final longBuffer = new StringBuffer();
       for (int i = 0; i < 100; i++) {
         longBuffer.write('$i');

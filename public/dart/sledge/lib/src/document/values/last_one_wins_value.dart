@@ -66,12 +66,12 @@ class _LastOneWinsValue<T> {
 /// Sledge Last One Wins value.
 class LastOneWinsValue<T> implements LeafValue {
   final _LastOneWinsValue _value;
-  final DataConverter<int, T> _converter;
+  final MapToKVListConverter<int, T> _converter;
   ValueObserver _observer;
 
   /// Default constructor.
   LastOneWinsValue([Change init])
-      : _converter = new DataConverter<int, T>(),
+      : _converter = new MapToKVListConverter<int, T>(),
         _value = new _LastOneWinsValue<T>(new Converter<T>().defaultValue) {
     applyChange(init ?? new Change());
   }

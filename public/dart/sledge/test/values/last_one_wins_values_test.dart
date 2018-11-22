@@ -63,7 +63,7 @@ void main() {
   });
 
   test('Integer oprations', () {
-    final conv = new DataConverter<int, int>();
+    final conv = new MapToKVListConverter<int, int>();
     final x = new LastOneWinsValue<int>(
         conv.serialize(new ConvertedChange<int, int>({0: -3})));
     expect(x.value, equals(-3));
@@ -80,7 +80,7 @@ void main() {
   });
 
   test('Double operations', () {
-    final conv = new DataConverter<int, double>();
+    final conv = new MapToKVListConverter<int, double>();
     final x = new LastOneWinsValue<double>(
         conv.serialize(new ConvertedChange<int, double>({0: -3.5})));
     expect(x.value, equals(-3.5));
@@ -97,7 +97,7 @@ void main() {
   });
 
   test('String operations', () {
-    final conv = new DataConverter<int, String>();
+    final conv = new MapToKVListConverter<int, String>();
     final x = new LastOneWinsValue<String>(
         conv.serialize(new ConvertedChange<int, String>({0: 'bar'})));
     expect(x.value, equals('bar'));
@@ -114,7 +114,7 @@ void main() {
   });
 
   test('Boolean operations', () {
-    final conv = new DataConverter<int, bool>();
+    final conv = new MapToKVListConverter<int, bool>();
     final x = new LastOneWinsValue<bool>(
         conv.serialize(new ConvertedChange<int, bool>({0: true})));
     expect(x.value, equals(true));
@@ -129,7 +129,7 @@ void main() {
   });
 
   test('onChange stream', () {
-    final conv = new DataConverter<int, String>();
+    final conv = new MapToKVListConverter<int, String>();
     final x = new LastOneWinsValue<String>(
         conv.serialize(new ConvertedChange<int, String>({0: 'aba'})));
     Stream<String> changeStream = x.onChange;

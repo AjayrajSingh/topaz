@@ -32,13 +32,13 @@ abstract class Converter<T> {
 }
 
 /// Class for converting Map<K, V> to List<KeyValue> and back.
-class DataConverter<K, V> {
+class MapToKVListConverter<K, V> {
   final Converter<K> _keyConverter;
   final Converter<V> _valueConverter;
   final Compressor _compressor = new Compressor();
 
   /// Constructor.
-  DataConverter({Converter<K> keyConverter, Converter<V> valueConverter})
+  MapToKVListConverter({Converter<K> keyConverter, Converter<V> valueConverter})
       : _keyConverter = keyConverter ?? new Converter<K>(),
         _valueConverter = valueConverter ?? new Converter<V>();
 

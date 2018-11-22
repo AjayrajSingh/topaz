@@ -19,11 +19,11 @@ class MapValue<K, V> extends MapBase<K, V>
   final KeyValueStorage<K, V> _map;
   final StreamController<MapChange<K, V>> _changeController =
       new StreamController<MapChange<K, V>>.broadcast();
-  final DataConverter _converter;
+  final MapToKVListConverter _converter;
 
   /// Creates a MapValue with provided [equals] as equality.
   MapValue({bool equals(K key1, K key2), int hashCode(K key)})
-      : _converter = new DataConverter<K, V>(),
+      : _converter = new MapToKVListConverter<K, V>(),
         _map = new KeyValueStorage<K, V>(equals: equals, hashCode: hashCode);
 
   @override
