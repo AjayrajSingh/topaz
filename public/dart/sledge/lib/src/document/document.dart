@@ -12,7 +12,7 @@ import '../uint8list_ops.dart';
 import 'change.dart';
 import 'document_id.dart';
 import 'leaf_value.dart';
-import 'value_node.dart';
+import 'node_value.dart';
 import 'value_observer.dart';
 import 'values/last_one_wins_value.dart';
 
@@ -36,7 +36,7 @@ enum DocumentState {
 class Document implements ValueObserver {
   final Sledge _sledge;
   final DocumentId _documentId;
-  ValueNode _value;
+  NodeValue _value;
   final Map<Uint8List, LeafValue> _fields;
   final ConnectionId _connectionId;
   static const int _identifierLength = 21;

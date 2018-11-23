@@ -82,7 +82,7 @@ To store data we can create `Values` from `Schemas`.
 Every `Type` has an associated `Value`, for example:
   * Boolean -> BooleanValue
   * Integer -> IntegerValue
-  * Schema -> ValueNode
+  * Schema -> NodeValue
 
 ### Documents
 

@@ -8,8 +8,8 @@ import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 
+import '../document/node_value.dart';
 import '../document/value.dart';
-import '../document/value_node.dart';
 import '../sledge_connection_id.dart';
 import '../uint8list_ops.dart' as utils;
 import 'base_type.dart';
@@ -93,7 +93,7 @@ class Schema implements BaseType {
 
   @override
   Value newValue(ConnectionId id) {
-    return new ValueNode(_schemaDescription, id);
+    return new NodeValue(_schemaDescription, id);
   }
 
   /// Returns a description of the schema.

@@ -8,24 +8,21 @@ import 'leaf_value.dart';
 import 'value.dart';
 
 /// Class that maps field names to values.
-/// TODO: rename to NodeValue
-class ValueNode implements Value {
+/// See the documentation for the `Value` class for a description
+/// of its role.
+class NodeValue implements Value {
   Map<String, Value> _childValues;
-  // TODO: remove
-  Map<Symbol, Value> _childValuesDeprecated;
 
   /// Default constructor. [schemaDescription] specifies the name and type of
   /// every field.
-  ValueNode(
+  NodeValue(
       Map<String, BaseType> schemaDescription, ConnectionId connectionId) {
-    _childValuesDeprecated = <Symbol, Value>{};
     _childValues = <String, Value>{};
 
     schemaDescription.forEach((String name, BaseType type) {
       Value value = type.newValue(connectionId);
       assert(value != null);
       _childValues[name] = value;
-      _childValuesDeprecated[new Symbol(name)] = value;
     });
   }
 
@@ -33,7 +30,7 @@ class ValueNode implements Value {
   Map<String, LeafValue> collectFields() {
     final fields = <String, LeafValue>{};
     _childValues.forEach((String name, Value value) {
-      if (value is ValueNode) {
+      if (value is NodeValue) {
         value
             .collectFields()
             .forEach((key, value) => fields['$name.$key'] = value);

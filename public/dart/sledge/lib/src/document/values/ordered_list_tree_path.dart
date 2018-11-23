@@ -12,7 +12,7 @@ import 'converter.dart';
 
 // Length of a bytelist, written on edge to value node.
 // Bytelist content is: {1}{timetamp}, {timestamp} is 8 bytes long.
-const _valueNodeSuffixLength = 9;
+const _nodeValueSuffixLength = 9;
 const _listEquality = const ListEquality();
 
 /// Type of child.
@@ -40,14 +40,14 @@ class OrderedListTreePath implements Comparable<OrderedListTreePath> {
       : this(concatListOfUint8Lists([parent._data]..addAll(labels)));
 
   /// Creates OrderedListTreePath corresponding to tree root.
-  OrderedListTreePath.root() : this(new Uint8List(_valueNodeSuffixLength));
+  OrderedListTreePath.root() : this(new Uint8List(_nodeValueSuffixLength));
 
   /// Checks if node is a child of a [parent].
   bool isDescendant(OrderedListTreePath parent) {
     if (_data.length <= parent._data.length) {
       return false;
     }
-    int prefixLen = parent._data.length - _valueNodeSuffixLength;
+    int prefixLen = parent._data.length - _nodeValueSuffixLength;
     for (int i = 0; i < prefixLen; i++) {
       if (parent._data[i] != _data[i]) {
         return false;
@@ -60,7 +60,7 @@ class OrderedListTreePath implements Comparable<OrderedListTreePath> {
   OrderedListTreePath parentPath() {
     // Remove appendix corresponding to value from path.
     return new OrderedListTreePath(new Uint8List.fromList(
-        _data.getRange(0, _data.length - _valueNodeSuffixLength).toList()));
+        _data.getRange(0, _data.length - _nodeValueSuffixLength).toList()));
   }
 
   /// Returns OrderedListTreePath representing child of this.

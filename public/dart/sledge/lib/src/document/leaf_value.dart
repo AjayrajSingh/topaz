@@ -9,6 +9,8 @@ import 'value.dart';
 import 'value_observer.dart';
 
 /// Interface implemented by all observable Sledge Values.
+/// See the documentation for the `Value` class for a description
+/// of its role.
 abstract class LeafValue implements Value {
   /// Observes events occurring on this value.
   set observer(ValueObserver observer);
