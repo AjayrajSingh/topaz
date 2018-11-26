@@ -26,8 +26,6 @@ import 'package:vm/target/flutter_runner.dart' show FlutterRunnerTarget;
 
 ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
   ..addOption('sdk-root', help: 'Path to runner_patched_sdk')
-  ..addOption('single-root-scheme', help: 'Deprecated')
-  ..addOption('single-root-base', help: 'Deprecated')
   ..addOption('multi-root-scheme', help: 'The URI scheme for the multi root')
   ..addMultiOption('multi-root',
       help: 'A base for the multi root. Can be given multiple times to build an overlay')
@@ -119,16 +117,10 @@ Future<void> main(List<String> args) async {
 
   FileSystem fileSystem = StandardFileSystem.instance;
   String multiRootScheme = options['multi-root-scheme'];
-  if (multiRootScheme == null) {
-    multiRootScheme = options['single-root-scheme'];
-  }
   if (multiRootScheme != null) {
     final rootUris = <Uri>[];
     for (String root in options['multi-root']) {
       rootUris.add(Uri.base.resolveUri(new Uri.file(root)));
-    }
-    if (options['single-root-base'] != null) {
-      rootUris.add(Uri.base.resolveUri(new Uri.file(options['single-root-base'])));
     }
     final multiRootFS = new MultiRootFileSystem(multiRootScheme, rootUris, fileSystem);
     fileSystem = new SchemeBasedFileSystem({
