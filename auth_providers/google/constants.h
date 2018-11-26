@@ -24,16 +24,18 @@ constexpr char kFirebaseAuthEndpoint[] =
 constexpr char kRedirectUri[] = "https://localhost/fuchsiaoauth2redirect";
 constexpr char kWebViewUrl[] = "web_view";
 
-constexpr auto kScopes = {"openid",
-                          "email",
-                          "https://www.googleapis.com/auth/assistant",
-                          "https://www.googleapis.com/auth/gmail.modify",
-                          "https://www.googleapis.com/auth/userinfo.email",
-                          "https://www.googleapis.com/auth/userinfo.profile",
-                          "https://www.googleapis.com/auth/youtube.readonly",
-                          "https://www.googleapis.com/auth/contacts",
-                          "https://www.googleapis.com/auth/drive",
-                          "https://www.googleapis.com/auth/plus.login",
-                          "https://www.googleapis.com/auth/calendar.readonly"};
+constexpr auto kScopes = {
+    "openid",
+    "email",
+    "https://www.googleapis.com/auth/assistant",
+    "https://www.googleapis.com/auth/gmail.modify",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "https://www.googleapis.com/auth/youtube.readonly",
+    "https://www.googleapis.com/auth/contacts",
+    "https://www.googleapis.com/auth/drive",
+    "https://www.googleapis.com/auth/plus.login",
+    "https://www.googleapis.com/auth/calendar.readonly",
+    "https://www.googleapis.com/auth/devstorage.read_write"};
 
 }  // namespace google_auth_provider
