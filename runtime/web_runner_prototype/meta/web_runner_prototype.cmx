@@ -1,0 +1,9 @@
+{
+    "program": {
+        "binary": "bin/web_runner_prototype"
+    },
+    "sandbox": {
+        "services": [
+        ]
+    }
+}

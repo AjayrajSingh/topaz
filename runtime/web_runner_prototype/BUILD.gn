@@ -56,13 +56,22 @@ if (enable_chromium_based_web_runner) {
   }
 
   package("web_runner_prototype") {
-    deprecated_no_cmx = "//build"
-
     deps = [
       ":bin",
     ]
 
-    binary = "web_runner_prototype"
+    binaries = [
+      {
+        name = "web_runner_prototype"
+      },
+    ]
+
+    meta = [
+      {
+        path = rebase_path("meta/web_runner_prototype.cmx")
+        dest = "web_runner_prototype.cmx"
+      },
+    ]
   }
 
   package("web_runner_tests") {

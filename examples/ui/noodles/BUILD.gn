@@ -29,11 +29,20 @@ executable("bin") {
 }
 
 package("noodles") {
-  deprecated_no_cmx = "//build"
-
   deps = [
     ":bin",
   ]
 
-  binary = "noodles"
+  binaries = [
+    {
+      name = "noodles"
+    },
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/noodles.cmx")
+      dest = "noodles.cmx"
+    },
+  ]
 }
