@@ -45,6 +45,8 @@ dart_library("fuchsia_modular") {
     "//third_party/dart-pkg/pub/uuid",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_services",
   ]
 }
 

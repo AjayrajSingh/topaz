@@ -2,14 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl;
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 import 'package:fidl/fidl.dart';
+import 'package:fuchsia/fuchsia.dart';
 
-// Import the fakes to aid in testing
-import '../../fuchsia.dart';
 import 'service_provider_impl.dart';
 
 /// The [StartupContext] holds references to the services and connections
@@ -71,8 +69,8 @@ class StartupContext {
     final Handle environmentHandle = MxStartupInfo.takeEnvironment();
     if (environmentHandle != null) {
       environmentProxy
-       ..ctrl
-          .bind(InterfaceHandle<fidl.Environment>(Channel(environmentHandle)))
+        ..ctrl
+            .bind(InterfaceHandle<fidl.Environment>(Channel(environmentHandle)))
         ..getLauncher(launcherProxy.ctrl.request())
         ..getServices(environmentServicesProxy.ctrl.request());
     }

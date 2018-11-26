@@ -2,11 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl/fidl.dart';
-import 'package:fuchsia/src/services/service_connection.dart';
-import 'package:test/test.dart';
 // ignore_for_file: implementation_imports
-
+import 'package:fidl/fidl.dart';
+import 'package:fuchsia_services/src/service_connection.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('connectToAgentService:=', () {

@@ -33,7 +33,7 @@ def main():
 import 'dart:async';
 
 import 'package:fidl_fuchsia_testing_runner/fidl_async.dart';
-import 'package:fuchsia/services.dart';
+import 'package:fuchsia_services/services.dart';
 import 'package:flutter_driver/driver_extension.dart';
 ''')
   outfile.write("import '%s' as flutter_app_main;\n" % args.main_dart)

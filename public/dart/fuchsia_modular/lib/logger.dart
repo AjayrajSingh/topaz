@@ -3,4 +3,4 @@
 // found in the LICENSE file.
 
 /// The logger used within the modular system.
-export 'package:fuchsia/logger.dart';
+export 'package:fuchsia_logger/logger.dart';

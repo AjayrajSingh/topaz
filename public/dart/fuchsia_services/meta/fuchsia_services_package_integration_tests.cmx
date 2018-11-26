@@ -1,6 +1,6 @@
 {
     "program": {
-        "data": "data/fuchsia_package_integration_tests"
+        "data": "data/fuchsia_services_package_integration_tests"
     },
     "sandbox": {
         "services": [

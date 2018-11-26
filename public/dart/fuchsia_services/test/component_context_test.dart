@@ -2,9 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fuchsia_services/src/component_context.dart'; // ignore: implementation_imports
 import 'package:test/test.dart';
-
-import 'package:fuchsia/src/services/component_context.dart'; // ignore: implementation_imports
 
 void main() {
   group('ComponentContext:', () {

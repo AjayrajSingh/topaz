@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
-import 'package:fuchsia/services.dart';
+import 'package:fuchsia_services/services.dart';
 import 'package:mockito/mockito.dart';
 import 'package:fuchsia_modular/src/module/internal/_intent_handler_impl.dart';
 import 'package:fuchsia_modular/src/module/internal/_module_impl.dart';

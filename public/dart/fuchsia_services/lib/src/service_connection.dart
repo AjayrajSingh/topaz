@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl_modular;
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl_sys;
 
 import 'component_context.dart';
@@ -27,7 +27,7 @@ void connectToAgentService<T>(
   }
 
   final serviceProviderProxy = fidl_sys.ServiceProviderProxy();
-  final agentControllerProxy = fidl.AgentControllerProxy();
+  final agentControllerProxy = fidl_modular.AgentControllerProxy();
 
   // Creates an interface request and binds one of the channels. Binding this
   // channel prior to connecting to the agent allows the developer to make
@@ -81,7 +81,7 @@ void connectToEnvironmentService<T>(AsyncProxy<T> serviceProxy) {
   // channel prior to connecting to the agent allows the developer to make
   // proxy calls without awaiting for the connection to actually establish.
   final serviceProxyRequest = serviceProxy.ctrl.request();
-  
+
   _connectToService(
     StartupContext.fromStartupInfo().environmentServices,
     serviceProxy.ctrl.$serviceName,

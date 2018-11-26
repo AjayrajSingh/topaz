@@ -2,17 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
-import("//topaz/runtime/dart/dart_test.gni")
-
-library_deps = [
-  "//peridot/public/fidl/fuchsia.modular",
-  "//garnet/public/fidl/fuchsia.sys",
-  "//third_party/dart-pkg/pub/meta",
-  "//topaz/public/dart/fidl",
-  "//topaz/public/dart/zircon",
-]
 
 dart_library("fuchsia") {
   package_name = "fuchsia"
@@ -21,46 +11,10 @@ dart_library("fuchsia") {
 
   sources = [
     "fuchsia.dart",
-    "logger.dart",
-    "media.dart",
-    "services.dart",
     "src/fakes/fuchsia_fakes.dart",
-    "src/services/component_context.dart",
-    "src/services/service_connection.dart",
-    "src/services/service_provider_impl.dart",
-    "src/services/startup_context.dart",
   ]
 
-  deps = library_deps
-}
-
-dart_test("fuchsia_package_unittests") {
-  sources = [
-    "services/service_connection_test.dart",
-    "services/service_provider_impl_test.dart",
-    "services/startup_context_test.dart",
+  deps = [
+    "//topaz/public/dart/zircon",
   ]
-
-  deps = library_deps + [
-           ":fuchsia",
-           "//third_party/dart-pkg/pub/test",
-         ]
-}
-
-dart_fuchsia_test("fuchsia_package_integration_tests") {
-  meta = [
-    {
-      path = rebase_path("meta/fuchsia_package_integration_tests.cmx")
-      dest = "fuchsia_package_integration_tests.cmx"
-    },
-  ]
-
-  sources = [
-    "services/component_context_test.dart",
-  ]
-
-  deps = library_deps + [
-           ":fuchsia",
-           "//third_party/dart-pkg/pub/test",
-         ]
 }

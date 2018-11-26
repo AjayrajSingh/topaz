@@ -6,7 +6,7 @@
 
 import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:mockito/mockito.dart';
-import 'package:fuchsia/services.dart';
+import 'package:fuchsia_services/services.dart';
 import 'package:test/test.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 
