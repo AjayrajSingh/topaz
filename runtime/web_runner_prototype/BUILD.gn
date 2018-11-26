@@ -10,6 +10,11 @@ if (enable_chromium_based_web_runner) {
     deprecated_system_image = true
     # Empty
   }
+
+  package("web_runner_tests") {
+    deprecated_system_image = true
+    # Empty
+  }
 } else {
   source_set("lib") {
     sources = [

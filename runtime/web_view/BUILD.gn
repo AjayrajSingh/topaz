@@ -23,6 +23,11 @@ if (enable_chromium_based_web_runner) {
     deprecated_system_image = true
     # Empty
   }
+
+  package("web_view_test_package") {
+    deprecated_system_image = true
+    # Empty
+  }
 } else {
   executable("web_view_bin") {
     output_name = "web_view"
