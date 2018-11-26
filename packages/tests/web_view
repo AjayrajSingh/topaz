@@ -6,7 +6,6 @@
     "packages": [
         "//topaz/runtime/web_view:web_view_test_package",
         "//topaz/runtime/web_view:web_view_link_test_package",
-        "//topaz/runtime/web_view/tests:web_view_provider_test",
-        "//topaz/runtime/web_view/tests:web_view_integration_tests"
+        "//topaz/runtime/web_view/tests:web_view_provider_test"
     ]
 }
