@@ -71,6 +71,7 @@ class ValueSlider extends StatelessWidget {
               alignment: Alignment.center,
               child: new Text('Result: ${snapshot.data}',
                   style: Theme.of(context).textTheme.display1),
+              key: Key('fib-result-widget-key'),
             );
           }
         });

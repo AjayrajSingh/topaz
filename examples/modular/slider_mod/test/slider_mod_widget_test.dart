@@ -48,7 +48,7 @@ void main() {
     print('tapping on Calc Fibonacci button');
     await driver.tap(find.text('Calc Fibonacci'));
     print('verifying the result');
-    await driver.waitFor(find.text('Result: 2'));
+    await driver.waitFor(find.byValueKey('fib-result-widget-key'));
     print('test is finished successfully');
-  }, skip: 'Skipping this test because driver is failing');
+  });
 }
