@@ -2,10 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'package:fidl_fuchsia_bluetooth/fidl.dart';
 import 'package:fidl_fuchsia_bluetooth_control/fidl.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.widgets/model.dart';
+
+const Duration _deviceListRefreshInterval = Duration(seconds: 5);
 
 /// Model containing state needed for the bluetooth settings app.
 class BluetoothSettingsModel extends Model implements PairingDelegate {
@@ -15,6 +18,7 @@ class BluetoothSettingsModel extends Model implements PairingDelegate {
   List<AdapterInfo> _adapters;
   AdapterInfo _activeAdapter;
   final List<RemoteDevice> _remoteDevices = [];
+  Timer _sortListTimer;
   bool _discoverable = true;
 
   PairingStatus pairingStatus;
@@ -62,6 +66,13 @@ class BluetoothSettingsModel extends Model implements PairingDelegate {
     connectToService(startupContext.environmentServices, _control.ctrl);
     _refresh();
 
+    // Sort the list by signal strength every few seconds.
+    _sortListTimer = Timer.periodic(_deviceListRefreshInterval, (_) {
+      _remoteDevices
+          .sort((a, b) => (b.rssi?.value ?? 0).compareTo(a.rssi?.value ?? 0));
+      _refresh();
+    });
+
     // Just for first draft purposes, refresh whenever there are any changes.
     // TODO: handle errors, refresh more gracefully
     _control
@@ -75,10 +86,15 @@ class BluetoothSettingsModel extends Model implements PairingDelegate {
         _refresh();
       }
       ..onDeviceUpdated = (device) {
-        _removeDeviceFromList(device.identifier);
-        _remoteDevices
-          ..add(device)
-          ..sort((a, b) => (b.rssi?.value ?? 0).compareTo(a.rssi?.value ?? 0));
+        int index =
+            _remoteDevices.indexWhere((d) => d.identifier == device.identifier);
+        if (index != -1) {
+          // Existing device, just update in-place.
+          _remoteDevices[index] = device;
+        } else {
+          // New device, add to bottom of list.
+          _remoteDevices.add(device);
+        }
         notifyListeners();
       }
       ..onDeviceRemoved = (deviceId) {
@@ -113,6 +129,7 @@ class BluetoothSettingsModel extends Model implements PairingDelegate {
   /// scanning.
   void dispose() {
     _control.ctrl.close();
+    _sortListTimer.cancel();
   }
 
   @override
