@@ -56,13 +56,16 @@ class TimeZoneController extends SetUiSettingController
   }
 
   @override
-  Future<bool> setSettingValue(SettingsObject value) async {
-    Completer<bool> completer = Completer();
+  Future<ReturnCode> applyMutation(Mutation mutation,
+      {MutationHandles handles}) async {
+    assert(mutation.timeZoneMutationValue != null);
 
-    final newId = value.data.timeZoneValue.current.id;
+    final Completer<ReturnCode> completer = Completer<ReturnCode>();
+    final currentTimeZone = mutation.timeZoneMutationValue.value.current;
+    final newId = currentTimeZone != null ? currentTimeZone.id : 0;
 
     _timeZoneProxy.setTimezone(newId, (success) {
-      completer.complete(success);
+      completer.complete(ReturnCode.ok);
     });
 
     return completer.future;

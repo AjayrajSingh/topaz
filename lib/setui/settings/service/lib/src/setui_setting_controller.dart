@@ -1,12 +1,11 @@
 import 'dart:async';
 
 import 'package:fidl_fuchsia_setui/fidl.dart';
-import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 
 /// Controller for a specific setting.
 ///
-/// The service instantiates [SettingController]s mapped to [SettingType]s.
+/// The service instantiates [SetUiSettingController]s mapped to [SettingType]s.
 abstract class SetUiSettingController {
   final List<SettingListenerProxy> listeners = [];
 
@@ -31,25 +30,6 @@ abstract class SetUiSettingController {
     }
   }
 
-  /// Subclasses should not override this.
-  ///
-  /// They should override [setSettingValue] instead.
-  Future<bool> setSetting(SettingsObject value) async {
-    if (listeners.isEmpty) {
-      await _initialize();
-    }
-
-    if (!active)
-      throw StateError(
-          'Attempted to set state with an uninitialized controller!');
-
-    final result = await setSettingValue(value);
-    if (listeners.isEmpty) {
-      await _close();
-    }
-    return result;
-  }
-
   Future<ReturnCode> mutate(Mutation mutation,
       {MutationHandles handles}) async {
     if (listeners.isEmpty) {
@@ -70,15 +50,10 @@ abstract class SetUiSettingController {
   }
 
   /// Subclasses should override this to make the changes requested
-  /// by setSettingValue, and return once complete.
-  Future<bool> setSettingValue(SettingsObject value);
-
+  /// by applyMutation, and return once complete.
   Future<ReturnCode> applyMutation(Mutation mutation,
-      {MutationHandles handles}) {
-    log.warning('mutation not implemented');
-    final Completer<ReturnCode> completer = Completer<ReturnCode>()
-      ..complete(ReturnCode.unsupported);
-    return completer.future;
+      {MutationHandles handles}) async {
+    return ReturnCode.unsupported;
   }
 
   /// Initializes the controller.

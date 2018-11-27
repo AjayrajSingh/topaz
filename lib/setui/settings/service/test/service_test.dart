@@ -41,25 +41,6 @@ void main() {
       await awaitForSetting(object, value1);
       expect(object.state, value1);
     });
-
-    test('sets a value', () async {
-      final object = manager.fetch<String>(SettingType.unknown);
-
-      await awaitForSetting(object, defaultValue);
-      expect(object.state, defaultValue);
-
-      final response = await manager.update(stringObject(value1));
-      expect(response.returnCode, ReturnCode.ok);
-
-      expect(object.state, value1);
-    });
-    test('sets a value without listeners and closes after set', () async {
-      final response = await manager.update(stringObject(value1));
-      expect(response.returnCode, ReturnCode.ok);
-      final FakeStringSettingController controller =
-          fakeControllers.fakes[SettingType.unknown];
-      expect(controller.open, false);
-    });
     test('mutates a value', () async {
       final object = manager.fetch<String>(SettingType.unknown);
 
@@ -71,8 +52,19 @@ void main() {
           Mutation.withStringMutationValue(StringMutation(
               operation: StringOperation.update, value: value1)));
       expect(response.returnCode, ReturnCode.ok);
-
       expect(object.state, value1);
+    });
+    test('mutates a value without listeners and closes after mutate', () async {
+      final response = await manager.mutate(
+          SettingType.unknown,
+          Mutation.withStringMutationValue(StringMutation(
+              operation: StringOperation.update, value: value1)));
+      expect(response.returnCode, ReturnCode.ok);
+
+      final FakeStringSettingController controller =
+          fakeControllers.fakes[SettingType.unknown];
+      expect(controller.item.value, value1);
+      expect(controller.open, false);
     });
     test('calls initialize and close depending on listeners', () async {
       final object = manager.fetch<String>(SettingType.unknown);
@@ -153,13 +145,13 @@ class FakeStringSettingController extends SetUiSettingController {
   }
 
   @override
-  Future<bool> setSettingValue(SettingsObject value) async {
-    item.value = value.data.stringValue;
-    return true;
+  Future<ReturnCode> mutate(Mutation mutation,
+      {MutationHandles handles}) async {
+    return applyMutation(mutation, handles: handles);
   }
 
   @override
-  Future<ReturnCode> mutate(Mutation mutation,
+  Future<ReturnCode> applyMutation(Mutation mutation,
       {MutationHandles handles}) async {
     if (mutation.tag != MutationTag.stringMutationValue) {
       return ReturnCode.unsupported;

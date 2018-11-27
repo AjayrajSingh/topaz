@@ -24,10 +24,7 @@ class LocalSetUiService implements SetUiService {
   @override
   void update(
       SettingsObject value, void Function(UpdateResponse response) callback) {
-    _getController(value.settingType).setSetting(value).then((success) {
-      callback(UpdateResponse(
-          returnCode: success ? ReturnCode.ok : ReturnCode.failed));
-    });
+    // TODO: Remove this method and replace with mutate.
   }
 
   @override

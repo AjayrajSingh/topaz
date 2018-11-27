@@ -8,6 +8,7 @@ import 'package:fidl_fuchsia_setui/fidl.dart';
 
 import 'setui_setting_controller.dart';
 
+// TODO: Implement and override applyMutation.
 class NetworkController extends SetUiSettingController {
   @override
   Future<void> close() async {
@@ -17,12 +18,6 @@ class NetworkController extends SetUiSettingController {
   @override
   Future<void> initialize() async {
     // TODO: implement initialize
-  }
-
-  @override
-  Future<bool> setSettingValue(SettingsObject value) async {
-    // TODO: implement setSettingValue
-    return false;
   }
 
   // TODO: implement value

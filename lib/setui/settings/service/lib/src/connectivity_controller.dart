@@ -6,6 +6,7 @@ import 'package:lib.app.dart/app.dart';
 
 import 'setui_setting_controller.dart';
 
+// TODO: Implement and override applyMutation.
 class ConnectivityController extends SetUiSettingController {
   net.ConnectivityProxy _connectivity;
   bool _reachable;
@@ -39,11 +40,6 @@ class ConnectivityController extends SetUiSettingController {
       _reachable = reachable;
       notifyListeners();
     }
-  }
-
-  @override
-  Future<bool> setSettingValue(SettingsObject value) async {
-    return false;
   }
 
   @override
