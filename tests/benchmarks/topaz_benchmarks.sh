@@ -14,7 +14,7 @@
 runbench_read_arguments "$@"
 
 # Run benchmarks
-if `run vulkan_is_supported`; then
+if `/pkgfs/packages/run/0/bin/run vulkan_is_supported`; then
   # Run these benchmarks in the current shell environment, because they write
   # to (hidden) global state used by runbench_finish.
   . /pkgfs/packages/startup_benchmarks/0/bin/startup_benchmarks.sh "$@"
