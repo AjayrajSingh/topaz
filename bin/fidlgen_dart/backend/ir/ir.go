@@ -816,6 +816,12 @@ func (c *compiler) compileStruct(val types.Struct) Struct {
 		r.Members = append(r.Members, member)
 	}
 
+	if len(r.Members) == 0 {
+		r.Members = []StructMember{
+			c.compileStructMember(types.EmptyStructMember("reserved")),
+		}
+	}
+
 	r.HasNullableField = hasNullableField
 
 	r.TypeExpr = fmt.Sprintf(`const $fidl.StructType<%s>(

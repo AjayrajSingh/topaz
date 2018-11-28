@@ -3,6 +3,7 @@
         "garnet/packages/tests/fidl_compatibility_test_bin",
         "garnet/packages/tests/fidl_compatibility_test_server_cpp",
         "garnet/packages/tests/fidl_compatibility_test_server_go",
+        "garnet/packages/tests/fidl_compatibility_test_server_rust",
         "topaz/packages/tests/fidl_compatibility_test_server_dart"
     ],
     "packages": [
