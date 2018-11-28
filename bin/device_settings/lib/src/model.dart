@@ -2,11 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
 import 'dart:io';
 
-import 'package:fidl_fuchsia_amber/fidl_async.dart' as amber;
+import 'package:fidl_fuchsia_amber/fidl.dart' as amber;
 import 'package:flutter/foundation.dart';
-import 'package:lib.app.dart/app_async.dart';
+import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.settings/device_info.dart';
 import 'package:lib.widgets/model.dart';
@@ -55,9 +56,8 @@ class DeviceSettingsModel extends Model {
       DateTime.now().isAfter(_lastUpdate.add(Duration(seconds: 60)));
 
   /// Checks for update from the update service
-  Future<void> checkForUpdates() async {
-    await _amberControl.checkForSystemUpdate();
-    _lastUpdate = DateTime.now();
+  void checkForUpdates() {
+    _amberControl.checkForSystemUpdate((_) => _lastUpdate = DateTime.now());
   }
 
   Future<void> selectChannel(amber.SourceConfig selectedConfig) async {
@@ -67,19 +67,28 @@ class DeviceSettingsModel extends Model {
     // more than one source well.
     for (amber.SourceConfig config in channels) {
       if (config.statusConfig.enabled) {
-        await _amberControl.setSrcEnabled(config.id, false);
+        await setSrcEnabled(config.id, enabled: false);
       }
     }
 
     if (selectedConfig != null) {
-      await _amberControl.setSrcEnabled(selectedConfig.id, true);
+      await setSrcEnabled(selectedConfig.id, enabled: true);
     }
-    await _updateSources();
+    _updateSources();
   }
 
-  Future<void> _updateSources() async {
-    _channels = await _amberControl.listSrcs();
-    notifyListeners();
+  /// Wraps amber.setSrcEnabled to be asynchronous.
+  Future<void> setSrcEnabled(String id, {@required bool enabled}) {
+    final completer = Completer();
+    _amberControl.setSrcEnabled(id, enabled, (_) => completer.complete());
+    return completer.future;
+  }
+
+  void _updateSources() {
+    _amberControl.listSrcs((srcs) {
+      _channels = srcs;
+      notifyListeners();
+    });
   }
 
   void dispose() {
@@ -89,10 +98,9 @@ class DeviceSettingsModel extends Model {
   Future<void> _onStart() async {
     final startupContext = StartupContext.fromStartupInfo();
     _sourceDate = DeviceInfo.getSourceDate();
-    await connectToService(
-        startupContext.environmentServices, _amberControl.ctrl);
+    connectToService(startupContext.environmentServices, _amberControl.ctrl);
 
-    await _updateSources();
+    _updateSources();
   }
 
   void factoryReset() async {

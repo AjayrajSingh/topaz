@@ -11,7 +11,7 @@ import 'src/widget.dart';
 
 /// Main entry point to the device settings module.
 void main() {
-  setupLoggerAsync();
+  setupLogger();
 
   Providers providers = Providers()..provideValue(DeviceSettingsModel());
 
