@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:fidl_fuchsia_devicesettings/fidl.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:fidl_fuchsia_devicesettings/fidl_async.dart';
+import 'package:lib.app.dart/app_async.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:meta/meta.dart';
 
@@ -39,13 +39,12 @@ class DeviceInfo {
     final completer = Completer<bool>();
     final deviceSettingsManagerProxy = DeviceSettingsManagerProxy();
 
-    connectToService(StartupContext.fromStartupInfo().environmentServices,
+    await connectToService(StartupContext.fromStartupInfo().environmentServices,
         deviceSettingsManagerProxy.ctrl);
-    deviceSettingsManagerProxy.getInteger(_factoryResetKey,
-        (int resetFlagValue, Status s) {
-      deviceSettingsManagerProxy.ctrl.close();
-      completer.complete(s == Status.ok && resetFlagValue > 0);
-    });
+    final result =
+        await deviceSettingsManagerProxy.getInteger(_factoryResetKey);
+    deviceSettingsManagerProxy.ctrl.close();
+    completer.complete(result.s == Status.ok && result.val > 0);
     return completer.future;
   }
 
@@ -59,13 +58,12 @@ class DeviceInfo {
     final completer = Completer<bool>();
     final deviceSettingsManagerProxy = DeviceSettingsManagerProxy();
 
-    connectToService(StartupContext.fromStartupInfo().environmentServices,
+    await connectToService(StartupContext.fromStartupInfo().environmentServices,
         deviceSettingsManagerProxy.ctrl);
-    deviceSettingsManagerProxy.setInteger(_factoryResetKey, resetFlagValue,
-        (bool result) {
-      deviceSettingsManagerProxy.ctrl.close();
-      completer.complete(result);
-    });
+    bool result = await deviceSettingsManagerProxy.setInteger(
+        _factoryResetKey, resetFlagValue);
+    deviceSettingsManagerProxy.ctrl.close();
+    completer.complete(result);
     return completer.future;
   }
 }
