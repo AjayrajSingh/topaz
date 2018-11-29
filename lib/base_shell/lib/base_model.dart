@@ -15,7 +15,6 @@ import 'package:fidl_fuchsia_ui_input/fidl.dart' as input;
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:lib.app.dart/app.dart' as app;
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.base_shell/session_shell_chooser.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
@@ -31,11 +30,6 @@ export 'package:lib.widgets/model.dart'
 typedef GetPresentationModeCallback = void Function(PresentationMode mode);
 
 const Duration _kCobaltTimerTimeout = const Duration(seconds: 20);
-const int _kKeyCodeL = 108;
-const int _kKeyCodeS = 115;
-const int _kKeyCodeSpacebar = 32;
-const int _kKeyModifierLeftCtrl = 8;
-const int _kKeyModifierRightAlt = 64;
 const int _kSessionShellLoginTimeMetricId = 14;
 
 /// Provides common features needed by all base shells.
@@ -64,8 +58,6 @@ class CommonBaseShellModel extends BaseShellModel
   /// Only updated after [refreshUsers] is called.
   List<Account> _accounts;
 
-  final SessionShellChooser _sessionShellChooser = SessionShellChooser();
-
   /// Childview connection that contains the session shell.
   ChildViewConnection _childViewConnection;
 
@@ -75,8 +67,6 @@ class CommonBaseShellModel extends BaseShellModel
       PresentationModeListenerBinding();
   final PointerCaptureListenerHackBinding _pointerCaptureListenerBinding =
       PointerCaptureListenerHackBinding();
-  ShadowTechnique _currentShadowTechnique = ShadowTechnique.unshadowed;
-  bool _currentClippingEnabled = true;
 
   // Because this base shell only supports a single user logged in at a time,
   // we don't need to maintain separate ServiceProvider for each logged-in user.
@@ -227,35 +217,6 @@ class CommonBaseShellModel extends BaseShellModel
     notifyListeners();
   }
 
-  /// |KeyboardCaptureListener|.
-  @override
-  void onEvent(input.KeyboardEvent ev) {
-    log.info('Keyboard captured in base shell!');
-    if (ev.codePoint == _kKeyCodeSpacebar && _sessionShellChooser != null) {
-      if (_sessionShellChooser.swapSessionShells()) {
-        _updatePresentation(_sessionShellChooser.currentSessionShell);
-        _userManager.setSessionShell();
-      }
-    } else if (ev.codePoint == _kKeyCodeS) {
-      // Toggles from unshadowed -> screenSpace -> shadowMap
-      if (_currentShadowTechnique == ShadowTechnique.unshadowed) {
-        _currentShadowTechnique = ShadowTechnique.screenSpace;
-      } else if (_currentShadowTechnique == ShadowTechnique.screenSpace) {
-        _currentShadowTechnique = ShadowTechnique.shadowMap;
-      } else {
-        _currentShadowTechnique = ShadowTechnique.unshadowed;
-      }
-      presentation.setRendererParams(
-        <RendererParam>[
-          RendererParam.withShadowTechnique(_currentShadowTechnique)
-        ],
-      );
-    } else if (ev.codePoint == _kKeyCodeL) {
-      _currentClippingEnabled = !_currentClippingEnabled;
-      enableClipping(_currentClippingEnabled);
-    }
-  }
-
   /// Called when the the session shell logs out.
   @mustCallSuper
   Future<void> onLogout() async {
@@ -290,6 +251,10 @@ class CommonBaseShellModel extends BaseShellModel
     });
   }
 
+  /// |KeyboardCaptureListener|.
+  @override
+  void onEvent(input.KeyboardEvent ev) {}
+
   /// |PointerCaptureListener|.
   @override
   void onPointerEvent(input.PointerEvent event) {}
@@ -311,25 +276,12 @@ class CommonBaseShellModel extends BaseShellModel
         netstackProxy.ctrl);
     _netstackModel = NetstackModel(netstack: netstackProxy)..start();
 
-    enableClipping(_currentClippingEnabled);
-
-    _addShortcut(key: _kKeyCodeSpacebar, modifier: _kKeyModifierLeftCtrl);
-    _addShortcut(key: _kKeyCodeS, modifier: _kKeyModifierLeftCtrl);
-    _addShortcut(key: _kKeyCodeL, modifier: _kKeyModifierRightAlt);
-
     presentation
       ..capturePointerEventsHack(_pointerCaptureListenerBinding.wrap(this))
-      ..setRendererParams(
-        <RendererParam>[
-          RendererParam.withShadowTechnique(_currentShadowTechnique)
-        ],
-      )
       ..setPresentationModeListener(
-          _presentationModeListenerBinding.wrap(this));
+        _presentationModeListenerBinding.wrap(this));
 
-    await _sessionShellChooser.init();
-
-    _userManager = BaseShellUserManager(userProvider, _sessionShellChooser);
+    _userManager = BaseShellUserManager(userProvider);
 
     _userManager.onLogout.listen((_) {
       logger.endTimer(
@@ -348,13 +300,6 @@ class CommonBaseShellModel extends BaseShellModel
       log.info('UserPickerBaseShell: User logged out!');
       onLogout();
     });
-
-    _updatePresentation(_sessionShellChooser.currentSessionShell);
-
-    if (_sessionShellChooser.currentSessionShell.autoLogin) {
-      await login(null);
-      return;
-    }
 
     await refreshUsers();
   }
@@ -436,26 +381,5 @@ class CommonBaseShellModel extends BaseShellModel
   @override
   void usePerspectiveView() {
     presentation.usePerspectiveView();
-  }
-
-  void _addShortcut({int key, int modifier}) {
-    final binding = KeyboardCaptureListenerHackBinding();
-    presentation.captureKeyboardEventHack(
-      input.KeyboardEvent(
-        deviceId: 0,
-        eventTime: 0,
-        hidUsage: 0,
-        codePoint: key,
-        modifiers: modifier,
-        phase: input.KeyboardEventPhase.pressed,
-      ),
-      binding.wrap(this),
-    );
-    _keyBindings.add(binding);
-  }
-
-  void _updatePresentation(SessionShellInfo info) {
-    setDisplayUsage(info.displayUsage);
-    setDisplaySizeInMm(info.screenWidthMm, info.screenHeightMm);
   }
 }

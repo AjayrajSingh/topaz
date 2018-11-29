@@ -5,7 +5,6 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.base_shell/session_shell_chooser.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 
 import 'user_watcher_impl.dart';
@@ -13,7 +12,6 @@ import 'user_watcher_impl.dart';
 /// Handles adding, removing, and logging, and controlling users.
 class BaseShellUserManager {
   final UserProvider _userProvider;
-  final SessionShellChooser _sessionShellChooser;
 
   UserControllerProxy _userControllerProxy;
   UserWatcherImpl _userWatcherImpl;
@@ -21,7 +19,7 @@ class BaseShellUserManager {
   final StreamController<void> _userLogoutController =
       StreamController<void>.broadcast();
 
-  BaseShellUserManager(this._userProvider, this._sessionShellChooser);
+  BaseShellUserManager(this._userProvider);
 
   Stream<void> get onLogout => _userLogoutController.stream;
 
@@ -61,14 +59,12 @@ class BaseShellUserManager {
       _userLogoutController.add(null);
     });
 
-    SessionShellInfo info = _sessionShellChooser.currentSessionShell;
     final InterfacePair<ViewOwner> viewOwner = InterfacePair<ViewOwner>();
     final UserLoginParams params = UserLoginParams(
       accountId: accountId,
       viewOwner: viewOwner.passRequest(),
       services: serviceProviderHandle,
       userController: _userControllerProxy.ctrl.request(),
-      sessionShellConfig: AppConfig(url: info.name),
     );
 
     _userProvider.login(params);
@@ -105,17 +101,6 @@ class BaseShellUserManager {
     _userControllerProxy.ctrl.close();
     _userLogoutController.close();
     _userWatcherImpl.close();
-  }
-
-  /// If a user is logged in, set the session shell to the current session shell,
-  /// otherwise, do nothing.
-  Future<void> setSessionShell() {
-    final completer = Completer<void>();
-
-    _userControllerProxy?.swapSessionShell(
-        new AppConfig(url: _sessionShellChooser.currentSessionShell.name),
-        completer.complete);
-    return completer.future;
   }
 }
 
