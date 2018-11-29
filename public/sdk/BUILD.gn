@@ -31,6 +31,10 @@ sdk_molecule("fidl_dart") {
 sdk_molecule("dart_support") {
   deps = [
     "//topaz/public/dart/fuchsia:fuchsia_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_logger:fuchsia_logger_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_media:fuchsia_media_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_modular:fuchsia_modular_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_services:fuchsia_services_sdk($dart_toolchain)",
     "//topaz/runtime/dart:kernel_compiler_sdk($host_toolchain)",
   ]
 }
