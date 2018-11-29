@@ -47,12 +47,19 @@ class SettingsItemList extends StatelessWidget {
   /// A list of child items in a settings item
   final Iterable<SettingsItem> items;
 
+  final CrossAxisAlignment crossAxisAlignment;
+
   /// Constructs a new list with the settings items
-  const SettingsItemList({@required this.items});
+  const SettingsItemList(
+      {@required this.items,
+      this.crossAxisAlignment = CrossAxisAlignment.center});
 
   @override
   Widget build(BuildContext context) {
-    return Column(mainAxisSize: MainAxisSize.min, children: items.toList());
+    return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: items.toList(),
+        crossAxisAlignment: crossAxisAlignment);
   }
 }
 

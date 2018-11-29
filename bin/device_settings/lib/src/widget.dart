@@ -31,10 +31,21 @@ Widget _buildDeviceSettings(
 SettingsSection _buildInfo(DeviceSettingsModel model, double scale) {
   final buildSyncDate =
       SettingsText(text: 'Source date: ${model.sourceDate}', scale: scale);
+  final uptimeDuration = SettingsText(
+      text: 'System uptime: ${uptimeToString(model.uptime)}', scale: scale);
   return SettingsSection(
       title: 'Build Info',
       scale: scale,
-      child: SettingsItemList(items: [buildSyncDate]));
+      child: SettingsItemList(
+        items: [buildSyncDate, uptimeDuration],
+        crossAxisAlignment: CrossAxisAlignment.start,
+      ));
+}
+
+/// Converts from uptime duration to a user-readable string in the format HH:mm:ss.
+String uptimeToString(Duration uptime) {
+  // Uptime comes with 6 digits of milliseconds, remove since we don't care to show it.
+  return uptime.toString().split('.')[0];
 }
 
 SettingsSection _update(DeviceSettingsModel model, double scale) {

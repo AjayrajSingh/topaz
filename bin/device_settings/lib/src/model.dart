@@ -11,6 +11,12 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.settings/device_info.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:zircon/zircon.dart';
+
+/// Clock ID of the system monotonic clock, which measures uptime in nanoseconds.
+const int _zxClockMonotonic = 0;
+
+const Duration _uptimeRefreshInterval = Duration(seconds: 1);
 
 /// Model containing state needed for the device settings app.
 class DeviceSettingsModel extends Model {
@@ -27,6 +33,10 @@ class DeviceSettingsModel extends Model {
 
   /// Holds the time the source code was updated.
   DateTime _sourceDate;
+
+  /// Length of time since system bootup.
+  Duration _uptime;
+  Timer _uptimeRefreshTimer;
 
   bool _showResetConfirmation = false;
 
@@ -51,6 +61,8 @@ class DeviceSettingsModel extends Model {
   bool get showResetConfirmation => _showResetConfirmation;
 
   DateTime get sourceDate => _sourceDate;
+
+  Duration get uptime => _uptime;
 
   bool get updateCheckDisabled =>
       DateTime.now().isAfter(_lastUpdate.add(Duration(seconds: 60)));
@@ -93,14 +105,27 @@ class DeviceSettingsModel extends Model {
 
   void dispose() {
     _amberControl.ctrl.close();
+    _uptimeRefreshTimer.cancel();
   }
 
   Future<void> _onStart() async {
-    final startupContext = StartupContext.fromStartupInfo();
     _sourceDate = DeviceInfo.getSourceDate();
+
+    updateUptime();
+    _uptimeRefreshTimer =
+        Timer.periodic(_uptimeRefreshInterval, (_) => updateUptime());
+
+    final startupContext = StartupContext.fromStartupInfo();
     connectToService(startupContext.environmentServices, _amberControl.ctrl);
 
     _updateSources();
+  }
+
+  void updateUptime() {
+    // System clock returns time since boot in nanoseconds.
+    _uptime =
+        Duration(microseconds: System.clockGet(_zxClockMonotonic) ~/ 1000);
+    notifyListeners();
   }
 
   void factoryReset() async {
