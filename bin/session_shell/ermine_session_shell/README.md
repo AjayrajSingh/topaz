@@ -1,6 +1,11 @@
 Ermine is a Fuchsia Session Shell intended to provide developers with a
 lovable environment for testing mods on Fuchsia.
 
+Pressing command-space (circle key in caps lock position on Eve, not sure
+what key on a Windows-style keyboard) will bring up a text entry box. Enter
+the name of a package (i.e. noodles) and it will be launched into a new
+story.
+
 This initial version implements the same approach for view hosting,
 layout and control as ``//garnet/bin/developer/[tiles|tiles_ctl]``. For
 simplicity it re-uses

@@ -1,0 +1,1 @@
+A simple module which shows a text input

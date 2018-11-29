@@ -30,6 +30,7 @@ rustc_binary("bin") {
     "//third_party/rust-crates/rustc_deps:itertools",
     "//third_party/rust-crates/rustc_deps:lazy_static",
     "//third_party/rust-crates/rustc_deps:parking_lot",
+    "//topaz/bin/ui/text_input_mod/public/fidl:fuchsia.textinputmod-rustc",
   ]
 }
 

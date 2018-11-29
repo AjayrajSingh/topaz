@@ -2,18 +2,22 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-use failure::Error;
+use crate::ask_box::AskBox;
+use failure::{Error, ResultExt};
 use fidl::encoding::OutOfLine;
 use fidl::endpoints::{create_proxy, ClientEnd, ServerEnd, ServiceMarker};
 use fidl_fuchsia_math::{InsetF, RectF, SizeF};
-use fidl_fuchsia_modular::{Intent, StoryProviderProxy};
+use fidl_fuchsia_modular::{AddMod, Intent, PuppetMasterMarker, PuppetMasterProxy, StoryCommand,
+                           StoryProviderProxy, StoryPuppetMasterProxy, SurfaceArrangement,
+                           SurfaceDependency, SurfaceRelation};
 use fidl_fuchsia_ui_gfx::{self as gfx, ColorRgba};
 use fidl_fuchsia_ui_input::{InputConnectionMarker, InputConnectionProxy, InputListenerMarker,
-                            InputListenerRequest};
+                            InputListenerRequest, KeyboardEvent};
 use fidl_fuchsia_ui_scenic::{SessionListenerMarker, SessionListenerRequest};
 use fidl_fuchsia_ui_viewsv1::{CustomFocusBehavior, ViewContainerListenerMarker,
                               ViewContainerListenerRequest, ViewLayout, ViewListenerMarker,
                               ViewListenerRequest, ViewProperties};
+use fuchsia_app::client::connect_to_service;
 use fuchsia_async as fasync;
 use fuchsia_scenic::{EntityNode, ImportNode, Material, Rectangle, Session, SessionPtr, ShapeNode};
 use fuchsia_zircon::{self as zx, Channel};
@@ -22,6 +26,32 @@ use itertools::Itertools;
 use parking_lot::Mutex;
 use std::collections::BTreeMap;
 use std::sync::Arc;
+use std::time::SystemTime;
+
+fn random_story_name() -> String {
+    let secs = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
+        Ok(n) => n.as_secs(),
+        Err(_) => panic!("SystemTime before UNIX EPOCH!"),
+    };
+    format!("ermine-story-{}", secs)
+}
+
+fn random_mod_name() -> String {
+    let secs = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
+        Ok(n) => n.as_secs(),
+        Err(_) => panic!("SystemTime before UNIX EPOCH!"),
+    };
+    format!("ermine-mod-{}", secs)
+}
+
+fn inset(rect: &mut RectF, border: f32) {
+    let inset = border.min(rect.width / 0.3).min(rect.height / 0.3);
+    rect.x += inset;
+    rect.y += inset;
+    let inset_width = inset * 2.0;
+    rect.width = rect.width - inset_width;
+    rect.height = rect.height - inset_width;
+}
 
 struct ViewData {
     key: u32,
@@ -50,6 +80,8 @@ impl ViewData {
 pub struct ErmineView {
     // Must keep the view proxy alive or the view goes away.
     _view: fidl_fuchsia_ui_viewsv1::ViewProxy,
+    puppet_master: PuppetMasterProxy,
+    story_puppet_masters: BTreeMap<String, StoryPuppetMasterProxy>,
     view_container: fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
     input_connection_proxy: InputConnectionProxy,
     session: SessionPtr,
@@ -59,6 +91,7 @@ pub struct ErmineView {
     views: BTreeMap<u32, ViewData>,
     width: f32,
     height: f32,
+    ask_box: Option<AskBox>,
 }
 
 pub type ErmineViewPtr = Arc<Mutex<ErmineView>>;
@@ -90,8 +123,12 @@ impl ErmineView {
             input_connection_request.into_channel(),
         )?;
 
+        let puppet_master = connect_to_service::<PuppetMasterMarker>()?;
+
         let view_controller = ErmineView {
             _view: view,
+            puppet_master,
+            story_puppet_masters: BTreeMap::new(),
             view_container: view_container_proxy,
             input_connection_proxy: input_connection_proxy,
             session: session.clone(),
@@ -101,6 +138,7 @@ impl ErmineView {
             views: BTreeMap::new(),
             width: 0.0,
             height: 0.0,
+            ask_box: None,
         };
 
         let view_controller = Arc::new(Mutex::new(view_controller));
@@ -386,66 +424,125 @@ impl ErmineView {
         (keys, urls, sizes, fs)
     }
 
-    fn inset(rect: &mut RectF, border: f32) {
-        let inset = border.min(rect.width / 0.3).min(rect.height / 0.3);
-        rect.x += inset;
-        rect.y += inset;
-        let inset_width = inset * 2.0;
-        rect.width = rect.width - inset_width;
-        rect.height = rect.height - inset_width;
+    pub fn handle_hot_key(&mut self, event: &KeyboardEvent, key_to_use: u32) -> Result<(), Error> {
+        if event.code_point == 0x20 {
+            if let Some(ask_box) = self.ask_box.as_mut() {
+                ask_box.focus(&self.view_container)?;
+            } else {
+                self.ask_box = Some(AskBox::new(
+                    key_to_use,
+                    &self.session,
+                    &self.view_container,
+                    &self.import_node,
+                )?);
+                self.update();
+                self.layout();
+            }
+        }
+        Ok(())
+    }
+
+    pub fn remove_ask_box(&mut self) {
+        if let Some(mut ask_box) = self.ask_box.take() {
+            ask_box
+                .remove(&self.view_container)
+                .unwrap_or_else(|e| eprintln!("ask_box.remove error: {:?}", e));
+        }
+    }
+
+    pub fn handle_suggestion(&mut self, text: &str) -> Result<(), Error> {
+        let story_name = random_story_name();
+        let package = format!("fuchsia-pkg://fuchsia.com/{}#meta/{}.cmx", text, text);
+        let (story_puppet_master, story_puppet_master_end) =
+            create_proxy().context("handle_suggestion control_story")?;
+        self.puppet_master
+            .control_story(&story_name, story_puppet_master_end)?;
+        let mut commands = [StoryCommand::AddMod(AddMod {
+            mod_name: vec![random_mod_name()],
+            intent: Intent {
+                action: None,
+                handler: Some(package),
+                parameters: None,
+            },
+            surface_parent_mod_name: None,
+            surface_relation: SurfaceRelation {
+                arrangement: SurfaceArrangement::None,
+                dependency: SurfaceDependency::None,
+                emphasis: 1.0,
+            },
+        })];
+        story_puppet_master
+            .enqueue(&mut commands.iter_mut())
+            .context("handle_suggestion story_puppet_master.enqueue")?;
+        let f = story_puppet_master.execute();
+        fasync::spawn(
+            f.map_ok(move |_| {})
+                .unwrap_or_else(|e| eprintln!("puppetmaster error: {:?}", e)),
+        );
+        self.story_puppet_masters
+            .insert(story_name, story_puppet_master);
+
+        Ok(())
     }
 
     pub fn layout(&mut self) {
-        if self.views.is_empty() {
-            return;
+        if !self.views.is_empty() {
+            let num_tiles = self.views.len();
+
+            let columns = (num_tiles as f32).sqrt().ceil() as usize;
+            let rows = (columns + num_tiles - 1) / columns;
+            let tile_height = (self.height / rows as f32).floor();
+
+            for (row_index, view_chunk) in self
+                .views
+                .iter_mut()
+                .chunks(columns)
+                .into_iter()
+                .enumerate()
+            {
+                let tiles_in_row = if row_index == rows - 1 && (num_tiles % columns) != 0 {
+                    num_tiles % columns
+                } else {
+                    columns
+                };
+                let tile_width = (self.width / tiles_in_row as f32).floor();
+                for (column_index, (_key, view)) in view_chunk.enumerate() {
+                    let mut tile_bounds = RectF {
+                        height: tile_height,
+                        width: tile_width,
+                        x: column_index as f32 * tile_width,
+                        y: row_index as f32 * tile_height,
+                    };
+                    inset(&mut tile_bounds, 10.0);
+                    let mut view_properties = ViewProperties {
+                        custom_focus_behavior: Some(Box::new(CustomFocusBehavior {
+                            allow_focus: view.allow_focus,
+                        })),
+                        view_layout: Some(Box::new(ViewLayout {
+                            inset: InsetF {
+                                bottom: 0.0,
+                                left: 0.0,
+                                right: 0.0,
+                                top: 0.0,
+                            },
+                            size: SizeF {
+                                width: tile_bounds.width,
+                                height: tile_bounds.height,
+                            },
+                        })),
+                    };
+                    self.view_container
+                        .set_child_properties(view.key, Some(OutOfLine(&mut view_properties)))
+                        .unwrap();
+                    view.host_node
+                        .set_translation(tile_bounds.x, tile_bounds.y, 0.0);
+                    view.bounds = Some(tile_bounds);
+                }
+            }
         }
 
-        let num_tiles = self.views.len();
-
-        let columns = (num_tiles as f32).sqrt().ceil() as usize;
-        let rows = (columns + num_tiles - 1) / columns;
-        let tile_height = (self.height / rows as f32).floor();
-
-        for (row_index, view_chunk) in itertools::enumerate(&self.views.iter_mut().chunks(columns))
-        {
-            let tiles_in_row = if row_index == rows - 1 && (num_tiles % columns) != 0 {
-                num_tiles % columns
-            } else {
-                columns
-            };
-            let tile_width = (self.width / tiles_in_row as f32).floor();
-            for (column_index, (_key, view)) in view_chunk.enumerate() {
-                let mut tile_bounds = RectF {
-                    height: tile_height,
-                    width: tile_width,
-                    x: column_index as f32 * tile_width,
-                    y: row_index as f32 * tile_height,
-                };
-                Self::inset(&mut tile_bounds, 10.0);
-                let mut view_properties = ViewProperties {
-                    custom_focus_behavior: Some(Box::new(CustomFocusBehavior {
-                        allow_focus: view.allow_focus,
-                    })),
-                    view_layout: Some(Box::new(ViewLayout {
-                        inset: InsetF {
-                            bottom: 0.0,
-                            left: 0.0,
-                            right: 0.0,
-                            top: 0.0,
-                        },
-                        size: SizeF {
-                            width: tile_bounds.width,
-                            height: tile_bounds.height,
-                        },
-                    })),
-                };
-                self.view_container
-                    .set_child_properties(view.key, Some(OutOfLine(&mut view_properties)))
-                    .unwrap();
-                view.host_node
-                    .set_translation(tile_bounds.x, tile_bounds.y, 0.0);
-                view.bounds = Some(tile_bounds);
-            }
+        if let Some(ask_box) = self.ask_box.as_ref() {
+            ask_box.layout(&self.view_container, self.width, self.height);
         }
     }
 }

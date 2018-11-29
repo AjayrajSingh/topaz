@@ -7,11 +7,11 @@ use fidl::endpoints::{create_endpoints, create_proxy, ClientEnd, RequestStream, 
                       ServiceMarker};
 use fidl_fuchsia_developer_tiles as tiles;
 use fidl_fuchsia_math::SizeF;
-use fidl_fuchsia_modular::{StoryProviderProxy, StoryProviderWatcherMarker,
-                           StoryProviderWatcherRequest, StoryState, SessionShellContextMarker,
-                           SessionShellContextProxy};
-use fidl_fuchsia_ui_input::{KeyboardEvent, KeyboardEventPhase, MODIFIER_LEFT_CONTROL,
-                            MODIFIER_RIGHT_CONTROL};
+use fidl_fuchsia_modular::{SessionShellContextMarker, SessionShellContextProxy,
+                           StoryProviderProxy, StoryProviderWatcherMarker,
+                           StoryProviderWatcherRequest, StoryState};
+use fidl_fuchsia_ui_input::{KeyboardEvent, KeyboardEventPhase, MODIFIER_LEFT_SUPER,
+                            MODIFIER_RIGHT_SUPER};
 use fidl_fuchsia_ui_policy::{KeyboardCaptureListenerHackMarker,
                              KeyboardCaptureListenerHackRequest, PresentationProxy};
 use fidl_fuchsia_ui_viewsv1::{ViewManagerMarker, ViewManagerProxy, ViewProviderMarker,
@@ -25,6 +25,7 @@ use lazy_static::lazy_static;
 use parking_lot::Mutex;
 use std::sync::Arc;
 
+mod ask_box;
 mod view;
 
 use crate::view::{ErmineView, ErmineViewPtr};
@@ -99,20 +100,14 @@ impl App {
         Ok(())
     }
 
-    pub fn setup_keyboard_hack(&mut self) -> Result<(), Error> {
-        let (presentation_proxy, presentation_request) = create_proxy()?;
-        self.session_shell_context
-            .clone()
-            .get_presentation(presentation_request)?;
-        self.presentation_proxy = Some(presentation_proxy);
-
+    pub fn watch_for_key_event(&mut self, code_point: u32, modifiers: u32) -> Result<(), Error> {
         let mut hotkey_event = KeyboardEvent {
             event_time: 0,
             device_id: 0,
             phase: KeyboardEventPhase::Released,
             hid_usage: 0,
-            code_point: 0x67,
-            modifiers: MODIFIER_LEFT_CONTROL | MODIFIER_RIGHT_CONTROL,
+            code_point: code_point,
+            modifiers: modifiers,
         };
         let (event_listener_client, event_listener_server) = zx::Channel::create()?;
         let event_listener = ClientEnd::new(event_listener_client);
@@ -129,13 +124,26 @@ impl App {
                 .into_stream()
                 .unwrap()
                 .try_for_each(move |event| match event {
-                    KeyboardCaptureListenerHackRequest::OnEvent { .. } => {
-                        println!("ermine: hotkey support goes here");
+                    KeyboardCaptureListenerHackRequest::OnEvent { event, .. } => {
+                        APP.lock().handle_hot_key(&event).expect("handle hot key");
                         futures::future::ready(Ok(()))
                     }
                 })
                 .unwrap_or_else(|e| eprintln!("keyboard hack listener error: {:?}", e)),
         );
+
+        Ok(())
+    }
+
+    pub fn setup_keyboard_hack(&mut self) -> Result<(), Error> {
+        let (presentation_proxy, presentation_request) = create_proxy()?;
+        self.session_shell_context
+            .clone()
+            .get_presentation(presentation_request)?;
+        self.presentation_proxy = Some(presentation_proxy);
+
+        self.watch_for_key_event(0x20, MODIFIER_LEFT_SUPER)?;
+        self.watch_for_key_event(0x20, MODIFIER_RIGHT_SUPER)?;
 
         Ok(())
     }
@@ -261,6 +269,21 @@ impl App {
             })
             .unwrap_or_else(|e| eprintln!("get_stories error: {:?}", e)),
         );
+        Ok(())
+    }
+
+    pub fn handle_hot_key(&mut self, event: &KeyboardEvent) -> Result<(), Error> {
+        let key_to_use = self.next_story_key();
+        self.views[0].lock().handle_hot_key(event, key_to_use)
+    }
+
+    pub fn handle_suggestion(&mut self, text: Option<&str>) -> Result<(), Error> {
+        let mut view = self.views[0].lock();
+        if let Some(text) = text {
+            view.handle_suggestion(text)
+                .unwrap_or_else(|e| eprintln!("handle_suggestion error: {:?}", e));
+        }
+        view.remove_ask_box();
         Ok(())
     }
 }

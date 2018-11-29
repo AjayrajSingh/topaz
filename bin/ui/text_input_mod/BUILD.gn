@@ -1,0 +1,38 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+flutter_app("text_input_mod") {
+  main_dart = "lib/main.dart"
+  package_name = "text_input_mod"
+
+  fuchsia_package_name = "text_input_mod"
+
+  sources = []
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/examples/modular/models",
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_modular",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/module/dart",
+    "//topaz/public/lib/module_resolver/dart",
+    "//topaz/public/lib/ui/flutter",
+    "//topaz/public/lib/widgets/dart",
+    "//topaz/bin/ui/text_input_mod/public/fidl:fuchsia.textinputmod",
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/text_input_mod.cmx")
+      dest = "text_input_mod.cmx"
+    },
+  ]
+}
+
