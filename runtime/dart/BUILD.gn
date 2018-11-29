@@ -82,6 +82,8 @@ sdk_atom("kernel_compiler_sdk") {
 
   non_sdk_deps = [
     ":kernel_compiler_snapshot($host_toolchain)",
+    "//third_party/flutter/frontend_server:frontend_server_tool($host_toolchain)",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_tools:fuchsia_attach($host_toolchain)",
     "//topaz/runtime/dart_runner/kernel:kernel_platform_files",
     "//topaz/runtime/flutter_runner/kernel:kernel_platform_files",
   ]
