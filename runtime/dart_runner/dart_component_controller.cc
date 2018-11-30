@@ -29,6 +29,7 @@
 #include "third_party/tonic/logging/dart_error.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/runtime/dart/utils/handle_exception.h"
+#include "topaz/runtime/dart/utils/tempfs.h"
 
 #include "builtin_libraries.h"
 
@@ -117,6 +118,7 @@ bool DartComponentController::Setup() {
   return true;
 }
 
+constexpr char kTmpPath[] = "/tmp";
 constexpr char kServiceRootPath[] = "/svc";
 
 bool DartComponentController::SetupNamespace() {
@@ -127,8 +129,12 @@ bool DartComponentController::SetupNamespace() {
     return false;
   }
 
+  fuchsia::dart::SetupComponentTemp(namespace_);
+
   for (size_t i = 0; i < flat->paths->size(); ++i) {
-    if (flat->paths->at(i) == kServiceRootPath) {
+    if ((flat->paths->at(i) == kTmpPath) ||
+        (flat->paths->at(i) == kServiceRootPath)) {
+      // /tmp is covered by the local memfs.
       // Ownership of /svc goes to the StartupContext created below.
       continue;
     }
@@ -138,7 +144,7 @@ bool DartComponentController::SetupNamespace() {
     status = fdio_ns_bind(namespace_, path, dir_handle);
     if (status != ZX_OK) {
       FXL_LOG(ERROR) << "Failed to bind " << flat->paths->at(i)
-                     << " to namespace";
+                     << " to namespace: " << zx_status_get_string(status);
       zx_handle_close(dir_handle);
       return false;
     }

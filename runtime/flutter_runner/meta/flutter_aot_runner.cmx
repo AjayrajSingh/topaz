@@ -5,7 +5,6 @@
     "sandbox": {
         "features": [
             "root-ssl-certificates",
-            "system-temp",
             "vulkan"
         ],
         "services": [

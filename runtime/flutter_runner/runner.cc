@@ -4,6 +4,7 @@
 
 #include "runner.h"
 
+#include <zircon/status.h>
 #include <zircon/types.h>
 
 #include <sstream>
@@ -15,6 +16,7 @@
 #include "lib/icu_data/cpp/icu_data.h"
 #include "third_party/flutter/runtime/dart_vm.h"
 #include "third_party/skia/include/core/SkGraphics.h"
+#include "topaz/runtime/dart/utils/vmservice_object.h"
 
 namespace flutter {
 
@@ -37,6 +39,14 @@ static void SetThreadName(const std::string& thread_name) {
 
 Runner::Runner()
     : host_context_(component::StartupContext::CreateFromStartupInfo()) {
+#if !defined(DART_PRODUCT)
+  // The VM service isolate uses the process-wide namespace. It writes the
+  // vm service protocol port under /tmp. The VMServiceObject exposes that
+  // port number to The Hub.
+  vmservice_object_ = fuchsia::dart::VMServiceObject::Create(
+      host_context_->outgoing().object_dir());
+#endif  // !defined(DART_PRODUCT)
+
   SkGraphics::Init();
 
   SetupICU();

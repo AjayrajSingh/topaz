@@ -18,6 +18,7 @@
 #include "lib/fsl/vmo/vector.h"
 #include "lib/fxl/command_line.h"
 #include "task_observers.h"
+#include "topaz/runtime/dart/utils/tempfs.h"
 
 namespace flutter {
 
@@ -104,10 +105,13 @@ Application::Application(
     return;
   }
 
+  // Setup /tmp to be mapped to the process-local memfs.
+  fuchsia::dart::SetupComponentTemp(fdio_ns_.get());
+
   // LaunchInfo::flat_namespace optional.
   for (size_t i = 0; i < startup_info.flat_namespace.paths->size(); ++i) {
     const auto& path = startup_info.flat_namespace.paths->at(i);
-    if (path == "/svc") {
+    if (path == "/tmp" || path == "/svc") {
       continue;
     }
 

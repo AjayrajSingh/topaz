@@ -4,8 +4,7 @@
     },
     "sandbox": {
         "features": [
-            "root-ssl-certificates",
-            "system-temp"
+            "root-ssl-certificates"
         ],
         "services": [
             "fuchsia.net.LegacySocketProvider",

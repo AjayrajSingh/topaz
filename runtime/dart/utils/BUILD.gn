@@ -2,10 +2,16 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/package.gni")
+
 source_set("utils") {
   sources = [
     "handle_exception.cc",
     "handle_exception.h",
+    "tempfs.cc",
+    "tempfs.h",
+    "vmservice_object.cc",
+    "vmservice_object.h",
   ]
 
   public_deps = [
@@ -17,7 +23,25 @@ source_set("utils") {
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
     "//third_party/tonic",
+    "//topaz/lib/deprecated_loop",
     "//zircon/public/fidl/fuchsia-crash",
     "//zircon/public/fidl/fuchsia-mem",
+    "//zircon/public/lib/memfs",
+  ]
+}
+
+package("run_vmservice_object_tests") {
+  testonly = true
+
+  deps = [
+    "../../dart_runner:dart_jit_runner",
+    "../../dart_runner/examples/hello_dart:hello_dart_jit",
+  ]
+
+  tests = [
+    {
+      name = rebase_path("run_vmservice_object_tests.sh")
+      dest = "run_vmservice_object_tests.sh"
+    },
   ]
 }

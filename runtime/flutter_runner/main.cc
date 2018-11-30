@@ -7,12 +7,16 @@
 
 #include "runner.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
+#include "topaz/runtime/dart/utils/tempfs.h"
 
 int main(int argc, char const* argv[]) {
   deprecated_loop::MessageLoop loop;
 
   trace::TraceProvider provider(loop.dispatcher());
   FML_DCHECK(provider.is_valid()) << "Trace provider must be valid.";
+
+  // Set up the process-wide /tmp memfs.
+  fuchsia::dart::SetupRunnerTemp();
 
   FML_DLOG(INFO) << "Flutter application services initialized.";
 

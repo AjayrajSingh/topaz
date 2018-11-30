@@ -50,6 +50,7 @@ template("runner") {
              "//topaz/lib/deprecated_loop",
              "//topaz/runtime/dart/utils",
              "//third_party/tonic",
+             "//topaz/lib/deprecated_loop",
              "//topaz/public/dart-pkg/fuchsia",
              "//zircon/public/lib/trace-provider",
            ] + dart_deps + extra_deps

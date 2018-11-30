@@ -15,6 +15,7 @@
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
+#include "topaz/runtime/dart/utils/vmservice_object.h"
 
 namespace flutter {
 
@@ -43,6 +44,11 @@ class Runner final : public fuchsia::sys::Runner {
   fidl::BindingSet<fuchsia::sys::Runner> active_applications_bindings_;
   std::unordered_map<const Application*, ActiveApplication>
       active_applications_;
+
+#if !defined(DART_PRODUCT)
+  // The connection between the Dart VM service and The Hub.
+  std::unique_ptr<fuchsia::dart::VMServiceObject> vmservice_object_;
+#endif  // !defined(DART_PRODUCT)
 
   // |fuchsia::sys::Runner|
   void StartComponent(fuchsia::sys::Package package,

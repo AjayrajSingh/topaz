@@ -146,6 +146,7 @@ template("flutter_runner") {
              "//topaz/lib/deprecated_loop",
              "//topaz/public/dart-pkg/fuchsia",
              "//topaz/public/lib/ui/flutter/sdk_ext",
+             "//topaz/runtime/dart/utils",
              "//zircon/public/lib/trace-provider",
            ] + extra_deps + flutter_deps
 

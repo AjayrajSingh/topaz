@@ -4,9 +4,11 @@
 
 #include "topaz/runtime/dart_runner/dart_runner.h"
 
+#include <errno.h>
 #include <sys/stat.h>
 #include <thread>
 #include <utility>
+#include <zircon/status.h>
 #include <zircon/syscalls.h>
 
 #include "lib/fxl/arraysize.h"
@@ -16,6 +18,7 @@
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
 #include "topaz/runtime/dart_runner/service_isolate.h"
+#include "topaz/runtime/dart/utils/vmservice_object.h"
 
 #if defined(AOT_RUNTIME)
 extern "C" uint8_t _kDartVmSnapshotData[];
@@ -146,6 +149,15 @@ DartRunner::DartRunner()
       [this](fidl::InterfaceRequest<fuchsia::sys::Runner> request) {
         bindings_.AddBinding(this, std::move(request));
       });
+
+#if !defined(DART_PRODUCT)
+  // The VM service isolate uses the process-wide namespace. It writes the
+  // vm service protocol port under /tmp. The VMServiceObject exposes that
+  // port number to The Hub.
+  vmservice_object_ = fuchsia::dart::VMServiceObject::Create(
+      context_->outgoing().object_dir());
+
+#endif  // !defined(DART_PRODUCT)
 
   dart::bin::BootstrapDartIo();
 

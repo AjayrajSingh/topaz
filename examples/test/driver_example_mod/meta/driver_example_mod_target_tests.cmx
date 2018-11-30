@@ -8,7 +8,10 @@
             "system-temp"
         ],
         "services": [
+            "fuchsia.process.Resolver",
             "fuchsia.sys.Environment"
-        ]
+        ],
+        "pkgfs": [ "packages" ],
+        "system": [ "bin" ]
     }
 }
