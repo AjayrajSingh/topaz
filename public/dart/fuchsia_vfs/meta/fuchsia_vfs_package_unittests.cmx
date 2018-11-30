@@ -1,0 +1,10 @@
+{
+    "program": {
+        "data": "data/fuchsia_vfs_package_unittests"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.sys.Environment"
+        ]
+    }
+}

@@ -1,0 +1,45 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_fuchsia_test.gni")
+import("//build/dart/dart_library.gni")
+
+dart_library("fuchsia_vfs") {
+  package_name = "fuchsia_vfs"
+
+  sdk_category = "partner"
+
+  source_dir = "lib"
+
+  sources = [
+    "src/internal/_error_node.dart",
+    "src/pseudo_file.dart",
+    "src/vnode.dart",
+    "vfs.dart",
+  ]
+
+  deps = [
+    "//topaz/public/dart/fidl",
+    "//zircon/public/fidl/fuchsia-io",
+  ]
+}
+
+dart_fuchsia_test("fuchsia_vfs_package_unittests") {
+  meta = [
+    {
+      path = rebase_path("meta/fuchsia_vfs_package_unittests.cmx")
+      dest = "fuchsia_vfs_package_unittests.cmx"
+    },
+  ]
+
+  sources = [
+    "pseudo_file_test.dart",
+  ]
+
+  deps = [
+    ":fuchsia_vfs",
+    "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}
