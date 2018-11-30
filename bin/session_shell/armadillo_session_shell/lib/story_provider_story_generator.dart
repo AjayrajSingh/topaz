@@ -315,11 +315,13 @@ class StoryProviderStoryGenerator extends ChangeNotifier {
         .where((StoryCluster storyCluster) => storyCluster.id == storyClusterId)
         .single;
     for (Story story in storyCluster.stories) {
-      log.info('Deleting story ${story.id.value}...');
-
+      log..info('Deleting story ${story.id.value}...')
+         ..severe('Not deleting story because Armadillo has not been converted to puppet master.');
+      /*
       _storyProvider.deleteStory(story.id.value, () {
         log.info('Story ${story.id.value} deleted!');
       });
+      */
 
       if (_storyControllerMap.containsKey(story.id.value)) {
         _storyControllerMap[story.id.value].ctrl.close();
