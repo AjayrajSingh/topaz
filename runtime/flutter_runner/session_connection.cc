@@ -37,6 +37,8 @@ SessionConnection::SessionConnection(
         callback();
       });
 
+  session_wrapper_.SetDebugName(debug_label_);
+
 #ifndef SCENIC_VIEWS2
   root_node_.Bind(std::move(import_token));
 #else
