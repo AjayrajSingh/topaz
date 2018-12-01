@@ -28,12 +28,17 @@ flutter_app("flutter_screencap_test_app") {
 package("flutter_screencap_test") {
   testonly = true
 
-  # This is really a test, but we list it as a binary because we don't want to
-  # run this test by default in CI since it requires specific hardware.
-  binaries = [
+  tests = [
     {
       name = rebase_path("run_flutter_screencap_test.sh")
       dest = "run_flutter_screencap_test.sh"
+      environments = [
+        {
+          dimensions = {
+            device_type = "Intel NUC Kit NUC7i5DNHE"
+          }
+        },
+      ]
     },
   ]
 
