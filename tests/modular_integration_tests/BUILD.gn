@@ -9,12 +9,17 @@ import("//build/package.gni")
 package("topaz_modular_integration_tests") {
   testonly = true
 
-  # TODO(IN-497): Move from binaries to tests once it is possible to run tests
-  # in their respective environments.
-  binaries = [
+  tests = [
     {
       name = rebase_path("run_topaz_modular_integration_tests.sh")
       dest = "run_topaz_modular_integration_tests.sh"
+      environments = [
+        {
+          dimensions = {
+            device_type = "Intel NUC Kit NUC7i5DNHE"
+          }
+        },
+      ]
     },
   ]
 
