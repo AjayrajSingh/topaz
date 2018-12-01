@@ -16,6 +16,9 @@ import 'home_work_proposer.dart';
 HomeWorkAgent _agent;
 
 /// An implementation of the [Agent] interface.
+/// 
+/// TODO: Refactor this class to use the new SDK instead of deprecated API
+/// ignore: deprecated_member_use
 class HomeWorkAgent extends AgentImpl {
   final IntelligenceServicesProxy _intelligenceServices =
       new IntelligenceServicesProxy();

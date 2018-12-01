@@ -17,6 +17,7 @@ export 'package:fidl_fuchsia_auth/fidl.dart' show TokenManager;
 
 /// A base class for implementing an [Agent] which receives common services and
 /// also helps exposing services through an outgoing [ServiceProvider].
+@Deprecated('Use package:fuchsia_modular/agent.dart instead')
 abstract class AgentImpl implements Agent, Lifecycle {
   final AgentBinding _agentBinding = new AgentBinding();
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();

@@ -28,6 +28,9 @@ class PendingNotification {
   PendingNotification(this.method, this.params);
 }
 
+
+/// TODO: Refactor this class to use the new SDK instead of deprecated API
+/// ignore: deprecated_member_use
 class XiSessionAgent extends AgentImpl {
   final _xiSessionManager = XiSessionManagerImpl();
 

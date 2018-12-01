@@ -13,6 +13,9 @@ import 'package:meta/meta.dart';
 import 'game_tracker_impl.dart';
 
 /// An implementation of the [Agent] interface for tracking game wins.
+/// 
+/// TODO: Refactor this class to use the new SDK instead of deprecated API
+/// ignore: deprecated_member_use
 class GameTrackerAgent extends AgentImpl {
   GameTrackerAgent({@required StartupContext startupContext})
       : super(startupContext: startupContext);
