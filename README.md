@@ -8,8 +8,8 @@ For example, modules include the dashboard, and runners include the Web, Dart, a
 
 Looking for something that used to be in this repository? The list below
 provides a code location and sha that can be used to checkout dead code that has
-been removed. Please note, the code will most likely be a reference only. It is
-unlikely the code will build or work correctly. Code can be checked out with:
+been removed. Please note, it is unlikely the code will build or work correctly
+shas are provided for reference only. Code can be checked out with:
 
         git checkout <sha> -- $FUCHSIA_DIR/<location>
 
@@ -17,3 +17,4 @@ unlikely the code will build or work correctly. Code can be checked out with:
 * topaz/app/color: 5a023ccb054104846e3e913951bcc7dc277d2274
 * topaz/app/contacts: 80378fe470817750188707de29237282892a3142
 * topaz/app/image: 5e731a943a907cf960ecfbda1c391958f9093afa
+* topaz/app/documents: b5a3ee29b15414f232865128195d14bd8811ab02

@@ -1,7 +1,6 @@
 {
     "host_tests" : [
       "//topaz/app/dashboard:dashboard_tests",
-      "//topaz/app/documents/packages/utils:document_util_tests",
       "//topaz/bin/dart_fidl_json/test:dart_fidl_json_test",
       "//topaz/examples/test/flutter_widget_test",
       "//topaz/examples/tictactoe/bin/tictactoe/game_board_mod:tictactoe_game_board_mod_test",
