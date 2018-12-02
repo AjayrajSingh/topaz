@@ -21,8 +21,6 @@ package("package") {
   tests = [
     {
       name = "run_fidl_compatibility_test_topaz.sh"
-      # TODO(DNO-366): test currently hangs.
-      disabled = true
     },
   ]
 }
