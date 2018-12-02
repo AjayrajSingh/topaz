@@ -10,8 +10,8 @@ chromium/fuchsia/fidl SNeLla_O5AnqdgA9aLvlaw7KxFul_0w_u_m7Y0J6hjkC
 
 # Chromium amd64 / x64 implementation
 @Subdir third_party/chromium/arch/x64
-chromium/fuchsia/webrunner-amd64 LBW7Lgeo5pABSBmtsPcrdRMSu9WWgBNchigx9oGRsGgC
+chromium/fuchsia/webrunner-amd64 X0dF9r1HpIBwoAkszS4lafNUvQVhrjNH82TgEl8LsHUC
 
 # Chromium arm64 / aarch64 implementation
 @Subdir third_party/chromium/arch/arm64
-chromium/fuchsia/webrunner-arm64 MIdzTrpUqMWa6V3y7bQ83Rz352ZXmvR6F32OftQyZQQC
+chromium/fuchsia/webrunner-arm64 H2hi5fUblBPrDtJzgqoboo1MXfMRl1QrTz5Y2pURxLUC
