@@ -44,7 +44,7 @@ void rioConnectToService(
   offset += 4;
 
   // ordinal -> ZXFIDL_OPEN
-  byteData.setUint32(offset, 0x83000001, Endian.little);
+  byteData.setUint32(offset, 0x77E4CCEB, Endian.little);
   offset += 4;
 
   // flags -> ZX_FS_RIGHT_READABLE | ZX_FS_RIGHT_WRITABLE
