@@ -60,11 +60,8 @@ class TestModel {
       final List<Document> documents =
           await sledge.getDocuments(new Query(schema));
       assert(documents.length == 1);
-      // TODO(nellyv): Fix [getDocuments]'s implementation:
-      // documents[0]['someBool'].value == true
-      // and
-      // documents[0]['someInteger'].value == 42
-      // should be valid assertions at this point.
+      assert(documents[0]['someBool'].value == true);
+      assert(documents[0]['someInteger'].value == 42);
       assert(await sledge.documentExists(id) == true);
       Document doc = await sledge.getDocument(id);
       assert(doc['someBool'].value == true);
@@ -76,7 +73,7 @@ class TestModel {
     Sledge sledge2 = new Sledge.fromModule(moduleContext, pageId);
     // Verify that the document is initialized.
     await sledge2.runInTransaction(() async {
-      final List<Document> documents = await sledge2.getDocuments(schema);
+      final List<Document> documents = await sledge2.getDocuments(new Query(schema));
       assert(documents.length == 1);
 
       Document doc = await sledge2.getDocument(id);
