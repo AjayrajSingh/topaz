@@ -1,0 +1,21 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/dart_runner/dart_app.gni")
+
+dart_app("crasher_dart") {
+  main_dart = "lib/main.dart"
+
+  fuchsia_package_name = "crasher_dart"
+  package_name = "crasher_dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/crasher_dart.cmx")
+      dest = "crasher_dart.cmx"
+    },
+  ]
+
+  deps = []
+}

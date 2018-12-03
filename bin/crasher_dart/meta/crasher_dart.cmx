@@ -1,0 +1,11 @@
+{
+    "program": {
+        "data": "data/crasher_dart"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.crash.Analyzer",
+            "fuchsia.sys.Environment"
+        ]
+    }
+}
