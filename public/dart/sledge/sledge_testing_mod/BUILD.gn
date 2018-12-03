@@ -6,6 +6,14 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("sledge_testing_mod") {
   main_dart = "lib/main.dart"
+  fuchsia_package_name = "sledge_testing_mod"
+
+  meta = [
+    {
+      path = "meta/sledge_testing_mod.cmx"
+      dest = "sledge_testing_mod.cmx"
+    },
+  ]
 
   sources = [
     "test_model.dart"
