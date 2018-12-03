@@ -10,6 +10,7 @@
 #include <lib/zx/timer.h>
 
 #include <fuchsia/sys/cpp/fidl.h>
+#include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fxl/macros.h"
@@ -60,6 +61,7 @@ class DartComponentController : public fuchsia::sys::ComponentController {
   std::string data_path_;
   component::ServiceProviderBridge service_provider_bridge_;
   fidl::Binding<fuchsia::sys::ComponentController> binding_;
+  std::unique_ptr<component::StartupContext> context_;
 
   fdio_ns_t* namespace_ = nullptr;
   int stdoutfd_ = -1;

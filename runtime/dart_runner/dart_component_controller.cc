@@ -28,7 +28,9 @@
 #include "third_party/tonic/dart_state.h"
 #include "third_party/tonic/logging/dart_error.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
-#include "topaz/runtime/dart_runner/builtin_libraries.h"
+#include "topaz/runtime/dart/utils/handle_exception.h"
+
+#include "builtin_libraries.h"
 
 using tonic::ToDart;
 
@@ -342,9 +344,12 @@ bool DartComponentController::Main() {
   stdoutfd_ = SetupFileDescriptor(std::move(startup_info_.launch_info.out));
   stderrfd_ = SetupFileDescriptor(std::move(startup_info_.launch_info.err));
 
+  context_ = component::StartupContext::CreateFrom(std::move(startup_info_));
+  fidl::InterfaceHandle<fuchsia::sys::Environment> environment;
+  context_->ConnectToEnvironmentService(environment.NewRequest());
+
   InitBuiltinLibrariesForIsolate(
-      url_, namespace_, stdoutfd_, stderrfd_,
-      component::StartupContext::CreateFrom(std::move(startup_info_)),
+      url_, namespace_, stdoutfd_, stderrfd_, std::move(environment),
       std::move(outgoing_services), false /* service_isolate */);
   namespace_ = nullptr;
 
@@ -386,6 +391,8 @@ bool DartComponentController::Main() {
       // The program hasn't set a return code meaning this exit is unexpected.
       FXL_LOG(ERROR) << Dart_GetError(main_result);
       return_code_ = tonic::GetErrorExitCode(main_result);
+
+      fuchsia::dart::HandleIfException(context_.get(), url_, main_result);
     }
     Dart_ExitScope();
     return false;
@@ -433,6 +440,8 @@ void DartComponentController::MessageEpilogue(Dart_Handle result) {
     Dart_ShutdownIsolate();
     return;
   }
+
+  fuchsia::dart::HandleIfException(context_.get(), url_, result);
 
   // Otherwise, see if there was any other error.
   return_code_ = tonic::GetErrorExitCode(result);

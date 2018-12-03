@@ -10,11 +10,11 @@
 #include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
+#include "third_party/dart/runtime/bin/io_natives.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "third_party/tonic/converter/dart_converter.h"
 #include "third_party/tonic/dart_microtask_queue.h"
 #include "third_party/tonic/logging/dart_error.h"
-#include "third_party/dart/runtime/bin/io_natives.h"
-#include "third_party/dart/runtime/include/dart_api.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 
 using tonic::ToDart;
@@ -91,13 +91,11 @@ void ScheduleMicrotask(Dart_NativeArguments args) {
 
 void InitBuiltinLibrariesForIsolate(
     const std::string& script_uri, fdio_ns_t* namespc, int stdoutfd,
-    int stderrfd, std::unique_ptr<component::StartupContext> context,
+    int stderrfd, fidl::InterfaceHandle<fuchsia::sys::Environment> environment,
     fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services,
     bool service_isolate) {
   // dart:fuchsia --------------------------------------------------------------
   if (!service_isolate) {
-    fidl::InterfaceHandle<fuchsia::sys::Environment> environment;
-    context->ConnectToEnvironmentService(environment.NewRequest());
     fuchsia::dart::Initialize(std::move(environment),
                               std::move(outgoing_services));
   }

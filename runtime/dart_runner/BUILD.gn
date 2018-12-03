@@ -48,6 +48,7 @@ template("runner") {
              "//garnet/public/lib/fxl",
              "//garnet/public/lib/svc/cpp",
              "//topaz/lib/deprecated_loop",
+             "//topaz/runtime/dart/utils",
              "//third_party/tonic",
              "//topaz/public/dart-pkg/fuchsia",
              "//zircon/public/lib/trace-provider",
@@ -124,7 +125,8 @@ observatory_target =
     "//third_party/dart/runtime/observatory:observatory_archive"
 observatory_archive_dir = get_label_info(observatory_target, "target_gen_dir")
 observatory_archive_name = get_label_info(observatory_target, "name")
-observatory_archive_file = "${observatory_archive_dir}/${observatory_archive_name}.tar"
+observatory_archive_file =
+    "${observatory_archive_dir}/${observatory_archive_name}.tar"
 
 template("aot_runner_package") {
   assert(defined(invoker.product), "The parameter 'product' must be defined")
@@ -210,9 +212,7 @@ template("jit_runner_package") {
       "kernel:kernel_core_snapshot${product_suffix}",
     ]
     if (!invoker.product) {
-      deps += [
-        observatory_target,
-      ]
+      deps += [ observatory_target ]
     }
 
     binary = "dart_${jit_or_dbc}${product_suffix}_runner"
