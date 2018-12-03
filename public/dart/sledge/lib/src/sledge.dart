@@ -18,7 +18,6 @@ import 'ledger_helpers.dart';
 import 'modification_queue.dart';
 import 'query/query.dart';
 import 'sledge_connection_id.dart';
-import 'sledge_errors.dart';
 import 'sledge_page_id.dart';
 import 'storage/kv_encoding.dart' as sledge_storage;
 import 'subscription/subscription.dart';
@@ -61,25 +60,41 @@ class Sledge {
         _ledgerObjectsFactory = new LedgerObjectsFactoryImpl() {
     pageId ??= new SledgePageId();
 
-    _ledgerProxy.ctrl.bind(ledgerHandle);
-
+    // The initialization sequence consists of:
+    // 1/ Obtaining a LedgerProxy from the LedgerHandle.
+    // 2/ Setting a conflict resolver on the LedgerProxy (not yet implemented).
+    // 3/ Obtaining a LedgerPageProxy using the LedgerProxy.
+    // 4/ Subscribing for change notifications on the LedgerPageProxy.
+    // Any of these steps can fail.
+    //
+    // The following Completer is completed with `false` if an error occurs at
+    // any step. It is completed with `true` if the 4th step finishes
+    // succesfully.
+    //
+    // Operations that require the succesfull initialization of the Sledge
+    // instance await the Future returned by this completer.
     Completer<bool> initializationCompleter = new Completer<bool>();
 
     _ledgerProxy.ctrl.onConnectionError = () {
-      initializationCompleter.complete(false);
-      throw new Exception('Sledge was disconnected from the Ledger.');
+      if (!initializationCompleter.isCompleted) {
+        initializationCompleter.complete(false);
+      }
     };
+
+    _ledgerProxy.ctrl.bind(ledgerHandle);
 
     _ledgerProxy.getPage(pageId.id, _pageProxy.ctrl.request(),
         (ledger.Status status) {
+      if (initializationCompleter.isCompleted) {
+        return;
+      }
       if (status != ledger.Status.ok) {
         initializationCompleter.complete(false);
-        throw new Exception('Sledge failed to GetPage with status `$status`.');
-      } else {
-        _modificationQueue =
-            new ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
-        _subscribe(initializationCompleter);
+        return;
       }
+      _modificationQueue =
+          new ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
+      _subscribe(initializationCompleter);
     });
 
     _initializationSucceeded = initializationCompleter.future;
@@ -209,10 +224,8 @@ class Sledge {
 
   /// Subscribes for page.onChange to perform applyChange.
   Subscription _subscribe(Completer<bool> subscriptionCompleter) {
-    if (_modificationQueue.currentTransaction != null) {
-      throw new InternalSledgeError(
-          'Must be called before any transaction can start.');
-    }
+    assert(_modificationQueue.currentTransaction == null,
+        '`_subscribe` must be called before any transaction can start.');
     return new Subscription(
         _pageProxy, _ledgerObjectsFactory, _applyChange, subscriptionCompleter);
   }

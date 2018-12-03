@@ -34,10 +34,13 @@ class Subscription extends ledger.PageWatcher {
     );
 
     completer.future.then((ledger.Status status) {
-      if (status != ledger.Status.ok) {
-        subscriptionCompleter.complete(false);
+      if (subscriptionCompleter.isCompleted) {
+        // If an error occurs, `subscriptionCompleter` may have been completed
+        // by the caller before `completer` has ran.
+        return;
       }
-      subscriptionCompleter.complete(true);
+      bool subscriptionSuccesfull = status == ledger.Status.ok;
+      subscriptionCompleter.complete(subscriptionSuccesfull);
     });
   }
 
