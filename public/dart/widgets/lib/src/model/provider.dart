@@ -446,6 +446,7 @@ class _StreamProvider<T> extends ChangeNotifier with TypedProvider<T> {
 /// Used to be able to find through inheritFromWidgetOfExactType.
 class _InheritedProviders extends InheritedWidget {
   /// The next _InheritedProvider up in the widget tree.
+  /// The topmost one will always be null.
   final _InheritedProviders parent;
 
   final Providers providers;
@@ -461,8 +462,8 @@ class _InheritedProviders extends InheritedWidget {
 
   @override
   bool updateShouldNotify(_InheritedProviders oldWidget) {
-    return parent.updateShouldNotify(oldWidget.parent) ||
-        providers != oldWidget.providers;
+    return parent?.updateShouldNotify(oldWidget.parent) ??
+        false || providers != oldWidget.providers;
   }
 
   /// This is more type-safe than getFromType.

@@ -145,6 +145,80 @@ void main() {
       // wait for the values to propagate
       await Future.delayed(Duration.zero);
     });
+
+    testWidgets('rebuilds dependent provide widget when providers change',
+        (tester) async {
+      final intController = StreamController<int>();
+
+      final otherProviders = Providers()
+        ..provide(Provider.stream(intController.stream));
+      int childBuilds = 0;
+
+      intController.add(2);
+
+      int providedValue;
+      final provide = Provide<int>(
+        builder: (context, child, value) {
+          providedValue = value;
+          childBuilds++;
+          return Container();
+        },
+      );
+
+      await tester
+          .pumpWidget(ProviderNode(providers: providers, child: provide));
+
+      expect(childBuilds, 1);
+      expect(providedValue, 1);
+
+      await tester
+          .pumpWidget(ProviderNode(providers: providers, child: provide));
+
+      expect(childBuilds, 1);
+      expect(providedValue, 1);
+
+      await tester
+          .pumpWidget(ProviderNode(providers: otherProviders, child: provide));
+
+      expect(childBuilds, 2);
+      expect(providedValue, 2);
+
+      await intController.close();
+    });
+
+    testWidgets('Rebuilds dependent provide.value when providers change',
+        (tester) async {
+      final otherProviders = Providers()..provideValue<int>(2);
+      int childBuilds = 0;
+
+      int providedValue;
+      final provide = CallbackWidget(
+        (context) {
+          providedValue = Provide.value<int>(context);
+          childBuilds++;
+          return Container();
+        },
+      );
+
+      await tester
+          .pumpWidget(ProviderNode(providers: providers, child: provide));
+
+      expect(childBuilds, 1);
+      expect(providedValue, 1);
+
+      await tester
+          .pumpWidget(ProviderNode(providers: providers, child: provide));
+
+      expect(childBuilds, 1);
+      expect(providedValue, 1);
+
+      await tester
+          .pumpWidget(ProviderNode(providers: otherProviders, child: provide));
+
+      expect(childBuilds, 2);
+      expect(providedValue, 2);
+    });
+
     testWidgets('can get static values', (tester) async {
       await tester.pumpWidget(ProviderNode(
           providers: providers,
@@ -259,7 +333,7 @@ void main() {
       int childBuilds = 0;
       int builderBuilds = 0;
 
-      final callbackChild = CallbackWidget(() {
+      final callbackChild = CallbackWidget((_) {
         childBuilds++;
       });
 
@@ -267,7 +341,7 @@ void main() {
           providers: providers,
           child: Provide<FakeModel>(
               builder: (context, child, model) {
-                return CallbackWidget(() {
+                return CallbackWidget((_) {
                   builderBuilds++;
                 }, child: child);
               },
@@ -381,14 +455,14 @@ class FakeModel extends Model {
 class FakeModel2 extends FakeModel {}
 
 class CallbackWidget extends StatelessWidget {
-  final VoidCallback callback;
+  final void Function(BuildContext) callback;
   final Widget child;
 
   const CallbackWidget(this.callback, {this.child});
 
   @override
   Widget build(BuildContext context) {
-    callback();
+    callback(context);
     return child ?? Container();
   }
 }
