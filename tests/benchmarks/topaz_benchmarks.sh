@@ -18,7 +18,9 @@ vulkan_is_supported_result="$(/pkgfs/packages/run/0/bin/run vulkan_is_supported 
 if [ "${vulkan_is_supported_result}" = '1' ]; then
   # Run the gfx benchmarks in the current shell environment, because they write
   # to (hidden) global state used by runbench_finish.
-  . /pkgfs/packages/startup_benchmarks/0/bin/startup_benchmarks.sh "$@"
+
+  # DISABLED: See BLD-324
+  # . /pkgfs/packages/startup_benchmarks/0/bin/startup_benchmarks.sh "$@"
   . /pkgfs/packages/topaz_benchmarks/0/bin/gfx_benchmarks.sh "$@"
 elif [ "${vulkan_is_supported_result}" = '0' ]; then
   echo 'Vulkan not supported; graphics tests skipped.'
