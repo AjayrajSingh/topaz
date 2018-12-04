@@ -5,12 +5,14 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia_services/services.dart';
+import 'package:fidl_fuchsia_auth/fidl_async.dart' as fidl_auth;
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl_sys;
 import 'package:fuchsia_modular/lifecycle.dart';
+import 'package:fuchsia_services/services.dart';
 
 import '../agent.dart';
+import '_agent_context.dart';
 
 /// A concrete implementation of the [Agent] interface.
 ///
@@ -32,12 +34,25 @@ class AgentImpl implements Agent, fidl.Agent {
   final List<AsyncBinding<Object>> _outgoingServicesBindings =
       <AsyncBinding<Object>>[];
 
+  /// Returns the [fidl.AgentContext] for the running module. This variable
+  /// should not be used directly, use the [getContext()] method instead.
+  fidl.AgentContext _agentContext;
+
+  /// Returns a [fidl_auth.TokenManagerProxy]. It's abstracted to aid with
+  /// testing and this variable should not be used directly, use the
+  /// [getTokenManager()] method instead.
+  fidl_auth.TokenManagerProxy _tokenManagerProxy;
+
   /// The default constructor for this instance.
-  AgentImpl(
-      {Lifecycle lifecycle,
-      StartupContext startupContext,
-      ServiceProviderImpl serviceProviderImpl})
-      : _serviceProvider = serviceProviderImpl ?? ServiceProviderImpl() {
+  AgentImpl({
+    Lifecycle lifecycle,
+    StartupContext startupContext,
+    fidl.AgentContext agentContext,
+    ServiceProviderImpl serviceProviderImpl,
+    fidl_auth.TokenManagerProxy tokenManagerProxy,
+  })  : _agentContext = agentContext,
+        _tokenManagerProxy = tokenManagerProxy,
+        _serviceProvider = serviceProviderImpl ?? ServiceProviderImpl() {
     (lifecycle ??= Lifecycle()).addTerminateListener(_terminate);
     startupContext ??= StartupContext.fromStartupInfo();
 
@@ -93,6 +108,13 @@ class AgentImpl implements Agent, fidl.Agent {
   }
 
   @override
+  fidl_auth.TokenManagerProxy getTokenManager() {
+    final tokenManagerProxy = _getTokenManager();
+    _getContext().getTokenManager(tokenManagerProxy.ctrl.request());
+    return tokenManagerProxy;
+  }
+
+  @override
   Future<void> runTask(String taskId) {
     if (taskId == null) {
       throw ArgumentError.notNull('taskId');
@@ -114,6 +136,12 @@ class AgentImpl implements Agent, fidl.Agent {
       },
       fidl.Agent.$serviceName,
     );
+  }
+
+  fidl.AgentContext _getContext() => _agentContext ??= getAgentContext();
+
+  fidl_auth.TokenManagerProxy _getTokenManager() {
+    return _tokenManagerProxy ??= fidl_auth.TokenManagerProxy();
   }
 
   // Any necessary cleanup should be done here.

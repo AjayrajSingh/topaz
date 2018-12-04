@@ -5,6 +5,7 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_auth/fidl_async.dart' as fidl_auth;
 
 import 'internal/_agent_impl.dart';
 
@@ -59,7 +60,11 @@ abstract class Agent {
   /// ```
   /// typedef ServiceProvider<T> = FutureOr<T> Function();
   /// ```
-  /// Where [T] represents the service type. 
+  /// Where [T] represents the service type.
   void exposeServiceProvider<T>(
       ServiceProvider<T> serviceProvider, ServiceData<T> serviceData);
+
+  /// Returns the auth token manager this Agent may use for accessing external
+  /// services.
+  fidl_auth.TokenManagerProxy getTokenManager();
 }

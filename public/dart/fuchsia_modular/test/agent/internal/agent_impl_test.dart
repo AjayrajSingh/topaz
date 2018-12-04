@@ -4,25 +4,35 @@
 
 // ignore_for_file: implementation_imports
 
-import 'package:fidl/fidl.dart' show AsyncBinding;
+import 'package:fidl/fidl.dart' show AsyncBinding, AsyncProxyController;
 import 'package:fidl/src/interface.dart';
+import 'package:fidl_fuchsia_auth/fidl_async.dart' as fidl_auth;
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fidl_fuchsia_sys/fidl_async.dart';
 import 'package:fuchsia_modular/lifecycle.dart';
-import 'package:mockito/mockito.dart';
-import 'package:fuchsia_services/services.dart';
-import 'package:test/test.dart';
-import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
-
 import 'package:fuchsia_modular/src/agent/internal/_agent_impl.dart';
+import 'package:fuchsia_services/services.dart';
+import 'package:mockito/mockito.dart';
+import 'package:test/test.dart';
 
 // Mock classes
 class MockLifecycle extends Mock implements Lifecycle {}
 
 class MockStartupContext extends Mock implements StartupContext {}
 
+class MockAgentContext extends Mock implements fidl.AgentContext {}
+
 class MockServiceProviderImpl extends Mock implements ServiceProviderImpl {}
 
 class MockAsyncBinding extends Mock implements AsyncBinding {}
+
+class MockAsyncProxyController<T> extends Mock
+    implements AsyncProxyController<T> {}
+
+class MockInterfaceRequest<T> extends Mock implements InterfaceRequest<T> {}
+
+class MockTokenManagerProxy extends Mock
+    implements fidl_auth.TokenManagerProxy {}
 
 void main() {
   test('startupContext ', () {
@@ -143,6 +153,22 @@ void main() {
 
       await untilCalled(mockServiceBindings.bind(service, any));
     });
+  });
+
+  test('verify getTokenManager should call context.getTokenManager', () {
+    final mockAgentContext = MockAgentContext();
+    final mockTokenManagerProxy = MockTokenManagerProxy();
+    final mockedCtrl = MockAsyncProxyController<fidl_auth.TokenManager>();
+
+    when(mockTokenManagerProxy.ctrl).thenReturn(mockedCtrl);
+    when(mockedCtrl.request()).thenReturn(MockInterfaceRequest());
+
+    AgentImpl(
+      agentContext: mockAgentContext,
+      tokenManagerProxy: mockTokenManagerProxy,
+    ).getTokenManager();
+
+    verify(mockAgentContext.getTokenManager(any));
   });
 }
 
