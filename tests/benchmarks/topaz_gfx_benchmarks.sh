@@ -75,7 +75,7 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
 #
 # image_grid_flutter x3
 #
-IMAGE_GRID_FLUTTER_X3_COMMAND="set_root_view tile_view image_grid_flutter image_grid_flutter image_grid_flutter"
+IMAGE_GRID_FLUTTER_X3_COMMAND="set_root_view fuchsia-pkg://fuchsia.com/tile_view#meta/tile_view.cmx image_grid_flutter image_grid_flutter image_grid_flutter"
 BENCHMARK="fuchsia.scenic.image_grid_flutter_x3_noclipping_noshadows"
 runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     "${RUN_SCENIC_BENCHMARK}"                 \
