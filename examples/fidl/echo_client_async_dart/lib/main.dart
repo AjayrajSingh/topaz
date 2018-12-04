@@ -27,7 +27,8 @@ Future<Null> main(List<String> args) async {
   await _context.launcher.createComponent(launchInfo, null);
 
   _echo = new EchoProxy();
-  _echo.ctrl.bind(services.connectToServiceByName<Echo>(Echo.$serviceName));
+  _echo.ctrl
+      .bind(await services.connectToServiceByName<Echo>(Echo.$serviceName));
 
   final response = await _echo.echoString('hello');
   print('***** Response: $response');

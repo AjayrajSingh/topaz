@@ -19,7 +19,6 @@ dart_library("dart") {
     "src/fuchsia_log_record.dart",
     "src/fuchsia_logger.dart",
     "src/logging.dart",
-    "src/rio.dart",
   ]
 
   deps = [
@@ -31,6 +30,7 @@ dart_library("dart") {
     "//topaz/public/dart/zircon",
     "//zircon/public/fidl/fuchsia-cobalt",
     "//zircon/public/fidl/fuchsia-logger",
+    "//zircon/public/fidl/fuchsia-io",
   ]
 }
 

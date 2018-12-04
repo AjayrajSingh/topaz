@@ -7,9 +7,8 @@
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia/fuchsia.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:fidl_fuchsia_io/fidl.dart';
 import 'package:zircon/zircon.dart';
-
-import 'src/rio.dart';
 
 class StartupContext {
   static StartupContext _context;
@@ -130,32 +129,34 @@ class ServiceProviderImpl extends ServiceProvider {
 }
 
 class Services {
-  Channel _directory;
+  DirectoryProxy _proxy;
+  static const int _openFlags =
+      openRightReadable | openRightWritable; // connect flags for service
+  static const int _openMode = 0x1ED; // 0755
 
   Services();
 
   Channel request() {
-    ChannelPair pair = new ChannelPair();
-    assert(pair.status == ZX.OK);
-    _directory = pair.second;
-    return pair.first;
+    _proxy = DirectoryProxy();
+    return _proxy.ctrl.request().passChannel();
   }
 
   void connectToService<T>(ProxyController<T> controller) {
     final String serviceName = controller.$serviceName;
     assert(serviceName != null,
         'controller.\$serviceName must not be null. Check the FIDL file for a missing [Discoverable]');
-    rioConnectToService(
-        _directory, controller.request().passChannel(), serviceName);
+    _proxy.open(_openFlags, _openMode, serviceName,
+        InterfaceRequest<Node>(controller.request().passChannel()));
   }
 
   InterfaceHandle<T> connectToServiceByName<T>(String serviceName) {
     final ChannelPair pair = new ChannelPair();
-    rioConnectToService(_directory, pair.first, serviceName);
+    _proxy.open(
+        _openFlags, _openMode, serviceName, InterfaceRequest<Node>(pair.first));
     return new InterfaceHandle<T>(pair.second);
   }
 
   void close() {
-    _directory.close();
+    _proxy.close((_) {});
   }
 }

@@ -23,8 +23,8 @@ class TestServerInstance {
         new LaunchInfo(url: _kServerName, directoryRequest: services.request());
     await _context.launcher
         .createComponent(launchInfo, controller.ctrl.request());
-    proxy.ctrl.bind(
-        services.connectToServiceByName<TestServer>(TestServer.$serviceName));
+    proxy.ctrl.bind(await services
+        .connectToServiceByName<TestServer>(TestServer.$serviceName));
   }
 
   Future<void> stop() async {

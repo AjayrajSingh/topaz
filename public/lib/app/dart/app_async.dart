@@ -9,9 +9,9 @@ import 'package:fidl/fidl.dart';
 import 'package:fuchsia/fuchsia.dart';
 import 'package:fidl_fuchsia_sys/fidl_async.dart';
 import 'package:zircon/zircon.dart';
+import 'package:fidl_fuchsia_io/fidl_async.dart';
 
 import 'app.dart' as sync_app;
-import 'src/rio.dart';
 
 class StartupContext {
   static StartupContext _context;
@@ -135,38 +135,38 @@ class ServiceProviderImpl extends ServiceProvider {
 }
 
 class Services {
-  Channel _directory;
+  DirectoryProxy _proxy;
+  static const int _openFlags =
+      openRightReadable | openRightWritable; // connect flags for service
+  static const int _openMode = 0x1ED; // 0755
 
   Services();
 
   Channel request() {
-    ChannelPair pair = new ChannelPair();
-    if (pair.status != ZX.OK) {
-      throw new Exception(
-          'Failed to create new ChannelPair: ${getStringForStatus(pair.status)}');
-    }
-    _directory = pair.second;
-    return pair.first;
+    _proxy = DirectoryProxy();
+    return _proxy.ctrl.request().passChannel();
   }
 
-  void connectToService<T>(AsyncProxyController<T> controller) {
+  Future<void> connectToService<T>(AsyncProxyController<T> controller) async {
     final String serviceName = controller.$serviceName;
     if (serviceName == null) {
       throw new Exception(
           "${controller.$interfaceName}'s controller.\$serviceName"
           ' must not be null. Check the FIDL file for a missing [Discoverable]');
     }
-    rioConnectToService(
-        _directory, controller.request().passChannel(), serviceName);
+    await _proxy.open(_openFlags, _openMode, serviceName,
+        InterfaceRequest<Node>(controller.request().passChannel()));
   }
 
-  InterfaceHandle<T> connectToServiceByName<T>(String serviceName) {
+  Future<InterfaceHandle<T>> connectToServiceByName<T>(
+      String serviceName) async {
     final ChannelPair pair = new ChannelPair();
-    rioConnectToService(_directory, pair.first, serviceName);
+    await _proxy.open(
+        _openFlags, _openMode, serviceName, InterfaceRequest<Node>(pair.first));
     return new InterfaceHandle<T>(pair.second);
   }
 
-  void close() {
-    _directory.close();
+  Future<void> close() async {
+    await _proxy.close();
   }
 }
