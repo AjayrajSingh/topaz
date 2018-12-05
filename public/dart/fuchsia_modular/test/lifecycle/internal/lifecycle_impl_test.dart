@@ -51,5 +51,7 @@ void main() {
       ..addTerminateListener(expectAsync0(terminateListener1))
       ..addTerminateListener(expectAsync0(terminateListener2))
       ..terminate();
-  });
+  },
+      skip:
+          'this test will cause other tests to not run after it is invoked since it calls exit()');
 }

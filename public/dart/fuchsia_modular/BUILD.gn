@@ -21,6 +21,7 @@ dart_library("fuchsia_modular") {
     "lifecycle.dart",
     "logger.dart",
     "module.dart",
+    "proposal.dart",
     "src/agent/agent.dart",
     "src/agent/internal/_agent_impl.dart",
     "src/entity/entity.dart",
@@ -38,6 +39,8 @@ dart_library("fuchsia_modular") {
     "src/module/module.dart",
     "src/module/module_state_exception.dart",
     "src/module/noop_intent_handler.dart",
+    "src/proposal/proposal.dart",
+    "src/proposal/internal/proposal_listener_impl.dart",
   ]
 
   deps = [
@@ -65,6 +68,8 @@ dart_test("fuchsia_modular_package_unittests") {
     "module/internal/module_impl_test.dart",
     "module/module_test.dart",
     "module/noop_intent_handler_test.dart",
+    "proposal/proposal_test.dart",
+    "proposal/internal/proposal_listener_impl_test.dart"
   ]
 
   deps = [
@@ -91,6 +96,7 @@ dart_fuchsia_test("fuchsia_modular_package_integration_tests") {
   sources = [
     "lifecycle/internal/lifecycle_impl_test.dart",
     "module/internal/module_impl_integ_test.dart",
+    "proposal/proposal_integ_test.dart",
   ]
 
   deps = [
