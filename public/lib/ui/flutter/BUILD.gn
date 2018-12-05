@@ -11,6 +11,7 @@ dart_library("flutter") {
 
   sources = [
     "child_view.dart",
+    "child_view_async.dart",
   ]
 
   source_dir = "."
