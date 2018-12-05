@@ -17,8 +17,15 @@ fidl("chromium.web") {
   ]
 }
 
-prebuilt_package("chromium") {
-  archive = "//topaz/third_party/chromium/arch/$target_cpu/chromium.far"
+if (enable_chromium_based_web_runner) {
+  prebuilt_package("chromium") {
+    archive = "//topaz/third_party/chromium/arch/$target_cpu/chromium.far"
+  }
+} else {
+  package("chromium") {
+    deprecated_system_image = true
+    # Empty
+  }
 }
 
 if (enable_chromium_based_web_runner) {
