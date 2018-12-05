@@ -1,3 +1,3 @@
 {
-    "runner": "dart_jit_product_runner"
+    "runner": "fuchsia-pkg://fuchsia.com/dart_jit_product_runner#meta/dart_jit_product_runner.cmx"
 }
