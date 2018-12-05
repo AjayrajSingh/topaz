@@ -28,6 +28,5 @@ group("dart_unittests") {
 initial_module_packages("topaz_modules_index") {
   packages = [
     "image",
-    "video",
   ]
 }

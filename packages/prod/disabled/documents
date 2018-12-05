@@ -1,7 +1,0 @@
-{
-    "packages": [
-        "//topaz/app/documents/modules/browser:documents_browser",
-        "//topaz/app/documents/agents/content_provider:documents_content_provider",
-        "//topaz/app/documents/modules/info:documents_info"
-    ]
-}

@@ -18,3 +18,4 @@ shas are provided for reference only. Code can be checked out with:
 * topaz/app/contacts: 80378fe470817750188707de29237282892a3142
 * topaz/app/image: 5e731a943a907cf960ecfbda1c391958f9093afa
 * topaz/app/documents: b5a3ee29b15414f232865128195d14bd8811ab02
+* topaz/app/video: fc03877f787fc119140b900d476c4563bd04a529
