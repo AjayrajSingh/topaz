@@ -14,4 +14,4 @@ by device_runner after the user logs in.
 
 Ermine also responds to stories and mods created with `sessionctl` as shown below.
 
-    sessionctl --story_name="Fez Story" --mod_name="noodles1" --mod_url="noodles" add_mod
+    sessionctl --story_name="Fez Story" --mod_name="noodles1" --mod_url="fuchsia-pkg://fuchsia.com/noodles#meta/noodles.cmx" add_mod

@@ -37,8 +37,8 @@ package("ermine") {
 
   meta = [
     {
-      path = rebase_path("meta/ermine_session_shell.cmx")
-      dest = "ermine_session_shell.cmx"
+      path = rebase_path("meta/ermine.cmx")
+      dest = "ermine.cmx"
     },
   ]
 
