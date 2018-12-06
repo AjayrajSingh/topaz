@@ -5,7 +5,7 @@
 import("//build/package.gni")
 import("//topaz/runtime/chromium/chromium.gni")
 
-if (enable_chromium_based_web_runner) {
+if (enable_chromium) {
   package("web_runner_prototype") {
     deprecated_system_image = true
     # Empty

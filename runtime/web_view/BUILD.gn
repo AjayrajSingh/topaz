@@ -6,7 +6,7 @@ import("//build/package.gni")
 import("//topaz/runtime/chromium/chromium.gni")
 import("//topaz/runtime/web_view/config.gni")
 
-if (enable_chromium_based_web_runner) {
+if (enable_chromium) {
   # If chromium is the web runner, we don't need any of these targets.
   # Leave empty build & package targets for package configurations that still
   # reference these.
