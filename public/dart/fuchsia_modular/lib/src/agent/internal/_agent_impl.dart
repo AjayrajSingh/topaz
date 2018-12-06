@@ -3,15 +3,18 @@
 // found in the LICENSE file
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_auth/fidl_async.dart' as fidl_auth;
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl_sys;
+import 'package:fuchsia_logger/logger.dart';
 import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:fuchsia_services/services.dart';
 
 import '../agent.dart';
+import '../agent_task_handler.dart';
 import '_agent_context.dart';
 
 /// A concrete implementation of the [Agent] interface.
@@ -42,6 +45,10 @@ class AgentImpl implements Agent, fidl.Agent {
   /// testing and this variable should not be used directly, use the
   /// [getTokenManager()] method instead.
   fidl_auth.TokenManagerProxy _tokenManagerProxy;
+
+  AgentTaskHandler _taskHandler;
+
+  final Queue<String> _outstandingTasks = Queue<String>();
 
   /// The default constructor for this instance.
   AgentImpl({
@@ -115,12 +122,58 @@ class AgentImpl implements Agent, fidl.Agent {
   }
 
   @override
-  Future<void> runTask(String taskId) {
+  void registerTaskHandler(AgentTaskHandler taskHandler) {
+    if (taskHandler == null) {
+      throw ArgumentError.notNull('taskHandler');
+    }
+
+    if (_taskHandler != null) {
+      throw Exception(
+          'AgentTaskHandler registration failed because a handler is already '
+          'registered.');
+    }
+    _taskHandler = taskHandler;
+
+    _outstandingTasks
+      ..forEach(_taskHandler.runTask)
+      ..clear();
+  }
+
+  @override
+  Future<void> runTask(String taskId) async {
     if (taskId == null) {
       throw ArgumentError.notNull('taskId');
     }
-    // TODO impl this method.
-    throw UnimplementedError('runTask method is not yet implemented');
+
+    if (_taskHandler != null) {
+      return _taskHandler.runTask(taskId);
+    }
+
+    log.warning('Attempting to run a task [$taskId] before a task handler was '
+        'registered. Queuing up this task to be executed as soon a task '
+        'handler is registered.');
+    _outstandingTasks.add(taskId);
+  }
+
+  @override
+  void scheduleTask(fidl.TaskInfo taskInfo) {
+    if (taskInfo == null) {
+      throw ArgumentError.notNull('taskInfo');
+    }
+    if (_taskHandler == null) {
+      throw Exception(
+          'Attempting to schedule a task without registering a task handler to '
+          'receive it');
+    }
+    _getContext().scheduleTask(taskInfo);
+  }
+
+  @override
+  void deleteTask(String taskId) {
+    if (taskId == null) {
+      throw ArgumentError.notNull('taskId');
+    }
+    _getContext().deleteTask(taskId);
   }
 
   /// Exposes this [fidl.Agent] instance to the

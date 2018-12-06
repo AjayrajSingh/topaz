@@ -106,7 +106,7 @@ abstract class Module {
   /// so the framework has a chance to connect the intent handler.
   ///
   /// ```
-  /// void main() {
+  /// void main(List<String> args) {
   ///   Module()
   ///     ..registerIntentHandler(MyHandler());
   /// }

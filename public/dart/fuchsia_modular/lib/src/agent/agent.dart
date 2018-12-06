@@ -6,7 +6,9 @@ import 'dart:async';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_auth/fidl_async.dart' as fidl_auth;
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl_agent;
 
+import 'agent_task_handler.dart';
 import 'internal/_agent_impl.dart';
 
 /// The service provider function that is responsible to return a service that
@@ -32,7 +34,6 @@ abstract class Agent {
   /// finish before initializing and exposing the service.
   ///
   /// Note: Multiple connections will be allowed to this [serviceImpl].
-  ///
   /// [serviceData] can be found as part of the generated FIDL bindings, it
   /// holds the service runtime name and bindings object used for establishing a
   /// connection.
@@ -67,4 +68,28 @@ abstract class Agent {
   /// Returns the auth token manager this Agent may use for accessing external
   /// services.
   fidl_auth.TokenManagerProxy getTokenManager();
+
+  /// Registers the [taskHandler] with this.
+  ///
+  /// This method must be called before scheduling any tasks via [scheduleTask].
+  /// It is also recommend to register as part of the main method in order to
+  /// start running tasks as soon as possible.
+  ///
+  /// ```
+  /// void main(List<String> args) {
+  ///   Agent()
+  ///     ..registerTaskHandler(MyAgentTaskHandler());
+  /// }
+  ///
+  /// class MyAgentTaskHandler extends AgentTaskHandler { ... }
+  /// ```
+  void registerTaskHandler(AgentTaskHandler taskHandler);
+
+  /// Schedules a task described in [taskInfo]. [registerTaskHandler] must be
+  /// called before scheduling any tasks. When this task is scheduled to
+  /// run, [AgentTaskHandler.runTask()] is called.
+  void scheduleTask(fidl_agent.TaskInfo taskInfo);
+
+  /// No new runs of this [taskId] will be scheduled.
+  void deleteTask(String taskId);
 }

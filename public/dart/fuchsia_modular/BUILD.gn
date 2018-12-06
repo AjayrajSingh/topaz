@@ -24,6 +24,7 @@ dart_library("fuchsia_modular") {
     "proposal.dart",
     "service_connection.dart",
     "src/agent/agent.dart",
+    "src/agent/agent_task_handler.dart",
     "src/agent/internal/_agent_impl.dart",
     "src/entity/entity.dart",
     "src/entity/entity_codec.dart",

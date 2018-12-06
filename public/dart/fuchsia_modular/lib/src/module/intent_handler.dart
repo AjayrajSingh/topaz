@@ -7,7 +7,7 @@ import 'intent.dart';
 
 /// The [IntentHandler] class is an abstract class which is intended to be
 /// extended by module authors to handle incoming intents. The class is
-/// intented to be registered with the Module class inside of the module's main
+/// intended to be registered with the Module class inside of the module's main
 /// method.
 abstract class IntentHandler {
   /// This method is intended to be implemented by subclasses.
