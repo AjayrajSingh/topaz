@@ -25,7 +25,6 @@
         "topaz/packages/prod/maxwell",
         "topaz/packages/prod/modules_index",
         "topaz/packages/prod/mondrian",
-        "topaz/packages/prod/oauth_token_manager",
         "topaz/packages/prod/perspective",
         "topaz/packages/prod/skottie_viewer",
         "topaz/packages/prod/spotify_auth_provider",

@@ -10,7 +10,6 @@
         "topaz/packages/config/ermine",
         "topaz/packages/examples/noodles",
         "topaz/packages/prod/dashboard",
-        "topaz/packages/prod/oauth_token_manager",
         "topaz/packages/prod/sysui",
         "topaz/packages/prod/term",
         "topaz/packages/prod/web_runner_prototype"
