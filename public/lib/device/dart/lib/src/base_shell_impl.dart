@@ -4,10 +4,8 @@
 
 import 'package:fidl_fuchsia_auth/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
-import 'package:meta/meta.dart';
 
 /// Called when [BaseShell.initialize] occurs.
 typedef OnBaseShellReady = void Function(
@@ -26,8 +24,6 @@ class BaseShellImpl implements BaseShell, Lifecycle {
       new BaseShellContextProxy();
   final UserProviderProxy _userProviderProxy = new UserProviderProxy();
   final PresentationProxy _presentationProxy = new PresentationProxy();
-  final Set<AuthenticationContextBinding> _bindingSet =
-      new Set<AuthenticationContextBinding>();
   final Set<AuthenticationUiContextBinding> _authUiContextBindingSet =
       new Set<AuthenticationUiContextBinding>();
 
@@ -37,9 +33,6 @@ class BaseShellImpl implements BaseShell, Lifecycle {
   /// Called when the [BaseShell] terminates.
   final OnBaseShellStop onStop;
 
-  /// The [AuthenticationContext] to provide when requested.
-  final AuthenticationContext authenticationContext;
-
   /// The [AuthenticationUiContext] is a new interface from
   /// |fuchsia::auth::TokenManager| service that provides a new authentication
   /// UI context to display signin and permission screens when requested.
@@ -47,7 +40,6 @@ class BaseShellImpl implements BaseShell, Lifecycle {
 
   /// Constructor.
   BaseShellImpl({
-    @required this.authenticationContext,
     this.authenticationUiContext,
     this.onReady,
     this.onStop,
@@ -73,22 +65,9 @@ class BaseShellImpl implements BaseShell, Lifecycle {
     onStop?.call();
     _userProviderProxy.ctrl.close();
     _baseShellContextProxy.ctrl.close();
-    for (AuthenticationContextBinding binding in _bindingSet) {
-      binding.close();
-    }
     for (AuthenticationUiContextBinding binding in _authUiContextBindingSet) {
       binding.close();
     }
-  }
-
-  @override
-  void getAuthenticationContext(
-    String username,
-    InterfaceRequest<AuthenticationContext> request,
-  ) {
-    AuthenticationContextBinding binding = new AuthenticationContextBinding()
-      ..bind(authenticationContext, request);
-    _bindingSet.add(binding);
   }
 
   @override
@@ -103,12 +82,7 @@ class BaseShellImpl implements BaseShell, Lifecycle {
 
   /// Closes all bindings to authentication contexts, effectively cancelling any ongoing
   /// authorization flows.
-  void closeAuthenticationContextBindings() {
-    for (AuthenticationContextBinding binding in _bindingSet) {
-      binding.close();
-    }
-    _bindingSet.clear();
-
+  void closeAuthenticationUiContextBindings() {
     for (AuthenticationUiContextBinding binding in _authUiContextBindingSet) {
       binding.close();
     }

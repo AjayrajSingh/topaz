@@ -5,7 +5,6 @@
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl_fuchsia_auth/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
@@ -46,13 +45,11 @@ class BaseShellWidget<T extends BaseShellModel> extends StatelessWidget {
   BaseShellWidget({
     @required this.startupContext,
     T baseShellModel,
-    AuthenticationContext authenticationContext,
     AuthenticationUiContext authenticationUiContext,
     this.child,
   })  : _baseShellModel = baseShellModel,
         _baseShell = _createBaseShell(
           baseShellModel,
-          authenticationContext,
           authenticationUiContext,
         );
 
@@ -88,11 +85,9 @@ class BaseShellWidget<T extends BaseShellModel> extends StatelessWidget {
 
   static BaseShell _createBaseShell(
     BaseShellModel baseShellModel,
-    AuthenticationContext authenticationContext,
     AuthenticationUiContext authenticationUiContext,
   ) {
     return new BaseShellImpl(
-      authenticationContext: authenticationContext,
       authenticationUiContext: authenticationUiContext,
       onReady: baseShellModel?.onReady,
       onStop: () {
@@ -103,6 +98,6 @@ class BaseShellWidget<T extends BaseShellModel> extends StatelessWidget {
 
   /// Cancels any authentication flow currently in progress.
   void cancelAuthenticationFlow() {
-    _baseShell.closeAuthenticationContextBindings();
+    _baseShell.closeAuthenticationUiContextBindings();
   }
 }

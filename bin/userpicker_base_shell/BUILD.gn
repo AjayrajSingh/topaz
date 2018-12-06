@@ -36,7 +36,7 @@ flutter_app("userpicker_base_shell") {
   manifest = "pubspec.yaml"
 
   sources = [
-    "authentication_context_impl.dart",
+    "authentication_ui_context_impl.dart",
     "authentication_overlay.dart",
     "authentication_overlay_model.dart",
     "circular_button.dart",

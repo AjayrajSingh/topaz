@@ -15,7 +15,6 @@ import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
-import 'authentication_context_impl.dart';
 import 'authentication_overlay.dart';
 import 'authentication_overlay_model.dart';
 import 'authentication_ui_context_impl.dart';
@@ -119,9 +118,6 @@ void main() {
   _baseShellWidget = new BaseShellWidget<UserPickerBaseShellModel>(
     startupContext: startupContext,
     baseShellModel: userPickerBaseShellModel,
-    authenticationContext: new AuthenticationContextImpl(
-        onStartOverlay: authModel.onStartOverlay,
-        onStopOverlay: authModel.onStopOverlay),
     authenticationUiContext: new AuthenticationUiContextImpl(
         onStartOverlay: authModel.onStartOverlay,
         onStopOverlay: authModel.onStopOverlay),
