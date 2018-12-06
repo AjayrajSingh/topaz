@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' hide FileSystemException;
 
 import 'package:args/args.dart';
 
@@ -134,12 +134,22 @@ Future<void> main(List<String> args) async {
   // fuchsia-source:///x/y/main.dart -> file:///a/b/x/y/main.dart
   String mainUriString = (await _asFileUri(fileSystem, mainUri)).toString();
   // file:///a/b/x/y/main.dart -> package:x.y/main.dart
-  for (var line in await new File(packagesUri.toFilePath()).readAsLines()) {
+  for (var line in await new File(
+          (await _asFileUri(fileSystem, packagesUri)).toFilePath())
+      .readAsLines()) {
     var colon = line.indexOf(':');
     if (colon == -1)
       continue;
     var packageName = line.substring(0, colon);
-    var packagePath = line.substring(colon + 1);
+    String packagePath;
+    try {
+      packagePath = (await _asFileUri(
+          fileSystem, packagesUri.resolve(line.substring(colon + 1))))
+          .toString();
+    } on FileSystemException {
+      // Can't resolve package path.
+      continue;
+    }
     if (mainUriString.startsWith(packagePath)) {
       mainUri = Uri.parse('package:$packageName/${mainUriString.substring(packagePath.length)}');
       break;

@@ -103,7 +103,7 @@ template("dart_kernel") {
     dart_target_gen_dir =
         get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
     rebased_packages_path =
-        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages")
+        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages", "//")
 
     multi_root_scheme = "fuchsia-source"
 
@@ -118,7 +118,7 @@ template("dart_kernel") {
              "--multi-root",
              rebase_path("//"),
              "--packages",
-             rebased_packages_path,
+             "$multi_root_scheme:///$rebased_packages_path",
              "--depfile",
              rebase_path(depfile, root_build_dir),
              "--output",
