@@ -4,7 +4,7 @@
 
 // ignore_for_file: implementation_imports
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia_services/src/service_connection.dart';
+import 'package:fuchsia_modular/src/service_connection/service_connection.dart';
 import 'package:test/test.dart';
 
 void main() {

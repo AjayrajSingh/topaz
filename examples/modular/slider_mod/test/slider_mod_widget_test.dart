@@ -5,7 +5,7 @@
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:fuchsia_remote_debug_protocol/logging.dart';
 import 'package:fidl_fuchsia_testing_runner/fidl_async.dart';
-import 'package:fuchsia_services/services.dart';
+import 'package:fuchsia_modular/service_connection.dart';
 import 'package:test/test.dart';
 
 void main() {

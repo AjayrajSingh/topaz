@@ -5,15 +5,15 @@
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl_modular;
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl_sys;
+import 'package:fuchsia_logger/logger.dart';
+import 'package:fuchsia_services/services.dart' show StartupContext;
 
-import 'component_context.dart';
-import 'startup_context.dart';
+import '../internal/_component_context.dart';
 
 /// Connect to the service specified by [serviceProxy] and implemented by the
 /// agent with [agentUrl].
 ///
 /// The agent will be launched if it's not already running.
-@Deprecated('Use package:fuchsia_modular/service_connection.dart instead')
 void connectToAgentService<T>(
   String agentUrl,
   AsyncProxy<T> serviceProxy,
@@ -52,8 +52,7 @@ void connectToAgentService<T>(
     ).then((_) {
       // Close agent controller when the service proxy is closed
       serviceProxy.ctrl.whenClosed.then((_) {
-        // TODO change to log.info when available
-        print('Service proxy [${serviceProxy.ctrl.$serviceName}] is closed. '
+        log.info('Service proxy [${serviceProxy.ctrl.$serviceName}] is closed. '
             'Closing the associated AgentControllerProxy.');
         agentControllerProxy.ctrl.close();
       });
@@ -73,7 +72,6 @@ void connectToAgentService<T>(
 ///
 /// Environment services are services that are implemented by the framework
 /// itself.
-@Deprecated('Use package:fuchsia_modular/service_connection.dart instead')
 void connectToEnvironmentService<T>(AsyncProxy<T> serviceProxy) {
   if (serviceProxy == null) {
     throw Exception(

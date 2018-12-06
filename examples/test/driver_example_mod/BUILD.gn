@@ -25,6 +25,7 @@ flutter_app("driver_example_mod") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/fuchsia_modular",
     "//topaz/public/dart/fuchsia_services",
     "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/app/dart",

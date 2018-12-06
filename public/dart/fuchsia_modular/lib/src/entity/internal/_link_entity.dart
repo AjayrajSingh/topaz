@@ -9,10 +9,10 @@ import 'dart:typed_data';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_mem/fidl_async.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
-import 'package:fuchsia_services/services.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
+import '../../internal/_component_context.dart';
 import '../../module/internal/_module_context.dart';
 import '../entity.dart';
 import '../entity_codec.dart';

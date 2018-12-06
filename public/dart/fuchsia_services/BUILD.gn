@@ -17,6 +17,8 @@ dart_library("fuchsia_services") {
     "src/service_connection.dart",
     "src/service_provider_impl.dart",
     "src/startup_context.dart",
+
+
   ]
 
   deps = [
@@ -31,7 +33,6 @@ dart_library("fuchsia_services") {
 
 dart_test("fuchsia_services_package_unittests") {
   sources = [
-    "service_connection_test.dart",
     "service_provider_impl_test.dart",
     "startup_context_test.dart",
   ]
@@ -50,9 +51,11 @@ dart_fuchsia_test("fuchsia_services_package_integration_tests") {
     },
   ]
 
-  sources = [
-    "component_context_test.dart",
-  ]
+  # Note: existing tests were moved into another package during a refactor which
+  # is why this is empty. We are leaving this here so that it is easy to add
+  # integration tests when we get a chance. This comment can be removed when
+  # sources is no longer empty.
+  sources = []
 
   deps = [
     ":fuchsia_services",

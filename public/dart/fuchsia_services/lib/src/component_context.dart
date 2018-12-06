@@ -9,11 +9,15 @@ ComponentContextProxy _componentContextProxy;
 
 /// Return the [ComponentContext] cached instance associated with the
 /// currently running component.
+@Deprecated(
+    'This method should not be used, instead use the fuchsia_modular package')
 ComponentContext getComponentContext() {
   if (_componentContextProxy != null) {
     return _componentContextProxy;
   }
   _componentContextProxy = ComponentContextProxy();
+
+  //ignore: deprecated_member_use
   connectToEnvironmentService(_componentContextProxy);
   return _componentContextProxy;
 }
