@@ -3,12 +3,8 @@
 # found in the LICENSE file.
 
 declare_args() {
-  enable_chromium_based_web_runner = false
-}
-
-declare_args() {
   # This enables a chromium-based web_runner implementation.
   # If this is set to false and web_runner_prototype is in the build, the
   # prototype version will be used instead to handle web requests.
-  enable_chromium = enable_chromium_based_web_runner
+  enable_chromium = false
 }

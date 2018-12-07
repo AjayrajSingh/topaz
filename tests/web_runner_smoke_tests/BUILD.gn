@@ -32,7 +32,7 @@ package("web_runner_smoke_tests") {
   ]
 
   # This test only works with the chromium based web runner
-  if (enable_chromium_based_web_runner) {
+  if (enable_chromium) {
     tests = [
       {
         name = "web_runner_smoke_tests"
