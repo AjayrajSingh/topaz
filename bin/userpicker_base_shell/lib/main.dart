@@ -108,7 +108,7 @@ void main() {
             model: wifiInfoOverlayModel,
             child: new _WifiInfo(
               wifiWidget: new ApplicationWidget(
-                url: 'wifi_settings',
+                url: 'fuchsia-pkg://fuchsia.com/wifi_settings#meta/wifi_settings.cmx',
                 launcher: startupContext.launcher,
               ),
             ),

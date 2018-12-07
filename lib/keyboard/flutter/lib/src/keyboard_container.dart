@@ -66,7 +66,7 @@ class KeyboardContainer extends StatelessWidget {
               top: const Radius.circular(_kKeyboardCornerRadius)),
           elevation: elevation ?? model.keyboardElevation,
           child: ApplicationWidget(
-            url: 'latin-ime',
+            url: 'fuchsia-pkg://fuchsia.com/latin-ime#meta/latin-ime.cmx',
             focusable: false,
             launcher: StartupContext.fromStartupInfo().launcher,
           ),
