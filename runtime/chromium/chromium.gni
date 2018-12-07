@@ -6,5 +6,5 @@ declare_args() {
   # This enables a chromium-based web_runner implementation.
   # If this is set to false and web_runner_prototype is in the build, the
   # prototype version will be used instead to handle web requests.
-  enable_chromium = false
+  enable_chromium = true
 }
