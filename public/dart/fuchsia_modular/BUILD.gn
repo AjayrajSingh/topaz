@@ -48,6 +48,8 @@ dart_library("fuchsia_modular") {
   ]
 
   deps = [
+    "//garnet/public/fidl/fuchsia.sys",
+    "//garnet/public/fidl/fuchsia.ui.viewsv1token",
     "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/pub/meta",
     "//third_party/dart-pkg/pub/uuid",
@@ -55,6 +57,8 @@ dart_library("fuchsia_modular") {
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/fuchsia_logger",
     "//topaz/public/dart/fuchsia_services",
+    "//topaz/public/dart/zircon",
+    "//zircon/public/fidl/fuchsia-mem",
   ]
 }
 

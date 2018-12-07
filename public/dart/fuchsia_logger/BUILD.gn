@@ -21,8 +21,6 @@ dart_library("fuchsia_logger") {
   deps = [
     "//third_party/dart-pkg/pub/logging",
     "//third_party/dart-pkg/pub/meta",
-    "//topaz/public/dart/zircon",
-    "//zircon/public/fidl/fuchsia-logger",
   ]
 }
 
