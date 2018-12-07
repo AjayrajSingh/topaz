@@ -53,6 +53,7 @@ sdk_atom("kernel_compiler_sdk") {
         "tools/dart_prebuilts/dart_runner/platform_strong.dill",
         "tools/dart_prebuilts/flutter_runner/platform_strong.dill",
         "tools/dart_prebuilts/kernel_compiler.snapshot",
+        "tools/dart_prebuilts/frontend_server_tool.snapshot",
       ]
     }
   }
@@ -60,6 +61,8 @@ sdk_atom("kernel_compiler_sdk") {
   dart_target_gen_dir =
       get_label_info(":bogus($host_toolchain)", "target_gen_dir")
   kernel_compiler_path = "$dart_target_gen_dir/kernel_compiler.snapshot"
+  frontend_server_tool_gen_dir =
+      get_label_info("//third_party/flutter/frontend_server:frontend_server_tool_snapshot($host_toolchain)", "target_gen_dir")
 
   files = [
     {
@@ -78,12 +81,15 @@ sdk_atom("kernel_compiler_sdk") {
       source = "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
       dest = "tools/dart_prebuilts/flutter_runner/platform_strong.dill"
     },
+    {
+      source = "$frontend_server_tool_gen_dir/frontend_server_tool.snapshot"
+      dest = "tools/dart_prebuilts/frontend_server_tool.snapshot"
+    },
   ]
 
   non_sdk_deps = [
     ":kernel_compiler_snapshot($host_toolchain)",
-    "//third_party/flutter/frontend_server:frontend_server_tool($host_toolchain)",
-    "//third_party/dart-pkg/git/flutter/packages/flutter_tools:fuchsia_attach($host_toolchain)",
+    "//third_party/flutter/frontend_server:frontend_server_tool_snapshot($host_toolchain)",
     "//topaz/runtime/dart_runner/kernel:kernel_platform_files",
     "//topaz/runtime/flutter_runner/kernel:kernel_platform_files",
   ]
