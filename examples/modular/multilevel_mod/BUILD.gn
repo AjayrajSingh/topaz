@@ -1,0 +1,28 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+flutter_app("multilevel_mod") {
+  package_name = "multilevel_mod"
+  main_dart = "lib/main.dart"
+
+  fuchsia_package_name = "multilevel_mod"
+
+  meta = [
+    {
+      path = rebase_path("meta/multilevel_mod.cmx")
+      dest = "multilevel_mod.cmx"
+    },
+  ]
+
+  sources = [
+    "src/handlers/root_intent_handler.dart",
+  ]
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/fuchsia_modular",
+  ]
+}
