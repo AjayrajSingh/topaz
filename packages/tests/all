@@ -9,6 +9,7 @@
         "topaz/packages/tests/dart_target_unittests",
         "topaz/packages/tests/dart_unittests",
         "topaz/packages/tests/deprecated_loop",
+        "topaz/packages/tests/fidl_changes",
         "topaz/packages/tests/fidl_compatibility_test",
         "topaz/packages/tests/fidl_compatibility_test_server_dart",
         "topaz/packages/tests/flutter_runner_unittests",

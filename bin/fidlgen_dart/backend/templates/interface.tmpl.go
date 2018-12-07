@@ -398,15 +398,25 @@ abstract class {{ .Name }} {
 
 {{- range .Methods }}
   {{- if .HasRequest }}
-  {{- range .Doc }}
-  ///{{ . -}}
-  {{- end }}
-  {{ template "AsyncReturn" . }} {{ .Name }}({{ template "AsyncParams" .Request }});
+    {{- range .Doc }}
+    ///{{ . -}}
+    {{- end }}
+    {{ template "AsyncReturn" . }} {{ .Name }}({{ template "AsyncParams" .Request }})
+    {{- if .Transitional }}
+      { return Future.error(UnimplementedError()); }
+    {{- else }}
+      ;
+    {{- end }}
   {{- else }}
-  {{- range .Doc }}
-  ///{{ . -}}
-  {{- end }}
-  Stream<{{ .AsyncResponseType}}> get {{ .Name }};
+    {{- range .Doc }}
+    ///{{ . -}}
+    {{- end }}
+    Stream<{{ .AsyncResponseType}}> get {{ .Name }}
+    {{- if .Transitional }}
+      { return Stream.empty(); }
+    {{- else }}
+      ;
+    {{- end }}
   {{- end }}
 {{- end }}
 }

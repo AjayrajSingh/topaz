@@ -142,6 +142,7 @@ type Method struct {
 	CallbackType       string
 	TypeSymbol         string
 	TypeExpr           string
+	Transitional       bool
 	Documented
 }
 
@@ -749,6 +750,7 @@ func (c *compiler) compileInterface(val types.Interface) Interface {
 				asyncResponseType = asyncResponseClass
 			}
 		}
+		_, transitional := v.LookupAttribute("Transitional")
 		m := Method{
 			v.Ordinal,
 			fmt.Sprintf("_k%s_%s_Ordinal", r.Name, v.Name),
@@ -764,6 +766,7 @@ func (c *compiler) compileInterface(val types.Interface) Interface {
 			fmt.Sprintf("%s%sCallback", r.Name, v.Name),
 			fmt.Sprintf("_k%s_%s_Type", r.Name, v.Name),
 			typeExprForMethod(request, response, fmt.Sprintf("%s.%s", r.Name, v.Name)),
+			transitional,
 			docString(v),
 		}
 		r.Methods = append(r.Methods, m)

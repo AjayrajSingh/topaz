@@ -1,0 +1,24 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_library.gni")
+
+# This is just so that we can run dart analysis on these files.
+dart_library("package_for_analysis") {
+  infer_package_name = true
+
+  sources = [
+    "before.dart",
+    "after.dart",
+        "before-during.dart",
+    "after-during.dart",
+
+  ]
+
+  deps = [
+    "//garnet/tests/fidl-changes:fidl.test.before",
+    "//garnet/tests/fidl-changes:fidl.test.during",
+    "//garnet/tests/fidl-changes:fidl.test.after",
+  ]
+}
