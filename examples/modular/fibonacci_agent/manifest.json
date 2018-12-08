@@ -1,6 +1,0 @@
-{
-  "@version": 2,
-  "binary": "fibonacci_agent",
-  "suggestion_headline": "calculate Fibonacci",
-  "intent_filters": []
-}

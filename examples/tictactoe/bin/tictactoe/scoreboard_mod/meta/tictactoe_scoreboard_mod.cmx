@@ -18,5 +18,17 @@
             "fuchsia.ui.viewsv1.ViewManager",
             "fuchsia.wlan.service.Wlan"
         ]
+    },
+    "facets": {
+        "fuchsia.module": {
+            "@version": 2,
+            "intent_filters": [
+                {
+                    "action": "com.google.fuchsia.tictactoe_score",
+                    "parameters": []
+                }
+            ],
+            "composition_pattern": "comments-right"
+        }
     }
 }

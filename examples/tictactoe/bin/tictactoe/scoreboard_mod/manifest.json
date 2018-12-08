@@ -1,5 +1,0 @@
-{
-  "binary": "tictactoe_scorecard_mod",
-  "action": "com.google.fuchsia.tictactoe_score",
-  "composition_pattern": "comments-right"
-}

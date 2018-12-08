@@ -18,5 +18,23 @@
             "fuchsia.ui.viewsv1.ViewManager",
             "fuchsia.wlan.service.Wlan"
         ]
+    },
+    "facets": {
+        "fuchsia.module": {
+            "@version": 2,
+            "intent_filters": [
+                {
+                    "action": "com.google.fuchsia.example_manual_relationships",
+                    "parameters": [
+                        {
+                        "name": "example_manual_relationships",
+                        "type": "com.fuchsia.mondrian.fake_param"
+                        }
+                    ]
+                }
+            ],
+            "suggestion_headline": "Example Manual Relationships",
+            "placeholder_color": "#00FF00"
+        }
     }
 }

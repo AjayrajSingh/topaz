@@ -18,5 +18,31 @@
             "fuchsia.ui.viewsv1.ViewManager",
             "fuchsia.wlan.service.Wlan"
         ]
+    },
+    "facets": {
+        "fuchsia.module": {
+            "@version": 2,
+            "suggestion_headline": "Show a shape",
+            "intent_filters": [
+                {
+                "action": "com.fuchsia.shapes_mod.show_circle",
+                "parameters": [
+                    {
+                    "name": "shape",
+                    "type": "com.fuchsia.shapes_mod.shape"
+                    }
+                ]
+                },
+                {
+                "action": "com.fuchsia.shapes_mod.show_square",
+                "parameters": [
+                    {
+                    "name": "shape",
+                    "type": "com.fuchsia.shape_mod.shape"
+                    }
+                ]
+                }
+            ]
+        }
     }
 }

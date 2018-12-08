@@ -19,5 +19,23 @@
             "fuchsia.ui.viewsv1.ViewManager",
             "fuchsia.wlan.service.Wlan"
         ]
+    },
+  "facets": {
+    "fuchsia.module": {
+      "@version": 2,
+      "intent_filters": [
+        {
+          "action": "com.google.fuchsia.mondrian_test",
+          "parameters": [
+            {
+              "name": "mondrian_test",
+              "type": "com.fuchsia.mondrian.fake_param"
+            }
+          ]
+        }
+      ],
+      "suggestion_headline": "Test Mondrian",
+      "placeholder_color": "#FF0000"
     }
+  }
 }

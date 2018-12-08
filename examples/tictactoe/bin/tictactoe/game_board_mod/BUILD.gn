@@ -10,7 +10,6 @@ flutter_app("tictactoe_game_board_mod") {
   main_dart = "lib/main.dart"
 
   fuchsia_package_name = "tictactoe_game_board_mod"
-  module_manifest = "manifest.json"
 
   meta = [
     {

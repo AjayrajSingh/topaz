@@ -10,7 +10,6 @@ flutter_app("tictactoe_scoreboard_mod") {
   main_dart = "lib/main.dart"
 
   fuchsia_package_name = "tictactoe_scoreboard_mod"
-  module_manifest = "manifest.json"
 
   meta = [
     {

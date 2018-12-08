@@ -7,7 +7,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 flutter_app("example_manual_relationships") {
   package_name = "example_manual_relationships"
   main_dart = "lib/main.dart"
-  module_manifest = "manifest.json"
 
   meta = [
     {

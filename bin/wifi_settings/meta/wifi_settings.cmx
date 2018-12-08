@@ -16,5 +16,22 @@
             "fuchsia.ui.viewsv1.ViewManager",
             "fuchsia.wlan.service.Wlan"
         ]
+    },
+    "facets": {
+        "fuchsia.module": {
+            "@version": 2,
+            "suggestion_headline": "Wi-Fi Settings",
+            "intent_filters": [
+                {
+                    "action": "com.fuchsia.settings.wifi.show",
+                    "parameters": [
+                        {
+                        "name": "status",
+                        "type": "com.fuchsia.status"
+                        }
+                    ]
+                }
+            ]
+        }
     }
 }

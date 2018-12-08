@@ -16,5 +16,11 @@
             "fuchsia.modular.ModuleContext",
             "fuchsia.testing.runner.TestRunner"
         ]
+    },
+    "facets": {
+        "fuchsia.module": {
+            "@version": 2,
+            "suggestion_headline": "Show a slider"
+        }
     }
 }
