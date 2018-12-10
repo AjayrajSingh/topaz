@@ -5,7 +5,7 @@
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fuchsia_modular;
 import 'package:meta/meta.dart';
 
-import 'internal/proposal_listener_impl.dart';
+import 'internal/_proposal_listener_impl.dart';
 
 /// The [Proposal] class is an extension to the [fuchsia_modular.Proposal].
 ///

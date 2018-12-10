@@ -4,26 +4,10 @@
 
 // ignore_for_file: implementation_imports
 import 'package:fidl/fidl.dart';
-import 'package:fuchsia_modular/src/service_connection/service_connection.dart';
+import 'package:fuchsia_services/src/environment_service_connection.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('connectToAgentService:=', () {
-    test('throws for null or empty agent url', () {
-      FakeAsyncProxy fakeServiceProxy =
-          FakeAsyncProxy('fuchsia.modular.FakeService', r'FakeService');
-      expect(() => connectToAgentService('', fakeServiceProxy), throwsException,
-          reason: 'AgentUrl cannot be empty');
-      expect(
-          () => connectToAgentService(null, fakeServiceProxy), throwsException,
-          reason: 'AgentUrl cannot be null');
-    });
-
-    test('throws if serviceProxy is null', () {
-      expect(() => connectToAgentService('agentUrl', null), throwsException);
-    });
-  });
-
   group('connectToEnvironmentService', () {
     test('throws if serviceProxy is null', () {
       expect(() => connectToEnvironmentService(null), throwsException);

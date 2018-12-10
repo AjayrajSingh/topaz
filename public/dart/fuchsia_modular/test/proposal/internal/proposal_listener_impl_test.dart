@@ -6,7 +6,7 @@
 
 import 'package:test/test.dart';
 
-import 'package:fuchsia_modular/src/proposal/internal/proposal_listener_impl.dart';
+import 'package:fuchsia_modular/src/proposal/internal/_proposal_listener_impl.dart';
 
 void main() {
   test('calls the callback when proposal accepted', () {

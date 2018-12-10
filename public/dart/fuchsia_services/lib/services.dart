@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 /// The base-level functionality required by any component on Fuchsia.
-export 'src/component_context.dart';
+export 'src/environment_service_connection.dart';
 export 'src/service_connection.dart';
 export 'src/service_provider_impl.dart';
 export 'src/startup_context.dart';

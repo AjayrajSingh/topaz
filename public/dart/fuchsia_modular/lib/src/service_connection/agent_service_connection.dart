@@ -6,7 +6,7 @@ import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl_modular;
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl_sys;
 import 'package:fuchsia_logger/logger.dart';
-import 'package:fuchsia_services/services.dart' show StartupContext;
+import 'package:fuchsia_services/services.dart' as fuchsia_services;
 
 import '../internal/_component_context.dart';
 
@@ -44,12 +44,14 @@ void connectToAgentService<T>(
   )
       .then((_) {
     // Connect to the service
-    _connectToService(
+    fuchsia_services
+        .connectToService(
       serviceProviderProxy,
       serviceProxy.ctrl.$serviceName,
       serviceProxy.ctrl.$interfaceName,
       serviceProxyRequest,
-    ).then((_) {
+    )
+        .then((_) {
       // Close agent controller when the service proxy is closed
       serviceProxy.ctrl.whenClosed.then((_) {
         log.info('Service proxy [${serviceProxy.ctrl.$serviceName}] is closed. '
@@ -66,45 +68,4 @@ void connectToAgentService<T>(
     serviceProxyRequest.close();
     throw e;
   });
-}
-
-/// Connects to the environment service specified by [serviceProxy].
-///
-/// Environment services are services that are implemented by the framework
-/// itself.
-void connectToEnvironmentService<T>(AsyncProxy<T> serviceProxy) {
-  if (serviceProxy == null) {
-    throw Exception(
-        'serviceProxy must not be null in call to connectToEnvironmentService');
-  }
-  // Creates an interface request and binds one of the channels. Binding this
-  // channel prior to connecting to the agent allows the developer to make
-  // proxy calls without awaiting for the connection to actually establish.
-  final serviceProxyRequest = serviceProxy.ctrl.request();
-
-  _connectToService(
-    StartupContext.fromStartupInfo().environmentServices,
-    serviceProxy.ctrl.$serviceName,
-    serviceProxy.ctrl.$interfaceName,
-    serviceProxyRequest,
-  ).catchError((e) {
-    serviceProxyRequest.close();
-    throw e;
-  });
-}
-
-Future<void> _connectToService<T>(
-  fidl_sys.ServiceProvider serviceProvider,
-  String serviceName,
-  String interfaceName,
-  InterfaceRequest<T> interfaceRequest,
-) async {
-  if (serviceName == null) {
-    throw Exception("$interfaceName's "
-        'proxyServiceController.\$serviceName must not be null. Check the FIDL '
-        'file for a missing [Discoverable]');
-  }
-
-  return serviceProvider.connectToService(
-      serviceName, interfaceRequest.passChannel());
 }

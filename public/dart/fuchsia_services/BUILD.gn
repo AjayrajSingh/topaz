@@ -13,17 +13,13 @@ dart_library("fuchsia_services") {
 
   sources = [
     "services.dart",
-    "src/component_context.dart",
     "src/service_connection.dart",
     "src/service_provider_impl.dart",
     "src/startup_context.dart",
-
-
   ]
 
   deps = [
     "//garnet/public/fidl/fuchsia.sys",
-    "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/pub/meta",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
@@ -33,6 +29,7 @@ dart_library("fuchsia_services") {
 
 dart_test("fuchsia_services_package_unittests") {
   sources = [
+    "environment_service_connection_test.dart",
     "service_provider_impl_test.dart",
     "startup_context_test.dart",
   ]

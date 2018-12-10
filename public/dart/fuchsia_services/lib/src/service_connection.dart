@@ -3,99 +3,13 @@
 // found in the LICENSE file.
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl_modular;
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl_sys;
 
-import 'component_context.dart';
-import 'startup_context.dart';
-
-/// Connect to the service specified by [serviceProxy] and implemented by the
-/// agent with [agentUrl].
+/// Connects to the specified service using the given [serviceProvider].
 ///
-/// The agent will be launched if it's not already running.
-@Deprecated('Use package:fuchsia_modular/service_connection.dart instead')
-void connectToAgentService<T>(
-  String agentUrl,
-  AsyncProxy<T> serviceProxy,
-) {
-  if (agentUrl == null || agentUrl.isEmpty) {
-    throw Exception(
-        'agentUrl must not be null or empty in call to connectToAgentService');
-  }
-  if (serviceProxy == null) {
-    throw Exception(
-        'serviceProxy must not be null in call to connectToAgentService');
-  }
-
-  final serviceProviderProxy = fidl_sys.ServiceProviderProxy();
-  final agentControllerProxy = fidl_modular.AgentControllerProxy();
-
-  // Creates an interface request and binds one of the channels. Binding this
-  // channel prior to connecting to the agent allows the developer to make
-  // proxy calls without awaiting for the connection to actually establish.
-  final serviceProxyRequest = serviceProxy.ctrl.request();
-
-  // Connect to the agent with agentUrl
-  getComponentContext()
-      .connectToAgent(
-    agentUrl,
-    serviceProviderProxy.ctrl.request(),
-    agentControllerProxy.ctrl.request(),
-  )
-      .then((_) {
-    // Connect to the service
-    _connectToService(
-      serviceProviderProxy,
-      serviceProxy.ctrl.$serviceName,
-      serviceProxy.ctrl.$interfaceName,
-      serviceProxyRequest,
-    ).then((_) {
-      // Close agent controller when the service proxy is closed
-      serviceProxy.ctrl.whenClosed.then((_) {
-        // TODO change to log.info when available
-        print('Service proxy [${serviceProxy.ctrl.$serviceName}] is closed. '
-            'Closing the associated AgentControllerProxy.');
-        agentControllerProxy.ctrl.close();
-      });
-
-      // Close all unnecessary bindings
-      serviceProviderProxy.ctrl.close();
-    });
-  }).catchError((e) {
-    serviceProviderProxy.ctrl.close();
-    agentControllerProxy.ctrl.close();
-    serviceProxyRequest.close();
-    throw e;
-  });
-}
-
-/// Connects to the environment service specified by [serviceProxy].
-///
-/// Environment services are services that are implemented by the framework
-/// itself.
-@Deprecated('Use package:fuchsia_modular/service_connection.dart instead')
-void connectToEnvironmentService<T>(AsyncProxy<T> serviceProxy) {
-  if (serviceProxy == null) {
-    throw Exception(
-        'serviceProxy must not be null in call to connectToEnvironmentService');
-  }
-  // Creates an interface request and binds one of the channels. Binding this
-  // channel prior to connecting to the agent allows the developer to make
-  // proxy calls without awaiting for the connection to actually establish.
-  final serviceProxyRequest = serviceProxy.ctrl.request();
-
-  _connectToService(
-    StartupContext.fromStartupInfo().environmentServices,
-    serviceProxy.ctrl.$serviceName,
-    serviceProxy.ctrl.$interfaceName,
-    serviceProxyRequest,
-  ).catchError((e) {
-    serviceProxyRequest.close();
-    throw e;
-  });
-}
-
-Future<void> _connectToService<T>(
+/// It is recommended to not use this method directly but rather to use the
+/// connectToEnvironmentService method or a higher level method instead.
+Future<void> connectToService<T>(
   fidl_sys.ServiceProvider serviceProvider,
   String serviceName,
   String interfaceName,

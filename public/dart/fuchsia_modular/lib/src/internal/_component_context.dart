@@ -3,8 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
-
-import '../service_connection/service_connection.dart';
+import 'package:fuchsia_services/services.dart';
 
 final fidl.ComponentContextProxy _componentContextProxy = () {
   final proxy = fidl.ComponentContextProxy();

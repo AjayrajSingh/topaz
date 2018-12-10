@@ -3,4 +3,5 @@
 // found in the LICENSE file.
 
 /// A collection of utilities which allow for connecting to modular components
-export 'src/service_connection/service_connection.dart';
+export 'package:fuchsia_services/services.dart';
+export 'src/service_connection/agent_service_connection.dart';
