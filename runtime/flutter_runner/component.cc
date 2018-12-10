@@ -232,6 +232,17 @@ class FileInNamespaceBuffer final : public blink::DartSnapshotBuffer {
     uint32_t flags = ZX_VM_PERM_READ;
     if (executable) {
       flags |= ZX_VM_PERM_EXECUTE;
+
+      // VmoFromFilenameAt will return VMOs without ZX_RIGHT_EXECUTE,
+      // so we need replace_as_executable to be able to map them as
+      // ZX_VM_PERM_EXECUTE.
+      // TODO(mdempsky): Update comment once SEC-42 is fixed.
+      zx_status_t status =
+          vmo.vmo().replace_as_executable(zx::handle(), &vmo.vmo());
+      if (status != ZX_OK) {
+        FML_LOG(FATAL) << "Failed to make VMO executable: "
+                       << zx_status_get_string(status);
+      }
     }
     uintptr_t addr;
     zx_status_t status =

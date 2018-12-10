@@ -40,6 +40,20 @@ bool MappedResource::LoadFromNamespace(fdio_ns_t* namespc,
     }
   }
 
+  if (executable) {
+    // VmoFromFilenameAt will return VMOs without ZX_RIGHT_EXECUTE,
+    // so we need replace_as_executable to be able to map them as
+    // ZX_VM_PERM_EXECUTE.
+    // TODO(mdempsky): Update comment once SEC-42 is fixed.
+    zx_status_t status =
+        resource_vmo.vmo().replace_as_executable(zx::handle(), &resource_vmo.vmo());
+    if (status != ZX_OK) {
+      FXL_LOG(ERROR) << "Failed to make VMO executable: "
+                     << zx_status_get_string(status);
+      return false;
+    }
+  }
+
   return LoadFromVmo(path, std::move(resource_vmo), resource, executable);
 }
 
