@@ -5,14 +5,16 @@
 import 'dart:async';
 
 import 'package:fidl_fuchsia_fibonacci/fidl_async.dart';
+import 'package:fuchsia_logger/logger.dart';
 
 import 'package:fuchsia_modular/agent.dart';
 import 'src/fibonacci_service_impl.dart';
 
 void main(List<String> args) {
+  setupLogger(name: 'fibonacci-agent');
   // Note [exposeServiceProvider] was used instead of [exposeService] for no
   // particular reason other than to illustrate how a provider function can be
-  // used. In this specific use case [exposeService] would work just fine. 
+  // used. In this specific use case [exposeService] would work just fine.
   Agent().exposeServiceProvider(getService, FibonacciServiceData());
 }
 
@@ -27,5 +29,3 @@ FutureOr<FibonacciServiceImpl> getService() {
     );
   });
 }
-
-

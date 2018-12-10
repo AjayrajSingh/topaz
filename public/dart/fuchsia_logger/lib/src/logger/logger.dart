@@ -6,7 +6,9 @@ import 'dart:io';
 
 import 'package:logging/logging.dart';
 
+import '../internal/_fuchsia_log_writer.dart';
 import '../internal/_log_writer.dart';
+import '../internal/_stdout_log_writer.dart';
 
 const _warningMessage =
     '\n========================== WARNING ================================\n'
@@ -45,7 +47,10 @@ LogWriter _logWriter;
 /// [Level.INFO].
 ///
 /// If [globalTags] is provided, these tags will be added to each message logged
-/// via this logger.
+/// via this logger. The logger can accept 5 global tags, however, one of those
+/// tags is reserved for the logger name and one is reserved for the code
+/// location if it is requested. The logger will drop any tags that are over
+/// this limit.
 ///
 /// By default, the caller code location is automatically added in checked mode
 /// and not in production mode, because it is relatively expensive to calculate
@@ -68,13 +73,16 @@ void setupLogger({
 
   // We need to provide a name for the logger in the form of a tag because
   // we are not using hierarchical logging.
-  final loggerName = name ??
-      Platform.script?.pathSegments?.lastWhere((_) => true, orElse: () => '');
-
   // Tags get appended to each log statement. We put the name, if present
   // as the first tag so it makes it easier to identify.
-  final List<String> tags = (loggerName.isNotEmpty ? [name] : [])
-    ..addAll(globalTags ?? const []);
+  // We remove any null values before sending them to the logger
+  final List<String> tags = [
+    name ??
+        Platform.script?.pathSegments
+            ?.lastWhere((_) => true, orElse: () => null)
+  ]
+    ..addAll(globalTags ?? const [])
+    ..removeWhere((t) => t == null || t.isNotEmpty);
 
   bool inCheckedMode = false;
   assert(() {
@@ -97,9 +105,7 @@ void _connectToLogWriterIfNeeded({
   }
 
   if (Platform.isFuchsia) {
-    // _logWriter = FuchsiaLogWriter(logger: Logger.root);
-    // TODO(MS-2257) connect to fuchsia logger when implemented.
-    _logWriter = StdoutLogWriter(logger: Logger.root);
+    _logWriter = FuchsiaLogWriter(logger: Logger.root);
   } else {
     _logWriter = StdoutLogWriter(logger: Logger.root);
   }

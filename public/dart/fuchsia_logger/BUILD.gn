@@ -14,13 +14,19 @@ dart_library("fuchsia_logger") {
 
   sources = [
     "logger.dart",
-    "src/internal/_log_writer.dart",
-    "src/logger/logger.dart",
+  "src/internal/_fuchsia_log_writer.dart",
+  "src/internal/_log_message.dart",
+  "src/internal/_log_writer.dart",
+  "src/internal/_stdout_log_writer.dart",
+  "src/logger/logger.dart",
   ]
 
   deps = [
     "//third_party/dart-pkg/pub/logging",
     "//third_party/dart-pkg/pub/meta",
+    "//topaz/public/dart/fuchsia_services",
+    "//topaz/public/dart/zircon",
+    "//zircon/public/fidl/fuchsia-logger",
   ]
 }
 
@@ -29,7 +35,9 @@ dart_library("fuchsia_logger") {
 dart_test("fuchsia_logger_package_unittests") {
 
   sources = [
+    "internal/log_message_test.dart",
     "internal/log_writer_test.dart",
+    "internal/stdout_log_writer_test.dart",
   ]
 
   deps = [

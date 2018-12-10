@@ -5,16 +5,17 @@
     "sandbox": {
         "services": [
             "fuchsia.fonts.Provider",
-            "fuchsia.sys.Environment",
-            "fuchsia.modular.ContextWriter",
-            "fuchsia.ui.viewsv1.ViewManager",
-            "fuchsia.ui.scenic.Scenic",
-            "fuchsia.ui.input.ImeService",
-            "fuchsia.ui.policy.Presenter",
+            "fuchsia.logger.LogSink",
             "fuchsia.modular.Clipboard",
             "fuchsia.modular.ComponentContext",
+            "fuchsia.modular.ContextWriter",
             "fuchsia.modular.ModuleContext",
-            "fuchsia.testing.runner.TestRunner"
+            "fuchsia.sys.Environment",
+            "fuchsia.testing.runner.TestRunner",
+            "fuchsia.ui.input.ImeService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.ui.viewsv1.ViewManager"
         ]
     },
     "facets": {

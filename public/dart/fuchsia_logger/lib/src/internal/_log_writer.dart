@@ -3,41 +3,23 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io';
+import 'dart:isolate';
 
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 
-/// A concrete implementation of [LogWriter] which sends logs to
-/// the fuchsia system logger. This log writer will buffer logs until
-/// a connection has been established at which time it will send all
-/// the buffered logs.
-class FuchsiaLogWriter extends LogWriter {
-  /// Constructor
-  FuchsiaLogWriter({@required Logger logger})
-      : assert(logger != null),
-        super(
-          logger: logger,
-          shouldBufferLogs: true,
-        ) {
-    _connectToSysLogger();
-  }
+import '_log_message.dart';
 
-  void _connectToSysLogger() {
-    // TODO(MS-2258) connect to the system logger
-    _startListening(_onMessage);
-  }
-
-  @override
-  // TODO(MS-2259) send logs to system logger
-  void _onMessage(_LogMessage message) => throw UnimplementedError();
-}
+const int _maxGlobalTags = 4; // leave one slot for code location
+const int _maxTagLength = 63;
 
 /// The base class for which log writers will inherit from. This class is
 /// used to pipe logs from the onRecord stream
 abstract class LogWriter {
   List<String> _globalTags = const [];
 
-  StreamController<_LogMessage> _controller;
+  StreamController<LogMessage> _controller;
 
   /// If set to true, this method will include the stack trace
   /// in each log record so we can later extract out the call site.
@@ -49,17 +31,17 @@ abstract class LogWriter {
     @required Logger logger,
     bool shouldBufferLogs = false,
   }) : assert(logger != null) {
-    void Function(_LogMessage) onMessageFunc;
+    void Function(LogMessage) onMessageFunc;
 
     if (shouldBufferLogs) {
       // create single subscription stream controller so that we buffer calls to the
       // stream while we connect to the logger. This avoids dropping logs that
       // come in while we wait.
-      _controller = StreamController<_LogMessage>();
+      _controller = StreamController<LogMessage>();
 
       onMessageFunc = _controller.add;
     } else {
-      onMessageFunc = _onMessage;
+      onMessageFunc = onMessage;
     }
     logger.onRecord.listen(
         (record) => onMessageFunc(_messageFromRecord(record)),
@@ -70,7 +52,7 @@ abstract class LogWriter {
   set globalTags(List<String> tags) => _globalTags = _verifyGlobalTags(tags);
 
   /// Remaps the level string to the ones used in FTL.
-  String _getLevelString(Level level) {
+  String getLevelString(Level level) {
     if (level == null) {
       return null;
     }
@@ -90,20 +72,49 @@ abstract class LogWriter {
     }
   }
 
-  _LogMessage _messageFromRecord(LogRecord record) => _LogMessage(
+  LogMessage _messageFromRecord(LogRecord record) => LogMessage(
         record: record,
+        processId: pid,
+        threadId: Isolate.current.hashCode,
         tags: _globalTags,
         callSiteTrace: forceShowCodeLocation ? StackTrace.current : null,
       );
 
-  void _onMessage(_LogMessage message);
+  /// A method for subclasses to implement to handle messages as they are
+  /// written
+  void onMessage(LogMessage message);
 
-  void _startListening(void Function(_LogMessage) onMessage) =>
-      _controller.stream.listen(_onMessage);
+  /// A method which is exposed to subclasses which can be used to indicate that
+  /// they are ready to start receiving messages.
+  @protected
+  void startListening(void Function(LogMessage) onMessage) =>
+      _controller.stream.listen(onMessage);
 
-  List<String> _verifyGlobalTags(List<String> incomingTags) {
-    //TODO(MS-2261) need to verify the incoming global tags
-    return incomingTags;
+  List<String> _verifyGlobalTags(List<String> tags) {
+    List<String> result = <String>[];
+
+    // make our own copy to allow us to remove null values an not change the
+    // original values
+    final incomingTags = List.of(tags)
+      ..removeWhere((t) => t == null || t.isEmpty);
+
+    if (incomingTags != null) {
+      if (incomingTags.length > _maxGlobalTags) {
+        Logger.root.warning('Logger initialized with > $_maxGlobalTags tags.');
+        Logger.root.warning('Later tags will be ignored.');
+      }
+      for (int i = 0; i < _maxGlobalTags && i < incomingTags.length; i++) {
+        String s = incomingTags[i];
+        if (s.length > _maxTagLength) {
+          Logger.root
+              .warning('Logger tags limited to $_maxTagLength characters.');
+          Logger.root.warning('Tag "$s" will be truncated.');
+          s = s.substring(0, _maxTagLength);
+        }
+        result.add(s);
+      }
+    }
+    return result;
   }
 
   //ignore: unused_element
@@ -111,59 +122,4 @@ abstract class LogWriter {
     // TODO(MS-2260) need to extract out the call site from the stack trace
     return '';
   }
-}
-
-/// A concrete implementation of [LogWriter] which prints the logs to stdout.
-class StdoutLogWriter extends LogWriter {
-  /// Constructor
-  StdoutLogWriter({@required Logger logger})
-      : assert(logger != null),
-        super(
-          logger: logger,
-          shouldBufferLogs: false,
-        );
-
-  @override
-  void _onMessage(_LogMessage message) {
-    final scopes = [
-      _getLevelString(message.record.level),
-    ];
-
-    if (message.record.loggerName.isNotEmpty) {
-      scopes.add(message.record.loggerName);
-    }
-    // if (message.codeLocation != null) {
-    // scopes.add(message.codeLocation);
-    // }
-    message.tags.forEach(scopes.add);
-    String scopesString = scopes.join(':');
-    if (message.record.error != null) {
-      print(
-          '[$scopesString] ${message.record.message}: ${message.record.error}');
-    } else {
-      print('[$scopesString] ${message.record.message}');
-    }
-
-    if (message.record.stackTrace != null) {
-      print('${message.record.stackTrace}');
-    }
-  }
-}
-
-/// A wrapper around [LogRecord] which appends additional data. This
-/// is what is sent to the log writer when a record is received.
-class _LogMessage {
-  /// The initial log record
-  final LogRecord record;
-
-  /// Any additional tags to append to the record.
-  final List<String> tags;
-
-  /// The stack trace at the call site. This is not to be confused with
-  /// the stack trace in the [record] which is a stack trace that is being
-  /// logged. This variable is used to later extract the code location
-  /// to include in the message.
-  final StackTrace callSiteTrace;
-
-  _LogMessage({this.record, this.tags, this.callSiteTrace});
 }
