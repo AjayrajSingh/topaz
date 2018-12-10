@@ -8,6 +8,8 @@ import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart' show SpringModel;
 
+import 'conditional_builder.dart';
+
 /// A Container for a Widget that's position is determined by a
 /// [ScreenPositionModel].
 class ScreenContainer extends StatelessWidget {
@@ -72,9 +74,14 @@ class ScreenContainer extends StatelessWidget {
         ),
       ),
       builder: (BuildContext context, Widget child) {
-        return Transform.translate(
-          offset: screenPositionModel.offset,
-          child: child,
+        return ConditionalBuilder(
+          condition: !screenPositionModel.isOffscreen,
+          builder: (_) {
+            return Transform.translate(
+              offset: screenPositionModel.offset,
+              child: child,
+            );
+          },
         );
       },
     );
