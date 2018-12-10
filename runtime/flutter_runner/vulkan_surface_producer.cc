@@ -48,7 +48,6 @@ bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
   vk_ = fml::MakeRefCounted<vulkan::VulkanProcTable>();
 
   std::vector<std::string> extensions = {
-      VK_KHR_SURFACE_EXTENSION_NAME,
       VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
   };
   application_ = std::make_unique<vulkan::VulkanApplication>(
