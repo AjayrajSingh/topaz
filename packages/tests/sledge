@@ -1,0 +1,8 @@
+{
+    "imports": [
+        "peridot/packages/tests/ledger"
+    ],
+    "packages": [
+        "//topaz/public/dart/sledge:sledge_integration_tests"
+    ]
+}

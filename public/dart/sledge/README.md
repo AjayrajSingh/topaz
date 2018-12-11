@@ -106,7 +106,7 @@ When testing is complete, reset to default packages with:
 fx set x64 $FUCHSIA_DIR/out/release-x64 --args=is_debug=false
 ```
 
-### Device-side tests
+### Device-side tests (deprecated)
 
 These tests run on a fuchsia and exercise real Ledger instances.
 Require the `topaz/public/dart/sledge/sledge_testing_mod/package` package.
@@ -115,4 +115,19 @@ Running these tests is done by launching the `sledge_testing_mod` mod:
 # The following statement will add a module named "bar" in a newly created
 # story named "foo" and will run the sledge_testing_mod.
 sessionctl --story_name="foo" --mod_name="bar" --mod_url="sledge_testing_mod" add_mod
+```
+
+### Device-side integration tests (work in progress)
+
+To locally run these tests:
+
+```
+fx set x64 --product ermine --monolith topaz/packages/all --monolith topaz/packages/tests/all
+fx build
+fx shell "run fuchsia-pkg://fuchsia.com/sledge_integration_tests#meta/sledge_integration_tests.cmx"
+```
+
+The results of the tests are visible in the logs:
+```
+fx syslog
 ```

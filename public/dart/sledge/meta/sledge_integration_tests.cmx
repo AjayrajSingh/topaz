@@ -1,0 +1,11 @@
+{
+    "program": {
+        "data": "data/sledge_integration_tests"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.crash.Analyzer",
+            "fuchsia.sys.Environment"
+        ]
+    }
+}

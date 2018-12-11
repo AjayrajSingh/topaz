@@ -110,6 +110,13 @@ class Sledge {
     _initializationSucceeded = initializationCompleter.future;
   }
 
+  /// Convenience constructor for integration tests.
+  factory Sledge.fromLedgerHandle(
+      fidl.InterfaceHandle<ledger.Ledger> ledgerHandle,
+      [SledgePageId pageId]) {
+    return new Sledge._(ledgerHandle, pageId);
+  }
+
   /// Closes connection to ledger.
   void close() {
     _pageProxy.ctrl.close();
