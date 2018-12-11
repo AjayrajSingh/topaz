@@ -16,6 +16,7 @@ dart_library("fuchsia_vfs") {
     "src/internal/_error_node.dart",
     "src/pseudo_dir.dart",
     "src/pseudo_file.dart",
+    "src/service.dart",
     "src/vnode.dart",
     "vfs.dart",
   ]
@@ -38,10 +39,12 @@ dart_fuchsia_test("fuchsia_vfs_package_unittests") {
   sources = [
     "pseudo_dir_test.dart",
     "pseudo_file_test.dart",
+    "service_test.dart",
   ]
 
   deps = [
     ":fuchsia_vfs",
+    "//garnet/examples/fidl/services:echo2",
     "//third_party/dart-pkg/pub/test",
   ]
 }
