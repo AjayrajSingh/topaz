@@ -49,6 +49,7 @@ dart_library("fuchsia_modular") {
   ]
 
   deps = [
+    "//garnet/public/fidl/fuchsia.auth",
     "//garnet/public/fidl/fuchsia.sys",
     "//garnet/public/fidl/fuchsia.ui.viewsv1token",
     "//peridot/public/fidl/fuchsia.modular",
