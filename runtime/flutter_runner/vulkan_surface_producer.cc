@@ -17,6 +17,14 @@
 
 namespace flutter {
 
+namespace {
+
+// TODO: Properly tune these values. See FL-153.
+constexpr int kGrCacheMaxCount = 8192;
+constexpr size_t kGrCacheMaxByteSize = 8 * (1 << 20);
+
+}
+
 VulkanSurfaceProducer::VulkanSurfaceProducer(scenic::Session* scenic_session) {
   valid_ = Initialize(scenic_session);
 
@@ -105,8 +113,8 @@ bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
 
   context_ = GrContext::MakeVulkan(backend_context);
 
-  context_->setResourceCacheLimits(vulkan::kGrCacheMaxCount,
-                                   vulkan::kGrCacheMaxByteSize);
+  // Use local limits specified in this file above instead of flutter defaults.
+  context_->setResourceCacheLimits(kGrCacheMaxCount, kGrCacheMaxByteSize);
 
   surface_pool_ =
       std::make_unique<VulkanSurfacePool>(*this, context_, scenic_session);
