@@ -6,7 +6,6 @@ assert(is_fuchsia || is_fuchsia_host)
 
 import("//build/package.gni")
 import("//build/tools/json_merge/json_merge.gni")
-import("//peridot/build/module_manifest.gni")
 import("//third_party/dart/build/dart/dart_action.gni")
 import("//topaz/runtime/dart/config.gni")
 import("//topaz/runtime/dart/dart_component.gni")

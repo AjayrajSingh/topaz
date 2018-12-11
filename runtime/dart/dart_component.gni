@@ -4,7 +4,6 @@
 
 import("//build/package.gni")
 import("//build/tools/json_merge/json_merge.gni")
-import("//peridot/build/module_manifest.gni")
 import("//third_party/dart/build/dart/dart_action.gni")
 import("//topaz/runtime/dart/config.gni")
 import("//topaz/runtime/dart/dart_kernel.gni")
@@ -107,12 +106,6 @@ dart_product_app = "flutter_dart_jit_component"
 #
 #       component_resources (required)
 #         Resources of this component.
-#
-#       component_copy_manifest (required)
-#         Copy of the module manifest of this component.
-#
-#       component_verify_manifest (required)
-#         Verify target of the module manifest of this component.
 template("_flutter_dart_jit_package") {
   package(target_name) {
     forward_variables_from(invoker,
@@ -140,12 +133,6 @@ template("_flutter_dart_jit_package") {
         ]
 
         deps += [ ":${component.component_resources}" ]
-        if (defined(invoker.module_manifest)) {
-          deps += [
-            ":${component.component_copy_manifest}",
-            ":${component.component_verify_manifest}",
-          ]
-        }
       }
     }
 
@@ -171,16 +158,6 @@ template("_flutter_dart_jit_package") {
     }
 
     meta = invoker.cmx_filtered_meta
-
-    # TODO(CP-140): Support module_manifest per component.
-    if (defined(invoker.module_manifest)) {
-      meta += [
-        {
-          path = rebase_path(invoker.module_manifest)
-          dest = "module.json"
-        },
-      ]
-    }
   }
 }
 
@@ -479,18 +456,6 @@ template("flutter_dart_jit_component") {
         ])
       }
 
-      # The module manifest verify & copy targets.
-      if (defined(invoker.module_manifest)) {
-        verify_module_manifest("${kernel_name}_verify_manifest") {
-          original_target_name = kernel_name
-          module_manifest = invoker.module_manifest
-        }
-        copy_module_manifest("${kernel_name}_copy_manifest") {
-          package_name = kernel_name
-          module_manifest = rebase_path(invoker.module_manifest)
-        }
-      }
-
       components_with_kernel += [
         {
           component_type = component.component_type
@@ -500,8 +465,6 @@ template("flutter_dart_jit_component") {
           deps = component.deps
           sources = component.sources
           component_resources = "${kernel_name}_resources"
-          component_copy_manifest = "${kernel_name}_copy_manifest"
-          component_verify_manifest = "${kernel_name}_verify_manifest"
         }
       ]
     } else if (component.component_type == "dart") {
@@ -571,12 +534,6 @@ template("flutter_dart_jit_component") {
 #
 #       component_resources (required)
 #         Resources of this component.
-#
-#       component_copy_manifest (required)
-#         Copy of the module manifest of this component.
-#
-#       component_verify_manifest (required)
-#         Verify target of the module manifest of this component.
 template("_flutter_dart_aot_package") {
   package(target_name) {
     forward_variables_from(invoker,
@@ -604,12 +561,6 @@ template("_flutter_dart_aot_package") {
       if (component.component_type == "flutter") {
         extra += [ component.asset_manifest ]
         deps += [ ":${component.component_resources}", ]
-        if (defined(invoker.module_manifest)) {
-          deps += [
-            ":${component.component_copy_manifest}",
-            ":${component.component_verify_manifest}",
-          ]
-        }
       }
 
       resources_path = "${component.component_name}/"
@@ -654,16 +605,6 @@ template("_flutter_dart_aot_package") {
     }
 
     meta = invoker.cmx_filtered_meta
-
-    # TODO(CP-140): Support module_manifest per component.
-    if (defined(invoker.module_manifest)) {
-      meta += [
-        {
-          path = rebase_path(invoker.module_manifest)
-          dest = "module.json"
-        },
-      ]
-    }
   }
 }
 
@@ -988,18 +929,6 @@ template("flutter_dart_aot_component") {
         ]
       }
 
-      # The module manifest verify & copy targets.
-      if (defined(invoker.module_manifest)) {
-        verify_module_manifest("${kernel_name}_verify_manifest") {
-          original_target_name = kernel_name
-          module_manifest = invoker.module_manifest
-        }
-        copy_module_manifest("${kernel_name}_copy_manifest") {
-          package_name = kernel_name
-          module_manifest = rebase_path(invoker.module_manifest)
-        }
-      }
-
       components_with_kernel += [
         {
           component_type = component.component_type
@@ -1020,8 +949,6 @@ template("flutter_dart_aot_component") {
           deps = component.deps
           sources = component.sources
           component_resources = "${kernel_name}_resources"
-          component_copy_manifest = "${kernel_name}_copy_manifest"
-          component_verify_manifest = "${kernel_name}_verify_manifest"
         }
       ]
     } else if (component.component_type == "dart") {
