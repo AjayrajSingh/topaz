@@ -1,7 +1,4 @@
 {
     "labels": [
-        "//topaz/tools/dartfmt_extras(//build/toolchain:host_x64)",
-        "//topaz/tools/mod(//build/toolchain:host_x64)",
-        "//topaz/tools/widget_explorer(//build/toolchain:host_x64)"
     ]
 }

@@ -16,6 +16,9 @@ shas are provided for reference only. Code can be checked out with:
 * topaz/app/chat: 9f6c31d2ceb8353f229a9ef6b53ba2386ff31867
 * topaz/app/color: 5a023ccb054104846e3e913951bcc7dc277d2274
 * topaz/app/contacts: 80378fe470817750188707de29237282892a3142
-* topaz/app/image: 5e731a943a907cf960ecfbda1c391958f9093afa
 * topaz/app/documents: b5a3ee29b15414f232865128195d14bd8811ab02
+* topaz/app/image: 5e731a943a907cf960ecfbda1c391958f9093afa
 * topaz/app/video: fc03877f787fc119140b900d476c4563bd04a529
+* topaz/tools/dartfmt_extras: acc1f05718af2bcfbba3317a456f82b67eec4e42
+* topaz/tools/mod: acc1f05718af2bcfbba3317a456f82b67eec4e42
+* topaz/tools/widget_explorer: acc1f05718af2bcfbba3317a456f82b67eec4e42

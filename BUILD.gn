@@ -15,10 +15,7 @@ group("dart_unittests") {
     "public/lib/app/dart:dart_app_tests",
     "public/lib/ledger/dart:dart_tests",
     "public/lib/schemas/dart:dart_schema_tests",
-    "shell:tests",
-    "tools/dartfmt_extras:dartfmt_extras_tests",
-    # "tools/mod:mod_tests",
-    "tools/widget_explorer:tests",
+    "shell:tests"
   ]
 }
 

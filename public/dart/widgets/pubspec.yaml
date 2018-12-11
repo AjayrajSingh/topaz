@@ -9,5 +9,3 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_image: ^1.0.0
-  widget_explorer_meta:
-    path: ../../../tools/widget_explorer/packages/widget_explorer_meta

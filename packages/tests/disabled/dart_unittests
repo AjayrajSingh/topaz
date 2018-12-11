@@ -1,8 +1,6 @@
 {
     "host_tests" : [
-      "//topaz/tools/widget_explorer/packages/widget_explorer_core:widget_explorer_core_tests",
       "//topaz/shell/keyboard:keyboard_tests",
-      "//topaz/tools/widget_explorer/tools/widget_explorer_gen:widget_explorer_gen_tests",
       "//topaz/shell/armadillo:armadillo_tests",
       "//topaz/bin/session_shell/capybara_session_shell:capybara_session_shell_tests"
     ]

@@ -54,7 +54,6 @@ dart_library("lib.widgets") {
     "//topaz/public/lib/module/dart",
     "//topaz/public/lib/ui/flutter",
     "//topaz/public/lib/user/dart",
-    "//topaz/tools/widget_explorer/packages/widget_explorer_meta",
     "//zircon/public/fidl/fuchsia-cobalt",
   ]
 }

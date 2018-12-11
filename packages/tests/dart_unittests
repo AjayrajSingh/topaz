@@ -21,9 +21,7 @@
       "//topaz/public/lib/display/flutter:display_test",
       "//topaz/public/lib/schemas/dart:dart_schema_tests",
       "//topaz/public/lib/testing/app_driver/dart:fake_module_driver_test",
-      "//topaz/shell/mondrian_story_shell:mondrian_story_shell_tests",
-      "//topaz/tools/dartfmt_extras:dartfmt_extras_tests",
-      "//topaz/tools/mod:mod_tests"
+      "//topaz/shell/mondrian_story_shell:mondrian_story_shell_tests"
     ],
     "labels": [
       "//topaz:dart_unittests"

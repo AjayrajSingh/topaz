@@ -7,7 +7,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_image/network.dart';
 import 'package:meta/meta.dart';
-import 'package:widget_explorer_meta/widgets_meta.dart';
 
 /// Holds all the allowed background colors for an [Alphatar].
 ///
@@ -34,7 +33,6 @@ List<Color> _kAllowedColors = <Color>[
 /// Alphatar is a 'circle avatar' to represent user profiles
 /// If no avatar URL is given for an Alphatar, then the letter of the users name
 /// along with a colored circle background will be used.
-@ExampleSize(40.0, 40.0)
 class Alphatar extends StatelessWidget {
   /// The [Image] to be displayed.
   final Image avatarImage;
@@ -54,8 +52,8 @@ class Alphatar extends StatelessWidget {
   Alphatar({
     Key key,
     this.avatarImage,
-    @ExampleValue('G') this.letter,
-    @sizeParam this.size = 40.0,
+    this.letter,
+    this.size = 40.0,
     Color backgroundColor,
   })  : backgroundColor = backgroundColor ?? _pickRandomColor(),
         assert(avatarImage != null || letter != null),
