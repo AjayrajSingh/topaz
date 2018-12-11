@@ -13,6 +13,7 @@ dart_library("fuchsia_services") {
 
   sources = [
     "services.dart",
+    "src/environment_service_connection.dart",
     "src/service_connection.dart",
     "src/service_provider_impl.dart",
     "src/startup_context.dart",
