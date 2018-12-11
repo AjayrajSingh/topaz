@@ -20,10 +20,9 @@ group("dart_unittests") {
 }
 
 # This target, if included in the built image, will cause the listed module
-# packages (which must also be included in the built image) to have their
-# manifests indexed by the on-device module resolver when the user logs in.
+# components to have their module facets indexed by the on-device module resolver
+# when the user logs in. These indexed module facets will be used to resolve
+# implicit intents (i.e., intents without a 'handler' specified).
 initial_module_packages("topaz_modules_index") {
-  packages = [
-    "image",
-  ]
+  packages = []
 }
