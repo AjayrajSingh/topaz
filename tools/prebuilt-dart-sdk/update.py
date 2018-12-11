@@ -87,7 +87,7 @@ Default COMMITHASH is the current `HEAD` in the CHECKOUT directory.
     parser.add_argument('--root',
                         metavar='ROOTDIR',
                         help='CIPD root (parent of `.cipd` subdirectory)',
-                        default=FUCHSIA_ROOT)
+                        default=SCRIPT_DIR)
     parser.add_argument('--verbose',
                         action='store_true',
                         help='Show CIPD commands and use -log-level info')
