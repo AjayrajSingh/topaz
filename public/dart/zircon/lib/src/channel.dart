@@ -7,7 +7,6 @@ part of zircon;
 // ignore_for_file: constant_identifier_names
 // ignore_for_file: public_member_api_docs
 
-/// Typed wrapper around a Zircon channel object.
 class Channel extends _HandleWrapper<Channel> {
   Channel(Handle handle) : super(handle);
 
@@ -50,8 +49,6 @@ class Channel extends _HandleWrapper<Channel> {
   }
 }
 
-/// Typed wrapper around a linked pair of channel objects and the
-/// zx_channel_create() syscall used to create them.
 class ChannelPair extends _HandleWrapperPair<Channel> {
   factory ChannelPair() {
     final HandlePairResult result = System.channelCreate();

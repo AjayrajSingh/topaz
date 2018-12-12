@@ -156,7 +156,7 @@ class ChildViewConnection2 {
     assert(_viewKey == null);
     assert(_viewInfo == null);
     assert(_sceneHost == null);
-    final EventPairPair pair = new EventPairPair();
+    final HandlePairResult pair = System.eventpairCreate();
     assert(pair.status == ZX.OK);
     _sceneHost = new ui.SceneHost(pair.first);
     _viewKey = _nextViewKey++;

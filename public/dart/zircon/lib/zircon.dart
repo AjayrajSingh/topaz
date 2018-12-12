@@ -19,7 +19,6 @@ part 'src/channel.dart';
 part 'src/channel_reader.dart';
 part 'src/constants.dart';
 part 'src/errors.dart';
-part 'src/eventpair.dart';
 part 'src/handle_wrapper.dart';
 part 'src/socket.dart';
 part 'src/socket_reader.dart';

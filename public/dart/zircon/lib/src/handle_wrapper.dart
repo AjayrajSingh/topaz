@@ -7,21 +7,12 @@ part of zircon;
 /// A base class for classes that wrap Handles.
 class _HandleWrapper<T> {
   Handle _handle;
-
   _HandleWrapper(this._handle);
-
   Handle get handle => _handle;
-  bool get isValid => handle?.isValid;
 
   void close() {
     _handle.close();
     _handle = null;
-  }
-
-  Handle passHandle() {
-    final Handle result = _handle;
-    _handle = null;
-    return result;
   }
 
   @override

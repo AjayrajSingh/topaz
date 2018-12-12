@@ -159,11 +159,11 @@ class ChildViewConnection {
     assert(_viewKey == null);
     assert(_viewInfo == null);
     assert(_sceneHost == null);
-    final EventPairPair sceneTokens = new EventPairPair();
-    assert(sceneTokens.status == ZX.OK);
-    _sceneHost = new ui.SceneHost(sceneTokens.first);
+    final HandlePairResult pair = System.eventpairCreate();
+    assert(pair.status == ZX.OK);
+    _sceneHost = new ui.SceneHost(pair.first);
     _viewKey = _nextViewKey++;
-    _viewContainer.addChild(_viewKey, _viewOwner, sceneTokens.second);
+    _viewContainer.addChild(_viewKey, _viewOwner, pair.second);
     _viewOwner = null;
     assert(!_ViewContainerListenerImpl.instance._connections
         .containsKey(_viewKey));
@@ -227,8 +227,7 @@ class ChildViewConnection {
     }
   }
 
-  void sendSizeChangeHintHack(
-      double widthChangeFactor, double heightChangeFactor) {
+  void sendSizeChangeHintHack(double widthChangeFactor, double heightChangeFactor) {
     assert(_attached);
     assert(_attachments == 1);
     if (_viewKey == null) {
@@ -494,8 +493,7 @@ class ChildSceneLayer extends Layer {
   bool hitTestable;
 
   @override
-  ui.EngineLayer addToScene(ui.SceneBuilder builder,
-      [Offset layerOffset = Offset.zero]) {
+  ui.EngineLayer addToScene(ui.SceneBuilder builder, [Offset layerOffset = Offset.zero]) {
     builder.addChildScene(
       offset: offset + layerOffset,
       width: width,

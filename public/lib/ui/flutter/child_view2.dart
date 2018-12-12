@@ -158,7 +158,7 @@ class ChildViewConnection2 {
     assert(_viewKey == null);
     assert(_viewInfo == null);
     assert(_sceneHost == null);
-    final EventPairPair pair = new EventPairPair();
+    final HandlePairResult pair = System.eventpairCreate();
     assert(pair.status == ZX.OK);
     _sceneHost = new ui.SceneHost(pair.first);
     _viewKey = _nextViewKey++;
@@ -241,9 +241,7 @@ class ChildViewConnection2 {
         _currentViewProperties.viewLayout.inset.right == insetRight &&
         _currentViewProperties.viewLayout.inset.bottom == insetBottom &&
         _currentViewProperties.viewLayout.inset.left == insetLeft &&
-        (_currentViewProperties.customFocusBehavior == null ||
-                _currentViewProperties.customFocusBehavior.allowFocus) ==
-            focusable) {
+        (_currentViewProperties.customFocusBehavior == null || _currentViewProperties.customFocusBehavior.allowFocus) == focusable) {
       return null;
     }
 
@@ -395,8 +393,7 @@ class _RenderChildView2 extends RenderBox {
 
     _width = size.width;
     _height = size.height;
-    _connection._setChildProperties(
-        _width, _height, 0.0, 0.0, 0.0, 0.0, _focusable);
+    _connection._setChildProperties(_width, _height, 0.0, 0.0, 0.0, 0.0, _focusable);
     assert(() {
       if (_viewContainer == null) {
         _debugErrorMessage ??= new TextPainter(
@@ -477,8 +474,7 @@ class ChildSceneLayer extends Layer {
   bool hitTestable;
 
   @override
-  ui.EngineLayer addToScene(ui.SceneBuilder builder,
-      [Offset layerOffset = Offset.zero]) {
+  ui.EngineLayer addToScene(ui.SceneBuilder builder, [Offset layerOffset = Offset.zero]) {
     builder.addChildScene(
       offset: offset + layerOffset,
       width: width,

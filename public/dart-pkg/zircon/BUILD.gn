@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
+import("//build/dart/dart_fuchsia_test.gni")
 
 # NOTE: You must add any Dart files to sdk_ext.gni.
 
@@ -59,7 +59,6 @@ dart_library("package_for_analysis") {
 dart_fuchsia_test("dart_zircon_test") {
   sources = [
     "channel_test.dart",
-    "eventpair_test.dart",
     "socket_test.dart",
     "vmo_test.dart",
   ]
