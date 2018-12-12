@@ -14,6 +14,14 @@ shell_gpu_configuration("fuchsia_gpu_configuration") {
   enable_vulkan = true
 }
 
+# Dependencies for flutter tooling
+#
+# While not required to run a flutter mod, these allow interacting
+# with flutter via the fx tool and need to be built.
+flutter_tool_deps = [
+  "//third_party/dart-pkg/git/flutter/packages/flutter_tools:fuchsia_attach($host_toolchain)",
+]
+
 # Builds a flutter_runner
 #
 # Parameters:
@@ -183,7 +191,7 @@ flutter_runner("jit") {
   extra_deps = [
     "//third_party/dart/runtime:libdart_jit",
     "//third_party/dart/runtime/platform:libdart_platform_jit",
-  ]
+  ] + flutter_tool_deps
 }
 
 flutter_runner("jit_product") {
