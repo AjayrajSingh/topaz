@@ -75,13 +75,15 @@ class ChildViewConnection {
   //     {InterfaceRequest<ServiceProvider> childServices,
   //     ChildViewConnectionCallback onAvailable,
   //     ChildViewConnectionCallback onUnavailable}) {
-  //   final ViewProviderProxy viewProvider = ViewProviderProxy();
-  //   services.connectToService(viewProvider.ctrl);
-  //   try {
-  //     final InterfacePair<ViewOwner> viewOwner = InterfacePair<ViewOwner>();
-  //     viewProvider.createView(viewOwner.passRequest(), childServices);
-  //     return ChildViewConnection(viewOwner.passHandle(),
-  //         onAvailable: onAvailable, onUnavailable: onUnavailable);
+  // final app.ViewProviderProxy viewProvider = new app.ViewProviderProxy();
+  // services.connectToService(viewProvider.ctrl);
+  // try {
+  //   EventPairPair viewTokens = new EventPairPair();
+  //   assert(viewTokens.status == ZX.OK);
+
+  //   viewProvider.createView(viewTokens.second, childServices, null);
+  //   return new ChildViewConnection.fromViewHolderToken(viewTokens.first,
+  //       onAvailable: onAvailable, onUnavailable: onUnavailable);
   //   } finally {
   //     viewProvider.ctrl.close();
   //   }
@@ -89,7 +91,7 @@ class ChildViewConnection {
 
   final ChildViewConnectionCallback _onAvailableCallback;
   final ChildViewConnectionCallback _onUnavailableCallback;
-  InterfaceHandle<ViewOwner> _viewOwner;
+  EventPair _viewHolderToken;
 
   int _viewKey;
   ViewProperties _currentViewProperties;
@@ -100,13 +102,24 @@ class ChildViewConnection {
   SceneHost _sceneHost;
   int _attachments = 0;
 
-  /// inits [ChildViewConnection] object
-  ChildViewConnection(this._viewOwner,
+  /// Deprecated.
+  ChildViewConnection(InterfaceHandle<ViewOwner> viewOwner,
+      {ChildViewConnectionCallback onAvailable,
+      ChildViewConnectionCallback onUnavailable})
+      : this.fromViewHolderToken(
+            new EventPair(viewOwner?.passChannel()?.passHandle()),
+            onAvailable: onAvailable,
+            onUnavailable: onUnavailable);
+
+  /// Constructs |ChildViewConnection| from a token.
+  ChildViewConnection.fromViewHolderToken(EventPair viewHolderToken,
       {ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable})
       : _onAvailableCallback = onAvailable ?? _emptyConnectionCallback,
         _onUnavailableCallback = onUnavailable ?? _emptyConnectionCallback,
-        assert(_viewOwner != null);
+        _viewHolderToken = viewHolderToken {
+    assert(_viewHolderToken != null);
+  }
 
   bool get _attached => _attachments > 0;
 
@@ -159,7 +172,7 @@ class ChildViewConnection {
       return;
     }
     assert(_attached);
-    assert(_viewOwner != null);
+    assert(_viewHolderToken != null);
     assert(_viewKey == null);
     assert(_viewInfo == null);
     assert(_sceneHost == null);
@@ -170,8 +183,8 @@ class ChildViewConnection {
     // Analyzer doesn't know Handle must be dart:zircon's Handle
     _sceneHost = new SceneHost(sceneTokens.first.passHandle());
     _viewKey = _nextViewKey++;
-    _viewContainer.addChild(_viewKey, _viewOwner, sceneTokens.second);
-    _viewOwner = null;
+    _viewContainer.addChild2(_viewKey, _viewHolderToken, sceneTokens.second);
+    _viewHolderToken = null;
     assert(!ViewContainerListenerImpl().containsConnectionForKey(_viewKey));
     ViewContainerListenerImpl().addConnectionForKey(_viewKey, this);
   }
@@ -227,16 +240,15 @@ class ChildViewConnection {
       return;
     }
     assert(!_attached);
-    assert(_viewOwner == null);
+    assert(_viewHolderToken == null);
     assert(_viewKey != null);
     assert(_sceneHost != null);
     assert(ViewContainerListenerImpl().getConnectionForKey(_viewKey) == this);
-    final ChannelPair pair = ChannelPair();
-    assert(pair.status == ZX.OK);
+    final EventPairPair viewTokens = new EventPairPair();
+    assert(viewTokens.status == ZX.OK);
     ViewContainerListenerImpl().removeConnectionForKey(_viewKey);
-    _viewOwner = InterfaceHandle<ViewOwner>(pair.first);
-    _viewContainer.removeChild(
-        _viewKey, InterfaceRequest<ViewOwner>(pair.second));
+    _viewHolderToken = viewTokens.first;
+    _viewContainer.removeChild2(_viewKey, viewTokens.second);
     _viewKey = null;
     _viewInfo = null;
     _currentViewProperties = null;

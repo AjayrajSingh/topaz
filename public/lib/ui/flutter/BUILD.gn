@@ -18,6 +18,7 @@ dart_library("flutter") {
 
   deps = [
     "//garnet/public/fidl/fuchsia.math",
+    "//garnet/public/fidl/fuchsia.ui.app",
     "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",

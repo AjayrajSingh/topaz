@@ -9,6 +9,7 @@ import 'dart:ui' as ui;
 import 'package:lib.app.dart/app_async.dart';
 import 'package:fidl_fuchsia_sys/fidl_async.dart';
 import 'package:fidl_fuchsia_math/fidl_async.dart' as fidl;
+import 'package:fidl_fuchsia_ui_app/fidl_async.dart' as app;
 import 'package:fidl_fuchsia_ui_viewsv1/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl_async.dart';
 import 'package:flutter/rendering.dart';
@@ -20,7 +21,6 @@ import 'package:zircon/zircon.dart';
 import 'mozart.dart';
 
 export 'package:fidl_fuchsia_ui_viewsv1token/fidl_async.dart' show ViewOwner;
-export 'child_view2_async.dart';
 
 ViewContainerProxy _initViewContainer() {
   // Analyzer doesn't know Handle must be dart:zircon's Handle
@@ -79,12 +79,22 @@ void _emptyConnectionCallback(ChildViewConnection c) {}
 ///
 /// Used with the [ChildView] widget to display a child view.
 class ChildViewConnection {
-  ChildViewConnection(this._viewOwner,
+  ChildViewConnection(InterfaceHandle<ViewOwner> viewOwner,
+      {ChildViewConnectionCallback onAvailable,
+      ChildViewConnectionCallback onUnavailable})
+      : this.fromViewHolderToken(
+            new EventPair(viewOwner?.passChannel()?.passHandle()),
+            onAvailable: onAvailable,
+            onUnavailable: onUnavailable);
+
+  ChildViewConnection.fromViewHolderToken(EventPair viewHolderToken,
       {ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable})
       : _onAvailableCallback = onAvailable ?? _emptyConnectionCallback,
         _onUnavailableCallback = onUnavailable ?? _emptyConnectionCallback,
-        assert(_viewOwner != null);
+        _viewHolderToken = viewHolderToken {
+    assert(_viewHolderToken != null);
+  }
 
   factory ChildViewConnection.launch(String url, Launcher launcher,
       {InterfaceRequest<ComponentController> controller,
@@ -109,12 +119,14 @@ class ChildViewConnection {
       {InterfaceRequest<ServiceProvider> childServices,
       ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable}) {
-    final ViewProviderProxy viewProvider = new ViewProviderProxy();
+    final app.ViewProviderProxy viewProvider = new app.ViewProviderProxy();
     services.connectToService(viewProvider.ctrl);
     try {
-      final InterfacePair<ViewOwner> viewOwner = new InterfacePair<ViewOwner>();
-      viewProvider.createView(viewOwner.passRequest(), childServices);
-      return new ChildViewConnection(viewOwner.passHandle(),
+      EventPairPair viewTokens = new EventPairPair();
+      assert(viewTokens.status == ZX.OK);
+
+      viewProvider.createView(viewTokens.second, childServices, null);
+      return new ChildViewConnection.fromViewHolderToken(viewTokens.first,
           onAvailable: onAvailable, onUnavailable: onUnavailable);
     } finally {
       viewProvider.ctrl.close();
@@ -123,7 +135,7 @@ class ChildViewConnection {
 
   final ChildViewConnectionCallback _onAvailableCallback;
   final ChildViewConnectionCallback _onUnavailableCallback;
-  InterfaceHandle<ViewOwner> _viewOwner;
+  EventPair _viewHolderToken;
 
   static int _nextViewKey = 1;
   int _viewKey;
@@ -153,7 +165,7 @@ class ChildViewConnection {
       return;
     }
     assert(_attached);
-    assert(_viewOwner != null);
+    assert(_viewHolderToken != null);
     assert(_viewKey == null);
     assert(_viewInfo == null);
     assert(_sceneHost == null);
@@ -164,8 +176,8 @@ class ChildViewConnection {
     // Analyzer doesn't know Handle must be dart:zircon's Handle
     _sceneHost = new ui.SceneHost(sceneTokens.first.passHandle());
     _viewKey = _nextViewKey++;
-    _viewContainer.addChild(_viewKey, _viewOwner, sceneTokens.second);
-    _viewOwner = null;
+    _viewContainer.addChild2(_viewKey, _viewHolderToken, sceneTokens.second);
+    _viewHolderToken = null;
     assert(!_ViewContainerListenerImpl.instance._connections
         .containsKey(_viewKey));
     _ViewContainerListenerImpl.instance._connections[_viewKey] = this;
@@ -176,16 +188,15 @@ class ChildViewConnection {
       return;
     }
     assert(!_attached);
-    assert(_viewOwner == null);
+    assert(_viewHolderToken == null);
     assert(_viewKey != null);
     assert(_sceneHost != null);
     assert(_ViewContainerListenerImpl.instance._connections[_viewKey] == this);
-    final ChannelPair pair = new ChannelPair();
-    assert(pair.status == ZX.OK);
+    final EventPairPair viewTokens = new EventPairPair();
+    assert(viewTokens.status == ZX.OK);
     _ViewContainerListenerImpl.instance._connections.remove(_viewKey);
-    _viewOwner = new InterfaceHandle<ViewOwner>(pair.first);
-    _viewContainer.removeChild(
-        _viewKey, new InterfaceRequest<ViewOwner>(pair.second));
+    _viewHolderToken = viewTokens.first;
+    _viewContainer.removeChild2(_viewKey, viewTokens.second);
     _viewKey = null;
     _viewInfo = null;
     _currentViewProperties = null;
