@@ -61,8 +61,11 @@ SettingsSection _update(DeviceSettingsModel model, double scale) {
     scale: scale,
   );
 
+  // The factory reset button is actually closer to "Erase User Data" in
+  // functionality. This string should be reverted back to "Factory Reset" once
+  // the implementation is closer to factory reset.
   final factoryResetButton = SettingsButton(
-    text: 'Factory Reset',
+    text: 'Erase User Data',
     onTap: model.factoryReset,
     scale: scale,
   );
@@ -134,11 +137,11 @@ Widget _buildResetBox(DeviceSettingsModel model, double scale) {
               physics: BouncingScrollPhysics(),
               padding: EdgeInsets.all(16.0),
               child: SettingsSection(
-                title: 'Factory Reset',
+                title: 'Erase User Data',
                 scale: scale,
                 child: Column(children: [
                   SettingsButton(
-                    text: 'Reset',
+                    text: 'Erase',
                     scale: scale,
                     onTap: model.factoryReset,
                   ),
