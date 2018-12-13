@@ -10,5 +10,5 @@ class FidlError implements Exception {
   final String message;
 
   @override
-  String toString() => 'FidlError($message)';
+  String toString() => 'FidlError: $message';
 }
