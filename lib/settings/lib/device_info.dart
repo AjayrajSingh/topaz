@@ -32,6 +32,23 @@ class DeviceInfo {
     return null;
   }
 
+  /// Determines whether the factory reset flag has been set.
+  ///
+  /// Completes as true if the factory reset flag is present, false otherwise.
+  static Future<bool> getFactoryResetFlag() async {
+    final completer = Completer<bool>();
+    final deviceSettingsManagerProxy = DeviceSettingsManagerProxy();
+
+    connectToService(StartupContext.fromStartupInfo().environmentServices,
+        deviceSettingsManagerProxy.ctrl);
+    deviceSettingsManagerProxy.getInteger(_factoryResetKey,
+        (int resetFlagValue, Status s) {
+      deviceSettingsManagerProxy.ctrl.close();
+      completer.complete(s == Status.ok && resetFlagValue > 0);
+    });
+    return completer.future;
+  }
+
   /// Sets a flag to determine whether the device should be reset to factory
   /// settings or not.
   ///
