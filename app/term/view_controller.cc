@@ -58,7 +58,7 @@ void ViewController::ComputeMetrics() {
   fg_paint.setTypeface(regular_typeface_);
   fg_paint.setTextSize(params_.font_size);
   // Figure out appropriate metrics.
-  SkPaint::FontMetrics fm = {};
+  SkFontMetrics fm = {};
   fg_paint.getFontMetrics(&fm);
   ascent_ = static_cast<int>(ceilf(-fm.fAscent));
   line_height_ = ascent_ + static_cast<int>(ceilf(fm.fDescent + fm.fLeading));
@@ -150,7 +150,7 @@ void ViewController::DrawContent(SkCanvas* canvas) {
   SkPaint fg_paint;
   fg_paint.setTypeface(regular_typeface_);
   fg_paint.setTextSize(params_.font_size);
-  fg_paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
+  fg_paint.setTextEncoding(SkTextEncoding::kUTF32);
 
   TermModel::Size size = model_.GetSize();
   int y = 0;

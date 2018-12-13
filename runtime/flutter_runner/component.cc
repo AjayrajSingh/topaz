@@ -180,10 +180,10 @@ Application::Application(
 
 #ifndef NDEBUG
   // Debug mode
-  settings_.dart_non_checked_mode = false;
+  settings_.disable_dart_asserts = false;
 #else   // NDEBUG
   // Release mode
-  settings_.dart_non_checked_mode = true;
+  settings_.disable_dart_asserts = true;
 #endif  // NDEBUG
 
   settings_.task_observer_add =

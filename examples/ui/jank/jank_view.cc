@@ -86,7 +86,7 @@ void JankView::DrawButton(SkCanvas* canvas, const char* label,
   SkPaint textPaint;
   textPaint.setColor(SK_ColorBLACK);
   textPaint.setTextSize(kTextSize);
-  textPaint.setTextEncoding(SkPaint::kUTF8_TextEncoding);
+  textPaint.setTextEncoding(SkTextEncoding::kUTF8);
   textPaint.setTypeface(typeface_);
   textPaint.setAntiAlias(true);
   SkRect textBounds;
