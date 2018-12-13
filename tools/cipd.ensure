@@ -6,12 +6,12 @@ $ParanoidMode CheckPresence
 
 # Chromium fidl
 @Subdir third_party/chromium/fidl/chromium.web
-chromium/fuchsia/fidl SNeLla_O5AnqdgA9aLvlaw7KxFul_0w_u_m7Y0J6hjkC
+chromium/fuchsia/fidl VMhrOOJ5BywNvCmtNQVkGLddRJ80c_cl0WpDMvtfwRsC
 
 # Chromium amd64 / x64 implementation
 @Subdir third_party/chromium/arch/x64
-chromium/fuchsia/webrunner-amd64 riIDpiT7xAFNBvAwn_QYoPtiSTP80gFSSUtklRPDPysC
+chromium/fuchsia/webrunner-amd64 ktc57OW_xRY0y0qh7pM7ki-IRAzTCWr_y7u_h8qtI0EC
 
 # Chromium arm64 / aarch64 implementation
 @Subdir third_party/chromium/arch/arm64
-chromium/fuchsia/webrunner-arm64 36sX9dnErV2SAQCaP4YFirf8FGmo57QPULKRhiJkO2kC
+chromium/fuchsia/webrunner-arm64 y7WDXXAPO7gertd9LQcGuhSAJmCq-v41UpqOHmBCuL0C
