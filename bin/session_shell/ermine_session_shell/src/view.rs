@@ -8,8 +8,8 @@ use fidl::encoding::OutOfLine;
 use fidl::endpoints::{create_proxy, ClientEnd, ServerEnd, ServiceMarker};
 use fidl_fuchsia_math::{InsetF, RectF, SizeF};
 use fidl_fuchsia_modular::{AddMod, Intent, PuppetMasterMarker, PuppetMasterProxy, StoryCommand,
-                           StoryProviderProxy, StoryPuppetMasterProxy, SurfaceArrangement,
-                           SurfaceDependency, SurfaceRelation};
+                           StoryPuppetMasterProxy, SurfaceArrangement, SurfaceDependency,
+                           SurfaceRelation};
 use fidl_fuchsia_ui_gfx::{self as gfx, ColorRgba};
 use fidl_fuchsia_ui_input::{InputConnectionMarker, InputConnectionProxy, InputListenerMarker,
                             InputListenerRequest, KeyboardEvent};
@@ -17,10 +17,11 @@ use fidl_fuchsia_ui_scenic::{SessionListenerMarker, SessionListenerRequest};
 use fidl_fuchsia_ui_viewsv1::{CustomFocusBehavior, ViewContainerListenerMarker,
                               ViewContainerListenerRequest, ViewLayout, ViewListenerMarker,
                               ViewListenerRequest, ViewProperties};
+use fidl_fuchsia_ui_viewsv1token::ViewOwnerMarker;
 use fuchsia_app::client::connect_to_service;
 use fuchsia_async as fasync;
 use fuchsia_scenic::{EntityNode, ImportNode, Material, Rectangle, Session, SessionPtr, ShapeNode};
-use fuchsia_zircon::{self as zx, Channel};
+use fuchsia_zircon as zx;
 use futures::{future::ready as fready, TryFutureExt, TryStreamExt};
 use itertools::Itertools;
 use parking_lot::Mutex;
@@ -317,32 +318,21 @@ impl ErmineView {
         }
     }
 
-    fn add_child_view_for_story(
-        &mut self, key: u32, url: String, story_id: String, allow_focus: bool, view_owner: Channel,
+    pub fn add_child_view_for_story_attach(
+        &mut self, key: u32, story_id: String, view_owner: ClientEnd<ViewOwnerMarker>,
     ) {
         let host_node = EntityNode::new(self.session.clone());
         let host_import_token = host_node.export_as_request();
 
         self.view_container
-            .add_child(key, ClientEnd::new(view_owner), host_import_token)
+            .add_child(key, view_owner, host_import_token)
             .unwrap();
 
         self.import_node.add_child(&host_node);
-        let view_data = ViewData::new(key, url, story_id, allow_focus, host_node);
+        let view_data = ViewData::new(key, "".to_string(), story_id, true, host_node);
         self.views.insert(key, view_data);
         self.update();
         self.layout();
-    }
-
-    pub fn display_story(
-        &mut self, key: u32, url: String, story_id: &String, story_provider: &StoryProviderProxy,
-    ) -> Result<(), Error> {
-        let (story_controller, story_controller_end) = create_proxy()?;
-        story_provider.get_controller(story_id, story_controller_end)?;
-        let (view_owner_client, view_owner_server) = Channel::create()?;
-        story_controller.start(ServerEnd::new(view_owner_client))?;
-        self.add_child_view_for_story(key, url, story_id.to_string(), true, view_owner_server);
-        Ok(())
     }
 
     pub fn remove_view_for_story(&mut self, story_id: &String) -> Result<(), Error> {

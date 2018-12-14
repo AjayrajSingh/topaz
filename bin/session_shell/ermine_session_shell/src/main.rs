@@ -8,6 +8,7 @@ use fidl::endpoints::{create_endpoints, create_proxy, ClientEnd, RequestStream, 
 use fidl_fuchsia_developer_tiles as tiles;
 use fidl_fuchsia_math::SizeF;
 use fidl_fuchsia_modular::{SessionShellContextMarker, SessionShellContextProxy,
+                           SessionShellMarker, SessionShellRequest, SessionShellRequestStream,
                            StoryProviderProxy, StoryProviderWatcherMarker,
                            StoryProviderWatcherRequest, StoryState};
 use fidl_fuchsia_ui_input::{KeyboardEvent, KeyboardEventPhase, MODIFIER_LEFT_SUPER,
@@ -154,12 +155,11 @@ impl App {
         next_key
     }
 
-    pub fn add_view_for_story(&mut self, story_id: String) -> Result<(), Error> {
-        let key_to_use = self.next_story_key();
-        self.views[0]
-            .lock()
-            .display_story(key_to_use, "".to_string(), &story_id, &self.story_provider)
-            .context("display_story failed")?;
+    pub fn request_start_story(&mut self, story_id: String) -> Result<(), Error> {
+        let (story_controller, story_controller_end) = create_proxy()?;
+        self.story_provider
+            .get_controller(&story_id, story_controller_end)?;
+        story_controller.request_start()?;
         Ok(())
     }
 
@@ -173,6 +173,15 @@ impl App {
 
     pub fn list_stories(&self) -> (Vec<u32>, Vec<String>, Vec<SizeF>, Vec<bool>) {
         self.views[0].lock().list_stories()
+    }
+
+    pub fn add_child_view_for_story_attach(
+        &mut self, story_id: String, view_owner: ClientEnd<ViewOwnerMarker>,
+    ) {
+        let key_to_use = self.next_story_key();
+        self.views[0]
+            .lock()
+            .add_child_view_for_story_attach(key_to_use, story_id, view_owner);
     }
 
     pub fn spawn_tiles_server(chan: fasync::Channel) {
@@ -208,6 +217,29 @@ impl App {
         )
     }
 
+    pub fn spawn_session_shell_server(chan: fasync::Channel) {
+        fasync::spawn(
+            SessionShellRequestStream::from_channel(chan)
+                .try_for_each(move |req| match req {
+                    SessionShellRequest::AttachView {
+                        view_id,
+                        view_owner,
+                        ..
+                    } => {
+                        println!("AttachView {:?}", view_id.story_id);
+                        APP.lock()
+                            .add_child_view_for_story_attach(view_id.story_id, view_owner);
+                        fready(Ok(()))
+                    }
+                    SessionShellRequest::DetachView { view_id, responder } => {
+                        println!("DetachView {:?}", view_id.story_id);
+                        fready(responder.send())
+                    }
+                })
+                .unwrap_or_else(|e| eprintln!("error running SessionShell server: {:?}", e)),
+        )
+    }
+
     pub fn spawn_story_watcher(&mut self) -> Result<(), Error> {
         let (story_watcher, story_watcher_request) =
             create_endpoints::<StoryProviderWatcherMarker>()?;
@@ -224,7 +256,7 @@ impl App {
                     } => {
                         if story_state == StoryState::Stopped {
                             APP.lock()
-                                .add_view_for_story(story_info.id.to_string())
+                                .request_start_story(story_info.id.to_string())
                                 .unwrap_or_else(|e| {
                                     eprintln!("error adding story {}: {:?}", story_info.id, e);
                                 });
@@ -247,7 +279,7 @@ impl App {
             f.map_ok(move |r| {
                 for story in r {
                     APP.lock()
-                        .add_view_for_story(story.id.to_string())
+                        .request_start_story(story.id.to_string())
                         .unwrap_or_else(|e| {
                             eprintln!("error adding view for initial story {}: {:?}", story.id, e);
                         });
@@ -278,11 +310,14 @@ fn main() -> Result<(), Error> {
     let mut executor = fasync::Executor::new().context("Error creating executor")?;
 
     let fut = component::server::ServicesServer::new()
-        .add_service((ViewProviderMarker::NAME, move |channel| {
-            App::spawn_view_provider_server(channel);
+        .add_service((ViewProviderMarker::NAME, move |chan| {
+            App::spawn_view_provider_server(chan);
         }))
         .add_service((tiles::ControllerMarker::NAME, move |chan| {
-            App::spawn_tiles_server(chan)
+            App::spawn_tiles_server(chan);
+        }))
+        .add_service((SessionShellMarker::NAME, move |chan| {
+            App::spawn_session_shell_server(chan);
         }))
         .start()
         .context("Error starting services server")?;
