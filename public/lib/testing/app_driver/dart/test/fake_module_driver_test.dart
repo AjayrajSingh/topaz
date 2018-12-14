@@ -37,6 +37,8 @@ void main() async {
   FakeModuleDriver moduleDriver;
 
   setUp(() {
+    // TODO: Refactor this class to use the new SDK instead of deprecated API
+    // ignore: deprecated_member_use
     moduleDriver = FakeModuleDriver();
   });
 

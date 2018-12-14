@@ -14,6 +14,8 @@ import 'package:lib_setui_module/module_action_result_sender.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+// TODO: Refactor this class to use the new SDK instead of deprecated API
+// ignore: deprecated_member_use
 class MockDriver extends Mock implements ModuleDriver {}
 
 class MockStream extends Mock implements Stream<String> {}

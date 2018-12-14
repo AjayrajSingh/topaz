@@ -12,6 +12,8 @@ import 'result_code_entity_codec.dart';
 /// module.
 class ModuleActionResultSender extends ActionResultSender {
   /// The driver to write the result to.
+  // TODO: Refactor this class to use the new SDK instead of deprecated API
+  // ignore: deprecated_member_use
   final ModuleDriver _driver;
 
   /// The codec to encode the data with.

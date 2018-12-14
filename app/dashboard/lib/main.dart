@@ -153,7 +153,8 @@ LauncherProxy launcherProxy;
 
 final List<List<BuildStatusModel>> _buildStatusModels =
     <List<BuildStatusModel>>[];
-
+// TODO: Refactor this class to use the new SDK instead of deprecated API
+// ignore: deprecated_member_use
 ModuleDriver _driver;
 
 void main() {
@@ -195,6 +196,8 @@ void main() {
     launchWebview: _launchWebview,
   );
 
+  // TODO: Refactor this class to use the new SDK instead of deprecated API
+  // ignore: deprecated_member_use
   _driver = new ModuleDriver(onTerminate: dashboardModel.onStop);
 
   runApp(

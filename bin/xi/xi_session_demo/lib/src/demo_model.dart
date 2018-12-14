@@ -14,6 +14,8 @@ import 'package:fidl_fuchsia_modular/fidl.dart';
 const String kSessionManagerURL = 'xi_session_agent';
 
 class DemoModel extends Model {
+  /// TODO: Refactor this class to use the new SDK instead of deprecated API
+  /// ignore: deprecated_member_use
   final ModuleDriver driver = ModuleDriver();
   final List<String> messages = [
     'Hello!',

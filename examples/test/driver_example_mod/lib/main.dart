@@ -13,6 +13,9 @@ import 'src/driver_example_model.dart';
 /// Main entry point to driver example module.
 void main() {
   setupLogger(name: 'driver_example_mod');
+
+  /// TODO: Refactor this class to use the new SDK instead of deprecated API
+  /// ignore: deprecated_member_use
   ModuleDriver driver = new ModuleDriver();
 
   driver.start().then((_) => log.fine('Mod started'),

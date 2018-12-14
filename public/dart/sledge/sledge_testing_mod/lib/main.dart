@@ -13,6 +13,8 @@ void main() {
   setupLogger();
 
   final testModel = new TestModel();
+  // TODO: Refactor this class to use the new SDK instead of deprecated API
+  // ignore: deprecated_member_use
   final driver = ModuleDriver();
 
   runApp(

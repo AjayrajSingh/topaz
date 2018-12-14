@@ -66,6 +66,8 @@ begin:
 ...
 ''';
 
+// TODO: Refactor this class to use the new SDK instead of deprecated API
+// ignore: deprecated_member_use
 class MockDriver extends Mock implements ModuleDriver {}
 
 class MockActionResultReceiver extends Mock implements ActionResultReceiver {}

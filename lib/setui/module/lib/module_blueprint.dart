@@ -16,6 +16,8 @@ class ModuleBlueprint extends Blueprint {
   /// The package that contains the module.
   final String handler;
 
+  // TODO: Refactor this class to use the new SDK instead of deprecated API
+  // ignore: deprecated_member_use
   final ModuleDriver driver;
 
   ModuleBlueprint(String name, this.verb, this.handler, this.driver)

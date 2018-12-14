@@ -26,6 +26,8 @@ void main() {
   setupLogger(name: 'xi_embeddable');
   log.info('Module main called');
 
+  // TODO: Refactor this class to use the new SDK instead of deprecated API
+  // ignore: deprecated_member_use
   final _driver = new ModuleDriver();
   XiSessionManager _sessionManager;
 
@@ -61,6 +63,8 @@ void main() {
   ));
 }
 
+// TODO: Refactor this class to use the new SDK instead of deprecated API
+// ignore: deprecated_member_use
 Future<String> _getLink(ModuleDriver _driver) async {
   var link = await _driver.getLink('session-id');
   fuchsia_mem.Buffer buffer = await link.get();
@@ -70,6 +74,8 @@ Future<String> _getLink(ModuleDriver _driver) async {
   return jsonDecode(utf8.decode(data.bytesAsUint8List()));
 }
 
+// TODO: Refactor this class to use the new SDK instead of deprecated API
+// ignore: deprecated_member_use
 Future<XiSessionManager> _getSessionManager(ModuleDriver _driver) async {
   XiSessionManagerProxy sessionManagerProxy = new XiSessionManagerProxy();
   return _driver

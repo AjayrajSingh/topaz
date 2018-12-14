@@ -7,12 +7,15 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.widgets/model.dart';
 
+/// TODO: Refactor this class to use the new SDK instead of deprecated API
+/// ignore: deprecated_member_use
 final ModuleDriver _driver = ModuleDriver();
 
 void main() {
   setupLogger(name: 'Hello mod');
 
-  _driver.start().then((ModuleDriver driver) {
+  /// ignore: deprecated_member_use
+  _driver.start().then((ModuleDriver driver) { 
       log.info('Hello mod started');
     });
 

@@ -24,6 +24,8 @@ void main() {
   setupLogger(name: 'tictactoe game board');
 
   // The ModuleDriver is a dart-idomatic interface to the Fuchsia system.
+  // TODO: Refactor this class to use the new SDK instead of deprecated API
+  // ignore: deprecated_member_use
   ModuleDriver moduleDriver = new ModuleDriver()
     ..start().then((_) => trace('module is ready')).catchError(
         (error, stackTrace) =>
@@ -50,6 +52,8 @@ void main() {
   );
 }
 
+// TODO: Refactor this class to use the new SDK instead of deprecated API
+// ignore: deprecated_member_use
 Future<GameTracker> _createGameTracker(ModuleDriver moduleDriver) async {
   GameTrackerProxy gameTrackerProxy = new GameTrackerProxy();
   return moduleDriver
@@ -81,7 +85,7 @@ void _recordWinner(
 }
 
 Future<void> _proposeScore(
-    StartupContext startupContext, ModuleDriver moduleDriver) async {
+    StartupContext startupContext, ModuleDriver moduleDriver) async { // ignore: deprecated_member_use
   final storyId = await moduleDriver.getStoryId();
 
   final Intent intent = Intent(handler: scoreBoardModUrl);

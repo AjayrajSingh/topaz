@@ -25,6 +25,8 @@ class RosterParser {
 
   static final List<String> _requiredKeys = [_keyVerb, _keyHandler];
 
+  // TODO: Refactor this class to use the new SDK instead of deprecated API
+  // ignore: deprecated_member_use
   final ModuleDriver _driver;
 
   RosterParser(this._driver);

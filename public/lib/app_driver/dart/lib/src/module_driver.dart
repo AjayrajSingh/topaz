@@ -81,7 +81,7 @@ const int _cobaltTimeToEmbedNewModMetricId = 8;
 /// Module termination is triggered by the system, all service hosts and clients
 /// will automatically have their underlying connections closed including any
 /// added by making calls to exposed APIs (e.g. [link], [moduleContext]).
-///
+@Deprecated('Use package:fuchsia_modular/module.dart instead')
 class ModuleDriver {
   final StartupContext _startupContext = new StartupContext.fromStartupInfo();
 
@@ -125,6 +125,8 @@ class ModuleDriver {
   // Methods to run when the module is being torn down
   final List<OnTerminateAsync> _onTerminatesAsync = <OnTerminateAsync>[];
 
+  /// Deprecated: Use package:fuchsia_modular/module.dart instead
+  /// 
   /// Create a new [ModuleDriver].
   ///
   ///     ModuleDriver module = new ModuleDriver();

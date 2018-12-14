@@ -12,6 +12,8 @@ import 'widgets/todo_widget.dart';
 void main() {
   setupLogger();
 
+  // TODO: Refactor this class to use the new SDK instead of deprecated API
+  // ignore: deprecated_member_use
   ModuleDriver().start().catchError(log.severe);
 
   runApp(

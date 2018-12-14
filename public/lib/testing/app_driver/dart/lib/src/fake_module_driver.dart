@@ -18,6 +18,8 @@ class FakeIntentParameters implements IntentParameters {
   FakeModuleDriver _driver;
 
   FakeIntentParameters({
+    // TODO: Refactor this class to use the new SDK instead of deprecated API
+    // ignore: deprecated_member_use
     ModuleDriver moduleDriver,
   }) {
     _driver = moduleDriver;
@@ -50,6 +52,8 @@ class LinkStreamController {
   LinkStreamController({@required this.controller, @required this.watchAll});
 }
 
+// TODO: Refactor this class to use the new SDK instead of deprecated API
+// ignore: deprecated_member_use
 class FakeModuleDriver implements ModuleDriver {
   final _linkValue = {};
   final _linkStreamControllers = {};
@@ -60,7 +64,7 @@ class FakeModuleDriver implements ModuleDriver {
   FakeIntentParameters _parameters;
 
   @override
-  // ignore: use_to_and_as_if_applicable
+  // ignore: use_to_and_as_if_applicable, deprecated_member_use
   Future<ModuleDriver> start() {
     return Future.value(this);
   }

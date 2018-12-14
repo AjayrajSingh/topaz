@@ -14,6 +14,8 @@ import 'widgets/vote_widget.dart';
 void main() {
   setupLogger();
 
+  /// TODO: Refactor this class to use the new SDK instead of deprecated API
+  /// ignore: deprecated_member_use
   final driver = ModuleDriver();
 
   driver.getComponentContext().then((ComponentContextClient client) {

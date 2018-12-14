@@ -16,6 +16,8 @@ void main() {
   setupLogger();
 
   final model = new TodoListModel();
+  // TODO: Refactor this class to use the new SDK instead of deprecated API
+  // ignore: deprecated_member_use
   final driver = ModuleDriver(onTerminate: model.onTerminate);
 
   driver.getComponentContext().then((ComponentContextClient client) {
