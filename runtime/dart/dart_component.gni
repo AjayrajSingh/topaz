@@ -406,7 +406,7 @@ template("flutter_dart_jit_component") {
       }
       manifest = kernel_manifest
       args = [
-        "--component-name",
+        "--data-dir",
         component_name,
       ]
 

@@ -36,7 +36,6 @@ ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
       help: 'Run global type flow analysis', defaultsTo: false)
   ..addFlag('drop-ast',
       help: 'Drop AST for members with bytecode', defaultsTo: false)
-  ..addOption('component-name', help: 'Name of the component')
   ..addOption('data-dir',
       help: 'Name of the subdirectory of //data for output files')
   ..addFlag('embed-sources',
@@ -95,7 +94,7 @@ Future<void> main(List<String> args) async {
   final String targetName = options['target'];
   final bool genBytecode = options['gen-bytecode'];
   final bool dropAST = options['drop-ast'];
-  final String dataDir = options.options.contains('component-name') ? options['component-name'] : options['data-dir'];
+  final String dataDir = options['data-dir'];
   final bool verbose = options['verbose'];
 
   Uri mainUri = Uri.parse(options.rest[0]);
