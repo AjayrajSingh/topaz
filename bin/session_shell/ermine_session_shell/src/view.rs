@@ -358,34 +358,6 @@ impl ErmineView {
         Ok(())
     }
 
-    pub fn setup_story(
-        &mut self, key: u32, story_id: &str, module_name: String, allow_focus: bool,
-        story_provider: &StoryProviderProxy,
-    ) -> Result<(), Error> {
-        let (story_controller, story_controller_end) = create_proxy()?;
-        story_provider.get_controller(story_id, story_controller_end)?;
-        let (view_owner_client, view_owner_server) = Channel::create()?;
-        story_controller.start(ServerEnd::new(view_owner_client))?;
-
-        let mut intent = Intent {
-            action: Some("view".to_string()),
-            handler: Some(module_name.clone()),
-            parameters: None,
-        };
-
-        story_controller.add_module(None, "root", &mut intent, None)?;
-
-        self.add_child_view_for_story(
-            key,
-            module_name,
-            story_id.to_string(),
-            allow_focus,
-            view_owner_server,
-        );
-
-        Ok(())
-    }
-
     pub fn remove_story(&mut self, key: u32) {
         if self.views.remove(&key).is_some() {
             self.view_container

@@ -154,20 +154,6 @@ impl App {
         next_key
     }
 
-    pub fn setup_story(
-        &mut self, key: u32, story_id: &str, module_name: String, allow_focus: bool,
-    ) -> Result<(), Error> {
-        self.views[0].lock().setup_story(
-            key,
-            story_id,
-            module_name,
-            allow_focus,
-            &self.story_provider,
-        )?;
-
-        Ok(())
-    }
-
     pub fn add_view_for_story(&mut self, story_id: String) -> Result<(), Error> {
         let key_to_use = self.next_story_key();
         self.views[0]
