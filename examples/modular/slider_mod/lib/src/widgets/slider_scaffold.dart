@@ -12,7 +12,7 @@ import 'launch_bar.dart';
 import 'value_slider.dart';
 
 class SliderScaffold extends StatelessWidget {
-  final Entity<Shape> shapeEntity;
+  final Entity shapeEntity;
   final Shape shape;
 
   const SliderScaffold(this.shapeEntity, this.shape);

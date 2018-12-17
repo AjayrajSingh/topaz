@@ -12,7 +12,6 @@ dart_library("models") {
   sources = [
     "shape.dart",
     "src/shape.dart",
-    "src/shape_codec.dart",
   ]
 
   deps = [
