@@ -1,0 +1,5 @@
+{
+    "packages": [
+        "//topaz/auth_providers:auth_provider_tests"
+    ]
+}

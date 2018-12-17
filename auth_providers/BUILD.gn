@@ -4,11 +4,8 @@
 
 import("//build/package.gni")
 
-package("tests") {
+package("auth_provider_tests") {
   testonly = true
-  deprecated_system_image = true
-
-  package_name = "auth_provider_tests"
 
   deps = [
     ":auth_provider_unittests",
