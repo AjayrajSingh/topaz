@@ -190,7 +190,6 @@ impl App {
             .add_child_view_for_story_attach(key_to_use, story_id, view_owner);
     }
 
-    #[allow(unreachable_patterns)]
     pub fn spawn_tiles_server(chan: fasync::Channel) {
         fasync::spawn(
             tiles::ControllerRequestStream::from_channel(chan)
@@ -219,7 +218,9 @@ impl App {
                             &mut focusabilties.iter_mut().map(|a| *a),
                         ))
                     }
-                    _ => fready(Ok(())),
+                    tiles::ControllerRequest::Quit { control_handle: _ } => {
+                        ::std::process::exit(0)
+                    }
                 })
                 .unwrap_or_else(|e| eprintln!("error running Tiles controller server: {:?}", e)),
         )
