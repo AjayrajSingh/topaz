@@ -12,7 +12,7 @@ import 'spinning_cube_gem.dart';
 
 class _TickerProviderImpl implements TickerProvider {
   @override
-  Ticker createTicker(TickerCallback onTick) => new Ticker(onTick);
+  Ticker createTicker(TickerCallback onTick) => Ticker(onTick);
 }
 
 const Duration _kCubeRotationAnimationPeriod = const Duration(
@@ -20,20 +20,20 @@ const Duration _kCubeRotationAnimationPeriod = const Duration(
 );
 
 Future<Null> main() async {
-  AnimationController controller = new AnimationController(
-    vsync: new _TickerProviderImpl(),
+  AnimationController controller = AnimationController(
+    vsync: _TickerProviderImpl(),
     duration: _kCubeRotationAnimationPeriod,
   );
   runApp(
-    new MaterialApp(
-      home: new Container(
+    MaterialApp(
+      home: Container(
         color: Colors.deepPurple,
-        child: new FractionallySizedBox(
+        child: FractionallySizedBox(
           alignment: FractionalOffset.center,
           widthFactor: 0.75,
           heightFactor: 0.75,
-          child: new Center(
-            child: new SpinningCubeGem(
+          child: Center(
+            child: SpinningCubeGem(
               controller: controller,
               color: Colors.pinkAccent[400],
             ),
