@@ -102,7 +102,6 @@ class PlatformView final : public shell::PlatformView,
   fidl::Binding<fuchsia::ui::input::InputMethodEditorClient> ime_client_;
   fuchsia::ui::input::InputMethodEditorPtr ime_;
   fuchsia::ui::input::ImeServicePtr text_sync_service_;
-  fuchsia::ui::policy::PresenterPtr presenter_service_;
 
   fuchsia::sys::ServiceProviderPtr parent_environment_service_provider_;
   fuchsia::modular::ClipboardPtr clipboard_;
@@ -113,8 +112,6 @@ class PlatformView final : public shell::PlatformView,
   std::unique_ptr<Surface> surface_;
   blink::LogicalMetrics metrics_;
   fuchsia::ui::gfx::Metrics scenic_metrics_;
-  // TODO(SCN-1013): Remove this wart after the input v2 migration.
-  bool HACK_legacy_input_path_;
   // last_text_state_ is the last state of the text input as reported by the IME
   // or initialized by Flutter. We set it to null if Flutter doesn't want any
   // input, since then there is no text input state at all.

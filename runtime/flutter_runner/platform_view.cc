@@ -80,7 +80,6 @@ PlatformView::PlatformView(
   SetInterfaceErrorHandler(view_, "View");
   SetInterfaceErrorHandler(input_connection_, "Input Connection");
 #endif
-  SetInterfaceErrorHandler(presenter_service_, "Presenter");
   SetInterfaceErrorHandler(ime_, "Input Method Editor");
   SetInterfaceErrorHandler(text_sync_service_, "Text Sync Service");
   SetInterfaceErrorHandler(clipboard_, "Clipboard");
@@ -117,16 +116,6 @@ PlatformView::PlatformView(
       parent_environment_service_provider_handle.Bind();
   component::ConnectToService(parent_environment_service_provider_.get(),
                               clipboard_.NewRequest());
-
-  // Access the Presenter service to query the input path.
-  // TODO(SCN-1013): Remove this wart.
-  component::ConnectToService(parent_environment_service_provider_.get(),
-                              presenter_service_.NewRequest());
-  presenter_service_->HACK_QueryInputPath([this](bool use_legacy) {
-    FXL_LOG(INFO) << "Flutter, input comes from: "
-                  << (use_legacy ? "ViewManager" : "Scenic");
-    HACK_legacy_input_path_ = use_legacy;  // This is early enough.
-  });
 
   component::ConnectToService(parent_environment_service_provider_.get(),
                               text_sync_service_.NewRequest());
@@ -585,38 +574,18 @@ bool PlatformView::OnHandleFocusEvent(
 void PlatformView::ActivateIme() {
   FXL_DCHECK(last_text_state_);
 
-#ifndef SCENIC_VIEWS2
-  if (HACK_legacy_input_path_) {
-    input_connection_->GetInputMethodEditor(
-        fuchsia::ui::input::KeyboardType::TEXT,       // keyboard type
-        fuchsia::ui::input::InputMethodAction::DONE,  // input method action
-        *last_text_state_,                            // initial state
-        ime_client_.NewBinding(),                     // client
-        ime_.NewRequest()                             // editor
-    );
-  } else
-#endif
-  {
-    text_sync_service_->GetInputMethodEditor(
-        fuchsia::ui::input::KeyboardType::TEXT,       // keyboard type
-        fuchsia::ui::input::InputMethodAction::DONE,  // input method action
-        *last_text_state_,                            // initial state
-        ime_client_.NewBinding(),                     // client
-        ime_.NewRequest()                             // editor
-    );
-  }
+  text_sync_service_->GetInputMethodEditor(
+      fuchsia::ui::input::KeyboardType::TEXT,       // keyboard type
+      fuchsia::ui::input::InputMethodAction::DONE,  // input method action
+      *last_text_state_,                            // initial state
+      ime_client_.NewBinding(),                     // client
+      ime_.NewRequest()                             // editor
+  );
 }
 
 void PlatformView::DeactivateIme() {
   if (ime_) {
-#ifndef SCENIC_VIEWS2
-    if (HACK_legacy_input_path_) {
-      input_connection_->HideKeyboard();
-    } else
-#endif
-    {
-      text_sync_service_->HideKeyboard();
-    }
+    text_sync_service_->HideKeyboard();
     ime_ = nullptr;
   }
   if (ime_client_.is_bound()) {
@@ -731,25 +700,11 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
 
   if (method->value == "TextInput.show") {
     if (ime_) {
-#ifndef SCENIC_VIEWS2
-      if (HACK_legacy_input_path_) {
-        input_connection_->ShowKeyboard();
-      } else
-#endif
-      {
-        text_sync_service_->ShowKeyboard();
-      }
+      text_sync_service_->ShowKeyboard();
     }
   } else if (method->value == "TextInput.hide") {
     if (ime_) {
-#ifndef SCENIC_VIEWS2
-      if (HACK_legacy_input_path_) {
-        input_connection_->HideKeyboard();
-      } else
-#endif
-      {
-        text_sync_service_->HideKeyboard();
-      }
+      text_sync_service_->HideKeyboard();
     }
   } else if (method->value == "TextInput.setClient") {
     current_text_input_client_ = 0;
