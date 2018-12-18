@@ -5,14 +5,13 @@
 use crate::ask_box::AskBox;
 use failure::{Error, ResultExt};
 use fidl::encoding::OutOfLine;
-use fidl::endpoints::{create_proxy, ClientEnd, ServerEnd, ServiceMarker};
+use fidl::endpoints::{create_proxy, ClientEnd, ServerEnd};
 use fidl_fuchsia_math::{InsetF, RectF, SizeF};
 use fidl_fuchsia_modular::{AddMod, Intent, PuppetMasterMarker, PuppetMasterProxy, StoryCommand,
                            StoryPuppetMasterProxy, SurfaceArrangement, SurfaceDependency,
                            SurfaceRelation};
 use fidl_fuchsia_ui_gfx::{self as gfx, ColorRgba};
-use fidl_fuchsia_ui_input::{InputConnectionMarker, InputConnectionProxy, InputListenerMarker,
-                            InputListenerRequest, KeyboardEvent};
+use fidl_fuchsia_ui_input::KeyboardEvent;
 use fidl_fuchsia_ui_scenic::{SessionListenerMarker, SessionListenerRequest};
 use fidl_fuchsia_ui_viewsv1::{CustomFocusBehavior, ViewContainerListenerMarker,
                               ViewContainerListenerRequest, ViewLayout, ViewListenerMarker,
@@ -84,7 +83,6 @@ pub struct ErmineView {
     puppet_master: PuppetMasterProxy,
     story_puppet_masters: BTreeMap<String, StoryPuppetMasterProxy>,
     view_container: fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
-    input_connection_proxy: InputConnectionProxy,
     session: SessionPtr,
     import_node: ImportNode,
     background_node: ShapeNode,
@@ -114,16 +112,6 @@ impl ErmineView {
 
         view.get_container(view_container_request)?;
 
-        let (service_provider_proxy, service_provider_req) = create_proxy()?;
-
-        view.get_service_provider(service_provider_req)?;
-        let (input_connection_proxy, input_connection_request) =
-            create_proxy::<InputConnectionMarker>()?;
-        service_provider_proxy.connect_to_service(
-            &InputConnectionMarker::NAME,
-            input_connection_request.into_channel(),
-        )?;
-
         let puppet_master = connect_to_service::<PuppetMasterMarker>()?;
 
         let view_controller = ErmineView {
@@ -131,7 +119,6 @@ impl ErmineView {
             puppet_master,
             story_puppet_masters: BTreeMap::new(),
             view_container: view_container_proxy,
-            input_connection_proxy: input_connection_proxy,
             session: session.clone(),
             import_node: ImportNode::new(session.clone(), mine),
             background_node: ShapeNode::new(session.clone()),
@@ -147,7 +134,6 @@ impl ErmineView {
         Self::setup_session_listener(&view_controller, session_listener_server);
         Self::setup_view_listener(&view_controller, view_listener_request);
         Self::setup_view_container_listener(&view_controller)?;
-        Self::setup_view_input_listener(&view_controller)?;
         Self::finish_setup_scene(&view_controller);
 
         Ok(view_controller)
@@ -224,31 +210,6 @@ impl ErmineView {
                         view_controller.lock().remove_story(child_key);
                         fready(responder.send())
                     }
-                })
-                .unwrap_or_else(|e| eprintln!("view listener error: {:?}", e)),
-        );
-
-        Ok(())
-    }
-
-    // Currently does nothing but will be hooked up in the future.
-    fn setup_view_input_listener(view_controller: &ErmineViewPtr) -> Result<(), Error> {
-        let view_controller = view_controller.lock();
-        let (event_listener_client, event_listener_server) = zx::Channel::create()?;
-
-        let event_listener = ClientEnd::new(event_listener_client);
-        let event_listener_request = ServerEnd::<InputListenerMarker>::new(event_listener_server);
-
-        view_controller
-            .input_connection_proxy
-            .set_event_listener(Some(event_listener))?;
-
-        fasync::spawn(
-            event_listener_request
-                .into_stream()
-                .unwrap()
-                .try_for_each(move |event| match event {
-                    InputListenerRequest::OnEvent { responder, .. } => fready(responder.send(true)),
                 })
                 .unwrap_or_else(|e| eprintln!("view listener error: {:?}", e)),
         );
