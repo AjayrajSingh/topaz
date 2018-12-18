@@ -38,8 +38,7 @@ class PlatformView final : public shell::PlatformView,
                            public fuchsia::ui::viewsv1::ViewListener,
 #endif
                            private fuchsia::ui::scenic::SessionListener,
-                           public fuchsia::ui::input::InputMethodEditorClient,
-                           public fuchsia::ui::input::InputListener {
+                           public fuchsia::ui::input::InputMethodEditorClient {
  public:
   PlatformView(
       PlatformView::Delegate& delegate, std::string debug_label,
@@ -87,15 +86,11 @@ class PlatformView final : public shell::PlatformView,
   OnMetricsUpdate metrics_changed_callback_;
   OnSizeChangeHint size_change_hint_callback_;
 
-  fuchsia::sys::ServiceProviderPtr service_provider_;
-
 #ifndef SCENIC_VIEWS2
   fuchsia::ui::viewsv1::ViewManagerPtr view_manager_;
   fuchsia::ui::viewsv1::ViewPtr view_;
   fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer> view_container_;
   fidl::Binding<fuchsia::ui::viewsv1::ViewListener> view_listener_;
-  fuchsia::ui::input::InputConnectionPtr input_connection_;
-  fidl::Binding<fuchsia::ui::input::InputListener> input_listener_;
 #endif
 
   int current_text_input_client_ = 0;
@@ -154,10 +149,6 @@ class PlatformView final : public shell::PlatformView,
 
   // |fuchsia::ui::input::InputMethodEditorClient|
   void OnAction(fuchsia::ui::input::InputMethodAction action) override;
-
-  // |fuchsia::ui::input::InputListener|
-  void OnEvent(fuchsia::ui::input::InputEvent event,
-               OnEventCallback callback) override;
 
   // |fuchsia::ui::scenic::SessionListener|
   void OnScenicError(fidl::StringPtr error) override;

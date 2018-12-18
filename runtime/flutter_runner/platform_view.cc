@@ -66,7 +66,6 @@ PlatformView::PlatformView(
 #ifndef SCENIC_VIEWS2
       view_manager_(view_manager_handle.Bind()),
       view_listener_(this),
-      input_listener_(this),
 #endif
       ime_client_(this),
       context_writer_bridge_(std::move(accessibility_context_writer)),
@@ -78,12 +77,10 @@ PlatformView::PlatformView(
 #ifndef SCENIC_VIEWS2
   SetInterfaceErrorHandler(view_manager_, "View Manager");
   SetInterfaceErrorHandler(view_, "View");
-  SetInterfaceErrorHandler(input_connection_, "Input Connection");
 #endif
   SetInterfaceErrorHandler(ime_, "Input Method Editor");
   SetInterfaceErrorHandler(text_sync_service_, "Text Sync Service");
   SetInterfaceErrorHandler(clipboard_, "Clipboard");
-  SetInterfaceErrorHandler(service_provider_, "Service Provider");
   SetInterfaceErrorHandler(parent_environment_service_provider_,
                            "Parent Environment Service Provider");
 
@@ -96,19 +93,9 @@ PlatformView::PlatformView(
                              debug_label_                  // diagnostic label
   );
 
-  // Get the services from the created view.
-  view_->GetServiceProvider(service_provider_.NewRequest());
-
   // Get the view container. This will need to be returned to the isolate
   // configurator so that it can setup Mozart bindings later.
   view_->GetContainer(view_container_.NewRequest());
-
-  // Get the input connection from the services of the view.
-  component::ConnectToService(service_provider_.get(),
-                              input_connection_.NewRequest());
-
-  // Set the input listener on the input connection.
-  input_connection_->SetEventListener(input_listener_.NewBinding());
 #endif
 
   // Access the clipboard.
@@ -312,27 +299,6 @@ void PlatformView::OnAction(fuchsia::ui::input::InputMethodAction action) {
       std::vector<uint8_t>(data, data + buffer.GetSize()),  // message
       nullptr)                                              // response
   );
-}
-
-// |fuchsia::ui::input::InputListener|
-void PlatformView::OnEvent(fuchsia::ui::input::InputEvent event,
-                           OnEventCallback callback) {
-  using Type = fuchsia::ui::input::InputEvent::Tag;
-  switch (event.Which()) {
-    case Type::kPointer:
-      callback(OnHandlePointerEvent(event.pointer()));
-      return;
-    case Type::kKeyboard:
-      callback(OnHandleKeyboardEvent(event.keyboard()));
-      return;
-    case Type::kFocus:
-      callback(OnHandleFocusEvent(event.focus()));
-      return;
-    default:
-      break;
-  }
-
-  callback(false);
 }
 
 void PlatformView::OnScenicError(fidl::StringPtr error) {
