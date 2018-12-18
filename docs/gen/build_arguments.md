@@ -75,12 +75,6 @@ must be in the source tree, which requires:
 
 From [//garnet/bin/mediaplayer/ffmpeg/BUILD.gn:14](https://fuchsia.googlesource.com/garnet/+/6dd381288512e11bfda06566bf15d5a6cc69a390/bin/mediaplayer/ffmpeg/BUILD.gn#14)
 
-### armadillo_path_context_config
-
-**Current value (from the default):** `"../bin/session_shell/armadillo_session_shell/assets/contextual_config.json"`
-
-From [//topaz/shell/BUILD.gn:14](https://fuchsia.googlesource.com/topaz/+/3deb9ec4ec5405b26055860edc6b798e1ffa874d/shell/BUILD.gn#14)
-
 ### dart_component_kind
 Allow for deduping the VM between standalone, flutter_runner and dart_runner.
 

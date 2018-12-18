@@ -40,7 +40,7 @@ Building causes layout.  Layout causes painting.  Try to do as little rebuilding
 
 1. Localize state changes to just rebuilding those widgets that need to change due to the state change.
 
-1. If there is a large widget tree between where the state changes and where its used use [InheritedWidgets](https://docs.flutter.io/flutter/widgets/InheritedWidget-class.html) to pass that state down without requiring the entire tree to rebuild.  For examples of how we do this, explore [Model](../armadillo/lib/config_manager) and its subclasses and how they are used in [Armadillo](../armadillo/lib/armadillo).
+1. If there is a large widget tree between where the state changes and where its used use [InheritedWidgets](https://docs.flutter.io/flutter/widgets/InheritedWidget-class.html) to pass that state down without requiring the entire tree to rebuild.  For examples of how we do this, explore Model and its subclasses.
 
 ---
 
@@ -63,13 +63,10 @@ are animating that opacity its cheaper to use an [Opacity](https://docs.flutter.
 ## Reduce Clipping
 Try to reduce your use of [ClipRect](https://docs.flutter.io/flutter/material/ClipRect-class.html), [ClipRRect](https://docs.flutter.io/flutter/widgets/ClipRRect-class.html) and [ClipPath](https://docs.flutter.io/flutter/widgets/ClipPath-class.html) as much as possible.
 
-Once option for rounded corners if your
-background is a solid corner is using [RoundedCornerDecoration](../armadillo/lib/rounded_corner_decoration.dart) as a [Container.foregroundDecoration](https://docs.flutter.io/flutter/widgets/Container/foregroundDecoration.html).
-
 ---
 
 ## Try not to draw Paths
-Just a curiousity I discovered in trying to implement [RoundedCornerDecoration](../armadillo/lib/rounded_corner_decoration.dart):  [Canvas.drawPath](https://docs.flutter.io/flutter/widgets/Canvas/drawPath.html) is much slower than [Canvas.drawDRRect](https://docs.flutter.io/flutter/widgets/Canvas/drawDRRect.html).
+Just a curiousity I discovered in trying to implement RoundedCornerDecoration:  [Canvas.drawPath](https://docs.flutter.io/flutter/widgets/Canvas/drawPath.html) is much slower than [Canvas.drawDRRect](https://docs.flutter.io/flutter/widgets/Canvas/drawDRRect.html).
 
 ---
 

@@ -24,12 +24,7 @@ declare_args() {
   # snapshot when available instead of writing the objects in its own snapshot.
   # The snapshot of the sharing basis app will be included in every other app's
   # package and deduplicated by blobfs.
-  if (flutter_default_app == "flutter_jit_app") {
-    # Armadillo is not AOT compiled in debug builds
-    flutter_aot_sharing_basis = ""
-  } else {
-    flutter_aot_sharing_basis = "//topaz/bin/session_shell/armadillo_session_shell"
-  }
+  flutter_aot_sharing_basis = ""
 
   # Enable profiling and tracing. Default is true in Debug builds and false
   # in release builds.
