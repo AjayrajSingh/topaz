@@ -31,8 +31,13 @@ class ScreenContainer extends StatelessWidget {
   /// The child widget to display.
   final Widget child;
 
+  /// If true, the child will be removed completely from the Widget tree when
+  /// the screen is offscreen.
+  final bool removeChildWhenOffscreen;
+
   /// Constructor.
   const ScreenContainer({
+    this.removeChildWhenOffscreen = true,
     this.screenPositionModel,
     this.elevation,
     this.childBackgroundColor,
@@ -74,15 +79,22 @@ class ScreenContainer extends StatelessWidget {
         ),
       ),
       builder: (BuildContext context, Widget child) {
-        return ConditionalBuilder(
-          condition: !screenPositionModel.isOffscreen,
-          builder: (_) {
-            return Transform.translate(
-              offset: screenPositionModel.offset,
-              child: child,
-            );
-          },
-        );
+        if (removeChildWhenOffscreen) {
+          return ConditionalBuilder(
+            condition: !screenPositionModel.isOffscreen,
+            builder: (_) {
+              return Transform.translate(
+                offset: screenPositionModel.offset,
+                child: child,
+              );
+            },
+          );
+        } else {
+          return Transform.translate(
+            offset: screenPositionModel.offset,
+            child: child,
+          );
+        }
       },
     );
   }
