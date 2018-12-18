@@ -31,21 +31,21 @@ class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
     {
       // Preroll the Flutter layer tree. This allows Flutter to perform
       // pre-paint optimizations.
-      TRACE_EVENT0("flutter", "Preroll");
+      TRACE_DURATION("flutter", "Preroll");
       layer_tree.Preroll(*this, true /* ignore raster cache */);
     }
 
     {
       // Traverse the Flutter layer tree so that the necessary session ops to
       // represent the frame are enqueued in the underlying session.
-      TRACE_EVENT0("flutter", "UpdateScene");
+      TRACE_DURATION("flutter", "UpdateScene");
       layer_tree.UpdateScene(session_connection_.scene_update_context(),
                              session_connection_.root_node());
     }
 
     {
       // Flush all pending session ops.
-      TRACE_EVENT0("flutter", "SessionPresent");
+      TRACE_DURATION("flutter", "SessionPresent");
       session_connection_.Present(*this);
     }
 
@@ -89,8 +89,7 @@ void CompositorContext::OnSessionSizeChangeHint(float width_change_factor,
 CompositorContext::~CompositorContext() = default;
 
 std::unique_ptr<flow::CompositorContext::ScopedFrame>
-CompositorContext::AcquireFrame(GrContext* gr_context,
-                                SkCanvas* canvas,
+CompositorContext::AcquireFrame(GrContext* gr_context, SkCanvas* canvas,
                                 flow::ExternalViewEmbedder* view_embedder,
                                 const SkMatrix& root_surface_transformation,
                                 bool instrumentation_enabled) {

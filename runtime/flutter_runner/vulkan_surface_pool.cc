@@ -17,8 +17,8 @@ namespace flutter {
 namespace {
 
 std::string ToString(const SkISize& size) {
-  return "{height: " + std::to_string(size.height()) +
-         ", width: " + std::to_string(size.width()) + "}";
+  return "{width: " + std::to_string(size.width()) +
+         ", height: " + std::to_string(size.height()) + "}";
 }
 
 }  // namespace
@@ -110,7 +110,7 @@ VulkanSurfacePool::GetCachedOrCreateSurface(const SkISize& size) {
 void VulkanSurfacePool::SubmitSurface(
     std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
         p_surface) {
-  TRACE_EVENT0("flutter", "VulkanSurfacePool::SubmitSurface");
+  TRACE_DURATION("flutter", "VulkanSurfacePool::SubmitSurface");
 
   // This cast is safe because |VulkanSurface| is the only implementation of
   // |SurfaceProducerSurface| for Flutter on Fuchsia.  Additionally, it is
@@ -137,7 +137,8 @@ void VulkanSurfacePool::SubmitSurface(
 
 std::unique_ptr<VulkanSurface> VulkanSurfacePool::CreateSurface(
     const SkISize& size) {
-  TRACE_EVENT0("flutter", "VulkanSurfacePool::CreateSurface");
+  TRACE_DURATION("flutter", "VulkanSurfacePool::CreateSurface", "width",
+                 size.width(), "height", size.height());
   auto surface = std::make_unique<VulkanSurface>(vulkan_provider_, context_,
                                                  scenic_session_, size);
   if (!surface->IsValid()) {
@@ -174,7 +175,7 @@ void VulkanSurfacePool::RecycleSurface(uintptr_t surface_key) {
 }
 
 void VulkanSurfacePool::AgeAndCollectOldBuffers() {
-  TRACE_EVENT0("flutter", "VulkanSurfacePool::AgeAndCollectOldBuffers");
+  TRACE_DURATION("flutter", "VulkanSurfacePool::AgeAndCollectOldBuffers");
 
   // Remove all surfaces that are no longer valid or are too old.
   available_surfaces_.erase(

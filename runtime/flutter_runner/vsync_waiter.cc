@@ -63,7 +63,7 @@ void VsyncWaiter::AwaitVSync() {
 }
 
 void VsyncWaiter::FireCallbackWhenSessionAvailable() {
-  TRACE_EVENT0("flutter", "VsyncWaiter::FireCallbackWhenSessionAvailable");
+  TRACE_DURATION("flutter", "VsyncWaiter::FireCallbackWhenSessionAvailable");
   FML_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
   if (session_wait_.Begin(
           deprecated_loop::MessageLoop::GetCurrent()->dispatcher()) != ZX_OK) {

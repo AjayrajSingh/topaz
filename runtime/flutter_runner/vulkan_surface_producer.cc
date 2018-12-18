@@ -23,7 +23,7 @@ namespace {
 constexpr int kGrCacheMaxCount = 8192;
 constexpr size_t kGrCacheMaxByteSize = 8 * (1 << 20);
 
-}
+}  // namespace
 
 VulkanSurfaceProducer::VulkanSurfaceProducer(scenic::Session* scenic_session) {
   valid_ = Initialize(scenic_session);
@@ -51,9 +51,8 @@ bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
       VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
   };
   application_ = std::make_unique<vulkan::VulkanApplication>(
-      *vk_, "FlutterRunner", std::move(extensions),
-      VK_MAKE_VERSION(1,0,0),
-      VK_MAKE_VERSION(1,1,0));
+      *vk_, "FlutterRunner", std::move(extensions), VK_MAKE_VERSION(1, 0, 0),
+      VK_MAKE_VERSION(1, 1, 0));
 
   if (!application_->IsValid() || !vk_->AreInstanceProcsSetup()) {
     // Make certain the application instance was created and it setup the
@@ -125,11 +124,11 @@ void VulkanSurfaceProducer::OnSurfacesPresented(
     std::vector<
         std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>>
         surfaces) {
-  TRACE_EVENT0("flutter", "VulkanSurfaceProducer::OnSurfacesPresented");
+  TRACE_DURATION("flutter", "VulkanSurfaceProducer::OnSurfacesPresented");
 
   // Do a single flush for all canvases derived from the context.
   {
-    TRACE_EVENT0("flutter", "GrContext::flushAndSignalSemaphores");
+    TRACE_DURATION("flutter", "GrContext::flushAndSignalSemaphores");
     context_->flush();
   }
 
