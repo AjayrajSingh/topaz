@@ -1,6 +1,6 @@
 {
     "program": {
-        "data": "data/hello_dart_dbc"
+        "data": "data/hello_dart_debug"
     },
     "sandbox": {
         "features": [],

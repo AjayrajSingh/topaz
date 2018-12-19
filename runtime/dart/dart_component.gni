@@ -36,6 +36,9 @@ declare_args() {
 
   # Whether experimental space dart mode is enabled for Flutter applications.
   flutter_space_dart = true
+
+  # Whether experimental space dart mode is enabled for Dart applications.
+  dart_space_dart = true
 }
 
 declare_args() {
@@ -139,15 +142,6 @@ template("_flutter_dart_jit_package") {
     }
     if (defined(invoker.invoker_resources)) {
       resources += invoker.invoker_resources
-    }
-
-    if (defined(invoker.interpreter) && invoker.interpreter) {
-      resources += [
-        {
-          path = rebase_path("//topaz/runtime/dart/enable_interpreter")
-          dest = "enable_interpreter"
-        },
-      ]
     }
 
     meta = invoker.cmx_filtered_meta
@@ -283,7 +277,6 @@ template("flutter_dart_jit_component") {
         product_suffix = "_product"
       }
 
-      dbc = false
       runtime_meta =
           "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime"
     } else if (component.component_type == "dart") {
@@ -301,15 +294,14 @@ template("flutter_dart_jit_component") {
         product_suffix = "_product"
       }
 
-      dbc = false
-      if (defined(invoker.dbc) && invoker.dbc) {
-        dbc = true
+      gen_bytecode = false
+      interpreter = false
+      if ((defined(invoker.space_dart) && invoker.space_dart) ||
+          dart_space_dart) {
+        gen_bytecode = true
+        interpreter = true
       }
-      runner_name = "jit"
-      if (dbc) {
-        runner_name = "dbc"
-      }
-      runtime_meta = "//topaz/runtime/dart_runner/meta/${runner_name}${product_suffix}_runtime"
+      runtime_meta = "//topaz/runtime/dart_runner/meta/jit${product_suffix}_runtime"
     }
 
     # Look through the package meta for cmx file for this component, and merge
@@ -431,13 +423,6 @@ template("flutter_dart_jit_component") {
 
         non_dart_deps +=
             [ ":${kernel_name}_extensions_wrapper($target_toolchain)" ]
-      }
-
-      if (dbc) {
-        args += [
-          "--gen-bytecode",
-          "--drop-ast",
-        ]
       }
     }
 

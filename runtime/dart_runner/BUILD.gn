@@ -77,26 +77,6 @@ runner("dart_jit_product_runner_bin") {
   ]
 }
 
-runner("dart_dbc_runner_bin") {
-  output_name = "dart_dbc_runner"
-  product = false
-  extra_defines = []
-  extra_deps = [
-    "//third_party/dart/runtime:libdart_jit",
-    "//third_party/dart/runtime/platform:libdart_platform_jit",
-  ]
-}
-
-runner("dart_dbc_product_runner_bin") {
-  output_name = "dart_dbc_product_runner"
-  product = true
-  extra_defines = [ "DART_PRODUCT" ]
-  extra_deps = [
-    "//third_party/dart/runtime:libdart_jit_product",
-    "//third_party/dart/runtime/platform:libdart_platform_jit_product",
-  ]
-}
-
 runner("dart_aot_runner_bin") {
   output_name = "dart_aot_runner"
   product = false
@@ -203,20 +183,16 @@ template("jit_runner_package") {
   if (invoker.product) {
     product_suffix = "_product"
   }
-  jit_or_dbc = "jit"
-  if (defined(invoker.dbc) && invoker.dbc) {
-    jit_or_dbc = "dbc"
-  }
   package(target_name) {
     deps = [
-      ":dart_${jit_or_dbc}${product_suffix}_runner_bin",
+      ":dart_jit${product_suffix}_runner_bin",
       "kernel:kernel_core_snapshot${product_suffix}",
     ]
     if (!invoker.product) {
       deps += [ observatory_target ]
     }
 
-    binary = "dart_${jit_or_dbc}${product_suffix}_runner"
+    binary = "dart_jit${product_suffix}_runner"
 
     meta = []
     if (defined(invoker.meta)) {
@@ -294,28 +270,6 @@ jit_runner_package("dart_jit_product_runner") {
     {
       path = rebase_path("meta/dart_jit_product_runner.cmx")
       dest = "dart_jit_product_runner.cmx"
-    },
-  ]
-}
-
-jit_runner_package("dart_dbc_runner") {
-  product = false
-  dbc = true
-  meta = [
-    {
-      path = rebase_path("meta/dart_dbc_runner.cmx")
-      dest = "dart_dbc_runner.cmx"
-    },
-  ]
-}
-
-jit_runner_package("dart_dbc_product_runner") {
-  product = true
-  dbc = true
-  meta = [
-    {
-      path = rebase_path("meta/dart_dbc_product_runner.cmx")
-      dest = "dart_dbc_product_runner.cmx"
     },
   ]
 }

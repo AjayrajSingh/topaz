@@ -58,12 +58,6 @@ static std::string DebugLabelForURL(const std::string& url) {
   }
 }
 
-static bool ShouldEnableInterpreter(int appdir_fd) {
-  struct stat stat_buffer = {};
-  return fstatat(appdir_fd, "pkg/data/enable_interpreter", &stat_buffer, 0) ==
-         0;
-}
-
 Application::Application(
     TerminationCallback termination_callback, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
@@ -255,14 +249,9 @@ Application::Application(
   // addressed.
   settings_.dart_flags = {"--no_causal_async_stacks"};
 
-  if (ShouldEnableInterpreter(application_directory_.get())) {
-    FML_DLOG(INFO)
-        << "Found pkg/data/enable_interpreter. Passing --enable_interpreter";
-    settings_.dart_flags.push_back("--enable_interpreter");
-  } else {
-    FML_DLOG(INFO) << "Did NOT find pkg/data/enable_interpreter.";
-    settings_.dart_flags.push_back("--no_use_field_guards");
-  }
+  // The interpreter is enabled unconditionally. If an app is built for
+  // debugging (that is, with no bytecode), the VM will fall back on ASTs.
+  settings_.dart_flags.push_back("--enable_interpreter");
 
   AttemptVMLaunchWithCurrentSettings(settings_);
 }
