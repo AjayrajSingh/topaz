@@ -13,7 +13,7 @@ typedef OnEventSent = Function(ErrorNodeForSendingEvent);
 
 /// This node implementation is used to send on_open event if
 /// there is a error opening connection to [Node].
-class ErrorNodeForSendingEvent implements Node {
+class ErrorNodeForSendingEvent extends Node {
   int _status;
   OnEventSent _onEventSent;
   final NodeBinding _bindings = NodeBinding();

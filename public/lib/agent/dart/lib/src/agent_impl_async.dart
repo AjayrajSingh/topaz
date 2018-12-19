@@ -17,7 +17,7 @@ export 'package:fidl_fuchsia_modular/fidl_async.dart';
 
 /// A base class for implementing an [Agent] which receives common services and
 /// also helps exposing services through an outgoing [ServiceProvider].
-abstract class AgentImpl implements Agent, Lifecycle {
+abstract class AgentImpl extends Agent implements Lifecycle {
   final AgentBinding _agentBinding = new AgentBinding();
   final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
   final StartupContext _startupContext;

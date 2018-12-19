@@ -246,6 +246,12 @@ abstract class AsyncBinding<T> extends _Stateful {
   final ChannelReader _reader = new ChannelReader();
 }
 
+/// Representation of a service that all [T] implementations should extend from.
+abstract class Service {
+  /// Getter for the [ServiceData]
+  ServiceData get $serviceData;
+}
+
 /// Exposes the ability to get a hold of the service runtime name and bindings.
 abstract class ServiceData<T> {
   /// Returns the generated runtime service name.

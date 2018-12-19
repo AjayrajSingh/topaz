@@ -10,7 +10,7 @@ import 'package:zircon/zircon.dart';
 
 /// The [ServiceProviderImpl] is a concrete implementation of the
 /// [fidl.ServiceProvider] interface.
-class ServiceProviderImpl implements fidl.ServiceProvider {
+class ServiceProviderImpl extends fidl.ServiceProvider {
   final _binding = fidl.ServiceProviderBinding();
 
   final Map<String, void Function(Channel)> _connectorThunks = {};

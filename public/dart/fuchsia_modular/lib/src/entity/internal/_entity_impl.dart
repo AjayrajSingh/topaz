@@ -97,7 +97,7 @@ class EntityImpl implements Entity {
   }
 }
 
-class _EntityWatcher implements fidl_modular.EntityWatcher {
+class _EntityWatcher extends fidl_modular.EntityWatcher {
   final fidl_modular.EntityWatcherBinding binding =
       fidl_modular.EntityWatcherBinding();
   final void Function(fuchsia_mem.Buffer) onUpdatedFunc;

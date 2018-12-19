@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:fidl_fuchsia_textinputmod/fidl_async.dart';
 import 'package:lib.app.dart/app_async.dart';
 
-class ErmineTextInputMod implements TextInputMod {
+class ErmineTextInputMod extends TextInputMod {
   TextInputModReceiverProxy textInputModReceiverProxy;
   Completer completer;
   void sendData(String text) {

@@ -127,7 +127,7 @@ class ServiceProviderImpl extends ServiceProvider {
     }
   }
 }
-
+ 
 class Services {
   DirectoryProxy _proxy;
   static const int _openFlags =

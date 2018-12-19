@@ -8,7 +8,7 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart' as fuchsia_modular;
 
 /// A class which implements the [fuchsia_modular.ProposalListener] interface
 /// and calls a callback when the proposal is accepted.
-class ProposalListenerImpl implements fuchsia_modular.ProposalListener {
+class ProposalListenerImpl extends fuchsia_modular.ProposalListener {
   final void Function(String, String) _onProposalAccepted;
 
   /// The default constructor

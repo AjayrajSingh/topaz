@@ -4,7 +4,7 @@
 
 import 'dart:async';
 
-import 'package:fidl/fidl.dart';
+import 'package:fidl/fidl.dart' hide Service;
 import 'package:fidl_fidl_examples_echo/fidl_async.dart';
 import 'package:fidl_fuchsia_io/fidl_async.dart' as io_fidl;
 import 'package:fuchsia_vfs/vfs.dart';

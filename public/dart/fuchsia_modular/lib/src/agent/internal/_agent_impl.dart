@@ -21,7 +21,7 @@ import '_agent_context.dart';
 ///
 /// This class is not intended to be used directly by authors but instead
 /// should be used by the [Agent] factory constructor.
-class AgentImpl implements Agent, fidl.Agent {
+class AgentImpl extends fidl.Agent implements Agent {
   /// Holds the framework binding connection to this agent.
   final fidl.AgentBinding _agentBinding = fidl.AgentBinding();
 
@@ -81,19 +81,23 @@ class AgentImpl implements Agent, fidl.Agent {
   }
 
   @override
-  void exposeService<T>(FutureOr<T> serviceImpl, ServiceData<T> serviceData) {
+  void exposeService<T extends Service>(FutureOr<T> serviceImpl) {
     if (serviceImpl == null) {
       throw ArgumentError.notNull('serviceImpl');
     }
 
-    exposeServiceProvider(
-        Future.value(serviceImpl).then((T service) => () => service),
-        serviceData);
+    if (serviceImpl is Future) {
+      Future.value(serviceImpl).then((T service) {
+        exposeServiceProvider(() => service, service.$serviceData);
+      });
+    } else if (serviceImpl is T) {
+      exposeServiceProvider(() => serviceImpl, serviceImpl.$serviceData);
+    }
   }
 
   @override
-  void exposeServiceProvider<T>(FutureOr<ServiceProvider<T>> serviceProvider,
-      ServiceData<T> serviceData) {
+  void exposeServiceProvider<T extends Service>(
+      FutureOr<ServiceProvider<T>> serviceProvider, ServiceData serviceData) {
     if (serviceProvider == null) {
       throw ArgumentError.notNull('serviceProvider');
     }

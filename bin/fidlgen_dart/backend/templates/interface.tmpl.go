@@ -393,8 +393,10 @@ class {{ .AsyncResponseClass }} {
 {{- range .Doc }}
 ///{{ . -}}
 {{- end }}
-abstract class {{ .Name }} {
+abstract class {{ .Name }} extends $fidl.Service {
   static const String $serviceName = {{ .ServiceName }};
+  @override
+  $fidl.ServiceData get $serviceData => const {{ .ServiceData }}();
 
 {{- range .Methods }}
   {{- if .HasRequest }}
@@ -422,6 +424,9 @@ abstract class {{ .Name }} {
 }
 
 class {{ .ServiceData }} implements $fidl.ServiceData<{{ .Name }}> {
+
+  const {{ .ServiceData }}();
+
   @override
   String getName() {
     return {{ .Name }}.$serviceName;
@@ -454,6 +459,9 @@ class {{ .ProxyName }} extends $fidl.AsyncProxy<{{ .Name }}>
     {{- end }}
 
   }
+
+  @override
+  $fidl.ServiceData get $serviceData => {{ .ServiceData }}();
 
   void _handleEvent($fidl.Message $message) {
     final $fidl.Decoder $decoder = new $fidl.Decoder($message);

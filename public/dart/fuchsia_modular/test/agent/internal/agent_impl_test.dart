@@ -60,10 +60,7 @@ void main() {
 
   test('verify exposeService arguments', () {
     expect(() {
-      AgentImpl().exposeService(null, fidl.AgentData());
-    }, throwsArgumentError);
-    expect(() {
-      AgentImpl().exposeService(fidl.Agent, null);
+      AgentImpl().exposeService(null);
     }, throwsArgumentError);
   });
 
@@ -86,12 +83,13 @@ void main() {
       serviceProviderImpl = ServiceProviderImpl();
       agentImpl = AgentImpl(serviceProviderImpl: serviceProviderImpl);
     });
+
     test('verify exposeService binds the correct service on connect request',
         () async {
       final service = DummyService();
       final mockServiceBindings = service.getServiceData().getBinding();
 
-      agentImpl.exposeService(service, service.getServiceData());
+      agentImpl.exposeService(service);
 
       // Mimic a this call as if the framework is asking us to connect.
       await serviceProviderImpl.connectToService(
@@ -108,11 +106,17 @@ void main() {
       final service = DummyService();
       final mockServiceBindings = service.getServiceData().getBinding();
 
-      final futureService = Future(
-          () => Future.delayed(Duration(microseconds: 1), () => service));
+      final serviceGetterCompleter = Completer();
+      final futureService =
+          Future(() => Future.delayed(Duration(microseconds: 1), () {
+                serviceGetterCompleter.complete();
+                return service;
+              }));
 
-      agentImpl.exposeService(futureService, service.getServiceData());
+      agentImpl.exposeService(futureService);
 
+      // Block until the service is exposed
+      await serviceGetterCompleter.future;
       // Mimic a this call as if the framework is asking us to connect.
       await serviceProviderImpl.connectToService(
         service.getServiceData().getName(),
@@ -287,6 +291,9 @@ class DummyService extends fidl.Agent {
     throw UnimplementedError();
   }
 
+  @override
+  fidl.AgentData get $serviceData => _fakeAgentData;
+
   fidl.AgentData getServiceData() {
     return _fakeAgentData;
   }
@@ -302,7 +309,7 @@ class FakeAgentData implements fidl.AgentData {
   }
 
   @override
-  AsyncBinding getBinding() {
+  MockAsyncBinding getBinding() {
     return _mockAsyncBinding;
   }
 }

@@ -14,7 +14,7 @@ import 'internal/_agent_impl.dart';
 /// The service provider function that is responsible to return a service that
 /// will be exposed upon receiving a service request. Where [T] represents the
 /// service type.
-typedef ServiceProvider<T> = FutureOr<T> Function();
+typedef ServiceProvider<T extends Service> = FutureOr<T> Function();
 
 /// Agent is a globally available object which simplifies common tasks that
 /// agent developers will face. At a high level, it is a wrapper around the
@@ -34,9 +34,6 @@ abstract class Agent {
   /// finish before initializing and exposing the service.
   ///
   /// Note: Multiple connections will be allowed to this [serviceImpl].
-  /// [serviceData] can be found as part of the generated FIDL bindings, it
-  /// holds the service runtime name and bindings object used for establishing a
-  /// connection.
   ///
   /// Usage example:
   /// ```
@@ -45,25 +42,30 @@ abstract class Agent {
   /// import 'src/foo_service_impl.dart';
   ///
   /// void main(List<String> args) {
-  ///   Agent().exposeService(FooServiceImpl(), fidl.FooServiceData());
+  ///   Agent().exposeService(FooServiceImpl());
   /// }
   ///
   /// class FooServiceImpl extends fidl.FooService { ... }
   /// ```
-  void exposeService<T>(FutureOr<T> serviceImpl, ServiceData<T> serviceData);
+  void exposeService<T extends Service>(FutureOr<T> serviceImpl);
 
   /// Similar to [#exposeService] but instead of passing the service
   /// implementation directly, pass a provider function that can be invoked
   /// asynchronously, when a request is received, to provide the service
   /// implementation at run time.
   ///
+  /// [serviceData] can be found as part of the generated FIDL bindings, it
+  /// holds the service runtime name and bindings object used for establishing a
+  /// connection.
+  ///
   /// [ServiceProvider] is defined as follows:
   /// ```
   /// typedef ServiceProvider<T> = FutureOr<T> Function();
   /// ```
   /// Where [T] represents the service type.
-  void exposeServiceProvider<T>(
-      ServiceProvider<T> serviceProvider, ServiceData<T> serviceData);
+  void exposeServiceProvider<T extends Service>(
+      ServiceProvider<T> serviceProvider,
+      ServiceData<T> serviceData);
 
   /// Returns the auth token manager this Agent may use for accessing external
   /// services.
