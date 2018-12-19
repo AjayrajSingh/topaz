@@ -1,6 +1,5 @@
 {
   "imports": [
-    "topaz/packages/sdk/dart",
     "topaz/packages/sdk/topaz"
   ]
 }
