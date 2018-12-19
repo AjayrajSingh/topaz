@@ -11,12 +11,12 @@
 #define TOPAZ_AUTH_PROVIDERS_SPOTIFY_SPOTIFY_AUTH_PROVIDER_IMPL_H_
 
 #include <fuchsia/auth/cpp/fidl.h>
-#include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 #include <lib/fit/function.h>
+#include <lib/zx/eventpair.h>
 
-#include "lib/component/cpp/startup_context.h"
 #include "lib/callback/cancellable.h"
+#include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fxl/macros.h"
 #include "lib/network_wrapper/network_wrapper.h"
@@ -90,7 +90,7 @@ class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
   void GetUserProfile(const fidl::StringPtr credential,
                       const fidl::StringPtr access_token);
 
-  fuchsia::ui::viewsv1token::ViewOwnerPtr SetupWebView();
+  zx::eventpair SetupWebView();
 
   void Request(
       fit::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,

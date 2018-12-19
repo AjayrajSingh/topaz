@@ -47,7 +47,7 @@ source_set("lib") {
 
   public_deps = [
     "//garnet/public/fidl/fuchsia.auth",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1",
+    "//garnet/public/fidl/fuchsia.ui.app",
     "//garnet/public/lib/callback",
     "//garnet/public/lib/component/cpp",
     "//garnet/public/lib/fidl/cpp",
@@ -55,6 +55,7 @@ source_set("lib") {
     "//garnet/public/lib/network_wrapper",
     "//topaz/runtime/web_runner/services",
     "//zircon/public/lib/fit",
+    "//zircon/public/lib/zx",
   ]
 }
 

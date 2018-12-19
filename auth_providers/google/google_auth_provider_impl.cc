@@ -5,7 +5,7 @@
 #include "topaz/auth_providers/google/google_auth_provider_impl.h"
 
 #include <fuchsia/net/oldhttp/cpp/fidl.h>
-#include <fuchsia/ui/viewsv1token/cpp/fidl.h>
+#include <fuchsia/ui/app/cpp/fidl.h>
 #include <lib/fdio/util.h>
 #include <lib/fit/function.h>
 
@@ -109,8 +109,6 @@ using fuchsia::auth::AuthenticationUIContext;
 using fuchsia::auth::AuthProviderStatus;
 using fuchsia::auth::AuthTokenPtr;
 using fuchsia::auth::FirebaseTokenPtr;
-using fuchsia::ui::viewsv1::ViewProviderPtr;
-using fuchsia::ui::viewsv1token::ViewOwnerPtr;
 using modular::JsonValueToPrettyString;
 
 GoogleAuthProviderImpl::GoogleAuthProviderImpl(
@@ -143,10 +141,10 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
   get_persistent_credential_callback_ = std::move(callback);
 
   std::string url = GetAuthorizeUrl(user_profile_id);
-  ViewOwnerPtr view_owner;
+  zx::eventpair view_holder_token;
   if (settings_.use_chromium) {
-    view_owner = SetupChromium();
-    if (!view_owner) {
+    view_holder_token = SetupChromium();
+    if (!view_holder_token) {
       return;
     }
     chromium::web::NavigationControllerPtr controller;
@@ -154,7 +152,7 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
     controller->LoadUrl(url, {});
     FXL_LOG(INFO) << "Loading URL in Chromium: " << url;
   } else {
-    view_owner = SetupWebView();
+    view_holder_token = SetupWebView();
     web_view_->SetUrl(url);
     FXL_LOG(INFO) << "Loading URL in WebView: " << url;
   }
@@ -168,7 +166,7 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
     return;
   });
 
-  auth_ui_context_->StartOverlay(std::move(view_owner));
+  auth_ui_context_->StartOverlay2(std::move(view_holder_token));
 }
 
 void GoogleAuthProviderImpl::GetAppAccessToken(
@@ -502,7 +500,7 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
   });
 }
 
-ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
+zx::eventpair GoogleAuthProviderImpl::SetupWebView() {
   // Launch an instance of the WebView component.
   component::Services web_view_services;
   fuchsia::sys::LaunchInfo web_view_launch_info;
@@ -514,15 +512,18 @@ ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
     FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
   });
 
+  zx::eventpair view_token, view_holder_token;
+  if (zx::eventpair::create(0u, &view_token, &view_holder_token) != ZX_OK)
+    FXL_NOTREACHED() << "Failed to create view tokens";
+
   // Connect to the launched WebView component, request that it creates a new
   // view, and connect to the WebView interface on this new view.
-  ViewOwnerPtr view_owner;
-  ViewProviderPtr view_provider;
+  fuchsia::ui::app::ViewProviderPtr view_provider;
+  fuchsia::sys::ServiceProviderPtr incoming_view_services;
   web_view_services.ConnectToService(view_provider.NewRequest());
-  fuchsia::sys::ServiceProviderPtr web_view_moz_services;
-  view_provider->CreateView(view_owner.NewRequest(),
-                            web_view_moz_services.NewRequest());
-  component::ConnectToService(web_view_moz_services.get(),
+  view_provider->CreateView(std::move(view_token),
+                            incoming_view_services.NewRequest(), nullptr);
+  component::ConnectToService(incoming_view_services.get(),
                               web_view_.NewRequest());
 
   // Set ourselves as a delegate so that we receive URL change events that
@@ -533,10 +534,10 @@ ViewOwnerPtr GoogleAuthProviderImpl::SetupWebView() {
   web_view_->SetWebRequestDelegate(std::move(web_request_delegate));
   web_view_->ClearCookies();
 
-  return view_owner;
+  return view_holder_token;
 }
 
-ViewOwnerPtr GoogleAuthProviderImpl::SetupChromium() {
+zx::eventpair GoogleAuthProviderImpl::SetupChromium() {
   // Connect to the Chromium service and create a new frame.
   auto context_provider =
       context_->ConnectToEnvironmentService<chromium::web::ContextProvider>();
@@ -545,7 +546,7 @@ ViewOwnerPtr GoogleAuthProviderImpl::SetupChromium() {
       fdio_service_clone(context_->incoming_services()->directory().get());
   if (incoming_service_clone == ZX_HANDLE_INVALID) {
     FXL_LOG(ERROR) << "Failed to clone service directory.";
-    return nullptr;
+    return zx::eventpair();
   }
 
   chromium::web::CreateContextParams params;
@@ -560,11 +561,13 @@ ViewOwnerPtr GoogleAuthProviderImpl::SetupChromium() {
   chromium_frame_->SetNavigationEventObserver(
       std::move(navigation_event_observer));
 
-  // And create a view for the frame
-  ViewOwnerPtr view_owner;
-  chromium_frame_->CreateView(view_owner.NewRequest(), {});
+  // And create a view for the frame.
+  zx::eventpair view_token, view_holder_token;
+  if (zx::eventpair::create(0u, &view_token, &view_holder_token) != ZX_OK)
+    FXL_NOTREACHED() << "Failed to create view tokens";
+  chromium_frame_->CreateView2(std::move(view_token), nullptr, nullptr);
 
-  return view_owner;
+  return view_holder_token;
 }
 
 void GoogleAuthProviderImpl::ReleaseResources() {

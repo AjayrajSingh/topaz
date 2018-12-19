@@ -9,9 +9,9 @@
 
 #include <chromium/web/cpp/fidl.h>
 #include <fuchsia/auth/cpp/fidl.h>
-#include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/webview/cpp/fidl.h>
 #include <lib/fit/function.h>
+#include <lib/zx/eventpair.h>
 
 #include "lib/callback/cancellable.h"
 #include "lib/component/cpp/startup_context.h"
@@ -108,13 +108,13 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
 
   // Launches and connects to a WebView service, binding |this| as a
   // |WebRequestDelegate| to process any changes in the URL, and returning a
-  // |ViewOwnerPtr| for the view.
-  fuchsia::ui::viewsv1token::ViewOwnerPtr SetupWebView();
+  // |zx::eventpair| token for the view's ViewHolder.
+  zx::eventpair SetupWebView();
 
   // Launches and connects to a Chromium frame, binding |this| as a
   // |NavigationEventObserver| to process any changes in the URL, and returning
-  // a |ViewOwnerPtr| for the view.
-  fuchsia::ui::viewsv1token::ViewOwnerPtr SetupChromium();
+  // a |zx::eventpair| token for the view's ViewHolder.
+  zx::eventpair SetupChromium();
 
   // Safely releases any resources associated with an open Webkit or Chromium
   // instance, including the associated view.

@@ -5,7 +5,8 @@
 #include "topaz/auth_providers/spotify/spotify_auth_provider_impl.h"
 
 #include <fuchsia/net/oldhttp/cpp/fidl.h>
-#include <fuchsia/ui/viewsv1token/cpp/fidl.h>
+#include <fuchsia/ui/app/cpp/fidl.h>
+#include <lib/fit/function.h>
 
 #include "lib/component/cpp/connect.h"
 #include "lib/component/cpp/startup_context.h"
@@ -99,7 +100,7 @@ void SpotifyAuthProviderImpl::GetPersistentCredential(
     return;
   });
 
-  auth_ui_context_->StartOverlay(std::move(view_owner));
+  auth_ui_context_->StartOverlay2(std::move(view_owner));
 }
 
 void SpotifyAuthProviderImpl::GetAppAccessToken(
@@ -305,8 +306,7 @@ void SpotifyAuthProviderImpl::GetUserProfile(
   });
 }
 
-fuchsia::ui::viewsv1token::ViewOwnerPtr
-SpotifyAuthProviderImpl::SetupWebView() {
+zx::eventpair SpotifyAuthProviderImpl::SetupWebView() {
   component::Services web_view_services;
   fuchsia::sys::LaunchInfo web_view_launch_info;
   web_view_launch_info.url = kWebViewUrl;
@@ -317,17 +317,19 @@ SpotifyAuthProviderImpl::SetupWebView() {
     FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
   });
 
-  fuchsia::ui::viewsv1token::ViewOwnerPtr view_owner;
-  fuchsia::ui::viewsv1::ViewProviderPtr view_provider;
-  web_view_services.ConnectToService(view_provider.NewRequest());
-  fuchsia::sys::ServiceProviderPtr web_view_moz_services;
-  view_provider->CreateView(view_owner.NewRequest(),
-                            web_view_moz_services.NewRequest());
+  zx::eventpair view_token, view_holder_token;
+  if (zx::eventpair::create(0u, &view_token, &view_holder_token) != ZX_OK)
+    FXL_NOTREACHED() << "Failed to create view tokens";
 
-  component::ConnectToService(web_view_moz_services.get(),
+  fuchsia::ui::app::ViewProviderPtr view_provider;
+  fuchsia::sys::ServiceProviderPtr incoming_view_services;
+  web_view_services.ConnectToService(view_provider.NewRequest());
+  view_provider->CreateView(std::move(view_token),
+                            incoming_view_services.NewRequest(), nullptr);
+  component::ConnectToService(incoming_view_services.get(),
                               web_view_.NewRequest());
 
-  return view_owner;
+  return view_holder_token;
 }
 
 void SpotifyAuthProviderImpl::Request(
