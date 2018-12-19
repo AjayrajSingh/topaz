@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl/fidl.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:zircon/zircon.dart';
 
 /// Manages the connection and animation of the authentication window.
 class AuthenticationOverlayModel extends Model implements TickerProvider {
@@ -37,9 +37,9 @@ class AuthenticationOverlayModel extends Model implements TickerProvider {
   CurvedAnimation get animation => _curvedTransitionAnimation;
 
   /// Starts showing an overlay over all other content.
-  void onStartOverlay(InterfaceHandle<ViewOwner> overlay) {
-    _childViewConnection = new ChildViewConnection(
-      overlay,
+  void onStartOverlay(EventPair overlayViewHolderToken) {
+    _childViewConnection = new ChildViewConnection.fromViewHolderToken(
+      overlayViewHolderToken,
       onAvailable: (ChildViewConnection connection) {
         log.fine(
           'AuthenticationOverlayModel: Child view connection available!',

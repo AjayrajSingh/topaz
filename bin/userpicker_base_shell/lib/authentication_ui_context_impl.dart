@@ -7,9 +7,10 @@ import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
 import 'package:lib.ui.flutter/child_view.dart';
+import 'package:zircon/zircon.dart';
 
 /// Called when an authentication overlay needs to be started.
-typedef OnStartOverlay = void Function(InterfaceHandle<ViewOwner> viewOwner);
+typedef OnStartOverlay = void Function(EventPair viewHolderToken);
 
 /// An [AuthenticationUiContext] which calls its callbacks to show an overlay.
 class AuthenticationUiContextImpl extends AuthenticationUiContext {
@@ -27,8 +28,15 @@ class AuthenticationUiContextImpl extends AuthenticationUiContext {
         _onStopOverlay = onStopOverlay;
 
   @override
+  // TODO(SCN-1018): Remove this temporary workaround.
   void startOverlay(InterfaceHandle<ViewOwner> viewOwner) =>
-      _onStartOverlay?.call(viewOwner);
+      startOverlay2(new EventPair(viewOwner?.passChannel()?.passHandle()));
+
+  @override
+  // TODO(SCN-1018): Remove this temporary workaround.
+  // ignore: override_on_non_overriding_method
+  void startOverlay2(EventPair viewHolderToken) =>
+      _onStartOverlay?.call(viewHolderToken);
 
   @override
   void stopOverlay() => _onStopOverlay?.call();
