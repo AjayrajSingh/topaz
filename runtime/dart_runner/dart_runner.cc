@@ -35,11 +35,15 @@ const char* kDartVMArgs[] = {
 #else
     "--enable_mirrors=false",
 #endif
+
 #if !defined(NDEBUG) && !defined(DART_PRODUCT)
     "--enable_asserts",
+#endif  // !defined(NDEBUG)
+
+#if !defined(DART_PRODUCT)
     "--systrace_timeline",
     "--timeline_streams=VM,Isolate,Compiler,Dart,GC,Embedder,API",
-#endif
+#endif  // !defined(DART_PRODUCT)
     // clang-format on
 };
 
