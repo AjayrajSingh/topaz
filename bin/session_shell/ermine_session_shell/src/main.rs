@@ -3,20 +3,26 @@
 // found in the LICENSE file.
 
 use failure::{Error, ResultExt};
-use fidl::endpoints::{create_endpoints, create_proxy, ClientEnd, RequestStream, ServerEnd,
-                      ServiceMarker};
+use fidl::endpoints::{
+    create_endpoints, create_proxy, ClientEnd, RequestStream, ServerEnd, ServiceMarker,
+};
 use fidl_fuchsia_developer_tiles as tiles;
 use fidl_fuchsia_math::SizeF;
-use fidl_fuchsia_modular::{SessionShellContextMarker, SessionShellContextProxy,
-                           SessionShellMarker, SessionShellRequest, SessionShellRequestStream,
-                           StoryProviderProxy, StoryProviderWatcherMarker,
-                           StoryProviderWatcherRequest, StoryState};
-use fidl_fuchsia_ui_input::{KeyboardEvent, KeyboardEventPhase, MODIFIER_LEFT_SUPER,
-                            MODIFIER_RIGHT_SUPER};
-use fidl_fuchsia_ui_policy::{KeyboardCaptureListenerHackMarker,
-                             KeyboardCaptureListenerHackRequest, PresentationProxy};
-use fidl_fuchsia_ui_viewsv1::{ViewManagerMarker, ViewManagerProxy, ViewProviderMarker,
-                              ViewProviderRequest::CreateView, ViewProviderRequestStream};
+use fidl_fuchsia_modular::{
+    SessionShellContextMarker, SessionShellContextProxy, SessionShellMarker, SessionShellRequest,
+    SessionShellRequestStream, StoryProviderProxy, StoryProviderWatcherMarker,
+    StoryProviderWatcherRequest, StoryState,
+};
+use fidl_fuchsia_ui_input::{
+    KeyboardEvent, KeyboardEventPhase, MODIFIER_LEFT_SUPER, MODIFIER_RIGHT_SUPER,
+};
+use fidl_fuchsia_ui_policy::{
+    KeyboardCaptureListenerHackMarker, KeyboardCaptureListenerHackRequest, PresentationProxy,
+};
+use fidl_fuchsia_ui_viewsv1::{
+    ViewManagerMarker, ViewManagerProxy, ViewProviderMarker, ViewProviderRequest::CreateView,
+    ViewProviderRequestStream,
+};
 use fidl_fuchsia_ui_viewsv1token::ViewOwnerMarker;
 use fuchsia_app::{self as component, client::connect_to_service};
 use fuchsia_async as fasync;
@@ -184,6 +190,7 @@ impl App {
             .add_child_view_for_story_attach(key_to_use, story_id, view_owner);
     }
 
+    #[allow(unreachable_patterns)]
     pub fn spawn_tiles_server(chan: fasync::Channel) {
         fasync::spawn(
             tiles::ControllerRequestStream::from_channel(chan)
@@ -212,6 +219,7 @@ impl App {
                             &mut focusabilties.iter_mut().map(|a| *a),
                         ))
                     }
+                    _ => fready(Ok(())),
                 })
                 .unwrap_or_else(|e| eprintln!("error running Tiles controller server: {:?}", e)),
         )
