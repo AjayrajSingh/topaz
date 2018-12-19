@@ -2,7 +2,6 @@
     "imports": [
         "garnet/packages/tests/run_test_component",
         "topaz/packages/tests/auth_provider_unittests",
-        "topaz/packages/tests/benchmarks",
         "topaz/packages/tests/bindings_tests",
         "topaz/packages/tests/crasher_dart",
         "topaz/packages/tests/dart",
