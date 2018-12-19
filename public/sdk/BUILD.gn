@@ -6,6 +6,19 @@ import("//build/dart/toolchain.gni")
 import("//build/sdk/sdk.gni")
 import("//build/sdk/sdk_molecule.gni")
 
+sdk("dart") {
+  category = "partner"
+
+  deps = [
+    "//topaz/public/dart/fidl:fidl_sdk($dart_toolchain)",
+    "//topaz/public/dart/widgets:lib.widgets_sdk($dart_toolchain)",
+    "//topaz/public/lib/app_driver/dart:dart_sdk($dart_toolchain)",
+    "//topaz/public/lib/app/dart:dart_sdk($dart_toolchain)",
+    "//topaz/public/lib/config/dart:config_sdk($dart_toolchain)",
+    "//topaz/public/lib/schemas/dart:dart_sdk($dart_toolchain)",
+  ]
+}
+
 # Tools and libraries required to generate and use FIDL bindings in Dart.
 sdk_molecule("fidl_dart") {
   deps = [
