@@ -5,6 +5,8 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("ble_scanner") {
+  deprecated_bare_package_url = "//build"
+
   package_name = "ble_scanner"
 
   main_dart = "lib/main.dart"

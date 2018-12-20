@@ -10,6 +10,8 @@ metrics_registry("module_usage_tracking_metrics_registry") {
 }
 
 dart_app("usage_log") {
+  deprecated_bare_package_url = "//build"
+
   main_dart = "main.dart"
 
   meta = [

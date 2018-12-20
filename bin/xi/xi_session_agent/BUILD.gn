@@ -13,6 +13,8 @@ fidl("xi_session_services") {
 }
 
 dart_app("xi_session_agent") {
+  deprecated_bare_package_url = "//build"
+
   main_dart = "lib/main.dart"
 
   meta = [

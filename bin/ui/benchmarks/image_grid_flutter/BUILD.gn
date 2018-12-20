@@ -5,6 +5,8 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("image_grid_flutter") {
+  deprecated_bare_package_url = "//build"
+
   main_dart = "lib/main.dart"
 
   fuchsia_package_name = "image_grid_flutter"

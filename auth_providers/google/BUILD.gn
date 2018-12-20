@@ -92,6 +92,8 @@ source_set("unittests") {
 }
 
 package("google_auth_provider") {
+  deprecated_bare_package_url = "//build"
+
   deps = [
     ":bin",
   ]

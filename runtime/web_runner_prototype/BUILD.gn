@@ -61,6 +61,8 @@ if (enable_chromium) {
   }
 
   package("web_runner_prototype") {
+    deprecated_bare_package_url = "//build"
+
     deps = [
       ":bin",
     ]

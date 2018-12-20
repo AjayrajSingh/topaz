@@ -5,6 +5,8 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_jit_app("hello_app_dart_jit") {
+  deprecated_bare_package_url = "//build"
+
   main_dart = "main.dart"
 
   source_dir = "."
@@ -25,6 +27,8 @@ dart_jit_app("hello_app_dart_jit") {
 }
 
 dart_aot_app("hello_app_dart_aot") {
+  deprecated_bare_package_url = "//build"
+
   main_dart = "main.dart"
 
   source_dir = "."

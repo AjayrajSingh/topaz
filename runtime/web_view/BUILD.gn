@@ -149,6 +149,8 @@ if (enable_chromium) {
   }
 
   package("web_view") {
+    deprecated_bare_package_url = "//build"
+
     deps = [
       ":web_view_bin",
     ]

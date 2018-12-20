@@ -5,6 +5,8 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_app("echo_client_async_dart") {
+  deprecated_bare_package_url = "//build"
+
   main_dart = "lib/main.dart"
 
   meta = [

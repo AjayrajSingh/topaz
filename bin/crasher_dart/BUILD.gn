@@ -5,6 +5,8 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_app("crasher_dart") {
+  deprecated_bare_package_url = "//build"
+
   main_dart = "lib/main.dart"
 
   fuchsia_package_name = "crasher_dart"

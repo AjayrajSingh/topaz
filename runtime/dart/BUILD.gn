@@ -96,6 +96,8 @@ sdk_atom("kernel_compiler_sdk") {
 }
 
 package("dart") {
+  deprecated_bare_package_url = "//build"
+
   deps = [
     "//third_party/dart/runtime/bin:dart",
   ]

@@ -35,6 +35,7 @@ rustc_binary("bin") {
 }
 
 package("ermine") {
+  deprecated_bare_package_url = "//build"
 
   meta = [
     {
