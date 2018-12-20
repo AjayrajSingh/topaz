@@ -64,11 +64,6 @@ Dart_Isolate IsolateCreateCallback(const char* uri, const char* main,
 #endif
   }
 
-  if (std::string(uri) == DART_KERNEL_ISOLATE_NAME) {
-    *error = strdup("The kernel isolate is not implemented in dart_runner");
-    return NULL;
-  }
-
   *error = strdup("Isolate spawning is not implemented in dart_runner");
   return NULL;
 }

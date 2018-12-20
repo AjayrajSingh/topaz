@@ -95,7 +95,7 @@ template("dart_kernel") {
       outputs += [
         # Explicit output when using --manifest.
         invoker.manifest,
-        # Implicit output when using --manifest; see writePackages in compiler.dart.
+        # Implicit output when using --manifest; see createManifest in compiler.dart.
         invoker.manifest + ".dilplist",
       ]
     }
@@ -111,11 +111,11 @@ template("dart_kernel") {
     args = invoker.args + [
              "--target",
              invoker.platform_name,
-             "--sdk-root",
-             rebase_path(invoker.platform_path),
-             "--multi-root-scheme",
+             "--platform",
+             rebase_path("${invoker.platform_path}/platform_strong.dill"),
+             "--filesystem-scheme",
              multi_root_scheme,
-             "--multi-root",
+             "--filesystem-root",
              rebase_path("//"),
              "--packages",
              "$multi_root_scheme:///$rebased_packages_path",
@@ -123,15 +123,19 @@ template("dart_kernel") {
              rebase_path(depfile, root_build_dir),
              "--output",
              rebase_path(kernel_path, root_build_dir),
+             "--no-link-platform",
            ]
     if (defined(invoker.manifest)) {
       args += [
+        "--split-output-by-packages",
         "--manifest",
         rebase_path(invoker.manifest),
       ]
     }
     if (is_debug) {
       args += [ "--embed-sources" ]
+    } else {
+      args += [ "--no-embed-sources" ]
     }
 
     if (defined(invoker.gen_bytecode) && invoker.gen_bytecode) {

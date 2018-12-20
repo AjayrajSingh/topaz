@@ -4,6 +4,8 @@
 
 // ignore_for_file: one_member_abstracts
 
+import 'dart:async';
+
 /// The [AgentTaskHandler] class is an abstract class which is intended to be
 /// extended by agent authors to handle incoming tasks. The class is intended to
 /// be registered with the [Agent] class inside of the agent's main method.

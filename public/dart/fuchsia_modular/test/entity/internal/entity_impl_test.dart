@@ -4,6 +4,7 @@
 
 // ignore_for_file: implementation_imports
 
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart';

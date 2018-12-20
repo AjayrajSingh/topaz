@@ -3,51 +3,18 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io' hide FileSystemException;
+import 'dart:io';
 
 import 'package:args/args.dart';
 
-import 'package:front_end/src/api_unstable/vm.dart';
-import 'package:front_end/src/scheme_based_file_system.dart'
-    show SchemeBasedFileSystem;
-
-import 'package:build_integration/file_system/multi_root.dart'
-    show MultiRootFileSystem, MultiRootFileSystemEntity;
-
-import 'package:kernel/ast.dart';
-import 'package:kernel/binary/ast_to_binary.dart';
-import 'package:kernel/binary/limited_ast_to_binary.dart';
-import 'package:kernel/target/targets.dart';
-
 import 'package:vm/kernel_front_end.dart'
-    show compileToKernel, ErrorDetector, ErrorPrinter;
-import 'package:vm/target/dart_runner.dart' show DartRunnerTarget;
-import 'package:vm/target/flutter_runner.dart' show FlutterRunnerTarget;
+    show createCompilerArgParser, runCompiler, successExitCode;
 
-ArgParser _argParser = new ArgParser(allowTrailingOptions: true)
-  ..addOption('sdk-root', help: 'Path to runner_patched_sdk')
-  ..addOption('multi-root-scheme', help: 'The URI scheme for the multi root')
-  ..addMultiOption('multi-root',
-      help: 'A base for the multi root. Can be given multiple times to build an overlay')
-  ..addFlag('aot',
-      help: 'Run compiler in AOT mode (enables whole-program transformations)',
-      defaultsTo: false)
-  ..addFlag('tfa',
-      help: 'Run global type flow analysis', defaultsTo: false)
-  ..addFlag('drop-ast',
-      help: 'Drop AST for members with bytecode', defaultsTo: false)
+final ArgParser _argParser = createCompilerArgParser()
   ..addOption('component-name', help: 'Name of the component')
   ..addOption('data-dir',
       help: 'Name of the subdirectory of //data for output files')
-  ..addFlag('embed-sources',
-      help: 'Embed sources in the output dill file', defaultsTo: false)
-  ..addFlag('gen-bytecode', help: 'Generate bytecode', defaultsTo: false)
-  ..addOption('depfile', help: 'Path to output Ninja depfile')
-  ..addOption('manifest', help: 'Path to output Fuchsia package manifest')
-  ..addOption('output', help: 'Path to output dill file')
-  ..addOption('packages', help: 'Path to .packages file')
-  ..addOption('target', help: 'Kernel target name')
-  ..addFlag('verbose', help: 'Run in verbose mode');
+  ..addOption('manifest', help: 'Path to output Fuchsia package manifest');
 
 String _usage = '''
 Usage: compiler [options] input.dart
@@ -55,23 +22,6 @@ Usage: compiler [options] input.dart
 Options:
 ${_argParser.usage}
 ''';
-
-Uri _ensureFolderPath(String path) {
-  String uriPath = new Uri.file(path).toString();
-  if (!uriPath.endsWith('/')) {
-    uriPath = '$uriPath/';
-  }
-  return Uri.base.resolve(uriPath);
-}
-
-Future<Uri> _asFileUri(FileSystem fileSystem, Uri uri) async {
-  FileSystemEntity fse = fileSystem.entityForUri(uri);
-  if (fse is MultiRootFileSystemEntity) {
-    MultiRootFileSystemEntity mrfse = fse;
-    fse = await mrfse.delegate;
-  }
-  return fse.uri;
-}
 
 Future<void> main(List<String> args) async {
   ArgResults options;
@@ -87,233 +37,44 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  final Uri sdkRoot = _ensureFolderPath(options['sdk-root']);
-  final Uri packagesUri = Uri.base.resolve(options['packages']);
-  final bool aot = options['aot'];
-  final bool tfa = options['tfa'];
-  final bool embedSources = options['embed-sources'];
-  final String targetName = options['target'];
-  final bool genBytecode = options['gen-bytecode'];
-  final bool dropAST = options['drop-ast'];
-  final String dataDir = options.options.contains('component-name') ? options['component-name'] : options['data-dir'];
-  final bool verbose = options['verbose'];
-
-  Uri mainUri = Uri.parse(options.rest[0]);
-
-  Uri platformKernelDill = sdkRoot.resolve('platform_strong.dill');
-
-  TargetFlags targetFlags = new TargetFlags(syncAsync: true);
-  Target target;
-  switch (targetName) {
-    case 'dart_runner':
-      target = new DartRunnerTarget(targetFlags);
-      break;
-    case 'flutter_runner':
-      target = new FlutterRunnerTarget(targetFlags);
-      break;
-    default:
-      print('Unknown target: $targetName');
-      exitCode = 1;
-      return;
-  }
-
-  FileSystem fileSystem = StandardFileSystem.instance;
-  String multiRootScheme = options['multi-root-scheme'];
-  if (multiRootScheme != null) {
-    final rootUris = <Uri>[];
-    for (String root in options['multi-root']) {
-      rootUris.add(Uri.base.resolveUri(new Uri.file(root)));
-    }
-    final multiRootFS = new MultiRootFileSystem(multiRootScheme, rootUris, fileSystem);
-    fileSystem = new SchemeBasedFileSystem({
-      'file': fileSystem,
-      'data': fileSystem,
-      '': fileSystem,
-      multiRootScheme: multiRootFS,
-    });
-  }
-
-  // fuchsia-source:///x/y/main.dart -> file:///a/b/x/y/main.dart
-  String mainUriString = (await _asFileUri(fileSystem, mainUri)).toString();
-  // file:///a/b/x/y/main.dart -> package:x.y/main.dart
-  for (var line in await new File(
-          (await _asFileUri(fileSystem, packagesUri)).toFilePath())
-      .readAsLines()) {
-    var colon = line.indexOf(':');
-    if (colon == -1)
-      continue;
-    var packageName = line.substring(0, colon);
-    String packagePath;
-    try {
-      packagePath = (await _asFileUri(
-          fileSystem, packagesUri.resolve(line.substring(colon + 1))))
-          .toString();
-    } on FileSystemException {
-      // Can't resolve package path.
-      continue;
-    }
-    if (mainUriString.startsWith(packagePath)) {
-      mainUri = Uri.parse('package:$packageName/${mainUriString.substring(packagePath.length)}');
-      break;
-    }
-  }
-
-  final errorPrinter = new ErrorPrinter();
-  final errorDetector = new ErrorDetector(previousErrorHandler: errorPrinter);
-  final CompilerOptions compilerOptions = new CompilerOptions()
-    ..sdkSummary = platformKernelDill
-    ..fileSystem = fileSystem
-    ..packagesFileUri = packagesUri
-    ..target = target
-    ..embedSourceText = embedSources
-    ..onDiagnostic = (DiagnosticMessage m) {
-      printDiagnosticMessage(m, stderr.writeln);
-      errorDetector(m);
-    }
-    ..verbose = verbose;
-
-  if (aot) {
-    // Link in the platform to produce an output with no external references.
-    compilerOptions.linkedDependencies = <Uri>[platformKernelDill];
-  }
-
-  Component component = await compileToKernel(
-    mainUri,
-    compilerOptions,
-    aot: aot,
-    useGlobalTypeFlowAnalysis: tfa,
-    genBytecode: genBytecode,
-    dropAST: dropAST,
-  );
-
-  errorPrinter.printCompilationMessages(mainUri);
-  if (errorDetector.hasCompilationErrors || (component == null)) {
-    exitCode = 1;
+  final compilerExitCode = await runCompiler(options, _usage);
+  if (compilerExitCode != successExitCode) {
+    exitCode = compilerExitCode;
     return;
   }
 
-  // Single-file output.
-  final String kernelBinaryFilename = options['output'];
-  if (kernelBinaryFilename != null) {
-    final IOSink sink = new File(kernelBinaryFilename).openWrite();
-    final BinaryPrinter printer = new LimitedBinaryPrinter(sink,
-        (Library lib) => true, false /* excludeUriToSource */);
-    printer.writeComponentFile(component);
-    await sink.close();
-
-    final String depfile = options['depfile'];
-    if (depfile != null) {
-      await writeDepfile(fileSystem, component, kernelBinaryFilename, depfile);
-    }
-  }
-
-  // Multiple-file output.
+  final String output = options['output'];
+  final String dataDir = options.options.contains('component-name')
+      ? options['component-name']
+      : options['data-dir'];
   final String manifestFilename = options['manifest'];
+
   if (manifestFilename != null) {
-    await writePackages(component, kernelBinaryFilename, manifestFilename, dataDir);
+    await createManifest(manifestFilename, dataDir, output);
   }
 }
 
-String escapePath(String path) {
-  return path.replaceAll('\\', '\\\\').replaceAll(' ', '\\ ');
-}
+Future createManifest(
+    String packageManifestFilename, String dataDir, String output) async {
+  List<String> packages = await new File('$output-packages').readAsLines();
 
-List<Uri> getDependencies(Component component) {
-  var deps = <Uri>[];
-  for (Library lib in component.libraries) {
-    if (lib.importUri.scheme == 'dart') {
-      continue;
-    }
-    deps.add(lib.fileUri);
-    for (LibraryPart part in lib.parts) {
-      final Uri fileUri = lib.fileUri.resolve(part.partUri);
-      deps.add(fileUri);
-    }
-  }
-  return deps;
-}
-
-// https://ninja-build.org/manual.html#_depfile
-Future<void> writeDepfile(FileSystem fileSystem,
-    Component component, String output, String depfile) async {
-  var file = new File(depfile).openWrite();
-  file.write(escapePath(output));
-  file.write(':');
-  for (Uri dep in getDependencies(component)) {
-    Uri uri = await _asFileUri(fileSystem, dep);
-    file.write(' ');
-    file.write(escapePath(uri.toFilePath()));
-  }
-  file.write('\n');
-  await file.close();
-}
-
-Future writePackages(Component component, String output, String packageManifestFilename, String dataDir) async {
-  // Package sharing: make the encoding not depend on the order in which parts
-  // of a package are loaded.
-  component.libraries.sort((Library a, Library b) {
-    return a.importUri.toString().compareTo(b.importUri.toString());
-  });
-  for (Library lib in component.libraries) {
-    lib.additionalExports.sort((Reference a, Reference b) {
-      return a.canonicalName.toString().compareTo(b.canonicalName.toString());
-    });
-  }
+  // Make sure the 'main' package is the last (convention with package loader).
+  packages.remove('main');
+  packages.add('main');
 
   final IOSink packageManifest = new File(packageManifestFilename).openWrite();
   final String kernelListFilename = '$packageManifestFilename.dilplist';
   final IOSink kernelList = new File(kernelListFilename).openWrite();
 
-  final packages = new Set<String>();
-  for (Library lib in component.libraries) {
-    packages.add(packageFor(lib));
-  }
-  packages.remove('main');
-  packages.remove(null);
-
   for (String package in packages) {
-    await writePackage(component, output, package, packageManifest, kernelList, dataDir);
+    final String filenameInPackage = '$package.dilp';
+    final String filenameInBuild = '$output-$package.dilp';
+    packageManifest
+        .write('data/$dataDir/$filenameInPackage=$filenameInBuild\n');
+    kernelList.write('$filenameInPackage\n');
   }
-  await writePackage(component, output, 'main', packageManifest, kernelList, dataDir);
 
   packageManifest.write('data/$dataDir/app.dilplist=$kernelListFilename\n');
   await packageManifest.close();
   await kernelList.close();
-}
-
-Future writePackage(Component component, String output, String package,
-    IOSink packageManifest, IOSink kernelList, String dataDir) async {
-  final String filenameInPackage = '$package.dilp';
-  final String filenameInBuild = '$output-$package.dilp';
-  final IOSink sink = new File(filenameInBuild).openWrite();
-
-  var main = component.mainMethod;
-  if (package != 'main') {
-    // Package sharing: remove the information about the importer from package
-    // dilps.
-    component.mainMethod = null;
-  }
-  final BinaryPrinter printer = new LimitedBinaryPrinter(sink,
-      (lib) => packageFor(lib) == package, false /* excludeUriToSource */);
-  printer.writeComponentFile(component);
-  component.mainMethod = main;
-
-  await sink.close();
-
-  packageManifest.write('data/$dataDir/$filenameInPackage=$filenameInBuild\n');
-  kernelList.write('$filenameInPackage\n');
-}
-
-String packageFor(Library lib) {
-  // Core libraries are not written into any dilp.
-  if (lib.isExternal)
-    return null;
-
-  // Packages are written into their own dilp.
-  Uri uri = lib.importUri;
-  if (uri.scheme == 'package')
-    return uri.pathSegments.first;
-
-  // Everything else (e.g., file: or data: imports) is lumped into the main dilp.
-  return 'main';
 }

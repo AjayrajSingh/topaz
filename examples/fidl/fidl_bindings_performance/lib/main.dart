@@ -42,7 +42,7 @@ Future<int> runTest(String server, void ready(Echo echo, void complete())) {
     print(message);
     completer.completeError(message);
   };
-  controller.ctrl.onConnectionError = () {
+  controller.ctrl.onConnectionError = () {  // ignore: cascade_invocations
     final message = '$server controller connection unexpectedly closed';
     print(message);
     completer.completeError(message);
@@ -62,9 +62,9 @@ Future<int> runTest(String server, void ready(Echo echo, void complete())) {
       // Stop the echo server.
       echo.ctrl.onConnectionError = null;
       echo.ctrl.close();
-      controller.ctrl.onConnectionError = complete;
-      controller.ctrl.onClose = complete;
       controller
+        ..ctrl.onConnectionError = complete
+        ..ctrl.onClose = complete
         ..kill()
         ..onTerminated = (unusedReturnCode, unusedTerminationReason) {
           // Now we're done...

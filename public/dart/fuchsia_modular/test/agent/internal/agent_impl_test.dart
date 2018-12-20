@@ -4,6 +4,7 @@
 
 // ignore_for_file: implementation_imports
 
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:fidl/fidl.dart' show AsyncBinding, AsyncProxyController;
