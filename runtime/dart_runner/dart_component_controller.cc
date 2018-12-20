@@ -180,6 +180,7 @@ bool DartComponentController::SetupFromKernel() {
     size_t end = str.find("\n", start);
     if (end == std::string::npos) {
       FXL_LOG(ERROR) << "Malformed manifest";
+      Dart_ExitScope();
       return false;
     }
 
@@ -188,6 +189,8 @@ bool DartComponentController::SetupFromKernel() {
 
     MappedResource kernel;
     if (!MappedResource::LoadFromNamespace(namespace_, path, kernel)) {
+      FXL_LOG(ERROR) << "Failed to find kernel: " << path;
+      Dart_ExitScope();
       return false;
     }
     library = Dart_LoadLibraryFromKernel(kernel.address(), kernel.size());
