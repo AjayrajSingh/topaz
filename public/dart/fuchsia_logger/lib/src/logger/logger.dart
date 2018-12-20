@@ -82,7 +82,7 @@ void setupLogger({
             ?.lastWhere((_) => true, orElse: () => null)
   ]
     ..addAll(globalTags ?? const [])
-    ..removeWhere((t) => t == null || t.isNotEmpty);
+    ..removeWhere((t) => t == null || t.isEmpty);
 
   bool inCheckedMode = false;
   assert(() {
