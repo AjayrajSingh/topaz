@@ -2,12 +2,12 @@
   "tests": [
     {
       "name": "driver_example_mod_tap_tests",
-      "exec": "basemgr --test --enable_presenter --account_provider=dev_token_manager --base_shell=dev_base_shell --base_shell_args=--test_timeout_ms=300000 --session_shell=dev_session_shell --session_shell_args=--root_module=test_driver_module,--module_under_test_url=driver_example_mod,--test_driver_url=driver_example_mod_target_tests --story_shell=dev_story_shell",
+      "exec": "basemgr --test --enable_presenter --account_provider=dev_token_manager --base_shell=dev_base_shell --base_shell_args=--test_timeout_ms=300000 --session_shell=dev_session_shell --session_shell_args=--root_module=test_driver_module,--module_under_test_url=driver_example_mod,--test_driver_url=fuchsia-pkg://fuchsia.com/driver_example_mod_target_tests#meta/driver_example_mod_target_tests.cmx --story_shell=dev_story_shell",
       "disabled": true
     },
     {
       "name": "slider_mod_tests",
-      "exec": "basemgr --test --enable_presenter --account_provider=dev_token_manager --base_shell=dev_base_shell --base_shell_args=--test_timeout_ms=300000 --session_shell=dev_session_shell --session_shell_args=--root_module=test_driver_module,--module_under_test_url=slider_mod,--test_driver_url=slider_mod_tests --story_shell=dev_story_shell",
+      "exec": "basemgr --test --enable_presenter --account_provider=dev_token_manager --base_shell=dev_base_shell --base_shell_args=--test_timeout_ms=300000 --session_shell=dev_session_shell --session_shell_args=--root_module=test_driver_module,--module_under_test_url=slider_mod,--test_driver_url=fuchsia-pkg://fuchsia.com/slider_mod_tests#meta/slider_mod_tests.cmx  --story_shell=dev_story_shell",
       "disabled": true
     }
   ]
