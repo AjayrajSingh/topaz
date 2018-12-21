@@ -12,7 +12,7 @@ import 'bloc_provider.dart';
 /// The [SliderBloc] provides actions and streams associated with
 /// the onscreen slider.
 class SliderBloc implements BlocBase {
-  final Entity shapeEntity;
+  final Entity<Shape> shapeEntity;
   final Shape shape;
 
   final _valueController = StreamController<double>.broadcast();
@@ -34,6 +34,6 @@ class SliderBloc implements BlocBase {
     _valueController.add(newValue);
     shape.size = newValue;
 
-    shapeEntity.write(shape.toBytes());
+    shapeEntity.write(shape);
   }
 }

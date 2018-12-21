@@ -6,6 +6,8 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:meta/meta.dart';
 
 import '../entity/entity.dart';
+import '../entity/entity_codec.dart';
+import '../entity/internal/_link_entity.dart';
 import 'module_state_exception.dart';
 
 /// An [Intent] is a fundamental building block of module development.
@@ -64,6 +66,16 @@ class Intent extends fidl.Intent {
         );
 
   /// Appends a [fidl.IntentParameter] to the intent's parameters containing
+  /// the [entity] as its data value and the [name] as its name value.
+  void addParameterFromEntity(String name, Entity entity) {
+    if (entity is LinkEntity) {
+      _addParameterFromLinkEntity(name, entity);
+    } else {
+      throw UnimplementedError('Only link entities are supported at this time');
+    }
+  }
+
+  /// Appends a [fidl.IntentParameter] to the intent's parameters containing
   /// the [reference] to an entity as its data value and the [name] as its
   /// name value.
   void addParameterFromEntityReference(String name, String reference) =>
@@ -73,27 +85,35 @@ class Intent extends fidl.Intent {
   /// Returns the entity with the given [name]. An entity's name maps to
   /// the name of a  parameter in your component's manifset.
   ///
-  /// The type is used to ensure the entity provider provides us with the
-  /// type of entity we are expecting. If the type does not match the entity
-  /// will fail to resolve.
+  /// The codec is used to translate the bytes in the entity to the dart
+  /// object type.
+  ///
+  /// The [codec] will need to match the EntityDataType. The name will need
+  /// to match the semantic type and the encoding will need to match the
+  /// encoding such that it can actually encode and decode values
   @experimental
   Entity getEntity({
     @required String name,
-    @required String type,
-  }) {
-    ArgumentError.checkNotNull(name, 'name');
-    ArgumentError.checkNotNull(type, 'type');
-    return _entityFromIntentParameter(_getParameter(name), type);
-  }
+    @required EntityCodec codec,
+  }) =>
+      _entityFromIntentParameter(
+        parameter: _getParameter(name),
+        codec: codec,
+      );
 
   void _addParameter(String name, fidl.IntentParameterData parameterData) =>
       parameters.add(fidl.IntentParameter(name: name, data: parameterData));
 
-  Entity _entityFromIntentParameter(
-      fidl.IntentParameter parameter, String type) {
-    if (parameter.data.tag == fidl.IntentParameterDataTag.entityReference) {
-      return Entity(
-          type: type, entityReference: parameter.data.entityReference);
+  void _addParameterFromLinkEntity(String name, LinkEntity entity) =>
+      _addParameter(
+          name, fidl.IntentParameterData.withLinkName(entity.linkName));
+
+  Entity _entityFromIntentParameter({
+    fidl.IntentParameter parameter,
+    EntityCodec codec,
+  }) {
+    if (parameter.data.tag == fidl.IntentParameterDataTag.linkName) {
+      return LinkEntity(linkName: parameter.data.linkName, codec: codec);
     }
     throw UnimplementedError();
   }

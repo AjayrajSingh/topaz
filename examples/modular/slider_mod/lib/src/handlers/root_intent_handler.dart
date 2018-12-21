@@ -13,16 +13,14 @@ import '../widgets/slider_scaffold.dart';
 
 class RootIntentHandler extends IntentHandler {
   @override
-  void handleIntent(Intent intent) async {
+  void handleIntent(Intent intent) {
     // if (intent.action != '') {
     //   throw Exception('Unknown intent action');
     // }
 
     final shape = Shape(5.0);
-    final shapeEntity = await Entity.createStoryScoped(
-      type: Shape.entityType,
-      initialData: shape.toBytes(),
-    );
+
+    final shapeEntity = Entity(codec: ShapeCodec())..write(shape);
 
     runApp(
       MaterialApp(

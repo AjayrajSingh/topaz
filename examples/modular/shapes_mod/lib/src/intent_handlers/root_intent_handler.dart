@@ -15,9 +15,9 @@ class RootIntentHandler extends IntentHandler {
   @override
   void handleIntent(Intent intent) {
     final stream = intent
-        .getEntity(name: 'shape', type: Shape.entityType)
+        .getEntity(name: 'shape', codec: ShapeCodec())
         .watch()
-        .map((b) => Shape.fromBytes(b));
+        .cast<Shape>();
 
     if (intent.action == _circleAction) {
       CircleRenderer().render(stream);
