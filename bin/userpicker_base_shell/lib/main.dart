@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.base_shell/netstack_model.dart';
-import 'package:lib.widgets/application.dart';
+import 'package:lib.widgets/application_deprecated.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
@@ -107,7 +107,8 @@ void main() {
             model: wifiInfoOverlayModel,
             child: new _WifiInfo(
               wifiWidget: new ApplicationWidget(
-                url: 'fuchsia-pkg://fuchsia.com/wifi_settings#meta/wifi_settings.cmx',
+                url:
+                    'fuchsia-pkg://fuchsia.com/wifi_settings#meta/wifi_settings.cmx',
                 launcher: startupContext.launcher,
               ),
             ),

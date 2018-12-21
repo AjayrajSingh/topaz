@@ -5,12 +5,11 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:fuchsia_services/services.dart' show StartupContext;
 import 'package:keyboard/constants.dart'
     as keyboard; // Temporary solution for keyboard height.
-import 'package:lib.widgets/application.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.widgets/application_deprecated.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:topaz.lib.shell/models/overlay_position_model.dart';
 
 import 'keyboard_model.dart';
 
@@ -18,6 +17,7 @@ const double _kKeyboardOverlayHeight = keyboard.keyboardHeight;
 const double _kKeyboardCornerRadius = keyboard.cornerRadius;
 
 /// Defines the UX of the keyboard drawer.
+@Deprecated('use package:topaz.lib.keyboard.flutter/keyboard.dart instead')
 class KeyboardContainer extends StatelessWidget {
   const KeyboardContainer({this.model, this.elevation});
 

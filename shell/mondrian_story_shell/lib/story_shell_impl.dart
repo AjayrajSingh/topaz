@@ -16,7 +16,7 @@ import 'package:fuchsia/fuchsia.dart' show exit;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.story_shell/common.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.widgets/utils.dart';
+import 'package:lib.widgets/utils_deprecated.dart';
 import 'package:zircon/zircon.dart';
 
 import 'models/surface/surface_graph.dart';
@@ -225,6 +225,7 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
     if (visualState == StoryVisualState.maximized) {
       PresentationProxy presentationProxy = new PresentationProxy();
       _storyShellContext.getPresentation(presentationProxy.ctrl.request());
+      // TODO(nzheng): switch story shell to use async fidl
       _pointerEventsListener.listen(presentationProxy);
       keyListener?.listen(presentationProxy);
       presentationProxy.ctrl.close();

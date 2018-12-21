@@ -6,13 +6,13 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:ui' as ui;
 
-import 'package:fidl_fuchsia_ui_input/fidl_async.dart';
-import 'package:fidl_fuchsia_ui_policy/fidl_async.dart';
+import 'package:fidl_fuchsia_ui_input/fidl.dart';
+import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 
 import 'package:flutter/scheduler.dart';
 
 /// Listens for pointer events and injects them into Flutter input pipeline.
-class PointerEventsListener extends PointerCaptureListenerHack {
+class PointerEventsListener implements PointerCaptureListenerHack {
   // Holds the fidl binding to receive pointer events.
   final PointerCaptureListenerHackBinding _pointerCaptureListenerBinding =
       new PointerCaptureListenerHackBinding();

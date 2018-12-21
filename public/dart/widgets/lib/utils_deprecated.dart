@@ -3,5 +3,4 @@
 // found in the LICENSE file
 
 export 'src/utils/change_notifiers.dart';
-export 'src/utils/frame_rate_tracer.dart';
-export 'src/utils/pointer_events_listener.dart';
+export 'src/utils/pointer_events_listener_deprecated.dart';

@@ -12,6 +12,7 @@ dart_library("lib.widgets") {
 
   sources = [
     "application.dart",
+    "application_deprecated.dart",
     "model.dart",
     "modular.dart",
     "src/application/application_widget.dart",
@@ -43,6 +44,7 @@ dart_library("lib.widgets") {
     "//third_party/dart-pkg/pub/flutter_image",
     "//topaz/bin/ui/skottie_viewer:skottie_loader",
     "//topaz/public/dart/fidl",
+    "//topaz/public/dart/fuchsia_logger",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/device/dart",
     "//topaz/public/lib/module/dart",

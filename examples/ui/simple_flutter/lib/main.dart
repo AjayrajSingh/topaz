@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
-import 'package:lib.widgets/application.dart';
+import 'package:lib.widgets/application_deprecated.dart';
 
 void main() => runApp(new MyApp());
 
@@ -88,7 +88,8 @@ class _MyHomePageState extends State<MyHomePage> {
                         width: 300.0,
                         height: 300.0,
                         child: new ApplicationWidget(
-                            url: 'fuchsia-pkg://fuchsia.com/simple_flutter#meta/leaf_flutter.cmx',
+                            url:
+                                'fuchsia-pkg://fuchsia.com/simple_flutter#meta/leaf_flutter.cmx',
                             launcher:
                                 StartupContext.fromStartupInfo().launcher),
                       ))),

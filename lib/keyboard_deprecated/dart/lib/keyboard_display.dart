@@ -3,17 +3,20 @@
 // found in the LICENSE file.
 import 'dart:async';
 
-import 'package:fidl_fuchsia_ui_input/fidl_async.dart'
+import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:fidl_fuchsia_ui_input/fidl.dart'
     show
         ImeService,
         ImeServiceProxy,
         ImeVisibilityService,
         ImeVisibilityServiceProxy;
-import 'package:fuchsia_logger/logger.dart';
-import 'package:fuchsia_services/services.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
 
 /// Handles connecting to [ImeVisibilityService] and [ImeService] to show
 /// and hide the keyboard.
+@Deprecated('use package:topaz.lib.keyboard.dart instead')
 class KeyboardDisplay {
   final ImeServiceProxy _imeProxy = ImeServiceProxy();
   final ImeVisibilityServiceProxy _imeVisibilityProxy =
@@ -23,12 +26,18 @@ class KeyboardDisplay {
 
   bool _keyboardVisible;
 
-  KeyboardDisplay() {
-    connectToEnvironmentService(_imeProxy);
-    connectToEnvironmentService(_imeVisibilityProxy);
+  KeyboardDisplay(ServiceProvider services) : assert(services != null) {
+    connectToService(services, _imeProxy.ctrl);
+    _imeProxy.ctrl.onConnectionError = _handleImeServiceError;
+    _imeProxy.ctrl.error
+        .then((ProxyError error) => _handleImeServiceError(error: error));
 
-    _imeVisibilityProxy.onKeyboardVisibilityChanged
-        .listen(_onVisibilityChanged);
+    connectToService(services, _imeVisibilityProxy.ctrl);
+    _imeVisibilityProxy.ctrl.onConnectionError =
+        _handleImeVisibilityServiceError;
+    _imeVisibilityProxy.ctrl.error.then(
+        (ProxyError error) => _handleImeVisibilityServiceError(error: error));
+    _imeVisibilityProxy.onKeyboardVisibilityChanged = _onVisibilityChanged;
   }
 
   /// Adds a listener to [KeyboardDisplay] for changes in keyboard
@@ -53,6 +62,14 @@ class KeyboardDisplay {
     _keyboardVisible = visible;
     _notifyKeyboardVisibilityChange();
   }
+
+  /// Handles connection error to the [ImeVisibilityService].
+  void _handleImeVisibilityServiceError({ProxyError error}) =>
+      _log(Level.SEVERE, 'Unable to connect to ImeVisibilityService', error);
+
+  /// Handles connection error to the [ImeService].
+  void _handleImeServiceError({ProxyError error}) =>
+      _log(Level.SEVERE, 'Unable to connect to ImeService', error);
 
   /// Invoked internally to signal to any registered listener of a change
   /// in keyboard visibility.

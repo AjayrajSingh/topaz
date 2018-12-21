@@ -3,10 +3,10 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:developer' show Timeline;
 import 'dart:ui' show VoidCallback;
 
-import 'package:fidl_fuchsia_cobalt/fidl.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fidl_fuchsia_cobalt/fidl_async.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
 
@@ -20,6 +20,7 @@ const RK4SpringDescription _kSimulationDesc =
 
 /// Model controlling an overlay.
 class OverlayPositionModel extends TracingSpringModel {
+  final String traceName;
   final Duration noInteractionTimeout;
 
   OverlayDragModel _overlayDragModel;
@@ -30,7 +31,7 @@ class OverlayPositionModel extends TracingSpringModel {
   /// Constructor.
   OverlayPositionModel({
     Logger logger,
-    String traceName,
+    this.traceName,
     int showMetricId,
     int hideMetricId,
     this.noInteractionTimeout = const Duration(seconds: 20),
@@ -52,7 +53,7 @@ class OverlayPositionModel extends TracingSpringModel {
   /// Shows the overlay.
   void show() {
     if (target != 1.0) {
-      trace('show overlay');
+      Timeline.instantSync('$traceName: show overlay');
       target = 1.0;
 
       restartNoInteractionTimer();
@@ -63,7 +64,7 @@ class OverlayPositionModel extends TracingSpringModel {
   void hide() {
     if (target != 0.0) {
       onHide?.call();
-      trace('hide overlay');
+      Timeline.instantSync('$traceName: hide overlay');
       target = 0.0;
 
       _stopNoInteractionTimer();

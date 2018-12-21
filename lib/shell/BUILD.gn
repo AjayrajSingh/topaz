@@ -15,6 +15,7 @@ dart_library("shell") {
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
+    "//topaz/public/dart/fuchsia_logger",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
   ]

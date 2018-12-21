@@ -2,15 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_cobalt/fidl_async.dart';
-
-import 'package:topaz.lib.keyboard.dart/keyboard_display.dart';
+import 'package:topaz.lib.keyboard_deprecated.dart/keyboard_display.dart';
 import 'package:topaz.lib.shell/models/overlay_position_model.dart';
 
-export 'package:topaz.lib.keyboard.dart/keyboard_display.dart'
-    show KeyboardDisplay;
+export 'package:topaz.lib.keyboard_deprecated.dart/keyboard_display.dart'
+    show KeyboardDisplay; // ignore: deprecated_member_use
 
 /// Handles connecting to ImeVisibilityService and showing/hiding the keyboard.
+@Deprecated('use package:topaz.lib.keyboard.flutter/keyboard.dart instead')
 class KeyboardModel extends Model {
   final KeyboardDisplay _keyboardDisplay;
 
@@ -35,7 +34,6 @@ class KeyboardModel extends Model {
   /// Returns whether the keyboard is visible or hidden.
   OverlayPositionModel get overlayPositionModel =>
       _overlayPositionModel ??= OverlayPositionModel(
-        logger: LoggerProxy(),
         traceName: 'Keyboard',
         noInteractionTimeout: null,
       );

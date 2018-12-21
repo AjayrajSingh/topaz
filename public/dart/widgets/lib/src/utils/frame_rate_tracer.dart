@@ -2,20 +2,20 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_cobalt/fidl.dart';
+import 'dart:developer' show Timeline;
+
+import 'package:fidl_fuchsia_cobalt/fidl_async.dart' as cobalt;
+import 'package:fuchsia_logger/logger.dart';
 import 'package:meta/meta.dart';
 
-import 'logging.dart';
-
 /// Traces the frame rate of an animation.
-@Deprecated('Use package:lib.widgets/utils.dart instead')
 class FrameRateTracer {
   /// Name of the animation for tracing purposes.
   final String name;
 
   /// Optional cobalt logger.  If not null the frame rate will be logged as
   /// an observation to cobalt.
-  final Logger cobaltLogger;
+  final cobalt.Logger cobaltLogger;
 
   DateTime _animationStart = new DateTime.now();
   int _frames = 0;
@@ -49,18 +49,19 @@ class FrameRateTracer {
     String prefix = _currentTargetName?.isEmpty ?? true
         ? '$name'
         : '$name to $_currentTargetName';
-    trace(
-      '$prefix: ${frameRate.toStringAsPrecision(3)} fps '
-          '($_frames/${microSeconds / 1000000.0}s)',
-    );
+    Timeline.instantSync('$prefix: ${frameRate.toStringAsPrecision(3)} fps '
+        '($_frames/${microSeconds / 1000000.0}s)');
     if (cobaltLogger != null && _currentCobaltMetricId != null) {
-      cobaltLogger.logFrameRate(
+      cobaltLogger
+          .logFrameRate(
         _currentCobaltMetricId,
         0,
         '',
         frameRate,
-        (Status status) {
-          if (status != Status.ok) {
+      )
+          .then(
+        (cobalt.Status status) {
+          if (status != cobalt.Status.ok) {
             log.warning(
               'Failed to observe frame rate metric '
                   '$_currentCobaltMetricId: $status. ',
