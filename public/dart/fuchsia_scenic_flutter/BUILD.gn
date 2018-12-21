@@ -14,6 +14,7 @@ dart_library("fuchsia_scenic_flutter") {
 
   sources = [
     "child_view.dart",
+    "child_view_connection.dart",
     "src/child_view.dart",
     "src/child_view_connection.dart",
     "src/internal/_child_scene_layer.dart",
@@ -25,13 +26,13 @@ dart_library("fuchsia_scenic_flutter") {
   deps = [
     "//garnet/public/fidl/fuchsia.math",
     "//garnet/public/fidl/fuchsia.sys",
-    "//garnet/public/fidl/fuchsia.ui.app",
     "//garnet/public/fidl/fuchsia.ui.viewsv1",
     "//garnet/public/fidl/fuchsia.ui.viewsv1token",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/zircon",
   ]
 }
 
