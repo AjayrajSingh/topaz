@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:developer' show Timeline;
+
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
@@ -225,7 +227,7 @@ class SurfaceGraph extends Model {
         ..connection = new ChildViewConnection(
           viewOwner,
           onAvailable: (ChildViewConnection connection) {
-            trace('surface $id available');
+            Timeline.instantSync('surface available', arguments: {'id': '$id'});
 
             // If this surface is the last focused one, also request input focus
             if (_lastFocusedSurface == surface) {

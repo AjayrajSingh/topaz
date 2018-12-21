@@ -4,6 +4,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' show Timeline;
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart';
@@ -104,7 +105,8 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   /// Focus the surface with this id
   @override
   void focusSurface(String surfaceId) {
-    trace('focusing view $surfaceId');
+    Timeline.instantSync('focusing view',
+        arguments: {'surfaceId': '$surfaceId'});
     surfaceGraph.focusSurface(surfaceId);
     persistStoryState();
   }
@@ -112,7 +114,8 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
   /// Defocus the surface with this id
   @override
   void defocusSurface(String surfaceId, void callback()) {
-    trace('defocusing view $surfaceId');
+    Timeline.instantSync('defocusing view',
+        arguments: {'surfaceId': '$surfaceId'});
     surfaceGraph.dismissSurface(surfaceId);
     // TODO(alangardner, djmurphy): Make Mondrian not crash if the process
     // associated with surfaceId is closed after callback returns.
@@ -131,7 +134,10 @@ class StoryShellImpl implements StoryShell, StoryVisualStateWatcher, Lifecycle {
       List<ContainerRelationEntry> relationships,
       List<ContainerView> views) {
     // Add a root node for the container
-    trace('adding container $containerName with parent $parentId');
+    Timeline.instantSync('adding container', arguments: {
+      'containerName': '$containerName',
+      'parentId': '$parentId'
+    });
     surfaceGraph.addContainer(
       containerName,
       new SurfaceProperties(),

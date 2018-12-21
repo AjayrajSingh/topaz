@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:developer' show Timeline;
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_cobalt/fidl.dart' as cobalt;
@@ -173,7 +174,7 @@ class CommonBaseShellModel extends BaseShellModel
       return;
     }
 
-    trace('logging in $accountId');
+    Timeline.instantSync('logging in', arguments: {'accountId': '$accountId'});
     logger.startTimer(
       _kSessionShellLoginTimeMetricId,
       0,
@@ -279,7 +280,7 @@ class CommonBaseShellModel extends BaseShellModel
     presentation
       ..capturePointerEventsHack(_pointerCaptureListenerBinding.wrap(this))
       ..setPresentationModeListener(
-        _presentationModeListenerBinding.wrap(this));
+          _presentationModeListenerBinding.wrap(this));
 
     _userManager = BaseShellUserManager(userProvider);
 
