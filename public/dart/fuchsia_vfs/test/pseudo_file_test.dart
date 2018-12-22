@@ -93,7 +93,7 @@ void main() {
 
     test('onOpen event on flag validation error', () async {
       var file = _createReadOnlyFile(
-          '', openRightWritable | openFlagStatus, ZX.ERR_NOT_SUPPORTED);
+          '', openRightWritable | openFlagDescribe, ZX.ERR_NOT_SUPPORTED);
 
       await file.proxy.onOpen.first.then((response) {
         expect(response.s, ZX.ERR_NOT_SUPPORTED);
@@ -154,12 +154,12 @@ void main() {
       }
     });
 
-    test('connect file with mod', () async {
+    test('connect file with mode', () async {
       var file = _createReadWriteFileStub();
 
       var proxy = FileProxy();
       expect(
-          file.connect(openRightReadable | openFlagStatus, ~modeTypeFile,
+          file.connect(openRightReadable | openFlagDescribe, ~modeTypeFile,
               _getNodeInterfaceRequest(proxy)),
           ZX.ERR_INVALID_ARGS);
 
@@ -172,12 +172,12 @@ void main() {
 
       proxy = FileProxy();
       expect(
-          file.connect(openRightReadable | openFlagStatus, modeTypeFile,
+          file.connect(openRightReadable | openFlagDescribe, modeTypeFile,
               _getNodeInterfaceRequest(proxy)),
           ZX.OK);
       await proxy.onOpen.first.then((response) {
         expect(response.s, ZX.OK);
-        expect(response.info, isNull);
+        expect(response.info, isNotNull);
       }).catchError((err) async {
         fail(err.toString());
       });
@@ -187,7 +187,7 @@ void main() {
       var file = _createReadWriteFileStub();
 
       var proxy = FileProxy();
-      file.open(openRightReadable | openFlagStatus, 0, '/',
+      file.open(openRightReadable | openFlagDescribe, 0, '/',
           _getNodeInterfaceRequest(proxy));
 
       await proxy.onOpen.first.then((response) {
@@ -202,12 +202,12 @@ void main() {
       var file = _createReadWriteFileStub();
 
       var proxy = FileProxy();
-      file.open(openRightReadable | openFlagStatus, 0, '',
+      file.open(openRightReadable | openFlagDescribe, 0, '',
           _getNodeInterfaceRequest(proxy));
 
       await proxy.onOpen.first.then((response) {
         expect(response.s, ZX.OK);
-        expect(response.info, isNull);
+        expect(response.info, isNotNull);
       }).catchError((err) async {
         fail(err.toString());
       });
@@ -243,11 +243,11 @@ void main() {
 
     test('onOpen event on success', () async {
       var file =
-          _createReadOnlyFile('test_str', openRightReadable | openFlagStatus);
+          _createReadOnlyFile('test_str', openRightReadable | openFlagDescribe);
 
       await file.proxy.onOpen.first.then((response) {
         expect(response.s, ZX.OK);
-        expect(response.info, isNull);
+        expect(response.info, isNotNull);
       }).catchError((err) async {
         fail(err.toString());
       });
@@ -257,12 +257,12 @@ void main() {
       var file = _createReadOnlyFile('test_str', openRightReadable);
 
       var clonedProxy = FileProxy();
-      await file.proxy.clone(openRightReadable | openFlagStatus,
+      await file.proxy.clone(openRightReadable | openFlagDescribe,
           _getNodeInterfaceRequest(clonedProxy));
 
       await clonedProxy.onOpen.first.then((response) {
         expect(response.s, ZX.OK);
-        expect(response.info, isNull);
+        expect(response.info, isNotNull);
       }).catchError((err) async {
         fail(err.toString());
       });
@@ -279,7 +279,7 @@ void main() {
 
         var clonedProxy = FileProxy();
         await proxy.clone(
-            flag | openFlagStatus, _getNodeInterfaceRequest(clonedProxy));
+            flag | openFlagDescribe, _getNodeInterfaceRequest(clonedProxy));
 
         await clonedProxy.onOpen.first.then((response) {
           expect(response.s, ZX.ERR_ACCESS_DENIED);
@@ -291,8 +291,8 @@ void main() {
     });
 
     test('onOpen with describe flag', () async {
-      var file = _createReadOnlyFile(
-          'test_str', openRightReadable | openFlagDescribe | openFlagStatus);
+      var file =
+          _createReadOnlyFile('test_str', openRightReadable | openFlagDescribe);
 
       await file.proxy.onOpen.first.then((response) {
         expect(response.s, ZX.OK);

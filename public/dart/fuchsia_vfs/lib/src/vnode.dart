@@ -45,11 +45,12 @@ abstract class Vnode {
       return;
     }
     sendErrorEvent(flags, ZX.ERR_NOT_DIR, request);
+    // TODO(anmittal): This should just send an onOpen event with this error and then close |request|.
   }
 
   /// Create a error node to send onOpen event with failure status.
   void sendErrorEvent(int flags, int status, InterfaceRequest<Node> request) {
-    if (flags & openFlagStatus != 0) {
+    if ((flags & openFlagDescribe) != 0) {
       var e = ErrorNodeForSendingEvent(status, _removeErrorNode, request);
       _errorNodes.add(e);
     }

@@ -162,7 +162,7 @@ void main() {
         var i = 0;
         for (var flag in invalidFlags) {
           DirectoryProxy proxy = DirectoryProxy();
-          var status = dir.connect(flag | openFlagStatus, 0,
+          var status = dir.connect(flag | openFlagDescribe, 0,
               InterfaceRequest(proxy.ctrl.request().passChannel()));
           expect(status, isNot(ZX.OK), reason: 'flagIndex: $i');
           i++;
@@ -188,7 +188,7 @@ void main() {
         var i = 0;
         for (var mode in invalidModes) {
           DirectoryProxy proxy = DirectoryProxy();
-          var status = dir.connect(openFlagStatus, mode,
+          var status = dir.connect(openFlagDescribe, mode,
               InterfaceRequest(proxy.ctrl.request().passChannel()));
           expect(status, ZX.ERR_INVALID_ARGS, reason: 'modeIndex: $i');
           i++;
@@ -212,11 +212,11 @@ void main() {
 
     test('open passes', () async {
       PseudoDir dir = PseudoDir();
-      DirectoryProxy proxy = _getProxyForDir(dir, openFlagStatus);
+      DirectoryProxy proxy = _getProxyForDir(dir, openFlagDescribe);
 
       await proxy.onOpen.first.then((response) {
         expect(response.s, ZX.OK);
-        expect(response.info, isNull);
+        expect(response.info, isNotNull);
       }).catchError((err) async {
         fail(err.toString());
       });
@@ -232,13 +232,13 @@ void main() {
       var i = 0;
       for (var mode in validModes) {
         DirectoryProxy proxy = DirectoryProxy();
-        var status = dir.connect(openFlagStatus, mode,
+        var status = dir.connect(openFlagDescribe, mode,
             InterfaceRequest(proxy.ctrl.request().passChannel()));
         expect(status, ZX.OK, reason: 'modeIndex: $i');
         i++;
         await proxy.onOpen.first.then((response) {
-          expect(response.s, status);
-          expect(response.info, isNull);
+          expect(response.s, ZX.OK);
+          expect(response.info, isNotNull);
         }).catchError((err) async {
           fail(err.toString());
         });
@@ -247,22 +247,13 @@ void main() {
 
     test('open passes with valid flags', () async {
       PseudoDir dir = PseudoDir();
-      var validFlags = [
-        openRightReadable,
-        openFlagDirectory,
-        openFlagStatus,
-        openFlagDescribe
-      ];
+      var validFlags = [openRightReadable, openFlagDirectory];
 
       for (var flag in validFlags) {
-        DirectoryProxy proxy = _getProxyForDir(dir, flag | openFlagStatus);
+        DirectoryProxy proxy = _getProxyForDir(dir, flag | openFlagDescribe);
         await proxy.onOpen.first.then((response) {
           expect(response.s, ZX.OK);
-          if (flag == openFlagDescribe) {
-            expect(response.info, isNotNull);
-          } else {
-            expect(response.info, isNull);
-          }
+          expect(response.info, isNotNull);
         }).catchError((err) async {
           fail(err.toString());
         });
@@ -734,7 +725,7 @@ void main() {
         var proxy = _getProxyForDir(dir);
 
         FileProxy fileProxy = FileProxy();
-        await proxy.open(openRightReadable | openFlagStatus, 0, 'file1/',
+        await proxy.open(openRightReadable | openFlagDescribe, 0, 'file1/',
             InterfaceRequest(fileProxy.ctrl.request().passChannel()));
 
         await fileProxy.onOpen.first.then((response) {
@@ -751,7 +742,7 @@ void main() {
         var proxy = _getProxyForDir(dir);
 
         FileProxy fileProxy = FileProxy();
-        await proxy.open(openRightReadable | openFlagStatus, 0, 'file1/file2',
+        await proxy.open(openRightReadable | openFlagDescribe, 0, 'file1/file2',
             InterfaceRequest(fileProxy.ctrl.request().passChannel()));
 
         await fileProxy.onOpen.first.then((response) {
@@ -801,15 +792,15 @@ void main() {
     test('test clone', () async {
       PseudoDir dir = PseudoDir();
 
-      var proxy = _getProxyForDir(dir, openFlagStatus);
+      var proxy = _getProxyForDir(dir, 0);
 
       DirectoryProxy newProxy = DirectoryProxy();
-      await proxy.clone(openFlagStatus,
+      await proxy.clone(openFlagDescribe,
           InterfaceRequest(newProxy.ctrl.request().passChannel()));
 
       await newProxy.onOpen.first.then((response) {
         expect(response.s, ZX.OK);
-        expect(response.info, isNull);
+        expect(response.info, isNotNull);
       }).catchError((err) async {
         fail(err.toString());
       });
@@ -818,10 +809,10 @@ void main() {
     test('test clone fails for invalid flags', () async {
       PseudoDir dir = PseudoDir();
 
-      var proxy = _getProxyForDir(dir, openFlagStatus);
+      var proxy = _getProxyForDir(dir, 0);
 
       DirectoryProxy newProxy = DirectoryProxy();
-      await proxy.clone(openFlagTruncate | openFlagStatus,
+      await proxy.clone(openFlagTruncate | openFlagDescribe,
           InterfaceRequest(newProxy.ctrl.request().passChannel()));
 
       await newProxy.onOpen.first.then((response) {

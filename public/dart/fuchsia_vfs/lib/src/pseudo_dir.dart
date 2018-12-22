@@ -164,10 +164,7 @@ class PseudoDir extends Vnode {
   }
 
   int _validateFlags(int flags) {
-    var allowedFlags = openRightReadable |
-        openFlagDirectory |
-        openFlagStatus |
-        openFlagDescribe;
+    var allowedFlags = openRightReadable | openFlagDirectory | openFlagDescribe;
     var prohibitedFlags = openFlagCreate |
         openFlagCreateIfAbsent |
         openFlagTruncate |
@@ -220,15 +217,12 @@ class _DirConnection extends Directory {
 
   @override
   Stream<Directory$OnOpen$Response> get onOpen {
-    if (_flags & openFlagStatus != 0) {
-      NodeInfo nodeInfo;
-      if (_flags & openFlagDescribe != 0) {
-        nodeInfo = _describe();
-      }
-      var d = Directory$OnOpen$Response(ZX.OK, nodeInfo);
-      return Stream.fromIterable([d]);
+    if ((_flags & openFlagDescribe) == 0) {
+      return null;
     }
-    return null;
+    NodeInfo nodeInfo = _describe();
+    var d = Directory$OnOpen$Response(ZX.OK, nodeInfo);
+    return Stream.fromIterable([d]);
   }
 
   @override

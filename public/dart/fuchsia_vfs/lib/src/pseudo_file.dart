@@ -143,7 +143,7 @@ class PseudoFile extends Vnode {
     if (flags & openFlagDirectory != 0) {
       return ZX.ERR_NOT_DIR;
     }
-    var allowedFlags = openFlagStatus | openFlagDescribe;
+    var allowedFlags = openFlagDescribe;
     if (_readFn != null) {
       allowedFlags |= openRightReadable;
     }
@@ -234,15 +234,12 @@ class _FileConnection extends File {
 
   @override
   Stream<File$OnOpen$Response> get onOpen {
-    if (flags & openFlagStatus != 0) {
-      NodeInfo nodeInfo;
-      if (flags & openFlagDescribe != 0) {
-        nodeInfo = _describe();
-      }
-      var d = File$OnOpen$Response(ZX.OK, nodeInfo);
-      return Stream.fromIterable([d]);
+    if ((flags & openFlagDescribe) == 0) {
+      return null;
     }
-    return null;
+    NodeInfo nodeInfo = _describe();
+    var d = File$OnOpen$Response(ZX.OK, nodeInfo);
+    return Stream.fromIterable([d]);
   }
 
   @override
