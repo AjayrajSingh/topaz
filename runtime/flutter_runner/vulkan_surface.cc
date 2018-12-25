@@ -336,7 +336,18 @@ bool VulkanSurface::PushSessionImageSetupOps(scenic::Session* session) {
   image_info.stride = 4 * sk_surface_->width();
   image_info.pixel_format = fuchsia::images::PixelFormat::BGRA_8;
   image_info.color_space = fuchsia::images::ColorSpace::SRGB;
-  image_info.tiling = fuchsia::images::Tiling::LINEAR;
+  switch (vulkan_image_.vk_image_create_info.tiling) {
+    case VK_IMAGE_TILING_OPTIMAL:
+      image_info.tiling = fuchsia::images::Tiling::GPU_OPTIMAL;
+      break;
+    case VK_IMAGE_TILING_LINEAR:
+      image_info.tiling = fuchsia::images::Tiling::LINEAR;
+      break;
+    default:
+      FML_DLOG(ERROR) << "Bad image tiling: "
+                      << vulkan_image_.vk_image_create_info.tiling;
+      return false;
+  }
 
   session_image_ = std::make_unique<scenic::Image>(
       *scenic_memory_, 0 /* memory offset */, std::move(image_info));
