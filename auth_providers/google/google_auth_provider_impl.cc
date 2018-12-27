@@ -170,17 +170,17 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
 }
 
 void GoogleAuthProviderImpl::GetAppAccessToken(
-    fidl::StringPtr credential, fidl::StringPtr app_client_id,
-    const fidl::VectorPtr<fidl::StringPtr> app_scopes,
+    std::string credential, fidl::StringPtr app_client_id,
+    const std::vector<std::string> app_scopes,
     GetAppAccessTokenCallback callback) {
-  if (credential->empty()) {
+  if (credential.empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
     return;
   }
 
   auto request =
       OAuthRequestBuilder(kGoogleOAuthTokenEndpoint, "POST")
-          .SetUrlEncodedBody("refresh_token=" + credential.get() +
+          .SetUrlEncodedBody("refresh_token=" + credential +
                              "&client_id=" + GetClientId(app_client_id.get()) +
                              "&grant_type=refresh_token");
 
@@ -209,17 +209,17 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
   });
 }
 
-void GoogleAuthProviderImpl::GetAppIdToken(fidl::StringPtr credential,
+void GoogleAuthProviderImpl::GetAppIdToken(std::string credential,
                                            fidl::StringPtr audience,
                                            GetAppIdTokenCallback callback) {
-  if (credential->empty()) {
+  if (credential.empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
     return;
   }
 
   auto request =
       OAuthRequestBuilder(kGoogleOAuthTokenEndpoint, "POST")
-          .SetUrlEncodedBody("refresh_token=" + credential.get() +
+          .SetUrlEncodedBody("refresh_token=" + credential +
                              "&client_id=" + GetClientId(audience.get()) +
                              "&grant_type=refresh_token");
 
@@ -247,19 +247,19 @@ void GoogleAuthProviderImpl::GetAppIdToken(fidl::StringPtr credential,
 }
 
 void GoogleAuthProviderImpl::GetAppFirebaseToken(
-    fidl::StringPtr id_token, fidl::StringPtr firebase_api_key,
+    std::string id_token, std::string firebase_api_key,
     GetAppFirebaseTokenCallback callback) {
-  if (id_token->empty() || firebase_api_key->empty()) {
+  if (id_token.empty() || firebase_api_key.empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
     return;
   }
 
   std::map<std::string, std::string> query_params;
-  query_params["key"] = firebase_api_key.get();
+  query_params["key"] = firebase_api_key;
   auto request =
       OAuthRequestBuilder(kFirebaseAuthEndpoint, "POST")
           .SetQueryParams(query_params)
-          .SetJsonBody(R"({"postBody": "id_token=)" + id_token.get() +
+          .SetJsonBody(R"({"postBody": "id_token=)" + id_token +
                        R"(&providerId=google.com",)" +
                        R"("returnIdpCredential": true,)" +
                        R"("returnSecureToken": true,)" +
@@ -291,15 +291,15 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
 }
 
 void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
-    fidl::StringPtr credential,
+    std::string credential,
     RevokeAppOrPersistentCredentialCallback callback) {
-  if (credential->empty()) {
+  if (credential.empty()) {
     callback(AuthProviderStatus::BAD_REQUEST);
     return;
   }
 
   std::string url =
-      kGoogleRevokeTokenEndpoint + std::string("?token=") + credential.get();
+      kGoogleRevokeTokenEndpoint + std::string("?token=") + credential;
   auto request = OAuthRequestBuilder(url, "POST").SetUrlEncodedBody("");
 
   auto request_factory = fxl::MakeCopyable(
@@ -332,19 +332,19 @@ void GoogleAuthProviderImpl::GetPersistentCredentialFromAttestationJWT(
 
 void GoogleAuthProviderImpl::GetAppAccessTokenFromAssertionJWT(
     fidl::InterfaceHandle<AttestationSigner> attestation_signer,
-    AssertionJWTParams jwt_params, fidl::StringPtr credential,
-    const fidl::VectorPtr<fidl::StringPtr> scopes,
+    AssertionJWTParams jwt_params, std::string credential,
+    const std::vector<std::string> scopes,
     GetAppAccessTokenFromAssertionJWTCallback callback) {
   // Remote attestation flow not supported for traditional OAuth.
   callback(AuthProviderStatus::BAD_REQUEST, nullptr, nullptr, nullptr);
 }
 
-void GoogleAuthProviderImpl::WillSendRequest(fidl::StringPtr incoming_url) {
+void GoogleAuthProviderImpl::WillSendRequest(std::string incoming_url) {
   FXL_CHECK(get_persistent_credential_callback_);
 
   std::string auth_code;
   AuthProviderStatus status =
-      ParseAuthCodeFromUrl(incoming_url.get(), auth_code);
+      ParseAuthCodeFromUrl(incoming_url, auth_code);
 
   // If either an error occured or the user successfully received an auth code
   // we need to close the WebView.

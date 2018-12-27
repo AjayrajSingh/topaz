@@ -50,23 +50,23 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
       GetPersistentCredentialCallback callback) override;
 
   // |AuthProvider|
-  void GetAppAccessToken(fidl::StringPtr credential,
+  void GetAppAccessToken(std::string credential,
                          fidl::StringPtr app_client_id,
-                         const fidl::VectorPtr<fidl::StringPtr> app_scopes,
+                         const std::vector<std::string> app_scopes,
                          GetAppAccessTokenCallback callback) override;
 
   // |AuthProvider|
-  void GetAppIdToken(fidl::StringPtr credential, fidl::StringPtr audience,
+  void GetAppIdToken(std::string credential, fidl::StringPtr audience,
                      GetAppIdTokenCallback callback) override;
 
   // |AuthProvider|
-  void GetAppFirebaseToken(fidl::StringPtr id_token,
-                           fidl::StringPtr firebase_api_key,
+  void GetAppFirebaseToken(std::string id_token,
+                           std::string firebase_api_key,
                            GetAppFirebaseTokenCallback callback) override;
 
   // |AuthProvider|
   void RevokeAppOrPersistentCredential(
-      fidl::StringPtr credential,
+      std::string credential,
       RevokeAppOrPersistentCredentialCallback callback) override;
 
   // |AuthProvider|
@@ -80,12 +80,12 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
   // |AuthProvider|
   void GetAppAccessTokenFromAssertionJWT(
       fidl::InterfaceHandle<AttestationSigner> attestation_signer,
-      AssertionJWTParams jwt_params, fidl::StringPtr credential,
-      fidl::VectorPtr<fidl::StringPtr> scopes,
+      AssertionJWTParams jwt_params, std::string credential,
+      std::vector<std::string> scopes,
       GetAppAccessTokenFromAssertionJWTCallback callback) override;
 
   // |fuchsia::webview::WebRequestDelegate|
-  void WillSendRequest(fidl::StringPtr incoming_url) override;
+  void WillSendRequest(std::string incoming_url) override;
 
   // |chromium::Web::NavigationEventObserver|
   void OnNavigationStateChanged(

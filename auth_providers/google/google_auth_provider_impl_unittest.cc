@@ -54,7 +54,7 @@ TEST_F(GoogleAuthProviderImplTest, GetAppAccessTokenSuccess) {
   bool callback_called = false;
   auto status = AuthProviderStatus::INTERNAL_ERROR;
   AuthTokenPtr access_token;
-  auto scopes = fidl::VectorPtr<fidl::StringPtr>::New(0);
+  std::vector<std::string> scopes;
   scopes.push_back("https://www.googleapis.com/auth/gmail.modify");
   scopes.push_back("https://www.googleapis.com/auth/userinfo.email");
 
@@ -82,7 +82,7 @@ TEST_F(GoogleAuthProviderImplTest, GetAppAccessTokenBadRequestError) {
   bool callback_called = false;
   auto status = AuthProviderStatus::INTERNAL_ERROR;
   fuchsia::auth::AuthTokenPtr access_token;
-  auto scopes = fidl::VectorPtr<fidl::StringPtr>::New(0);
+  std::vector<std::string> scopes;
   scopes.push_back("https://www.googleapis.com/auth/gmail.modify");
 
   auth_provider_->GetAppAccessToken(
@@ -100,7 +100,7 @@ TEST_F(GoogleAuthProviderImplTest, GetAppAccessTokenInvalidClientError) {
   bool callback_called = false;
   auto status = AuthProviderStatus::INTERNAL_ERROR;
   AuthTokenPtr access_token;
-  auto scopes = fidl::VectorPtr<fidl::StringPtr>::New(0);
+  std::vector<std::string> scopes;
   scopes.push_back("https://www.googleapis.com/auth/gmail.modify");
   scopes.push_back("https://www.googleapis.com/auth/userinfo.email");
 
@@ -124,7 +124,7 @@ TEST_F(GoogleAuthProviderImplTest, GetAppAccessTokenInvalidUserError) {
   bool callback_called = false;
   auto status = AuthProviderStatus::INTERNAL_ERROR;
   AuthTokenPtr access_token;
-  auto scopes = fidl::VectorPtr<fidl::StringPtr>::New(0);
+  std::vector<std::string> scopes;
   scopes.push_back("https://www.googleapis.com/auth/gmail.modify");
   scopes.push_back("https://www.googleapis.com/auth/userinfo.email");
 

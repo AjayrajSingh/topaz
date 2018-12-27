@@ -382,7 +382,7 @@ void MediaPlayerView::HandleStatusChanged(
   if (status.metadata && !metadata_shown_) {
     FXL_DLOG(INFO) << "duration   " << std::fixed << std::setprecision(1)
                    << double(duration_ns_) / 1000000000.0 << " seconds";
-    for (auto& property : *status.metadata->properties) {
+    for (auto& property : status.metadata->properties) {
       FXL_DLOG(INFO) << property.label << ": " << property.value;
     }
 

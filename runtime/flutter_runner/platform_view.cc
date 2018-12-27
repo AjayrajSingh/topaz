@@ -120,7 +120,7 @@ PlatformView::~PlatformView() = default;
 #ifndef SCENIC_VIEWS2
 void PlatformView::OfferServiceProvider(
     fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
-    fidl::VectorPtr<fidl::StringPtr> services) {
+    std::vector<std::string> services) {
   view_->OfferServiceProvider(std::move(service_provider), std::move(services));
 }
 #endif
@@ -230,7 +230,7 @@ void PlatformView::DidUpdateState(
   rapidjson::Document document;
   auto& allocator = document.GetAllocator();
   rapidjson::Value encoded_state(rapidjson::kObjectType);
-  encoded_state.AddMember("text", state.text.get(), allocator);
+  encoded_state.AddMember("text", state.text, allocator);
   encoded_state.AddMember("selectionBase", state.selection.base, allocator);
   encoded_state.AddMember("selectionExtent", state.selection.extent, allocator);
   switch (state.selection.affinity) {
@@ -307,14 +307,14 @@ void PlatformView::OnAction(fuchsia::ui::input::InputMethodAction action) {
   );
 }
 
-void PlatformView::OnScenicError(fidl::StringPtr error) {
+void PlatformView::OnScenicError(std::string error) {
   FML_LOG(ERROR) << "Session error: " << error;
   session_listener_error_callback_();
 }
 
 void PlatformView::OnScenicEvent(
-    fidl::VectorPtr<fuchsia::ui::scenic::Event> events) {
-  for (const auto& event : *events) {
+    std::vector<fuchsia::ui::scenic::Event> events) {
+  for (const auto& event : events) {
     switch (event.Which()) {
       case fuchsia::ui::scenic::Event::Tag::kGfx:
         switch (event.gfx().Which()) {

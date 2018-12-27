@@ -15,7 +15,7 @@ class NativesDelegate {
  public:
   virtual void OfferServiceProvider(
       fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>,
-      fidl::VectorPtr<fidl::StringPtr> services) = 0;
+      std::vector<std::string> services) = 0;
 
  protected:
   virtual ~NativesDelegate();

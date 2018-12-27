@@ -75,7 +75,7 @@ class PlatformView final : public shell::PlatformView,
 #ifndef SCENIC_VIEWS2
   void OfferServiceProvider(
       fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
-      fidl::VectorPtr<fidl::StringPtr> services);
+      std::vector<std::string> services);
 #endif
 
  private:
@@ -151,9 +151,9 @@ class PlatformView final : public shell::PlatformView,
   void OnAction(fuchsia::ui::input::InputMethodAction action) override;
 
   // |fuchsia::ui::scenic::SessionListener|
-  void OnScenicError(fidl::StringPtr error) override;
+  void OnScenicError(std::string error) override;
   void OnScenicEvent(
-      fidl::VectorPtr<fuchsia::ui::scenic::Event> events) override;
+      std::vector<fuchsia::ui::scenic::Event> events) override;
 
   bool OnHandlePointerEvent(const fuchsia::ui::input::PointerEvent& pointer);
 

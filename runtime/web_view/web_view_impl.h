@@ -62,7 +62,7 @@ class WebViewImpl : public scenic::V1BaseView,
   void OnAction(fuchsia::ui::input::InputMethodAction action) override;
 
   // |WebView|:
-  void SetUrl(fidl::StringPtr url) override;
+  void SetUrl(std::string url) override;
 
  private:
   // |WebView|:

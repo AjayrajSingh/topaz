@@ -104,10 +104,10 @@ void SpotifyAuthProviderImpl::GetPersistentCredential(
 }
 
 void SpotifyAuthProviderImpl::GetAppAccessToken(
-    const fidl::StringPtr credential, const fidl::StringPtr app_client_id,
-    const fidl::VectorPtr<fidl::StringPtr> app_scopes,
+    const std::string credential, const fidl::StringPtr app_client_id,
+    const std::vector<std::string> app_scopes,
     GetAppAccessTokenCallback callback) {
-  if (credential->empty()) {
+  if (credential.empty()) {
     callback(AuthProviderStatus::BAD_REQUEST, nullptr);
     return;
   }
@@ -118,7 +118,7 @@ void SpotifyAuthProviderImpl::GetAppAccessToken(
   }
 
   auto request = OAuthRequestBuilder(kSpotifyOAuthTokenEndpoint, "POST")
-                     .SetUrlEncodedBody("refresh_token=" + credential.get() +
+                     .SetUrlEncodedBody("refresh_token=" + credential +
                                         "&client_id=" + app_client_id.get() +
                                         "&grant_type=refresh_token");
 
@@ -147,7 +147,7 @@ void SpotifyAuthProviderImpl::GetAppAccessToken(
   });
 }
 
-void SpotifyAuthProviderImpl::GetAppIdToken(const fidl::StringPtr credential,
+void SpotifyAuthProviderImpl::GetAppIdToken(const std::string credential,
                                             const fidl::StringPtr audience,
                                             GetAppIdTokenCallback callback) {
   // Id Tokens are not supported by Spotify.
@@ -155,14 +155,14 @@ void SpotifyAuthProviderImpl::GetAppIdToken(const fidl::StringPtr credential,
 }
 
 void SpotifyAuthProviderImpl::GetAppFirebaseToken(
-    const fidl::StringPtr id_token, const fidl::StringPtr firebase_api_key,
+    const std::string id_token, const std::string firebase_api_key,
     GetAppFirebaseTokenCallback callback) {
   // Firebase Token doesn't exist for Spotify.
   callback(AuthProviderStatus::BAD_REQUEST, nullptr);
 }
 
 void SpotifyAuthProviderImpl::RevokeAppOrPersistentCredential(
-    const fidl::StringPtr credential,
+    const std::string credential,
     RevokeAppOrPersistentCredentialCallback callback) {
   // There is no programmatic way to revoke tokens. Instead, Spotify users have
   // to manually revoke access from this page here:
@@ -182,18 +182,18 @@ void SpotifyAuthProviderImpl::GetPersistentCredentialFromAttestationJWT(
 
 void SpotifyAuthProviderImpl::GetAppAccessTokenFromAssertionJWT(
     fidl::InterfaceHandle<AttestationSigner> attestation_signer,
-    AssertionJWTParams jwt_params, fidl::StringPtr credential,
-    const fidl::VectorPtr<fidl::StringPtr> app_scopes,
+    AssertionJWTParams jwt_params, std::string credential,
+    const std::vector<std::string> app_scopes,
     GetAppAccessTokenFromAssertionJWTCallback callback) {
   // Remote attestation flow not supported.
   callback(AuthProviderStatus::BAD_REQUEST, nullptr, nullptr, nullptr);
 }
 
 void SpotifyAuthProviderImpl::WillSendRequest(
-    const fidl::StringPtr incoming_url) {
+    const std::string incoming_url) {
   FXL_DCHECK(get_persistent_credential_callback_);
 
-  const std::string& uri = incoming_url.get();
+  const std::string& uri = incoming_url;
   const std::string prefix = std::string{kRedirectUri} + "?code=";
   const std::string cancel_prefix =
       std::string{kRedirectUri} + "?error=access_denied";

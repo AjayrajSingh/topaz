@@ -98,10 +98,10 @@ SkFontStyle::Slant FuchsiaToSkSlant(fuchsia::fonts::Slant slant) {
   }
 }
 
-fidl::VectorPtr<fidl::StringPtr> BuildLanguageList(const char* bcp47[],
+fidl::VectorPtr<std::string> BuildLanguageList(const char* bcp47[],
                                                    int bcp47_count) {
   FXL_DCHECK(bcp47 != nullptr || bcp47_count == 0);
-  auto languages = fidl::VectorPtr<fidl::StringPtr>::New(0);
+  auto languages = fidl::VectorPtr<std::string>::New(0);
   for (int i = 0; i < bcp47_count; i++) {
     languages.push_back(bcp47[i]);
   }
@@ -317,7 +317,7 @@ SkFontStyleSet* FuchsiaFontManager::onMatchFamily(
     return nullptr;
 
   std::vector<SkFontStyle> styles;
-  for (auto& style : *(family_info->styles)) {
+  for (auto& style : family_info->styles) {
     styles.push_back(
         SkFontStyle(style.weight, style.width, FuchsiaToSkSlant(style.slant)));
   }

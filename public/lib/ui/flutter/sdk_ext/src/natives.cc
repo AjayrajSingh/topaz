@@ -108,7 +108,7 @@ void Scenic_offerServiceProvider(Dart_NativeArguments args) {
   if (Dart_IsError(result)) {
     return;
   }
-  fidl::VectorPtr<fidl::StringPtr> services;
+  std::vector<std::string> services;
   services.resize(list_length);
   for (intptr_t index = 0; index < list_length; ++index) {
     Dart_Handle value = Dart_ListGetAt(list, index);
@@ -125,7 +125,7 @@ void Scenic_offerServiceProvider(Dart_NativeArguments args) {
     }
 
     buffer[length] = '\0';
-    services->at(index) = std::string(buffer);
+    services.at(index) = std::string(buffer);
   }
 
   NativesDelegate* delegate = reinterpret_cast<NativesDelegate*>(context);

@@ -49,24 +49,24 @@ class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
       GetPersistentCredentialCallback callback) override;
 
   // |AuthProvider|
-  void GetAppAccessToken(const fidl::StringPtr credential,
+  void GetAppAccessToken(const std::string credential,
                          const fidl::StringPtr app_client_id,
-                         const fidl::VectorPtr<fidl::StringPtr> app_scopes,
+                         const std::vector<std::string> app_scopes,
                          GetAppAccessTokenCallback callback) override;
 
   // |AuthProvider|
-  void GetAppIdToken(const fidl::StringPtr credential,
+  void GetAppIdToken(const std::string credential,
                      const fidl::StringPtr audience,
                      GetAppIdTokenCallback callback) override;
 
   // |AuthProvider|
-  void GetAppFirebaseToken(const fidl::StringPtr id_token,
-                           const fidl::StringPtr firebase_api_key,
+  void GetAppFirebaseToken(const std::string id_token,
+                           const std::string firebase_api_key,
                            GetAppFirebaseTokenCallback callback) override;
 
   // |AuthProvider|
   void RevokeAppOrPersistentCredential(
-      const fidl::StringPtr credential,
+      const std::string credential,
       RevokeAppOrPersistentCredentialCallback callback) override;
 
   // |AuthProvider|
@@ -80,12 +80,12 @@ class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
   // |AuthProvider|
   void GetAppAccessTokenFromAssertionJWT(
       fidl::InterfaceHandle<AttestationSigner> attestation_signer,
-      AssertionJWTParams jwt_params, const fidl::StringPtr credential,
-      const fidl::VectorPtr<fidl::StringPtr> app_scopes,
+      AssertionJWTParams jwt_params, const std::string credential,
+      const std::vector<std::string> app_scopes,
       GetAppAccessTokenFromAssertionJWTCallback callback) override;
 
   // |fuchsia::webview::WebRequestDelegate|
-  void WillSendRequest(const fidl::StringPtr incoming_url) override;
+  void WillSendRequest(const std::string incoming_url) override;
 
   void GetUserProfile(const fidl::StringPtr credential,
                       const fidl::StringPtr access_token);

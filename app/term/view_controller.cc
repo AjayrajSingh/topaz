@@ -40,7 +40,6 @@ ViewController::ViewController(scenic::ViewContext view_context,
 
   fuchsia::fonts::Request font_request;
   font_request.family = "RobotoMono";
-  font_request.language = fidl::VectorPtr<fidl::StringPtr>::New(0);
   font_loader_.LoadFont(
       std::move(font_request), [this](sk_sp<SkTypeface> typeface) {
         FXL_CHECK(typeface);  // TODO(jpoichet): Fail gracefully.

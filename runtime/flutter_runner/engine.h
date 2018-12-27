@@ -64,7 +64,7 @@ class Engine final : public mozart::NativesDelegate {
   // |mozart::NativesDelegate|
   void OfferServiceProvider(
       fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
-      fidl::VectorPtr<fidl::StringPtr> services);
+      std::vector<std::string> services);
 
   FML_DISALLOW_COPY_AND_ASSIGN(Engine);
 };

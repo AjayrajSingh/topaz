@@ -53,7 +53,7 @@ TEST_F(SpotifyAuthProviderImplTest, GetAppAccessTokenSuccess) {
   bool callback_called = false;
   auto status = AuthProviderStatus::INTERNAL_ERROR;
   AuthTokenPtr access_token;
-  auto scopes = fidl::VectorPtr<fidl::StringPtr>::New(0);
+  std::vector<std::string> scopes;
   scopes.push_back("http://spotifyapis.test.com/scope1");
   scopes.push_back("http://spotifyapis.test.com/scope2");
 
@@ -80,7 +80,7 @@ TEST_F(SpotifyAuthProviderImplTest, GetAppAccessTokenError) {
   bool callback_called = false;
   auto status = AuthProviderStatus::INTERNAL_ERROR;
   AuthTokenPtr access_token;
-  auto scopes = fidl::VectorPtr<fidl::StringPtr>::New(0);
+  std::vector<std::string> scopes;
   scopes.push_back("http://spotifyapis.test.com/scope1");
   scopes.push_back("http://spotifyapis.test.com/scope2");
 

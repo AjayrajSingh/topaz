@@ -427,7 +427,7 @@ void Engine::OnSessionSizeChangeHint(float width_change_factor,
 // |mozart::NativesDelegate|
 void Engine::OfferServiceProvider(
     fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
-    fidl::VectorPtr<fidl::StringPtr> services) {
+    std::vector<std::string> services) {
 #ifndef SCENIC_VIEWS2
   if (!shell_) {
     return;

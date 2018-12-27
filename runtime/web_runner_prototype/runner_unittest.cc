@@ -49,7 +49,7 @@ class FakeWebView : public fuchsia::ui::app::ViewProvider,
   // |fuchsia::webview::WebView|:
   void ClearCookies() final {}
 
-  void SetUrl(fidl::StringPtr url) final { last_url_ = *url; }
+  void SetUrl(std::string url) final { last_url_ = url; }
 
   void SetWebRequestDelegate(
       fidl::InterfaceHandle<fuchsia::webview::WebRequestDelegate> delegate)

@@ -151,7 +151,7 @@ void WebViewImpl::OnAction(fuchsia::ui::input::InputMethodAction action) {
 }
 
 // |WebView|:
-void WebViewImpl::SetUrl(fidl::StringPtr url) {
+void WebViewImpl::SetUrl(std::string url) {
   url_ = url;
   // Reset url_set_ so that the next OnDraw() knows to call
   // web_view_.setURL()

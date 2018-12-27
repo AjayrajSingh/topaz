@@ -60,8 +60,8 @@ DartComponentController::DartComponentController(
       binding_(this) {
   for (size_t i = 0; i < startup_info_.program_metadata->size(); ++i) {
     auto pg = startup_info_.program_metadata->at(i);
-    if (pg.key.get().compare(kDataKey) == 0) {
-      data_path_ = "pkg/" + pg.value.get();
+    if (pg.key.compare(kDataKey) == 0) {
+      data_path_ = "pkg/" + pg.value;
     }
   }
   if (data_path_.empty()) {
@@ -131,19 +131,19 @@ bool DartComponentController::SetupNamespace() {
 
   fuchsia::dart::SetupComponentTemp(namespace_);
 
-  for (size_t i = 0; i < flat->paths->size(); ++i) {
-    if ((flat->paths->at(i) == kTmpPath) ||
-        (flat->paths->at(i) == kServiceRootPath)) {
+  for (size_t i = 0; i < flat->paths.size(); ++i) {
+    if ((flat->paths.at(i) == kTmpPath) ||
+        (flat->paths.at(i) == kServiceRootPath)) {
       // /tmp is covered by the local memfs.
       // Ownership of /svc goes to the StartupContext created below.
       continue;
     }
-    zx::channel dir = std::move(flat->directories->at(i));
+    zx::channel dir = std::move(flat->directories.at(i));
     zx_handle_t dir_handle = dir.release();
-    const char* path = flat->paths->at(i)->data();
+    const char* path = flat->paths.at(i).data();
     status = fdio_ns_bind(namespace_, path, dir_handle);
     if (status != ZX_OK) {
-      FXL_LOG(ERROR) << "Failed to bind " << flat->paths->at(i)
+      FXL_LOG(ERROR) << "Failed to bind " << flat->paths.at(i)
                      << " to namespace: " << zx_status_get_string(status);
       zx_handle_close(dir_handle);
       return false;
@@ -336,7 +336,7 @@ bool DartComponentController::Main() {
   tonic::DartMicrotaskQueue::StartForCurrentThread();
   deprecated_loop::MessageLoop::GetCurrent()->SetAfterTaskCallback(AfterTask);
 
-  fidl::VectorPtr<fidl::StringPtr> arguments =
+  std::vector<std::string> arguments =
       std::move(startup_info_.launch_info.arguments);
 
   // TODO(abarth): Remove service_provider_bridge once we have an
@@ -376,16 +376,16 @@ bool DartComponentController::Main() {
   Dart_EnterScope();
 
   Dart_Handle dart_arguments =
-      Dart_NewListOf(Dart_CoreType_String, arguments->size());
+      Dart_NewListOf(Dart_CoreType_String, arguments.size());
   if (Dart_IsError(dart_arguments)) {
     FXL_LOG(ERROR) << "Failed to allocate Dart arguments list: "
                    << Dart_GetError(dart_arguments);
     Dart_ExitScope();
     return false;
   }
-  for (size_t i = 0; i < arguments->size(); i++) {
+  for (size_t i = 0; i < arguments.size(); i++) {
     tonic::LogIfError(
-        Dart_ListSetAt(dart_arguments, i, ToDart(arguments->at(i).get())));
+        Dart_ListSetAt(dart_arguments, i, ToDart(arguments.at(i))));
   }
 
   Dart_Handle argv[] = {

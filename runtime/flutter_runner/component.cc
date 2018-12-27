@@ -95,8 +95,8 @@ Application::Application(
   std::string data_path;
   for (size_t i = 0; i < startup_info.program_metadata->size(); ++i) {
     auto pg = startup_info.program_metadata->at(i);
-    if (pg.key.get().compare(kDataKey) == 0) {
-      data_path = "pkg/" + pg.value.get();
+    if (pg.key.compare(kDataKey) == 0) {
+      data_path = "pkg/" + pg.value;
     }
   }
   if (data_path.empty()) {
@@ -109,15 +109,15 @@ Application::Application(
   fuchsia::dart::SetupComponentTemp(fdio_ns_.get());
 
   // LaunchInfo::flat_namespace optional.
-  for (size_t i = 0; i < startup_info.flat_namespace.paths->size(); ++i) {
-    const auto& path = startup_info.flat_namespace.paths->at(i);
+  for (size_t i = 0; i < startup_info.flat_namespace.paths.size(); ++i) {
+    const auto& path = startup_info.flat_namespace.paths.at(i);
     if (path == "/tmp" || path == "/svc") {
       continue;
     }
 
-    zx::channel dir = std::move(startup_info.flat_namespace.directories->at(i));
+    zx::channel dir = std::move(startup_info.flat_namespace.directories.at(i));
     zx_handle_t dir_handle = dir.release();
-    if (fdio_ns_bind(fdio_ns_.get(), path->data(), dir_handle) != ZX_OK) {
+    if (fdio_ns_bind(fdio_ns_.get(), path.data(), dir_handle) != ZX_OK) {
       FML_DLOG(ERROR) << "Could not bind path to namespace: " << path;
       zx_handle_close(dir_handle);
     }
