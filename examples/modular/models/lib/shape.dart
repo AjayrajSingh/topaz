@@ -3,4 +3,3 @@
 // found in the LICENSE file.
 
 export 'src/shape.dart';
-export 'src/shape_codec.dart';

@@ -3,11 +3,13 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fuchsia_services/services.dart';
 import 'package:meta/meta.dart';
 
+import '../entity/entity.dart';
 import 'embedded_module.dart';
 import 'intent_handler.dart';
 import 'internal/_intent_handler_impl.dart';
@@ -83,6 +85,14 @@ abstract class Module {
     fidl.SurfaceRelation surfaceRelation,
   });
 
+  /// Creates an entity that will live for the lifetime of the story.
+  /// The entity that is created will be backed by the framework and
+  /// can be treated as if it was received from any other entity provider.
+  Future<Entity<Uint8List>> createEntity({
+    @required String type,
+    @required Uint8List initialData,
+  });
+
   /// This method functions similarly to [addModuleToStory()], but instead
   /// of relying on the story shell for display it is up to the caller to
   /// display the view from the new module.
@@ -121,5 +131,4 @@ abstract class Module {
   /// module and remove it from the story. If there are no more running modules
   /// in the story the story will be stopped.
   void removeSelfFromStory();
-
 }

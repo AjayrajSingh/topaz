@@ -21,7 +21,8 @@
     "facets": {
         "fuchsia.module": {
             "@version": 2,
-            "suggestion_headline": "Show a slider"
+            "suggestion_headline": "Show a slider",
+            "intent_filters": []
         }
     }
 }

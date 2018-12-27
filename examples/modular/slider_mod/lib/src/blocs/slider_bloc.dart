@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:example_modular_models/shape.dart';
 import 'package:fuchsia_modular/entity.dart';
@@ -12,7 +13,7 @@ import 'bloc_provider.dart';
 /// The [SliderBloc] provides actions and streams associated with
 /// the onscreen slider.
 class SliderBloc implements BlocBase {
-  final Entity<Shape> shapeEntity;
+  final Entity<Uint8List> shapeEntity;
   final Shape shape;
 
   final _valueController = StreamController<double>.broadcast();
@@ -34,6 +35,6 @@ class SliderBloc implements BlocBase {
     _valueController.add(newValue);
     shape.size = newValue;
 
-    shapeEntity.write(shape);
+    shapeEntity.write(shape.toBytes());
   }
 }

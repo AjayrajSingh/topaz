@@ -13,18 +13,22 @@ class AppBloc implements BlocBase {
 
   AppBloc(this.shapeEntity);
 
-  void launchSquare() => Module().addModuleToStory(
-      name: 'shape_module',
-      intent: _makeIntent('com.fuchsia.shapes_mod.show_square'));
+  void launchSquare() =>
+      _launchModule('shape_module', 'com.fuchsia.shapes_mod.show_square');
 
-  void launchCircle() => Module().addModuleToStory(
-      name: 'shape_module',
-      intent: _makeIntent('com.fuchsia.shapes_mod.show_circle'));
+  void launchCircle() =>
+      _launchModule('shape_module', 'com.fuchsia.shapes_mod.show_circle');
 
-  Intent _makeIntent(String action) => Intent(
+  void _launchModule(String name, String action) {
+    _makeIntent(action).then(
+        (intent) => Module().addModuleToStory(name: name, intent: intent));
+  }
+
+  Future<Intent> _makeIntent(String action) async => Intent(
         action: action,
-        handler: 'shapes_mod',
-      )..addParameterFromEntity('shape', shapeEntity);
+        handler: 'fuchsia-pkg://fuchsia.com/shapes_mod#meta/shapes_mod.cmx',
+      )..addParameterFromEntityReference(
+          'shape', await shapeEntity.getEntityReference());
 
   @override
   void dispose() {}

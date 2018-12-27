@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:typed_data';
+
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:meta/meta.dart';
 
@@ -94,12 +96,35 @@ class Intent extends fidl.Intent {
   @experimental
   Entity getEntity({
     @required String name,
-    @required EntityCodec codec,
-  }) =>
-      _entityFromIntentParameter(
+    EntityCodec codec,
+    String type,
+  }) {
+    if (codec != null) {
+      return _entityFromIntentParameter(
         parameter: _getParameter(name),
         codec: codec,
       );
+    } else {
+      return _getEntity(name: name, type: type);
+    }
+  }
+
+  /// Returns the entity with the given [name]. An entity's name maps to
+  /// the name of a  parameter in your component's manifset.
+  ///
+  /// The type is used to ensure the entity provider provides us with the
+  /// type of entity we are expecting. If the type does not match the entity
+  /// will fail to resolve.
+  // Note: this method will be renamed to getEntity when the soft transition completes.
+  Entity _getEntity({
+    @required String name,
+    @required String type,
+  }) {
+    ArgumentError.checkNotNull(name, 'name');
+    ArgumentError.checkNotNull(type, 'type');
+    return _entityFromIntentParameter(
+        parameter: _getParameter(name), type: type);
+  }
 
   void _addParameter(String name, fidl.IntentParameterData parameterData) =>
       parameters.add(fidl.IntentParameter(name: name, data: parameterData));
@@ -110,10 +135,15 @@ class Intent extends fidl.Intent {
 
   Entity _entityFromIntentParameter({
     fidl.IntentParameter parameter,
+    String type,
     EntityCodec codec,
   }) {
     if (parameter.data.tag == fidl.IntentParameterDataTag.linkName) {
       return LinkEntity(linkName: parameter.data.linkName, codec: codec);
+    } else if (parameter.data.tag ==
+        fidl.IntentParameterDataTag.entityReference) {
+      return Entity<Uint8List>(
+          type: type, entityReference: parameter.data.entityReference);
     }
     throw UnimplementedError();
   }

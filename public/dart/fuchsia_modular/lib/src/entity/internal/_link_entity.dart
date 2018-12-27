@@ -16,6 +16,7 @@ import '../../internal/_component_context.dart';
 import '../../module/internal/_module_context.dart';
 import '../entity.dart';
 import '../entity_codec.dart';
+import '../entity_exceptions.dart';
 
 /// An [Entity] implementation which supports
 /// data that lives inside links.
@@ -38,7 +39,13 @@ class LinkEntity<T> implements Entity<T> {
         assert(codec != null);
 
   @override
+  String get type => codec.type;
+
+  @override
   Future<T> getData() async => _getSnapshot();
+
+  @override
+  Future<String> getEntityReference() => null;
 
   @override
   Stream<T> watch() {

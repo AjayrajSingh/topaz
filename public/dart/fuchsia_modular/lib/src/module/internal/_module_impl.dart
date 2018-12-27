@@ -3,13 +3,18 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_mem/fidl_async.dart' as fuchsia_mem;
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl_async.dart' as views_fidl;
 import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:meta/meta.dart';
+import 'package:zircon/zircon.dart';
 
+import '../../entity/entity.dart';
+import '../../entity/internal/_entity_impl.dart';
 import '../embedded_module.dart';
 import '../intent.dart';
 import '../intent_handler.dart';
@@ -77,6 +82,36 @@ class ModuleImpl implements Module {
     _validateStartModuleStatus(status, name, intent);
 
     return moduleControllerProxy;
+  }
+
+  @override
+  Future<Entity<Uint8List>> createEntity({
+    @required String type,
+    @required Uint8List initialData,
+  }) async {
+    ArgumentError.checkNotNull(type, 'type');
+    ArgumentError.checkNotNull(initialData, 'initialData');
+
+    if (type.isEmpty) {
+      throw ArgumentError.value(type, 'type cannot be an empty string');
+    }
+
+    final context = _getContext();
+
+    // need to create the proxy and write data immediately so other modules
+    // can extract values
+    final proxy = fidl.EntityProxy();
+    final vmo = SizedVmo.fromUint8List(initialData);
+    final buffer = fuchsia_mem.Buffer(vmo: vmo, size: initialData.length);
+    final ref = await context.createEntity(type, buffer, proxy.ctrl.request());
+
+    // use the ref value to determine if creation was successful
+    if (ref == null || ref.isEmpty) {
+      throw Exception('Module.createEntity creation failed because'
+          ' the framework was unable to create the entity.');
+    }
+
+    return EntityImpl(type: type, proxyFactory: () => proxy);
   }
 
   @override

@@ -5,3 +5,4 @@
 /// The classes required for working with enities
 export 'src/entity/entity.dart';
 export 'src/entity/entity_codec.dart';
+export 'src/entity/entity_exceptions.dart';
