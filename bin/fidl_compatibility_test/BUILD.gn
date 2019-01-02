@@ -10,7 +10,7 @@ copy("run_fidl_compatibility_test_topaz_sh") {
 }
 
 package("package") {
-  package_name = "fidl_compatibility_test"
+  package_name = "fidl_compatibility_test_topaz"
 
   deps = [
     ":run_fidl_compatibility_test_topaz_sh",
