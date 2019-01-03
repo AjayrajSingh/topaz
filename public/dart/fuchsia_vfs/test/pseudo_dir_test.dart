@@ -156,7 +156,6 @@ void main() {
           openFlagNoRemote,
           openFlagTruncate,
           openRightAdmin,
-          openRightWritable
         ];
 
         var i = 0;
@@ -247,7 +246,11 @@ void main() {
 
     test('open passes with valid flags', () async {
       PseudoDir dir = PseudoDir();
-      var validFlags = [openRightReadable, openFlagDirectory];
+      var validFlags = [
+        openRightReadable,
+        openRightWritable,
+        openFlagDirectory
+      ];
 
       for (var flag in validFlags) {
         DirectoryProxy proxy = _getProxyForDir(dir, flag | openFlagDescribe);

@@ -164,14 +164,19 @@ class PseudoDir extends Vnode {
   }
 
   int _validateFlags(int flags) {
-    var allowedFlags = openRightReadable | openFlagDirectory | openFlagDescribe;
+    var allowedFlags = openRightReadable |
+        openRightWritable |
+        openFlagDirectory |
+        openFlagDescribe;
     var prohibitedFlags = openFlagCreate |
         openFlagCreateIfAbsent |
         openFlagTruncate |
         openFlagAppend;
 
-    // Pseudo directories do not allow modifications or mounting, at this point.
-    if (flags & openRightWritable != 0 || flags & openRightAdmin != 0) {
+    // TODO(ZX-3251) : do not allow openRightWritable.
+
+    // Pseudo directories do not allow mounting, at this point.
+    if (flags & openRightAdmin != 0) {
       return ZX.ERR_ACCESS_DENIED;
     }
     if (flags & prohibitedFlags != 0) {
