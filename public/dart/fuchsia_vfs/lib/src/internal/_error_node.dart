@@ -30,6 +30,7 @@ class ErrorNodeForSendingEvent implements Node {
   Stream<Node$OnOpen$Response> get onOpen async* {
     yield Node$OnOpen$Response(_status, null);
     _onEventSent(this);
+    _bindings.close();
   }
 
   @override
