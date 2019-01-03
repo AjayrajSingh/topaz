@@ -11,11 +11,11 @@ group("dart_unittests") {
     # "app/dashboard:tests",
     "examples/test/flutter_widget_test:flutter_widget_test",
     "public/dart/sledge:dart_sledge_tests",
+
     # "public/dart/widgets:dart_widget_tests",
     "public/lib/app/dart:dart_app_tests",
-    "public/lib/ledger/dart:dart_tests",
     "public/lib/schemas/dart:dart_schema_tests",
-    "shell:tests"
+    "shell:tests",
   ]
 }
 

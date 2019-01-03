@@ -110,3 +110,17 @@ Uint8List randomUint8List(int length) {
   }
   return result;
 }
+
+/// Checks if [keyPrefix] is the prefix of the [key].
+/// Both [keyPrefix] and [key] must not be null.
+bool hasPrefix(Uint8List key, Uint8List keyPrefix) {
+  if (keyPrefix.length > key.length) {
+    return false;
+  }
+  for (int i = 0; i < keyPrefix.length; i++) {
+    if (key[i] != keyPrefix[i]) {
+      return false;
+    }
+  }
+  return true;
+}

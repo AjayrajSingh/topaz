@@ -7,11 +7,11 @@ import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
 import 'package:fidl_fuchsia_mem/fidl.dart';
-import 'package:lib.ledger.dart/ledger.dart';
 import 'package:zircon/zircon.dart' show ZX, ReadResult;
 
 import 'document/change.dart';
 import 'document/values/key_value.dart';
+import 'uint8list_ops.dart';
 
 // ignore_for_file: one_member_abstracts
 /// Factory that creates ledger proxies and bindings.
@@ -51,6 +51,58 @@ Uint8List readBuffer(Buffer buffer) {
     throw new Exception('Unexpected count of bytes read.');
   }
   return new Uint8List.view(readResult.bytes.buffer);
+}
+
+/// Helper method for the [getFullEntries] method.
+Future<Null> _getFullEntriesRecursively(
+  ledger.PageSnapshot snapshot,
+  List<ledger.Entry> result,
+  List<int> keyPrefix, {
+  ledger.Token token,
+}) async {
+  Completer<ledger.Status> statusCompleter = new Completer<ledger.Status>();
+  List<ledger.Entry> entries;
+  ledger.Token nextToken;
+
+  snapshot.getEntries(keyPrefix ?? new Uint8List(0), token,
+      (ledger.Status status, List<ledger.Entry> entriesResult,
+          ledger.Token nextTokenResult) {
+    entries = entriesResult;
+    nextToken = nextTokenResult;
+    statusCompleter.complete(status);
+  });
+
+  ledger.Status status = await statusCompleter.future;
+
+  if (status != ledger.Status.ok && status != ledger.Status.partialResult) {
+    throw new Exception(
+        'PageSnapshot::GetEntries() returned an error status: $status');
+  }
+
+  result.addAll(entries.takeWhile((entry) => hasPrefix(entry.key, keyPrefix)));
+
+  if (status == ledger.Status.partialResult &&
+      hasPrefix(entries[entries.length - 1].key, keyPrefix)) {
+    return _getFullEntriesRecursively(
+      snapshot,
+      result,
+      keyPrefix,
+      token: nextToken,
+    );
+  }
+}
+
+/// Gets the full list of [Entry] objects from a given [PageSnapshot].
+///
+/// This will continuously call the [PageSnapshot.getEntries] method in case the
+/// returned status code is [Status.partialResult].
+Future<List<ledger.Entry>> getFullEntries(
+  ledger.PageSnapshot snapshot, {
+  List<int> keyPrefix,
+}) async {
+  List<ledger.Entry> entries = <ledger.Entry>[];
+  await _getFullEntriesRecursively(snapshot, entries, keyPrefix);
+  return entries;
 }
 
 /// Returns all the KV pairs stored in [pageSnapshotProxy] whose key start

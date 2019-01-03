@@ -8,7 +8,6 @@ import 'dart:typed_data';
 import 'package:sledge/src/document/change.dart';
 import 'package:sledge/src/uint8list_ops.dart';
 import 'package:sledge/src/document/values/key_value.dart';
-import 'package:lib.ledger.dart/src/helpers.dart' as ledger_helpers;
 
 import 'entry.dart';
 
@@ -79,7 +78,7 @@ class StorageState {
     final entries = <KeyValue>[];
     for (final key in _storage.keys) {
       Entry value = _storage[key];
-      if (!value.isDeleted && ledger_helpers.hasPrefix(key, keyPrefix)) {
+      if (!value.isDeleted && hasPrefix(key, keyPrefix)) {
         entries.add(new KeyValue(key, value.value));
       }
     }
