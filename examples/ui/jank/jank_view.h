@@ -11,6 +11,7 @@
 #include "lib/fxl/time/time_point.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkColor.h"
+#include "third_party/skia/include/core/SkFont.h"
 #include "third_party/skia/include/core/SkRect.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 

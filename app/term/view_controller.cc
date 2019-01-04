@@ -12,6 +12,7 @@
 #include "lib/fxl/logging.h"
 #include "lib/fxl/strings/string_printf.h"
 #include "lib/ui/input/cpp/formatting.h"
+#include "third_party/skia/include/core/SkFont.h"
 #include "third_party/skia/include/core/SkPaint.h"
 #include "topaz/app/term/key_util.h"
 #include "topaz/app/term/pty_server.h"
@@ -53,19 +54,20 @@ void ViewController::ComputeMetrics() {
   if (!regular_typeface_)
     return;
 
-  // TODO(vtl): This duplicates some code.
-  SkPaint fg_paint;
-  fg_paint.setTypeface(regular_typeface_);
-  fg_paint.setTextSize(params_.font_size);
+  SkFont fg_font;
+  fg_font.setTypeface(regular_typeface_);
+  fg_font.setSize(params_.font_size);
   // Figure out appropriate metrics.
   SkFontMetrics fm = {};
-  fg_paint.getFontMetrics(&fm);
+  fg_font.getMetrics(&fm);
+
   ascent_ = static_cast<int>(ceilf(-fm.fAscent));
   line_height_ = ascent_ + static_cast<int>(ceilf(fm.fDescent + fm.fLeading));
   FXL_DCHECK(line_height_ > 0);
   // To figure out the advance width, measure an X. Better hope the font
   // is monospace.
-  advance_width_ = static_cast<int>(ceilf(fg_paint.measureText("X", 1)));
+  advance_width_ = static_cast<int>(
+      ceilf(fg_font.measureText("X", 1, kUTF8_SkTextEncoding)));
   FXL_DCHECK(advance_width_ > 0);
 }
 
