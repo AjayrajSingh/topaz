@@ -32,7 +32,7 @@ ViewContainerProxy _initViewContainer() {
   }
   final ViewContainerProxy proxy = ViewContainerProxy()
     ..ctrl.bind(InterfaceHandle<ViewContainer>(Channel(handle)))
-    ..setListener(ViewContainerListenerImpl().createInterfaceHandle());
+    ..setListener(ViewContainerListenerImpl.instance.createInterfaceHandle());
 
   assert(() {
     proxy.ctrl.whenClosed.then((_) async {

@@ -11,17 +11,14 @@ import '../child_view_connection.dart';
 
 /// A singleton class that allows receive events from the view container.
 class ViewContainerListenerImpl extends ViewContainerListener {
-  static ViewContainerListenerImpl _instance;
+  /// The shared [ViewContainerListenerImpl] instance.
+  static final ViewContainerListenerImpl instance =
+      new ViewContainerListenerImpl();
 
   static final Map<int, ChildViewConnection> _connections =
       HashMap<int, ChildViewConnection>();
 
   final ViewContainerListenerBinding _binding = ViewContainerListenerBinding();
-
-  /// Initializes the shared [ViewContainerListenerImpl] instance
-  factory ViewContainerListenerImpl() {
-    return _instance ??= ViewContainerListenerImpl();
-  }
 
   /// adds a [ChildViewConnection] for a given [key]
   void addConnectionForKey(int key, ChildViewConnection connection) {
