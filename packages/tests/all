@@ -18,6 +18,7 @@
         "topaz/packages/tests/modular_integration_tests",
         "topaz/packages/tests/repl",
         "topaz/packages/tests/scenic",
+        "topaz/packages/tests/voila",
         "topaz/packages/tests/web_runner",
         "topaz/packages/tests/web_runner_smoke",
         "topaz/packages/tests/web_view"
