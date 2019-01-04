@@ -26,12 +26,10 @@ class ProviderNode extends StatelessWidget {
   }
 }
 
-/// A [ProviderScope] provides a separate type-space for
-/// a provider, thus allowing more than one provider of the
-/// same type.
+/// A [ProviderScope] provides a separate type-space for a provider, thus
+/// allowing more than one provider of the same type.
 ///
-/// This should always be initialized as a static const and passed
-/// around.
+/// This should always be initialized as a static const and passed around.
 /// The name is only used for descriptive purposes.
 class ProviderScope {
   final String _name;
@@ -47,22 +45,21 @@ class ProviderScope {
 
 /// Providers are the values passed to the [ProviderNodes].
 ///
-/// Either convenience funcitons such as [provideValue] or
-/// creating Providers directly can be used.
+/// Providers can be added to using either convenience functions such as
+/// [provideValue] or by passing in Providers.
 class Providers {
-  // The Provider for each given [Type] should return
-  // that type, but we can't enforce that here directy.
-  // We can use APIs to make sure it's type-safe though.
+  // The Provider for each given [Type] should return that type, but we can't
+  // enforce that here directy. We can use APIs to make sure it's type-safe.
   final Map<ProviderScope, Map<Type, Provider<dynamic>>> _providers = {};
 
-  /// Creates a new empty provider
+  /// Creates a new empty provider.
   Providers();
 
-  /// The default scope in which any type not with a defined scope
-  /// resides.
+  /// The default scope in which any type not with a defined scope resides.
   static const ProviderScope defaultScope = ProviderScope('_default');
 
   /// Creates a provider with the included providers.
+  ///
   /// If a scope is provided, the values will be under that scope.
   factory Providers.withProviders(Map<Type, Provider<dynamic>> providers,
           {ProviderScope scope}) =>
@@ -70,12 +67,10 @@ class Providers {
 
   /// Add a provider for a single type.
   ///
-  /// Will override any existing provider of that type in this node with
-  /// the given scope.
-  ///
-  /// If no [scope] is passed in, the default one will be used.
+  /// Will override any existing provider of that type in this node with the
+  /// given scope. If no [scope] is passed in, the default one will be used.
   void provide<T>(Provider<T> provider, {ProviderScope scope}) {
-    // This should never happen
+    // This should never happen.
     assert(provider.type == T);
 
     _providersForScope(scope)[T] = provider;
@@ -100,7 +95,7 @@ class Providers {
     _providersForScope(scope).addAll(providers);
   }
 
-  /// Add in all the providers from another Providers
+  /// Add in all the providers from another Providers.
   void provideFrom(Providers other) {
     for (ProviderScope scope in other._providers.keys) {
       provideAll(other._providersForScope(scope), scope: scope);
@@ -109,15 +104,14 @@ class Providers {
 
   /// Syntactic sugar around adding a value based provider.
   ///
-  /// If this value is [Listenable], widgets that use this
-  /// value can be rebuilt on change.
-  /// If no [scope] is passed in, the default one will be used.
+  /// If this value is [Listenable], widgets that use this value can be rebuilt
+  /// on change. If no [scope] is passed in, the default one will be used.
   void provideValue<T>(T value, {ProviderScope scope}) {
     provide(Provider.value(value), scope: scope);
   }
 
-  /// Provider in this case will always be of the provided
-  /// type, but there is no way to make this type safe.
+  /// Provider in this case will always be of the provider type, but there is no
+  /// way to make this type safe.
   ///
   /// Internal users should cast this whenever possible.
   @visibleForTesting
@@ -131,25 +125,23 @@ class Providers {
 
 /// A Provider provides a value on request.
 ///
-/// If a provider implements [Listenable], it will be listened to
-/// by the [Provide] widget to rebuild on change.
-/// Other than the built in providers, one can implement Provider
-/// to provide caching or linkages.
+/// If a provider implements [Listenable], it will be listened to by the
+/// [Provide] widget to rebuild on change. Other than the built in providers,
+/// one can implement Provider to provide caching or linkages.
 ///
-/// When a Provider is instantiated within a [providers.provide]
-/// call, the type can be inferred and therefore the type can
-/// be ommited, but otherwise, [T] is required.
+/// When a Provider is instantiated within a [providers.provide] call, the type
+/// can be inferred and therefore the type can be ommited, but otherwise,
+/// [T] is required.
 ///
 /// Provider should be implemented and not extended.
 abstract class Provider<T> {
   /// Returns the value provided by the provider.
   ///
-  /// Because providers could potentially initialize the value
-  /// each time [get] is called, this should be called as infrequently
-  /// as possible.
-  T get();
+  /// Because providers could potentially initialize the value each time [get]
+  /// is called, this should be called as infrequently as possible.
+  T get(BuildContext context);
 
-  /// The type provided by the provider
+  /// The type that is provided by the provider.
   Type get type;
 
   /// Creates a provider with the value provided to it.
@@ -158,12 +150,13 @@ abstract class Provider<T> {
   /// Creates a provider which will initialize using the [ProviderFunction]
   /// the first time the value is requested.
   ///
-  /// The provider will not notify on change unless [T] implements
-  /// listenable.
-  /// [dispose]: whether or not the value should be disposed
-  /// after no longer being used. A value is considered used
-  /// if there is a value listening to it, so using the static function
-  /// won't affect disposal.
+  /// The provider will not notify on change unless [T] implements listenable.
+  /// [dispose]: whether or not the value should be disposed after no longer
+  /// being used. A value is considered used if there is a value listening to
+  /// it, so using the static function won't affect disposal.
+  ///
+  /// The context can be used to obtain other values from the provider. However,
+  /// care should be taken with this to not have circular dependencies.
   factory Provider.function(ProviderFunction<T> function,
           {bool dispose = true}) =>
       _LazyProvider<T>(function, dispose: dispose);
@@ -187,12 +180,12 @@ abstract class TypedProvider<T> implements Provider<T> {
   Type get type => T;
 }
 
-/// A widget that obtains the given value from the nearest provider
-/// and rebuilds using the [builder] whenever it changes.
+/// A widget that obtains the given value from the nearest provider and rebuilds
+/// using the [builder] whenever it changes.
 ///
-/// Either the provider or the value must implement [Listenable].
-/// To obtain a value without listening to changes, the static
-/// [Provide.value<T>] function should be used instead.
+/// Either the provider or the value must implement [Listenable]. To obtain a
+/// value without listening to changes, the static [Provide.value<T>] function
+/// should be used instead.
 ///
 /// To improve performance by having less rebuilds, the part of the tree rebuilt
 /// by builder should be minimized by putting as much of the tree in [child] as
@@ -217,13 +210,13 @@ class Provide<T> extends StatelessWidget {
 
     assert(provider != null);
 
-    return provider.get();
+    return provider.get(context);
   }
 
   @override
   Widget build(BuildContext context) {
     final provider = _InheritedProviders.of(context).getValue<T>(scope: scope);
-    final value = provider.get();
+    final value = provider.get(context);
     final listenable = _getListenable(provider, value);
 
     if (provider is Listenable) {
@@ -231,7 +224,7 @@ class Provide<T> extends StatelessWidget {
         listenable: listenable,
         child: child,
         builder: (buildContext, child) =>
-            builder(buildContext, child, provider.get()),
+            builder(buildContext, child, provider.get(context)),
       );
     } else if (value is Listenable) {
       return ListeningBuilder(
@@ -252,13 +245,14 @@ class Provide<T> extends StatelessWidget {
 Listenable _getListenable(Provider provider, dynamic value) =>
     provider is Listenable ? provider : value is Listenable ? value : null;
 
-/// Widget that rebuilds on change using multiple values provided by a [ProviderNode].
+/// Widget that rebuilds on change using multiple values provided by a
+/// [ProviderNode].
 ///
 /// [ProvideMulti] is the functional equivalent of chained [Provide] widgets.
 /// It will call builder whenever any of the requested values changes.
 ///
-/// As with [Provide], the builder should just build as little as possible to optimize
-/// performance.
+/// As with [Provide], the builder should just build as little as possible to
+/// optimize performance.
 class ProvideMulti extends StatelessWidget {
   /// A set of requested values per scope
   final Map<ProviderScope, List<Type>> requestedScopedValues;
@@ -290,7 +284,7 @@ class ProvideMulti extends StatelessWidget {
     for (ProviderScope providerScope in requestedScopedValues.keys) {
       for (Type type in requestedScopedValues[providerScope]) {
         final provider = providers.getFromType(type, scope: providerScope);
-        final value = provider.get();
+        final value = provider.get(context);
         listenables.add(_getListenable(provider, value));
         (values[providerScope] ??= {})[type] = value;
       }
@@ -305,7 +299,7 @@ class ProvideMulti extends StatelessWidget {
   }
 
   // When the provider is the one that is changing instead of the value,
-  // The values in the map returned need to be updated.
+  // the values in the map returned need to be updated.
   ProvidedValues _update(
       BuildContext context, Map<ProviderScope, Map<Type, dynamic>> values) {
     final providers = _InheritedProviders.of(context);
@@ -314,7 +308,7 @@ class ProvideMulti extends StatelessWidget {
       for (Type type in requestedScopedValues[providerScope]) {
         final provider = providers.getFromType(type, scope: providerScope);
         if (provider is Listenable) {
-          final value = provider.get();
+          final value = provider.get(context);
           values[providerScope][type] = value;
         }
       }
@@ -356,13 +350,13 @@ class _ValueProvider<T> extends TypedProvider<T> {
   final T _value;
 
   @override
-  T get() => _value;
+  T get(BuildContext context) => _value;
 
   _ValueProvider(this._value);
 }
 
 /// Function that returns an instance of T when called.
-typedef ProviderFunction<T> = T Function();
+typedef ProviderFunction<T> = T Function(BuildContext context);
 
 /// Is initialized on demand, and disposed when no longer needed
 /// if [dispose] is set to true.
@@ -394,12 +388,12 @@ class _LazyProvider<T> extends ChangeNotifier with TypedProvider<T> {
   }
 
   @override
-  T get() {
+  T get(BuildContext context) {
     // Need to have a local copy for casting because
     // dart requires it.
     T value;
     if (_value == null) {
-      value = _value ??= _initalizer();
+      value = _value ??= _initalizer(context);
       if (value is Listenable) {
         value.addListener(notifyListeners);
       }
@@ -408,17 +402,18 @@ class _LazyProvider<T> extends ChangeNotifier with TypedProvider<T> {
   }
 }
 
-/// A value is obtained from providerFunction for each time
-/// the value is requested. This provider doesn't keep any
-/// values itself, so those values are disposed when the containing
-/// widget is disposed.
+/// A provider who's value is obtained from providerFunction for each time the
+/// value is requested.
+///
+/// This provider doesn't keep any values itself, so those values are disposed
+/// when the containing widget is disposed.
 class _FactoryProvider<T> with TypedProvider<T> {
   final ProviderFunction<T> providerFunction;
 
   _FactoryProvider(this.providerFunction);
 
   @override
-  T get() => providerFunction();
+  T get(BuildContext context) => providerFunction(context);
 }
 
 /// Provider that takes a stream.
@@ -440,7 +435,7 @@ class _StreamProvider<T> extends ChangeNotifier with TypedProvider<T> {
   }
 
   @override
-  T get() => _lastValue;
+  T get(BuildContext context) => _lastValue;
 }
 
 /// Put in the widget tree through [ProviderNode].
@@ -474,7 +469,7 @@ class _InheritedProviders extends InheritedWidget {
         parent?.getValue<T>(scope: scope);
   }
 
-  /// Needed beccause this works at runtime for ProvideMulti.
+  /// Needed because this works at runtime for ProvideMulti.
   Provider getFromType(Type type, {ProviderScope scope}) {
     return providers.getFromType(type, scope: scope) ??
         parent?.getFromType(type, scope: scope);
@@ -522,6 +517,7 @@ class ListeningBuilder extends AnimatedWidget {
 }
 
 /// Listenable that only listens to its children when it has listeners.
+///
 /// The default implementation of Listenable.merge only removes
 /// on disposal, which isn't called by the listening widgets, thus
 /// causing a potential memory leak.

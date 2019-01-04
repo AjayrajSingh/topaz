@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:mockito/mockito.dart';
 import 'package:test/test.dart' as package_test;
 
 const ProviderScope scope1 = ProviderScope('scope1');
@@ -21,17 +22,23 @@ void main() {
   });
 
   group('Providers', () {
+    BuildContext buildContext;
+
+    setUp(() {
+      buildContext = MockBuildContext();
+    });
+
     test('can set and retreive a single value', () {
       const value = 'value';
       const otherValue = 'otherValue';
 
       providers.provideValue(value);
       final provider = providers.getFromType(String);
-      expect(provider.get(), value);
+      expect(provider.get(buildContext), value);
 
       providers.provideValue(otherValue);
       final otherProvider = providers.getFromType(String);
-      expect(otherProvider.get(), otherValue);
+      expect(otherProvider.get(buildContext), otherValue);
     });
     test('can provide and retreive various kinds of providers', () async {
       final streamController = StreamController<String>.broadcast();
@@ -39,12 +46,12 @@ void main() {
       int factoryCounter = 0;
 
       providers
-        ..provide(Provider.withFactory(() {
+        ..provide(Provider.withFactory((buildContext) {
           return factoryCounter++;
         }))
         ..provideAll({
           String: Provider<String>.stream(streamController.stream),
-          SampleClass: Provider<SampleClass>.function(() {
+          SampleClass: Provider<SampleClass>.function((buildContext) {
             final value = SampleClass('function $functionCounter');
             functionCounter++;
             return value;
@@ -56,30 +63,32 @@ void main() {
       streamController.add('stream');
       await new Future.delayed(Duration.zero);
 
-      expect(providers.getFromType(String).get(), 'stream');
-      expect(providers.getFromType(String).get(), 'stream');
+      expect(providers.getFromType(String).get(buildContext), 'stream');
+      expect(providers.getFromType(String).get(buildContext), 'stream');
 
       // Must wait one async cycle for value to propagate.
       streamController.add('stream2');
       await new Future.delayed(Duration.zero);
 
-      expect(providers.getFromType(String).get(), 'stream2');
+      expect(providers.getFromType(String).get(buildContext), 'stream2');
 
-      expect(providers.getFromType(SampleClass).get().value, 'function 0');
-      expect(providers.getFromType(SampleClass).get().value, 'function 0');
+      expect(providers.getFromType(SampleClass).get(buildContext).value,
+          'function 0');
+      expect(providers.getFromType(SampleClass).get(buildContext).value,
+          'function 0');
 
-      expect(providers.getFromType(int).get(), 0);
-      expect(providers.getFromType(int).get(), 1);
+      expect(providers.getFromType(int).get(buildContext), 0);
+      expect(providers.getFromType(int).get(buildContext), 1);
 
-      expect(providers.getFromType(double).get(), 1.1);
+      expect(providers.getFromType(double).get(buildContext), 1.1);
 
       // Copied providers should have the same providers as original.
       final copiedProviders = Providers()..provideFrom(providers);
-      expect(copiedProviders.getFromType(String).get(), 'stream2');
-      expect(
-          copiedProviders.getFromType(SampleClass).get().value, 'function 0');
-      expect(copiedProviders.getFromType(int).get(), 2);
-      expect(copiedProviders.getFromType(double).get(), 1.1);
+      expect(copiedProviders.getFromType(String).get(buildContext), 'stream2');
+      expect(copiedProviders.getFromType(SampleClass).get(buildContext).value,
+          'function 0');
+      expect(copiedProviders.getFromType(int).get(buildContext), 2);
+      expect(copiedProviders.getFromType(double).get(buildContext), 1.1);
 
       await streamController.close();
     });
@@ -98,23 +107,25 @@ void main() {
         ..provide(Provider.value(2), scope: scope2)
         ..provideValue(360);
 
-      expect(providers.getFromType(int).get(), 360);
-      expect(providers.getFromType(int, scope: scope1).get(), 1);
-      expect(providers.getFromType(int, scope: scope2).get(), 2);
+      expect(providers.getFromType(int).get(buildContext), 360);
+      expect(providers.getFromType(int, scope: scope1).get(buildContext), 1);
+      expect(providers.getFromType(int, scope: scope2).get(buildContext), 2);
 
       final other = Providers()..provideFrom(providers);
-      expect(other.getFromType(int).get(), 360);
-      expect(other.getFromType(int, scope: scope1).get(), 1);
-      expect(other.getFromType(int, scope: scope2).get(), 2);
+      expect(other.getFromType(int).get(buildContext), 360);
+      expect(other.getFromType(int, scope: scope1).get(buildContext), 1);
+      expect(other.getFromType(int, scope: scope2).get(buildContext), 2);
 
       // overwriting in the same scope
       providers.provideValue(3, scope: scope1);
-      expect(providers.getFromType(int, scope: scope1).get(), 3);
+      expect(providers.getFromType(int, scope: scope1).get(buildContext), 3);
 
-      providers.provideAll({double: Provider<double>.function(() => 1.0)},
+      providers.provideAll(
+          {double: Provider<double>.function((buildContext) => 1.0)},
           scope: scope2);
 
-      expect(providers.getFromType(double, scope: scope2).get(), 1.0);
+      expect(
+          providers.getFromType(double, scope: scope2).get(buildContext), 1.0);
     });
   });
 
@@ -137,7 +148,10 @@ void main() {
         ..provideValue(notifier)
         ..provide(Provider.stream(broadcastController.stream))
         ..provide(Provider.stream(singleStreamController.stream), scope: scope1)
-        ..provideValue(sampleClass, scope: scope2);
+        ..provideValue(sampleClass, scope: scope2)
+        // a provider that uses other provided values when accessed
+        ..provide(Provider.function((context) => SampleClass(
+            Provide.value<SampleClass>(context, scope: scope2).value)));
 
       broadcastController.add(1);
       singleStreamController.add(1.0);
@@ -254,6 +268,23 @@ void main() {
       expect(buildCalled, isTrue);
     });
 
+    testWidgets('can get multi level dependencies', (tester) async {
+      bool buildCalled = false;
+      String expectedValue = sampleClass.value;
+
+      final widget = ProviderNode(
+        providers: providers,
+        child: Provide<SampleClass>(builder: (context, child, value) {
+          expect(value.value, expectedValue);
+          buildCalled = true;
+          return Container();
+        }),
+      );
+
+      await tester.pumpWidget(widget);
+      expect(buildCalled, isTrue);
+    });
+
     testWidgets('can get listened streams', (tester) async {
       bool buildCalled = false;
       double expectedValue = 1.0;
@@ -365,8 +396,9 @@ void main() {
       final build = ValueNotifier<bool>(true);
 
       providers
-        ..provide(Provider.function(() => model, dispose: true))
-        ..provide(Provider.function(() => fakeModel2, dispose: false))
+        ..provide(Provider.function((buildContext) => model, dispose: true))
+        ..provide(
+            Provider.function((buildContext) => fakeModel2, dispose: false))
         ..provideValue(build);
 
       expect(model.listenerCount, 0);
@@ -398,8 +430,9 @@ void main() {
       final build = ValueNotifier<bool>(true);
 
       providers
-        ..provide(Provider.function(() => model, dispose: true))
-        ..provide(Provider.function(() => fakeModel2, dispose: true))
+        ..provide(Provider.function((buildContext) => model, dispose: true))
+        ..provide(
+            Provider.function((buildContext) => fakeModel2, dispose: true))
         ..provideValue(build);
 
       await tester.pumpWidget(ProviderNode(
@@ -431,6 +464,8 @@ void main() {
   });
 }
 
+class MockBuildContext extends Mock implements BuildContext {}
+
 class SampleClass {
   String value;
   SampleClass(this.value);
@@ -438,7 +473,7 @@ class SampleClass {
 
 class SampleProvider extends TypedProvider<double> {
   @override
-  double get() => 1.1;
+  double get(BuildContext context) => 1.1;
 }
 
 class FakeModel extends Model {
