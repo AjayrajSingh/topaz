@@ -12,7 +12,7 @@ set -eu
 #   https://ci.chromium.org/p/fuchsia/builders/luci.fuchsia.ci/web_view-linux.
 # - Find any "webkit.so" link on the page.
 # - Use the trailing part of the link's URL as the new PREBUILT_SUBPATH.
-readonly PREBUILT_SUBPATH="/aee7414968c20470f6e405b928f761fc67a333a9/libwebkit.so"
+readonly PREBUILT_SUBPATH="/d8f57281f2f753af64c62282ef517b420e0bc4d5/libwebkit.so"
 
 readonly SCRIPT_ROOT="$(cd $(dirname ${BASH_SOURCE[0]} ) && pwd)"
 readonly FUCHSIA_ROOT="${SCRIPT_ROOT}/../../../.."
