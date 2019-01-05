@@ -1,0 +1,16 @@
+{
+    "program": {
+        "data": "data/localized_mod"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.accessibility.ToggleBroadcaster",
+            "fuchsia.fonts.Provider",
+            "fuchsia.modular.Clipboard",
+            "fuchsia.modular.ContextWriter",
+            "fuchsia.sys.Environment",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.ui.viewsv1.ViewManager"
+        ]
+    }
+}

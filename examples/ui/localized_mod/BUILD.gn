@@ -1,0 +1,31 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+flutter_app("localized_mod") {
+  main_dart = "lib/main.dart"
+  package_name = "localized_mod"
+
+  sources = []
+
+  deps = [
+    "//garnet/public/fidl/fuchsia.ui.gfx",
+    "//garnet/public/fidl/fuchsia.ui.scenic",
+    "//garnet/public/fidl/fuchsia.ui.viewsv1",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_localizations",
+    "//third_party/dart/third_party/pkg/intl",
+    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/lib/ui/flutter",
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/localized_mod.cmx")
+      dest = "localized_mod.cmx"
+    },
+  ]
+}

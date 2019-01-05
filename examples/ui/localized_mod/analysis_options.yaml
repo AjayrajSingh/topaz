@@ -1,0 +1,13 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+# Dart's analyzer can't seem to handle `include` and `exclude` in the same analysis_options.yaml.
+# See https://github.com/dart-lang/sdk/issues/35555.
+
+#include: ../../../tools/analysis_options.yaml
+
+analyzer:
+  # Don't analyze generated code.
+  exclude:
+    - 'lib/localization/**'
