@@ -226,7 +226,7 @@ void PlatformView::FlushViewportMetrics() {
 // |fuchsia::ui::input::InputMethodEditorClient|
 void PlatformView::DidUpdateState(
     fuchsia::ui::input::TextInputState state,
-    std::unique_ptr<fuchsia::ui::input::InputEvent>) {
+    std::unique_ptr<fuchsia::ui::input::InputEvent> input_event) {
   rapidjson::Document document;
   auto& allocator = document.GetAllocator();
   rapidjson::Value encoded_state(rapidjson::kObjectType);
@@ -271,6 +271,12 @@ void PlatformView::DidUpdateState(
   );
   last_text_state_ =
       std::make_unique<fuchsia::ui::input::TextInputState>(state);
+
+  // Handle keyboard input events for HID keys only.
+  // TODO(SCN-1189): Are we done here?
+  if (input_event && input_event->keyboard().hid_usage != 0) {
+    OnHandleKeyboardEvent(input_event->keyboard());
+  }
 }
 
 // |fuchsia::ui::input::InputMethodEditorClient|
