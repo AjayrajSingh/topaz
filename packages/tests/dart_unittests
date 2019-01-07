@@ -8,7 +8,6 @@
       "//topaz/lib/keyboard/flutter:keyboard_test",
       "//topaz/lib/setui/common:lib_setui_common_test",
       "//topaz/lib/setui/flutter:lib_setui_flutter_test",
-      "//topaz/lib/setui/module:lib_setui_module_test",
       "//topaz/lib/setui/settings/client:lib_setui_settings_client_test",
       "//topaz/lib/setui/settings/common:lib_setui_settings_common_test",
       "//topaz/lib/setui/settings/service:lib_setui_service_test",
