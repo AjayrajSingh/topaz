@@ -18,7 +18,7 @@ import '../entity_exceptions.dart';
 typedef EntityProxyFactory = FutureOr<fidl_modular.Entity> Function();
 
 /// A concrete implementation of the [Entity] class.
-class EntityImpl implements Entity<Uint8List> {
+class EntityImpl implements Entity {
   final _proxyMemo = AsyncMemoizer<fidl_modular.Entity>();
 
   @override

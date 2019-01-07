@@ -7,40 +7,15 @@ import 'dart:typed_data';
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl_modular;
 import 'package:meta/meta.dart';
-import 'package:uuid/uuid.dart';
 
 import '../internal/_component_context.dart';
-import 'entity_codec.dart';
 import 'entity_exceptions.dart';
 import 'internal/_entity_impl.dart';
-import 'internal/_link_entity.dart';
 
 /// An [Entity] provides a mechanism for communicating
 /// data between components.
 ///
-/// Note: this is a preliminary API that is likely to change.
-@experimental
-abstract class Entity<T> {
-  /// Creates an entity that will live for the scope of this story.
-  /// The entity that is created will be backed by the framework and
-  /// can be treated as if it was received from any other entity provider.
-  ///
-  /// Note: EntityCodec will be removed after soft transition
-  factory Entity({
-    EntityCodec<T> codec,
-    String type,
-    String entityReference,
-  }) {
-    if (codec != null) {
-      // This is temporary and go away when we remove link entities.
-      final linkName = Uuid().v4().toString();
-      return LinkEntity<T>(linkName: linkName, codec: codec);
-    } else if (T is Uint8List) {
-      return Entity._resolved(entityReference: entityReference, type: type);
-    }
-    return null;
-  }
-
+abstract class Entity {
   /// Creates an Entity instance.
   ///
   /// This method will lazily connect to the entity proxy for data transmission.
@@ -53,10 +28,7 @@ abstract class Entity<T> {
   ///   // did not the call to getData() will fail.
   ///   final data = await entity.getData();
   /// ```
-  // note: hidden and static until soft transition completes at which point
-  // will become `factory Entity(...)`
-  // ignore: unused_element
-  static Entity _resolved({
+  factory Entity({
     @required String entityReference,
     @required String type,
   }) {
@@ -86,7 +58,7 @@ abstract class Entity<T> {
   String get type;
 
   /// Returns the data stored in the entity.
-  Future<T> getData();
+  Future<Uint8List> getData();
 
   /// Returns the reference for this entity. Entity references will never change
   /// for a given entity so this value can be cached and used to access the
@@ -101,8 +73,8 @@ abstract class Entity<T> {
   /// The returned stream is a single subscription stream
   /// which, when closed, will close the underlying fidl
   /// connection.
-  Stream<T> watch();
+  Stream<Uint8List> watch();
 
   /// Writes the object stored in value
-  Future<void> write(T object);
+  Future<void> write(Uint8List object);
 }

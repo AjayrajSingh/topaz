@@ -85,7 +85,7 @@ class ModuleImpl implements Module {
   }
 
   @override
-  Future<Entity<Uint8List>> createEntity({
+  Future<Entity> createEntity({
     @required String type,
     @required Uint8List initialData,
   }) async {

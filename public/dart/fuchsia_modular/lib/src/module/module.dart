@@ -88,7 +88,7 @@ abstract class Module {
   /// Creates an entity that will live for the lifetime of the story.
   /// The entity that is created will be backed by the framework and
   /// can be treated as if it was received from any other entity provider.
-  Future<Entity<Uint8List>> createEntity({
+  Future<Entity> createEntity({
     @required String type,
     @required Uint8List initialData,
   });

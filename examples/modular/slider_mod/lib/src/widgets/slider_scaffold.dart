@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:typed_data';
-
 import 'package:example_modular_models/shape.dart';
 import 'package:flutter/material.dart';
 import 'package:fuchsia_modular/entity.dart';
@@ -14,7 +12,7 @@ import 'launch_bar.dart';
 import 'value_slider.dart';
 
 class SliderScaffold extends StatelessWidget {
-  final Entity<Uint8List> shapeEntity;
+  final Entity shapeEntity;
   final Shape shape;
 
   const SliderScaffold(this.shapeEntity, this.shape);
