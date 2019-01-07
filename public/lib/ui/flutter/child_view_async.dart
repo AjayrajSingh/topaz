@@ -207,7 +207,7 @@ class ChildViewConnection {
   /// Only call when the connection is available.
   void requestFocus() {
     if (_viewKey != null) {
-      _viewContainer.requestFocus(_viewKey);
+      // TODO(SCN-1186): Use new mechanism to implement RequestFocus.
     }
   }
 
