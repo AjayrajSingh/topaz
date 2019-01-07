@@ -46,11 +46,6 @@ class IntentBuilder {
     _addParameter(name, new IntentParameterData.withEntityReference(reference));
   }
 
-  // Adds a parameter that containts a Link to the intent.
-  void addParameterFromLink(String name, String linkName) {
-    _addParameter(name, new IntentParameterData.withLinkName(linkName));
-  }
-
   // The intent being built.
   Intent get intent => _intent;
 
