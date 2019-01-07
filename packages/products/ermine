@@ -12,10 +12,7 @@
         "topaz/packages/prod/dashboard",
         "topaz/packages/prod/sysui",
         "topaz/packages/prod/term",
+        "topaz/packages/prod/text_input_mod",
         "topaz/packages/prod/web_runner_prototype"
-    ],
-
-    "packages": [
-        "//topaz/bin/ui/text_input_mod"
     ]
 }
