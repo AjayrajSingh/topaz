@@ -2,7 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#pragma once
+#ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_ISOLATE_CONFIGURATOR_H_
+#define TOPAZ_RUNTIME_FLUTTER_RUNNER_ISOLATE_CONFIGURATOR_H_
 
 #include <fuchsia/sys/cpp/fidl.h>
 #include <fuchsia/ui/scenic/cpp/fidl.h>
@@ -27,8 +28,7 @@ class IsolateConfigurator final {
       fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer> view_container,
 #endif
       fidl::InterfaceHandle<fuchsia::sys::Environment> environment,
-      fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-          outgoing_services_request);
+      zx::channel directory_request);
 
   ~IsolateConfigurator();
 
@@ -43,8 +43,7 @@ class IsolateConfigurator final {
   fidl::InterfaceHandle<fuchsia::ui::viewsv1::ViewContainer> view_container_;
 #endif
   fidl::InterfaceHandle<fuchsia::sys::Environment> environment_;
-  fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-      outgoing_services_request_;
+  zx::channel directory_request_;
 
   void BindFuchsia();
 
@@ -58,3 +57,5 @@ class IsolateConfigurator final {
 };
 
 }  // namespace flutter
+
+#endif  // TOPAZ_RUNTIME_FLUTTER_RUNNER_ISOLATE_CONFIGURATOR_H_

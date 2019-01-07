@@ -9,6 +9,11 @@ import 'package:fuchsia/fuchsia.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_io/fidl.dart';
 import 'package:zircon/zircon.dart';
+import 'package:fidl_fuchsia_io/fidl_async.dart' as async_io;
+
+import 'src/outgoing.dart';
+
+export 'src/outgoing.dart';
 
 /// Deprecated! Use package:fuchsia_services/services.dart instead
 class StartupContext {
@@ -24,7 +29,7 @@ class StartupContext {
   final EnvironmentProxy environment = new EnvironmentProxy();
   final LauncherProxy launcher = new LauncherProxy();
   final ServiceProviderProxy environmentServices = new ServiceProviderProxy();
-  final ServiceProviderImpl outgoingServices = new ServiceProviderImpl();
+  final Outgoing outgoingServices = new Outgoing();
 
   factory StartupContext.fromStartupInfo() {
     if (_context != null) {
@@ -45,8 +50,8 @@ class StartupContext {
 
     final Handle outgoingServicesHandle = MxStartupInfo.takeOutgoingServices();
     if (outgoingServicesHandle != null) {
-      context.outgoingServices.bind(new InterfaceRequest<ServiceProvider>(
-          new Channel(outgoingServicesHandle)));
+      context.outgoingServices.serve(
+          InterfaceRequest<async_io.Node>(Channel(outgoingServicesHandle)));
     }
 
     _context = context;

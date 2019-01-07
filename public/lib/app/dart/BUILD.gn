@@ -19,6 +19,7 @@ dart_library("dart") {
     "src/fuchsia_log_record.dart",
     "src/fuchsia_logger.dart",
     "src/logging.dart",
+    "src/outgoing.dart",
   ]
 
   deps = [
@@ -27,6 +28,7 @@ dart_library("dart") {
     "//third_party/dart-pkg/pub/stack_trace",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
+    "//topaz/public/dart/fuchsia_vfs",
     "//topaz/public/dart/zircon",
     "//zircon/public/fidl/fuchsia-cobalt",
     "//zircon/public/fidl/fuchsia-io",

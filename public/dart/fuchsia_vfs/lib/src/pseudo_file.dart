@@ -41,6 +41,7 @@ class PseudoFile extends Vnode {
   final int _capacity;
   ReadFn _readFn;
   WriteFn _writeFn;
+  bool _isClosed = false;
   final List<_FileConnection> _connections = [];
 
   /// Creates a new read-only [PseudoFile] backed by the specified read handler.
@@ -93,6 +94,10 @@ class PseudoFile extends Vnode {
   @override
   int connect(int flags, int mode, fidl.InterfaceRequest<Node> request,
       [int parentFlags = -1]) {
+    if (_isClosed) {
+      sendErrorEvent(flags, ZX.ERR_NOT_SUPPORTED, request);
+      return ZX.ERR_NOT_SUPPORTED;
+    }
     // There should be no MODE_TYPE_* flags set, except for, possibly,
     // MODE_TYPE_FILE when the target is a pseudo file.
     if ((mode & ~modeProtectionMask) & ~modeTypeFile != 0) {
@@ -171,6 +176,20 @@ class PseudoFile extends Vnode {
     }
     return ZX.OK;
   }
+
+  @override
+  void close() {
+    _isClosed = true;
+    // schedule a task because if user closes this as soon as
+    // they open a connection, dart fidl binding throws exception due to
+    // event on this fidl.
+    scheduleMicrotask(() {
+      for (var c in _connections) {
+        c.closeBinding();
+      }
+      _connections.clear();
+    });
+  }
 }
 
 /// Implementation of fuchsia.io.File for pseudo file.
@@ -204,7 +223,7 @@ class _FileConnection extends File {
   /// Reference to PsuedoFile's Vnode.
   PseudoFile file;
 
-  bool _closed = false;
+  bool _isClosed = false;
 
   /// Constructor to init _FileConnection
   _FileConnection({
@@ -234,6 +253,11 @@ class _FileConnection extends File {
     _binding.whenClosed.then((_) => close());
   }
 
+  void closeBinding() {
+    _binding.close();
+    _isClosed = true;
+  }
+
   @override
   Stream<File$OnOpen$Response> get onOpen {
     if ((flags & openFlagDescribe) == 0) {
@@ -251,7 +275,7 @@ class _FileConnection extends File {
 
   @override
   Future<int> close() async {
-    if (_closed) {
+    if (_isClosed) {
       return ZX.OK;
     }
     var status = ZX.OK;
@@ -260,7 +284,7 @@ class _FileConnection extends File {
     }
     // no more read/write operations should be possible
     file._onClose(this);
-    _closed = true;
+    _isClosed = true;
     return status;
   }
 

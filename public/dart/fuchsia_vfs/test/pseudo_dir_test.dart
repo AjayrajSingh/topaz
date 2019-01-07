@@ -343,6 +343,25 @@ void main() {
         _validateExpectedDirents(expectedDirents, response);
       });
 
+      test('serve function works', () async {
+        PseudoDir dir = PseudoDir();
+        var file1 = PseudoFile.readOnlyStr(() => 'file1');
+
+        dir.addNode('file1', file1);
+
+        DirectoryProxy proxy = DirectoryProxy();
+        var status =
+            dir.serve(InterfaceRequest(proxy.ctrl.request().passChannel()));
+        expect(status, ZX.OK);
+
+        var expectedDirents = [
+          _createDirentForDot(),
+          _createDirent(file1, 'file1'),
+        ];
+        var response = await proxy.readDirents(1024);
+        _validateExpectedDirents(expectedDirents, response);
+      });
+
       test('passed buffer size is exact', () async {
         PseudoDir dir = PseudoDir();
         PseudoDir subDir = PseudoDir();
@@ -672,7 +691,7 @@ void main() {
       });
     });
 
-    group('open file/dir in dir:', () {
+    group('open/close file/dir in dir:', () {
       Future<void> _openFileAndAssert(DirectoryProxy proxy, String filePath,
           int bufferLen, String expectedContent) async {
         FileProxy fileProxy = FileProxy();
@@ -755,6 +774,26 @@ void main() {
         }).catchError((err) async {
           fail(err.toString());
         });
+      });
+
+      test('close works', () async {
+        PseudoDir dir = PseudoDir();
+        PseudoDir subDir = PseudoDir();
+        var file1 = PseudoFile.readOnlyStr(() => 'file1');
+        dir..addNode('file1', file1)..addNode('subDir', subDir);
+
+        var proxy = _getProxyForDir(dir);
+        DirectoryProxy subDirProxy = DirectoryProxy();
+        await proxy.open(0, 0, 'subDir',
+            InterfaceRequest(subDirProxy.ctrl.request().passChannel()));
+
+        FileProxy fileProxy = FileProxy();
+        await proxy.open(0, 0, 'file1',
+            InterfaceRequest(fileProxy.ctrl.request().passChannel()));
+        dir.close();
+        proxy.ctrl.whenClosed.asStream().listen(expectAsync1((_) {}));
+        subDirProxy.ctrl.whenClosed.asStream().listen(expectAsync1((_) {}));
+        fileProxy.ctrl.whenClosed.asStream().listen(expectAsync1((_) {}));
       });
 
       test('open sub dir', () async {
@@ -913,4 +952,7 @@ class _TestVnode extends Vnode {
   }
 
   String value() => _val;
+
+  @override
+  void close() {}
 }

@@ -5,6 +5,9 @@
 #include "component.h"
 
 #include <dlfcn.h>
+#include <fs/pseudo-dir.h>
+#include <fs/remote-dir.h>
+#include <lib/fdio/util.h>
 #include <sys/stat.h>
 #include <zircon/dlfcn.h>
 #include <zircon/status.h>
@@ -17,6 +20,7 @@
 #include "lib/fsl/vmo/file.h"
 #include "lib/fsl/vmo/vector.h"
 #include "lib/fxl/command_line.h"
+#include "service_provider_dir.h"
 #include "task_observers.h"
 #include "topaz/runtime/dart/utils/tempfs.h"
 
@@ -67,7 +71,9 @@ Application::Application(
         application_controller_request)
     : termination_callback_(std::move(termination_callback)),
       debug_label_(DebugLabelForURL(startup_info.launch_info.url)),
-      application_controller_(this) {
+      application_controller_(this),
+      outgoing_dir_(fbl::AdoptRef(new fs::PseudoDir())),
+      outgoing_vfs_(async_get_default_dispatcher()) {
   application_controller_.set_error_handler(
       [this](zx_status_t status) { Kill(); });
 
@@ -79,16 +85,6 @@ Application::Application(
   if (auto& arguments = launch_info.arguments) {
     settings_ = shell::SettingsFromCommandLine(
         fml::CommandLineFromIterators(arguments->begin(), arguments->end()));
-  }
-
-  // TODO: LaunchInfo::out.
-
-  // TODO: LaunchInfo::err.
-
-  // LaunchInfo::service_request optional.
-  if (launch_info.directory_request) {
-    service_provider_bridge_.ServeDirectory(
-        std::move(launch_info.directory_request));
   }
 
   // Determine /pkg/data directory from StartupInfo.
@@ -129,27 +125,64 @@ Application::Application(
   application_assets_directory_.reset(openat(
       application_directory_.get(), data_path.c_str(), O_RDONLY | O_DIRECTORY));
 
+  // TODO: LaunchInfo::out.
+
+  // TODO: LaunchInfo::err.
+
+  // LaunchInfo::service_request optional.
+  if (launch_info.directory_request) {
+    outgoing_vfs_.ServeDirectory(outgoing_dir_,
+                                 std::move(launch_info.directory_request));
+  }
+
+  fidl::InterfaceHandle<fuchsia::io::Directory> directory_ptr;
+  directory_request_ = directory_ptr.NewRequest();
+
+  fbl::RefPtr<ServiceProviderDir> service_provider_dir =
+      fbl::AdoptRef(new ServiceProviderDir);
+  outgoing_dir_->AddEntry("public", service_provider_dir);
+
+  fidl::InterfaceHandle<fuchsia::io::Directory> flutter_public_dir;
+
+  auto chan = directory_ptr.TakeChannel();
+
+  auto request = flutter_public_dir.NewRequest().TakeChannel();
+  fdio_service_connect_at(chan.get(), "public", request.release());
+  service_provider_dir->set_fallback(std::move(flutter_public_dir));
+
+  const char* other_dirs[] = {"debug", "ctrl", "object"};
+  // add other directories as RemoteDirs.
+  for (auto& dir_str : other_dirs) {
+    fidl::InterfaceHandle<fuchsia::io::Directory> dir;
+    request = dir.NewRequest().TakeChannel();
+    fdio_service_connect_at(chan.get(), dir_str, request.release());
+    outgoing_dir_->AddEntry(
+        dir_str, fbl::AdoptRef(new fs::RemoteDir(dir.TakeChannel())));
+  }
+
   // TODO: LaunchInfo::additional_services optional.
 
   // All launch arguments have been read. Perform service binding and
   // final settings configuration. The next call will be to create a view
   // for this application.
 
-  service_provider_bridge_.AddService<fuchsia::ui::viewsv1::ViewProvider>(
-      [this](fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider>
-                 view_provider_request) {
-        v1_shells_bindings_.AddBinding(this, std::move(view_provider_request));
-      });
+  service_provider_dir->AddService(
+      fuchsia::ui::viewsv1::ViewProvider::Name_,
+      fbl::AdoptRef(new fs::Service([this](zx::channel channel) {
+        v1_shells_bindings_.AddBinding(
+            this, fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider>(
+                      std::move(channel)));
+        return ZX_OK;
+      })));
 
-  service_provider_bridge_.AddService<fuchsia::ui::app::ViewProvider>(
-      [this](fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider>
-                 view_provider_request) {
-        shells_bindings_.AddBinding(this, std::move(view_provider_request));
-      });
-
-  fuchsia::sys::ServiceProviderPtr outgoing_services;
-  outgoing_services_request_ = outgoing_services.NewRequest();
-  service_provider_bridge_.set_backend(std::move(outgoing_services));
+  service_provider_dir->AddService(
+      fuchsia::ui::app::ViewProvider::Name_,
+      fbl::AdoptRef(new fs::Service([this](zx::channel channel) {
+        shells_bindings_.AddBinding(
+            this, fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider>(
+                      std::move(channel)));
+        return ZX_OK;
+      })));
 
   // Setup the application controller binding.
   if (application_controller_request) {
@@ -393,15 +426,15 @@ void Application::CreateView(
   }
 
   shell_holders_.emplace(std::make_unique<Engine>(
-      *this,                                 // delegate
-      debug_label_,                          // thread label
-      *startup_context_,                     // application context
-      settings_,                             // settings
-      std::move(isolate_snapshot_),          // isolate snapshot
-      std::move(shared_snapshot_),           // shared snapshot
-      std::move(view_token),                 // view token
-      std::move(fdio_ns_),                   // FDIO namespace
-      std::move(outgoing_services_request_)  // outgoing request
+      *this,                         // delegate
+      debug_label_,                  // thread label
+      *startup_context_,             // application context
+      settings_,                     // settings
+      std::move(isolate_snapshot_),  // isolate snapshot
+      std::move(shared_snapshot_),   // shared snapshot
+      std::move(view_token),         // view token
+      std::move(fdio_ns_),           // FDIO namespace
+      std::move(directory_request_)  // outgoing request
       ));
 }
 

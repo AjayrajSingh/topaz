@@ -43,8 +43,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
                fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
                fml::RefPtr<blink::DartSnapshot> shared_snapshot,
                zx::eventpair view_token, UniqueFDIONS fdio_ns,
-               fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-                   outgoing_services_request)
+               fidl::InterfaceRequest<fuchsia::io::Directory> directory_request)
     : delegate_(delegate),
       thread_label_(std::move(thread_label)),
       settings_(std::move(settings)),
@@ -274,8 +273,8 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 #ifndef SCENIC_VIEWS2
         std::move(view_container),  //
 #endif
-        std::move(environment),               //
-        std::move(outgoing_services_request)  //
+        std::move(environment),          //
+        directory_request.TakeChannel()  //
     );
   }
 

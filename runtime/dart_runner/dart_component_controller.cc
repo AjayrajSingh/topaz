@@ -339,27 +339,18 @@ bool DartComponentController::Main() {
   std::vector<std::string> arguments =
       std::move(startup_info_.launch_info.arguments);
 
-  // TODO(abarth): Remove service_provider_bridge once we have an
-  // implementation of rio.Directory in Dart.
-  if (startup_info_.launch_info.directory_request.is_valid()) {
-    service_provider_bridge_.ServeDirectory(
-        std::move(startup_info_.launch_info.directory_request));
-  }
-
-  fuchsia::sys::ServiceProviderPtr service_provider;
-  auto outgoing_services = service_provider.NewRequest();
-  service_provider_bridge_.set_backend(std::move(service_provider));
-
   stdoutfd_ = SetupFileDescriptor(std::move(startup_info_.launch_info.out));
   stderrfd_ = SetupFileDescriptor(std::move(startup_info_.launch_info.err));
-
+  auto directory_request = std::move(
+      startup_info_.launch_info
+          .directory_request);  // capture before moving startup_context
   context_ = component::StartupContext::CreateFrom(std::move(startup_info_));
   fidl::InterfaceHandle<fuchsia::sys::Environment> environment;
   context_->ConnectToEnvironmentService(environment.NewRequest());
 
   InitBuiltinLibrariesForIsolate(
       url_, namespace_, stdoutfd_, stderrfd_, std::move(environment),
-      std::move(outgoing_services), false /* service_isolate */);
+      std::move(directory_request), false /* service_isolate */);
   namespace_ = nullptr;
 
   Dart_ExitScope();

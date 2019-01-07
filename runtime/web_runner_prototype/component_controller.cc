@@ -12,16 +12,30 @@ constexpr char kWebView[] = "web_view";
 
 ComponentController::ComponentController(Runner* runner)
     : runner_(runner), binding_(this) {
-  service_provider_.AddService<fuchsia::ui::app::ViewProvider>(
-      [this](fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider> request) {
-        view_provider_bindings_.AddBinding(this, std::move(request));
-      });
+  outgoing_.AddPublicService<fuchsia::ui::app::ViewProvider>(
+      view_provider_bindings_.GetHandler(this));
 
-  service_provider_.AddService<fuchsia::ui::viewsv1::ViewProvider>(
-      [this](
-          fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider> request) {
-        v1_view_provider_bindings_.AddBinding(this, std::move(request));
-      });
+  outgoing_.AddPublicService<fuchsia::ui::viewsv1::ViewProvider>(
+      v1_view_provider_bindings_.GetHandler(this));
+
+  // TODO(CF-268): remove below code
+  outgoing_.root_dir()->AddEntry(
+      fuchsia::ui::app::ViewProvider::Name_,
+      fbl::AdoptRef(new fs::Service([this](zx::channel channel) {
+        view_provider_bindings_.AddBinding(
+            this, fidl::InterfaceRequest<fuchsia::ui::app::ViewProvider>(
+                      std::move(channel)));
+        return ZX_OK;
+      })));
+
+  outgoing_.root_dir()->AddEntry(
+      fuchsia::ui::viewsv1::ViewProvider::Name_,
+      fbl::AdoptRef(new fs::Service([this](zx::channel channel) {
+        v1_view_provider_bindings_.AddBinding(
+            this, fidl::InterfaceRequest<fuchsia::ui::viewsv1::ViewProvider>(
+                      std::move(channel)));
+        return ZX_OK;
+      })));
 }
 
 ComponentController::~ComponentController() {
@@ -38,8 +52,7 @@ void ComponentController::Start(
     binding_.set_error_handler([this](zx_status_t status) { Kill(); });
   }
 
-  service_provider_.ServeDirectory(
-      std::move(startup_info.launch_info.directory_request));
+  outgoing_.Serve(std::move(startup_info.launch_info.directory_request));
 
   url_ = package.resolved_url;
 

@@ -59,7 +59,6 @@ class DartComponentController : public fuchsia::sys::ComponentController {
   fuchsia::sys::Package package_;
   fuchsia::sys::StartupInfo startup_info_;
   std::string data_path_;
-  component::ServiceProviderBridge service_provider_bridge_;
   fidl::Binding<fuchsia::sys::ComponentController> binding_;
   std::unique_ptr<component::StartupContext> context_;
 

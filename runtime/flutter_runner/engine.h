@@ -5,6 +5,7 @@
 #ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_
 #define TOPAZ_RUNTIME_FLUTTER_RUNNER_ENGINE_H_
 
+#include <fuchsia/io/cpp/fidl.h>
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <zx/event.h>
 #include <zx/eventpair.h>
@@ -33,8 +34,7 @@ class Engine final : public mozart::NativesDelegate {
          fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
          fml::RefPtr<blink::DartSnapshot> shared_snapshot,
          zx::eventpair view_token, UniqueFDIONS fdio_ns,
-         fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-             outgoing_services_request);
+         fidl::InterfaceRequest<fuchsia::io::Directory> directory_request);
   ~Engine();
 
   // Returns the Dart return code for the root isolate if one is present. This

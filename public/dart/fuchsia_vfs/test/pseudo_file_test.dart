@@ -806,6 +806,15 @@ void main() {
         // truncate should have worked
         await _assertReadAt(proxy, 100, 0, str.substring(0, 3));
       });
+
+      test('close should work', () async {
+        var str = 'test_str';
+        var file = _createReadOnlyFile(str, openRightReadable);
+        // make sure file was opened
+        file.pseudoFile.close();
+
+        file.proxy.ctrl.whenClosed.asStream().listen(expectAsync1((_) {}));
+      });
     });
   });
 }

@@ -12,13 +12,13 @@
 #include <memory>
 #include <vector>
 
-#include "third_party/dart/runtime/include/dart_api.h"
 #include "dart-pkg/zircon/sdk_ext/handle.h"
 #include "dart-pkg/zircon/sdk_ext/natives.h"
 #include "dart-pkg/zircon/sdk_ext/system.h"
 #include "lib/fxl/arraysize.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/macros.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "third_party/tonic/dart_binding_macros.h"
 #include "third_party/tonic/dart_class_library.h"
 #include "third_party/tonic/dart_class_provider.h"
@@ -41,14 +41,11 @@ tonic::DartLibraryNatives* InitNatives() {
   return natives;
 }
 
-#define REGISTER_FUNCTION(name, count) \
-  { "" #name, name, count }            \
-  ,
+#define REGISTER_FUNCTION(name, count) {"" #name, name, count},
 #define DECLARE_FUNCTION(name, count) \
   extern void name(Dart_NativeArguments args);
 
-#define FIDL_NATIVE_LIST(V)    \
-  V(SetReturnCode, 1)
+#define FIDL_NATIVE_LIST(V) V(SetReturnCode, 1)
 
 FIDL_NATIVE_LIST(DECLARE_FUNCTION);
 
@@ -58,8 +55,7 @@ static struct NativeEntries {
   int argument_count;
 } Entries[] = {FIDL_NATIVE_LIST(REGISTER_FUNCTION)};
 
-Dart_NativeFunction NativeLookup(Dart_Handle name,
-                                 int argument_count,
+Dart_NativeFunction NativeLookup(Dart_Handle name, int argument_count,
                                  bool* auto_setup_scope) {
   const char* function_name = nullptr;
   Dart_Handle result = Dart_StringToCString(name, &function_name);
@@ -95,7 +91,8 @@ const uint8_t* NativeSymbol(Dart_NativeFunction native_function) {
 
 void SetReturnCode(Dart_NativeArguments arguments) {
   int64_t return_code;
-  Dart_Handle status = Dart_GetNativeIntegerArgument(arguments, 0, &return_code);
+  Dart_Handle status =
+      Dart_GetNativeIntegerArgument(arguments, 0, &return_code);
   if (!tonic::LogIfError(status)) {
     tonic::DartState::Current()->SetReturnCode(return_code);
   }
@@ -103,9 +100,8 @@ void SetReturnCode(Dart_NativeArguments arguments) {
 
 }  // namespace
 
-void Initialize(
-    fidl::InterfaceHandle<fuchsia::sys::Environment> environment,
-    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services) {
+void Initialize(fidl::InterfaceHandle<fuchsia::sys::Environment> environment,
+                zx::channel directory_request) {
   zircon::dart::Initialize();
 
   Dart_Handle library = Dart_LookupLibrary(ToDart("dart:fuchsia"));
@@ -123,10 +119,10 @@ void Initialize(
       library, ToDart("_environment"),
       ToDart(zircon::dart::Handle::Create(environment.TakeChannel()))));
 
-  if (outgoing_services) {
+  if (directory_request) {
     DART_CHECK_VALID(Dart_SetField(
         library, ToDart("_outgoingServices"),
-        ToDart(zircon::dart::Handle::Create(outgoing_services.TakeChannel()))));
+        ToDart(zircon::dart::Handle::Create(std::move(directory_request)))));
   }
 }
 

@@ -23,8 +23,7 @@ class TestStartupContext implements StartupContext {
   final MockLauncherProxy launcher = new MockLauncherProxy();
 
   @override
-  final MockServiceProviderImpl outgoingServices =
-      new MockServiceProviderImpl();
+  final MockOutgoing outgoingServices = new MockOutgoing();
 
   @override
   void close() {
@@ -68,7 +67,7 @@ class MockLauncherProxy extends Mock implements LauncherProxy {}
 
 class MockProxyController<T> extends Mock implements ProxyController<T> {}
 
-class MockServiceProviderImpl extends Mock implements ServiceProviderImpl {}
+class MockOutgoing extends Mock implements Outgoing {}
 
 class TestEnvironmentException implements Exception {
   final String message;

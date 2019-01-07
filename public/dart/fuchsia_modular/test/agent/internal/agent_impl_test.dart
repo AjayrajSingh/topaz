@@ -27,7 +27,7 @@ class MockStartupContext extends Mock implements StartupContext {}
 
 class MockAgentContext extends Mock implements fidl.AgentContext {}
 
-class MockServiceProviderImpl extends Mock implements ServiceProviderImpl {}
+class MockOutgoing extends Mock implements Outgoing {}
 
 class MockAsyncBinding extends Mock implements AsyncBinding {}
 
@@ -43,13 +43,11 @@ void main() {
   setupLogger();
   test('startupContext ', () {
     final mockStartupContext = MockStartupContext();
-    final mockServiceProviderImpl = MockServiceProviderImpl();
-    when(mockStartupContext.outgoingServices)
-        .thenReturn(mockServiceProviderImpl);
+    final mockOutgoingImpl = MockOutgoing();
+    when(mockStartupContext.outgoingServices).thenReturn(mockOutgoingImpl);
 
     AgentImpl(startupContext: mockStartupContext);
-    verify(mockServiceProviderImpl.addServiceForName(
-        any, fidl.Agent.$serviceName));
+    verify(mockOutgoingImpl.addServiceForName(any, fidl.Agent.$serviceName));
   });
 
   test('verify Lifecycle init during the construction of ModuleImpl', () {

@@ -15,6 +15,7 @@ typedef Connector<T> = void Function(fidl.InterfaceRequest<T> request);
 /// A node which binds a channel to a service implementation when opened.
 class Service<T> extends Vnode {
   Connector<T> _connector;
+  bool _closed = false;
 
   /// Constructor with [Connector]
   Service.withConnector(this._connector) : assert(_connector != null);
@@ -27,6 +28,10 @@ class Service<T> extends Vnode {
   @override
   int connect(int flags, int mode, fidl.InterfaceRequest<Node> request,
       [int parentFlags = -1]) {
+    if (_closed) {
+      sendErrorEvent(flags, ZX.ERR_NOT_SUPPORTED, request);
+      return ZX.ERR_NOT_SUPPORTED;
+    }
     var status = _validateFlagsAndMode(flags, mode);
     if (status != ZX.OK) {
       sendErrorEvent(flags, status, request);
@@ -60,5 +65,10 @@ class Service<T> extends Vnode {
     }
 
     return ZX.OK;
+  }
+
+  @override
+  void close() {
+    _closed = true;
   }
 }

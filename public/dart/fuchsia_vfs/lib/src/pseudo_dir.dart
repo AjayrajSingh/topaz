@@ -29,6 +29,7 @@ class PseudoDir extends Vnode {
       AvlTreeSet(comparator: (v1, v2) => v1.nodeId.compareTo(v2.nodeId));
   int _nextId = 1;
   final List<_DirConnection> _connections = [];
+  bool _isClosed = false;
 
   /// Adds a directory entry associating the given [name] with [node].
   /// It is ok to add the same Vnode multiple times with different names.
@@ -51,11 +52,33 @@ class PseudoDir extends Vnode {
     return ZX.OK;
   }
 
+  @override
+  void close() {
+    _isClosed = true;
+    for (var entry in _entries.entries) {
+      entry.value.node.close();
+    }
+    removeAllNodes();
+    // schedule a task because if user closes this as soon as
+    // they open a connection, dart fidl binding throws exception due to
+    // event(OnOpen) on this fidl.
+    scheduleMicrotask(() {
+      for (var c in _connections) {
+        c.closeBinding();
+      }
+      _connections.clear();
+    });
+  }
+
   /// Connects to this instance of [PseudoDir] and serves
   /// [fushsia.io.Directory] over fidl.
   @override
   int connect(int flags, int mode, fidl.InterfaceRequest<Node> request,
       [int parentFlags = -1]) {
+    if (_isClosed) {
+      sendErrorEvent(flags, ZX.ERR_NOT_SUPPORTED, request);
+      return ZX.ERR_NOT_SUPPORTED;
+    }
     // There should be no modeType* flags set, except for, possibly,
     // modeTypeDirectory when the target is a pseudo dir.
     if ((mode & ~modeProtectionMask) & ~modeTypeDirectory != 0) {
@@ -73,7 +96,6 @@ class PseudoDir extends Vnode {
     }
     var connection = _DirConnection(
         mode, connectFlags, this, fidl.InterfaceRequest(request.passChannel()));
-
     _connections.add(connection);
     return ZX.OK;
   }
@@ -156,6 +178,11 @@ class PseudoDir extends Vnode {
     return ZX.OK;
   }
 
+  /// Serves this [request] directory over request channel.
+  int serve(fidl.InterfaceRequest<Node> request) {
+    return connect(openFlagDirectory, 0, request);
+  }
+
   @override
   int type() {
     return direntTypeDirectory;
@@ -211,7 +238,7 @@ class _DirConnection extends Directory {
   /// We will get key after `_seek` and traverse in the TreeMap.
   int _seek = -1;
 
-  bool _closed = false;
+  bool _isClosed = false;
 
   /// Constructor
   _DirConnection(this._mode, this._flags, this._dir,
@@ -244,13 +271,18 @@ class _DirConnection extends Directory {
 
   @override
   Future<int> close() async {
-    if (_closed) {
+    if (_isClosed) {
       return ZX.OK;
     }
     _dir._onClose(this);
-    _closed = true;
+    _isClosed = true;
 
     return ZX.OK;
+  }
+
+  void closeBinding() {
+    _binding.close();
+    _isClosed = true;
   }
 
   @override

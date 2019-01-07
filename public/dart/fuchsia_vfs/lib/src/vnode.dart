@@ -15,6 +15,9 @@ import 'internal/_error_node.dart';
 abstract class Vnode {
   final List<ErrorNodeForSendingEvent> _errorNodes = [];
 
+  /// Close this node and all of its bindings and children.
+  void close();
+
   /// Connect to this vnode.
   /// All flags and modes are defined in
   /// https://fuchsia.googlesource.com/zircon/+/master/system/fidl/fuchsia-io/io.fidl
@@ -23,6 +26,16 @@ abstract class Vnode {
   /// This param is used by clone to restrict cloning.
   int connect(int flags, int mode, InterfaceRequest<Node> request,
       [int parentFlags = -1]);
+
+  /// Filter flags when [openFlagNodeReference] is passed.
+  /// This will maintain compatibility with c++ layer.
+  int filterForNodeReference(int flags) {
+    if (flags & openFlagNodeReference != 0) {
+      return flags &
+          (openFlagNodeReference | openFlagDirectory | openFlagDescribe);
+    }
+    return flags;
+  }
 
   /// Inode number as defined in io.fidl.
   int inodeNumber();
@@ -55,16 +68,6 @@ abstract class Vnode {
     } else {
       request.close();
     }
-  }
-
-  /// Filter flags when [openFlagNodeReference] is passed.
-  /// This will maintain compatibility with c++ layer.
-  int filterForNodeReference(int flags) {
-    if (flags & openFlagNodeReference != 0) {
-      return flags &
-          (openFlagNodeReference | openFlagDirectory | openFlagDescribe);
-    }
-    return flags;
   }
 
   /// Should be one of

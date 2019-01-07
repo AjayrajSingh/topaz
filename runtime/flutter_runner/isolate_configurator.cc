@@ -6,11 +6,11 @@
 
 #include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"
 #include "dart-pkg/zircon/sdk_ext/handle.h"
+#include "lib/ui/flutter/sdk_ext/src/natives.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "third_party/tonic/converter/dart_converter.h"
 #include "third_party/tonic/dart_state.h"
 #include "third_party/tonic/logging/dart_error.h"
-#include "lib/ui/flutter/sdk_ext/src/natives.h"
-#include "third_party/dart/runtime/include/dart_api.h"
 
 namespace flutter {
 
@@ -22,14 +22,13 @@ IsolateConfigurator::IsolateConfigurator(
 #else
     fidl::InterfaceHandle<fuchsia::sys::Environment> environment,
 #endif
-    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-        outgoing_services_request)
+    zx::channel directory_request)
     : fdio_ns_(std::move(fdio_ns)),
 #ifndef SCENIC_VIEWS2
       view_container_(std::move(view_container)),
 #endif
       environment_(std::move(environment)),
-      outgoing_services_request_(std::move(outgoing_services_request)) {
+      directory_request_(std::move(directory_request)) {
 }
 
 IsolateConfigurator::~IsolateConfigurator() = default;
@@ -55,7 +54,7 @@ bool IsolateConfigurator::ConfigureCurrentIsolate(
 
 void IsolateConfigurator::BindFuchsia() {
   fuchsia::dart::Initialize(std::move(environment_),
-                            std::move(outgoing_services_request_));
+                            std::move(directory_request_));
 }
 
 void IsolateConfigurator::BindZircon() {

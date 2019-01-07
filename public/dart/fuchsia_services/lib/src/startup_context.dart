@@ -3,12 +3,13 @@
 // found in the LICENSE file.
 
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl;
+import 'package:fidl_fuchsia_io/fidl_async.dart' as fidl_io;
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 import 'package:fidl/fidl.dart';
 import 'package:fuchsia/fuchsia.dart';
 
-import 'service_provider_impl.dart';
+import 'outgoing.dart';
 
 /// The [StartupContext] holds references to the services and connections
 /// that the component was launched with. Authors can get use the startup
@@ -27,8 +28,12 @@ class StartupContext {
   /// the services exposed to the component on launch.
   final fidl.ServiceProvider environmentServices;
 
+  /// deprecated, use [outgoing].
+  final Outgoing outgoingServices;
+
   /// The service provider which can be used to expose outgoing services
-  final ServiceProviderImpl outgoingServices;
+  /// and other directories.
+  final Outgoing outgoing;
 
   /// Creates a new instance of [StartupContext].
   ///
@@ -41,7 +46,8 @@ class StartupContext {
   })  : assert(environment != null),
         assert(launcher != null),
         assert(environmentServices != null),
-        assert(outgoingServices != null);
+        assert(outgoingServices != null),
+        outgoing = outgoingServices;
 
   /// Returns the [StartupContext] cached instance associated with the
   /// currently running component.
@@ -57,13 +63,13 @@ class StartupContext {
     final environmentProxy = fidl.EnvironmentProxy();
     final launcherProxy = fidl.LauncherProxy();
     final environmentServicesProxy = fidl.ServiceProviderProxy();
-    final outgoingServicesImpl = ServiceProviderImpl();
+    final outgoingImpl = Outgoing();
 
     _context = StartupContext(
       environment: environmentProxy,
       launcher: launcherProxy,
       environmentServices: environmentServicesProxy,
-      outgoingServices: outgoingServicesImpl,
+      outgoingServices: outgoingImpl,
     );
 
     final Handle environmentHandle = MxStartupInfo.takeEnvironment();
@@ -77,8 +83,8 @@ class StartupContext {
 
     final Handle outgoingServicesHandle = MxStartupInfo.takeOutgoingServices();
     if (outgoingServicesHandle != null) {
-      outgoingServicesImpl.bind(InterfaceRequest<fidl.ServiceProvider>(
-          Channel(outgoingServicesHandle)));
+      outgoingImpl.serve(
+          InterfaceRequest<fidl_io.Node>(Channel(outgoingServicesHandle)));
     }
 
     return _context;

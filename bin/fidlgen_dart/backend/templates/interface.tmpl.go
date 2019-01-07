@@ -272,7 +272,7 @@ class {{ .BindingName }} extends $fidl.Binding<{{ .Name }}> {
   {{- end }}
 {{- end }}
       default:
-        throw new $fidl.FidlError('Unexpected message name');
+        throw new $fidl.FidlError('Unexpected message name for {{ .BindingName }}');
     }
   }
 }
@@ -650,7 +650,7 @@ class {{ .BindingName }} extends $fidl.AsyncBinding<{{ .Name }}> {
       {{- end }}
     {{- end }}
       default:
-        throw new $fidl.FidlError('Unexpected message name');
+        throw new $fidl.FidlError('Unexpected message name for {{ .BindingName }}');
     }
   }
 }

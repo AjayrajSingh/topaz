@@ -5,12 +5,12 @@
 #include "topaz/runtime/dart_runner/service_isolate.h"
 
 #include "lib/fsl/vmo/file.h"
+#include "third_party/dart/runtime/include/bin/dart_io_api.h"
 #include "third_party/tonic/converter/dart_converter.h"
 #include "third_party/tonic/dart_library_natives.h"
 #include "third_party/tonic/dart_microtask_queue.h"
 #include "third_party/tonic/dart_state.h"
 #include "third_party/tonic/typed_data/uint8_list.h"
-#include "third_party/dart/runtime/include/bin/dart_io_api.h"
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
 
@@ -171,7 +171,7 @@ Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
   SHUTDOWN_ON_ERROR(result);
 
   InitBuiltinLibrariesForIsolate(std::string(uri), nullptr, fileno(stdout),
-                                 fileno(stderr), nullptr, nullptr, true);
+                                 fileno(stderr), nullptr, zx::channel(), true);
 
   // Make runnable.
   Dart_ExitScope();

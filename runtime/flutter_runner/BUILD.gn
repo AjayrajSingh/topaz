@@ -80,6 +80,8 @@ template("flutter_runner") {
       "runner.h",
       "semantics_bridge.cc",
       "semantics_bridge.h",
+      "service_provider_dir.cc",
+      "service_provider_dir.h",
       "session_connection.cc",
       "session_connection.h",
       "surface.cc",
@@ -146,6 +148,7 @@ template("flutter_runner") {
              "//topaz/public/lib/ui/flutter/sdk_ext",
              "//topaz/runtime/dart/utils",
              "//zircon/public/lib/trace-provider",
+             "//zircon/public/fidl/fuchsia-io",
            ] + extra_deps + flutter_deps
 
     if (scenic_use_views2) {

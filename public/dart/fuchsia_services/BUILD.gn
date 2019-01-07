@@ -14,6 +14,7 @@ dart_library("fuchsia_services") {
   sources = [
     "services.dart",
     "src/environment_service_connection.dart",
+    "src/outgoing.dart",
     "src/service_connection.dart",
     "src/service_provider_impl.dart",
     "src/startup_context.dart",
@@ -24,6 +25,7 @@ dart_library("fuchsia_services") {
     "//third_party/dart-pkg/pub/meta",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
+    "//topaz/public/dart/fuchsia_vfs",
     "//topaz/public/dart/zircon",
     "//zircon/public/fidl/fuchsia-io",
   ]
@@ -39,6 +41,7 @@ dart_test("fuchsia_services_package_unittests") {
   deps = [
     ":fuchsia_services",
     "//third_party/dart-pkg/pub/test",
+    "//zircon/public/fidl/fuchsia-io",
   ]
 }
 
@@ -54,10 +57,13 @@ dart_fuchsia_test("fuchsia_services_package_integration_tests") {
   # is why this is empty. We are leaving this here so that it is easy to add
   # integration tests when we get a chance. This comment can be removed when
   # sources is no longer empty.
-  sources = []
+  sources = [
+    "outgoing_test.dart",
+  ]
 
   deps = [
     ":fuchsia_services",
     "//third_party/dart-pkg/pub/test",
+    "//zircon/public/fidl/fuchsia-io",
   ]
 }

@@ -12,10 +12,10 @@
 
 #include <memory>
 
+#include "lib/component/cpp/outgoing.h"
 #include "lib/fidl/cpp/binding.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fidl/cpp/interface_ptr_set.h"
-#include "lib/svc/cpp/service_provider_bridge.h"
 
 namespace web {
 
@@ -53,7 +53,7 @@ class ComponentController : public fuchsia::sys::ComponentController,
       fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> services) final;
 
   Runner* runner_;
-  component::ServiceProviderBridge service_provider_;
+  component::Outgoing outgoing_;
   fidl::Binding<fuchsia::sys::ComponentController> binding_;
   fidl::BindingSet<fuchsia::ui::app::ViewProvider> view_provider_bindings_;
   fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider>

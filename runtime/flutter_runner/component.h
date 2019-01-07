@@ -9,10 +9,14 @@
 #include <memory>
 #include <set>
 
+#include <fs/pseudo-dir.h>
+#include <fs/synchronous-vfs.h>
+#include <fuchsia/io/cpp/fidl.h>
 #include <fuchsia/sys/cpp/fidl.h>
 #include <fuchsia/ui/app/cpp/fidl.h>
 #include <fuchsia/ui/viewsv1/cpp/fidl.h>
 #include <fuchsia/ui/viewsv1token/cpp/fidl.h>
+#include <lib/async/default.h>
 #include <lib/fit/function.h>
 #include <zx/eventpair.h>
 
@@ -62,9 +66,9 @@ class Application final : public Engine::Delegate,
   fml::UniqueFD application_assets_directory_;
 
   fidl::Binding<fuchsia::sys::ComponentController> application_controller_;
-  fidl::InterfaceRequest<fuchsia::sys::ServiceProvider>
-      outgoing_services_request_;
-  component::ServiceProviderBridge service_provider_bridge_;
+  fidl::InterfaceRequest<fuchsia::io::Directory> directory_request_;
+  fbl::RefPtr<fs::PseudoDir> outgoing_dir_;
+  fs::SynchronousVfs outgoing_vfs_;
   std::unique_ptr<component::StartupContext> startup_context_;
   fidl::BindingSet<fuchsia::ui::app::ViewProvider> shells_bindings_;
   fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider> v1_shells_bindings_;

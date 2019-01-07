@@ -6,14 +6,12 @@
 #define DART_PKG_FUCHSIA_SDK_EXT_FUCHSIA_H_
 
 #include <fuchsia/sys/cpp/fidl.h>
-#include <fuchsia/sys/cpp/fidl.h>
 
 namespace fuchsia {
 namespace dart {
 
-void Initialize(
-    fidl::InterfaceHandle<fuchsia::sys::Environment> environment,
-    fidl::InterfaceRequest<fuchsia::sys::ServiceProvider> outgoing_services);
+void Initialize(fidl::InterfaceHandle<fuchsia::sys::Environment> environment,
+                zx::channel directory_request);
 
 }  // namespace dart
 }  // namespace fuchsia
