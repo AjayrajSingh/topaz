@@ -54,8 +54,6 @@ class IntentParameters {
         return _getJsonData(data.json, codec);
       case IntentParameterDataTag.entityReference:
         return _getEntityData(data.entityReference, codec);
-      case IntentParameterDataTag.linkName:
-        return _getLinkData(data.linkName, codec);
       default:
         throw Exception('Unsupported parameter type.');
     }
@@ -85,19 +83,6 @@ class IntentParameters {
     return codec.decode(data);
   }
 
-  Future<T> _getLinkData<T>(String linkName, EntityCodec<T> codec) async {
-    final link = await _driver.getLink(linkName);
-    final entityReference = await link.getEntity();
-    if (entityReference == null) {
-      fuchsia_mem.Buffer buffer = await link.get();
-      if (buffer == null) {
-        throw Exception('No content in the link.');
-      }
-      return _getJsonData(buffer, codec);
-    }
-    return _getEntityData(entityReference, codec);
-  }
-
   /// Returns a stream of data. If the parameter is JSON, or an Entity the data
   /// will be added to the stream and the stream will then be closed. If the
   /// parameter is a Link, any observed updates to the Link will also be added
@@ -125,13 +110,6 @@ class IntentParameters {
           controller
             ..add(entityData)
             ..close();
-        });
-        break;
-      case IntentParameterDataTag.linkName:
-        controller
-            .addStream(_driver.watch(data.linkName, codec), cancelOnError: true)
-            .then((_) {
-          controller.close();
         });
         break;
       default:
