@@ -255,6 +255,22 @@ void main() {
       });
     });
 
+    var expectedNodeAttrs = NodeAttributes(
+        mode: modeTypeFile | modeProtectionMask,
+        id: inoUnknown,
+        contentSize: 0,
+        storageSize: 0,
+        linkCount: 1,
+        creationTime: 0,
+        modificationTime: 0);
+
+    test('test getAttr', () async {
+      var file = _createReadOnlyFile('test_str', openRightReadable);
+      var response = await file.proxy.getAttr();
+      expect(response.s, ZX.OK);
+      expect(response.attributes, expectedNodeAttrs);
+    });
+
     test('clone works', () async {
       var file = _createReadOnlyFile('test_str', openRightReadable);
 

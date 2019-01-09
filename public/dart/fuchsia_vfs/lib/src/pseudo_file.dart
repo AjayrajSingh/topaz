@@ -271,7 +271,7 @@ class _FileConnection extends File {
   @override
   Future<File$GetAttr$Response> getAttr() async {
     return File$GetAttr$Response(
-        ZX.ERR_NOT_SUPPORTED,
+        ZX.OK,
         NodeAttributes(
             mode: modeTypeFile | modeProtectionMask,
             id: inoUnknown,
