@@ -3,7 +3,6 @@
         "topaz/packages/tools/dart",
         "topaz/packages/tools/doc_checker",
         "topaz/packages/tools/fidlgen_dart",
-        "topaz/packages/tools/ledger",
         "topaz/packages/tools/voila"
     ]
 }
