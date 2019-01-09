@@ -30,7 +30,7 @@ const double _kGestureWidth = 32.0;
 
 /// Delays the first animation by this amount.  This gives new mods time to
 /// load.
-const _introAnimationDelay = Duration(milliseconds: 750);
+const _introAnimationDelay = Duration(milliseconds: 3000);
 
 /// Stages determine how things move, and how they can be manipulated
 class SurfaceStage extends StatelessWidget {
