@@ -92,7 +92,7 @@ dart_test("fuchsia_modular_package_unittests") {
 # Run tese tests using:
 #  fx set x64 --packages topaz/packages/buildbot
 # Start a qemu emulator (using a real device is also possible):
-#  fx run -- -kN  (tip: to terminate the emulator press "ctrl+a x")
+#  fx run -kN  (tip: to terminate the emulator press "ctrl+a x")
 # Run integration tests:
 #  fx shell runtests pkgfs/packages/fuchsia_modular_package_integration_tests/0/test
 dart_fuchsia_test("fuchsia_modular_package_integration_tests") {
