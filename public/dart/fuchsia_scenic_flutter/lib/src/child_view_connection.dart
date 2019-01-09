@@ -185,8 +185,9 @@ class ChildViewConnection {
     _viewKey = _nextViewKey++;
     _viewContainer.addChild2(_viewKey, _viewHolderToken, sceneTokens.second);
     _viewHolderToken = null;
-    assert(!ViewContainerListenerImpl().containsConnectionForKey(_viewKey));
-    ViewContainerListenerImpl().addConnectionForKey(_viewKey, this);
+    assert(
+        !ViewContainerListenerImpl.instance.containsConnectionForKey(_viewKey));
+    ViewContainerListenerImpl.instance.addConnectionForKey(_viewKey, this);
   }
 
   void _attach() {
@@ -243,10 +244,11 @@ class ChildViewConnection {
     assert(_viewHolderToken == null);
     assert(_viewKey != null);
     assert(_sceneHost != null);
-    assert(ViewContainerListenerImpl().getConnectionForKey(_viewKey) == this);
+    assert(ViewContainerListenerImpl.instance.getConnectionForKey(_viewKey) ==
+        this);
     final EventPairPair viewTokens = new EventPairPair();
     assert(viewTokens.status == ZX.OK);
-    ViewContainerListenerImpl().removeConnectionForKey(_viewKey);
+    ViewContainerListenerImpl.instance.removeConnectionForKey(_viewKey);
     _viewHolderToken = viewTokens.first;
     _viewContainer.removeChild2(_viewKey, viewTokens.second);
     _viewKey = null;

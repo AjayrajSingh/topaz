@@ -14,7 +14,9 @@ import '../child_view_connection.dart';
 class ViewContainerListenerImpl extends ViewContainerListener {
   /// The shared [ViewContainerListenerImpl] instance.
   static final ViewContainerListenerImpl instance =
-      new ViewContainerListenerImpl();
+      new ViewContainerListenerImpl._();
+
+  ViewContainerListenerImpl._() : super();
 
   static final Map<int, ChildViewConnection> _connections =
       HashMap<int, ChildViewConnection>();
