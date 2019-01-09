@@ -9,3 +9,4 @@ export 'src/module/intent_handler.dart';
 export 'src/module/module.dart';
 export 'src/module/module_state_exception.dart';
 export 'src/module/noop_intent_handler.dart';
+export 'src/module/ongoing_activity.dart';

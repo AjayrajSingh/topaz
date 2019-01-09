@@ -20,8 +20,10 @@ import '../intent.dart';
 import '../intent_handler.dart';
 import '../module.dart';
 import '../module_state_exception.dart';
+import '../ongoing_activity.dart';
 import '_intent_handler_impl.dart';
 import '_module_context.dart';
+import '_ongoing_activity_impl.dart';
 
 /// A concrete implementation of the [Module] interface. This class
 /// is not intended to be used directly by authors but instead should
@@ -150,13 +152,21 @@ class ModuleImpl implements Module {
   }
 
   @override
+  void removeSelfFromStory() {
+    _getContext().removeSelfFromStory();
+  }
+
+  @override
   void requestFocus() {
     _getContext().requestFocus();
   }
 
   @override
-  void removeSelfFromStory() {
-    _getContext().removeSelfFromStory();
+  OngoingActivity startOngoingActivity(fidl.OngoingActivityType type) {
+    final proxy = fidl.OngoingActivityProxy();
+    _getContext().startOngoingActivity(type, proxy.ctrl.request());
+
+    return OngoingActivityImpl(proxy);
   }
 
   fidl.ModuleContext _getContext() => _moduleContext ??= getModuleContext();
@@ -172,11 +182,11 @@ class ModuleImpl implements Module {
     _intentHandler.handleIntent(intent);
   }
 
+  // any necessary cleanup should be done in this method.
   Future<void> _terminate() async {
     _intentHandler = null;
   }
 
-  // any necessary cleanup should be done in this method.
   void _validateStartModuleStatus(
       fidl.StartModuleStatus status, String name, fidl.Intent intent) {
     switch (status) {
