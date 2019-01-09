@@ -57,6 +57,16 @@ abstract class Vnode {
     }
   }
 
+  /// Filter flags when [openFlagNodeReference] is passed.
+  /// This will maintain compatibility with c++ layer.
+  int filterForNodeReference(int flags) {
+    if (flags & openFlagNodeReference != 0) {
+      return flags &
+          (openFlagNodeReference | openFlagDirectory | openFlagDescribe);
+    }
+    return flags;
+  }
+
   /// Should be one of
   ///
   /// direntTypeUnknown

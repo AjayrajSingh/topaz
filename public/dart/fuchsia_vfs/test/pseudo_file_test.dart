@@ -88,7 +88,6 @@ void main() {
     var _notAllowedFlags = [
       openFlagCreate,
       openFlagCreateIfAbsent,
-      openFlagNodeReference,
       openFlagNoRemote,
       openRightAdmin
     ];
@@ -218,7 +217,9 @@ void main() {
 
   group('pseudo file:', () {
     _ReadWriteFile _createReadWriteFile(String initialStr,
-        {int capacity, createProxy = true}) {
+        {int capacity,
+        createProxy = true,
+        flags = openRightReadable | openRightWritable}) {
       int c = initialStr.length;
       if (capacity != null) {
         assert(capacity >= initialStr.length);
@@ -236,8 +237,8 @@ void main() {
       if (createProxy) {
         file.proxy = FileProxy();
         expect(
-            file.pseudoFile.connect(openRightReadable | openRightWritable, 0,
-                _getNodeInterfaceRequest(file.proxy)),
+            file.pseudoFile
+                .connect(flags, 0, _getNodeInterfaceRequest(file.proxy)),
             ZX.OK);
       }
       return file;
@@ -286,6 +287,55 @@ void main() {
       });
     });
 
+    test('clone fails when trying to pass Readable flag to Node Reference',
+        () async {
+      var file = _createReadOnlyFile(
+          'test_str', openRightReadable | openFlagNodeReference);
+
+      var clonedProxy = FileProxy();
+      await file.proxy.clone(openRightReadable | openFlagDescribe,
+          _getNodeInterfaceRequest(clonedProxy));
+
+      await clonedProxy.onOpen.first.then((response) {
+        expect(response.s, ZX.ERR_ACCESS_DENIED);
+        expect(response.info, isNull);
+      }).catchError((err) async {
+        fail(err.toString());
+      });
+    });
+
+    test('clone fails when trying to pass Writable flag to Node Reference',
+        () async {
+      var file = _createReadWriteFile('test_str',
+          flags: openRightWritable | openFlagNodeReference);
+
+      var clonedProxy = FileProxy();
+      await file.proxy.clone(openRightWritable | openFlagDescribe,
+          _getNodeInterfaceRequest(clonedProxy));
+
+      await clonedProxy.onOpen.first.then((response) {
+        expect(response.s, ZX.ERR_ACCESS_DENIED);
+        expect(response.info, isNull);
+      }).catchError((err) async {
+        fail(err.toString());
+      });
+    });
+
+    test('able to clone Node Reference', () async {
+      var file = _createReadOnlyFile('test_str', openFlagNodeReference);
+
+      var clonedProxy = FileProxy();
+      await file.proxy.clone(openFlagNodeReference | openFlagDescribe,
+          _getNodeInterfaceRequest(clonedProxy));
+
+      await clonedProxy.onOpen.first.then((response) {
+        expect(response.s, ZX.OK);
+        expect(response.info, isNotNull);
+      }).catchError((err) async {
+        fail(err.toString());
+      });
+    });
+
     test('clone should fail if parent\'s flag doesn\'t match up', () async {
       var file = _createReadWriteFile('test_str', createProxy: false);
       var flagsToTest = [openRightReadable, openRightWritable];
@@ -320,10 +370,53 @@ void main() {
       });
     });
 
+    test('onOpen with NodeReference flag', () async {
+      var file = _createReadOnlyFile(
+          'test_str', openFlagNodeReference | openFlagDescribe);
+
+      await file.proxy.onOpen.first.then((response) {
+        expect(response.s, ZX.OK);
+        expect(response.info, isNotNull);
+      }).catchError((err) async {
+        fail(err.toString());
+      });
+    });
+
+    test('Directory not ignored with NodeReference flag', () async {
+      var file = _createReadOnlyFile(
+          'test_str',
+          openFlagNodeReference | openFlagDescribe | openFlagDirectory,
+          ZX.ERR_NOT_DIR);
+
+      await file.proxy.onOpen.first.then((response) {
+        expect(response.s, ZX.ERR_NOT_DIR);
+        expect(response.info, isNull);
+      }).catchError((err) async {
+        fail(err.toString());
+      });
+    });
+
+    test('GetAttr with NodeReference flag', () async {
+      var file = _createReadOnlyFile('test_str', openFlagNodeReference);
+      var response = await file.proxy.getAttr();
+      expect(response.s, ZX.OK);
+      expect(response.attributes, expectedNodeAttrs);
+    });
+
     test('read file', () async {
       var str = 'test_str';
       var file = _createReadOnlyFile(str, openRightReadable);
       await _assertRead(file.proxy, 10, str);
+    });
+
+    test('read functions fails for NodeReference flag', () async {
+      var file = _createReadOnlyFile(
+          'test_str', openRightReadable | openFlagNodeReference);
+      var readResponse = await file.proxy.read(1024);
+      expect(readResponse.s, ZX.ERR_ACCESS_DENIED);
+
+      var readAtResponse = await file.proxy.readAt(0, 1024);
+      expect(readAtResponse.s, ZX.ERR_ACCESS_DENIED);
     });
 
     Future<void> _resetSeek(FileProxy proxy, [int offset]) async {
@@ -563,6 +656,20 @@ void main() {
         await _assertRead(proxy, 100, str);
 
         await _assertFinalBuffer(proxy, file, str, str);
+      });
+
+      test('write functions fails for NodeReference flag', () async {
+        var str = 'test_str';
+        var file = _createReadWriteFile(str,
+            capacity: str.length + 5,
+            flags: openRightWritable | openFlagNodeReference);
+        var proxy = file.proxy;
+
+        await _assertWriteAt(proxy, _newStrList, str.length + 1, 0,
+            expectedStatus: ZX.ERR_ACCESS_DENIED);
+
+        await _assertWrite(proxy, _newStrList,
+            expectedSize: 0, expectedStatus: ZX.ERR_ACCESS_DENIED);
       });
     });
 

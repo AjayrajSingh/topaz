@@ -100,15 +100,16 @@ class PseudoFile extends Vnode {
       return ZX.ERR_INVALID_ARGS;
     }
 
-    var status = _validateFlags(parentFlags, flags);
+    var connectFlags = filterForNodeReference(flags);
+    var status = _validateFlags(parentFlags, connectFlags);
     if (status != ZX.OK) {
-      sendErrorEvent(flags, status, request);
+      sendErrorEvent(connectFlags, status, request);
       return status;
     }
 
     var connection = _FileConnection(
         capacity: _capacity,
-        flags: flags,
+        flags: connectFlags,
         file: this,
         mode: mode,
         request: fidl.InterfaceRequest<File>(request.passChannel()));
@@ -144,7 +145,7 @@ class PseudoFile extends Vnode {
     if (flags & openFlagDirectory != 0) {
       return ZX.ERR_NOT_DIR;
     }
-    var allowedFlags = openFlagDescribe;
+    var allowedFlags = openFlagDescribe | openFlagNodeReference;
     if (_readFn != null) {
       allowedFlags |= openRightReadable;
     }

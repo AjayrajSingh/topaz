@@ -63,14 +63,16 @@ class PseudoDir extends Vnode {
       return ZX.ERR_INVALID_ARGS;
     }
 
+    var connectFlags = filterForNodeReference(flags);
+
     // ignore parentFlags as every directory is readable even if flag is not passed.
-    var status = _validateFlags(flags);
+    var status = _validateFlags(connectFlags);
     if (status != ZX.OK) {
-      sendErrorEvent(flags, status, request);
+      sendErrorEvent(connectFlags, status, request);
       return status;
     }
     var connection = _DirConnection(
-        mode, flags, this, fidl.InterfaceRequest(request.passChannel()));
+        mode, connectFlags, this, fidl.InterfaceRequest(request.passChannel()));
 
     _connections.add(connection);
     return ZX.OK;
@@ -167,6 +169,7 @@ class PseudoDir extends Vnode {
     var allowedFlags = openRightReadable |
         openRightWritable |
         openFlagDirectory |
+        openFlagNodeReference |
         openFlagDescribe;
     var prohibitedFlags = openFlagCreate |
         openFlagCreateIfAbsent |
@@ -194,6 +197,7 @@ class PseudoDir extends Vnode {
 /// This class should not be used directly, but by [fuchsia_vfs.PseudoDirectory].
 class _DirConnection extends Directory {
   final DirectoryBinding _binding = DirectoryBinding();
+  bool isNodeRef = false;
 
   // reference to current Directory object;
   PseudoDir _dir;
@@ -218,6 +222,9 @@ class _DirConnection extends Directory {
     _binding.whenClosed.then((_) {
       return close();
     });
+    if (_flags & openFlagNodeReference != 0) {
+      isNodeRef = true;
+    }
   }
 
   @override
@@ -289,6 +296,9 @@ class _DirConnection extends Directory {
 
   @override
   Future<Directory$ReadDirents$Response> readDirents(int maxBytes) async {
+    if (isNodeRef) {
+      return Directory$ReadDirents$Response(ZX.ERR_BAD_HANDLE, Uint8List(0));
+    }
     var buf = Uint8List(maxBytes);
     var bData = ByteData.view(buf.buffer);
     var firstOne = true;

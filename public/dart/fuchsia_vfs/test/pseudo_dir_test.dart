@@ -153,7 +153,6 @@ void main() {
           openFlagAppend,
           openFlagCreate,
           openFlagCreateIfAbsent,
-          openFlagNodeReference,
           openFlagNoRemote,
           openFlagTruncate,
           openRightAdmin,
@@ -250,7 +249,8 @@ void main() {
       var validFlags = [
         openRightReadable,
         openRightWritable,
-        openFlagDirectory
+        openFlagDirectory,
+        openFlagNodeReference
       ];
 
       for (var flag in validFlags) {
@@ -788,7 +788,25 @@ void main() {
 
         var proxy = _getProxyForDir(dir);
 
-        // open file 4 in subDir.
+        // open file 2 in subDir.
+        await _openFileAndAssert(proxy, 'subDir/file2', 100, 'file2');
+      });
+
+      test('readdir fails for NodeReference', () async {
+        PseudoDir dir = _setUpDir();
+
+        var proxy = _getProxyForDir(dir, openFlagNodeReference);
+
+        var response = await proxy.readDirents(1024);
+        expect(response.s, ZX.ERR_BAD_HANDLE);
+      });
+
+      test('able to open a file for NodeReference', () async {
+        PseudoDir dir = _setUpDir();
+
+        var proxy = _getProxyForDir(dir, openFlagNodeReference);
+
+        // open file 2 in subDir.
         await _openFileAndAssert(proxy, 'subDir/file2', 100, 'file2');
       });
     });
