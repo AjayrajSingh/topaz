@@ -149,10 +149,9 @@ void ViewController::DrawContent(SkCanvas* canvas) {
   SkPaint bg_paint;
   bg_paint.setStyle(SkPaint::kFill_Style);
 
-  SkPaint fg_paint;
-  fg_paint.setTypeface(regular_typeface_);
-  fg_paint.setTextSize(params_.font_size);
-  fg_paint.setTextEncoding(SkTextEncoding::kUTF32);
+  SkFont fg_font;
+  fg_font.setTypeface(regular_typeface_);
+  fg_font.setSize(params_.font_size);
 
   TermModel::Size size = model_.GetSize();
   int y = 0;
@@ -178,13 +177,14 @@ void ViewController::DrawContent(SkCanvas* canvas) {
             flags |= SkPaint::kFakeBoldText_Flag;
           // TODO(jpoichet): Account for TermModel::kAttributesUnderline
           // without using the deprecated flag SkPaint::kUnderlineText_Flag
+          SkPaint fg_paint;
           fg_paint.setFlags(flags);
           fg_paint.setColor(SkColorSetRGB(ch.foreground_color.red,
                                           ch.foreground_color.green,
                                           ch.foreground_color.blue));
 
-          canvas->drawText(&ch.code_point, sizeof(ch.code_point), x,
-                           y + ascent_, fg_paint);
+          canvas->drawSimpleText(&ch.code_point, sizeof(ch.code_point),
+              SkTextEncoding::kUTF32, x, y + ascent_, fg_font, fg_paint);
         }
       }
     }
