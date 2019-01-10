@@ -55,12 +55,12 @@ Runner::Runner()
 
   SetThreadName("io.flutter.runner.main");
 
-  host_context_->outgoing_services()->AddService<fuchsia::sys::Runner>(
+  host_context_->outgoing().deprecated_services()->AddService<fuchsia::sys::Runner>(
       std::bind(&Runner::RegisterApplication, this, std::placeholders::_1));
 }
 
 Runner::~Runner() {
-  host_context_->outgoing_services()->RemoveService<fuchsia::sys::Runner>();
+  host_context_->outgoing().deprecated_services()->RemoveService<fuchsia::sys::Runner>();
 }
 
 void Runner::RegisterApplication(
