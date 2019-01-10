@@ -294,6 +294,11 @@ class _FileConnection extends File {
   }
 
   @override
+  Future<File$GetBuffer$Response> getBuffer(int flags) async {
+    return File$GetBuffer$Response(ZX.OK, null);
+  }
+
+  @override
   Future<File$Ioctl$Response> ioctl(
       int opcode, int maxOut, List<Handle> handles, Uint8List in$) async {
     return File$Ioctl$Response(ZX.ERR_NOT_SUPPORTED, [], Uint8List(0));
