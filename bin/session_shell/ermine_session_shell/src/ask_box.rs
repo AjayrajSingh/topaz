@@ -31,7 +31,6 @@ impl AskBox {
         let host_import_token = host_node.export_as_request();
 
         view_container.add_child(key, view_owner_client, host_import_token)?;
-        //view_container.request_focus(key)?;
         import_node.add_child(&host_node);
         Ok(host_node)
     }
@@ -75,10 +74,10 @@ impl AskBox {
     }
 
     pub fn focus(
-        &mut self, view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
+        &mut self, _view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
     ) -> Result<(), Error> {
+        // TODO: add correct scenic focusing call here
         println!("Want to focus {}", self.key);
-        view_container.request_focus(self.key)?;
         Ok(())
     }
 
