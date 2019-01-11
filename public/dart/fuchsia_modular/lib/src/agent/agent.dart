@@ -63,9 +63,26 @@ abstract class Agent {
   /// typedef ServiceProvider<T> = FutureOr<T> Function();
   /// ```
   /// Where [T] represents the service type.
+  ///
+  /// Usage example:
+  /// ```
+  /// import 'package:fidl_fuchsia_foo/fidl_async.dart' as fidl;
+  /// import 'package:fuchsia_modular/agent.dart';
+  /// import 'src/foo_service_impl.dart';
+  ///
+  /// void main(List<String> args) {
+  ///   Agent().exposeServiceProvider(getService, fidl.FooServiceData());
+  /// }
+  ///
+  /// FutureOr<FooServiceImpl> getService() {
+  ///   // do something fancy here
+  ///   return FooServiceImpl();
+  /// }
+  ///
+  /// class FooServiceImpl extends fidl.FooService { ... }
+  /// ```
   void exposeServiceProvider<T extends Service>(
-      ServiceProvider<T> serviceProvider,
-      ServiceData<T> serviceData);
+      ServiceProvider<T> serviceProvider, ServiceData<T> serviceData);
 
   /// Returns the auth token manager this Agent may use for accessing external
   /// services.
