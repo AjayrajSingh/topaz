@@ -7,16 +7,17 @@ use failure::{Error, ResultExt};
 use fidl::encoding::OutOfLine;
 use fidl::endpoints::{create_proxy, ClientEnd, ServerEnd};
 use fidl_fuchsia_math::{InsetF, RectF, SizeF};
-use fidl_fuchsia_modular::{AddMod, Intent, PuppetMasterMarker, PuppetMasterProxy, StoryCommand,
-                           StoryPuppetMasterProxy, SurfaceArrangement, SurfaceDependency,
-                           SurfaceRelation};
+use fidl_fuchsia_modular::{
+    AddMod, Intent, PuppetMasterMarker, PuppetMasterProxy, StoryCommand, StoryPuppetMasterProxy,
+    SurfaceArrangement, SurfaceDependency, SurfaceRelation,
+};
 use fidl_fuchsia_ui_gfx::{self as gfx, ColorRgba};
 use fidl_fuchsia_ui_input::KeyboardEvent;
 use fidl_fuchsia_ui_scenic::{SessionListenerMarker, SessionListenerRequest};
-use fidl_fuchsia_ui_viewsv1::{CustomFocusBehavior, ViewContainerListenerMarker,
-                              ViewContainerListenerRequest, ViewLayout, ViewListenerMarker,
-                              ViewListenerRequest, ViewProperties};
-use fidl_fuchsia_ui_viewsv1token::ViewOwnerMarker;
+use fidl_fuchsia_ui_viewsv1::{
+    CustomFocusBehavior, ViewContainerListenerMarker, ViewContainerListenerRequest, ViewLayout,
+    ViewListenerMarker, ViewListenerRequest, ViewProperties,
+};
 use fuchsia_app::client::connect_to_service;
 use fuchsia_async as fasync;
 use fuchsia_scenic::{EntityNode, ImportNode, Material, Rectangle, Session, SessionPtr, ShapeNode};
@@ -280,13 +281,13 @@ impl ErmineView {
     }
 
     pub fn add_child_view_for_story_attach(
-        &mut self, key: u32, story_id: String, view_owner: ClientEnd<ViewOwnerMarker>,
+        &mut self, key: u32, story_id: String, view_holder_token: zx::EventPair,
     ) {
         let host_node = EntityNode::new(self.session.clone());
         let host_import_token = host_node.export_as_request();
 
         self.view_container
-            .add_child(key, view_owner, host_import_token)
+            .add_child2(key, view_holder_token, host_import_token)
             .unwrap();
 
         self.import_node.add_child(&host_node);

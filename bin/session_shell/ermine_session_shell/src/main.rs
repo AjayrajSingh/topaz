@@ -182,12 +182,14 @@ impl App {
     }
 
     pub fn add_child_view_for_story_attach(
-        &mut self, story_id: String, view_owner: ClientEnd<ViewOwnerMarker>,
+        &mut self, story_id: String, view_holder_token: zx::EventPair,
     ) {
         let key_to_use = self.next_story_key();
-        self.views[0]
-            .lock()
-            .add_child_view_for_story_attach(key_to_use, story_id, view_owner);
+        self.views[0].lock().add_child_view_for_story_attach(
+            key_to_use,
+            story_id,
+            view_holder_token,
+        );
     }
 
     pub fn spawn_tiles_server(chan: fasync::Channel) {
@@ -218,9 +220,7 @@ impl App {
                             &mut focusabilties.iter_mut().map(|a| *a),
                         ))
                     }
-                    tiles::ControllerRequest::Quit { control_handle: _ } => {
-                        ::std::process::exit(0)
-                    }
+                    tiles::ControllerRequest::Quit { control_handle: _ } => ::std::process::exit(0),
                 })
                 .unwrap_or_else(|e| eprintln!("error running Tiles controller server: {:?}", e)),
         )
@@ -228,6 +228,7 @@ impl App {
 
     pub fn spawn_session_shell_server(chan: fasync::Channel) {
         fasync::spawn(
+            #[allow(unreachable_patterns)]
             SessionShellRequestStream::from_channel(chan)
                 .try_for_each(move |req| match req {
                     SessionShellRequest::AttachView {
@@ -236,14 +237,17 @@ impl App {
                         ..
                     } => {
                         println!("AttachView {:?}", view_id.story_id);
+                        let view_holder_token: zx::EventPair =
+                            zx::EventPair::from(zx::Handle::from(view_owner.into_channel()));
                         APP.lock()
-                            .add_child_view_for_story_attach(view_id.story_id, view_owner);
+                            .add_child_view_for_story_attach(view_id.story_id, view_holder_token);
                         fready(Ok(()))
                     }
                     SessionShellRequest::DetachView { view_id, responder } => {
                         println!("DetachView {:?}", view_id.story_id);
                         fready(responder.send())
                     }
+                    _ => fready(Ok(())),
                 })
                 .unwrap_or_else(|e| eprintln!("error running SessionShell server: {:?}", e)),
         )
