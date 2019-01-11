@@ -1,0 +1,10 @@
+{
+    "program": {
+        "data": "data/dart_app_service_tests"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.sys.Environment"
+        ]
+    }
+}

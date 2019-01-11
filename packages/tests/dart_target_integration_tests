@@ -1,0 +1,8 @@
+{
+    "imports": [
+        "topaz/packages/examples/fidl"
+    ],
+    "packages": [
+        "//topaz/tests/dart_app_service_tests:dart_app_service_tests"
+    ]
+}

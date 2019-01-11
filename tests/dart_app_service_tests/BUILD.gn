@@ -1,0 +1,27 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_fuchsia_test.gni")
+
+
+dart_fuchsia_test("dart_app_service_tests") {
+  meta = [
+    {
+      path = rebase_path("meta/dart_app_service_tests.cmx")
+      dest = "dart_app_service_tests.cmx"
+    },
+  ]
+
+  sources = [
+    "dart_server_test.dart",
+  ]
+
+  deps = [
+    "//garnet/examples/fidl/services:echo2",
+    "//garnet/public/fidl/fuchsia.sys",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/lib/app/dart",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}

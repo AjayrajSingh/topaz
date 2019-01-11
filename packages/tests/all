@@ -6,6 +6,7 @@
         "topaz/packages/tests/crasher_dart",
         "topaz/packages/tests/dart",
         "topaz/packages/tests/dart_target_unittests",
+        "topaz/packages/tests/dart_target_integration_tests",
         "topaz/packages/tests/dart_unittests",
         "topaz/packages/tests/deprecated_loop",
         "topaz/packages/tests/fidl_changes",
