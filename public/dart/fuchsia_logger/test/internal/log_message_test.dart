@@ -59,33 +59,6 @@ void main() {
       expect(bytes.lengthInBytes, equals(end));
     });
 
-    test('convert to bytes with code location', () {
-      //TODO: Need to uncomment this when we have code location implemented again
-      // final message = _makeMessage(Level.FINEST, 'bar');
-
-      // final bytes = message.toBytes();
-      // final buffer = bytes.buffer.asUint8List();
-      // _validateFixedBlock(buffer, -4, 1, 2);
-
-      // expect(buffer[32], equals(4));
-      // expect(utf8.decode(buffer.sublist(33, 37)), equals('TEST'));
-      // int start = 37;
-      // expect(buffer[start], greaterThan(_fileName.length));
-      // int end = start + buffer[start] + 1;
-      // start++;
-      // expect(utf8.decode(buffer.sublist(start, end)),
-      //     matches('$_fileName\\(\\d+\\)'));
-
-      // // dividing 0 byte
-      // expect(buffer[end++], equals(0));
-
-      // start = end;
-      // expect(utf8.decode(buffer.sublist(start, start + 3)), equals('bar'));
-      // end = start + 3;
-      // expect(buffer[end++], equals(0));
-      // expect(bytes.lengthInBytes, equals(end));
-    });
-
     test('convert to bytes with stack trace', () {
       const errorMsg = 'this error message plus the stacktrace need to be '
           'long enough to hit the max block size to validate that truncation of long '

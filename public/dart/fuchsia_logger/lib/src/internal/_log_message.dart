@@ -48,19 +48,12 @@ class LogMessage {
       ? System.clockGet(_zxClockMonotonic)
       : new DateTime.now().microsecondsSinceEpoch * 1000;
 
-  /// The stack trace at the call site. This is not to be confused with
-  /// the stack trace in the [record] which is a stack trace that is being
-  /// logged. This variable is used to later extract the code location
-  /// to include in the message.
-  final StackTrace callSiteTrace;
-
   /// The default constructor
   LogMessage({
     @required this.record,
     @required this.processId,
     @required this.threadId,
     this.tags = const [],
-    this.callSiteTrace,
   })  : assert(record != null),
         assert(processId != null),
         assert(threadId != null);

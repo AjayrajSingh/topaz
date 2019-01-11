@@ -14,6 +14,9 @@ import '_log_message.dart';
 const int _maxGlobalTags = 4; // leave one slot for code location
 const int _maxTagLength = 63;
 
+final _fileNameRegex = RegExp(r'(\w+\.dart)');
+final _lineNumberRegex = RegExp(r'\.dart:(\d+)');
+
 /// The base class for which log writers will inherit from. This class is
 /// used to pipe logs from the onRecord stream
 abstract class LogWriter {
@@ -76,8 +79,7 @@ abstract class LogWriter {
         record: record,
         processId: pid,
         threadId: Isolate.current.hashCode,
-        tags: _globalTags,
-        callSiteTrace: forceShowCodeLocation ? StackTrace.current : null,
+        tags: _tagsForLogMessage(),
       );
 
   /// A method for subclasses to implement to handle messages as they are
@@ -117,9 +119,62 @@ abstract class LogWriter {
     return result;
   }
 
-  //ignore: unused_element
+  List<String> _tagsForLogMessage() {
+    if (forceShowCodeLocation) {
+      final codeLocation = _codeLocationFromStackTrace(StackTrace.current);
+      if (codeLocation != null && codeLocation.isNotEmpty) {
+        return List.of(_globalTags)..add(codeLocation);
+      }
+    }
+    return _globalTags;
+  }
+
   String _codeLocationFromStackTrace(StackTrace stackTrace) {
-    // TODO(MS-2260) need to extract out the call site from the stack trace
-    return '';
+    final lines = stackTrace.toString().split('\n');
+    // There is no well supported way for getting the calling code location from
+    // the log line. In lieu of this, we use the following algorithm which is
+    // fragile and depends on the order which the logger methods are called. The
+    // algorithm is that we run through each line and look for the call to the
+    // line that contains 'Logger.log (package:logging/logging.dart' which is
+    // the call that comes after the user calls Logger.info, Logger.warn, etc.
+    // When this line is found we look 2 lines past for their call site.
+
+    const loggerLogLine = r'Logger.log (package:logging/logging.dart';
+    const logLineOffset = 2;
+    String codeLocation;
+
+    for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+      final line = lines[lineNumber];
+      if (line.contains(loggerLogLine)) {
+        if (lineNumber + logLineOffset < lines.length) {
+          codeLocation = lines[lineNumber + logLineOffset];
+        }
+        break;
+      }
+    }
+
+    return _extractCodeLocationFromLine(codeLocation);
+  }
+
+  String _extractCodeLocationFromLine(String line) {
+    if (line == null) {
+      return null;
+    }
+
+    String regexValue(RegExp regexp) {
+      final match = regexp.firstMatch(line);
+      return match != null ? match.group(1) : null;
+    }
+
+    final fileName = regexValue(_fileNameRegex);
+    if (fileName == null) {
+      return null;
+    }
+
+    final lineNumber = regexValue(_lineNumberRegex);
+
+    // Some environments don't give us the line number so we avoid failing
+    // completely if we have just the file name.
+    return lineNumber == null ? fileName : '$fileName($lineNumber)';
   }
 }

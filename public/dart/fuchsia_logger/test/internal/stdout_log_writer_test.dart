@@ -67,6 +67,13 @@ void main() {
       expect(lines.length, 2);
       expect(lines[1], 'my stacktrace');
     });
+
+    test('includes code location', () {
+      _overridePrint((logger, writer) {
+        writer.forceShowCodeLocation = true;
+        logger.info('foo');
+      }, (l) => expect(l, matches(r'INFO:stdout_log_writer_test.dart\(\d+\)')));
+    });
   });
 
   group('tags', () {

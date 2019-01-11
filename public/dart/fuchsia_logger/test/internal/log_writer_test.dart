@@ -126,6 +126,19 @@ void main() {
 
       expect(tags.firstWhere((t) => t.length == maxTagLength), isNotNull);
     });
+
+    test('setting forceShowCodeLocation includes code location in tags', () {
+      List<String> tags;
+
+      StubLogWriter(
+          logger: logger,
+          onMessageFunc: (m) {
+            tags = m.tags;
+          }).forceShowCodeLocation = true;
+
+      logger.info('foo');
+      expect(tags[0], matches(r'log_writer_test.dart\(\d+\)'));
+    });
   }, timeout: Timeout(Duration(milliseconds: 100)));
 }
 
