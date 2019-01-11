@@ -48,7 +48,11 @@ void main() {
     controller.setCurrentTimeZone(firstTimeZone);
 
     final TimeZoneInfo updatedState =
-        verify(adapter.update(captureAny)).captured.single.data.timeZoneValue;
+        verify(adapter.mutate(SettingType.timeZone, captureAny))
+            .captured
+            .single
+            .timeZoneMutationValue
+            .value;
 
     expect(updatedState.current, firstTimeZone);
     expect(updatedState.available, state.available);

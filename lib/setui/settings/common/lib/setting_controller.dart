@@ -36,6 +36,10 @@ class SettingController<T> {
     throw new Exception('Undefined setting type!');
   }
 
+  Future<void> mutate(Mutation mutation, MutationHandles handles) async {
+    await _adapter.mutate(settingType, mutation, handles: handles);
+  }
+
   /// Updates the setting state to the provided version.
   Future<void> update(SettingsObject state) async {
     await _adapter.update(state);

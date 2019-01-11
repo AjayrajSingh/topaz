@@ -12,9 +12,10 @@ class TimeZoneController extends SettingController<TimeZoneInfo> {
 
   /// Sets the system timezone to the specified zone.
   void setCurrentTimeZone(TimeZone timeZone) {
-    update(SettingsObject(
-        settingType: SettingType.timeZone,
-        data: SettingData.withTimeZoneValue(
-            TimeZoneInfo(available: state.available, current: timeZone))));
+    mutate(
+        Mutation.withTimeZoneMutationValue(TimeZoneMutation(
+            value:
+                TimeZoneInfo(available: state.available, current: timeZone))),
+        null /* handles */);
   }
 }
