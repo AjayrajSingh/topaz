@@ -14,10 +14,10 @@ dart_library("fuchsia_media") {
 
   sources = [
     "media.dart",
-    "src/media.dart"
+    "src/media.dart",
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.media"
+    "//garnet/public/fidl/fuchsia.media",
   ]
 }

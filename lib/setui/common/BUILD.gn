@@ -5,7 +5,6 @@
 import("//build/dart/dart_library.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
-
 dart_library("common") {
   package_name = "lib_setui_common"
 
@@ -20,17 +19,16 @@ dart_library("common") {
   ]
 
   deps = [
-    "//third_party/dart-pkg/pub/yaml",
     "//third_party/dart-pkg/pub/quiver",
+    "//third_party/dart-pkg/pub/yaml",
     "//topaz/public/lib/app/dart",
   ]
 }
 
 dart_test("lib_setui_common_test") {
-
   sources = [
-    "conductor_test.dart",
     "conductor_builder_test.dart",
+    "conductor_test.dart",
     "step_test.dart",
     "syllabus_parser_test.dart",
     "syllabus_test.dart",

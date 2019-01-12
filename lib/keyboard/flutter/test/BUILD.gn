@@ -23,7 +23,6 @@ dart_library("dart") {
   ]
 }
 
-
 dart_library("flutter") {
   package_name = "keyboard.flutter"
 
@@ -36,15 +35,13 @@ dart_library("flutter") {
   deps = [
     ":dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/lib/shell",
+    "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/shell/keyboard",
   ]
 }
 
-
 dart_test("keyboard_test") {
-
   sources = [
     "keyboard_model_test.dart",
   ]
@@ -53,9 +50,8 @@ dart_test("keyboard_test") {
     ":dart",
     ":flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
-    "//third_party/dart-pkg/pub/test",
     "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
     "//topaz/lib/shell",
   ]
 }
-

@@ -11,7 +11,7 @@ go_library("fidlgen_dart_lib") {
   name = "fidlgen_dart"
 
   deps = [
-    "//garnet/go/src/fidl:fidl_lib"
+    "//garnet/go/src/fidl:fidl_lib",
   ]
 }
 
@@ -20,7 +20,9 @@ go_binary("fidlgen_dart") {
 
   sdk_category = "partner"
 
-  deps = [ ":fidlgen_dart_lib" ]
+  deps = [
+    ":fidlgen_dart_lib",
+  ]
 }
 
 install_host_tools("install") {

@@ -9,7 +9,8 @@ compile_platform("kernel_platform_files") {
   single_root_scheme = "org-dartlang-sdk"
   single_root_base = rebase_path("../../../../")
 
-  libraries_specification_uri = "org-dartlang-sdk:///topaz/runtime/dart_runner/kernel/libraries.json"
+  libraries_specification_uri =
+      "org-dartlang-sdk:///topaz/runtime/dart_runner/kernel/libraries.json"
 
   outputs = [
     "$root_out_dir/dart_runner_patched_sdk/platform_strong.dill",

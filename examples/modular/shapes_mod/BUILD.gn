@@ -19,9 +19,7 @@ flutter_app("shapes_mod") {
     },
   ]
 
-  sources = [
-
-  ]
+  sources = []
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",

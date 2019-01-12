@@ -6,7 +6,8 @@ import("//build/dart/dart_library.gni")
 import("//build/dart/toolchain.gni")
 
 _compiler_label = "//topaz/runtime/dart:kernel_compiler($host_toolchain)"
-_compiler_path = get_label_info(_compiler_label, "root_out_dir") + "/dart-tools/kernel_compiler"
+_compiler_path = get_label_info(_compiler_label, "root_out_dir") +
+                 "/dart-tools/kernel_compiler"
 
 # Generates dill files for a Dart application
 #
@@ -71,15 +72,17 @@ template("dart_kernel") {
     if (defined(invoker.sources)) {
       sources += invoker.sources
     }
-    extra_sources = [
-      invoker.main_dart,
-    ]
+    extra_sources = [ invoker.main_dart ]
   }
 
   # TODO(tvolkert): Name this ${target_name}
   action("${target_name}_kernel") {
     pool = "//build/dart:dart_pool($dart_toolchain)"
-    forward_variables_from(invoker, ["testonly", "visibility"])
+    forward_variables_from(invoker,
+                           [
+                             "testonly",
+                             "visibility",
+                           ])
 
     kernel_path = "$target_gen_dir/${target_name}.dil"
 
@@ -95,6 +98,7 @@ template("dart_kernel") {
       outputs += [
         # Explicit output when using --manifest.
         invoker.manifest,
+
         # Implicit output when using --manifest; see createManifest in compiler.dart.
         invoker.manifest + ".dilplist",
       ]
@@ -103,7 +107,8 @@ template("dart_kernel") {
     dart_target_gen_dir =
         get_label_info(":bogus($dart_toolchain)", "target_gen_dir")
     rebased_packages_path =
-        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages", "//")
+        rebase_path("$dart_target_gen_dir/$dart_library_target_name.packages",
+                    "//")
 
     multi_root_scheme = "fuchsia-source"
 

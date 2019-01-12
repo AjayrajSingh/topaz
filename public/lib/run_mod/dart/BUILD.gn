@@ -2,9 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-
-import("//topaz/runtime/dart/dart_test.gni")
 import("//build/dart/dart_library.gni")
+import("//topaz/runtime/dart/dart_test.gni")
 
 dart_library("dart") {
   package_name = "lib.run_mod.dart"
@@ -19,7 +18,7 @@ dart_library("dart") {
   ]
 
   deps = [
-    "//topaz/public/dart/widgets:lib.widgets",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/widgets:lib.widgets",
   ]
 }

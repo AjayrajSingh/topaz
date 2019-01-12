@@ -26,7 +26,6 @@ flutter_app("hello_mod") {
   ]
 }
 
-
 flutter_app("hello_space_dart") {
   deprecated_bare_package_url = "//build"
 

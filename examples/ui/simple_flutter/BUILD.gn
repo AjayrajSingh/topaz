@@ -42,6 +42,6 @@ flutter_app("simple_flutter") {
     {
       path = rebase_path("meta/leaf_flutter.cmx")
       dest = "leaf_flutter.cmx"
-    }
+    },
   ]
 }

@@ -25,6 +25,6 @@ flutter_app("text_flutter") {
     {
       path = rebase_path("meta/text_flutter.cmx")
       dest = "text_flutter.cmx"
-    }
+    },
   ]
 }

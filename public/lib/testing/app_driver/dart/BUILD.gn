@@ -18,7 +18,6 @@ dart_library("dart") {
 }
 
 dart_test("fake_module_driver_test") {
-
   sources = [
     "fake_module_driver_test.dart",
   ]

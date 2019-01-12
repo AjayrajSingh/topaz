@@ -29,8 +29,8 @@ dart_library("dart") {
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/zircon",
     "//zircon/public/fidl/fuchsia-cobalt",
-    "//zircon/public/fidl/fuchsia-logger",
     "//zircon/public/fidl/fuchsia-io",
+    "//zircon/public/fidl/fuchsia-logger",
   ]
 }
 
@@ -42,19 +42,18 @@ dart_library("testing") {
   source_dir = "testing"
 
   sources = [
-    "app_test.dart"
+    "app_test.dart",
   ]
 
   deps = [
-    "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
     "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/lib/app/dart",
   ]
 }
 
 dart_test("dart_app_tests") {
-
   sources = [
     "fuchsia_log_record_test.dart",
     "legacy_code.dart",

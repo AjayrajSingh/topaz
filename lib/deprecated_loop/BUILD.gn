@@ -36,13 +36,12 @@ executable("deprecated_loop_unittests") {
     "//garnet/public/lib/fxl/test:gtest_main",
     "//third_party/googletest:gtest",
   ]
-
 }
 
-package("deprecated_loop_tests"){
+package("deprecated_loop_tests") {
   testonly = true
   deps = [
-    ":deprecated_loop_unittests"
+    ":deprecated_loop_unittests",
   ]
 
   tests = [

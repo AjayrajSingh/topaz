@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//topaz/runtime/dart/dart_test.gni")
 import("//build/dart/dart_library.gni")
+import("//topaz/runtime/dart/dart_test.gni")
 
 dart_library("dart") {
   package_name = "lib.schemas.dart"

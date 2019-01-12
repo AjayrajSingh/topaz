@@ -37,7 +37,6 @@ flutter_app("tictactoe_game_board_mod") {
 }
 
 dart_test("tictactoe_game_board_mod_test") {
-
   sources = [
     "mod_test.dart",
   ]

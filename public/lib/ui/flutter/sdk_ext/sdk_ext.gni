@@ -4,6 +4,4 @@
 
 mozart_dart_sdk_ext_lib = "//topaz/public/lib/ui/flutter/sdk_ext/mozart.dart"
 
-mozart_dart_sdk_ext_files = [
-  mozart_dart_sdk_ext_lib,
-]
+mozart_dart_sdk_ext_files = [ mozart_dart_sdk_ext_lib ]

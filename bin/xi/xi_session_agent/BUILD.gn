@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//topaz/runtime/dart_runner/dart_app.gni")
 import("//build/fidl/fidl.gni")
+import("//topaz/runtime/dart_runner/dart_app.gni")
 
 fidl("xi_session_services") {
   name = "fuchsia.xi.session"
@@ -25,11 +25,11 @@ dart_app("xi_session_agent") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.auth",
-    "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/agent/dart",
-    "//topaz/lib/xi/fuchsia_client:xi_fuchsia_client",
     ":xi_session_services",
+    "//garnet/public/fidl/fuchsia.auth",
+    "//topaz/lib/xi/fuchsia_client:xi_fuchsia_client",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/lib/agent/dart",
+    "//topaz/public/lib/app/dart",
   ]
 }

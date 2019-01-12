@@ -5,7 +5,6 @@
 import("//build/dart/dart_library.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
-
 dart_library("service") {
   package_name = "lib_setui_service"
 
@@ -28,7 +27,6 @@ dart_library("service") {
 }
 
 dart_test("lib_setui_service_test") {
-
   sources = [
     "service_test.dart",
     # STOPSHIP(brycelee): add test back once migration to new api is complete.

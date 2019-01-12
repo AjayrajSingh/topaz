@@ -25,12 +25,10 @@ flutter_app("userpicker_base_shell") {
   resources = [
     {
       path = rebase_path(
-              get_label_info(
-                             ":sysui_metrics_config",
-                             "target_gen_dir")
-              + "/sysui_metrics_config.pb")
+              get_label_info(":sysui_metrics_config", "target_gen_dir") +
+              "/sysui_metrics_config.pb")
       dest = "sysui_metrics_config.pb"
-    }
+    },
   ]
 
   package_name = "userpicker_base_shell"
@@ -38,9 +36,9 @@ flutter_app("userpicker_base_shell") {
   manifest = "pubspec.yaml"
 
   sources = [
-    "authentication_ui_context_impl.dart",
     "authentication_overlay.dart",
     "authentication_overlay_model.dart",
+    "authentication_ui_context_impl.dart",
     "circular_button.dart",
     "clock.dart",
     "user_list.dart",
@@ -49,9 +47,7 @@ flutter_app("userpicker_base_shell") {
     "user_picker_screen.dart",
   ]
 
-  non_dart_deps = [
-    ":sysui_metrics_config",
-  ]
+  non_dart_deps = [ ":sysui_metrics_config" ]
 
   deps = [
     "//garnet/public/fidl/fuchsia.timezone",

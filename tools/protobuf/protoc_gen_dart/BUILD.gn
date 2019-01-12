@@ -10,5 +10,7 @@ dart_tool("protoc_gen_dart") {
 
   main_dart = "lib/main.dart"
 
-  deps = ["//third_party/dart-pkg/pub/protoc_plugin"]
+  deps = [
+    "//third_party/dart-pkg/pub/protoc_plugin",
+  ]
 }

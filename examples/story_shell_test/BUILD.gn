@@ -16,9 +16,9 @@ dart_fuchsia_test("key_listener_device_tests") {
   package_only = true
 
   deps = [
-    "//topaz/lib/story_shell:lib.story_shell",
     "//peridot/public/fidl/fuchsia.modular",
     "//third_party/dart-pkg/pub/mockito",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/lib/story_shell:lib.story_shell",
   ]
 }

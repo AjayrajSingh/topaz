@@ -21,9 +21,9 @@ dart_library("lib.widgets") {
     "src/model/spring_model.dart",
     "src/model/ticking_model.dart",
     "src/model/tracing_spring_model.dart",
-    "src/modular/dank_session_shell_widget.dart",
     "src/modular/base_shell_model.dart",
     "src/modular/base_shell_widget.dart",
+    "src/modular/dank_session_shell_widget.dart",
     "src/modular/session_shell_model.dart",
     "src/modular/session_shell_widget.dart",
     "src/widgets/alphatar.dart",
@@ -61,8 +61,8 @@ dart_library("lib.widgets") {
 dart_test("dart_widget_tests") {
   sources = [
     "alphatar_test.dart",
-    "rk4_spring_simulation_test.dart",
     "providers_test.dart",
+    "rk4_spring_simulation_test.dart",
   ]
 
   deps = [

@@ -22,7 +22,6 @@ dart_library("client") {
 }
 
 dart_test("lib_setui_settings_client_test") {
-
   sources = [
     "time_zone_controller_test.dart",
     # STOPSHIP(brycelee): add test back once migration to new api is complete.

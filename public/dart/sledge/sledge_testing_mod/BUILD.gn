@@ -16,7 +16,7 @@ flutter_app("sledge_testing_mod") {
   ]
 
   sources = [
-    "test_model.dart"
+    "test_model.dart",
   ]
 
   deps = [

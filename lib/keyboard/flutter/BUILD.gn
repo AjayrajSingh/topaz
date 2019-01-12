@@ -14,27 +14,24 @@ dart_library("flutter") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/lib/keyboard/dart",
     "//topaz/lib/shell",
+    "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/shell/keyboard",
   ]
 }
 
-
 dart_test("keyboard_test") {
-
   sources = [
     "keyboard_model_test.dart",
   ]
 
   deps = [
     ":flutter",
-    "//topaz/lib/keyboard/dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
-    "//third_party/dart-pkg/pub/test",
     "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
+    "//topaz/lib/keyboard/dart",
     "//topaz/lib/shell",
   ]
 }
-

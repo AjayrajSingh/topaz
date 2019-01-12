@@ -24,7 +24,6 @@ dart_library("common") {
 }
 
 dart_test("tictactoe_game_test") {
-
   sources = [
     "game_test.dart",
     "win_detection_test.dart",

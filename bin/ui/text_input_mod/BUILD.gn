@@ -13,11 +13,12 @@ flutter_app("text_input_mod") {
   sources = []
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/dart/widgets:lib.widgets",
+    "//topaz/bin/ui/text_input_mod/public/fidl:fuchsia.textinputmod",
     "//topaz/examples/modular/models",
+    "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_logger",
     "//topaz/public/dart/fuchsia_modular",
-    "//topaz/public/dart/fidl",
+    "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/app_driver/dart",
@@ -25,7 +26,6 @@ flutter_app("text_input_mod") {
     "//topaz/public/lib/module_resolver/dart",
     "//topaz/public/lib/ui/flutter",
     "//topaz/public/lib/widgets/dart",
-    "//topaz/bin/ui/text_input_mod/public/fidl:fuchsia.textinputmod",
   ]
 
   meta = [
@@ -35,4 +35,3 @@ flutter_app("text_input_mod") {
     },
   ]
 }
-

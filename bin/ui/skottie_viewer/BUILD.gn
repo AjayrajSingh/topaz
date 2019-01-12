@@ -31,10 +31,11 @@ executable("skottie_viewer") {
     ":skottie_loader",
     "//garnet/public/fidl/fuchsia.ui.app",
     "//garnet/public/fidl/fuchsia.ui.viewsv1",
-    # TODO(SCN-1193): Remove fostr dependency.
-    "//garnet/public/lib/fostr/fidl/fuchsia.ui.scenic",
     "//garnet/public/lib/component/cpp",
     "//garnet/public/lib/fidl/cpp",
+
+    # TODO(SCN-1193): Remove fostr dependency.
+    "//garnet/public/lib/fostr/fidl/fuchsia.ui.scenic",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/ui/base_view/cpp",
     "//garnet/public/lib/ui/scenic/cpp",

@@ -5,8 +5,12 @@
 import("//build/package.gni")
 
 copy("run_fidl_compatibility_test_topaz_sh") {
-  sources = [ "run_fidl_compatibility_test_topaz.sh" ]
-  outputs = [ "${root_build_dir}/run_fidl_compatibility_test_topaz.sh" ]
+  sources = [
+    "run_fidl_compatibility_test_topaz.sh",
+  ]
+  outputs = [
+    "${root_build_dir}/run_fidl_compatibility_test_topaz.sh",
+  ]
 }
 
 package("package") {

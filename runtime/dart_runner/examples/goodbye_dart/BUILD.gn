@@ -49,17 +49,23 @@ dart_aot_app("goodbye_dart_aot") {
 }
 
 copy("copy_goodbye_dart_test") {
-  sources = [ "goodbye_dart_test" ]
-  outputs = [ "${root_build_dir}/goodbye_dart_test" ]
+  sources = [
+    "goodbye_dart_test",
+  ]
+  outputs = [
+    "${root_build_dir}/goodbye_dart_test",
+  ]
 }
 
 package("goodbye_dart_test") {
   deprecated_bare_package_url = "//build"
 
   testonly = true
-  tests = [{
-    name = "goodbye_dart_test"
-  }]
+  tests = [
+    {
+      name = "goodbye_dart_test"
+    },
+  ]
   meta = [
     {
       dest = "goodbye_dart_test.cmx"
@@ -67,6 +73,6 @@ package("goodbye_dart_test") {
     },
   ]
   deps = [
-    ":copy_goodbye_dart_test"
+    ":copy_goodbye_dart_test",
   ]
 }

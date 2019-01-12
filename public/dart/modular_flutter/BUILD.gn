@@ -15,6 +15,5 @@ dart_library("modular_flutter") {
     "run_mod.dart",
   ]
 
-  deps = [
-  ]
+  deps = []
 }

@@ -74,7 +74,7 @@ template("_flutter_jit_component") {
         package_root = "."
         deps = invoker.deps
         sources = pkg_sources
-      }
+      },
     ]
   }
   flutter_dart_jit_component(target_name) {
@@ -120,7 +120,7 @@ template("_flutter_jit_component") {
 template("_flutter_aot_component") {
   # This variable isn't needed in AOT builds.
   if (defined(invoker.flutter_driver_extendable)) {
-    not_needed(invoker, ["flutter_driver_extendable",])
+    not_needed(invoker, [ "flutter_driver_extendable" ])
   }
   pkg_name = target_name
   legacy_component = false
@@ -149,7 +149,7 @@ template("_flutter_aot_component") {
         package_root = "."
         deps = invoker.deps
         sources = pkg_sources
-      }
+      },
     ]
   }
   flutter_dart_aot_component(target_name) {
@@ -175,7 +175,7 @@ template("flutter_aot_app") {
   }
 
   target(template_name, target_name) {
-    forward_variables_from(invoker, "*", ["space_dart"])
+    forward_variables_from(invoker, "*", [ "space_dart" ])
   }
 }
 
@@ -226,7 +226,7 @@ template("flutter_aot_app") {
 #
 template("flutter_app") {
   assert((defined(invoker.components) && !defined(invoker.main_dart)) ||
-         (!defined(invoker.components) && defined(invoker.main_dart)),
+             (!defined(invoker.components) && defined(invoker.main_dart)),
          "Only one of components or main_dart should be defined")
   target(flutter_default_app, target_name) {
     forward_variables_from(invoker, "*", [ "aot" ])
@@ -254,7 +254,7 @@ template("flutter_app") {
 #         be inferred from the component name.
 #
 template("flutter_dart_apps") {
-  assert((defined(invoker.components) && !defined(invoker.main_dart)),
+  assert(defined(invoker.components) && !defined(invoker.main_dart),
          "components must be defined. Use main_dart under components instead.")
 
   pkg_name = target_name
@@ -273,7 +273,12 @@ template("flutter_dart_apps") {
       template_name = flutter_product_app
     }
     target(template_name, target_name) {
-      forward_variables_from(invoker, "*", [ "aot", "space_dart" ])
+      forward_variables_from(invoker,
+                             "*",
+                             [
+                               "aot",
+                               "space_dart",
+                             ])
     }
   }
 }

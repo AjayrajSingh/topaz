@@ -2,9 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/dart/dart_library.gni")
 import("//third_party/cobalt_config/metrics_registry.gni")
 import("//topaz/runtime/dart/dart_test.gni")
-import("//build/dart/dart_library.gni")
 
 metrics_registry("modules_metrics_registry") {
   project_id = 104
@@ -22,9 +22,9 @@ dart_library("dart") {
   sources = [
     "app_driver.dart",
     "module_driver.dart",
+    "src/intent_parameters.dart",
     "src/module_driver.dart",
     "src/service_client.dart",
-    "src/intent_parameters.dart",
   ]
 
   deps = [

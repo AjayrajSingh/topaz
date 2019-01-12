@@ -9,16 +9,15 @@ dart_library("package_for_analysis") {
   infer_package_name = true
 
   sources = [
-    "before.dart",
-    "after.dart",
-        "before-during.dart",
     "after-during.dart",
-
+    "after.dart",
+    "before-during.dart",
+    "before.dart",
   ]
 
   deps = [
+    "//garnet/tests/fidl-changes:fidl.test.after",
     "//garnet/tests/fidl-changes:fidl.test.before",
     "//garnet/tests/fidl-changes:fidl.test.during",
-    "//garnet/tests/fidl-changes:fidl.test.after",
   ]
 }

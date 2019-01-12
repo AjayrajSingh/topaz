@@ -24,9 +24,7 @@ dart_app("usage_log") {
   source_dir = "."
   sources = []
 
-  non_dart_deps = [
-    ":module_usage_tracking_metrics_registry",
-  ]
+  non_dart_deps = [ ":module_usage_tracking_metrics_registry" ]
 
   deps = [
     "//peridot/public/fidl/fuchsia.modular",
@@ -38,12 +36,11 @@ dart_app("usage_log") {
 
   resources = [
     {
-      path = rebase_path(
-              get_label_info(
-                             ":module_usage_tracking_metrics_registry",
-                             "target_gen_dir")
-              + "/module_usage_tracking_metrics_registry.pb")
+      path =
+          rebase_path(get_label_info(":module_usage_tracking_metrics_registry",
+                                     "target_gen_dir") +
+                      "/module_usage_tracking_metrics_registry.pb")
       dest = "module_usage_tracking_metrics_registry.pb"
-    }
+    },
   ]
 }

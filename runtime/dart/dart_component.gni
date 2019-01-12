@@ -104,11 +104,11 @@ dart_product_app = "flutter_dart_jit_component"
 template("_flutter_dart_jit_package") {
   package(target_name) {
     forward_variables_from(invoker,
-                       [
-                         "testonly",
-                         "tests",
-                         "deprecated_bare_package_url",
-                       ])
+                           [
+                             "testonly",
+                             "tests",
+                             "deprecated_bare_package_url",
+                           ])
     package_name = invoker.pkg_name
     deps = invoker.cmx_deps
     extra = []
@@ -123,9 +123,7 @@ template("_flutter_dart_jit_package") {
         extra += [ component.asset_manifest ]
 
         # TODO(rmacnak): Remove core_jit_cheat_target.
-        public_deps += [
-          ":${component.kernel_target_name}",
-        ]
+        public_deps += [ ":${component.kernel_target_name}" ]
 
         deps += [ ":${component.component_resources}" ]
       }
@@ -145,10 +143,10 @@ template("_flutter_dart_jit_package") {
 
     if (defined(invoker.interpreter) && invoker.interpreter) {
       resources += [
-          {
-            path = rebase_path("//topaz/runtime/dart/enable_interpreter")
-            dest = "enable_interpreter"
-          }
+        {
+          path = rebase_path("//topaz/runtime/dart/enable_interpreter")
+          dest = "enable_interpreter"
+        },
       ]
     }
 
@@ -252,6 +250,7 @@ template("flutter_dart_jit_component") {
   if (defined(invoker.meta)) {
     package_meta = invoker.meta
   }
+
   # Inject appropriate "runner" into Component manifests
   cmx_filtered_meta = []
   cmx_deps = []
@@ -285,7 +284,8 @@ template("flutter_dart_jit_component") {
       }
 
       dbc = false
-      runtime_meta = "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime"
+      runtime_meta =
+          "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime"
     } else if (component.component_type == "dart") {
       product = !is_debug
       if (defined(invoker.product)) {
@@ -336,6 +336,7 @@ template("flutter_dart_jit_component") {
     }
 
     component_name = component.component_name
+
     # TODO(CP-142): Should be renamed to component_root
     package_root = component.package_root
 
@@ -355,13 +356,16 @@ template("flutter_dart_jit_component") {
     }
 
     if (flutter_driver_extendable) {
-      generated_extension_wrapper = "$dart_target_gen_dir/${kernel_name}__extension_wrapper.dart"
+      generated_extension_wrapper =
+          "$dart_target_gen_dir/${kernel_name}__extension_wrapper.dart"
       generated_extension_wrapper_main_dart = component.main_dart
 
       action("${kernel_name}_extensions_wrapper") {
-        script = "//topaz/runtime/flutter_runner/build/gen_debug_wrapper_main.py"
+        script =
+            "//topaz/runtime/flutter_runner/build/gen_debug_wrapper_main.py"
         args = [
-          "--main-dart=" + rebase_path(generated_extension_wrapper_main_dart, dart_target_gen_dir),
+          "--main-dart=" + rebase_path(generated_extension_wrapper_main_dart,
+                                       dart_target_gen_dir),
           "--out=" + rebase_path(generated_extension_wrapper),
         ]
 
@@ -425,9 +429,8 @@ template("flutter_dart_jit_component") {
           "//topaz/public/lib/module/dart",
         ]
 
-        non_dart_deps += [
-          ":${kernel_name}_extensions_wrapper($target_toolchain)",
-        ]
+        non_dart_deps +=
+            [ ":${kernel_name}_extensions_wrapper($target_toolchain)" ]
       }
 
       if (dbc) {
@@ -442,13 +445,14 @@ template("flutter_dart_jit_component") {
       asset_manifest = "$target_gen_dir/build/${kernel_name}_pkgassets"
 
       _flutter_jit_asset_manifest(kernel_name) {
-        forward_variables_from(invoker, [
-            "manifest",
-            "component_name",
-            "asset_manifest",
-            "dart_library_target_name",
-            "dot_packages"
-        ])
+        forward_variables_from(invoker,
+                               [
+                                 "manifest",
+                                 "component_name",
+                                 "asset_manifest",
+                                 "dart_library_target_name",
+                                 "dot_packages",
+                               ])
       }
 
       components_with_kernel += [
@@ -460,7 +464,7 @@ template("flutter_dart_jit_component") {
           deps = component.deps
           sources = component.sources
           component_resources = "${kernel_name}_resources"
-        }
+        },
       ]
     } else if (component.component_type == "dart") {
       components_with_kernel += [
@@ -470,7 +474,7 @@ template("flutter_dart_jit_component") {
           kernel_manifest = kernel_manifest
           deps = component.deps
           sources = component.sources
-        }
+        },
       ]
     }
   }
@@ -549,13 +553,13 @@ template("_flutter_dart_aot_package") {
 
     foreach(component, invoker.components_with_kernel) {
       deps += [
-             ":${component.snapshot_target_name}",
-             ":${component.stats_target_name}",
-           ] + component.component_shared_snapshot_deps + component.deps
+                ":${component.snapshot_target_name}",
+                ":${component.stats_target_name}",
+              ] + component.component_shared_snapshot_deps + component.deps
 
       if (component.component_type == "flutter") {
         extra += [ component.asset_manifest ]
-        deps += [ ":${component.component_resources}", ]
+        deps += [ ":${component.component_resources}" ]
       }
 
       resources_path = "${component.component_name}/"
@@ -589,7 +593,6 @@ template("_flutter_dart_aot_package") {
           },
         ]
       }
-
     }
 
     if (defined(invoker.invoker_resources)) {
@@ -654,6 +657,7 @@ template("flutter_dart_aot_component") {
   if (defined(invoker.meta)) {
     package_meta = invoker.meta
   }
+
   # Inject appropriate "runner" into Component manifests
   cmx_filtered_meta = []
   cmx_deps = []
@@ -666,7 +670,6 @@ template("flutter_dart_aot_component") {
 
     if (component.component_type == "flutter") {
       product = !flutter_profile
-
     } else if (component.component_type == "dart") {
       product = !is_debug
     }
@@ -714,6 +717,7 @@ template("flutter_dart_aot_component") {
     }
 
     component_name = component.component_name
+
     # TODO(CP-142): Should be renamed to component_root
     package_root = component.package_root
 
@@ -758,9 +762,11 @@ template("flutter_dart_aot_component") {
       }
 
       main_dart = component.main_dart
-      args = [ "--aot", "--tfa" ]
+      args = [
+        "--aot",
+        "--tfa",
+      ]
     }
-
 
     # TODO(rmacnak): VM snapshot is ignored. Allow skipping its generation.
     vm_snapshot_data_path = "$target_gen_dir/${kernel_name}_vm_data.aotsnapshot"
@@ -783,13 +789,13 @@ template("flutter_dart_aot_component") {
           [ get_label_info(flutter_aot_sharing_basis, "label_no_toolchain") +
             "_snapshot" ]
       prefix = get_label_info(flutter_aot_sharing_basis, "target_gen_dir") +
-          "/" + get_label_info(flutter_aot_sharing_basis, "name")
+               "/" + get_label_info(flutter_aot_sharing_basis, "name")
       shared_snapshot_data_path = "${prefix}_data.aotsnapshot"
       shared_snapshot_instructions_path = "${prefix}_instructions.aotsnapshot"
     } else if (component.component_type == "dart" &&
-        dart_aot_sharing_basis != "" &&
-        get_label_info(":$kernel_name", "label_no_toolchain") !=
-        get_label_info(dart_aot_sharing_basis, "label_no_toolchain")) {
+               dart_aot_sharing_basis != "" &&
+               get_label_info(":$kernel_name", "label_no_toolchain") !=
+               get_label_info(dart_aot_sharing_basis, "label_no_toolchain")) {
       # Note: The use of "label_no_toolchain" is to ensure we are comparing
       # fully qualified target names. We don't actually care about the
       # toolchain.
@@ -816,14 +822,13 @@ template("flutter_dart_aot_component") {
         testonly = invoker.testonly
       }
 
-      deps = gen_snapshot_deps +
-          shared_snapshot_deps +
-          [ ":$kernel_target_name" ]
+      deps =
+          gen_snapshot_deps + shared_snapshot_deps + [ ":$kernel_target_name" ]
       inputs = [
-                 shared_snapshot_data_path,
-                 shared_snapshot_instructions_path,
-                 kernel_path,
-               ]
+        shared_snapshot_data_path,
+        shared_snapshot_instructions_path,
+        kernel_path,
+      ]
       outputs = [
         vm_snapshot_data_path,
         vm_snapshot_instructions_path,
@@ -944,7 +949,7 @@ template("flutter_dart_aot_component") {
           deps = component.deps
           sources = component.sources
           component_resources = "${kernel_name}_resources"
-        }
+        },
       ]
     } else if (component.component_type == "dart") {
       components_with_kernel += [
@@ -963,7 +968,7 @@ template("flutter_dart_aot_component") {
           component_shared_snapshot_deps = shared_snapshot_deps
           deps = component.deps
           sources = component.sources
-        }
+        },
       ]
     }
   }

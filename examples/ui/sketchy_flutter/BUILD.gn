@@ -24,8 +24,8 @@ flutter_app("sketchy_flutter") {
     "//garnet/public/fidl/fuchsia.ui.gfx",
     "//garnet/public/fidl/fuchsia.ui.scenic",
     "//garnet/public/fidl/fuchsia.ui.viewsv1",
-    "//topaz/public/lib/ui/scenic/dart",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/lib/ui/flutter",
+    "//topaz/public/lib/ui/scenic/dart",
   ]
 }

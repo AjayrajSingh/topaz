@@ -9,9 +9,9 @@ dart_library("xi_widgets") {
 
   sources = [
     "src/editor.dart",
+    "src/editor_host.dart",
     "src/line_cache.dart",
     "src/text_line.dart",
-    "src/editor_host.dart",
     "widgets.dart",
   ]
 

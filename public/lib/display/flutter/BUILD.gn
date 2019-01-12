@@ -20,7 +20,6 @@ dart_library("flutter") {
 }
 
 dart_test("display_test") {
-
   sources = [
     "display_policy_brightness_model_test.dart",
   ]
@@ -28,8 +27,8 @@ dart_test("display_test") {
   deps = [
     ":flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
-    "//third_party/dart-pkg/pub/test",
     "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
     "//topaz/public/lib/display/dart",
   ]
 }

@@ -72,7 +72,7 @@ template("_dart_jit_component") {
         package_root = "."
         deps = invoker.deps
         sources = pkg_sources
-      }
+      },
     ]
   }
 
@@ -144,7 +144,7 @@ template("_dart_aot_component") {
         package_root = "."
         deps = invoker.deps
         sources = pkg_sources
-      }
+      },
     ]
   }
 
@@ -219,7 +219,7 @@ template("dart_aot_app") {
 #
 template("dart_app") {
   assert((defined(invoker.components) && !defined(invoker.main_dart)) ||
-         (!defined(invoker.components) && defined(invoker.main_dart)),
+             (!defined(invoker.components) && defined(invoker.main_dart)),
          "Only one of components or main_dart should be defined")
   target(dart_default_app, target_name) {
     forward_variables_from(invoker, "*")

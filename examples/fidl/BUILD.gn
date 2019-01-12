@@ -12,12 +12,12 @@ dart_app("echo_dart") {
       package_root = "."
       main_dart = "echo_client_dart/lib/main.dart"
       sources = []
-       deps = [
-         "//garnet/examples/fidl/services:echo2",
-         "//garnet/public/fidl/fuchsia.sys",
-         "//topaz/public/dart/fidl",
-         "//topaz/public/lib/app/dart",
-       ]
+      deps = [
+        "//garnet/examples/fidl/services:echo2",
+        "//garnet/public/fidl/fuchsia.sys",
+        "//topaz/public/dart/fidl",
+        "//topaz/public/lib/app/dart",
+      ]
     },
     {
       component_name = "echo_server_dart"

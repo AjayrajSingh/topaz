@@ -19,15 +19,14 @@ dart_library("common") {
     "//garnet/public/fidl/fuchsia.setui",
     "//topaz/lib/setui/common:common",
     "//topaz/lib/setui/flutter:flutter",
-    "//topaz/lib/setui/settings/json:fuchsia.setui.json"
+    "//topaz/lib/setui/settings/json:fuchsia.setui.json",
   ]
 }
 
 dart_test("lib_setui_settings_common_test") {
-
   sources = [
-    "setting_controller_test.dart",
     "adapter_log_test.dart",
+    "setting_controller_test.dart",
   ]
 
   deps = [

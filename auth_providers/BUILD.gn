@@ -23,9 +23,9 @@ executable("auth_provider_unittests") {
 
   deps = [
     "//garnet/public/lib/fxl:fxl_printers",
+    "//third_party/googletest:gtest_main",
     "//topaz/auth_providers/google:unittests",
     "//topaz/auth_providers/oauth:unittests",
     "//topaz/auth_providers/spotify:unittests",
-    "//third_party/googletest:gtest_main",
   ]
 }

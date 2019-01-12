@@ -14,11 +14,11 @@ dart_library("fuchsia_logger") {
 
   sources = [
     "logger.dart",
-  "src/internal/_fuchsia_log_writer.dart",
-  "src/internal/_log_message.dart",
-  "src/internal/_log_writer.dart",
-  "src/internal/_stdout_log_writer.dart",
-  "src/logger/logger.dart",
+    "src/internal/_fuchsia_log_writer.dart",
+    "src/internal/_log_message.dart",
+    "src/internal/_log_writer.dart",
+    "src/internal/_stdout_log_writer.dart",
+    "src/logger/logger.dart",
   ]
 
   deps = [
@@ -33,7 +33,6 @@ dart_library("fuchsia_logger") {
 # Runs these tests using:
 #   fx run-host-tests fuchsia_logger_package_unittests
 dart_test("fuchsia_logger_package_unittests") {
-
   sources = [
     "internal/log_message_test.dart",
     "internal/log_writer_test.dart",

@@ -5,7 +5,6 @@
 import("//build/dart/dart_library.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
-
 dart_library("flutter") {
   package_name = "lib_setui_flutter"
 
@@ -25,7 +24,6 @@ dart_library("flutter") {
 }
 
 dart_test("lib_setui_flutter_test") {
-
   sources = [
     "action_test.dart",
   ]

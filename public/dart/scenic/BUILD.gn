@@ -15,6 +15,5 @@ dart_library("scenic") {
     "child_view.dart",
   ]
 
-  deps = [
-  ]
+  deps = []
 }
