@@ -17,12 +17,12 @@ not connected to the rest of the documentation tree.
 In order to build this tool, add `topaz/packages/doc_checker` to your build
 packages. The tool is then available at:
 ```
-out/debug-x64/host_x64/dart-tools/doc_checker
+out/x64/dart-tools/doc_checker
 ```
 
 See the tool's help for how to hold it right.
 
-In order to view the generated graph, run:
+In order to view the generated graph, run (on Linux):
 ```
 dot -Tpng graph.dot -o tree.png && feh tree.png
 ```

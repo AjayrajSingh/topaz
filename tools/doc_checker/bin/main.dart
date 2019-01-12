@@ -107,7 +107,11 @@ Future<Null> main(List<String> args) async {
 
   final List<String> docs = new Directory(docsDir)
       .listSync(recursive: true)
-      .where((FileSystemEntity entity) => path.extension(entity.path) == '.md')
+      .where((FileSystemEntity entity) =>
+        path.extension(entity.path) == '.md' &&
+        // Skip these files created by macOS since they're not real Markdown:
+        // https://apple.stackexchange.com/q/14980
+        !path.basename(entity.path).startsWith('._'))
       .map((FileSystemEntity entity) => entity.path)
       .toList();
 
