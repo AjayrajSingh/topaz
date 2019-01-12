@@ -71,8 +71,9 @@ TEST(MessageLoop, CanPostTasksFromTasks) {
     EXPECT_FALSE(did_run);
     did_run = true;
   };
-  loop.task_runner()->PostTask(
-      [&nested_task, &loop]() { loop.task_runner()->PostTask(nested_task); });
+  loop.task_runner()->PostTask([&nested_task, &loop]() {
+          loop.task_runner()->PostTask(std::move(nested_task));
+      });
   loop.RunUntilIdle();
   EXPECT_TRUE(did_run);
 }
@@ -242,47 +243,6 @@ TEST(MessageLoop, FDWaiter) {
   }
 
   EXPECT_TRUE(callback_ran);
-}
-
-// Tests that the message loop's task runner can still be accessed during
-// message loop destruction (while tearing down remaining tasks and handlers)
-// though any tasks posted to it are immediately destroyed.
-TEST(MessageLoop, TaskRunnerAvailableDuringLoopDestruction) {
-  zx::event event;
-  EXPECT_EQ(ZX_OK, zx::event::create(0u, &event));
-
-  auto loop = std::make_unique<MessageLoop>();
-
-  // Set up a task which will record some observed state during destruction
-  // then attempt to post another task.  The task should be destroyed
-  // immediately without running.
-  bool task_destroyed = false;
-  bool task_observed_runs_tasks_on_current_thread = false;
-  bool task_posted_from_task_ran = false;
-  bool task_posted_from_task_destroyed = false;
-  fxl::Closure task =
-      [d = DestructorObserver([task_runner = loop->task_runner(),            //
-                               &task_observed_runs_tasks_on_current_thread,  //
-                               &task_destroyed,                              //
-                               &task_posted_from_task_ran,                   //
-                               &task_posted_from_task_destroyed] {
-         task_destroyed = true;
-         task_observed_runs_tasks_on_current_thread =
-             task_runner->RunsTasksOnCurrentThread();
-         task_runner->PostTask(
-             [&task_posted_from_task_ran,
-              d = DestructorObserver([&task_posted_from_task_destroyed] {
-                task_posted_from_task_destroyed = true;
-              })] { task_posted_from_task_ran = true; });
-       })] {};
-
-  loop->task_runner()->PostTask(std::move(task));
-  loop.reset();
-
-  EXPECT_TRUE(task_destroyed);
-  EXPECT_TRUE(task_observed_runs_tasks_on_current_thread);
-  EXPECT_FALSE(task_posted_from_task_ran);
-  EXPECT_TRUE(task_posted_from_task_destroyed);
 }
 
 }  // namespace
