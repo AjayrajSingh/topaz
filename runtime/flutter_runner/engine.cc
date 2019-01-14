@@ -13,6 +13,7 @@
 #include "flutter/shell/common/rasterizer.h"
 #include "flutter/shell/common/run_configuration.h"
 #include "fuchsia_font_manager.h"
+#include "lib/fxl/files/file.h"
 #include "platform_view.h"
 #include "task_runner_adapter.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
@@ -366,7 +367,16 @@ void Engine::OnMainIsolateStart() {
           intptr_t log_length = 0;
           Dart_Handle result = Dart_SaveCompilationTrace(&log, &log_length);
           tonic::LogIfError(result);
-          FML_LOG(ERROR) << log;
+          const std::string kCompilationTraceFile = "/data/dart.compilation.trace";
+          if (files::WriteFile(kCompilationTraceFile,
+                               reinterpret_cast<const char*>(log),
+                               log_length)) {
+            FML_LOG(ERROR) << "Dart compilation trace written to "
+                           << kCompilationTraceFile;
+          } else {
+            FML_LOG(ERROR) << "Could not write Dart compilation trace to "
+                           << kCompilationTraceFile;
+          }
           Dart_ExitScope();
           Dart_ExitIsolate();
         },
