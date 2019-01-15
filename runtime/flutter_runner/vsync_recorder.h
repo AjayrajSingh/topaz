@@ -5,6 +5,8 @@
 #ifndef TOPAZ_RUNTIME_FLUTTER_RUNNER_VSYNC_RECORDER_H_
 #define TOPAZ_RUNTIME_FLUTTER_RUNNER_VSYNC_RECORDER_H_
 
+#include <optional>
+
 #include "flutter/fml/time/time_delta.h"
 #include "flutter/fml/time/time_point.h"
 #include "lib/fxl/macros.h"
@@ -36,8 +38,7 @@ class VsyncRecorder {
  private:
   VsyncRecorder() = default;
 
-  fuchsia::images::PresentationInfo last_presentation_info_ = {};
-  bool last_presentation_info_set_ = false;
+  std::optional<fuchsia::images::PresentationInfo> last_presentation_info_;
 
   FXL_DISALLOW_COPY_ASSIGN_AND_MOVE(VsyncRecorder);
 };

@@ -20,18 +20,18 @@ constexpr fml::TimeDelta kDefaultPresentationInterval =
 }  // namespace
 
 VsyncRecorder& VsyncRecorder::GetInstance() {
-  static VsyncRecorder vsync_manager;
-  return vsync_manager;
+  static VsyncRecorder vsync_recorder;
+  return vsync_recorder;
 }
 
 VsyncInfo VsyncRecorder::GetCurrentVsyncInfo() const {
   {
     std::unique_lock<std::mutex> lock(g_mutex);
-    if (last_presentation_info_set_) {
+    if (last_presentation_info_) {
       return {fml::TimePoint::FromEpochDelta(fml::TimeDelta::FromNanoseconds(
-                  last_presentation_info_.presentation_time)),
+                  last_presentation_info_->presentation_time)),
               fml::TimeDelta::FromNanoseconds(
-                  last_presentation_info_.presentation_interval)};
+                  last_presentation_info_->presentation_interval)};
     }
   }
   return {fml::TimePoint::Now(), kDefaultPresentationInterval};
@@ -40,13 +40,12 @@ VsyncInfo VsyncRecorder::GetCurrentVsyncInfo() const {
 void VsyncRecorder::UpdateVsyncInfo(
     fuchsia::images::PresentationInfo presentation_info) {
   std::unique_lock<std::mutex> lock(g_mutex);
-  if (last_presentation_info_set_ &&
+  if (last_presentation_info_ &&
       presentation_info.presentation_time >
-          last_presentation_info_.presentation_time) {
+          last_presentation_info_->presentation_time) {
     last_presentation_info_ = presentation_info;
-  } else if (!last_presentation_info_set_) {
+  } else if (!last_presentation_info_) {
     last_presentation_info_ = presentation_info;
-    last_presentation_info_set_ = true;
   }
 }
 
