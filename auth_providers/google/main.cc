@@ -61,11 +61,6 @@ class GoogleAuthProviderApp {
 
   static Settings CreateSettings(fxl::CommandLine command_line) {
     Settings settings;
-    if (command_line.HasOption("chromium")) {
-      settings.use_chromium = true;
-    } else if (command_line.HasOption("webkit")) {
-      settings.use_chromium = false;
-    }
     if (command_line.HasOption("glif")) {
       settings.use_glif = true;
     } else if (command_line.HasOption("redcarpet")) {

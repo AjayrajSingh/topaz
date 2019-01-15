@@ -5,7 +5,6 @@
 import("//build/fidl/fidl.gni")
 import("//build/package.gni")
 import("//build/packages/prebuilt_package.gni")
-import("//topaz/runtime/chromium/chromium.gni")
 import("//topaz/runtime/chromium/chromium_web_sources.gni")
 
 fidl("chromium.web") {
@@ -17,24 +16,10 @@ fidl("chromium.web") {
   ]
 }
 
-if (enable_chromium) {
-  prebuilt_package("chromium") {
-    archive = "//topaz/third_party/chromium/arch/$target_cpu/chromium.far"
-  }
-} else {
-  package("chromium") {
-    deprecated_system_image = true
-    # Empty
-  }
+prebuilt_package("chromium") {
+  archive = "//topaz/third_party/chromium/arch/$target_cpu/chromium.far"
 }
 
-if (enable_chromium) {
-  prebuilt_package("web_runner") {
-    archive = "//topaz/third_party/chromium/arch/$target_cpu/web_runner.far"
-  }
-} else {
-  package("web_runner") {
-    deprecated_system_image = true
-    # Empty
-  }
+prebuilt_package("web_runner") {
+  archive = "//topaz/third_party/chromium/arch/$target_cpu/web_runner.far"
 }

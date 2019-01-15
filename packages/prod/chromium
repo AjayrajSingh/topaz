@@ -1,6 +1,5 @@
 {
   "packages": [
-    "//topaz/runtime/chromium",
-    "//topaz/runtime/chromium:web_runner"
+    "//topaz/runtime/chromium"
   ]
 }

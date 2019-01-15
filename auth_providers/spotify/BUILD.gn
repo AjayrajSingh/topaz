@@ -53,7 +53,6 @@ source_set("lib") {
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl",
     "//garnet/public/lib/network_wrapper",
-    "//topaz/runtime/web_runner/services",
     "//zircon/public/lib/fit",
     "//zircon/public/lib/zx",
   ]

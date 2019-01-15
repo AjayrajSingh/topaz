@@ -142,20 +142,14 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
 
   std::string url = GetAuthorizeUrl(user_profile_id);
   zx::eventpair view_holder_token;
-  if (settings_.use_chromium) {
-    view_holder_token = SetupChromium();
-    if (!view_holder_token) {
-      return;
-    }
-    chromium::web::NavigationControllerPtr controller;
-    chromium_frame_->GetNavigationController(controller.NewRequest());
-    controller->LoadUrl(url, {});
-    FXL_LOG(INFO) << "Loading URL in Chromium: " << url;
-  } else {
-    view_holder_token = SetupWebView();
-    web_view_->SetUrl(url);
-    FXL_LOG(INFO) << "Loading URL in WebView: " << url;
+  view_holder_token = SetupChromium();
+  if (!view_holder_token) {
+    return;
   }
+  chromium::web::NavigationControllerPtr controller;
+  chromium_frame_->GetNavigationController(controller.NewRequest());
+  controller->LoadUrl(url, {});
+  FXL_LOG(INFO) << "Loading URL in Chromium: " << url;
 
   auth_ui_context_ = auth_ui_context.Bind();
   auth_ui_context_.set_error_handler([this](zx_status_t status) {
@@ -339,32 +333,6 @@ void GoogleAuthProviderImpl::GetAppAccessTokenFromAssertionJWT(
   callback(AuthProviderStatus::BAD_REQUEST, nullptr, nullptr, nullptr);
 }
 
-void GoogleAuthProviderImpl::WillSendRequest(std::string incoming_url) {
-  FXL_CHECK(get_persistent_credential_callback_);
-
-  std::string auth_code;
-  AuthProviderStatus status =
-      ParseAuthCodeFromUrl(incoming_url, auth_code);
-
-  // If either an error occured or the user successfully received an auth code
-  // we need to close the WebView.
-  if (status != AuthProviderStatus::OK || !auth_code.empty()) {
-    // Also, de-register previously registered error callbacks since calling
-    // StopOverlay() might cause this connection to be closed.
-    FXL_LOG(INFO) << "Received auth code: " << auth_code;
-    auth_ui_context_.set_error_handler(nullptr);
-    FXL_LOG(INFO) << "Calling stop overlay..";
-    auth_ui_context_->StopOverlay();
-
-    if (status != AuthProviderStatus::OK) {
-      FXL_LOG(INFO) << "Encountered error while fetching auth code..";
-      get_persistent_credential_callback_(status, nullptr, nullptr);
-    } else if (!auth_code.empty()) {
-      ExchangeAuthCode(auth_code);
-    }
-  }
-}
-
 void GoogleAuthProviderImpl::OnNavigationStateChanged(
     NavigationEvent change, OnNavigationStateChangedCallback callback) {
   FXL_CHECK(get_persistent_credential_callback_);
@@ -500,43 +468,6 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
   });
 }
 
-zx::eventpair GoogleAuthProviderImpl::SetupWebView() {
-  // Launch an instance of the WebView component.
-  component::Services web_view_services;
-  fuchsia::sys::LaunchInfo web_view_launch_info;
-  web_view_launch_info.url = kWebViewUrl;
-  web_view_launch_info.directory_request = web_view_services.NewRequest();
-  context_->launcher()->CreateComponent(std::move(web_view_launch_info),
-                                        web_view_controller_.NewRequest());
-  web_view_controller_.set_error_handler([this](zx_status_t status) {
-    FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
-  });
-
-  zx::eventpair view_token, view_holder_token;
-  if (zx::eventpair::create(0u, &view_token, &view_holder_token) != ZX_OK)
-    FXL_NOTREACHED() << "Failed to create view tokens";
-
-  // Connect to the launched WebView component, request that it creates a new
-  // view, and connect to the WebView interface on this new view.
-  fuchsia::ui::app::ViewProviderPtr view_provider;
-  fuchsia::sys::ServiceProviderPtr incoming_view_services;
-  web_view_services.ConnectToService(view_provider.NewRequest());
-  view_provider->CreateView(std::move(view_token),
-                            incoming_view_services.NewRequest(), nullptr);
-  component::ConnectToService(incoming_view_services.get(),
-                              web_view_.NewRequest());
-
-  // Set ourselves as a delegate so that we receive URL change events that
-  // we can parse for an authorization code.
-  fuchsia::webview::WebRequestDelegatePtr web_request_delegate;
-  web_request_delegate_bindings_.AddBinding(this,
-                                            web_request_delegate.NewRequest());
-  web_view_->SetWebRequestDelegate(std::move(web_request_delegate));
-  web_view_->ClearCookies();
-
-  return view_holder_token;
-}
-
 zx::eventpair GoogleAuthProviderImpl::SetupChromium() {
   // Connect to the Chromium service and create a new frame.
   auto context_provider =
@@ -579,9 +510,7 @@ void GoogleAuthProviderImpl::ReleaseResources() {
     auth_ui_context_->StopOverlay();
     auth_ui_context_ = nullptr;
   }
-  // Release all smart pointers for WebView and Chromium resources.
-  web_view_controller_ = nullptr;
-  web_view_ = nullptr;
+  // Release all smart pointers for Chromium resources.
   chromium_frame_ = nullptr;
   chromium_context_ = nullptr;
 }

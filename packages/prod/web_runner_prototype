@@ -1,8 +1,0 @@
-{
-    "imports": [
-        "topaz/packages/prod/web_view"
-    ],
-    "packages": [
-        "//topaz/runtime/web_runner_prototype"
-    ]
-}

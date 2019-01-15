@@ -33,9 +33,7 @@
         "topaz/packages/prod/term",
         "topaz/packages/prod/text_input_mod",
         "topaz/packages/prod/userpicker_base_shell",
-        "topaz/packages/prod/webkit",
-        "topaz/packages/prod/web_runner_prototype",
-        "topaz/packages/prod/web_view",
+        "topaz/packages/prod/web_runner",
         "topaz/packages/prod/wifi_settings",
         "topaz/packages/prod/xi"
     ]

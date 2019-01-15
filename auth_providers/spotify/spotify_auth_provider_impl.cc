@@ -37,8 +37,7 @@ SpotifyAuthProviderImpl::SpotifyAuthProviderImpl(
     component::StartupContext* context,
     network_wrapper::NetworkWrapper* network_wrapper,
     fidl::InterfaceRequest<fuchsia::auth::AuthProvider> request)
-    : context_(context),
-      network_wrapper_(network_wrapper),
+    : network_wrapper_(network_wrapper),
       binding_(this, std::move(request)) {
   FXL_DCHECK(network_wrapper_);
 
@@ -60,47 +59,7 @@ void SpotifyAuthProviderImpl::GetPersistentCredential(
   FXL_DCHECK(auth_ui_context);
   get_persistent_credential_callback_ = std::move(callback);
 
-  auto view_owner = SetupWebView();
-
-  // Set a delegate which will parse incoming URLs for authorization code.
-  fuchsia::webview::WebRequestDelegatePtr web_request_delegate;
-  web_request_delegate_bindings_.AddBinding(this,
-                                            web_request_delegate.NewRequest());
-  web_view_->SetWebRequestDelegate(std::move(web_request_delegate));
-
-  web_view_->ClearCookies();
-
-  // TODO(ukode): use app_scopes instead of |kScopes|
-  const std::vector<std::string> scopes(kScopes.begin(), kScopes.end());
-  std::string scopes_str = fxl::JoinStrings(scopes, "+");
-
-  std::string url = kSpotifyOAuthAuthEndpoint;
-  url += "?scope=" + scopes_str;
-  url += "&response_type=code&redirect_uri=";
-  url += kRedirectUri;
-  // TODO: Client_id and secret should be passed as api args for
-  // GetPersistentCredential. Need to fix the fidl interface in Garnet before
-  // fixing it here.
-  url += "&client_id=";
-  url += "TODO";
-
-  web_view_->SetUrl(url);
-
-  auth_ui_context_ = auth_ui_context.Bind();
-  auth_ui_context_.set_error_handler([this](zx_status_t status) {
-    FXL_VLOG(1) << "Overlay cancelled by the caller";
-    // close any open web view
-    if (auth_ui_context_) {
-      auth_ui_context_.set_error_handler([](zx_status_t status) {});
-      auth_ui_context_->StopOverlay();
-    }
-    auth_ui_context_ = nullptr;
-    get_persistent_credential_callback_(AuthProviderStatus::INTERNAL_ERROR,
-                                        nullptr, nullptr);
-    return;
-  });
-
-  auth_ui_context_->StartOverlay2(std::move(view_owner));
+  // TODO(jsankey): Teach this code how to hold a chromium based web view.
 }
 
 void SpotifyAuthProviderImpl::GetAppAccessToken(
@@ -189,73 +148,6 @@ void SpotifyAuthProviderImpl::GetAppAccessTokenFromAssertionJWT(
   callback(AuthProviderStatus::BAD_REQUEST, nullptr, nullptr, nullptr);
 }
 
-void SpotifyAuthProviderImpl::WillSendRequest(
-    const std::string incoming_url) {
-  FXL_DCHECK(get_persistent_credential_callback_);
-
-  const std::string& uri = incoming_url;
-  const std::string prefix = std::string{kRedirectUri} + "?code=";
-  const std::string cancel_prefix =
-      std::string{kRedirectUri} + "?error=access_denied";
-
-  auto cancel_pos = uri.find(cancel_prefix);
-  // user denied OAuth permissions
-  if (cancel_pos == 0) {
-    get_persistent_credential_callback_(AuthProviderStatus::USER_CANCELLED,
-                                        nullptr, nullptr);
-    return;
-  }
-  auto pos = uri.find(prefix);
-  // user performing gaia authentication inside webview, let it pass
-  if (pos != 0) {
-    return;
-  }
-
-  // user accepted OAuth permissions - close the webview and exchange auth
-  // code to long lived credential.
-  // Also, de-register previously registered error callbacks since calling
-  // StopOverlay() might cause this connection to be closed.
-  auth_ui_context_.set_error_handler([](zx_status_t status) {});
-  auth_ui_context_->StopOverlay();
-
-  auto code = uri.substr(prefix.size(), std::string::npos);
-  // There is a '#' character at the end.
-  code.pop_back();
-
-  auto request =
-      OAuthRequestBuilder(kSpotifyOAuthTokenEndpoint, "POST")
-          .SetUrlEncodedBody("code=" + code + "&redirect_uri=" + kRedirectUri +
-                             "&client_id=" + "TODO" +
-                             "&grant_type=authorization_code");
-
-  auto request_factory = fxl::MakeCopyable(
-      [request = std::move(request)] { return request.Build(); });
-
-  // Generate long lived credentials (OAuth refresh token)
-  Request(std::move(request_factory), [this](http::URLResponse response) {
-    auto oauth_response = ParseOAuthResponse(std::move(response));
-    if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_VLOG(1) << "Got error: " << oauth_response.error_description;
-      FXL_VLOG(1) << "Got response: "
-                  << JsonValueToPrettyString(oauth_response.json_response);
-      get_persistent_credential_callback_(oauth_response.status, nullptr,
-                                          nullptr);
-      return;
-    }
-
-    if (!oauth_response.json_response.HasMember("refresh_token") ||
-        (!oauth_response.json_response.HasMember("access_token"))) {
-      FXL_VLOG(1) << "Got response: "
-                  << JsonValueToPrettyString(oauth_response.json_response);
-      get_persistent_credential_callback_(
-          AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr, nullptr);
-    }
-
-    GetUserProfile(oauth_response.json_response["refresh_token"].GetString(),
-                   oauth_response.json_response["access_token"].GetString());
-  });
-}
-
 void SpotifyAuthProviderImpl::GetUserProfile(
     const fidl::StringPtr credential, const fidl::StringPtr access_token) {
   FXL_DCHECK(credential.get().size() > 0);
@@ -306,30 +198,9 @@ void SpotifyAuthProviderImpl::GetUserProfile(
   });
 }
 
-zx::eventpair SpotifyAuthProviderImpl::SetupWebView() {
-  component::Services web_view_services;
-  fuchsia::sys::LaunchInfo web_view_launch_info;
-  web_view_launch_info.url = kWebViewUrl;
-  web_view_launch_info.directory_request = web_view_services.NewRequest();
-  context_->launcher()->CreateComponent(std::move(web_view_launch_info),
-                                        web_view_controller_.NewRequest());
-  web_view_controller_.set_error_handler([this](zx_status_t status) {
-    FXL_CHECK(false) << "web_view not found at " << kWebViewUrl << ".";
-  });
-
-  zx::eventpair view_token, view_holder_token;
-  if (zx::eventpair::create(0u, &view_token, &view_holder_token) != ZX_OK)
-    FXL_NOTREACHED() << "Failed to create view tokens";
-
-  fuchsia::ui::app::ViewProviderPtr view_provider;
-  fuchsia::sys::ServiceProviderPtr incoming_view_services;
-  web_view_services.ConnectToService(view_provider.NewRequest());
-  view_provider->CreateView(std::move(view_token),
-                            incoming_view_services.NewRequest(), nullptr);
-  component::ConnectToService(incoming_view_services.get(),
-                              web_view_.NewRequest());
-
-  return view_holder_token;
+zx::eventpair SpotifyAuthProviderImpl::SetupChromium() {
+  // TODO(jsankey): Implement.
+  return {};
 }
 
 void SpotifyAuthProviderImpl::Request(

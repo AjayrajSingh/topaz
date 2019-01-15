@@ -8,6 +8,6 @@
         "topaz/packages/config/dashboard",
         "topaz/packages/prod/dashboard",
         "topaz/packages/prod/flutter",
-        "topaz/packages/prod/web_runner_prototype"
+        "topaz/packages/prod/web_runner"
     ]
 }

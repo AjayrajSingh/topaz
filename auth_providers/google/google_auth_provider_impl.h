@@ -9,7 +9,6 @@
 
 #include <chromium/web/cpp/fidl.h>
 #include <fuchsia/auth/cpp/fidl.h>
-#include <fuchsia/webview/cpp/fidl.h>
 #include <lib/fit/function.h>
 #include <lib/zx/eventpair.h>
 
@@ -29,8 +28,7 @@ using fuchsia::auth::AttestationSigner;
 using fuchsia::auth::AuthenticationUIContext;
 
 class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
-                               fuchsia::auth::AuthProvider,
-                               fuchsia::webview::WebRequestDelegate {
+                               fuchsia::auth::AuthProvider {
  public:
   GoogleAuthProviderImpl(
       async_dispatcher_t* main_dispatcher, component::StartupContext* context,
@@ -84,9 +82,6 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
       std::vector<std::string> scopes,
       GetAppAccessTokenFromAssertionJWTCallback callback) override;
 
-  // |fuchsia::webview::WebRequestDelegate|
-  void WillSendRequest(std::string incoming_url) override;
-
   // |chromium::Web::NavigationEventObserver|
   void OnNavigationStateChanged(
       NavigationEvent change,
@@ -105,11 +100,6 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
   // Calls the people endpoint to gather profile information using the supplied
   // |access_token| and responds to the pending |get_credential_callback_|.
   void GetUserProfile(fidl::StringPtr credential, fidl::StringPtr access_token);
-
-  // Launches and connects to a WebView service, binding |this| as a
-  // |WebRequestDelegate| to process any changes in the URL, and returning a
-  // |zx::eventpair| token for the view's ViewHolder.
-  zx::eventpair SetupWebView();
 
   // Launches and connects to a Chromium frame, binding |this| as a
   // |NavigationEventObserver| to process any changes in the URL, and returning
@@ -131,13 +121,10 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
   const Settings settings_;
   fuchsia::sys::ComponentControllerPtr web_view_controller_;
   fuchsia::auth::AuthenticationUIContextPtr auth_ui_context_;
-  fuchsia::webview::WebViewPtr web_view_;
   chromium::web::ContextPtr chromium_context_;
   chromium::web::FramePtr chromium_frame_;
   GetPersistentCredentialCallback get_persistent_credential_callback_;
 
-  fidl::BindingSet<fuchsia::webview::WebRequestDelegate>
-      web_request_delegate_bindings_;
   fidl::BindingSet<chromium::web::NavigationEventObserver>
       navigation_event_observer_bindings_;
   fidl::Binding<fuchsia::auth::AuthProvider> binding_;

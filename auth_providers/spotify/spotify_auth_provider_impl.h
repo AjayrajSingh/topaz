@@ -11,7 +11,6 @@
 #define TOPAZ_AUTH_PROVIDERS_SPOTIFY_SPOTIFY_AUTH_PROVIDER_IMPL_H_
 
 #include <fuchsia/auth/cpp/fidl.h>
-#include <fuchsia/webview/cpp/fidl.h>
 #include <lib/fit/function.h>
 #include <lib/zx/eventpair.h>
 
@@ -28,8 +27,7 @@ using fuchsia::auth::AttestationJWTParams;
 using fuchsia::auth::AttestationSigner;
 using fuchsia::auth::AuthenticationUIContext;
 
-class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
-                                fuchsia::webview::WebRequestDelegate {
+class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider {
  public:
   SpotifyAuthProviderImpl(
       component::StartupContext* context,
@@ -84,28 +82,20 @@ class SpotifyAuthProviderImpl : public fuchsia::auth::AuthProvider,
       const std::vector<std::string> app_scopes,
       GetAppAccessTokenFromAssertionJWTCallback callback) override;
 
-  // |fuchsia::webview::WebRequestDelegate|
-  void WillSendRequest(const std::string incoming_url) override;
-
   void GetUserProfile(const fidl::StringPtr credential,
                       const fidl::StringPtr access_token);
 
-  zx::eventpair SetupWebView();
+  zx::eventpair SetupChromium();
 
   void Request(
       fit::function<::fuchsia::net::oldhttp::URLRequest()> request_factory,
       fit::function<void(::fuchsia::net::oldhttp::URLResponse response)>
           callback);
 
-  component::StartupContext* context_;
-  fuchsia::sys::ComponentControllerPtr web_view_controller_;
   fuchsia::auth::AuthenticationUIContextPtr auth_ui_context_;
   network_wrapper::NetworkWrapper* const network_wrapper_;
-  fuchsia::webview::WebViewPtr web_view_;
   GetPersistentCredentialCallback get_persistent_credential_callback_;
 
-  fidl::BindingSet<fuchsia::webview::WebRequestDelegate>
-      web_request_delegate_bindings_;
   fidl::Binding<fuchsia::auth::AuthProvider> binding_;
   callback::CancellableContainer requests_;
 

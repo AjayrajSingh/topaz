@@ -1,8 +1,4 @@
 {
-    "imports": [
-        "topaz/packages/prod/flutter",
-        "topaz/packages/prod/web_view"
-    ],
     "packages": [
         "//topaz/app/dashboard"
     ]

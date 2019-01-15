@@ -4,7 +4,6 @@
 
 import("//build/package.gni")
 import("//build/test/test_package.gni")
-import("//topaz/runtime/chromium/chromium.gni")
 
 executable("bin") {
   testonly = true
@@ -31,12 +30,9 @@ package("web_runner_smoke_tests") {
     ":bin",
   ]
 
-  # This test only works with the chromium based web runner
-  if (enable_chromium) {
-    tests = [
-      {
-        name = "web_runner_smoke_tests"
-      },
-    ]
-  }
+  tests = [
+    {
+      name = "web_runner_smoke_tests"
+    },
+  ]
 }
