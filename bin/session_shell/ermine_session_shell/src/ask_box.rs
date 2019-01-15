@@ -3,9 +3,12 @@ use failure::Error;
 use fidl::encoding::OutOfLine;
 use fidl::endpoints::create_endpoints;
 use fidl_fuchsia_math::{InsetF, SizeF};
-use fidl_fuchsia_textinputmod::{TextInputModMarker, TextInputModProxy, TextInputModReceiverMarker,
-                                TextInputModReceiverRequest};
-use fidl_fuchsia_ui_viewsv1::{CustomFocusBehavior, ViewLayout, ViewProperties, ViewProviderMarker};
+use fidl_fuchsia_textinputmod::{
+    TextInputModMarker, TextInputModProxy, TextInputModReceiverMarker, TextInputModReceiverRequest,
+};
+use fidl_fuchsia_ui_viewsv1::{
+    CustomFocusBehavior, ViewLayout, ViewProperties, ViewProviderMarker,
+};
 use fidl_fuchsia_ui_viewsv1token::ViewOwnerMarker;
 use fuchsia_app::client::{App, Launcher};
 use fuchsia_async as fasync;
