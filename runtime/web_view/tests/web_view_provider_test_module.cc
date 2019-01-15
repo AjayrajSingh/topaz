@@ -56,7 +56,6 @@ class TestModule : fuchsia::modular::LinkWatcher {
       input_url_link->Set(nullptr, std::move(buf));
 
       fuchsia::modular::IntentParameter p;
-      p.data.set_link_name(nullptr);
       intent.parameters->push_back(std::move(p));
     }
     // output: the input URL is echo'd back and received over the output link.
@@ -67,7 +66,6 @@ class TestModule : fuchsia::modular::LinkWatcher {
 
       fuchsia::modular::IntentParameter p;
       p.name = kOutputUrlLinkName;
-      p.data.set_link_name(kOutputUrlLinkName);
       intent.parameters->push_back(std::move(p));
     }
 
