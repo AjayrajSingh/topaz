@@ -43,8 +43,7 @@ impl AskBox {
 
         fasync::spawn(
             text_input_receiver_request
-                .into_stream()
-                .unwrap()
+                .into_stream()?
                 .map_ok(move |request| match request {
                     TextInputModReceiverRequest::UserEnteredText { text, responder } => {
                         APP.lock()
@@ -111,7 +110,7 @@ impl AskBox {
     pub fn layout(
         &self, view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy, width: f32,
         height: f32,
-    ) {
+    ) -> Result<(), Error> {
         let x_inset = width * 0.1;
         let y_inset = height * 0.4;
         let mut view_properties = ViewProperties {
@@ -129,9 +128,9 @@ impl AskBox {
                 },
             })),
         };
-        view_container
-            .set_child_properties(self.key, Some(OutOfLine(&mut view_properties)))
-            .unwrap();
+        view_container.set_child_properties(self.key, Some(OutOfLine(&mut view_properties)))?;
         self.host_node.set_translation(x_inset, y_inset, 10.0);
+
+        Ok(())
     }
 }

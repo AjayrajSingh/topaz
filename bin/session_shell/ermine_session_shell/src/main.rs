@@ -2,27 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-use failure::{Error, ResultExt};
-use fidl::endpoints::{
-    create_endpoints, create_proxy, ClientEnd, RequestStream, ServerEnd, ServiceMarker,
-};
+use failure::{err_msg, Error, ResultExt};
+use fidl::endpoints::{create_endpoints, create_proxy, ClientEnd, RequestStream, ServerEnd,
+                      ServiceMarker};
 use fidl_fuchsia_developer_tiles as tiles;
 use fidl_fuchsia_math::SizeF;
-use fidl_fuchsia_modular::{
-    SessionShellContextMarker, SessionShellContextProxy, SessionShellMarker, SessionShellRequest,
-    SessionShellRequestStream, StoryProviderProxy, StoryProviderWatcherMarker,
-    StoryProviderWatcherRequest, StoryState,
-};
-use fidl_fuchsia_ui_input::{
-    KeyboardEvent, KeyboardEventPhase, MODIFIER_LEFT_SUPER, MODIFIER_RIGHT_SUPER,
-};
-use fidl_fuchsia_ui_policy::{
-    KeyboardCaptureListenerHackMarker, KeyboardCaptureListenerHackRequest, PresentationProxy,
-};
-use fidl_fuchsia_ui_viewsv1::{
-    ViewManagerMarker, ViewManagerProxy, ViewProviderMarker, ViewProviderRequest::CreateView,
-    ViewProviderRequestStream,
-};
+use fidl_fuchsia_modular::{SessionShellContextMarker, SessionShellContextProxy,
+                           SessionShellMarker, SessionShellRequest, SessionShellRequestStream,
+                           StoryProviderProxy, StoryProviderWatcherMarker,
+                           StoryProviderWatcherRequest, StoryState};
+use fidl_fuchsia_ui_input::{KeyboardEvent, KeyboardEventPhase, MODIFIER_LEFT_SUPER,
+                            MODIFIER_RIGHT_SUPER};
+use fidl_fuchsia_ui_policy::{KeyboardCaptureListenerHackMarker,
+                             KeyboardCaptureListenerHackRequest, PresentationProxy};
+use fidl_fuchsia_ui_viewsv1::{ViewManagerMarker, ViewManagerProxy, ViewProviderMarker,
+                              ViewProviderRequest::CreateView, ViewProviderRequestStream};
 use fidl_fuchsia_ui_viewsv1token::ViewOwnerMarker;
 use fuchsia_app::{self as component, client::connect_to_service};
 use fuchsia_async as fasync;
@@ -123,13 +117,12 @@ impl App {
 
         self.presentation_proxy
             .clone()
-            .unwrap()
+            .ok_or_else(|| err_msg("clone failed"))?
             .capture_keyboard_event_hack(&mut hotkey_event, event_listener)?;
 
         fasync::spawn(
             event_listener_request
-                .into_stream()
-                .unwrap()
+                .into_stream()?
                 .try_for_each(move |event| match event {
                     KeyboardCaptureListenerHackRequest::OnEvent { event, .. } => {
                         APP.lock().handle_hot_key(&event).expect("handle hot key");
@@ -173,8 +166,8 @@ impl App {
         self.views[0].lock().remove_view_for_story(&story_id)
     }
 
-    pub fn remove_story(&mut self, key: u32) {
-        self.views[0].lock().remove_story(key);
+    pub fn remove_story(&mut self, key: u32) -> Result<(), Error> {
+        self.views[0].lock().remove_story(key)
     }
 
     pub fn list_stories(&self) -> (Vec<u32>, Vec<String>, Vec<SizeF>, Vec<bool>) {
@@ -183,13 +176,13 @@ impl App {
 
     pub fn add_child_view_for_story_attach(
         &mut self, story_id: String, view_holder_token: zx::EventPair,
-    ) {
+    ) -> Result<(), Error> {
         let key_to_use = self.next_story_key();
         self.views[0].lock().add_child_view_for_story_attach(
             key_to_use,
             story_id,
             view_holder_token,
-        );
+        )
     }
 
     pub fn spawn_tiles_server(chan: fasync::Channel) {
@@ -207,7 +200,9 @@ impl App {
                         fready(Ok(()))
                     }
                     tiles::ControllerRequest::RemoveTile { key, .. } => {
-                        APP.lock().remove_story(key);
+                        APP.lock()
+                            .remove_story(key)
+                            .unwrap_or_else(|e| eprintln!("remove_story error: {:?}", e));
                         fready(Ok(()))
                     }
                     tiles::ControllerRequest::ListTiles { responder } => {
@@ -240,7 +235,10 @@ impl App {
                         let view_holder_token: zx::EventPair =
                             zx::EventPair::from(zx::Handle::from(view_owner.into_channel()));
                         APP.lock()
-                            .add_child_view_for_story_attach(view_id.story_id, view_holder_token);
+                            .add_child_view_for_story_attach(view_id.story_id, view_holder_token)
+                            .unwrap_or_else(|e| {
+                                eprintln!("add_child_view_for_story_attach error: {:?}", e)
+                            });
                         fready(Ok(()))
                     }
                     SessionShellRequest::DetachView { view_id, responder } => {
@@ -259,8 +257,7 @@ impl App {
 
         fasync::spawn(
             story_watcher_request
-                .into_stream()
-                .unwrap()
+                .into_stream()?
                 .map_ok(move |request| match request {
                     StoryProviderWatcherRequest::OnChange {
                         story_info,

@@ -7,17 +7,15 @@ use failure::{Error, ResultExt};
 use fidl::encoding::OutOfLine;
 use fidl::endpoints::{create_proxy, ClientEnd, ServerEnd};
 use fidl_fuchsia_math::{InsetF, RectF, SizeF};
-use fidl_fuchsia_modular::{
-    AddMod, Intent, PuppetMasterMarker, PuppetMasterProxy, StoryCommand, StoryPuppetMasterProxy,
-    SurfaceArrangement, SurfaceDependency, SurfaceRelation,
-};
+use fidl_fuchsia_modular::{AddMod, Intent, PuppetMasterMarker, PuppetMasterProxy, StoryCommand,
+                           StoryPuppetMasterProxy, SurfaceArrangement, SurfaceDependency,
+                           SurfaceRelation};
 use fidl_fuchsia_ui_gfx::{self as gfx, ColorRgba};
 use fidl_fuchsia_ui_input::KeyboardEvent;
 use fidl_fuchsia_ui_scenic::{SessionListenerMarker, SessionListenerRequest};
-use fidl_fuchsia_ui_viewsv1::{
-    CustomFocusBehavior, ViewContainerListenerMarker, ViewContainerListenerRequest, ViewLayout,
-    ViewListenerMarker, ViewListenerRequest, ViewProperties,
-};
+use fidl_fuchsia_ui_viewsv1::{CustomFocusBehavior, ViewContainerListenerMarker,
+                              ViewContainerListenerRequest, ViewLayout, ViewListenerMarker,
+                              ViewListenerRequest, ViewProperties};
 use fuchsia_app::client::connect_to_service;
 use fuchsia_async as fasync;
 use fuchsia_scenic::{EntityNode, ImportNode, Material, Rectangle, Session, SessionPtr, ShapeNode};
@@ -132,8 +130,8 @@ impl ErmineView {
 
         let view_controller = Arc::new(Mutex::new(view_controller));
 
-        Self::setup_session_listener(&view_controller, session_listener_server);
-        Self::setup_view_listener(&view_controller, view_listener_request);
+        Self::setup_session_listener(&view_controller, session_listener_server)?;
+        Self::setup_view_listener(&view_controller, view_listener_request)?;
         Self::setup_view_container_listener(&view_controller)?;
         Self::finish_setup_scene(&view_controller);
 
@@ -142,14 +140,13 @@ impl ErmineView {
 
     fn setup_session_listener(
         view_controller: &ErmineViewPtr, session_listener_server: zx::Channel,
-    ) {
+    ) -> Result<(), Error> {
         let session_listener_request =
             ServerEnd::<SessionListenerMarker>::new(session_listener_server);
         let view_controller = view_controller.clone();
         fasync::spawn(
             session_listener_request
-                .into_stream()
-                .unwrap()
+                .into_stream()?
                 .map_ok(move |request| match request {
                     SessionListenerRequest::OnScenicEvent { events, .. } => {
                         view_controller.lock().handle_session_events(events)
@@ -159,16 +156,16 @@ impl ErmineView {
                 .try_collect::<()>()
                 .unwrap_or_else(|e| eprintln!("session listener error: {:?}", e)),
         );
+        Ok(())
     }
 
     fn setup_view_listener(
         view_controller: &ErmineViewPtr, view_listener_request: ServerEnd<ViewListenerMarker>,
-    ) {
+    ) -> Result<(), Error> {
         let view_controller = view_controller.clone();
         fasync::spawn(
             view_listener_request
-                .into_stream()
-                .unwrap()
+                .into_stream()?
                 .try_for_each(
                     move |ViewListenerRequest::OnPropertiesChanged {
                               properties,
@@ -180,6 +177,7 @@ impl ErmineView {
                 )
                 .unwrap_or_else(|e| eprintln!("view listener error: {:?}", e)),
         );
+        Ok(())
     }
 
     fn setup_view_container_listener(view_controller: &ErmineViewPtr) -> Result<(), Error> {
@@ -197,8 +195,7 @@ impl ErmineView {
 
         fasync::spawn(
             view_container_listener_request
-                .into_stream()
-                .unwrap()
+                .into_stream()?
                 .try_for_each(move |event| match event {
                     ViewContainerListenerRequest::OnChildAttached { responder, .. } => {
                         view_controller.lock().update();
@@ -208,7 +205,10 @@ impl ErmineView {
                         responder,
                         child_key,
                     } => {
-                        view_controller.lock().remove_story(child_key);
+                        view_controller
+                            .lock()
+                            .remove_story(child_key)
+                            .unwrap_or_else(|e| eprintln!("remove_story error: {:?}", e));
                         fready(responder.send())
                     }
                 })
@@ -282,19 +282,19 @@ impl ErmineView {
 
     pub fn add_child_view_for_story_attach(
         &mut self, key: u32, story_id: String, view_holder_token: zx::EventPair,
-    ) {
+    ) -> Result<(), Error> {
         let host_node = EntityNode::new(self.session.clone());
         let host_import_token = host_node.export_as_request();
 
         self.view_container
-            .add_child2(key, view_holder_token, host_import_token)
-            .unwrap();
+            .add_child2(key, view_holder_token, host_import_token)?;
 
         self.import_node.add_child(&host_node);
         let view_data = ViewData::new(key, "".to_string(), story_id, true, host_node);
         self.views.insert(key, view_data);
         self.update();
-        self.layout();
+        self.layout()?;
+        Ok(())
     }
 
     pub fn remove_view_for_story(&mut self, story_id: &String) -> Result<(), Error> {
@@ -304,13 +304,13 @@ impl ErmineView {
             .find(|(_key, view)| view.story_id == *story_id);
 
         if let Some((key, _view)) = result {
-            self.remove_story(*key);
+            self.remove_story(*key)?;
         }
 
         Ok(())
     }
 
-    pub fn remove_story(&mut self, key: u32) {
+    pub fn remove_story(&mut self, key: u32) -> Result<(), Error> {
         if self.views.remove(&key).is_some() {
             self.view_container
                 .remove_child(key, None)
@@ -320,9 +320,10 @@ impl ErmineView {
                         key, e
                     );
                 });
-            self.layout();
+            self.layout()?;
             self.update();
         }
+        Ok(())
     }
 
     pub fn list_stories(&self) -> (Vec<u32>, Vec<String>, Vec<SizeF>, Vec<bool>) {
@@ -360,7 +361,7 @@ impl ErmineView {
                     &self.import_node,
                 )?);
                 self.update();
-                self.layout();
+                self.layout()?;
             }
         }
         Ok(())
@@ -409,7 +410,7 @@ impl ErmineView {
         Ok(())
     }
 
-    pub fn layout(&mut self) {
+    pub fn layout(&mut self) -> Result<(), Error> {
         if !self.views.is_empty() {
             let num_tiles = self.views.len();
 
@@ -456,8 +457,7 @@ impl ErmineView {
                         })),
                     };
                     self.view_container
-                        .set_child_properties(view.key, Some(OutOfLine(&mut view_properties)))
-                        .unwrap();
+                        .set_child_properties(view.key, Some(OutOfLine(&mut view_properties)))?;
                     view.host_node
                         .set_translation(tile_bounds.x, tile_bounds.y, 0.0);
                     view.bounds = Some(tile_bounds);
@@ -466,7 +466,9 @@ impl ErmineView {
         }
 
         if let Some(ask_box) = self.ask_box.as_ref() {
-            ask_box.layout(&self.view_container, self.width, self.height);
+            ask_box.layout(&self.view_container, self.width, self.height)?;
         }
+
+        Ok(())
     }
 }
