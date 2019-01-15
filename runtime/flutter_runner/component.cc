@@ -279,6 +279,7 @@ class FileInNamespaceBuffer final : public blink::DartSnapshotBuffer {
 
 std::unique_ptr<blink::DartSnapshotBuffer> CreateWithContentsOfFile(
     int namespace_fd, const char* file_path, bool executable) {
+  TRACE_DURATION("flutter", "LoadFile", "path", file_path);
   auto source = std::make_unique<FileInNamespaceBuffer>(namespace_fd, file_path,
                                                         executable);
   return source->GetSnapshotPointer() == nullptr ? nullptr : std::move(source);

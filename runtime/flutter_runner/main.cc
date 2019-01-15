@@ -3,6 +3,8 @@
 // found in the LICENSE file.
 
 #include <trace-provider/provider.h>
+#include <trace/event.h>
+
 #include <cstdlib>
 
 #include "runner.h"
@@ -12,8 +14,14 @@
 int main(int argc, char const* argv[]) {
   deprecated_loop::MessageLoop loop;
 
-  trace::TraceProvider provider(loop.dispatcher());
-  FML_DCHECK(provider.is_valid()) << "Trace provider must be valid.";
+  fbl::unique_ptr<trace::TraceProvider> provider;
+  {
+    TRACE_DURATION("flutter", "CreateTraceProvider");
+    bool already_started;
+    // Use CreateSynchronously to prevent loss of early events.
+    trace::TraceProvider::CreateSynchronously(
+        loop.dispatcher(), "flutter_runner", &provider, &already_started);
+  }
 
   // Set up the process-wide /tmp memfs.
   fuchsia::dart::SetupRunnerTemp();

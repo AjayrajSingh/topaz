@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <thread>
+#include <trace/event.h>
 #include <utility>
 #include <zircon/status.h>
 #include <zircon/syscalls.h>
@@ -200,6 +201,7 @@ DartRunner::~DartRunner() {
 void DartRunner::StartComponent(
     fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
     ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
+  TRACE_DURATION("dart", "StartComponent", "url", package.resolved_url);
   std::string label = GetLabelFromURL(package.resolved_url);
   std::thread thread(RunApplication, this, AddController(label),
                      std::move(package), std::move(startup_info),

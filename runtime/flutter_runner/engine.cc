@@ -174,19 +174,22 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 
   // Create the compositor context from the scenic pointer to create the
   // rasterizer.
-  std::unique_ptr<flow::CompositorContext> compositor_context =
-      std::make_unique<flutter::CompositorContext>(
-          thread_label_,  // debug label
+  std::unique_ptr<flow::CompositorContext> compositor_context;
+  {
+    TRACE_DURATION("flutter", "CreateCompositorContext");
+    compositor_context = std::make_unique<flutter::CompositorContext>(
+        thread_label_,  // debug label
 #ifndef SCENIC_VIEWS2
-          std::move(import_token),  // import token (scenic node we attach our
-                                    // tree to)
+        std::move(import_token),  // import token (scenic node we attach our
+                                  // tree to)
 #else
-          std::move(view_token),  // scenic view we attach our tree to
+        std::move(view_token),    // scenic view we attach our tree to
 #endif
-          std::move(session),                    // scenic session
-          std::move(on_session_error_callback),  // session did encounter error
-          vsync_event_.get()                     // vsync event handle
-      );
+        std::move(session),                    // scenic session
+        std::move(on_session_error_callback),  // session did encounter error
+        vsync_event_.get()                     // vsync event handle
+    );
+  }
 
   // Setup the callback that will instantiate the rasterizer.
   shell::Shell::CreateCallback<shell::Rasterizer> on_create_rasterizer =
@@ -236,14 +239,17 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
     shared_snapshot = blink::DartSnapshot::Empty();
   }
 
-  shell_ = shell::Shell::Create(
-      task_runners,                 // host task runners
-      settings_,                    // shell launch settings
-      std::move(isolate_snapshot),  // isolate snapshot
-      std::move(shared_snapshot),   // shared snapshot
-      on_create_platform_view,      // platform view create callback
-      on_create_rasterizer          // rasterizer create callback
-  );
+  {
+    TRACE_DURATION("flutter", "CreateShell");
+    shell_ = shell::Shell::Create(
+        task_runners,                 // host task runners
+        settings_,                    // shell launch settings
+        std::move(isolate_snapshot),  // isolate snapshot
+        std::move(shared_snapshot),   // shared snapshot
+        on_create_platform_view,      // platform view create callback
+        on_create_rasterizer          // rasterizer create callback
+    );
+  }
 
   if (!shell_) {
     FML_LOG(ERROR) << "Could not launch the shell with settings: "

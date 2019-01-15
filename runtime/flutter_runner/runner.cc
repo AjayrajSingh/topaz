@@ -71,6 +71,7 @@ void Runner::RegisterApplication(
 void Runner::StartComponent(
     fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
     fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
+  TRACE_DURATION("flutter", "StartComponent", "url", package.resolved_url);
   // Notes on application termination: Application typically terminate on the
   // thread on which they were created. This usually means the thread was
   // specifically created to host the application. But we want to ensure that
