@@ -21,6 +21,6 @@ dart_app("echo_client_async_dart") {
     "//garnet/examples/fidl/services:echo2",
     "//garnet/public/fidl/fuchsia.sys",
     "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
+    "//topaz/public/dart/fuchsia_services",
   ]
 }

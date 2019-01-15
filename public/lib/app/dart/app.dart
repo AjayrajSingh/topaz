@@ -10,6 +10,7 @@ import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_io/fidl.dart';
 import 'package:zircon/zircon.dart';
 
+/// Deprecated! Use package:fuchsia_services/services.dart instead
 class StartupContext {
   static StartupContext _context;
 
@@ -71,6 +72,7 @@ class StartupContext {
   }
 }
 
+/// Deprecated! Use package:fuchsia_services/services.dart instead
 void connectToService<T>(
     ServiceProvider serviceProvider, ProxyController<T> controller) {
   final String serviceName = controller.$serviceName;
@@ -80,6 +82,7 @@ void connectToService<T>(
       serviceName, controller.request().passChannel());
 }
 
+/// Deprecated! Use package:fuchsia_services/services.dart instead
 InterfaceHandle<T> connectToServiceByName<T>(
     ServiceProvider serviceProvider, String serviceName) {
   final ChannelPair pair = new ChannelPair();
@@ -93,6 +96,7 @@ typedef DefaultServiceConnector<T> = void Function(
 
 typedef _ServiceConnectorThunk = void Function(Channel channel);
 
+/// Deprecated! Use package:fuchsia_services/services.dart instead
 class ServiceProviderImpl extends ServiceProvider {
   final ServiceProviderBinding _binding = new ServiceProviderBinding();
 
@@ -127,7 +131,8 @@ class ServiceProviderImpl extends ServiceProvider {
     }
   }
 }
- 
+
+/// Deprecated! Use package:fuchsia_services/services.dart instead
 class Services {
   DirectoryProxy _proxy;
   static const int _openFlags =

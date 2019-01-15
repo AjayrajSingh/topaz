@@ -25,6 +25,7 @@ dart_library("fuchsia_services") {
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/zircon",
+    "//zircon/public/fidl/fuchsia-io",
   ]
 }
 
