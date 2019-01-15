@@ -7,8 +7,6 @@
 // FIDL related files here will break some of the host-side flutter tests we
 // have. (See: https://fuchsia.atlassian.net/browse/SO-435)
 
-export 'src/model/embedder_model.dart';
-export 'src/model/idle_model.dart';
 export 'src/model/model.dart';
 export 'src/model/provider.dart';
 export 'src/model/spring_model.dart';

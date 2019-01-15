@@ -8,5 +8,3 @@
 export 'src/modular/base_shell_model.dart';
 export 'src/modular/base_shell_widget.dart';
 export 'src/modular/dank_session_shell_widget.dart';
-export 'src/modular/session_shell_model.dart';
-export 'src/modular/session_shell_widget.dart';
