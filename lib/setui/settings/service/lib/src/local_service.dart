@@ -2,6 +2,7 @@ import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_setui/fidl.dart';
 
 import 'connectivity_controller.dart';
+import 'intl_controller.dart';
 import 'network_controller.dart';
 import 'setui_setting_controller.dart';
 import 'timezone_controller.dart';
@@ -62,6 +63,8 @@ class SetUiSettingControllerCreator {
         return NetworkController();
       case SettingType.connectivity:
         return ConnectivityController();
+      case SettingType.intl:
+        return IntlSettingsController();
       default:
         throw UnimplementedError('No controller for the given type!');
     }
