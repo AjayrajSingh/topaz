@@ -32,7 +32,7 @@ class ServicesConnector {
 
   /// Connects the most recently returned [Channel] from [request()] with the
   /// provided services represented by its [controller].
-  Future<void> connectToService<T>(ProxyController<T> controller) async {
+  Future<void> connectToService<T>(AsyncProxyController<T> controller) async {
     final String serviceName = controller.$serviceName;
     if (serviceName == null) {
       throw Exception(
