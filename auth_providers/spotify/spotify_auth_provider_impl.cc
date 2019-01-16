@@ -11,7 +11,6 @@
 #include "lib/component/cpp/connect.h"
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/interface_request.h"
-#include "lib/fxl/functional/make_copyable.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/strings/join_strings.h"
 #include "lib/svc/cpp/services.h"
@@ -81,8 +80,9 @@ void SpotifyAuthProviderImpl::GetAppAccessToken(
                                         "&client_id=" + app_client_id.get() +
                                         "&grant_type=refresh_token");
 
-  auto request_factory = fxl::MakeCopyable(
-      [request = std::move(request)] { return request.Build(); });
+  auto request_factory = [request = std::move(request)] {
+    return request.Build();
+  };
 
   Request(std::move(request_factory), [callback = std::move(callback)](
                                           http::URLResponse response) {
@@ -156,8 +156,9 @@ void SpotifyAuthProviderImpl::GetUserProfile(
   auto request = OAuthRequestBuilder(kSpotifyPeopleGetEndpoint, "GET")
                      .SetAuthorizationHeader(access_token.get());
 
-  auto request_factory = fxl::MakeCopyable(
-      [request = std::move(request)] { return request.Build(); });
+  auto request_factory = [request = std::move(request)] {
+    return request.Build();
+  };
 
   Request(std::move(request_factory), [this,
                                        credential](http::URLResponse response) {

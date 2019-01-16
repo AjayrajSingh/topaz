@@ -12,7 +12,6 @@
 #include "lib/component/cpp/connect.h"
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/interface_request.h"
-#include "lib/fxl/functional/make_copyable.h"
 #include "lib/fxl/logging.h"
 #include "lib/fxl/strings/join_strings.h"
 #include "lib/svc/cpp/services.h"
@@ -178,8 +177,9 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
                              "&client_id=" + GetClientId(app_client_id.get()) +
                              "&grant_type=refresh_token");
 
-  auto request_factory = fxl::MakeCopyable(
-      [request = std::move(request)] { return request.Build(); });
+  auto request_factory = [request = std::move(request)] {
+    return request.Build();
+  };
 
   Request(std::move(request_factory), [callback = std::move(callback)](
                                           http::URLResponse response) {
@@ -217,8 +217,9 @@ void GoogleAuthProviderImpl::GetAppIdToken(std::string credential,
                              "&client_id=" + GetClientId(audience.get()) +
                              "&grant_type=refresh_token");
 
-  auto request_factory = fxl::MakeCopyable(
-      [request = std::move(request)] { return request.Build(); });
+  auto request_factory = [request = std::move(request)] {
+    return request.Build();
+  };
   Request(std::move(request_factory), [callback = std::move(callback)](
                                           http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
@@ -250,18 +251,18 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
 
   std::map<std::string, std::string> query_params;
   query_params["key"] = firebase_api_key;
-  auto request =
-      OAuthRequestBuilder(kFirebaseAuthEndpoint, "POST")
-          .SetQueryParams(query_params)
-          .SetJsonBody(R"({"postBody": "id_token=)" + id_token +
-                       R"(&providerId=google.com",)" +
-                       R"("returnIdpCredential": true,)" +
-                       R"("returnSecureToken": true,)" +
-                       R"("requestUri": "http://localhost"})");
+  auto request = OAuthRequestBuilder(kFirebaseAuthEndpoint, "POST")
+                     .SetQueryParams(query_params)
+                     .SetJsonBody(R"({"postBody": "id_token=)" + id_token +
+                                  R"(&providerId=google.com",)" +
+                                  R"("returnIdpCredential": true,)" +
+                                  R"("returnSecureToken": true,)" +
+                                  R"("requestUri": "http://localhost"})");
 
   // Exchange credential to access token at Google OAuth token endpoint
-  auto request_factory = fxl::MakeCopyable(
-      [request = std::move(request)] { return request.Build(); });
+  auto request_factory = [request = std::move(request)] {
+    return request.Build();
+  };
   Request(std::move(request_factory), [callback = std::move(callback)](
                                           http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
@@ -285,8 +286,7 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
 }
 
 void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
-    std::string credential,
-    RevokeAppOrPersistentCredentialCallback callback) {
+    std::string credential, RevokeAppOrPersistentCredentialCallback callback) {
   if (credential.empty()) {
     callback(AuthProviderStatus::BAD_REQUEST);
     return;
@@ -296,8 +296,9 @@ void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
       kGoogleRevokeTokenEndpoint + std::string("?token=") + credential;
   auto request = OAuthRequestBuilder(url, "POST").SetUrlEncodedBody("");
 
-  auto request_factory = fxl::MakeCopyable(
-      [request = std::move(request)] { return request.Build(); });
+  auto request_factory = [request = std::move(request)] {
+    return request.Build();
+  };
 
   Request(std::move(request_factory), [callback = std::move(callback)](
                                           http::URLResponse response) {
@@ -389,8 +390,9 @@ void GoogleAuthProviderImpl::ExchangeAuthCode(std::string auth_code) {
                                         "&client_id=" + kFuchsiaClientId +
                                         "&grant_type=authorization_code");
 
-  auto request_factory = fxl::MakeCopyable(
-      [request = std::move(request)] { return request.Build(); });
+  auto request_factory = [request = std::move(request)] {
+    return request.Build();
+  };
 
   Request(std::move(request_factory), [this](http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
@@ -425,8 +427,9 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
   auto request = OAuthRequestBuilder(kGooglePeopleGetEndpoint, "GET")
                      .SetAuthorizationHeader(access_token.get());
 
-  auto request_factory = fxl::MakeCopyable(
-      [request = std::move(request)] { return request.Build(); });
+  auto request_factory = [request = std::move(request)] {
+    return request.Build();
+  };
 
   Request(std::move(request_factory), [this,
                                        credential](http::URLResponse response) {

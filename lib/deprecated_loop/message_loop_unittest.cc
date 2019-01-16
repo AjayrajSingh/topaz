@@ -20,7 +20,6 @@
 #include "lib/fsl/tasks/fd_waiter.h"
 #include "lib/fxl/files/unique_fd.h"
 #include "lib/fxl/functional/closure.h"
-#include "lib/fxl/functional/make_copyable.h"
 #include "lib/fxl/macros.h"
 
 namespace deprecated_loop {
@@ -72,8 +71,8 @@ TEST(MessageLoop, CanPostTasksFromTasks) {
     did_run = true;
   };
   loop.task_runner()->PostTask([&nested_task, &loop]() {
-          loop.task_runner()->PostTask(std::move(nested_task));
-      });
+    loop.task_runner()->PostTask(std::move(nested_task));
+  });
   loop.RunUntilIdle();
   EXPECT_TRUE(did_run);
 }
@@ -177,7 +176,7 @@ TEST(MessageLoop, TaskDestructionTime) {
     loop.RunUntilIdle();
     auto observer1 = std::make_unique<DestructorObserver>(
         [&destructed] { destructed = true; });
-    task_runner->PostTask(fxl::MakeCopyable([p = std::move(observer1)]() {}));
+    task_runner->PostTask([p = std::move(observer1)]() {});
     EXPECT_FALSE(destructed);
   }
   EXPECT_TRUE(destructed);
@@ -185,7 +184,7 @@ TEST(MessageLoop, TaskDestructionTime) {
   destructed = false;
   auto observer2 = std::make_unique<DestructorObserver>(
       [&destructed] { destructed = true; });
-  task_runner->PostTask(fxl::MakeCopyable([p = std::move(observer2)]() {}));
+  task_runner->PostTask([p = std::move(observer2)]() {});
   EXPECT_TRUE(destructed);
 }
 

@@ -16,6 +16,7 @@
 
 #include "fuchsia_font_manager.h"
 
+#include <lib/fit/function.h>
 #include <zx/vmar.h>
 #include <unordered_map>
 
@@ -39,13 +40,13 @@ void UnmapMemory(const void* buffer, uint64_t size) {
 struct ReleaseSkDataContext {
   uint64_t buffer_size;
   int buffer_id;
-  std::function<void()> release_proc;
+  fit::function<void()> release_proc;
 
   ReleaseSkDataContext(uint64_t buffer_size, int buffer_id,
-                       const std::function<void()>& release_proc)
+                       fit::function<void()> release_proc)
       : buffer_size(buffer_size),
         buffer_id(buffer_id),
-        release_proc(release_proc) {}
+        release_proc(std::move(release_proc)) {}
 };
 
 void ReleaseSkData(const void* buffer, void* context) {
@@ -58,7 +59,7 @@ void ReleaseSkData(const void* buffer, void* context) {
 
 sk_sp<SkData> MakeSkDataFromBuffer(const fuchsia::mem::Buffer& data,
                                    int buffer_id,
-                                   std::function<void()> release_proc) {
+                                   fit::function<void()> release_proc) {
   if (!fsl::SizedVmo::IsSizeValid(data.vmo, data.size) ||
       data.size > std::numeric_limits<size_t>::max()) {
     return nullptr;
@@ -69,7 +70,8 @@ sk_sp<SkData> MakeSkDataFromBuffer(const fuchsia::mem::Buffer& data,
                                                   ZX_VM_PERM_READ, &buffer);
   if (status != ZX_OK)
     return nullptr;
-  auto context = new ReleaseSkDataContext(size, buffer_id, release_proc);
+  auto context =
+      new ReleaseSkDataContext(size, buffer_id, std::move(release_proc));
   return SkData::MakeWithProc(reinterpret_cast<void*>(buffer), size,
                               ReleaseSkData, context);
 }
@@ -99,7 +101,7 @@ SkFontStyle::Slant FuchsiaToSkSlant(fuchsia::fonts::Slant slant) {
 }
 
 fidl::VectorPtr<std::string> BuildLanguageList(const char* bcp47[],
-                                                   int bcp47_count) {
+                                               int bcp47_count) {
   FXL_DCHECK(bcp47 != nullptr || bcp47_count == 0);
   auto languages = fidl::VectorPtr<std::string>::New(0);
   for (int i = 0; i < bcp47_count; i++) {
