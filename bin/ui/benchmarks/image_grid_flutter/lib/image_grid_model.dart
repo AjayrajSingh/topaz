@@ -25,30 +25,32 @@ class ImageGridModel extends Model {
 
   ImageGridModel() {
     scheduleMicrotask(() {
-      _images = generateImages();
-      _scrollModel.jump(0.0);
+      generateImages().then((List<RawImage> images) {
+        _images = images;
+        _scrollModel.jump(0.0);
 
-      // Set up auto-scroller behavior.
-      _scrollController = new ScrollController();
-      _scrollModel
-        ..addListener(() {
-          if (!_scrollController.hasClients) {
-            return;
-          }
-          _scrollController.jumpTo(_scrollModel.value);
-          if (_scrollModel.isDone) {
-            _scrollModel.target = _scrollModel.target == _kMinScrollOffset
-                ? _kMaxScrollOffset
-                : _kMinScrollOffset;
-          }
-        })
-        ..target = _kMaxScrollOffset;
-      notifyListeners();
+        // Set up auto-scroller behavior.
+        _scrollController = new ScrollController();
+        _scrollModel
+          ..addListener(() {
+            if (!_scrollController.hasClients) {
+              return;
+            }
+            _scrollController.jumpTo(_scrollModel.value);
+            if (_scrollModel.isDone) {
+              _scrollModel.target = _scrollModel.target == _kMinScrollOffset
+                  ? _kMaxScrollOffset
+                  : _kMinScrollOffset;
+            }
+          })
+          ..target = _kMaxScrollOffset;
+        notifyListeners();
+      });
     });
   }
 
   // Draw some images with circles.
-  List<RawImage> generateImages() {
+  Future<List<RawImage>> generateImages() async {
     List<RawImage> images = [];
     for (int i = 0; i < _kNumImages; i++) {
       var recorder = new ui.PictureRecorder();
@@ -62,7 +64,7 @@ class ImageGridModel extends Model {
 
       canvas.drawCircle(new Offset(250.0, 250.0), 200.0, paint);
 
-      var image = recorder.endRecording().toImage(500, 500);
+      var image = await recorder.endRecording().toImage(500, 500);
 
       images.add(
           new RawImage(image: image, width: 500.0, height: 500.0, scale: 1.0));

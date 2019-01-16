@@ -26,13 +26,14 @@ import 'package:zircon/zircon.dart';
 class IntentParameters {
   final Map<String, IntentParameterData> _parameters = {};
   // TODO: Refactor this class to use the new SDK instead of deprecated API
-  // ignore: deprecated_member_use
+  // ignore: deprecated_member_use_from_same_package
   ModuleDriver _driver;
 
   /// [moduleDriver] is used to access Entity and Link parameters.
   /// [parameters] are the parmeters from an [Intent].
   IntentParameters({
-    ModuleDriver moduleDriver, // ignore: deprecated_member_use
+    // ignore: deprecated_member_use_from_same_package
+    ModuleDriver moduleDriver,
     List<IntentParameter> parameters,
   }) {
     _driver = moduleDriver;
