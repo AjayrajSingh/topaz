@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets/model.dart';
 
 import 'src/fuchsia/wifi_settings_model.dart';
 import 'src/wlan_manager.dart';

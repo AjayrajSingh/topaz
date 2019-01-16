@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets/model.dart';
 import 'package:tictactoe_common/common.dart' show SquareState;
 
 import '../model/tictactoe_model.dart';

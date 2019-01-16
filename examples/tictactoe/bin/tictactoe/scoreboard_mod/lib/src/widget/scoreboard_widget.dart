@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lib.widgets/modular.dart';
+import 'package:lib.widgets/model.dart';
 
 import '../model/scoreboard_model.dart';
 
