@@ -18,7 +18,7 @@
 namespace fuchsia {
 namespace dart {
 
-zx_status_t HandleIfException(component::StartupContext* context,
+zx_status_t HandleIfException(std::shared_ptr<component::Services> services,
                               const std::string& component_url,
                               Dart_Handle result) {
   if (!Dart_IsError(result) || !Dart_ErrorHasException(result)) {
@@ -36,7 +36,7 @@ zx_status_t HandleIfException(component::StartupContext* context,
   }
 
   fuchsia::crash::AnalyzerSyncPtr analyzer;
-  context->ConnectToEnvironmentService(analyzer.NewRequest());
+  services->ConnectToService(analyzer.NewRequest());
   FXL_DCHECK(analyzer);
 
   zx_status_t out_status;

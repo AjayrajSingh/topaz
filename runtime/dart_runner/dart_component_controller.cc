@@ -52,11 +52,13 @@ void AfterTask() {
 DartComponentController::DartComponentController(
     std::string label, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
+    std::shared_ptr<component::Services> runner_incoming_services,
     fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller)
     : label_(label),
       url_(std::move(package.resolved_url)),
       package_(std::move(package)),
       startup_info_(std::move(startup_info)),
+      runner_incoming_services_(runner_incoming_services),
       binding_(this) {
   for (size_t i = 0; i < startup_info_.program_metadata->size(); ++i) {
     auto pg = startup_info_.program_metadata->at(i);
@@ -392,7 +394,8 @@ bool DartComponentController::Main() {
       FXL_LOG(ERROR) << Dart_GetError(main_result);
       return_code_ = tonic::GetErrorExitCode(main_result);
 
-      fuchsia::dart::HandleIfException(context_.get(), url_, main_result);
+      fuchsia::dart::HandleIfException(runner_incoming_services_, url_,
+                                       main_result);
     }
     Dart_ExitScope();
     return false;
@@ -441,7 +444,7 @@ void DartComponentController::MessageEpilogue(Dart_Handle result) {
     return;
   }
 
-  fuchsia::dart::HandleIfException(context_.get(), url_, result);
+  fuchsia::dart::HandleIfException(runner_incoming_services_, url_, result);
 
   // Otherwise, see if there was any other error.
   return_code_ = tonic::GetErrorExitCode(result);

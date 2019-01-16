@@ -5,9 +5,10 @@
 #ifndef TOPAZ_RUNTIME_DART_UTILS_HANDLE_EXCEPTION_H_
 #define TOPAZ_RUNTIME_DART_UTILS_HANDLE_EXCEPTION_H_
 
+#include <memory>
 #include <string>
 
-#include <lib/component/cpp/startup_context.h>
+#include <lib/svc/cpp/services.h>
 #include <sys/types.h>
 #include <third_party/dart/runtime/include/dart_api.h>
 
@@ -18,7 +19,7 @@ namespace dart {
 // to the crash analyzer service for further handling.
 //
 // Otherwise early returns with OK status.
-zx_status_t HandleIfException(component::StartupContext* context,
+zx_status_t HandleIfException(std::shared_ptr<component::Services> services,
                               const std::string& component_url,
                               Dart_Handle result);
 

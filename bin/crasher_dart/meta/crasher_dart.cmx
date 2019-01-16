@@ -4,7 +4,6 @@
     },
     "sandbox": {
         "services": [
-            "fuchsia.crash.Analyzer",
             "fuchsia.sys.Environment"
         ]
     }

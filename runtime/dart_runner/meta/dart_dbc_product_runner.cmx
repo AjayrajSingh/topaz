@@ -7,6 +7,7 @@
             "root-ssl-certificates"
         ],
         "services": [
+            "fuchsia.crash.Analyzer",
             "fuchsia.net.LegacySocketProvider",
             "fuchsia.timezone.Timezone",
             "fuchsia.tracelink.Registry"

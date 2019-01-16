@@ -88,11 +88,13 @@ void IsolateCleanupCallback(void* callback_data) {
 void RunApplication(
     DartRunner* runner, ControllerToken* token, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
+    std::shared_ptr<component::Services> runner_incoming_services,
     ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   deprecated_loop::MessageLoop loop;
   DartComponentController app(token->label(), std::move(package),
-                              std::move(startup_info), std::move(controller));
+                              std::move(startup_info), runner_incoming_services,
+                              std::move(controller));
   bool success = app.Setup();
   int64_t end = Dart_TimelineGetMicros();
   Dart_TimelineEvent("DartComponentController::Setup", start, end,
@@ -207,7 +209,7 @@ void DartRunner::StartComponent(
   std::string label = GetLabelFromURL(package.resolved_url);
   std::thread thread(RunApplication, this, AddController(label),
                      std::move(package), std::move(startup_info),
-                     std::move(controller));
+                     context_->incoming_services(), std::move(controller));
   thread.detach();
 }
 

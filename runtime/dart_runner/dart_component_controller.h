@@ -5,6 +5,8 @@
 #ifndef TOPAZ_RUNTIME_DART_RUNNER_DART_COMPONENT_CONTROLLER_H_
 #define TOPAZ_RUNTIME_DART_RUNNER_DART_COMPONENT_CONTROLLER_H_
 
+#include <memory>
+
 #include <lib/async/cpp/wait.h>
 #include <lib/fdio/namespace.h>
 #include <lib/zx/timer.h>
@@ -15,6 +17,7 @@
 #include "lib/fsl/vmo/sized_vmo.h"
 #include "lib/fxl/macros.h"
 #include "lib/svc/cpp/service_provider_bridge.h"
+#include "lib/svc/cpp/services.h"
 #include "third_party/dart/runtime/include/dart_api.h"
 #include "topaz/runtime/dart_runner/mapped_resource.h"
 
@@ -25,6 +28,7 @@ class DartComponentController : public fuchsia::sys::ComponentController {
   DartComponentController(
       std::string label, fuchsia::sys::Package package,
       fuchsia::sys::StartupInfo startup_info,
+      std::shared_ptr<component::Services> runner_incoming_services,
       fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller);
   ~DartComponentController() override;
 
@@ -58,6 +62,7 @@ class DartComponentController : public fuchsia::sys::ComponentController {
   std::string url_;
   fuchsia::sys::Package package_;
   fuchsia::sys::StartupInfo startup_info_;
+  std::shared_ptr<component::Services> runner_incoming_services_;
   std::string data_path_;
   fidl::Binding<fuchsia::sys::ComponentController> binding_;
   std::unique_ptr<component::StartupContext> context_;
