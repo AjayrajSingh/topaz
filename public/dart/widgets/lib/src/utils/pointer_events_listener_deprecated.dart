@@ -9,8 +9,6 @@ import 'dart:ui' as ui;
 import 'package:fidl_fuchsia_ui_input/fidl.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 
-import 'package:flutter/scheduler.dart';
-
 /// Listens for pointer events and injects them into Flutter input pipeline.
 class PointerEventsListener implements PointerCaptureListenerHack {
   // Holds the fidl binding to receive pointer events.
@@ -29,9 +27,6 @@ class PointerEventsListener implements PointerCaptureListenerHack {
   // Holds the [onPointerDataCallback] assigned to [ui.window] at
   // the start of the program.
   ui.PointerDataPacketCallback _originalCallback;
-
-  final _queuedEvents = <PointerEvent>[];
-  bool _frameScheduled = false;
 
   /// Starts listening to pointer events. Also overrides the original
   /// [ui.window.onPointerDataPacket] callback to a NOP since we
@@ -93,33 +88,12 @@ class PointerEventsListener implements PointerCaptureListenerHack {
       return;
     }
 
-    _queuedEvents.add(event);
-
-    if (_frameScheduled) {
-      return;
+    Timeline.startSync('PointerEventsListener.onPointerEvent');
+    final packet = _getPacket(event);
+    if (packet != null) {
+      _originalCallback(new ui.PointerDataPacket(data: [packet]));
     }
-
-    _frameScheduled = true;
-    SchedulerBinding.instance.scheduleFrameCallback((_) {
-      if (_originalCallback == null) {
-        return;
-      }
-      _frameScheduled = false;
-      Timeline.startSync('PointerEventsListener.onPointerEvent');
-      List<ui.PointerData> packets = [];
-      for (PointerEvent event in _queuedEvents) {
-        final packet = _getPacket(event);
-        if (packet != null) {
-          packets.add(packet);
-        }
-      }
-      if (packets.isNotEmpty) {
-        _originalCallback(new ui.PointerDataPacket(data: packets));
-      }
-      _queuedEvents.clear();
-      Timeline.finishSync();
-    });
-    SchedulerBinding.instance.scheduleFrame();
+    Timeline.finishSync();
   }
 
   ui.PointerChange _changeFromPointerEvent(PointerEvent event) {

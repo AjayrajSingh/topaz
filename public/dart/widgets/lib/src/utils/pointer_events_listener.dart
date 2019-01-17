@@ -93,33 +93,12 @@ class PointerEventsListener extends PointerCaptureListenerHack {
       return;
     }
 
-    _queuedEvents.add(event);
-
-    if (_frameScheduled) {
-      return;
+    Timeline.startSync('PointerEventsListener.onPointerEvent');
+    final packet = _getPacket(event);
+    if (packet != null) {
+      _originalCallback(ui.PointerDataPacket(data: [packet]));
     }
-
-    _frameScheduled = true;
-    SchedulerBinding.instance.scheduleFrameCallback((_) {
-      if (_originalCallback == null) {
-        return;
-      }
-      _frameScheduled = false;
-      Timeline.startSync('PointerEventsListener.onPointerEvent');
-      List<ui.PointerData> packets = [];
-      for (PointerEvent event in _queuedEvents) {
-        final packet = _getPacket(event);
-        if (packet != null) {
-          packets.add(packet);
-        }
-      }
-      if (packets.isNotEmpty) {
-        _originalCallback(new ui.PointerDataPacket(data: packets));
-      }
-      _queuedEvents.clear();
-      Timeline.finishSync();
-    });
-    SchedulerBinding.instance.scheduleFrame();
+    Timeline.finishSync();
   }
 
   ui.PointerChange _changeFromPointerEvent(PointerEvent event) {
