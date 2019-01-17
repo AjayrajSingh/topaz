@@ -12,7 +12,6 @@
 #include "lib/fxl/macros.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "topaz/runtime/dart_runner/mapped_resource.h"
-#include "topaz/runtime/dart/utils/vmservice_object.h"
 
 namespace dart_runner {
 
@@ -36,10 +35,10 @@ class DartRunner : public fuchsia::sys::Runner {
 
  private:
   // |fuchsia::sys::Runner| implementation:
-  void StartComponent(fuchsia::sys::Package package,
-                      fuchsia::sys::StartupInfo startup_info,
-                      ::fidl::InterfaceRequest<fuchsia::sys::ComponentController>
-                          controller) override;
+  void StartComponent(
+      fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
+      ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller)
+      override;
 
   ControllerToken* AddController(std::string label);
   void RemoveController(ControllerToken* token);
@@ -49,11 +48,6 @@ class DartRunner : public fuchsia::sys::Runner {
   deprecated_loop::MessageLoop* loop_;
   fidl::BindingSet<fuchsia::sys::Runner> bindings_;
   std::vector<ControllerToken*> controllers_;
-
-#if !defined(DART_PRODUCT)
-  // The connection between the Dart VM service and The Hub.
-  std::unique_ptr<fuchsia::dart::VMServiceObject> vmservice_object_;
-#endif  // !defined(DART_PRODUCT)
 
 #if !defined(AOT_RUNTIME)
   MappedResource vm_snapshot_data_;

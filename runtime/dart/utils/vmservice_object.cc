@@ -7,41 +7,34 @@
 #include <errno.h>
 #include <zircon/status.h>
 
-#include "lib/component/cpp/exposed_object.h"
 #include "lib/fxl/files/directory.h"
 #include "lib/fxl/files/file.h"
+
+#include <string>
 
 namespace fuchsia {
 namespace dart {
 
-VMServiceObject::VMServiceObject() : ExposedObject(kDirName) {
-  // This code exposes the contents of /${kPortDir} in the hub for the
-  // dart_runner at /hub/.../out/objects/${kDirName}/${kPortDirName}.
-  object_dir().set_children_callback(component::ObjectPath{kPortDirName},
-      [](component::Object::ObjectVector* out_children){
-    // List /tmp/dart.services if it exists, and push its contents as
-    // component::Objects onto out_children.
-    std::vector<std::string> files;
-    if (!files::ReadDirContents(kPortDir, &files)) {
-      FXL_LOG(ERROR) << "Failed to read Dart VM Service port directory '"
-                     << kPortDir << "':"
-                     << strerror(errno);
-      return;
+void VMServiceObject::GetContents(LazyEntryVector* out_vector) {
+  // List /tmp/dart.services if it exists, and push its contents as
+  // as the conrtents of this directory.
+  std::vector<std::string> files;
+  if (!files::ReadDirContents(kPortDir, &files)) {
+    FXL_LOG(ERROR) << "Failed to read Dart VM Service port directory '"
+                   << kPortDir << "':" << strerror(errno);
+    return;
+  }
+  for (const auto& file : files) {
+    if ((file == ".") || (file == "..")) {
+      continue;
     }
-    for (const auto& file : files) {
-      if ((file == ".") || (file == "..")) {
-        continue;
-      }
-      out_children->push_back(component::ObjectDir::Make(file).object());
-    }
-  });
+    out_vector->push_back({std::stoul(file), file, V_TYPE_FILE});
+  }
 }
 
-std::unique_ptr<VMServiceObject> VMServiceObject::Create(
-    component::ObjectDir* object_dir) {
-  auto vmservice = std::make_unique<VMServiceObject>();
-  vmservice->set_parent(*object_dir);
-  return vmservice;
+zx_status_t VMServiceObject::GetFile(fbl::RefPtr<fs::Vnode>* out, uint64_t id,
+                                     fbl::String name) {
+  return ZX_ERR_NOT_FOUND;
 }
 
 }  // namespace dart

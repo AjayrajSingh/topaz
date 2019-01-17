@@ -5,24 +5,23 @@
 #ifndef TOPAZ_RUNTIME_DART_UTILS_VMSERVICE_OBJECT_H_
 #define TOPAZ_RUNTIME_DART_UTILS_VMSERVICE_OBJECT_H_
 
-#include "lib/component/cpp/exposed_object.h"
+#include <fs/lazy-dir.h>
 
 namespace fuchsia {
 namespace dart {
 
-class VMServiceObject : public component::ExposedObject {
+class VMServiceObject : public fs::LazyDir {
  public:
   static constexpr const char* kDirName = "DartVM";
   static constexpr const char* kPortDirName = "vmservice-port";
   static constexpr const char* kPortDir = "/tmp/dart.services";
 
-  VMServiceObject();
-
-  static std::unique_ptr<VMServiceObject> Create(
-      component::ObjectDir* object_dir);
+  void GetContents(LazyEntryVector* out_vector) override;
+  zx_status_t GetFile(fbl::RefPtr<Vnode>* out, uint64_t id,
+                      fbl::String name) override;
 };
 
 }  // namespace dart
 }  // namespace fuchsia
 
-#endif  // TOPAZ_RUNTIME_UTILS_VMSERVICE_OBJECT_H_
+#endif  // TOPAZ_RUNTIME_DART_UTILS_VMSERVICE_OBJECT_H_

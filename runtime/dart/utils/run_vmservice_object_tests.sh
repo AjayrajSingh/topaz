@@ -7,7 +7,7 @@ killall dart* || true
 
 # Start up a dart runner app that is guaranteed to be JIT, non-product, and
 # won't terminate.
-run hello_dart_jit &
+run -d hello_dart_jit
 
 # Wait for it to come up.
 sleep 2

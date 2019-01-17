@@ -6,20 +6,20 @@
 
 #include <errno.h>
 #include <sys/stat.h>
-#include <thread>
 #include <trace/event.h>
-#include <utility>
 #include <zircon/status.h>
 #include <zircon/syscalls.h>
+#include <thread>
+#include <utility>
 
 #include "lib/fxl/arraysize.h"
+#include "third_party/dart/runtime/include/bin/dart_io_api.h"
 #include "third_party/tonic/dart_microtask_queue.h"
 #include "third_party/tonic/dart_state.h"
-#include "third_party/dart/runtime/include/bin/dart_io_api.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
+#include "topaz/runtime/dart/utils/vmservice_object.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
 #include "topaz/runtime/dart_runner/service_isolate.h"
-#include "topaz/runtime/dart/utils/vmservice_object.h"
 
 #if defined(AOT_RUNTIME)
 extern "C" uint8_t _kDartVmSnapshotData[];
@@ -72,7 +72,8 @@ Dart_Isolate IsolateCreateCallback(const char* uri, const char* main,
 void IsolateShutdownCallback(void* callback_data) {
   // The service isolate (and maybe later the kernel isolate) doesn't have an
   // deprecated_loop::MessageLoop.
-  deprecated_loop::MessageLoop* loop = deprecated_loop::MessageLoop::GetCurrent();
+  deprecated_loop::MessageLoop* loop =
+      deprecated_loop::MessageLoop::GetCurrent();
   if (loop) {
     loop->SetAfterTaskCallback(nullptr);
     tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
@@ -150,8 +151,9 @@ DartRunner::DartRunner()
   // The VM service isolate uses the process-wide namespace. It writes the
   // vm service protocol port under /tmp. The VMServiceObject exposes that
   // port number to The Hub.
-  vmservice_object_ = fuchsia::dart::VMServiceObject::Create(
-      context_->outgoing().object_dir());
+  context_->outgoing().debug_dir()->AddEntry(
+      fuchsia::dart::VMServiceObject::kPortDirName,
+      fbl::AdoptRef(new fuchsia::dart::VMServiceObject()));
 
 #endif  // !defined(DART_PRODUCT)
 
