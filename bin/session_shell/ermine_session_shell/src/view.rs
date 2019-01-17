@@ -234,9 +234,9 @@ impl ErmineView {
         self.import_node.add_child(&self.container_node);
         let material = Material::new(self.session.clone());
         material.set_color(ColorRgba {
-            red: 0x40,
-            green: 0x40,
-            blue: 0x40,
+            red: 0xb3,
+            green: 0x1b,
+            blue: 0x1b,
             alpha: 0x80,
         });
         self.background_node.set_material(&material);
