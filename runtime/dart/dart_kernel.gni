@@ -144,8 +144,7 @@ template("dart_kernel") {
     }
 
     if (defined(invoker.gen_bytecode) && invoker.gen_bytecode) {
-      # TODO(zra): Drop ASTs when bytecode works without ASTs.
-      args += [ "--gen-bytecode" ]
+      args += [ "--gen-bytecode", "--drop-ast" ]
     }
 
     rebased_main_dart = rebase_path(invoker.main_dart, "//")
