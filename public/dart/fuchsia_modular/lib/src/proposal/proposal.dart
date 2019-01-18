@@ -33,7 +33,8 @@ class Proposal extends fuchsia_modular.Proposal {
     int color = 0x000000,
     void Function(String, String) onProposalAccepted,
   })  : assert(id != null && id.isNotEmpty),
-        assert(headline != null && headline.isNotEmpty),
+        assert(headline != null),
+        assert(headline.isNotEmpty || wantsRichSuggestion),
         super(
           id: id,
           storyName: storyName,
