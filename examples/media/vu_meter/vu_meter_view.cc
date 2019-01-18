@@ -83,7 +83,7 @@ void VuMeterView::DrawContent(SkCanvas* canvas) {
   canvas->clear(SK_ColorBLACK);
 
   SkPaint paint;
-  paint.setFlags(SkPaint::kAntiAlias_Flag);
+  paint.setAntiAlias(true);
 
   paint.setColor(SK_ColorCYAN);
   canvas->drawCircle(

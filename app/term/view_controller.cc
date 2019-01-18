@@ -170,14 +170,13 @@ void ViewController::DrawContent(SkCanvas* canvas) {
       // Paint the foreground.
       if (ch.code_point) {
         if (!(ch.attributes & TermModel::kAttributesBlink) || blink_on_) {
-          uint32_t flags = SkPaint::kAntiAlias_Flag;
+          SkPaint fg_paint;
+          fg_paint.setAntiAlias(true);
           // TODO(jpoichet): Use real bold font
           if ((ch.attributes & TermModel::kAttributesBold))
-            flags |= SkPaint::kFakeBoldText_Flag;
+            fg_font.setEmbolden(true);
           // TODO(jpoichet): Account for TermModel::kAttributesUnderline
           // without using the deprecated flag SkPaint::kUnderlineText_Flag
-          SkPaint fg_paint;
-          fg_paint.setFlags(flags);
           fg_paint.setColor(SkColorSetRGB(ch.foreground_color.red,
                                           ch.foreground_color.green,
                                           ch.foreground_color.blue));

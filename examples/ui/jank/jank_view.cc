@@ -92,9 +92,10 @@ void JankView::DrawButton(SkCanvas* canvas, const char* label,
   SkPaint textPaint;
   textPaint.setColor(SK_ColorBLACK);
   textPaint.setAntiAlias(true);
-  canvas->drawText(label, strlen(label),
+  canvas->drawSimpleText(label, strlen(label), kUTF8_SkTextEncoding,
                    bounds.centerX() - textBounds.centerX(),
-                   bounds.centerY() - textBounds.centerY(), textPaint);
+                   bounds.centerY() - textBounds.centerY(),
+                   textFont, textPaint);
 }
 
 bool JankView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
