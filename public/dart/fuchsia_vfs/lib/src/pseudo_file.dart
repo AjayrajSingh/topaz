@@ -313,11 +313,6 @@ class _FileConnection extends File {
   }
 
   @override
-  Future<File$GetVmo$Response> getVmo(int flags) async {
-    return File$GetVmo$Response(ZX.OK, null);
-  }
-
-  @override
   Future<File$GetBuffer$Response> getBuffer(int flags) async {
     return File$GetBuffer$Response(ZX.OK, null);
   }
