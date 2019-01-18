@@ -55,7 +55,7 @@ fn main() -> Result<(), Error> {
         .context("Can't find user entry at path '/hub/r'. Did you not yet log in?")?;
     let proc =
         first_entry_at_path(&user).context("Can't find process entry in hub user directory.")?;
-    let ermine_c = proc.join("c").join("ermine");
+    let ermine_c = proc.join("c").join("ermine.cmx");
     let ermine = first_entry_at_path(&ermine_c).context(
         "Can't find ermine component directory in the hub, perhaps ermine isn't running?",
     )?;
