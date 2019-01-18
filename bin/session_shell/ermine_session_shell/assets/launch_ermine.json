@@ -1,6 +1,6 @@
 [
     {
-        "name": "ermine",
+        "name": "fuchsia-pkg://fuchsia.com/ermine#meta/ermine.cmx",
         "display_usage": "near"
     }
 ]
