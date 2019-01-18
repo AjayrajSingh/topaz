@@ -8,10 +8,10 @@ import 'package:fidl_fuchsia_netstack/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.base_shell/base_shell_widget.dart';
 import 'package:lib.base_shell/netstack_model.dart';
 import 'package:lib.widgets/application_deprecated.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 

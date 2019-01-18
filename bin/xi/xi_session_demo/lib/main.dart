@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/modular.dart';
 
 import 'src/demo_model.dart';
 import 'src/demo_widget.dart';

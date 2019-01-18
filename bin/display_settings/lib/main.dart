@@ -3,10 +3,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/app.dart' show StartupContext;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.display.flutter/display_policy_brightness_model.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/modular.dart';
 import 'src/widget.dart';
 
 /// Main entry point to the display settings module.

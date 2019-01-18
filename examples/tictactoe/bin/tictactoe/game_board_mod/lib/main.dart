@@ -10,7 +10,7 @@ import 'package:lib.app.dart/app.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.proposal.dart/proposal.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/modular.dart';
 import 'package:tictactoe_common/common.dart';
 
 import 'src/model/tictactoe_model.dart';

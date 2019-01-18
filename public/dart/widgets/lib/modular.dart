@@ -5,4 +5,6 @@
 // WARNING(MS-1613): All Fuchsia system dependencies will be separated out from
 // this Flutter specific Dart package. If you need Fuchsia system interactions
 // use //topaz/public/lib/app_driver/dart or the Dart FIDL Bindings directly.
+export 'src/modular/base_shell_model.dart';
+export 'src/modular/base_shell_widget.dart';
 export 'src/modular/dank_session_shell_widget.dart';

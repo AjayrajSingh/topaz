@@ -6,7 +6,7 @@ import 'package:fidl_fuchsia_tictactoe/fidl_async.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.app_driver.dart/module_driver.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/modular.dart';
 import 'package:tictactoe_common/common.dart';
 
 import 'src/model/scoreboard_model.dart';

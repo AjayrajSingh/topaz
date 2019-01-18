@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/modular.dart';
 import 'package:topaz.examples.tictactoe.bin.tictactoe.game_board_mod._tictactoe_game_board_mod_dart_library/src/model/tictactoe_model.dart'; // ignore: implementation_imports
 import 'package:topaz.examples.tictactoe.bin.tictactoe.game_board_mod._tictactoe_game_board_mod_dart_library/src/widget/square.dart'; // ignore: implementation_imports
 import 'package:topaz.examples.tictactoe.bin.tictactoe.game_board_mod._tictactoe_game_board_mod_dart_library/src/widget/tictactoe_board.dart'; // ignore: implementation_imports

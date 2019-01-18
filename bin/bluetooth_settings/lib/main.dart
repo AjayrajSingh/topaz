@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/modular.dart';
 
 import 'src/bluetooth_model.dart';
 import 'src/bluetooth_settings.dart';

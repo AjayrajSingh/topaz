@@ -17,10 +17,10 @@ import 'package:fidl_fuchsia_ui_policy/fidl.dart';
 import 'package:lib.app.dart/app.dart' as app;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
+import 'package:lib.widgets/modular.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart' show Channel;
 
-import 'base_shell_model.dart';
 import 'netstack_model.dart';
 import 'user_manager.dart';
 
@@ -273,8 +273,7 @@ class CommonBaseShellModel extends BaseShellModel
     super.onReady(userProvider, baseShellContext, presentation);
 
     final netstackProxy = NetstackProxy();
-    app.connectToService(
-        app.StartupContext.fromStartupInfo().environmentServices,
+    app.connectToService(StartupContext.fromStartupInfo().environmentServices,
         netstackProxy.ctrl);
     _netstackModel = NetstackModel(netstack: netstackProxy)..start();
 
