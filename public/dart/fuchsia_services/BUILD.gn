@@ -17,6 +17,7 @@ dart_library("fuchsia_services") {
     "src/outgoing.dart",
     "src/service_connection.dart",
     "src/service_provider_impl.dart",
+    "src/services_connector.dart",
     "src/startup_context.dart",
   ]
 
