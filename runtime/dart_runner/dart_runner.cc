@@ -34,6 +34,10 @@ const char* kDartVMArgs[] = {
     // TODO(FL-117): Re-enable causal async stack traces when this issue is
     // addressed.
     "--no_causal_async_stacks",
+
+    "--systrace_timeline",
+    "--timeline_streams=Compiler,Dart,Debugger,Embedder,GC,Isolate,VM",
+
 #if defined(AOT_RUNTIME)
     "--precompilation",
 #else
@@ -43,11 +47,6 @@ const char* kDartVMArgs[] = {
 #if !defined(NDEBUG) && !defined(DART_PRODUCT)
     "--enable_asserts",
 #endif  // !defined(NDEBUG)
-
-#if !defined(DART_PRODUCT)
-    "--systrace_timeline",
-    "--timeline_streams=VM,Isolate,Compiler,Dart,GC,Embedder,API",
-#endif  // !defined(DART_PRODUCT)
     // clang-format on
 };
 
