@@ -33,7 +33,7 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_dir "${OUT_DIR}"                    \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
-    --cmd "set_root_view image_grid_flutter"  \
+    --cmd "set_root_view fuchsia-pkg://fuchsia.com/image_grid_flutter#meta/image_grid_flutter.cmx"  \
     --flutter_app_name 'image_grid_flutter'   \
     --sleep_before_trace 5                    \
     --unshadowed --clipping_disabled
@@ -44,7 +44,7 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_dir "${OUT_DIR}"                    \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
-    --cmd "set_root_view image_grid_flutter"  \
+    --cmd "set_root_view fuchsia-pkg://fuchsia.com/image_grid_flutter#meta/image_grid_flutter.cmx"  \
     --flutter_app_name 'image_grid_flutter'   \
     --sleep_before_trace 5                    \
     --unshadowed --clipping_enabled
@@ -55,7 +55,7 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_dir "${OUT_DIR}"                    \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
-    --cmd "set_root_view image_grid_flutter"  \
+    --cmd "set_root_view fuchsia-pkg://fuchsia.com/image_grid_flutter#meta/image_grid_flutter.cmx"  \
     --flutter_app_name 'image_grid_flutter'   \
     --sleep_before_trace 5                    \
     --screen_space_shadows --clipping_enabled
@@ -66,7 +66,7 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_dir "${OUT_DIR}"                    \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
-    --cmd "set_root_view image_grid_flutter"  \
+    --cmd "set_root_view fuchsia-pkg://fuchsia.com/image_grid_flutter#meta/image_grid_flutter.cmx"  \
     --flutter_app_name 'image_grid_flutter'   \
     --sleep_before_trace 5                    \
     --shadow_map --clipping_enabled
@@ -77,7 +77,7 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --out_dir "${OUT_DIR}"                    \
     --out_file "${OUT_DIR}/${BENCHMARK}.json" \
     --benchmark_label "${BENCHMARK}"          \
-    --cmd "set_root_view image_grid_flutter"  \
+    --cmd "set_root_view fuchsia-pkg://fuchsia.com/image_grid_flutter#meta/image_grid_flutter.cmx"  \
     --flutter_app_name 'image_grid_flutter'   \
     --sleep_before_trace 5                    \
     --moment_shadow_map --clipping_enabled
@@ -132,4 +132,3 @@ runbench_exec "${OUT_DIR}/${BENCHMARK}.json"  \
     --benchmark_label "${BENCHMARK}"          \
     --cmd "${IMAGE_GRID_FLUTTER_X3_COMMAND}"  \
     --moment_shadow_map --clipping_enabled
-
