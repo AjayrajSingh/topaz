@@ -55,7 +55,7 @@ class _SketchyExampleState extends State<SketchyExample> {
 
   _SketchyExampleState._internal(
       this.startupContext, this.session, EventPairPair tokenPair)
-      : sceneHost = new SceneHost(tokenPair.first),
+      : sceneHost = new SceneHost(tokenPair.first.passHandle()),
         rect = new scenic.RoundedRectangle(
             session, 100.0, 100.0, 10.0, 10.0, 10.0, 10.0),
         material = new scenic.Material(session),
