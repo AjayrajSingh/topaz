@@ -29,21 +29,15 @@ executable("bin") {
 }
 
 package("noodles") {
-  deprecated_bare_package_url = "//build"
-
   deps = [
     ":bin",
   ]
 
-  binaries = [
-    {
-      name = "noodles"
-    },
-  ]
+  binary = "noodles"
 
   meta = [
     {
-      path = rebase_path("meta/noodles.cmx")
+      path = rebase_path("../meta/ui_example.cmx")
       dest = "noodles.cmx"
     },
   ]

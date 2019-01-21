@@ -30,16 +30,18 @@ executable("paint") {
 }
 
 package("package") {
-  deprecated_system_image = true
   package_name = "paint"
 
   deps = [
     ":paint",
   ]
 
-  binaries = [
+  binary = "paint_view"
+
+  meta = [
     {
-      name = "paint_view"
+      path = rebase_path("../meta/ui_example.cmx")
+      dest = "paint.cmx"
     },
   ]
 }

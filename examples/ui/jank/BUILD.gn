@@ -29,16 +29,18 @@ executable("jank") {
 }
 
 package("package") {
-  deprecated_system_image = true
   package_name = "jank"
 
   deps = [
     ":jank",
   ]
 
-  binaries = [
+  binary = "jank_view"
+
+  meta = [
     {
-      name = "jank_view"
+      path = rebase_path("../meta/ui_example.cmx")
+      dest = "jank.cmx"
     },
   ]
 }
