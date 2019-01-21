@@ -47,16 +47,18 @@ executable("skottie_viewer") {
 }
 
 package("package") {
-  deprecated_system_image = true
   package_name = "skottie_viewer"
 
   deps = [
     ":skottie_viewer",
   ]
 
-  binaries = [
+  binary = "skottie_viewer"
+
+  meta = [
     {
-      name = "skottie_viewer"
+      path = rebase_path("meta/skottie_viewer.cmx")
+      dest = "skottie_viewer.cmx"
     },
   ]
 }
