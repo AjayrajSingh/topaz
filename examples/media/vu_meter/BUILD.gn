@@ -25,16 +25,18 @@ executable("vu_meter") {
 }
 
 package("package") {
-  deprecated_system_image = true
   package_name = "vu_meter"
 
   deps = [
     ":vu_meter",
   ]
 
-  binaries = [
+  binary = "vu_meter"
+
+  meta = [
     {
-      name = "vu_meter"
+      path = rebase_path("meta/vu_meter.cmx")
+      dest = "vu_meter.cmx"
     },
   ]
 }
