@@ -47,7 +47,7 @@ class _LinkVerifier<P> {
   Future<bool> _verifyLink(Link<P> link) async {
     try {
       for (int i = 0; i < 3; i++) {
-        final http.Response response = await http.head(link.uri);
+        final http.Response response = await http.get(link.uri);
         final int code = response.statusCode;
         if (code == HttpStatus.tooManyRequests) {
           final int delay = int.tryParse(response.headers['retry-after']) ?? 50;
