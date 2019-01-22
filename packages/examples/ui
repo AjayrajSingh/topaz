@@ -3,7 +3,6 @@
         "topaz/packages/examples/noodles"
     ],
     "packages": [
-        "//topaz/examples/ui/async_hello_mod",
         "//topaz/examples/ui/hello_mod",
         "//topaz/examples/ui/hello_mod:hello_space_dart",
         "//topaz/examples/ui/jank:package",
