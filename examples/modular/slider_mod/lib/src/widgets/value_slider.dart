@@ -75,7 +75,9 @@ class ValueSlider extends StatelessWidget {
   void _onCalcFibBtnPressed(SliderBloc sliderBloc) {
     // recreating the proxy for every button press just to illustrate
     final _proxy = fidl_fib.FibonacciServiceProxy();
-    connectToAgentService('fibonacci_agent', _proxy);
+    connectToAgentService(
+        'fuchsia-pkg://fuchsia.com/fibonacci_agent#meta/fibonacci_agent.cmx',
+        _proxy);
 
     _proxy
         .calcFibonacci(sliderBloc.currentValue.toInt())
