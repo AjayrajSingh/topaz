@@ -6,11 +6,11 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
 import 'package:doc_checker/graph.dart';
 import 'package:doc_checker/link_scraper.dart';
+import 'package:doc_checker/link_verifier.dart';
 import 'package:doc_checker/projects.dart';
 
 const String _optionHelp = 'help';
@@ -66,14 +66,6 @@ class Error {
   bool get hasLocation => location != null;
 }
 
-Future<bool> isLinkValid(Uri link) async {
-  try {
-    return (await http.get(link)).statusCode == 200;
-  } on IOException {
-    return false;
-  }
-}
-
 Future<Null> main(List<String> args) async {
   final ArgParser parser = new ArgParser()
     ..addFlag(
@@ -108,17 +100,17 @@ Future<Null> main(List<String> args) async {
   final List<String> docs = new Directory(docsDir)
       .listSync(recursive: true)
       .where((FileSystemEntity entity) =>
-        path.extension(entity.path) == '.md' &&
-        // Skip these files created by macOS since they're not real Markdown:
-        // https://apple.stackexchange.com/q/14980
-        !path.basename(entity.path).startsWith('._'))
+          path.extension(entity.path) == '.md' &&
+          // Skip these files created by macOS since they're not real Markdown:
+          // https://apple.stackexchange.com/q/14980
+          !path.basename(entity.path).startsWith('._'))
       .map((FileSystemEntity entity) => entity.path)
       .toList();
 
   final String readme = path.join(docsDir, 'README.md');
   final Graph graph = new Graph();
   final List<Error> errors = <Error>[];
-  final List<Future<Error>> pendingErrors = <Future<Error>>[];
+  final List<Link<String>> linksToVerify = [];
 
   for (String doc in docs) {
     final String label = path.relative(doc, from: docsDir);
@@ -151,12 +143,7 @@ Future<Null> main(List<String> args) async {
             }
           }
           if (shouldTestLink) {
-            pendingErrors.add(() async {
-              if (!(await isLinkValid(uri))) {
-                return new Error(ErrorType.brokenLink, label, uri.toString());
-              }
-              return null;
-            }());
+            linksToVerify.add(new Link(uri, label));
           }
         }
         continue;
@@ -184,9 +171,13 @@ Future<Null> main(List<String> args) async {
     }
   }
 
-  // Resolve all pending errors.
-  errors.addAll(
-      (await Future.wait(pendingErrors)).where((Error error) => error != null));
+  // Verify http links.
+  await verifyLinks(linksToVerify, (Link<String> link, bool isValid) {
+    if (!isValid) {
+      errors.add(
+          new Error(ErrorType.brokenLink, link.payload, link.uri.toString()));
+    }
+  });
 
   // Verify singletons and orphans.
   final List<Node> unreachable = graph.removeSingletons()

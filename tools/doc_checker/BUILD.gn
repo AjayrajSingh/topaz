@@ -12,6 +12,7 @@ dart_tool("doc_checker") {
   sources = [
     "graph.dart",
     "link_scraper.dart",
+    "link_verifier.dart",
     "projects.dart",
   ]
 
