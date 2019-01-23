@@ -5,7 +5,6 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("todo_list_sledge") {
-
   main_dart = "lib/main.dart"
 
   meta = [
