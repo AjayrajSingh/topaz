@@ -5,6 +5,7 @@
 use crate::ask_box::AskBox;
 use failure::{Error, ResultExt};
 use fidl::encoding::OutOfLine;
+use fidl::encoding::Decodable;
 use fidl::endpoints::{create_proxy, ClientEnd, ServerEnd};
 use fidl_fuchsia_math::{InsetF, RectF, SizeF};
 use fidl_fuchsia_modular::{
@@ -397,6 +398,7 @@ impl ErmineView {
                 dependency: SurfaceDependency::None,
                 emphasis: 1.0,
             },
+            ..AddMod::new_empty()
         })];
         story_puppet_master
             .enqueue(&mut commands.iter_mut())
