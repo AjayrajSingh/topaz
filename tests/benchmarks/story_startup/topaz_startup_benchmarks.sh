@@ -15,9 +15,10 @@
 bench() {
     MODULE=$1
     BENCHMARK=$2
-    COMMAND="basemgr --test --enable_presenter --account_provider=dev_token_manager "`
-      `"--base_shell=dev_base_shell --base_shell_args=--test_timeout_ms=60000 "`
-      `"--session_shell=dev_session_shell --session_shell_args=--root_module=${MODULE} --story_shell=mondrian"
+    COMMAND="fuchsia-pkg://fuchsia.com/basemgr#meta/basemgr.cmx "`
+      `"--test --enable_presenter --account_provider=fuchsia-pkg://fuchsia.com/dev_token_manager#meta/dev_token_manager.cmx "`
+      `"--base_shell=fuchsia-pkg://fuchsia.com/dev_base_shell#meta/dev_base_shell.cmx --base_shell_args=--test_timeout_ms=60000 "`
+      `"--session_shell=fuchsia-pkg://fuchsia.com/dev_session_shell#meta/dev_session_shell.cmx --session_shell_args=--root_module=${MODULE} --story_shell=fuchsia-pkg://fuchsia.com/mondrian#meta/mondrian.cmx"
 
     runbench_exec "${OUT_DIR}/${BENCHMARK}.json"                           \
       "/pkgfs/packages/startup_benchmarks/0/bin/run_startup_benchmark.sh"  \
