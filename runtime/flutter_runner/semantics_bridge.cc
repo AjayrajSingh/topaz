@@ -109,6 +109,8 @@ void SemanticsBridge::UpdateSemantics(
       update_nodes.push_back(SerializeNode(node, (float)metrics_->scale));
     }
   }
+  // TODO(MI4-1539): re-enable after changes to semantics root API
+  /*
   if (!delete_nodes.get().empty()) {
     root_->DeleteSemanticNodes(view_id_, std::move(delete_nodes));
   }
@@ -116,6 +118,7 @@ void SemanticsBridge::UpdateSemantics(
     root_->UpdateSemanticNodes(view_id_, std::move(update_nodes));
   }
   root_->Commit(view_id_);
+   */
 }
 
 void SemanticsBridge::PerformAccessibilityAction(
@@ -150,11 +153,14 @@ void SemanticsBridge::OnAccessibilityToggle(bool enabled) {
       component::ConnectToService(environment_service_provider_,
                                   root_.NewRequest());
     }
-    if (root_.is_bound()) {
-      root_->RegisterSemanticsProvider(view_id_, binding_.NewBinding());
-      platform_view_->SetSemanticsEnabled(true);
-      return;
-    }
+    // TODO(MI4-1539): re-enable after changes to semantics root API
+    /*
+     if (root_.is_bound()) {
+          root_->RegisterSemanticsProvider(view_id_, binding_.NewBinding());
+          platform_view_->SetSemanticsEnabled(true);
+          return;
+        }
+        */
   }
   root_.Unbind();
   // Disable if fall through to here.
