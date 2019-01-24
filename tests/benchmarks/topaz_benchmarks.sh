@@ -22,7 +22,9 @@ if [ "${vulkan_is_supported_result}" = '1' ]; then
 
   # DISABLED: See BLD-324
   # . /pkgfs/packages/startup_benchmarks/0/bin/startup_benchmarks.sh "$@"
-  . /pkgfs/packages/topaz_benchmarks/0/bin/gfx_benchmarks.sh "$@"
+  # DISABLED: See SCN-1223
+  # . /pkgfs/packages/topaz_benchmarks/0/bin/gfx_benchmarks.sh "$@"
+  echo 'Graphics performance tests disabled'
 elif [ "${vulkan_is_supported_result}" = '0' ]; then
   echo 'Vulkan not supported; graphics tests skipped.'
 else
