@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'package:fidl_fidl_examples_echo/fidl_async.dart' as fidl_echo;
 import 'package:fuchsia_services/services.dart';
-import 'package:fidl_fuchsia_sys/fidl_async.dart' show LaunchInfo;
+import 'package:fidl_fuchsia_sys/fidl_async.dart';
 import 'package:fuchsia/fuchsia.dart' show exit;
 
 Future<Null> main(List<String> args) async {
@@ -23,7 +23,11 @@ Future<Null> main(List<String> args) async {
   final launchInfo =
       LaunchInfo(url: serverUrl, directoryRequest: servicesConnector.request());
   // Creates a new instance of the component described by launchInfo.
-  await context.launcher.createComponent(launchInfo, null);
+
+  final componentController = ComponentControllerProxy();
+
+  await context.launcher
+      .createComponent(launchInfo, componentController.ctrl.request());
 
   // Bind. We bind EchoProxy, a generated proxy class, to the remote Echo
   // service.
@@ -34,6 +38,9 @@ Future<Null> main(List<String> args) async {
   // Invoke echoString with a value and print it's response.
   final response = await _echo.echoString('hello');
   print('***** Response: $response');
+
+  // close the echo server
+  componentController.ctrl.close();
 
   // Shutdown, exit this Echo client
   exit(0);
