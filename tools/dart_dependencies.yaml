@@ -17,4 +17,5 @@ dependencies:
   protobuf: ^0.10.4
   protoc_plugin: ^0.10.5
   strings: ^0.1.0
+  tuple: ^1.0.2
   uuid: ^1.0.3
