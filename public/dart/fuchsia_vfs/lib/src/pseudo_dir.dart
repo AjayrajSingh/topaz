@@ -136,6 +136,7 @@ class PseudoDir extends Vnode {
     }
     if (p == '' || p == '.') {
       connect(flags, mode, request);
+      return;
     }
     var index = p.indexOf('/');
     var key = '';
@@ -149,13 +150,18 @@ class PseudoDir extends Vnode {
       // final element, open it
       if (index == -1) {
         e.node.connect(flags, mode, request);
+        return;
       } else if (index == p.length - 1) {
         // '/' is at end, should be a directory, add flag
         e.node.connect(flags | openFlagDirectory, mode, request);
+        return;
       } else {
         // forward request to child Vnode and let it handle rest of path.
-        e.node.open(flags, mode, p.substring(index + 1), request);
+        return e.node.open(flags, mode, p.substring(index + 1), request);
       }
+    } else {
+      sendErrorEvent(flags, ZX.ERR_NOT_FOUND, request);
+      return;
     }
   }
 

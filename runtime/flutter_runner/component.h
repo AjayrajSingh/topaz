@@ -66,6 +66,8 @@ class Application final : public Engine::Delegate,
   fml::UniqueFD application_assets_directory_;
 
   fidl::Binding<fuchsia::sys::ComponentController> application_controller_;
+  fuchsia::io::DirectoryPtr directory_ptr_;
+  fuchsia::io::NodePtr cloned_directory_ptr_;
   fidl::InterfaceRequest<fuchsia::io::Directory> directory_request_;
   fbl::RefPtr<fs::PseudoDir> outgoing_dir_;
   fs::SynchronousVfs outgoing_vfs_;

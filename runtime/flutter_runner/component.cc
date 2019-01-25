@@ -135,8 +135,7 @@ Application::Application(
                                  std::move(launch_info.directory_request));
   }
 
-  fidl::InterfaceHandle<fuchsia::io::Directory> directory_ptr;
-  directory_request_ = directory_ptr.NewRequest();
+  directory_request_ = directory_ptr_.NewRequest();
 
   fbl::RefPtr<ServiceProviderDir> service_provider_dir =
       fbl::AdoptRef(new ServiceProviderDir);
@@ -144,21 +143,43 @@ Application::Application(
 
   fidl::InterfaceHandle<fuchsia::io::Directory> flutter_public_dir;
 
-  auto chan = directory_ptr.TakeChannel();
-
+  // TODO(anmittal): when fixing enumeration using new c++ vfs, make sure that
+  // flutter_public_dir is only accessed once we recieve OnOpen Event.
+  // That will prevent FL-175 for public directory
   auto request = flutter_public_dir.NewRequest().TakeChannel();
-  fdio_service_connect_at(chan.get(), "public", request.release());
+  fdio_service_connect_at(directory_ptr_.channel().get(), "public",
+                          request.release());
   service_provider_dir->set_fallback(std::move(flutter_public_dir));
 
-  const char* other_dirs[] = {"debug", "ctrl", "object"};
-  // add other directories as RemoteDirs.
-  for (auto& dir_str : other_dirs) {
-    fidl::InterfaceHandle<fuchsia::io::Directory> dir;
-    request = dir.NewRequest().TakeChannel();
-    fdio_service_connect_at(chan.get(), dir_str, request.release());
-    outgoing_dir_->AddEntry(
-        dir_str, fbl::AdoptRef(new fs::RemoteDir(dir.TakeChannel())));
-  }
+  // Clone and check if client is servicing the directory.
+  directory_ptr_->Clone(fuchsia::io::OPEN_FLAG_DESCRIBE |
+                            fuchsia::io::OPEN_RIGHT_READABLE |
+                            fuchsia::io::OPEN_RIGHT_WRITABLE,
+                        cloned_directory_ptr_.NewRequest());
+
+  cloned_directory_ptr_.events().OnOpen =
+      [this](zx_status_t status, std::unique_ptr<fuchsia::io::NodeInfo> info) {
+        cloned_directory_ptr_.Unbind();
+        if (status != ZX_OK) {
+          FML_LOG(ERROR) << "could not bind out directory for flutter app("
+                         << debug_label_
+                         << "): " << zx_status_get_string(status);
+          return;
+        }
+        const char* other_dirs[] = {"debug", "ctrl", "object"};
+        // add other directories as RemoteDirs.
+        for (auto& dir_str : other_dirs) {
+          fidl::InterfaceHandle<fuchsia::io::Directory> dir;
+          auto request = dir.NewRequest().TakeChannel();
+          fdio_service_connect_at(directory_ptr_.channel().get(), dir_str,
+                                  request.release());
+          outgoing_dir_->AddEntry(
+              dir_str, fbl::AdoptRef(new fs::RemoteDir(dir.TakeChannel())));
+        }
+      };
+
+  cloned_directory_ptr_.set_error_handler(
+      [this](zx_status_t status) { cloned_directory_ptr_.Unbind(); });
 
   // TODO: LaunchInfo::additional_services optional.
 

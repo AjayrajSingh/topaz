@@ -759,6 +759,19 @@ void main() {
         });
       });
 
+      test('open file fails for invalid key', () async {
+        PseudoDir dir = _setUpDir();
+
+        var proxy = _getProxyForDir(dir);
+
+        FileProxy fileProxy = FileProxy();
+        await proxy.open(openRightReadable, 0, 'invalid',
+            InterfaceRequest(fileProxy.ctrl.request().passChannel()));
+
+        // channel should be closed
+        fileProxy.ctrl.whenClosed.asStream().listen(expectAsync1((_) {}));
+      });
+
       test('open fails for trying to open file within a file', () async {
         PseudoDir dir = _setUpDir();
 
