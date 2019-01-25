@@ -81,7 +81,7 @@ class XiFuchsiaClient extends FuchsiaSocketClient {
     }
 
     final LaunchInfo launchInfo =
-        new LaunchInfo(url: 'xi_core', directoryRequest: _services.request());
+        new LaunchInfo(url: 'fuchsia-pkg://fuchsia.com/xi_core#meta/xi_core.cmx', directoryRequest: _services.request());
     kContext.launcher.createComponent(launchInfo, null);
     // TODO(jasoncampbell): File a bug for how to get rid of the Dart warning
     // "Unsafe implicit cast from InterfaceHandle<dynamic>"?

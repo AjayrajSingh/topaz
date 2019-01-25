@@ -11,7 +11,7 @@ import 'package:lib.app.dart/logging.dart';
 import 'package:fidl_fuchsia_xi_session/fidl_async.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 
-const String kSessionManagerURL = 'xi_session_agent';
+const String kSessionManagerURL = 'fuchsia-pkg://fuchsia.com/xi_session_agent#meta/xi_session_agent.cmx';
 
 class DemoModel extends Model {
   /// TODO: Refactor this class to use the new SDK instead of deprecated API
@@ -96,7 +96,7 @@ class DemoModel extends Model {
   void connectXiModule(String sessionId) async {
     viewOwner = InterfacePair();
     editorController = new ModuleControllerClient();
-    IntentBuilder intentBuilder = new IntentBuilder.handler('xi_embeddable')
+    IntentBuilder intentBuilder = new IntentBuilder.handler('fuchsia-pkg://fuchsia.com/xi_embeddable#meta/xi_embeddable.cmx')
       ..addParameter('session-id', sessionId);
     driver.moduleContext.proxy.embedModule(
         'xi_embeddable',
