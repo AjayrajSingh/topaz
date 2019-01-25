@@ -8,7 +8,6 @@
         "//topaz/examples/mine_digger",
         "//topaz/examples/ledger/todo_list",
         "//topaz/examples/ledger/todo_list_sledge",
-        "//topaz/examples/ledger/vote_list_sledge",
         "//topaz/examples/media/vu_meter:package"
     ]
 }
