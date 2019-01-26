@@ -6,8 +6,6 @@ import("//build/package.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("flutter_screencap_test_app") {
-  deprecated_bare_package_url = "//build"
-
   main_dart = "lib/main.dart"
 
   meta = [
