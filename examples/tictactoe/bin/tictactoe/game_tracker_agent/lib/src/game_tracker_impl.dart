@@ -8,7 +8,7 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
 import 'package:fidl_fuchsia_sys/fidl_async.dart' as fidl;
 import 'package:fidl_fuchsia_tictactoe/fidl_async.dart' as tictactoe_fidl;
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.component.dart/component.dart';
+import 'package:lib.component.dart/component_async.dart';
 import 'package:sledge/sledge.dart';
 import 'package:tictactoe_common/common.dart';
 
