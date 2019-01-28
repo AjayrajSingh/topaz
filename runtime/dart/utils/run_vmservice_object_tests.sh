@@ -7,7 +7,7 @@ killall dart* || true
 
 # Start up a dart runner app that is guaranteed to be JIT, non-product, and
 # won't terminate.
-run -d hello_dart_jit
+run -d fuchsia-pkg://fuchsia.com/hello_dart_jit#meta/hello_dart_jit.cmx
 
 # Wait for it to come up.
 sleep 2
