@@ -4,7 +4,9 @@
 
 import("//build/package.gni")
 
-executable("mediaplayer_skia") {
+executable("mediaplayer_skia_bin") {
+  output_name = "mediaplayer_skia"
+
   sources = [
     "main.cc",
     "mediaplayer_params.cc",
@@ -28,17 +30,21 @@ executable("mediaplayer_skia") {
   ]
 }
 
-package("package") {
-  deprecated_system_image = true
-  package_name = "mediaplayer_skia"
-
-  deps = [
-    ":mediaplayer_skia",
-  ]
-
+package("mediaplayer_skia") {
   binaries = [
     {
       name = "mediaplayer_skia"
+    },
+  ]
+
+  deps = [
+    ":mediaplayer_skia_bin",
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/mediaplayer_skia.cmx")
+      dest = "mediaplayer_skia.cmx"
     },
   ]
 }

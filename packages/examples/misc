@@ -4,7 +4,7 @@
     ],
     "packages": [
         "//topaz/examples/mediaplayer/mediaplayer_flutter",
-        "//topaz/examples/mediaplayer/mediaplayer_skia:package",
+        "//topaz/examples/mediaplayer/mediaplayer_skia",
         "//topaz/examples/mine_digger",
         "//topaz/examples/ledger/todo_list",
         "//topaz/examples/ledger/todo_list_sledge",

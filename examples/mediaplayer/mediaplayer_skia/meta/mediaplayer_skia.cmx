@@ -1,0 +1,18 @@
+{
+    "program": {
+        "binary": "bin/mediaplayer_skia"
+    },
+    "sandbox": {
+        "features": [
+            "persistent-storage",
+            "system-temp"
+        ],
+        "services": [
+            "fuchsia.fonts.Provider",
+            "fuchsia.mediaplayer.Player",
+            "fuchsia.tracelink.Registry",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.ui.viewsv1.ViewManager"
+        ]
+    }
+}
