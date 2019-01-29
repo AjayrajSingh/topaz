@@ -1,6 +1,7 @@
 {
     "imports": [
         "topaz/packages/examples/dart",
+        "topaz/packages/examples/dart_sdk",
         "topaz/packages/examples/fidl",
         "topaz/packages/examples/flutter_gallery",
         "topaz/packages/examples/misc",
