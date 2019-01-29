@@ -4,6 +4,7 @@
 
 assert(is_fuchsia)
 
+import("//build/test/test_package.gni")
 import("//build/vulkan/config.gni")
 import("//garnet/bin/ui/scenic/config.gni")
 import("$flutter_root/shell/gpu/gpu.gni")
@@ -344,6 +345,8 @@ jit_runner("flutter_jit_product_runner") {
 executable("flutter_runner_unittests") {
   testonly = true
 
+  output_name = "flutter_runner_tests"
+
   sources = [
     "fuchsia_font_manager.cc",
     "fuchsia_font_manager.h",
@@ -363,9 +366,7 @@ executable("flutter_runner_unittests") {
   configs += [ "//third_party/skia:skia_private" ]
 }
 
-package("flutter_runner_tests") {
-  testonly = true
-
+test_package("flutter_runner_tests") {
   deps = [
     ":flutter_runner_unittests",
     "//third_party/skia",
@@ -373,7 +374,7 @@ package("flutter_runner_tests") {
 
   tests = [
     {
-      name = "flutter_runner_unittests"
+      name = "flutter_runner_tests"
     },
   ]
 }

@@ -1,6 +1,6 @@
 {
     "program": {
-        "binary": "test/flutter_runner_unittests"
+        "binary": "test/flutter_runner_tests"
     },
     "sandbox": {
         "services": [
