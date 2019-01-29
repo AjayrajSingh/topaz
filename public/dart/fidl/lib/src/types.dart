@@ -14,6 +14,7 @@ import 'interface.dart';
 import 'struct.dart';
 import 'table.dart';
 import 'union.dart';
+import 'xunion.dart';
 
 // ignore_for_file: public_member_api_docs
 // ignore_for_file: always_specify_types
@@ -711,6 +712,76 @@ class StructType<T extends Struct> extends FidlType<T> {
 
 const int _kEnvelopeSize = 16;
 
+void _encodeEnvelopePresent<T>(Encoder encoder, int offset, T field, FidlType<T> fieldType) {
+  int numHandles = encoder.countHandles();
+  final fieldOffset = encoder.alloc(fieldType.encodedSize);
+  fieldType.encode(encoder, field, fieldOffset);
+  numHandles = encoder.countHandles() - numHandles;
+  final numBytes = encoder.nextOffset() - fieldOffset;
+
+  encoder
+    ..encodeUint32(numBytes, offset)
+    ..encodeUint32(numHandles, offset + 4)
+    ..encodeUint64(kAllocPresent, offset + 8);
+}
+
+void _encodeEnvelopeAbsent(Encoder encoder, int offset) {
+  encoder
+    ..encodeUint64(0, offset)
+    ..encodeUint64(kAllocAbsent, offset + 8);
+}
+
+enum _envelopeMode {
+  kAllowUnknown,
+  kDisallowUnknown,
+}
+
+T _decodeEnvelope<T>(Decoder decoder, int offset, _envelopeMode mode, FidlType<T> fieldType) {
+  final numBytes = decoder.decodeUint32(offset);
+  final numHandles = decoder.decodeUint32(offset + 4);
+  final fieldPresent = decoder.decodeUint64(offset + 8);
+  switch (fieldPresent) {
+    case kAllocPresent:
+      final fieldKnown = fieldType != null;
+      if (fieldKnown) {
+        final fieldOffset = decoder.claimMemory(fieldType.encodedSize);
+        final claimedHandles = decoder.countClaimedHandles();
+        final field = fieldType.decode(decoder, fieldOffset);
+        final numBytesConsumed = decoder.nextOffset() - fieldOffset;
+        final numHandlesConsumed =
+            decoder.countClaimedHandles() - claimedHandles;
+        if (numBytes != numBytesConsumed)
+          throw new FidlError('field was mis-sized');
+        if (numHandles != numHandlesConsumed)
+          throw new FidlError('handles were mis-sized');
+        return field;
+      } else if (mode == _envelopeMode.kAllowUnknown) {
+        decoder.claimMemory(numBytes);
+        for (int i = 0; i < numHandles; i++) {
+          final handle = decoder.claimHandle();
+          try {
+            handle.close();
+            // ignore: avoid_catches_without_on_clauses
+          } catch (e) {
+            // best effort
+          }
+        }
+        return null;
+      } else {
+        throw new FidlError('unknown field');
+      }
+      break;
+    case kAllocAbsent:
+      if (numBytes != 0)
+        throw new FidlError('absent envelope with non-zero bytes');
+      if (numHandles != 0)
+        throw new FidlError('absent envelope with non-zero handles');
+      return null;
+    default:
+      throw new FidlError('Bad reference encoding');
+  }
+}
+
 class TableType<T extends Table> extends FidlType<T> {
   const TableType({
     int encodedSize,
@@ -756,20 +827,9 @@ class TableType<T extends Table> extends FidlType<T> {
       final fieldPresent = field != null;
       if (fieldPresent) {
         final fieldType = members[ordinal];
-        int numHandles = encoder.countHandles();
-        final fieldOffset = encoder.alloc(fieldType.encodedSize);
-        fieldType.encode(encoder, field, fieldOffset);
-        numHandles = encoder.countHandles() - numHandles;
-        final numBytes = encoder.nextOffset() - fieldOffset;
-
-        encoder
-          ..encodeUint32(numBytes, envelopeOffset)
-          ..encodeUint32(numHandles, envelopeOffset + 4)
-          ..encodeUint64(kAllocPresent, envelopeOffset + 8);
+        _encodeEnvelopePresent(encoder, envelopeOffset, field, fieldType);
       } else {
-        encoder
-          ..encodeUint64(0, envelopeOffset)
-          ..encodeUint64(kAllocAbsent, envelopeOffset + 8);
+        _encodeEnvelopeAbsent(encoder, envelopeOffset);
       }
       envelopeOffset += _kEnvelopeSize;
     }
@@ -800,48 +860,12 @@ class TableType<T extends Table> extends FidlType<T> {
     // Envelopes, and fields.
     final Map<int, dynamic> argv = {};
     for (int ordinal = 1; ordinal <= maxOrdinal; ordinal++) {
-      final numBytes = decoder.decodeUint32(envelopeOffset);
-      final numHandles = decoder.decodeUint32(envelopeOffset + 4);
-      final fieldPresent = decoder.decodeUint64(envelopeOffset + 8);
+      final fieldType = members[ordinal];
+      final field = _decodeEnvelope(
+        decoder, envelopeOffset, _envelopeMode.kAllowUnknown, fieldType);
+      if (field != null)
+        argv[ordinal] = field;
       envelopeOffset += _kEnvelopeSize;
-      switch (fieldPresent) {
-        case kAllocPresent:
-          final fieldKnown = members.containsKey(ordinal);
-          if (fieldKnown) {
-            final fieldType = members[ordinal];
-            final fieldOffset = decoder.claimMemory(fieldType.encodedSize);
-            final claimedHandles = decoder.countClaimedHandles();
-            final field = fieldType.decode(decoder, fieldOffset);
-            final numBytesConsumed = decoder.nextOffset() - fieldOffset;
-            final numHandlesConsumed =
-                decoder.countClaimedHandles() - claimedHandles;
-            if (numBytes != numBytesConsumed)
-              throw new FidlError('Table field was mis-sized');
-            if (numHandles != numHandlesConsumed)
-              throw new FidlError('Table handles were mis-sized');
-            argv[ordinal] = field;
-          } else {
-            decoder.claimMemory(numBytes);
-            for (int i = 0; i < numHandles; i++) {
-              final handle = decoder.claimHandle();
-              try {
-                handle.close();
-                // ignore: avoid_catches_without_on_clauses
-              } catch (e) {
-                // best effort
-              }
-            }
-          }
-          break;
-        case kAllocAbsent:
-          // TODO(FIDL-237): We should check that numBytes and numHandles
-          // are 0, and reject messages where this is not the case. This
-          // requires all other bindings from properly memseting to 0
-          // all bytes of the buffer.
-          break;
-        default:
-          throw new FidlError('Bad reference encoding');
-      }
     }
 
     return ctor(argv);
@@ -873,6 +897,44 @@ class UnionType<T extends Union> extends FidlType<T> {
     if (index < 0 || index >= members.length)
       throw new FidlError('Bad union tag index: $index');
     return ctor(index, members[index].decode(decoder, offset));
+  }
+}
+
+class XUnionType<T extends XUnion> extends FidlType<T> {
+  const XUnionType({
+    int encodedSize,
+    this.members,
+    this.ctor,
+  }) : super(encodedSize: encodedSize);
+
+  final Map<int, FidlType> members;
+  final XUnionFactory<T> ctor;
+
+  @override
+  void encode(Encoder encoder, T value, int offset) {
+    final int ordinal = value.$ordinal;
+    final FidlType fieldType = members[ordinal];
+    if (fieldType == null)
+      throw new FidlError('Bad xunion ordinal: $ordinal');
+    encoder.encodeUint32(ordinal, offset);
+    final int envelopeOffset = offset + 8;
+    _encodeEnvelopePresent(encoder, envelopeOffset, value.$data, fieldType);
+  }
+
+  @override
+  T decode(Decoder decoder, int offset) {
+    final int ordinal = decoder.decodeUint32(offset);
+    if (ordinal == 0)
+      throw new FidlError('Empty xunion not yet supported');
+    final fieldType = members[ordinal];
+    if (fieldType == null)
+      throw new FidlError('Bad xunion ordinal: $ordinal');
+    final int envelopeOffset = offset + 8;
+    final field = _decodeEnvelope(
+      decoder, envelopeOffset, _envelopeMode.kDisallowUnknown, fieldType);
+    if (field == null)
+      throw new FidlError('Bad xunion: missing content');
+    return ctor(ordinal, field);
   }
 }
 

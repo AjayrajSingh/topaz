@@ -17,3 +17,4 @@ export 'src/struct.dart';
 export 'src/table.dart';
 export 'src/types.dart';
 export 'src/union.dart';
+export 'src/xunion.dart';

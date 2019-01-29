@@ -24,6 +24,7 @@ dart_library("fidl") {
     "src/table.dart",
     "src/types.dart",
     "src/union.dart",
+    "src/xunion.dart",
   ]
 
   deps = [

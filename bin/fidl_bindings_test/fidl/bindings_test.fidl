@@ -22,6 +22,12 @@ table ExampleTable {
     3: vector<uint8> baz;
 };
 
+xunion ExampleXunion {
+    string foo;
+    int32 bar;
+    vector<uint8> baz;
+};
+
 [Discoverable]
 interface TestServer {
     OneWayNoArgs();
@@ -39,6 +45,9 @@ interface TestServer {
     TwoWayNoArgs() -> ();
     TwoWayStringArg(string value) -> (string value);
     TwoWayThreeArgs(int32 x, uint64 y, NoHandleStruct z) -> (int32 x, uint64 y, NoHandleStruct z);
+
+    OneWayExampleXunion(ExampleXunion value);
+    ReceivedOneWayExampleXunion() -> (ExampleXunion received);
 
     SendEmptyEvent();
     -> EmptyEvent();

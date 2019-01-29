@@ -63,6 +63,9 @@ import 'fidl_async.dart' as $strongly_connect_async;
 {{ range $union := .Unions -}}
 {{ template "UnionDeclaration" $union }}
 {{ end -}}
+{{ range $xunion := .XUnions -}}
+{{ template "XUnionDeclaration" $xunion }}
+{{ end -}}
 {{ range $struct := .Structs -}}
 {{ template "StructDeclaration" $struct }}
 {{ end -}}
@@ -135,6 +138,9 @@ import '{{ .AsyncURL }}' as {{ .LocalName }};
 {{ end -}}
 {{ range $union := .Unions -}}
 {{ template "UnionDeclaration" $union }}
+{{ end -}}
+{{ range $xunion := .XUnions -}}
+{{ template "XUnionDeclaration" $xunion }}
 {{ end -}}
 {{ range $struct := .Structs -}}
 {{ template "StructDeclaration" $struct }}

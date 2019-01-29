@@ -65,6 +65,7 @@ func GenerateFidl(fidl types.Root, config *types.Config, dartfmt string) error {
 	template.Must(tmpls.Parse(templates.Struct))
 	template.Must(tmpls.Parse(templates.Table))
 	template.Must(tmpls.Parse(templates.Union))
+	template.Must(tmpls.Parse(templates.XUnion))
 
 	err := writeFile(config.OutputBase+"/fidl.dart", "GenerateLibraryFile", tmpls, tree, dartfmt)
 	if err != nil {

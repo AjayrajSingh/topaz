@@ -74,6 +74,26 @@ type UnionMember struct {
 	Documented
 }
 
+// XUnion represents a union declaration.
+type XUnion struct {
+	Name       string
+	TagName    string
+	Members    []XUnionMember
+	TypeSymbol string
+	TypeExpr   string
+	Documented
+}
+
+// XUnionMember represents a member of a xunion declaration.
+type XUnionMember struct {
+	Ordinal  int
+	Type     Type
+	Name     string
+	CtorName string
+	Offset   int
+	Documented
+}
+
 // Struct represents a struct declaration.
 type Struct struct {
 	Name             string
@@ -172,6 +192,7 @@ type Root struct {
 	Structs     []Struct
 	Tables      []Table
 	Unions      []Union
+	XUnions     []XUnion
 }
 
 // FIXME(FIDL-107): Add "get" and "set" back to this list.
@@ -375,6 +396,19 @@ func formatUnionMemberList(members []UnionMember) string {
 	}
 
 	return fmt.Sprintf("const <$fidl.MemberType>[\n%s  ]", strings.Join(lines, ""))
+}
+
+func formatXUnionMemberList(members []XUnionMember) string {
+	if len(members) == 0 {
+		return "const <int, $fidl.FidlType>{}"
+	}
+
+	var lines []string
+	for _, v := range members {
+		lines = append(lines, fmt.Sprintf("    %d: %s,\n", v.Ordinal, v.Type.typeExpr))
+	}
+
+	return fmt.Sprintf("const <int, $fidl.FidlType>{\n%s  }", strings.Join(lines, ""))
 }
 
 func formatLibraryName(library types.LibraryIdentifier) string {
@@ -616,6 +650,8 @@ func (c *compiler) compileType(val types.Type) Type {
 		case types.TableDeclType:
 			fallthrough
 		case types.UnionDeclType:
+			fallthrough
+		case types.XUnionDeclType:
 			r.Decl = t
 			if c.inExternalLibrary(compound) {
 				r.SyncDecl = fmt.Sprintf("sync$%s", t)
@@ -915,6 +951,37 @@ func (c *compiler) compileUnion(val types.Union) Union {
 	return r
 }
 
+func (c *compiler) compileXUnion(val types.XUnion) XUnion {
+	var members []XUnionMember
+	for _, member := range val.Members {
+		memberType := c.compileType(member.Type)
+		members = append(members, XUnionMember{
+			Ordinal:    member.Ordinal,
+			Type:       memberType,
+			Name:       c.compileLowerCamelIdentifier(member.Name),
+			CtorName:   c.compileUpperCamelIdentifier(member.Name),
+			Offset:     member.Offset,
+			Documented: docString(member),
+		})
+	}
+
+	ci := types.ParseCompoundIdentifier(val.Name)
+	r := XUnion{
+		Name:       c.compileUpperCamelCompoundIdentifier(ci, ""),
+		TagName:    c.compileUpperCamelCompoundIdentifier(ci, "Tag"),
+		TypeSymbol: c.typeSymbolForCompoundIdentifier(ci),
+		Members:    members,
+		Documented: docString(val),
+	}
+	r.TypeExpr = fmt.Sprintf(`const $fidl.XUnionType<%s>(
+  encodedSize: %v,
+  members: %s,
+  ctor: %s._ctor,
+)`, r.Name, val.Size, formatXUnionMemberList(r.Members), r.Name)
+
+	return r
+}
+
 // Compile the language independent type definition into the Dart-specific representation.
 func Compile(r types.Root) Root {
 	root := Root{}
@@ -944,6 +1011,10 @@ func Compile(r types.Root) Root {
 
 	for _, v := range r.Unions {
 		root.Unions = append(root.Unions, c.compileUnion(v))
+	}
+
+	for _, v := range r.XUnions {
+		root.XUnions = append(root.XUnions, c.compileXUnion(v))
 	}
 
 	for _, l := range r.Libraries {

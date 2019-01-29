@@ -65,6 +65,18 @@ class TestServerImpl extends TestServer {
     return _oneWayExampleTable;
   }
 
+  ExampleXunion _oneWayExampleXunion;
+
+  @override
+  Future<void> oneWayExampleXunion(ExampleXunion value) async {
+    _oneWayExampleXunion = value;
+  }
+
+  @override
+  Future<ExampleXunion> receivedOneWayExampleXunion() async {
+    return _oneWayExampleXunion;
+  }
+
   @override
   Future<void> twoWayNoArgs() async {}
 

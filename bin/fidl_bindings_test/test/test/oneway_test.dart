@@ -75,5 +75,34 @@ void main() async {
       expect(received.bar, equals(null));
       expect(received.baz, equals(null));
     });
+
+    test('xunion with string', () async {
+      await server.proxy.oneWayExampleXunion(
+        ExampleXunion.withFoo('hello'));
+      final received = await server.proxy.receivedOneWayExampleXunion();
+      expect(received.foo, equals('hello'));
+      expect(received.bar, equals(null));
+      expect(received.baz, equals(null));
+    });
+
+    test('xunion with int', () async {
+      await server.proxy.oneWayExampleXunion(
+        ExampleXunion.withBar(1729));
+      final received = await server.proxy.receivedOneWayExampleXunion();
+      expect(received.foo, equals(null));
+      expect(received.bar, equals(1729));
+      expect(received.baz, equals(null));
+    });
+
+    test('xunion with vector of bytes', () async {
+      final primes =
+          new Uint8List.fromList([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]);
+      await server.proxy.oneWayExampleXunion(
+        ExampleXunion.withBaz(primes));
+      final received = await server.proxy.receivedOneWayExampleXunion();
+      expect(received.foo, equals(null));
+      expect(received.bar, equals(null));
+      expect(received.baz, unorderedEquals(primes));
+    });
   });
 }
