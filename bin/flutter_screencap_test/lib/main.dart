@@ -94,7 +94,7 @@ void runTestIterations() {
   Stopwatch stopWatch = new Stopwatch()..start();
   new Timer(const Duration(seconds: kDelayBeforeCaptureSeconds), () {
     LaunchInfo launchInfo =
-        new LaunchInfo(url: 'screencap', arguments: ['-histogram']);
+        new LaunchInfo(url: 'fuchsia-pkg://fuchsia.com/screencap#meta/screencap.cmx', arguments: ['-histogram']);
     final ComponentControllerProxy controller = new ComponentControllerProxy();
     log.info('attempting to launch screencap');
     launcherProxy.createComponent(launchInfo, controller.ctrl.request());
