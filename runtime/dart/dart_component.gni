@@ -844,6 +844,7 @@ template("flutter_dart_aot_component") {
       }
 
       args = [
+        "--no_causal_async_stacks",
         "--deterministic",
         "--snapshot_kind=app-aot-blobs",
         "--vm_snapshot_data=" + rebase_path(vm_snapshot_data_path),
