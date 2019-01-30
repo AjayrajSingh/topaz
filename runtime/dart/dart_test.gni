@@ -208,14 +208,14 @@ if (current_toolchain == dart_toolchain) {
     _invocation_file = "$target_gen_dir/$target_name"
 
     if (is_linux || is_mac) {
+      # TODO(IN-819): Delete renaming when dart tests are no longer run out of one
+      # directory
+      _invocation_file = "$root_out_dir/$target_name"
+
       test_spec(target_name) {
         name = target_name
         location = _invocation_file
       }
-
-      # TODO(IN-819): Delete renaming when dart tests are no longer run out of one
-      # directory
-      _invocation_file = "$root_out_dir/$target_name"
     }
 
     action(target_name) {
