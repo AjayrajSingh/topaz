@@ -1,5 +1,0 @@
-{
-    "packages": [
-        "//topaz/examples/bluetooth/ble_scanner"
-    ]
-}

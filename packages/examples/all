@@ -1,6 +1,5 @@
 {
     "imports": [
-        "topaz/packages/examples/bluetooth",
         "topaz/packages/examples/dart",
         "topaz/packages/examples/fidl",
         "topaz/packages/examples/flutter_gallery",
