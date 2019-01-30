@@ -20,7 +20,6 @@
         "topaz/packages/prod/flutter_jit",
         "topaz/packages/prod/flutter_jit_product",
         "topaz/packages/prod/google_auth_provider",
-        "topaz/packages/prod/infinite_scroller",
         "topaz/packages/prod/latin-ime",
         "topaz/packages/prod/maxwell",
         "topaz/packages/prod/modules_index",
