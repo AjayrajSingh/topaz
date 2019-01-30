@@ -1,10 +1,10 @@
-// Copyright 2019 The Fuchsia Authors. All rights reserved.
+// Copyright 2018 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
 import 'dart:async';
 
-import 'package:fidl_fuchsia_devicesettings/fidl_async.dart';
+import 'package:fidl_fuchsia_devicesettings/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:protobuf/protobuf.dart';
 
@@ -43,34 +43,39 @@ class SettingStore<T extends GeneratedMessage> extends DeviceSettingsWatcher {
   /// Connects to the device settings service and fetches the initial value.
   /// This is separate from the constructor to allow clients to add a listener
   /// beforehand.
-  Future<void> connect() async {
-    await _deviceSettingsManagerService.watch(
-        _settingsKey, _deviceSettingsWatcherBinding.wrap(this));
+  void connect() {
+    _deviceSettingsManagerService.watch(
+        _settingsKey, _deviceSettingsWatcherBinding.wrap(this), null);
 
-    await _fetch();
+    _fetch();
   }
 
-  Future<void> _fetch() async {
-    await _deviceSettingsManagerService
-        .getString(_settingsKey)
-        .then((response) {
-      _tmpSetting.clear();
-      _tmpSetting.mergeFromJson(response.val);
-      _updateStreamController.add(_tmpSetting.clone());
+  void _fetch() {
+    _deviceSettingsManagerService.getString(_settingsKey,
+        (String val, Status status) {
+      if (status == Status.ok) {
+        _tmpSetting.clear();
+        _tmpSetting.mergeFromJson(val);
+        _updateStreamController.add(_tmpSetting.clone());
+      }
     });
   }
 
   /// Persists the provided setting's values to device settings.
-  Future<void> commit(T setting) async {
-    await _deviceSettingsManagerService
-        .setString(_settingsKey, setting.writeToJson())
-        .catchError((e) =>
-            log.warning('Could not persist value at key: $_settingsKey: ', e));
+  void commit(T setting) {
+    _deviceSettingsManagerService.setString(_settingsKey, setting.writeToJson(),
+        (bool result) {
+      if (result) {
+        return;
+      }
+
+      log.warning('Could not persist value at key: $_settingsKey');
+    });
   }
 
   /// Upon a setting change, refetch value.
   @override
-  Future<void> onChangeSettings(ValueType type) async {
-    await _fetch();
+  void onChangeSettings(ValueType type) {
+    _fetch();
   }
 }

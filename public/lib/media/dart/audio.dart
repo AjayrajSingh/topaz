@@ -1,10 +1,12 @@
-// Copyright 2019 The Fuchsia Authors. All rights reserved.
+// Copyright 2017 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_media/fidl_async.dart';
-import 'package:fuchsia_services/services.dart';
-import 'package:fuchsia_logger/logger.dart';
+import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_media/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:settings_protos/audio.pb.dart' as stored_audio;
 import 'package:settings_protos/setting_store.dart';
 import 'package:settings_protos/setting_store_factory.dart';
@@ -32,36 +34,27 @@ class Audio {
   SettingStore<stored_audio.Audio> _store;
 
   /// Constructs an Audio object.
-  Audio() {
-    try {
-      connectToEnvironmentService(_audioService);
-    } on Exception catch (error) {
-      log.severe('Unable to connect to audio service', error);
-    }
-
-    _audioService.systemGainMuteChanged.forEach(_handleGainMuteChanged);
-
-    _store = new SettingStoreFactory().createAudioStore()
+  Audio(ServiceProvider services) {
+    connectToService(services, _audioService.ctrl);
+    _audioService.ctrl.onConnectionError = _handleConnectionError;
+    _audioService.ctrl.error
+        .then((ProxyError error) => _handleConnectionError(error: error));
+    _audioService.systemGainMuteChanged = _handleGainMuteChanged;
+    _store = new SettingStoreFactory(services).createAudioStore()
       ..addlistener(_onSettingChanged)
-      ..connect().catchError(
-          (e) => log.severe('Unable to connect to setting store service', e));
+      ..connect();
   }
 
   /// Called when properties have changed significantly.
   UpdateCallback updateCallback;
 
-  void _onSettingChanged(stored_audio.Audio value) async {
-    await setSystemAudioGainDb(value.gain);
-    await setSystemAudioMuted(value.muted);
+  void _onSettingChanged(stored_audio.Audio value) {
+    systemAudioGainDb = value.gain;
+    systemAudioMuted = value.muted;
   }
 
   /// Disposes this object.
   void dispose() {
-    if (_audioService.ctrl.isClosed) {
-      log.warning('Audio service is already closed');
-      return;
-    }
-
     _audioService.ctrl.close();
   }
 
@@ -73,7 +66,7 @@ class Audio {
   /// -160db to 0db inclusive. When gain is set to -160db, |systemAudioMuted| is
   /// implicitly set to true. When gain is changed from -160db to a higher
   /// value, |systemAudioMuted| is implicitly set to false.
-  Future<void> setSystemAudioGainDb(double value) async {
+  set systemAudioGainDb(double value) {
     double clampedValue = value.clamp(mutedGainDb, _unityGainDb);
     if (_systemAudioGainDb == clampedValue) {
       return;
@@ -86,9 +79,7 @@ class Audio {
       _systemAudioMuted = true;
     }
 
-    await _audioService
-        .setSystemGain(_systemAudioGainDb)
-        .catchError((_) => log.warning('Could not set the audio system gain.'));
+    _audioService.setSystemGain(_systemAudioGainDb);
   }
 
   /// Gets system-wide audio muted state. |systemAudioMuted| is always true
@@ -97,25 +88,24 @@ class Audio {
 
   /// Sets system-wide audio muted state. Setting this value to false when
   /// |systemAudioGainDb| is -160db has no effect.
-  // ignore: avoid_positional_boolean_parameters
-  Future<void> setSystemAudioMuted(bool value) async {
+  set systemAudioMuted(bool value) {
     bool muted = value || _systemAudioGainDb == mutedGainDb;
     if (_systemAudioMuted == muted) {
       return;
     }
 
     _systemAudioMuted = muted;
-    await _audioService.setSystemMute(_systemAudioMuted);
+    _audioService.setSystemMute(_systemAudioMuted);
 
-    await _persistUserSetting();
+    _persistUserSetting();
   }
 
-  Future<void> _persistUserSetting() async {
+  void _persistUserSetting() {
     final stored_audio.Audio audio = new stored_audio.Audio()
       ..clear()
       ..muted = _systemAudioMuted
       ..gain = _systemAudioGainDb;
-    await _store.commit(audio);
+    _store.commit(audio);
   }
 
   /// Gets the perceived system-wide audio level in the range [0,1]. This value
@@ -125,21 +115,22 @@ class Audio {
 
   /// Sets the perceived system-wide audio level in the range [0,1]. When this
   /// property is set to 0.0, |systemAudioGainDb| is set to -160db.
-  Future<void> setSystemAudioPerceivedLevel(double value) async {
+  set systemAudioPerceivedLevel(double value) {
     _systemAudioPerceivedLevel = value.clamp(0.0, 1.0);
     _systemAudioGainDb = levelToGain(_systemAudioPerceivedLevel);
 
-    await _persistUserSetting();
-    await _audioService.setSystemGain(_systemAudioGainDb);
+    _persistUserSetting();
+    _audioService.setSystemGain(_systemAudioGainDb);
   }
 
-  // Handles a status update from the audio service.
-  void _handleGainMuteChanged(Audio$SystemGainMuteChanged$Response response) {
-    bool callUpdate = _systemAudioMuted != response.muted ||
-        (_systemAudioGainDb - response.gainDb).abs() > _minDbDiff;
+  // Handles a status update from the audio service. Call with
+  // kInitialStatus, null to initiate status updates.
+  void _handleGainMuteChanged(double gainDb, bool muted) {
+    bool callUpdate = _systemAudioMuted != muted ||
+        (_systemAudioGainDb - gainDb).abs() > _minDbDiff;
 
-    _systemAudioGainDb = response.gainDb;
-    _systemAudioMuted = response.muted;
+    _systemAudioGainDb = gainDb;
+    _systemAudioMuted = muted;
 
     double newPerceivedLevel = gainToLevel(_systemAudioGainDb);
     if ((_systemAudioPerceivedLevel - newPerceivedLevel).abs() >
@@ -151,6 +142,11 @@ class Audio {
     if (callUpdate && updateCallback != null) {
       updateCallback();
     }
+  }
+
+  /// Handles connection error to the audio service.
+  void _handleConnectionError({ProxyError error}) {
+    log.severe('Unable to connect to audio service', error);
   }
 
   void setRoutingPolicy(AudioOutputRoutingPolicy policy) {
