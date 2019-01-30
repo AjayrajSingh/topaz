@@ -6,7 +6,6 @@
     "packages": [
         "//topaz/bin/session_shell/capybara_session_shell",
         "//topaz/bin/session_shell/ermine_session_shell:ermine",
-        "//topaz/bin/ermine_ctl:ermine_ctl",
-        "//topaz/shell/kernel_panic"
+        "//topaz/bin/ermine_ctl:ermine_ctl"
     ]
 }
