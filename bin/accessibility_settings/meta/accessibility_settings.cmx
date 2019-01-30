@@ -8,6 +8,7 @@
             "fuchsia.modular.Clipboard",
             "fuchsia.modular.ContextWriter",
             "fuchsia.sys.Environment",
+            "fuchsia.ui.input.ImeService",
             "fuchsia.ui.scenic.Scenic",
             "fuchsia.ui.viewsv1.ViewManager"
         ]
