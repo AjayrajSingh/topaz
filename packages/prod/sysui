@@ -7,7 +7,6 @@
         "//topaz/bin/session_shell/capybara_session_shell",
         "//topaz/bin/session_shell/ermine_session_shell:ermine",
         "//topaz/bin/ermine_ctl:ermine_ctl",
-        "//topaz/shell/agents/home_work_agent",
         "//topaz/shell/kernel_panic"
     ]
 }

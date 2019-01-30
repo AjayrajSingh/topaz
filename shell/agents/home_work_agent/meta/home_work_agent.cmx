@@ -1,9 +1,0 @@
-{
-    "program": {
-        "data": "data/home_work_agent"
-    },
-    "sandbox": {
-        "system": [ "bin", "pkgs" ],
-        "pkgfs": [ "packages" ]
-    }
-}
