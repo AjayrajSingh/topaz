@@ -64,7 +64,7 @@ class LifecycleImpl extends fidl.Lifecycle implements Lifecycle {
   // This class be must called before the first iteration of the event loop.
   void _exposeService() {
     StartupContext startupContext = StartupContext.fromStartupInfo();
-    startupContext.outgoingServices.addServiceForName(
+    startupContext.outgoing.addPublicService(
       (InterfaceRequest<fidl.Lifecycle> request) {
         _lifecycleBinding.bind(this, request);
       },

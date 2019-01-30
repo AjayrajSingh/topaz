@@ -54,7 +54,7 @@ class IntentHandlerImpl extends fidl.IntentHandler {
 
   // any necessary cleanup should be done in this method.
   void _exposeService(StartupContext startupContext) {
-    startupContext.outgoingServices.addServiceForName(
+    startupContext.outgoing.addPublicService(
       (InterfaceRequest<fidl.IntentHandler> request) {
         _clearBinding();
         _intentHandlerBinding = fidl.IntentHandlerBinding()

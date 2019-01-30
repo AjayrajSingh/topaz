@@ -6,7 +6,7 @@ import 'dart:async';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fidl_examples_echo/fidl_async.dart' as fidl_echo;
-import 'package:lib.app.dart/app_async.dart';
+import 'package:fuchsia_services/services.dart';
 
 bool _quiet = false;
 
@@ -32,6 +32,6 @@ void main(List<String> args) {
   final context = StartupContext.fromStartupInfo();
   final echo = _EchoImpl();
 
-  context.outgoingServices.addServiceForName<fidl_echo.Echo>(
+  context.outgoing.addPublicService<fidl_echo.Echo>(
       echo.bind, fidl_echo.Echo.$serviceName);
 }

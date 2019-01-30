@@ -181,12 +181,12 @@ class AgentImpl extends fidl.Agent implements Agent {
   }
 
   /// Exposes this [fidl.Agent] instance to the
-  /// [StartupContext#outgoingServices]. In other words, advertises this as an
+  /// [StartupContext#addPublicService]. In other words, advertises this as an
   /// [fidl.Agent] to the rest of the system via the [StartupContext].
   ///
   /// This class be must called before the first iteration of the event loop.
   void _exposeAgent(StartupContext startupContext) {
-    startupContext.outgoingServices.addServiceForName(
+    startupContext.outgoing.addPublicService(
       (InterfaceRequest<fidl.Agent> request) {
         assert(!_agentBinding.isBound);
         _agentBinding.bind(this, request);

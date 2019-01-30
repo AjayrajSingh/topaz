@@ -41,16 +41,16 @@ class MockTokenManagerProxy extends Mock
 
 void main() {
   setupLogger();
-  test('startupContext ', () {
+  test('verify agent is exposed during construction of AgentImpl', () {
     final mockStartupContext = MockStartupContext();
     final mockOutgoingImpl = MockOutgoing();
-    when(mockStartupContext.outgoingServices).thenReturn(mockOutgoingImpl);
+    when(mockStartupContext.outgoing).thenReturn(mockOutgoingImpl);
 
     AgentImpl(startupContext: mockStartupContext);
-    verify(mockOutgoingImpl.addServiceForName(any, fidl.Agent.$serviceName));
+    verify(mockOutgoingImpl.addPublicService(any, fidl.Agent.$serviceName));
   });
 
-  test('verify Lifecycle init during the construction of ModuleImpl', () {
+  test('verify Lifecycle init during the construction of AgentImpl', () {
     final mockLifecycle = MockLifecycle();
     AgentImpl(lifecycle: mockLifecycle);
     verify(mockLifecycle.addTerminateListener(any));

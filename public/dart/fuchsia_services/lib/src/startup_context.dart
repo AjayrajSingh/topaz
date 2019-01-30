@@ -28,9 +28,6 @@ class StartupContext {
   /// the services exposed to the component on launch.
   final fidl.ServiceProvider environmentServices;
 
-  /// deprecated, use [outgoing].
-  final Outgoing outgoingServices;
-
   /// The service provider which can be used to expose outgoing services
   /// and other directories.
   final Outgoing outgoing;
@@ -42,12 +39,11 @@ class StartupContext {
     @required this.environment,
     @required this.launcher,
     @required this.environmentServices,
-    @required this.outgoingServices,
+    @required this.outgoing,
   })  : assert(environment != null),
         assert(launcher != null),
         assert(environmentServices != null),
-        assert(outgoingServices != null),
-        outgoing = outgoingServices;
+        assert(outgoing != null);
 
   /// Returns the [StartupContext] cached instance associated with the
   /// currently running component.
@@ -69,7 +65,7 @@ class StartupContext {
       environment: environmentProxy,
       launcher: launcherProxy,
       environmentServices: environmentServicesProxy,
-      outgoingServices: outgoingImpl,
+      outgoing: outgoingImpl,
     );
 
     final Handle environmentHandle = MxStartupInfo.takeEnvironment();
