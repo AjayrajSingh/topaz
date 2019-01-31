@@ -7,10 +7,16 @@
 #include <lib/component/cpp/environment_services_helper.h>
 #include <lib/fxl/strings/string_printf.h>
 
-#include "topaz/tests/web_runner_smoke_tests/test_server.h"
+#include "topaz/tests/web_runner_tests/test_server.h"
 
-TEST(WebRunnerTest, Smoke) {
-  web_runner_smoke_tests::TestServer server;
+// This is a black box smoke test for whether the web runner in a given system
+// is capable of performing basic operations.
+//
+// This currently tests if launching a component with an HTTP URL triggers an
+// HTTP GET for the main resource, and if an HTML response with an <img> tag
+// triggers a subresource load for the image.
+TEST(WebRunnerIntegrationTest, Smoke) {
+  web_runner_tests::TestServer server;
 
   ASSERT_TRUE(server.FindAndBindPort());
 
@@ -35,12 +41,7 @@ TEST(WebRunnerTest, Smoke) {
 
   EXPECT_EQ(expected_prefix, std::string(buf.data(), expected_prefix.size()));
 
-  std::string page = "<!doctype html><img src=\"/img.png\">";
-  std::string response = "HTTP/1.1 200 OK\r\n";
-  response += fxl::StringPrintf("Content-Length: %ld\r\n", page.size());
-  response += "\r\n" + page;
-
-  ASSERT_TRUE(server.Write(response));
+  ASSERT_TRUE(server.WriteContent("<!doctype html><img src=\"/img.png\">"));
 
   expected_prefix = "GET /img.png HTTP";
   buf.resize(4096);

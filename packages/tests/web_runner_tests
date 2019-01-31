@@ -1,0 +1,5 @@
+{
+  "packages": [
+        "//topaz/tests/web_runner_tests"
+    ]
+}

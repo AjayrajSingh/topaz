@@ -1,5 +1,0 @@
-{
-  "packages": [
-        "//topaz/tests/web_runner_smoke_tests"
-    ]
-}

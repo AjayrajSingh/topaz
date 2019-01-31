@@ -1,0 +1,93 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/package.gni")
+import("//build/test/test_package.gni")
+
+source_set("test_server") {
+  testonly = true
+
+  sources = [
+    "test_server.cc",
+    "test_server.h",
+  ]
+
+  deps = [
+    "//garnet/public/lib/fxl",
+  ]
+}
+
+executable("web_runner_integration_tests") {
+  testonly = true
+
+  sources = [
+    "web_runner_integration_tests.cc",
+  ]
+
+  deps = [
+    ":test_server",
+    "//garnet/public/lib/component/cpp/testing",
+    "//garnet/public/lib/fxl",
+    "//sdk/fidl/fuchsia.sys",
+    "//third_party/googletest:gtest_main",
+  ]
+}
+
+executable("web_runner_pixel_tests") {
+  testonly = true
+
+  sources = [
+    "web_runner_pixel_tests.cc",
+  ]
+
+  deps = [
+    ":test_server",
+    "//garnet/public/lib/component/cpp/testing",
+    "//garnet/public/lib/fsl",
+    "//sdk/fidl/fuchsia.sys",
+    "//sdk/fidl/fuchsia.ui.policy",
+    "//sdk/fidl/fuchsia.ui.scenic",
+    "//third_party/googletest:gtest_main",
+    "//topaz/runtime/chromium:chromium.web",
+  ]
+}
+
+package("web_runner_tests") {
+  testonly = true
+
+  deps = [
+    ":web_runner_integration_tests",
+    ":web_runner_pixel_tests",
+  ]
+
+  tests = [
+    {
+      name = "web_runner_integration_tests"
+    },
+    {
+      name = "web_runner_pixel_tests"
+      environments = [
+        {
+          dimensions = {
+            device_type = "Intel NUC Kit NUC7i5DNHE"
+          }
+        },
+      ]
+    },
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/web_runner_pixel_tests.cmx")
+      dest = "web_runner_pixel_tests.cmx"
+    },
+  ]
+
+  resources = [
+    {
+      path = rebase_path("data/static.html")
+      dest = "static.html"
+    },
+  ]
+}

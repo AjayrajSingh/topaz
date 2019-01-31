@@ -2,15 +2,15 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#ifndef TOPAZ_TESTS_WEB_RUNNER_SMOKE_TESTS_TEST_SERVER_H_
-#define TOPAZ_TESTS_WEB_RUNNER_SMOKE_TESTS_TEST_SERVER_H_
+#ifndef TOPAZ_TESTS_WEB_RUNNER_TESTS_TEST_SERVER_H_
+#define TOPAZ_TESTS_WEB_RUNNER_TESTS_TEST_SERVER_H_
 
 #include <string>
 #include <vector>
 
 #include <lib/fxl/files/unique_fd.h>
 
-namespace web_runner_smoke_tests {
+namespace web_runner_tests {
 
 // This is a simple TCP server that binds to a random port on localhost and
 // serves a single connection.
@@ -18,6 +18,9 @@ class TestServer {
  public:
   // This attempts to find an available port the server to.
   bool FindAndBindPort();
+
+  // Closes the bound socket file descriptor, cancelling any pending |Accept|.
+  void Close();
 
   // This accepts exactly one incoming connection.
   bool Accept();
@@ -29,6 +32,10 @@ class TestServer {
   // Writes data from |buf| into the currently open connection.
   bool Write(const std::string& buf);
 
+  // Writes message content into the currently open connection, preceeded by an
+  // appropriate HTTP response header.
+  bool WriteContent(const std::string& content);
+
   // Port number in use.
   int port() const { return port_; }
 
@@ -38,6 +45,6 @@ class TestServer {
   int port_ = -1;
 };
 
-}  // namespace web_runner_smoke_tests
+}  // namespace web_runner_tests
 
-#endif  // TOPAZ_TESTS_WEB_RUNNER_SMOKE_TESTS_TEST_SERVER_H_
+#endif  // TOPAZ_TESTS_WEB_RUNNER_TESTS_TEST_SERVER_H_

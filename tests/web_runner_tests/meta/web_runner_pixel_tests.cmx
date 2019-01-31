@@ -1,0 +1,33 @@
+{
+    "facets": {
+        "fuchsia.test": {
+            "injected-services": {
+                "chromium.web.ContextProvider": "fuchsia-pkg://fuchsia.com/chromium#meta/chromium.cmx",
+                "fuchsia.ui.input.ImeVisibilityService": "fuchsia-pkg://fuchsia.com/ime_service#meta/ime_service.cmx",
+                "fuchsia.ui.policy.Presenter": "fuchsia-pkg://fuchsia.com/root_presenter#meta/root_presenter.cmx",
+                "fuchsia.ui.scenic.Scenic": "fuchsia-pkg://fuchsia.com/scenic#meta/scenic.cmx",
+                "fuchsia.ui.viewsv1.ViewManager": "fuchsia-pkg://fuchsia.com/view_manager#meta/view_manager.cmx",
+                "fuchsia.vulkan.loader.Loader": "fuchsia-pkg://fuchsia.com/vulkan_loader#meta/vulkan_loader.cmx"
+            },
+            "system-services": [
+                "fuchsia.net.SocketProvider",
+                "fuchsia.netstack.Netstack"
+            ]
+        }
+    },
+    "program": {
+        "binary": "test/web_runner_pixel_tests"
+    },
+    "sandbox": {
+        "services": [
+            "chromium.web.ContextProvider",
+            "fuchsia.net.SocketProvider",
+            "fuchsia.netstack.Netstack",
+            "fuchsia.process.Launcher",
+            "fuchsia.ui.input.ImeVisibilityService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.ui.viewsv1.ViewManager"
+        ]
+    }
+}

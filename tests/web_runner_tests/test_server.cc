@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "topaz/tests/web_runner_smoke_tests/test_server.h"
+#include "topaz/tests/web_runner_tests/test_server.h"
 
 #include <arpa/inet.h>
 #include <errno.h>
@@ -13,7 +13,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-namespace web_runner_smoke_tests {
+namespace web_runner_tests {
 
 bool TestServer::FindAndBindPort() {
   socket_.reset(socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP));
@@ -44,6 +44,8 @@ bool TestServer::FindAndBindPort() {
   return true;
 }
 
+void TestServer::Close() { socket_.reset(); }
+
 bool TestServer::Accept() {
   conn_.reset(accept(socket_.get(), nullptr, nullptr));
   return conn_.is_valid();
@@ -62,4 +64,12 @@ bool TestServer::Write(const std::string& buf) {
   return ret == static_cast<ssize_t>(buf.size());
 }
 
-}  // namespace web_runner_smoke_tests
+bool TestServer::WriteContent(const std::string& content) {
+  std::ostringstream response;
+  response << "HTTP/1.1 200 OK\r\n"
+           << "Content-Length: " << content.size() << "\r\n\r\n"
+           << content;
+  return Write(response.str());
+}
+
+}  // namespace web_runner_tests
