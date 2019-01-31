@@ -51,8 +51,9 @@ class _ModuleControllerWrapper {
 
 /// Starts a predefined test container
 void startContainerInShell() {
-  IntentBuilder intentBuilder =
-      new IntentBuilder.handler('example_manual_relationships');
+  IntentBuilder intentBuilder = new IntentBuilder.handler(
+      'fuchsia-pkg://fuchsia.com/example_manual_relationships#meta/example_manual_relationships.cmx');
+
   const List<double> leftRect = const <double>[0.0, 0.0, 0.5, 1.0];
   const List<double> trRect = const <double>[0.5, 0.0, 0.5, 0.5];
   const List<double> brRect = const <double>[0.5, 0.5, 0.5, 0.5];

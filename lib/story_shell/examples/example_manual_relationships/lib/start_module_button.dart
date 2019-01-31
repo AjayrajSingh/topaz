@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:lib.module_resolver.dart/intent_builder.dart';
 
-const String _kModuleUrl = 'example_manual_relationships';
+const String _kModuleUrl =
+    'fuchsia-pkg://fuchsia.com/example_manual_relationships#meta/example_manual_relationships.cmx';
 
 typedef GenerateChildId = String Function();
 
