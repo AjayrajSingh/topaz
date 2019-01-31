@@ -950,7 +950,7 @@ class _TestVnode extends Vnode {
 
   @override
   int connect(int flags, int mode, InterfaceRequest<Node> request,
-      [int parentFlags]) {
+      [int parentFlags = -1]) {
     throw UnimplementedError();
   }
 
