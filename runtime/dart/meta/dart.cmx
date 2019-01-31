@@ -8,7 +8,6 @@
             "system-temp"
         ],
         "services": [
-            "fuchsia.net.LegacySocketProvider",
             "fuchsia.net.SocketProvider",
             "fuchsia.timezone.Timezone",
             "fuchsia.tracelink.Registry"

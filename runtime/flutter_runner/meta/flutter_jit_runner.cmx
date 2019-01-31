@@ -9,7 +9,6 @@
         ],
         "services": [
             "fuchsia.fonts.Provider",
-            "fuchsia.net.LegacySocketProvider",
             "fuchsia.net.SocketProvider",
             "fuchsia.timezone.Timezone",
             "fuchsia.tracelink.Registry",
