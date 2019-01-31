@@ -110,7 +110,6 @@ template("_flutter_dart_jit_package") {
                            [
                              "testonly",
                              "tests",
-                             "deprecated_bare_package_url",
                            ])
     package_name = invoker.pkg_name
     deps = invoker.cmx_deps
@@ -524,7 +523,6 @@ template("_flutter_dart_aot_package") {
                            [
                              "testonly",
                              "tests",
-                             "deprecated_bare_package_url",
                            ])
 
     package_name = invoker.pkg_name
