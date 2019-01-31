@@ -8,5 +8,5 @@ To update this trace.
   - In //topaz/runtime/flutter_runner/meta/flutter_jit_runner.cmx, add "persistent-storage" to "features" section.
   - Build; run a few apps, collecting compilation trace from each app.
     - Look for "Dart compilation trace" in 'fx log' to make sure the trace is written.
-    - Copy the compilation trace to the host: "fx cp --to-host /data/dart.compilation.trace trace"
+    - Copy the compilation trace to the host: "fx cp --to-host /data/dart_compilation_trace.txt trace"
   - Remove lines that aren't for dart: libraries.

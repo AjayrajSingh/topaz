@@ -990,12 +990,6 @@ Where to find Zircon's host-side tools that are run as part of the build.
 
 From [//build/config/fuchsia/zircon.gni:9](https://fuchsia.googlesource.com/build/+/fb9b46cbb98da8b92fdfd2dc1a8beba0836807e8/config/fuchsia/zircon.gni#9)
 
-### core_jit_cheat_target
-
-**Current value (from the default):** `""`
-
-From [//topaz/runtime/flutter_runner/kernel/BUILD.gn:27](https://fuchsia.googlesource.com/topaz/+/3deb9ec4ec5405b26055860edc6b798e1ffa874d/runtime/flutter_runner/kernel/BUILD.gn#27)
-
 ### fvm_slice_size
 The size of the FVM partition images "slice size". The FVM slice size is a
 minimum size of a particular chunk of a partition that is stored within
@@ -1706,12 +1700,6 @@ From [//build/images/zedboot/BUILD.gn:21](https://fuchsia.googlesource.com/build
 **Current value (from the default):** `"../buildtools/linux-x64/clang/bin"`
 
 From [//build/config/clang/clang.gni:9](https://fuchsia.googlesource.com/build/+/fb9b46cbb98da8b92fdfd2dc1a8beba0836807e8/config/clang/clang.gni#9)
-
-### core_jit_cheat_trace
-
-**Current value (from the default):** `""`
-
-From [//topaz/runtime/flutter_runner/kernel/BUILD.gn:28](https://fuchsia.googlesource.com/topaz/+/3deb9ec4ec5405b26055860edc6b798e1ffa874d/runtime/flutter_runner/kernel/BUILD.gn#28)
 
 ### dart_version_git_info
 Whether the Dart binary version string should include the git hash and

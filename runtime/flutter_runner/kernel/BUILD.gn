@@ -18,14 +18,10 @@ compile_platform("kernel_platform_files") {
   ]
 
   args = [
+    "--bytecode",
     "--target=flutter_runner",
     "dart:core",
   ]
-}
-
-declare_args() {
-  core_jit_cheat_target = ""
-  core_jit_cheat_trace = ""
 }
 
 template("core_snapshot") {
@@ -38,22 +34,10 @@ template("core_snapshot") {
   }
 
   action(target_name) {
-    deps = gen_snapshot_deps
+    deps = gen_snapshot_deps + [ ":kernel_platform_files" ]
 
-    if (core_jit_cheat_target == "") {
-      platform_dill =
-          "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
-      deps += [ ":kernel_platform_files" ]
-      compilation_trace = "//topaz/runtime/flutter_runner/compilation_trace.txt"
-    } else {
-      # TODO(rmacnak): Remove core_jit_cheat_target.
-      platform_dill =
-          get_label_info(core_jit_cheat_target, "target_gen_dir") + "/" +
-          get_label_info(core_jit_cheat_target, "name") + "_kernel.dil"
-      deps += [ core_jit_cheat_target ]
-      compilation_trace = core_jit_cheat_trace
-    }
-
+    platform_dill = "$root_out_dir/flutter_runner_patched_sdk/platform_strong.dill"
+    compilation_trace = "//topaz/runtime/flutter_runner/compilation_trace.txt"
     inputs = [
       platform_dill,
       compilation_trace,
@@ -86,6 +70,7 @@ template("core_snapshot") {
       # TODO(FL-117): Re-enable causal async stack traces when this issue is
       # addressed.
       "--no_causal_async_stacks",
+      "--use_bytecode_compiler",
       "--enable_mirrors=false",
       "--deterministic",
       "--snapshot_kind=core-jit",

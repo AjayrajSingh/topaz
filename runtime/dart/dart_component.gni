@@ -123,10 +123,6 @@ template("_flutter_dart_jit_package") {
 
       if (component.component_type == "flutter") {
         extra += [ component.asset_manifest ]
-
-        # TODO(rmacnak): Remove core_jit_cheat_target.
-        public_deps += [ ":${component.kernel_target_name}" ]
-
         deps += [ ":${component.component_resources}" ]
       }
     }

@@ -348,6 +348,52 @@ std::pair<bool, uint32_t> Engine::GetEngineReturnCode() const {
   return code;
 }
 
+static void CreateCompilationTrace(Dart_Isolate isolate) {
+  Dart_EnterIsolate(isolate);
+
+  {
+    Dart_EnterScope();
+    uint8_t* trace = nullptr;
+    intptr_t trace_length = 0;
+    Dart_Handle result = Dart_SaveCompilationTrace(&trace, &trace_length);
+    tonic::LogIfError(result);
+    const std::string kCompilationTraceFile = "/data/dart_compilation_trace.txt";
+    if (files::WriteFile(kCompilationTraceFile,
+                         reinterpret_cast<const char*>(trace),
+                         trace_length)) {
+      FML_LOG(ERROR) << "Dart compilation trace written to "
+                     << kCompilationTraceFile;
+    } else {
+      FML_LOG(ERROR) << "Could not write Dart compilation trace to "
+                     << kCompilationTraceFile;
+    }
+    Dart_ExitScope();
+  }
+
+  // Re-enter Dart scope to release the compilation trace's memory.
+
+  {
+    Dart_EnterScope();
+    uint8_t* feedback = nullptr;
+    intptr_t feedback_length = 0;
+    Dart_Handle result = Dart_SaveTypeFeedback(&feedback, &feedback_length);
+    tonic::LogIfError(result);
+    const std::string kTypeFeedbackFile = "/data/dart_type_feedback.bin";
+    if (files::WriteFile(kTypeFeedbackFile,
+                         reinterpret_cast<const char*>(feedback),
+                         feedback_length)) {
+      FML_LOG(ERROR) << "Dart type feedback written to "
+                     << kTypeFeedbackFile;
+    } else {
+      FML_LOG(ERROR) << "Could not write Dart type feedback to "
+                     << kTypeFeedbackFile;
+    }
+    Dart_ExitScope();
+  }
+
+  Dart_ExitIsolate();
+}
+
 void Engine::OnMainIsolateStart() {
   if (!isolate_configurator_ ||
       !isolate_configurator_->ConfigureCurrentIsolate(this)) {
@@ -366,24 +412,7 @@ void Engine::OnMainIsolateStart() {
           if (!engine) {
             return;
           }
-          Dart_EnterIsolate(isolate);
-          Dart_EnterScope();
-          uint8_t* log = nullptr;
-          intptr_t log_length = 0;
-          Dart_Handle result = Dart_SaveCompilationTrace(&log, &log_length);
-          tonic::LogIfError(result);
-          const std::string kCompilationTraceFile = "/data/dart.compilation.trace";
-          if (files::WriteFile(kCompilationTraceFile,
-                               reinterpret_cast<const char*>(log),
-                               log_length)) {
-            FML_LOG(ERROR) << "Dart compilation trace written to "
-                           << kCompilationTraceFile;
-          } else {
-            FML_LOG(ERROR) << "Could not write Dart compilation trace to "
-                           << kCompilationTraceFile;
-          }
-          Dart_ExitScope();
-          Dart_ExitIsolate();
+          CreateCompilationTrace(isolate);
         },
         fml::TimeDelta::FromSeconds(kCompilationTraceDelayInSeconds));
   }
