@@ -16,7 +16,9 @@
             "fuchsia.ui.policy.Presenter",
             "fuchsia.ui.scenic.Scenic",
             "fuchsia.ui.viewsv1.ViewManager",
-            "fuchsia.wlan.service.Wlan"
+            "fuchsia.wlan.service.Wlan",
+            "fuchsia.device.display.Manager",
+            "fuchsia.devicesettings.DeviceSettingsManager"
         ]
     }
 }
