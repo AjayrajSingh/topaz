@@ -5,7 +5,6 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_app("fidl_bindings_performance") {
-  deprecated_bare_package_url = "//build"
 
   main_dart = "lib/main.dart"
 

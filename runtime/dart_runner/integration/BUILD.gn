@@ -5,7 +5,6 @@
 import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_jit_app("dart_jit_runner_test") {
-  deprecated_bare_package_url = "//build"
 
   testonly = true
 
@@ -29,7 +28,6 @@ dart_jit_app("dart_jit_runner_test") {
 }
 
 dart_aot_app("dart_aot_runner_test") {
-  deprecated_bare_package_url = "//build"
 
   testonly = true
 
