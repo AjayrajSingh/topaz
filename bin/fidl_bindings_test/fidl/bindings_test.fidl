@@ -24,51 +24,51 @@ table ExampleTable {
 
 [Discoverable]
 interface TestServer {
-  1: OneWayNoArgs();
-  2: ReceivedOneWayNoArgs() -> (bool received);
+    OneWayNoArgs();
+    ReceivedOneWayNoArgs() -> (bool received);
 
-  3: OneWayStringArg(string value);
-  4: ReceivedOneWayString() -> (string value);
+    OneWayStringArg(string value);
+    ReceivedOneWayString() -> (string value);
 
-  5: OneWayThreeArgs(int32 x, uint64 y, NoHandleStruct z);
-  6: ReceivedOneWayThreeArgs() -> (int32 x, uint64 y, NoHandleStruct z);
+    OneWayThreeArgs(int32 x, uint64 y, NoHandleStruct z);
+    ReceivedOneWayThreeArgs() -> (int32 x, uint64 y, NoHandleStruct z);
 
-  21: OneWayExampleTable(ExampleTable value);
-  22: ReceivedOneWayExampleTable() -> (ExampleTable received);
+    OneWayExampleTable(ExampleTable value);
+    ReceivedOneWayExampleTable() -> (ExampleTable received);
 
-  7: TwoWayNoArgs() -> ();
-  8: TwoWayStringArg(string value) -> (string value);
-  9: TwoWayThreeArgs(int32 x, uint64 y, NoHandleStruct z) -> (int32 x, uint64 y, NoHandleStruct z);
+    TwoWayNoArgs() -> ();
+    TwoWayStringArg(string value) -> (string value);
+    TwoWayThreeArgs(int32 x, uint64 y, NoHandleStruct z) -> (int32 x, uint64 y, NoHandleStruct z);
 
-  10: SendEmptyEvent();
-  11: -> EmptyEvent();
+    SendEmptyEvent();
+    -> EmptyEvent();
 
-  12: SendStringEvent(string value);
-  13: -> StringEvent(string value);
+    SendStringEvent(string value);
+    -> StringEvent(string value);
 
-  14: SendThreeArgEvent(int32 x, uint64 y, NoHandleStruct z);
-  15: -> ThreeArgEvent(int32 x, uint64 y, NoHandleStruct z);
+    SendThreeArgEvent(int32 x, uint64 y, NoHandleStruct z);
+    -> ThreeArgEvent(int32 x, uint64 y, NoHandleStruct z);
 
-  16: SendMultipleEvents(int32 count, float64 intervalSeconds);
-  17: -> MultipleEvent(int32 index);
+    SendMultipleEvents(int32 count, float64 intervalSeconds);
+    -> MultipleEvent(int32 index);
 
-  18: ReplySlowly(string value, float64 delaySeconds) -> (string value);
+    ReplySlowly(string value, float64 delaySeconds) -> (string value);
 
-  19: CloseConnection(float64 delaySeconds);
+    CloseConnection(float64 delaySeconds);
 
-  20: -> NeverEvent();
+    -> NeverEvent();
 };
 
 enum EnumOne {
-  ONE = 1;
-  TWO = 2;
-  THREE = 3;
+    ONE = 1;
+    TWO = 2;
+    THREE = 3;
 };
 
 enum EnumTwo {
-  ONE = 1;
-  TWO = 2;
-  THREE = 3;
+    ONE = 1;
+    TWO = 2;
+    THREE = 3;
 };
 
 struct HandleStruct {
@@ -78,17 +78,17 @@ struct HandleStruct {
 };
 
 union UnionOne {
-  string foo;
-  string bar;
-  uint32 baz;
+    string foo;
+    string bar;
+    uint32 baz;
 };
 
 union UnionTwo {
-  string foo;
-  string bar;
-  uint32 baz;
+    string foo;
+    string bar;
+    uint32 baz;
 };
 
 interface SimpleServer {
-  1: Ping() -> ();
+    Ping() -> ();
 };

@@ -5,34 +5,34 @@
 library fuchsia.tictactoe;
 
 enum Player : uint8 {
-  X = 1;
-  O = 0;
+    X = 1;
+    O = 0;
 };
 
 // Completion status of a fidl call.
 enum Status {
-  OK = 0;
-  ERROR = 1;
+    OK = 0;
+    ERROR = 1;
 };
 
 // Result a fidl call's indicating success or failure and reason for failure.
 struct ExecuteResult {
-  Status status;
-  string? error_message;
+    Status status;
+    string? error_message;
 };
 
 [Discoverable]
 interface GameTracker {
-  1: RecordWin(Player player) -> (ExecuteResult result);
+    RecordWin(Player player) -> (ExecuteResult result);
 
-  // Request that the game tracker start sending score updates to the message
-  // queue identified by [queue_token].  This method will send an update
-  // immediately when this method is called and then each time the score 
-  // changes.
-  2: SubscribeToScore(string queue_token) -> (ExecuteResult result);
+    // Request that the game tracker start sending score updates to the message
+    // queue identified by [queue_token].  This method will send an update
+    // immediately when this method is called and then each time the score
+    // changes.
+    SubscribeToScore(string queue_token) -> (ExecuteResult result);
 
-  // Request that the game tracker stop sending score updates to the message
-  // queue identified by [queue_token].  If a queue identified by [queue_token]
-  // is not set up, this method will do nothing.
-  3: UnsubscribeFromScore(string queue_token) -> (ExecuteResult result);
-}; 
+    // Request that the game tracker stop sending score updates to the message
+    // queue identified by [queue_token].  If a queue identified by [queue_token]
+    // is not set up, this method will do nothing.
+    UnsubscribeFromScore(string queue_token) -> (ExecuteResult result);
+};

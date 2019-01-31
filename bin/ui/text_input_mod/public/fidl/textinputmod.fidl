@@ -6,11 +6,11 @@ library fuchsia.textinputmod;
 
 [Discoverable]
 interface TextInputModReceiver {
-   1: UserEnteredText(string text) -> ();
-   2: UserCanceled() -> ();
+    UserEnteredText(string text) -> ();
+    UserCanceled() -> ();
 };
 
 [Discoverable]
 interface TextInputMod {
-   1: ListenForTextInput(TextInputModReceiver receiver) -> ();
+    ListenForTextInput(TextInputModReceiver receiver) -> ();
 };
