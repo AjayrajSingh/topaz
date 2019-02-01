@@ -2,8 +2,10 @@
   "imports": [
     "garnet/packages/sdk/garnet",
     "peridot/packages/prod/sessionctl",
+    "topaz/packages/prod/dart_jit_product_runner",
     "topaz/packages/prod/dart_jit_runner",
-    "topaz/packages/prod/flutter_jit"
+    "topaz/packages/prod/flutter_jit",
+    "topaz/packages/prod/flutter_jit_product"
   ],
   "labels": [
     "//topaz/public/sdk:topaz"
