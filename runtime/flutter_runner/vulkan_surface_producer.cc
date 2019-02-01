@@ -4,11 +4,12 @@
 
 #include "vulkan_surface_producer.h"
 
+#include <trace/event.h>
+
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "flutter/fml/trace_event.h"
 #include "third_party/skia/include/gpu/GrBackendSemaphore.h"
 #include "third_party/skia/include/gpu/GrBackendSurface.h"
 #include "third_party/skia/include/gpu/GrContext.h"

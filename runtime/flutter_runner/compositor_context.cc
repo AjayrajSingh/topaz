@@ -5,7 +5,6 @@
 #include "compositor_context.h"
 
 #include "flutter/flow/layers/layer_tree.h"
-#include "flutter/fml/trace_event.h"
 
 namespace flutter {
 

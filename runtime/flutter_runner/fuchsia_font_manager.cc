@@ -17,7 +17,9 @@
 #include "fuchsia_font_manager.h"
 
 #include <lib/fit/function.h>
+#include <trace/event.h>
 #include <zx/vmar.h>
+
 #include <unordered_map>
 
 #include "lib/fsl/vmo/sized_vmo.h"
@@ -381,6 +383,7 @@ sk_sp<SkTypeface> FuchsiaFontManager::onLegacyMakeTypeface(
 sk_sp<SkTypeface> FuchsiaFontManager::FetchTypeface(
     const char family_name[], const SkFontStyle& style, const char* bcp47[],
     int bcp47_count, SkUnichar character, uint32_t flags) const {
+  TRACE_DURATION("flutter", "FuchsiaFontManager::FetchTypeface");
   fuchsia::fonts::Request request;
   request.family = family_name;
   request.weight = style.weight();

@@ -9,7 +9,6 @@
 
 #include <trace/event.h>
 
-#include "flutter/fml/trace_event.h"
 #include "third_party/skia/include/gpu/GrContext.h"
 
 namespace flutter {

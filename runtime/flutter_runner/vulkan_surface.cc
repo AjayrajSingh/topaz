@@ -5,10 +5,10 @@
 #include "vulkan_surface.h"
 
 #include <lib/async/default.h>
+#include <trace/event.h>
 
 #include <algorithm>
 
-#include "flutter/fml/trace_event.h"
 #include "lib/fxl/logging.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/gpu/GrBackendSemaphore.h"

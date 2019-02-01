@@ -4,7 +4,8 @@
 
 #include "vsync_waiter.h"
 
-#include "flutter/fml/trace_event.h"
+#include <trace/event.h>
+
 #include "topaz/lib/deprecated_loop/message_loop.h"
 #include "vsync_recorder.h"
 
