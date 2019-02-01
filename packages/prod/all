@@ -2,6 +2,7 @@
     "imports": [
         "topaz/packages/prod/accessibility_settings",
         "topaz/packages/prod/bluetooth_settings",
+        "topaz/packages/prod/cast_runner",
         "topaz/packages/prod/chromium",
         "topaz/packages/prod/dart",
         "topaz/packages/prod/dart_aot_product_runner",
