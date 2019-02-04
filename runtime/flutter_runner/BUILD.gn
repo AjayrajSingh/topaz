@@ -362,8 +362,6 @@ executable("flutter_runner_unittests") {
     "//third_party/icu",
     "//third_party/skia",
   ]
-
-  configs += [ "//third_party/skia:skia_private" ]
 }
 
 test_package("flutter_runner_tests") {

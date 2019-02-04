@@ -20,6 +20,9 @@ namespace {
 // A codepoint guaranteed to be unknown in any font/family.
 constexpr SkUnichar kUnknownUnicodeCharacter = 0xFFF0;
 
+// Font family to use for tests.
+constexpr char kTestFontFamily[] = "Roboto";
+
 class FuchsiaFontManagerTest : public component::testing::TestWithEnvironment {
  public:
   FuchsiaFontManagerTest() : loop_(&kAsyncLoopConfigNoAttachToThread) {
@@ -69,67 +72,68 @@ class FuchsiaFontManagerTest : public component::testing::TestWithEnvironment {
 
 // Verify that a typeface is returned for a found character.
 TEST_F(FuchsiaFontManagerTest, ValidResponseWhenCharacterFound) {
-  sk_sp<SkTypeface> sans(font_manager_->matchFamilyStyleCharacter(
+  sk_sp<SkTypeface> typeface(font_manager_->matchFamilyStyleCharacter(
       "", SkFontStyle(), nullptr, 0, '&'));
-  EXPECT_TRUE(sans.get() != nullptr);
+  EXPECT_TRUE(typeface.get() != nullptr);
 }
 
 // Verify that a codepoint that doesn't map to a character correctly returns
 // an empty typeface.
 TEST_F(FuchsiaFontManagerTest, EmptyResponseWhenCharacterNotFound) {
-  sk_sp<SkTypeface> sans(font_manager_->matchFamilyStyleCharacter(
+  sk_sp<SkTypeface> typeface(font_manager_->matchFamilyStyleCharacter(
       "", SkFontStyle(), nullptr, 0, kUnknownUnicodeCharacter));
-  EXPECT_TRUE(sans.get() == nullptr);
+  EXPECT_TRUE(typeface.get() == nullptr);
 }
 
 // Verify that SkTypeface objects are cached.
 TEST_F(FuchsiaFontManagerTest, Caching) {
-  sk_sp<SkTypeface> sans(
-      font_manager_->matchFamilyStyle("Roboto", SkFontStyle()));
-  sk_sp<SkTypeface> sans2(
-      font_manager_->matchFamilyStyle("Roboto", SkFontStyle()));
+  sk_sp<SkTypeface> typeface(
+      font_manager_->matchFamilyStyle(kTestFontFamily, SkFontStyle()));
+  sk_sp<SkTypeface> typeface2(
+      font_manager_->matchFamilyStyle(kTestFontFamily, SkFontStyle()));
 
   // Expect that the same SkTypeface is returned for both requests.
-  EXPECT_EQ(sans.get(), sans2.get());
+  EXPECT_EQ(typeface.get(), typeface2.get());
 
-  // Request serif and verify that a different SkTypeface is returned.
-  sk_sp<SkTypeface> serif(
-      font_manager_->matchFamilyStyle("RobotoSlab", SkFontStyle()));
-  EXPECT_NE(sans.get(), serif.get());
+  // Request a different typeface and verify that a different SkTypeface is
+  // returned.
+  sk_sp<SkTypeface> typeface3(
+      font_manager_->matchFamilyStyle(kTestFontFamily, SkFontStyle::Italic()));
+  EXPECT_NE(typeface.get(), typeface3.get());
 }
 
 // Verify that SkTypeface can outlive the manager.
 TEST_F(FuchsiaFontManagerTest, TypefaceOutlivesManager) {
-  sk_sp<SkTypeface> sans(
-      font_manager_->matchFamilyStyle("Roboto", SkFontStyle()));
+  sk_sp<SkTypeface> typeface(
+      font_manager_->matchFamilyStyle(kTestFontFamily, SkFontStyle()));
   font_manager_.reset();
-  EXPECT_TRUE(sans.get() != nullptr);
+  EXPECT_TRUE(typeface.get() != nullptr);
 }
 
 // Verify that we can query a font after releasing a previous instance.
 TEST_F(FuchsiaFontManagerTest, ReleaseThenCreateAgain) {
-  sk_sp<SkTypeface> serif(
-      font_manager_->matchFamilyStyle("RobotoSlab", SkFontStyle()));
-  EXPECT_TRUE(serif != nullptr);
-  serif.reset();
+  sk_sp<SkTypeface> typeface(
+      font_manager_->matchFamilyStyle(kTestFontFamily, SkFontStyle()));
+  EXPECT_TRUE(typeface != nullptr);
+  typeface.reset();
 
-  sk_sp<SkTypeface> serif2(
-      font_manager_->matchFamilyStyle("RobotoSlab", SkFontStyle()));
-  EXPECT_TRUE(serif2 != nullptr);
+  sk_sp<SkTypeface> typeface2(
+      font_manager_->matchFamilyStyle(kTestFontFamily, SkFontStyle()));
+  EXPECT_TRUE(typeface2 != nullptr);
 }
 
 // Verify that we get a new typeface instance after releasing a previous
 // instance of the same typeface (i.e. the cache purges the released typeface).
 TEST_F(FuchsiaFontManagerTest, ReleasedTypefaceIsPurged) {
-  sk_sp<SkTypeface> serif(
-      font_manager_->matchFamilyStyle("RobotoSlab", SkFontStyle()));
-  EXPECT_TRUE(serif != nullptr);
-  serif.reset();
+  sk_sp<SkTypeface> typeface(
+      font_manager_->matchFamilyStyle(kTestFontFamily, SkFontStyle()));
+  EXPECT_TRUE(typeface != nullptr);
+  typeface.reset();
 
-  sk_sp<SkTypeface> serif2(
-      font_manager_->matchFamilyStyle("RobotoSlab", SkFontStyle()));
-  EXPECT_TRUE(serif2 != nullptr);
-  EXPECT_NE(serif.get(), serif2.get());
+  sk_sp<SkTypeface> typeface2(
+      font_manager_->matchFamilyStyle(kTestFontFamily, SkFontStyle()));
+  EXPECT_TRUE(typeface2 != nullptr);
+  EXPECT_NE(typeface.get(), typeface2.get());
 }
 
 // Verify that unknown font families are handled correctly.
@@ -140,13 +144,13 @@ TEST_F(FuchsiaFontManagerTest, MatchUnknownFamily) {
 
 // Verify that a style set is returned for a known family.
 TEST_F(FuchsiaFontManagerTest, MatchKnownFamily) {
-  SkFontStyleSet* style_set = font_manager_->matchFamily("Roboto");
+  SkFontStyleSet* style_set = font_manager_->matchFamily(kTestFontFamily);
   EXPECT_GT(style_set->count(), 0);
 }
 
 // Verify getting an SkFontStyle from a matched family.
 TEST_F(FuchsiaFontManagerTest, FontFamilyGetStyle) {
-  SkFontStyleSet* style_set = font_manager_->matchFamily("Roboto");
+  SkFontStyleSet* style_set = font_manager_->matchFamily(kTestFontFamily);
   SkFontStyle style;
   style_set->getStyle(0, &style, nullptr);
   EXPECT_EQ(style.weight(), 400);
@@ -156,7 +160,7 @@ TEST_F(FuchsiaFontManagerTest, FontFamilyGetStyle) {
 
 // Verify creating a typeface from a matched family.
 TEST_F(FuchsiaFontManagerTest, FontFamilyCreateTypeface) {
-  SkFontStyleSet* style_set = font_manager_->matchFamily("Roboto");
+  SkFontStyleSet* style_set = font_manager_->matchFamily(kTestFontFamily);
   SkTypeface* typeface = style_set->createTypeface(0);
   EXPECT_TRUE(typeface != nullptr);
   SkFontStyle style = typeface->fontStyle();
