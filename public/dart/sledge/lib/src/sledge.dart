@@ -126,11 +126,9 @@ class Sledge {
   }
 
   /// Convenience constructor for integration tests.
-  factory Sledge.fromLedgerHandle(
-      fidl.InterfaceHandle<ledger.Ledger> ledgerHandle,
-      [SledgePageId pageId]) {
-    return new Sledge._(ledgerHandle, pageId);
-  }
+  Sledge.fromLedgerHandle(fidl.InterfaceHandle<ledger.Ledger> ledgerHandle,
+      [SledgePageId pageId])
+      : this._(ledgerHandle, pageId);
 
   /// Closes connection to ledger.
   void close() {

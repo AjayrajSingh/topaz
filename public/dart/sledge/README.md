@@ -124,7 +124,7 @@ To locally run these tests:
 ```
 fx set x64 --product ermine --monolith topaz/packages/all --monolith topaz/packages/tests/all
 fx build
-fx shell "run fuchsia-pkg://fuchsia.com/sledge_integration_tests#meta/sledge_integration_tests.cmx"
+fx run-test sledge_integration_tests
 ```
 
 The results of the tests are visible in the logs:
