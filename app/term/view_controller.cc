@@ -47,6 +47,13 @@ ViewController::ViewController(scenic::ViewContext view_context,
         ComputeMetrics();
         StartCommandIfNeeded();
       });
+  {
+    fuchsia::ui::input::SetHardKeyboardDeliveryCmd cmd;
+    cmd.delivery_request = true;
+    fuchsia::ui::input::Command input_cmd;
+    input_cmd.set_set_hard_keyboard_delivery(std::move(cmd));
+    session()->Enqueue(std::move(input_cmd));
+  }
 }
 
 void ViewController::ComputeMetrics() {
@@ -182,7 +189,8 @@ void ViewController::DrawContent(SkCanvas* canvas) {
                                           ch.foreground_color.blue));
 
           canvas->drawSimpleText(&ch.code_point, sizeof(ch.code_point),
-              SkTextEncoding::kUTF32, x, y + ascent_, fg_font, fg_paint);
+                                 SkTextEncoding::kUTF32, x, y + ascent_,
+                                 fg_font, fg_paint);
         }
       }
     }
