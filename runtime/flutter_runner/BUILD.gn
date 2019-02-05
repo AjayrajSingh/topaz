@@ -375,4 +375,25 @@ test_package("flutter_runner_tests") {
       name = "flutter_runner_tests"
     },
   ]
+
+  resources = [
+    {
+      path = rebase_path("tests/test_manifest.json")
+      dest = "testdata/test_fonts/manifest.json"
+    },
+  ]
+
+  fonts = [
+    "roboto/Roboto-Regular.ttf",
+    "robotoslab/RobotoSlab-Regular.ttf",
+  ]
+  foreach(font, fonts) {
+    resources += [
+      {
+        path = rebase_path("//garnet/bin/fonts/third_party/${font}")
+        file_name = get_path_info(font, "file")
+        dest = "testdata/test_fonts/${file_name}"
+      },
+    ]
+  }
 }

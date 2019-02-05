@@ -2,14 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "fuchsia_font_manager.h"
+#include "topaz/runtime/flutter_runner/fuchsia_font_manager.h"
 
+#include <fcntl.h>
 #include <fuchsia/fonts/cpp/fidl.h>
 #include <lib/async-loop/cpp/loop.h>
 #include <lib/component/cpp/startup_context.h>
 #include <lib/component/cpp/testing/test_with_environment.h>
 
 #include "gtest/gtest.h"
+#include "lib/fsl/io/fd.h"
 #include "third_party/skia/include/core/SkFontMgr.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 
@@ -22,6 +24,10 @@ constexpr SkUnichar kUnknownUnicodeCharacter = 0xFFF0;
 
 // Font family to use for tests.
 constexpr char kTestFontFamily[] = "Roboto";
+
+// URL for the fonts service.
+constexpr char kFontsServiceUrl[] =
+    "fuchsia-pkg://fuchsia.com/fonts#meta/fonts.cmx";
 
 class FuchsiaFontManagerTest : public component::testing::TestWithEnvironment {
  public:
@@ -38,11 +44,28 @@ class FuchsiaFontManagerTest : public component::testing::TestWithEnvironment {
     auto services = component::testing::EnvironmentServices::Create(
         parent_env, loop_.dispatcher());
 
-    // Add the font provider service to the newly created set of services.
-    fuchsia::sys::LaunchInfo launch_info{
-        "fuchsia-pkg://fuchsia.com/fonts#meta/fonts.cmx"};
+    // Add the fonts provider service to services. We need to use the version of
+    // AddServiceWithLaunchInfo that takes a callback to produce LaunchInfo
+    // because the version that takes LaunchInfo directly only uses 'url' and
+    // 'aguments', but we need 'flat_namespace' as well in order to have the
+    // font provider use the test fonts in our package.
     zx_status_t status = services->AddServiceWithLaunchInfo(
-        std::move(launch_info), fuchsia::fonts::Provider::Name_);
+        kFontsServiceUrl,
+        []() {
+          fuchsia::sys::LaunchInfo launch_info;
+          launch_info.url = kFontsServiceUrl;
+          launch_info.arguments.reset(
+              {"--no-default-fonts",
+               "--font-manifest=/test_fonts/manifest.json"});
+          fxl::UniqueFD tmp_dir_fd(
+              open("/pkg/data/testdata/test_fonts", O_DIRECTORY | O_RDONLY));
+          launch_info.flat_namespace = fuchsia::sys::FlatNamespace::New();
+          launch_info.flat_namespace->paths.push_back("/test_fonts");
+          launch_info.flat_namespace->directories.push_back(
+              fsl::CloneChannelFromFileDescriptor(tmp_dir_fd.get()));
+          return launch_info;
+        },
+        fuchsia::fonts::Provider::Name_);
     EXPECT_EQ(ZX_OK, status);
 
     // Create an enclosing environment wrapping the new set of services.
@@ -98,7 +121,7 @@ TEST_F(FuchsiaFontManagerTest, Caching) {
   // Request a different typeface and verify that a different SkTypeface is
   // returned.
   sk_sp<SkTypeface> typeface3(
-      font_manager_->matchFamilyStyle(kTestFontFamily, SkFontStyle::Italic()));
+      font_manager_->matchFamilyStyle("Roboto Slab", SkFontStyle()));
   EXPECT_NE(typeface.get(), typeface3.get());
 }
 
