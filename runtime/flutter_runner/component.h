@@ -28,6 +28,7 @@
 #include "lib/fidl/cpp/interface_request.h"
 #include "lib/fxl/files/unique_fd.h"
 #include "lib/svc/cpp/service_provider_bridge.h"
+#include "lib/svc/cpp/services.h"
 #include "topaz/lib/deprecated_loop/thread.h"
 #include "unique_fdio_ns.h"
 
@@ -49,6 +50,7 @@ class Application final : public Engine::Delegate,
                    std::unique_ptr<Application>>
   Create(TerminationCallback termination_callback,
          fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
+         std::shared_ptr<component::Services> runner_incoming_services,
          fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller);
 
   // Must be called on the same thread returned from the create call. The thread
@@ -72,6 +74,7 @@ class Application final : public Engine::Delegate,
   fbl::RefPtr<fs::PseudoDir> outgoing_dir_;
   fs::SynchronousVfs outgoing_vfs_;
   std::unique_ptr<component::StartupContext> startup_context_;
+  std::shared_ptr<component::Services> runner_incoming_services_;
   fidl::BindingSet<fuchsia::ui::app::ViewProvider> shells_bindings_;
   fidl::BindingSet<fuchsia::ui::viewsv1::ViewProvider> v1_shells_bindings_;
 
@@ -83,6 +86,7 @@ class Application final : public Engine::Delegate,
   Application(
       TerminationCallback termination_callback, fuchsia::sys::Package package,
       fuchsia::sys::StartupInfo startup_info,
+      std::shared_ptr<component::Services> runner_incoming_services,
       fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller);
 
   // |fuchsia::sys::ComponentController|

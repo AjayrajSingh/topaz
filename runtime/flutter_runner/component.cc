@@ -22,6 +22,8 @@
 #include "lib/fxl/command_line.h"
 #include "service_provider_dir.h"
 #include "task_observers.h"
+#include "topaz/lib/deprecated_loop/message_loop.h"
+#include "topaz/runtime/dart/utils/handle_exception.h"
 #include "topaz/runtime/dart/utils/tempfs.h"
 
 namespace flutter {
@@ -33,6 +35,7 @@ std::pair<std::unique_ptr<deprecated_loop::Thread>,
 Application::Create(
     TerminationCallback termination_callback, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
+    std::shared_ptr<component::Services> runner_incoming_services,
     fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   auto thread = std::make_unique<deprecated_loop::Thread>();
   std::unique_ptr<Application> application;
@@ -41,7 +44,8 @@ Application::Create(
   thread->TaskRunner()->PostTask([&]() mutable {
     application.reset(
         new Application(std::move(termination_callback), std::move(package),
-                        std::move(startup_info), std::move(controller)));
+                        std::move(startup_info), runner_incoming_services,
+                        std::move(controller)));
     latch.Signal();
   });
   thread->Run();
@@ -61,13 +65,15 @@ static std::string DebugLabelForURL(const std::string& url) {
 Application::Application(
     TerminationCallback termination_callback, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
+    std::shared_ptr<component::Services> runner_incoming_services,
     fidl::InterfaceRequest<fuchsia::sys::ComponentController>
         application_controller_request)
     : termination_callback_(std::move(termination_callback)),
       debug_label_(DebugLabelForURL(startup_info.launch_info.url)),
       application_controller_(this),
       outgoing_dir_(fbl::AdoptRef(new fs::PseudoDir())),
-      outgoing_vfs_(async_get_default_dispatcher()) {
+      outgoing_vfs_(async_get_default_dispatcher()),
+      runner_incoming_services_(runner_incoming_services) {
   application_controller_.set_error_handler(
       [this](zx_status_t status) { Kill(); });
 
@@ -252,6 +258,22 @@ Application::Application(
   // The interpreter is enabled unconditionally. If an app is built for
   // debugging (that is, with no bytecode), the VM will fall back on ASTs.
   settings_.dart_flags.push_back("--enable_interpreter");
+
+  auto task_runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner();
+  const std::string component_url = package.resolved_url;
+  settings_.unhandled_exception_callback =
+      [task_runner, runner_incoming_services, component_url](
+          const std::string& error, const std::string& stack_trace) {
+        task_runner->PostTask(
+            [runner_incoming_services, component_url, error, stack_trace]() {
+              fuchsia::dart::HandleException(runner_incoming_services,
+                                             component_url, error, stack_trace);
+            });
+        // Ideally we would return whether HandleException returned ZX_OK, but
+        // short of knowing if the exception was correctly handled, we return
+        // false to have the error and stack trace printed in the logs.
+        return false;
+      };
 
   AttemptVMLaunchWithCurrentSettings(settings_);
 }

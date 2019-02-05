@@ -27,10 +27,18 @@ zx_status_t HandleIfException(std::shared_ptr<component::Services> services,
 
   const std::string error =
       tonic::StdStringFromDart(Dart_ToString(Dart_ErrorGetException(result)));
-  fuchsia::mem::Buffer stack_trace;
-  if (!fsl::VmoFromString(tonic::StdStringFromDart(
-                              Dart_ToString(Dart_ErrorGetStackTrace(result))),
-                          &stack_trace)) {
+  const std::string stack_trace =
+      tonic::StdStringFromDart(Dart_ToString(Dart_ErrorGetStackTrace(result)));
+
+  return HandleException(services, component_url, error, stack_trace);
+}
+
+zx_status_t HandleException(std::shared_ptr<component::Services> services,
+                            const std::string& component_url,
+                            const std::string& error,
+                            const std::string& stack_trace) {
+  fuchsia::mem::Buffer stack_trace_vmo;
+  if (!fsl::VmoFromString(stack_trace, &stack_trace_vmo)) {
     FXL_LOG(ERROR) << "failed to convert Dart stack trace to VMO";
     return ZX_ERR_INTERNAL;
   }
@@ -42,7 +50,7 @@ zx_status_t HandleIfException(std::shared_ptr<component::Services> services,
   zx_status_t out_status;
   const zx_status_t status = analyzer->HandleManagedRuntimeException(
       fuchsia::crash::ManagedRuntimeLanguage::DART, component_url, error,
-      std::move(stack_trace), &out_status);
+      std::move(stack_trace_vmo), &out_status);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "failed to connect to crash analyzer: " << status << " ("
                    << zx_status_get_string(status) << ")";

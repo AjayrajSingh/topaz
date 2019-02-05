@@ -8,6 +8,7 @@
             "vulkan"
         ],
         "services": [
+            "fuchsia.crash.Analyzer",
             "fuchsia.fonts.Provider",
             "fuchsia.net.SocketProvider",
             "fuchsia.timezone.Timezone",

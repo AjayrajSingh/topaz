@@ -23,6 +23,13 @@ zx_status_t HandleIfException(std::shared_ptr<component::Services> services,
                               const std::string& component_url,
                               Dart_Handle result);
 
+// Passes the exception message and stack trace to the crash analyzer service
+// for further handling.
+zx_status_t HandleException(std::shared_ptr<component::Services> services,
+                            const std::string& component_url,
+                            const std::string& error,
+                            const std::string& stack_trace);
+
 }  // namespace dart
 }  // namespace fuchsia
 

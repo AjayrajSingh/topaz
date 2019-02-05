@@ -95,10 +95,11 @@ void Runner::StartComponent(
       };
 
   auto thread_application_pair = Application::Create(
-      std::move(termination_callback),  // termination callback
-      std::move(package),               // application pacakge
-      std::move(startup_info),          // startup info
-      std::move(controller)             // controller request
+      std::move(termination_callback),     // termination callback
+      std::move(package),                  // application pacakge
+      std::move(startup_info),             // startup info
+      host_context_->incoming_services(),  // runner incoming services
+      std::move(controller)                // controller request
   );
 
   auto key = thread_application_pair.second.get();
