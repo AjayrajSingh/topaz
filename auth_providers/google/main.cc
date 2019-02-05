@@ -12,9 +12,9 @@
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fidl/cpp/interface_request.h"
+#include "lib/fsl/syslogger/init.h"
 #include "lib/fsl/vmo/strings.h"
 #include "lib/fxl/command_line.h"
-#include "lib/fxl/log_settings_command_line.h"
 #include "lib/network_wrapper/network_wrapper_impl.h"
 #include "topaz/auth_providers/google/factory_impl.h"
 #include "topaz/auth_providers/google/settings.h"
@@ -81,9 +81,7 @@ class GoogleAuthProviderApp {
 
 int main(int argc, const char** argv) {
   auto command_line = fxl::CommandLineFromArgcArgv(argc, argv);
-  if (!fxl::SetLogSettingsFromCommandLine(command_line)) {
-    return 1;
-  }
+  fsl::InitLoggerFromCommandLine(command_line, {"auth"});
 
   GoogleAuthProviderApp app(command_line);
   app.Run();

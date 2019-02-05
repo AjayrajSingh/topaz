@@ -48,8 +48,7 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
       GetPersistentCredentialCallback callback) override;
 
   // |AuthProvider|
-  void GetAppAccessToken(std::string credential,
-                         fidl::StringPtr app_client_id,
+  void GetAppAccessToken(std::string credential, fidl::StringPtr app_client_id,
                          const std::vector<std::string> app_scopes,
                          GetAppAccessTokenCallback callback) override;
 
@@ -58,8 +57,7 @@ class GoogleAuthProviderImpl : chromium::web::NavigationEventObserver,
                      GetAppIdTokenCallback callback) override;
 
   // |AuthProvider|
-  void GetAppFirebaseToken(std::string id_token,
-                           std::string firebase_api_key,
+  void GetAppFirebaseToken(std::string id_token, std::string firebase_api_key,
                            GetAppFirebaseTokenCallback callback) override;
 
   // |AuthProvider|

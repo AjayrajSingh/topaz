@@ -8,11 +8,11 @@
 #include <fuchsia/ui/app/cpp/fidl.h>
 #include <lib/fdio/util.h>
 #include <lib/fit/function.h>
+#include <lib/syslog/global.h>
 
 #include "lib/component/cpp/connect.h"
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/interface_request.h"
-#include "lib/fxl/logging.h"
 #include "lib/fxl/strings/join_strings.h"
 #include "lib/svc/cpp/services.h"
 #include "peridot/lib/rapidjson/rapidjson.h"
@@ -38,6 +38,15 @@ std::string GetClientId(const std::string& app_client_id) {
   }
 
   return client_id;
+}
+
+// Outputs information from a failing OAuthResponse to the syslog.
+void LogOauthResponse(const char* operation,
+                      const auth_providers::oauth::OAuthResponse& response) {
+  FX_LOGF(WARNING, NULL,
+          "OAuthResponse error during %s: %s (Full response: %s)",
+          operation, response.error_description.c_str(),
+          modular::JsonValueToPrettyString(response.json_response).c_str());
 }
 
 // Sometimes auth codes contain non alpha characters such as a slash. When we
@@ -148,11 +157,11 @@ void GoogleAuthProviderImpl::GetPersistentCredential(
   chromium::web::NavigationControllerPtr controller;
   chromium_frame_->GetNavigationController(controller.NewRequest());
   controller->LoadUrl(url, {});
-  FXL_LOG(INFO) << "Loading URL in Chromium: " << url;
+  FX_LOGF(INFO, NULL, "Loading URL: %s", url.c_str());
 
   auth_ui_context_ = auth_ui_context.Bind();
   auth_ui_context_.set_error_handler([this](zx_status_t status) {
-    FXL_LOG(INFO) << "Overlay cancelled by the caller";
+    FX_LOG(INFO, NULL, "Overlay cancelled by the caller");
     ReleaseResources();
     get_persistent_credential_callback_(AuthProviderStatus::INTERNAL_ERROR,
                                         nullptr, nullptr);
@@ -181,26 +190,24 @@ void GoogleAuthProviderImpl::GetAppAccessToken(
     return request.Build();
   };
 
-  Request(std::move(request_factory), [callback = std::move(callback)](
-                                          http::URLResponse response) {
-    auto oauth_response = ParseOAuthResponse(std::move(response));
-    if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_LOG(WARNING) << "Got error: " << oauth_response.error_description;
-      FXL_LOG(WARNING) << "Got response: "
-                       << JsonValueToPrettyString(oauth_response.json_response);
-      callback(oauth_response.status, nullptr);
-      return;
-    }
+  Request(std::move(request_factory),
+          [callback = std::move(callback)](http::URLResponse response) {
+            auto oauth_response = ParseOAuthResponse(std::move(response));
+            if (oauth_response.status != AuthProviderStatus::OK) {
+              LogOauthResponse("GetAppAccessToken", oauth_response);
+              callback(oauth_response.status, nullptr);
+              return;
+            }
 
-    AuthTokenPtr access_token = fuchsia::auth::AuthToken::New();
-    access_token->token_type = fuchsia::auth::TokenType::ACCESS_TOKEN;
-    access_token->token =
-        oauth_response.json_response["access_token"].GetString();
-    access_token->expires_in =
-        oauth_response.json_response["expires_in"].GetUint64();
+            AuthTokenPtr access_token = fuchsia::auth::AuthToken::New();
+            access_token->token_type = fuchsia::auth::TokenType::ACCESS_TOKEN;
+            access_token->token =
+                oauth_response.json_response["access_token"].GetString();
+            access_token->expires_in =
+                oauth_response.json_response["expires_in"].GetUint64();
 
-    callback(AuthProviderStatus::OK, std::move(access_token));
-  });
+            callback(AuthProviderStatus::OK, std::move(access_token));
+          });
 }
 
 void GoogleAuthProviderImpl::GetAppIdToken(std::string credential,
@@ -220,25 +227,24 @@ void GoogleAuthProviderImpl::GetAppIdToken(std::string credential,
   auto request_factory = [request = std::move(request)] {
     return request.Build();
   };
-  Request(std::move(request_factory), [callback = std::move(callback)](
-                                          http::URLResponse response) {
-    auto oauth_response = ParseOAuthResponse(std::move(response));
-    if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_LOG(WARNING) << "Got error: " << oauth_response.error_description;
-      FXL_LOG(WARNING) << "Got response: "
-                       << JsonValueToPrettyString(oauth_response.json_response);
-      callback(oauth_response.status, nullptr);
-      return;
-    }
+  Request(std::move(request_factory),
+          [callback = std::move(callback)](http::URLResponse response) {
+            auto oauth_response = ParseOAuthResponse(std::move(response));
+            if (oauth_response.status != AuthProviderStatus::OK) {
+              LogOauthResponse("GetAppIdToken", oauth_response);
+              callback(oauth_response.status, nullptr);
+              return;
+            }
 
-    AuthTokenPtr id_token = fuchsia::auth::AuthToken::New();
-    id_token->token = oauth_response.json_response["id_token"].GetString();
-    id_token->token_type = fuchsia::auth::TokenType::ID_TOKEN;
-    id_token->expires_in =
-        oauth_response.json_response["expires_in"].GetUint64();
+            AuthTokenPtr id_token = fuchsia::auth::AuthToken::New();
+            id_token->token =
+                oauth_response.json_response["id_token"].GetString();
+            id_token->token_type = fuchsia::auth::TokenType::ID_TOKEN;
+            id_token->expires_in =
+                oauth_response.json_response["expires_in"].GetUint64();
 
-    callback(AuthProviderStatus::OK, std::move(id_token));
-  });
+            callback(AuthProviderStatus::OK, std::move(id_token));
+          });
 }
 
 void GoogleAuthProviderImpl::GetAppFirebaseToken(
@@ -267,9 +273,7 @@ void GoogleAuthProviderImpl::GetAppFirebaseToken(
                                           http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_LOG(WARNING) << "Got error: " << oauth_response.error_description;
-      FXL_LOG(WARNING) << "Got response: "
-                       << JsonValueToPrettyString(oauth_response.json_response);
+      LogOauthResponse("GetAppFirebaseToken", oauth_response);
       callback(oauth_response.status, nullptr);
       return;
     }
@@ -300,19 +304,17 @@ void GoogleAuthProviderImpl::RevokeAppOrPersistentCredential(
     return request.Build();
   };
 
-  Request(std::move(request_factory), [callback = std::move(callback)](
-                                          http::URLResponse response) {
-    auto oauth_response = ParseOAuthResponse(std::move(response));
-    if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_LOG(WARNING) << "Got error: " << oauth_response.error_description;
-      FXL_LOG(WARNING) << "Got response: "
-                       << JsonValueToPrettyString(oauth_response.json_response);
-      callback(oauth_response.status);
-      return;
-    }
+  Request(std::move(request_factory),
+          [callback = std::move(callback)](http::URLResponse response) {
+            auto oauth_response = ParseOAuthResponse(std::move(response));
+            if (oauth_response.status != AuthProviderStatus::OK) {
+              LogOauthResponse("RevokeToken", oauth_response);
+              callback(oauth_response.status);
+              return;
+            }
 
-    callback(AuthProviderStatus::OK);
-  });
+            callback(AuthProviderStatus::OK);
+          });
 }
 
 void GoogleAuthProviderImpl::GetPersistentCredentialFromAttestationJWT(
@@ -352,8 +354,10 @@ void GoogleAuthProviderImpl::OnNavigationStateChanged(
   if (status != AuthProviderStatus::OK || !auth_code.empty()) {
     ReleaseResources();
     if (status != AuthProviderStatus::OK) {
+      FX_LOGF(INFO, NULL, "Failed to capture auth code: Status %d", status);
       get_persistent_credential_callback_(status, nullptr, nullptr);
     } else if (!auth_code.empty()) {
+      FX_LOGF(INFO, NULL, "Captured auth code of length %d", auth_code.size());
       ExchangeAuthCode(auth_code);
     }
   }
@@ -397,10 +401,7 @@ void GoogleAuthProviderImpl::ExchangeAuthCode(std::string auth_code) {
   Request(std::move(request_factory), [this](http::URLResponse response) {
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_LOG(WARNING) << "auth: Got error exchanging auth code: "
-                       << oauth_response.error_description;
-      FXL_LOG(WARNING) << "auth: Got response exchanging auth code: "
-                       << JsonValueToPrettyString(oauth_response.json_response);
+      LogOauthResponse("ExchangeAuthCode", oauth_response);
       get_persistent_credential_callback_(oauth_response.status, nullptr,
                                           nullptr);
       return;
@@ -408,14 +409,21 @@ void GoogleAuthProviderImpl::ExchangeAuthCode(std::string auth_code) {
 
     if (!oauth_response.json_response.HasMember("refresh_token") ||
         (!oauth_response.json_response.HasMember("access_token"))) {
-      FXL_LOG(WARNING) << "Got response without refresh and access tokens: "
-                       << JsonValueToPrettyString(oauth_response.json_response);
+      FX_LOGF(WARNING, NULL,
+              "Got response without refresh and access tokens: %s",
+              JsonValueToPrettyString(oauth_response.json_response).c_str());
       get_persistent_credential_callback_(
           AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr, nullptr);
     }
 
-    GetUserProfile(oauth_response.json_response["refresh_token"].GetString(),
-                   oauth_response.json_response["access_token"].GetString());
+    auto refresh_token =
+        oauth_response.json_response["refresh_token"].GetString();
+    auto access_token =
+        oauth_response.json_response["access_token"].GetString();
+    FX_LOGF(INFO, NULL, "Received refresh token of length %d",
+            strlen(refresh_token));
+
+    GetUserProfile(refresh_token, access_token);
   });
 }
 
@@ -438,11 +446,7 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
 
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      FXL_LOG(WARNING) << "Got error fetching profile: "
-                       << oauth_response.error_description;
-      FXL_LOG(WARNING) << "Got response fetching profile: "
-                       << JsonValueToPrettyString(oauth_response.json_response);
-
+      LogOauthResponse("GetUserProfile", oauth_response);
       get_persistent_credential_callback_(oauth_response.status, credential,
                                           std::move(user_profile_info));
       return;
@@ -466,6 +470,7 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
           oauth_response.json_response["image"]["url"].GetString();
     }
 
+    FX_LOG(INFO, NULL, "Received valid UserProfile");
     get_persistent_credential_callback_(oauth_response.status, credential,
                                         std::move(user_profile_info));
   });
@@ -479,7 +484,7 @@ zx::eventpair GoogleAuthProviderImpl::SetupChromium() {
   zx_handle_t incoming_service_clone =
       fdio_service_clone(context_->incoming_services()->directory().get());
   if (incoming_service_clone == ZX_HANDLE_INVALID) {
-    FXL_LOG(ERROR) << "Failed to clone service directory.";
+    FX_LOG(ERROR, NULL, "Failed to clone service directory");
     return zx::eventpair();
   }
 
@@ -497,8 +502,10 @@ zx::eventpair GoogleAuthProviderImpl::SetupChromium() {
 
   // And create a view for the frame.
   zx::eventpair view_token, view_holder_token;
-  if (zx::eventpair::create(0u, &view_token, &view_holder_token) != ZX_OK)
-    FXL_NOTREACHED() << "Failed to create view tokens";
+  if (zx::eventpair::create(0u, &view_token, &view_holder_token) != ZX_OK) {
+    FX_LOG(ERROR, NULL, "Failed to create view tokens");
+    return zx::eventpair();
+  }
   chromium_frame_->CreateView2(std::move(view_token), nullptr, nullptr);
 
   return view_holder_token;
@@ -507,9 +514,8 @@ zx::eventpair GoogleAuthProviderImpl::SetupChromium() {
 void GoogleAuthProviderImpl::ReleaseResources() {
   // Close any open view
   if (auth_ui_context_) {
-    FXL_LOG(INFO) << "Releasing auth UI context..";
+    FX_LOG(INFO, NULL, "Releasing Auth UI Context");
     auth_ui_context_.set_error_handler(nullptr);
-    FXL_LOG(INFO) << " Inside ReleaseResources: Stopping overlay";
     auth_ui_context_->StopOverlay();
     auth_ui_context_ = nullptr;
   }
