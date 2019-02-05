@@ -33,7 +33,7 @@ class BaseShellUserManager {
     _userProvider.addUser(
       IdentityProvider.google,
       (Account account, String errorCode) {
-        if (errorCode == null) {
+        if (errorCode == null || errorCode == '') {
           completer.complete(account.id);
         } else {
           log.warning('ERROR adding user!  $errorCode');
