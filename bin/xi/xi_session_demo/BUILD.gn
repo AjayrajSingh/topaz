@@ -20,6 +20,6 @@ flutter_app("xi_session_demo") {
     "//topaz/bin/xi/xi_session_agent:xi_session_services",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/app_driver/dart",
-    "//topaz/public/lib/run_mod/dart",
+    "//topaz/public/lib/widgets/dart",
   ]
 }

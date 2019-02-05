@@ -4,7 +4,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets.dart/model.dart';
 
 import 'demo_model.dart';
 
