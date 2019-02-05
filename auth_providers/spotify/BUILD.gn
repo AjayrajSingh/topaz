@@ -17,7 +17,7 @@ executable("bin") {
 
   deps = [
     ":lib",
-    "//garnet/public/fidl/fuchsia.auth",
+    "$garnet_sdk_fidl/fuchsia.auth",
     "//garnet/public/lib/component/cpp",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fsl",
@@ -38,7 +38,7 @@ source_set("lib") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.net.oldhttp",
+    "$garnet_sdk_fidl/fuchsia.net.oldhttp",
     "//garnet/public/lib/svc/cpp",
     "//peridot/lib/rapidjson",
     "//third_party/rapidjson",
@@ -46,8 +46,8 @@ source_set("lib") {
   ]
 
   public_deps = [
-    "//garnet/public/fidl/fuchsia.auth",
-    "//garnet/public/fidl/fuchsia.ui.app",
+    "$garnet_sdk_fidl/fuchsia.auth",
+    "$garnet_sdk_fidl/fuchsia.ui.app",
     "//garnet/public/lib/callback",
     "//garnet/public/lib/component/cpp",
     "//garnet/public/lib/fidl/cpp",
@@ -68,7 +68,7 @@ source_set("unittests") {
 
   deps = [
     ":lib",
-    "//garnet/public/fidl/fuchsia.auth",
+    "$garnet_sdk_fidl/fuchsia.auth",
     "//garnet/public/lib/fidl/cpp",
     "//garnet/public/lib/fxl:fxl_printers",
     "//garnet/public/lib/gtest:gtest",

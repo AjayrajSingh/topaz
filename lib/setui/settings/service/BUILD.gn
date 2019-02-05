@@ -13,10 +13,10 @@ dart_library("service") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.netstack",
-    "//garnet/public/fidl/fuchsia.setui",
-    "//garnet/public/fidl/fuchsia.timezone",
-    "//garnet/public/fidl/fuchsia.wlan.service",
+    "$garnet_sdk_fidl/fuchsia.netstack",
+    "$garnet_sdk_fidl/fuchsia.setui",
+    "$garnet_sdk_fidl/fuchsia.timezone",
+    "$garnet_sdk_fidl/fuchsia.wlan.service",
     "//topaz/lib/settings:lib.settings",
     "//topaz/lib/setui/settings/common:common",
     "//topaz/public/dart/fidl",

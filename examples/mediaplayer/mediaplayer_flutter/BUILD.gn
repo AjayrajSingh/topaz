@@ -16,8 +16,8 @@ flutter_app("mediaplayer_flutter") {
         "config.dart",
       ]
       deps = [
-        "//garnet/public/fidl/fuchsia.ui.viewsv1",
-        "//peridot/public/fidl/fuchsia.modular",
+        "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
+        "$peridot_sdk_fidl/fuchsia.modular",
         "//third_party/dart-pkg/git/flutter/packages/flutter",
         "//topaz/public/dart/fidl",
         "//topaz/public/dart/fuchsia",

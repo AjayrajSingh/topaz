@@ -27,5 +27,5 @@ import 'package:zircon/zircon.dart';
 import 'package:lib.app.dart/app.dart';
 import 'package:fidl/fidl.dart';
 
-// From //peridot/public/fidl/fuchsia.modular
+// From $peridot_sdk_fidl/fuchsia.modular
 import 'package:fidl_fuchsia_modular/fidl.dart';

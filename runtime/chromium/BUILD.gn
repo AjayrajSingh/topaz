@@ -11,8 +11,8 @@ fidl("chromium.web") {
   sources = chromium_web_sources
 
   deps = [
-    "//garnet/public/fidl/fuchsia.sys",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1token",
+    "$garnet_sdk_fidl/fuchsia.sys",
+    "$garnet_sdk_fidl/fuchsia.ui.viewsv1token",
   ]
 }
 

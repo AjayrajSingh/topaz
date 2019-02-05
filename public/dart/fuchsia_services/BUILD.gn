@@ -22,7 +22,7 @@ dart_library("fuchsia_services") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.sys",
+    "$garnet_sdk_fidl/fuchsia.sys",
     "//third_party/dart-pkg/pub/meta",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",

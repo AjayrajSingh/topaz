@@ -26,7 +26,7 @@ source_set("sdk_ext") {
   ]
 
   public_deps = [
-    "//garnet/public/fidl/fuchsia.sys",
+    "$garnet_sdk_fidl/fuchsia.sys",
     "//third_party/tonic",
     "//topaz/public/dart-pkg/zircon",
   ]

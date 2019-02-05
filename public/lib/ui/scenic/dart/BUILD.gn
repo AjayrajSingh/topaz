@@ -16,8 +16,8 @@ dart_library("dart") {
   source_dir = "."
 
   deps = [
-    "//garnet/public/fidl/fuchsia.ui.gfx",
-    "//garnet/public/fidl/fuchsia.ui.scenic",
+    "$garnet_sdk_fidl/fuchsia.ui.gfx",
+    "$garnet_sdk_fidl/fuchsia.ui.scenic",
     "//topaz/public/lib/app/dart",
   ]
 }

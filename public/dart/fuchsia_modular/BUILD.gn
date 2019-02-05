@@ -50,10 +50,10 @@ dart_library("fuchsia_modular") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.auth",
-    "//garnet/public/fidl/fuchsia.sys",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1token",
-    "//peridot/public/fidl/fuchsia.modular",
+    "$garnet_sdk_fidl/fuchsia.auth",
+    "$garnet_sdk_fidl/fuchsia.sys",
+    "$garnet_sdk_fidl/fuchsia.ui.viewsv1token",
+    "$peridot_sdk_fidl/fuchsia.modular",
     "//third_party/dart-pkg/pub/async",
     "//third_party/dart-pkg/pub/meta",
     "//topaz/public/dart/fidl",

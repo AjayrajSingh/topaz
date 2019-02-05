@@ -23,7 +23,7 @@ flutter_app("device_settings") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.amber",
+    "$garnet_sdk_fidl/fuchsia.amber",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/lib/settings:lib.settings",
     "//topaz/public/dart/widgets:lib.widgets",

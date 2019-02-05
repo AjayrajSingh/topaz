@@ -27,7 +27,7 @@ flutter_app("slider_mod") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.testing.runner",
+    "$garnet_sdk_fidl/fuchsia.testing.runner",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/examples/modular/fidl:fibonacci_service",
     "//topaz/examples/modular/models",

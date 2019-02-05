@@ -19,7 +19,7 @@ flutter_app("system_dashboard") {
 
   sources = []
   deps = [
-    "//garnet/public/fidl/fuchsia.scpi",
+    "$garnet_sdk_fidl/fuchsia.scpi",
     "//third_party/dart-pkg/pub/flutter_staggered_grid_view",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

@@ -23,10 +23,10 @@ flutter_app("bluetooth_settings") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.bluetooth",
-    "//garnet/public/fidl/fuchsia.bluetooth.control",
-    "//garnet/public/fidl/fuchsia.bluetooth.gatt",
-    "//garnet/public/fidl/fuchsia.bluetooth.le",
+    "$garnet_sdk_fidl/fuchsia.bluetooth",
+    "$garnet_sdk_fidl/fuchsia.bluetooth.control",
+    "$garnet_sdk_fidl/fuchsia.bluetooth.gatt",
+    "$garnet_sdk_fidl/fuchsia.bluetooth.le",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/lib/settings:lib.settings",
     "//topaz/public/dart/widgets:lib.widgets",

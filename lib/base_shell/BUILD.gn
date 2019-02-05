@@ -15,12 +15,12 @@ dart_library("lib.base_shell") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.netstack",
-    "//garnet/public/fidl/fuchsia.timezone",
-    "//garnet/public/fidl/fuchsia.ui.input",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1",
-    "//peridot/public/fidl/fuchsia.modular",
-    "//peridot/public/fidl/fuchsia.modular.auth",
+    "$garnet_sdk_fidl/fuchsia.netstack",
+    "$garnet_sdk_fidl/fuchsia.timezone",
+    "$garnet_sdk_fidl/fuchsia.ui.input",
+    "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
+    "$peridot_sdk_fidl/fuchsia.modular",
+    "$peridot_sdk_fidl/fuchsia.modular.auth",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",

@@ -13,7 +13,7 @@ import("//build/dart/toolchain.gni")
 #
 #   fidl_target (required)
 #     Specifies the fidl target from which to read fidl json. For example,
-#     "//garnet/public/fidl/fuchsia.setui" for fuchsia.setui.
+#     "$garnet_sdk_fidl/fuchsia.setui" for fuchsia.setui.
 #
 #   template_path (optional)
 #     Specifies the template to use to generate the formatting code. Default

@@ -18,6 +18,6 @@ dart_library("fuchsia_media") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.media",
+    "$garnet_sdk_fidl/fuchsia.media",
   ]
 }

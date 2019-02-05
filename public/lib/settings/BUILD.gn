@@ -20,7 +20,7 @@ dart_library("settings_protos") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.devicesettings",
+    "$garnet_sdk_fidl/fuchsia.devicesettings",
     "//third_party/dart-pkg/pub/protobuf",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_services",

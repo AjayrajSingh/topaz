@@ -56,7 +56,7 @@ class Modifiers {
   static const int _metaCtrlRightOn = 0x4000;
 
   // Fuchsia modifier values. See:
-  // //garnet/public/fidl/fuchsia.ui.input/input_event_constants.fidl
+  // $garnet_sdk_fidl/fuchsia.ui.input/input_event_constants.fidl
   static const int _modifierShiftLeft = 2;
   static const int _modifierShiftRight = 4;
   static const int _modifierShiftMask = 6;

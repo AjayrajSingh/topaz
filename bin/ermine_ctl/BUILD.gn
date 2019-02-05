@@ -9,7 +9,7 @@ rustc_binary("bin") {
   name = "ermine_ctl"
   edition = "2018"
   deps = [
-    "//garnet/public/fidl/fuchsia.developer.tiles:fuchsia.developer.tiles-rustc",
+    "$garnet_sdk_fidl/fuchsia.developer.tiles:fuchsia.developer.tiles-rustc",
     "//garnet/public/lib/fidl/rust/fidl",
     "//garnet/public/rust/fuchsia-app",
     "//garnet/public/rust/fuchsia-async",

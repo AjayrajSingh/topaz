@@ -20,9 +20,9 @@ flutter_app("sketchy_flutter") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.ui.gfx",
-    "//garnet/public/fidl/fuchsia.ui.scenic",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1",
+    "$garnet_sdk_fidl/fuchsia.ui.gfx",
+    "$garnet_sdk_fidl/fuchsia.ui.scenic",
+    "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/lib/ui/flutter",
     "//topaz/public/lib/ui/scenic/dart",

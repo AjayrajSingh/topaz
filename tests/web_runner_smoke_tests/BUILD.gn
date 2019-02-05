@@ -16,7 +16,7 @@ executable("bin") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.sys",
+    "$garnet_sdk_fidl/fuchsia.sys",
     "//garnet/public/lib/component/cpp/testing",
     "//garnet/public/lib/fxl",
     "//third_party/googletest:gtest_main",

@@ -124,11 +124,11 @@ template("flutter_runner") {
     ]
 
     deps = [
-             "//garnet/public/fidl/fuchsia.accessibility",
-             "//garnet/public/fidl/fuchsia.fonts",
-             "//garnet/public/fidl/fuchsia.ui.app",
-             "//garnet/public/fidl/fuchsia.ui.input",
-             "//garnet/public/fidl/fuchsia.ui.viewsv1",
+             "$garnet_sdk_fidl/fuchsia.accessibility",
+             "$garnet_sdk_fidl/fuchsia.fonts",
+             "$garnet_sdk_fidl/fuchsia.ui.app",
+             "$garnet_sdk_fidl/fuchsia.ui.input",
+             "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
              "//garnet/public/lib/component/cpp",
              "//garnet/public/lib/fsl",
              "//garnet/public/lib/fxl",
@@ -137,7 +137,7 @@ template("flutter_runner") {
              "//garnet/public/lib/ui/gfx/cpp",
              "//garnet/public/lib/ui/scenic/cpp",
              "//garnet/public/lib/vulkan",
-             "//peridot/public/fidl/fuchsia.modular",
+             "$peridot_sdk_fidl/fuchsia.modular",
              "//third_party/dart/runtime/bin:libdart_builtin${product_suffix}",
              "//third_party/rapidjson",
              "//third_party/skia",
@@ -354,7 +354,7 @@ executable("flutter_runner_unittests") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.fonts",
+    "$garnet_sdk_fidl/fuchsia.fonts",
     "//garnet/public/lib/component/cpp",
     "//garnet/public/lib/component/cpp/testing",
     "//garnet/public/lib/fsl",

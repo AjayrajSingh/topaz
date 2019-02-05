@@ -15,8 +15,8 @@ dart_library("dart") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.auth",
-    "//peridot/public/fidl/fuchsia.modular",
+    "$garnet_sdk_fidl/fuchsia.auth",
+    "$peridot_sdk_fidl/fuchsia.modular",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
   ]

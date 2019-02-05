@@ -413,8 +413,8 @@ template("flutter_dart_jit_component") {
 
       if (flutter_driver_extendable) {
         deps += [
-          "//garnet/public/fidl/fuchsia.testing.runner",
-          "//peridot/public/fidl/fuchsia.modular",
+          "$garnet_sdk_fidl/fuchsia.testing.runner",
+          "$peridot_sdk_fidl/fuchsia.modular",
           "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
           "//topaz/public/lib/app/dart",
           "//topaz/public/lib/module/dart",

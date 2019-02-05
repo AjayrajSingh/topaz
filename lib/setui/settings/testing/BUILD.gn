@@ -13,7 +13,7 @@ dart_library("testing") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.setui",
+    "$garnet_sdk_fidl/fuchsia.setui",
     "//topaz/lib/setui/settings/client:client",
     "//topaz/lib/setui/settings/common:common",
   ]
@@ -26,7 +26,7 @@ dart_test("lib_setui_settings_testing_test") {
 
   deps = [
     ":testing",
-    "//garnet/public/fidl/fuchsia.setui",
+    "$garnet_sdk_fidl/fuchsia.setui",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
     "//topaz/lib/setui/settings/common:common",

@@ -49,11 +49,11 @@ flutter_app("userpicker_base_shell") {
   non_dart_deps = [ ":sysui_metrics_config" ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.timezone",
-    "//garnet/public/fidl/fuchsia.ui.input",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1",
-    "//peridot/public/fidl/fuchsia.modular",
-    "//peridot/public/fidl/fuchsia.modular.auth",
+    "$garnet_sdk_fidl/fuchsia.timezone",
+    "$garnet_sdk_fidl/fuchsia.ui.input",
+    "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
+    "$peridot_sdk_fidl/fuchsia.modular",
+    "$peridot_sdk_fidl/fuchsia.modular.auth",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/http",
     "//topaz/lib/base_shell:lib.base_shell",

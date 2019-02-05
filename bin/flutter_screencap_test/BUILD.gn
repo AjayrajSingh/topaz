@@ -18,8 +18,8 @@ flutter_app("flutter_screencap_test_app") {
   sources = []
 
   deps = [
-    "//garnet/public/fidl/fuchsia.sys",
-    "//garnet/public/fidl/fuchsia.testing.runner",
+    "$garnet_sdk_fidl/fuchsia.sys",
+    "$garnet_sdk_fidl/fuchsia.testing.runner",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/lib/app/dart",
   ]

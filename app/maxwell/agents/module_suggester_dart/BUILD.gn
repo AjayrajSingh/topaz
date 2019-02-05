@@ -19,7 +19,7 @@ dart_app("module_suggester") {
   sources = []
 
   deps = [
-    "//peridot/public/fidl/fuchsia.modular",
+    "$peridot_sdk_fidl/fuchsia.modular",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/module_resolver/dart",
     "//topaz/public/lib/proposal/dart",

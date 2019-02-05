@@ -30,9 +30,9 @@ dart_library("lib.widgets") {
   ]
 
   deps = [
-    "//garnet/public/fidl/fuchsia.ui.policy",
-    "//garnet/public/fidl/fuchsia.ui.viewsv1",
-    "//peridot/public/fidl/fuchsia.modular",
+    "$garnet_sdk_fidl/fuchsia.ui.policy",
+    "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
+    "$peridot_sdk_fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/flutter_image",
     "//topaz/bin/ui/skottie_viewer:skottie_loader",

@@ -22,7 +22,7 @@ flutter_app("todo_list") {
   ]
 
   deps = [
-    "//peridot/public/fidl/fuchsia.ledger",
+    "$peridot_sdk_fidl/fuchsia.ledger",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/app_driver/dart",
