@@ -20,6 +20,7 @@
       "//topaz/public/dart/widgets:dart_widget_tests",
       "//topaz/public/lib/app/dart:dart_app_tests",
       "//topaz/public/lib/display/flutter:display_test",
+      "//topaz/public/lib/mondrian/dart:mondrian_lib_tests",
       "//topaz/public/lib/schemas/dart:dart_schema_tests",
       "//topaz/public/lib/testing/app_driver/dart:fake_module_driver_test",
       "//topaz/shell/mondrian_story_shell:mondrian_story_shell_tests"
