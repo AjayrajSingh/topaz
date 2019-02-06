@@ -6,7 +6,7 @@
 
 #include "flutter/fml/make_copyable.h"
 #include "lib/fidl/cpp/optional.h"
-#include "lib/ui/scenic/fidl_helpers.h"
+#include "lib/ui/scenic/cpp/commands.h"
 #include "vsync_recorder.h"
 #include "vsync_waiter.h"
 
