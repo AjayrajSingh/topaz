@@ -8,24 +8,24 @@ import 'dart:io';
 import 'package:fidl_fuchsia_math/fidl.dart' as geom;
 import 'package:fidl_fuchsia_mediaplayer/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
-import 'package:fidl_fuchsia_ui_viewsv1/fidl.dart';
-import 'package:fidl/fidl.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.mediaplayer.dart/audio_player_controller.dart';
-import 'package:lib.ui.flutter/child_view.dart';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
+    show ChildViewConnection;
+import 'package:lib.mediaplayer.dart/audio_player_controller.dart';
+import 'package:lib.ui.flutter/child_view.dart' as deprecated
+    show ChildViewConnection;
+import 'package:zircon/zircon.dart';
 
 /// Controller for MediaPlayer widgets.
 class MediaPlayerController extends AudioPlayerController
     implements Listenable {
   final List<VoidCallback> _listeners = <VoidCallback>[];
 
-  ServiceProvider _services;
-
   Timer _hideTimer;
 
+  bool _shouldCreateNewChildView = false;
+  deprecated.ChildViewConnection _deprecatedVideoViewConnection;
   ChildViewConnection _videoViewConnection;
 
   Size _videoSize = Size.zero;
@@ -36,8 +36,11 @@ class MediaPlayerController extends AudioPlayerController
   /// Constructs a MediaPlayerController.
   MediaPlayerController(ServiceProvider services) : super(services) {
     updateCallback = _notifyListeners;
-    _services = services;
     _close(); // Initialize stuff.
+  }
+
+  set shouldCreateNewChildView(bool should) {
+    _shouldCreateNewChildView = should;
   }
 
   @override
@@ -50,14 +53,18 @@ class MediaPlayerController extends AudioPlayerController
   @override
   void onMediaPlayerCreated(PlayerProxy player) {
     if (!_wasActive) {
-      ViewManagerProxy viewManager = new ViewManagerProxy();
-      connectToService(_services, viewManager.ctrl);
+      final EventPairPair viewTokens = new EventPairPair();
+      assert(viewTokens.status == ZX.OK);
+      player.createView2(viewTokens.first);
 
-      InterfacePair<ViewOwner> viewOwnerPair = new InterfacePair<ViewOwner>();
-      player.createView(viewManager.ctrl.unbind(), viewOwnerPair.passRequest());
-
-      _videoViewConnection =
-          new ChildViewConnection(viewOwnerPair.passHandle());
+      if (_shouldCreateNewChildView) {
+        _videoViewConnection =
+            ChildViewConnection.fromViewHolderToken(viewTokens.second);
+      } else {
+        _deprecatedVideoViewConnection =
+            deprecated.ChildViewConnection.fromViewHolderToken(
+                viewTokens.second);
+      }
     }
   }
 
@@ -69,6 +76,7 @@ class MediaPlayerController extends AudioPlayerController
   }
 
   void _close() {
+    _deprecatedVideoViewConnection = null;
     _videoViewConnection = null;
   }
 
@@ -138,7 +146,9 @@ class MediaPlayerController extends AudioPlayerController
   Size get videoPhysicalSize => hasVideo ? _videoSize : Size.zero;
 
   /// Gets the video view connection.
-  ChildViewConnection get videoViewConnection => _videoViewConnection;
+  deprecated.ChildViewConnection get videoViewConnection =>
+      _deprecatedVideoViewConnection;
+  ChildViewConnection get videoViewConnectionNew => _videoViewConnection;
 
   @override
   void onVideoGeometryUpdated(geom.Size videoSize, geom.Size pixelAspectRatio) {

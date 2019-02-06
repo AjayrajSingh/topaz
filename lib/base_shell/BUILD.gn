@@ -23,8 +23,10 @@ dart_library("lib.base_shell") {
     "$peridot_sdk_fidl/fuchsia.modular.auth",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
+    "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
+    "//topaz/public/lib/ui/flutter",
     "//topaz/shell/widgets",
     "//zircon/public/fidl/fuchsia-net:fuchsia-net",
   ]

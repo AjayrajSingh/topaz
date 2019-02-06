@@ -14,11 +14,14 @@ import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_ui_gfx/fidl.dart';
 import 'package:fidl_fuchsia_ui_input/fidl.dart' as input;
 import 'package:fidl_fuchsia_ui_policy/fidl.dart';
+import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
+    show ChildViewConnection;
 import 'package:lib.app.dart/app.dart' as app;
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.ui.flutter/child_view.dart';
+import 'package:lib.ui.flutter/child_view.dart' as deprecated
+    show ChildViewConnection;
 import 'package:meta/meta.dart';
-import 'package:zircon/zircon.dart' show Channel;
+import 'package:zircon/zircon.dart' show Channel, EventPair;
 
 import 'base_shell_model.dart';
 import 'netstack_model.dart';
@@ -60,6 +63,8 @@ class CommonBaseShellModel extends BaseShellModel
   List<Account> _accounts;
 
   /// Childview connection that contains the session shell.
+  bool _shouldCreateNewChildView = false;
+  deprecated.ChildViewConnection _deprecatedChildViewConnection;
   ChildViewConnection _childViewConnection;
 
   final List<KeyboardCaptureListenerHackBinding> _keyBindings = [];
@@ -82,7 +87,13 @@ class CommonBaseShellModel extends BaseShellModel
   List<Account> get accounts => _accounts;
 
   /// Returns the authenticated child view connection
-  ChildViewConnection get childViewConnection => _childViewConnection;
+  deprecated.ChildViewConnection get childViewConnection =>
+      _deprecatedChildViewConnection;
+  ChildViewConnection get childViewConnectionNew => _childViewConnection;
+
+  set shouldCreateNewChildView(bool should) {
+    _shouldCreateNewChildView = should;
+  }
 
   @override
   void captureKeyboardEventHack(input.KeyboardEvent eventToCapture,
@@ -200,21 +211,40 @@ class CommonBaseShellModel extends BaseShellModel
     final viewOwnerHandle =
         _userManager.login(accountId, serviceProvider.passHandle());
 
-    _childViewConnection = ChildViewConnection(
-      viewOwnerHandle,
-      onAvailable: (ChildViewConnection connection) {
-        trace('session shell available');
-        log.info('BaseShell: Child view connection available!');
-        connection.requestFocus();
-        notifyListeners();
-      },
-      onUnavailable: (ChildViewConnection connection) {
-        trace('BaseShell: Child view connection now unavailable!');
-        log.info('BaseShell: Child view connection now unavailable!');
-        onLogout();
-        notifyListeners();
-      },
-    );
+    if (_shouldCreateNewChildView) {
+      _childViewConnection = ChildViewConnection.fromViewHolderToken(
+        EventPair(viewOwnerHandle.passChannel().passHandle()),
+        onAvailable: (ChildViewConnection connection) {
+          trace('session shell available');
+          log.info('BaseShell: Child view connection available!');
+          connection.requestFocus();
+          notifyListeners();
+        },
+        onUnavailable: (ChildViewConnection connection) {
+          trace('BaseShell: Child view connection now unavailable!');
+          log.info('BaseShell: Child view connection now unavailable!');
+          onLogout();
+          notifyListeners();
+        },
+      );
+    } else {
+      _deprecatedChildViewConnection =
+          deprecated.ChildViewConnection.fromViewHolderToken(
+        EventPair(viewOwnerHandle.passChannel().passHandle()),
+        onAvailable: (deprecated.ChildViewConnection connection) {
+          trace('session shell available');
+          log.info('BaseShell: Child view connection available!');
+          connection.requestFocus();
+          notifyListeners();
+        },
+        onUnavailable: (deprecated.ChildViewConnection connection) {
+          trace('BaseShell: Child view connection now unavailable!');
+          log.info('BaseShell: Child view connection now unavailable!');
+          onLogout();
+          notifyListeners();
+        },
+      );
+    }
     notifyListeners();
   }
 
@@ -222,6 +252,7 @@ class CommonBaseShellModel extends BaseShellModel
   @mustCallSuper
   Future<void> onLogout() async {
     trace('logout');
+    _deprecatedChildViewConnection = null;
     _childViewConnection = null;
     _serviceProviderBinding.close();
     for (PresentationBinding presentationBinding in _presentationBindings) {
