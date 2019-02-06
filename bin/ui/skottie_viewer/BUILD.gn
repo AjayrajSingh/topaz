@@ -32,7 +32,7 @@ executable("skottie_viewer") {
     "$garnet_sdk_fidl/fuchsia.ui.app",
     "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
     "//garnet/public/lib/component/cpp",
-    "//garnet/public/lib/fidl/cpp",
+    "//sdk/lib/fidl/cpp",
 
     # TODO(SCN-1193): Remove fostr dependency.
     "//garnet/public/lib/fostr/fidl/fuchsia.ui.scenic",

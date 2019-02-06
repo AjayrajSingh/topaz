@@ -17,7 +17,7 @@ executable("jank") {
     "$garnet_sdk_fidl/fuchsia.ui.app",
     "$garnet_sdk_fidl/fuchsia.ui.scenic",
     "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
-    "//garnet/public/lib/fidl/cpp",
+    "//sdk/lib/fidl/cpp",
     "//garnet/public/lib/fxl",
     "//garnet/public/lib/ui/base_view/cpp",
     "//third_party/skia",

@@ -19,7 +19,7 @@ source_set("sdk_ext") {
   ]
 
   deps = [
-    "//garnet/public/lib/fidl/cpp",
+    "//sdk/lib/fidl/cpp",
     "//garnet/public/lib/fxl",
     "//third_party/dart/runtime:dart_api",
     "//zircon/public/lib/zx",
