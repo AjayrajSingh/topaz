@@ -674,7 +674,8 @@ Future<Proposal> _createProposal({
     ..annoyanceType = annoyanceType
     ..addStoryCommand(StoryCommand.withAddMod(new AddMod(
       intent: intentBuilder.intent,
-      modName: ['root'],
+      modName: null,
+      modNameTransitional: 'root',  // TODO(MF-148) Move to string |mod_name|
       surfaceParentModName: [],
       surfaceRelation: const SurfaceRelation(),
     )));

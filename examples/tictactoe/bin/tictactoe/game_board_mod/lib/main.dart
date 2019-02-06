@@ -91,7 +91,8 @@ Future<void> _proposeScore(
   final Intent intent = Intent(handler: scoreBoardModUrl);
 
   final AddMod addMod = AddMod(
-    modName: ['ScoreBoard'],
+    modName: null,
+    modNameTransitional: 'ScoreBoard',  // TODO(MF-148) Move to string |mod_name|
     surfaceRelation: const SurfaceRelation(
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,

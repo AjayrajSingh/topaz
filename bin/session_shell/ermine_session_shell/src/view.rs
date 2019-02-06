@@ -386,7 +386,7 @@ impl ErmineView {
         self.puppet_master
             .control_story(&story_name, story_puppet_master_end)?;
         let mut commands = [StoryCommand::AddMod(AddMod {
-            mod_name: vec![random_mod_name()],
+            mod_name_transitional: Some(random_mod_name()),
             intent: Intent {
                 action: None,
                 handler: Some(package),
