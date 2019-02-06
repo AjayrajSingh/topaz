@@ -22,10 +22,10 @@ dart_app("fibonacci_agent") {
   ]
 
   deps = [
-    "//topaz/examples/modular/fidl:fibonacci_service",
     "//topaz/public/dart/fidl",
-    "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_modular/examples/fidl:fibonacci_service",
     "//topaz/public/dart/fuchsia_modular",
+    "//topaz/public/dart/fuchsia",
   ]
 }

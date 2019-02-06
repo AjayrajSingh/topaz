@@ -1,8 +1,8 @@
 {
     "packages": [
-        "//topaz/examples/modular/fibonacci_agent",
-        "//topaz/examples/modular/multilevel_mod",
-        "//topaz/examples/modular/shapes_mod",
-        "//topaz/examples/modular/slider_mod"
+        "//topaz/public/dart/fuchsia_modular/examples/fibonacci_agent",
+        "//topaz/public/dart/fuchsia_modular/examples/multilevel_mod",
+        "//topaz/public/dart/fuchsia_modular/examples/shapes_mod",
+        "//topaz/public/dart/fuchsia_modular/examples/slider_mod"
     ]
 }
