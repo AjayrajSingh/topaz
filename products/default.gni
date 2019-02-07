@@ -2,6 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+# DEPRECATED - Replacement: "fx set <board> --product workstation --monolith bundles/kitchen_sink"
+
 monolith = [ "topaz/packages/default" ]
 
 preinstall = [ "topaz/packages/tools/all" ]

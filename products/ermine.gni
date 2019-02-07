@@ -2,8 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-monolith = [ "topaz/packages/products/ermine" ]
+# DEPRECATED - this import path is deprecated, please use //products/workstation.gni.
 
-preinstall = []
-
-available = []
+import("//products/workstation.gni")

@@ -1,7 +1,6 @@
 {
     "imports": [
         "peridot/packages/peridot",
-        "topaz/packages/all",
-        "topaz/packages/products/ermine"
+        "topaz/packages/all"
     ]
 }
