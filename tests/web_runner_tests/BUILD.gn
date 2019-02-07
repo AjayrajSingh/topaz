@@ -46,6 +46,7 @@ executable("web_runner_pixel_tests") {
     "//garnet/public/lib/component/cpp/testing",
     "//garnet/public/lib/fsl",
     "//sdk/fidl/fuchsia.sys",
+    "//sdk/fidl/fuchsia.ui.app",
     "//sdk/fidl/fuchsia.ui.policy",
     "//sdk/fidl/fuchsia.ui.scenic",
     "//third_party/googletest:gtest_main",

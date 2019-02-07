@@ -9,11 +9,13 @@
 
 #include <chromium/web/cpp/fidl.h>
 #include <fuchsia/sys/cpp/fidl.h>
+#include <fuchsia/ui/app/cpp/fidl.h>
 #include <fuchsia/ui/policy/cpp/fidl.h>
 #include <fuchsia/ui/scenic/cpp/fidl.h>
 #include <gtest/gtest.h>
 #include <lib/component/cpp/startup_context.h>
 #include <lib/fdio/util.h>
+#include <lib/fit/defer.h>
 #include <lib/fit/function.h>
 #include <lib/fsl/vmo/vector.h>
 #include <lib/fxl/files/file.h>
@@ -26,6 +28,9 @@
 #include "topaz/tests/web_runner_tests/test_server.h"
 
 namespace {
+
+// Max time to wait in failure cases before bailing.
+constexpr zx::duration kTimeout = zx::sec(15);
 
 std::map<uint32_t, size_t> Histogram(
     const fuchsia::ui::scenic::ScreenshotData& screenshot) {
@@ -45,6 +50,34 @@ std::map<uint32_t, size_t> Histogram(
   }
 
   return histogram;
+}
+
+// Runs the test server on its own thread, with proper cleanup to prevent
+// deadlock. |serve| must terminate after |server->Accept()| returns false.
+auto ServeAsync(web_runner_tests::TestServer* server, fit::closure serve) {
+  auto server_thread = std::make_unique<fxl::Thread>(std::move(serve));
+  server_thread->Run();
+  // The socket must be closed before the thread goes out of scope so that any
+  // blocking |Accept| calls terminate so that |serve| can terminate.
+  return fit::defer(
+      [server, server_thread = std::move(server_thread)] { server->Close(); });
+}
+
+// Responds to a GET request, testing that the request looks as expected.
+void MockHttpGetResponse(web_runner_tests::TestServer* server,
+                         const char* resource) {
+  std::string expected_prefix = fxl::StringPrintf("GET /%s HTTP", resource);
+  std::vector<char> buf;
+  // |Read| requires preallocate (see sys/socket.h: read)
+  buf.resize(4096);
+
+  EXPECT_TRUE(server->Read(&buf));
+  EXPECT_GE(buf.size(), expected_prefix.size());
+  EXPECT_EQ(expected_prefix, std::string(buf.data(), expected_prefix.size()));
+  std::string content;
+  FXL_CHECK(files::ReadFileToString(fxl::StringPrintf("/pkg/data/%s", resource),
+                                    &content));
+  FXL_CHECK(server->WriteContent(content));
 }
 
 // Base fixture for web runner pixel tests, containing Scenic and presentation
@@ -80,7 +113,7 @@ class WebRunnerPixelTest : public gtest::RealLoopFixture {
 
   bool ScreenshotUntil(
       fit::function<bool(fuchsia::ui::scenic::ScreenshotData)> condition,
-      zx::duration timeout = zx::sec(15)) {
+      zx::duration timeout = kTimeout) {
     zx::time start = zx::clock::get_monotonic();
     while (zx::clock::get_monotonic() - start <= timeout) {
       fuchsia::ui::scenic::ScreenshotData screenshot;
@@ -102,11 +135,59 @@ class WebRunnerPixelTest : public gtest::RealLoopFixture {
     return false;
   }
 
+  void ExpectSolidColor(uint32_t argb) {
+    std::map<uint32_t, size_t> histogram;
+
+    FXL_LOG(INFO) << "Looking for color " << std::hex << argb;
+    EXPECT_TRUE(ScreenshotUntil(
+        [argb, &histogram](fuchsia::ui::scenic::ScreenshotData screenshot) {
+          histogram = Histogram(screenshot);
+          FXL_LOG(INFO) << histogram[argb] << " px";
+          return histogram[argb] > 0u;
+        }));
+
+    histogram.erase(argb);
+    EXPECT_EQ((std::map<uint32_t, size_t>){}, histogram) << "Unexpected colors";
+  }
+
  private:
   std::unique_ptr<component::StartupContext> context_;
   fuchsia::sys::ComponentControllerPtr runner_ctrl_;
   fuchsia::ui::scenic::ScenicPtr scenic_;
 };
+
+// Loads a static page with a solid color via the component framework and
+// verifies that the color is the only color onscreen.
+TEST_F(WebRunnerPixelTest, Static) {
+  static constexpr uint32_t kTargetColor = 0xffff00ff;
+
+  web_runner_tests::TestServer server;
+  FXL_CHECK(server.FindAndBindPort());
+
+  // Chromium and the Fuchsia network package loader both send us requests. This
+  // may go away after MI4-1807; although the race seems to be in Modular, the
+  // fix may remove the unnecessary net request in component framework.
+  auto serve = ServeAsync(&server, [&server] {
+    while (server.Accept()) {
+      MockHttpGetResponse(&server, "static.html");
+    }
+  });
+
+  component::Services services;
+  fuchsia::sys::ComponentControllerPtr controller;
+
+  context()->launcher()->CreateComponent(
+      {.url =
+           fxl::StringPrintf("http://localhost:%d/static.html", server.port()),
+       .directory_request = services.NewRequest()},
+      controller.NewRequest());
+
+  // Present the view.
+  services.ConnectToService<fuchsia::ui::app::ViewProvider>()->CreateView(
+      CreatePresentationViewToken(), nullptr, nullptr);
+
+  ExpectSolidColor(kTargetColor);
+}
 
 // This fixture uses chromium.web FIDL services to interact with Chromium.
 class ChromiumFidlTest : public WebRunnerPixelTest,
@@ -121,7 +202,7 @@ class ChromiumFidlTest : public WebRunnerPixelTest,
 
     zx_handle_t incoming_service_clone =
         fdio_service_clone(context()->incoming_services()->directory().get());
-    EXPECT_NE(ZX_HANDLE_INVALID, incoming_service_clone);
+    FXL_CHECK(incoming_service_clone != ZX_HANDLE_INVALID);
 
     chromium::web::CreateContextParams params;
     params.service_directory = zx::channel(incoming_service_clone);
@@ -173,34 +254,20 @@ class ChromiumFidlTest : public WebRunnerPixelTest,
       navigation_event_observer_binding_;
 };
 
-// Loads a static page with a solid color, and verifies that the color is the
-// only color onscreen.
+// Loads a static page with a solid color via chromium.web interfaces and
+// verifies that the color is the only color onscreen.
 TEST_F(ChromiumFidlTest, StaticChromiumFidl) {
   static constexpr uint32_t kTargetColor = 0xffff00ff;
 
   web_runner_tests::TestServer server;
   FXL_CHECK(server.FindAndBindPort());
 
-  // Accept could block indefinitely in the failure case, so use a thread to
-  // time it out.
-  fxl::Thread server_thread([&server] {
+  auto serve = ServeAsync(&server, [&server] {
     FXL_LOG(INFO) << "Waiting for HTTP request from Chromium";
     ASSERT_TRUE(server.Accept())
         << "Did not receive HTTP request from Chromium";
-
-    std::string expected_prefix = "GET /static.html HTTP";
-    std::vector<char> buf;
-    // |Read| requires preallocate (see sys/socket.h: read)
-    buf.resize(4096);
-
-    EXPECT_TRUE(server.Read(&buf));
-    EXPECT_GE(buf.size(), expected_prefix.size());
-    EXPECT_EQ(expected_prefix, std::string(buf.data(), expected_prefix.size()));
-    std::string content;
-    FXL_CHECK(files::ReadFileToString("/pkg/data/static.html", &content));
-    FXL_CHECK(server.WriteContent(content));
+    MockHttpGetResponse(&server, "static.html");
   });
-  server_thread.Run();
 
   std::string url =
       fxl::StringPrintf("http://localhost:%d/static.html", server.port());
@@ -217,23 +284,10 @@ TEST_F(ChromiumFidlTest, StaticChromiumFidl) {
 
   LaunchPage(url);
 
-  EXPECT_FALSE(RunLoopWithTimeout(zx::sec(15)))
+  EXPECT_FALSE(RunLoopWithTimeout(kTimeout))
       << "Timed out waiting for OnNavigationStateChanged";
-  // Close the socket so |Accept| stops blocking if we never got a request.
-  server.Close();
 
-  std::map<uint32_t, size_t> histogram;
-
-  FXL_LOG(INFO) << "Looking for color " << std::hex << kTargetColor;
-  EXPECT_TRUE(ScreenshotUntil(
-      [&histogram](fuchsia::ui::scenic::ScreenshotData screenshot) {
-        histogram = Histogram(screenshot);
-        FXL_LOG(INFO) << histogram[kTargetColor] << " px";
-        return histogram[kTargetColor] > 0u;
-      }));
-
-  histogram.erase(kTargetColor);
-  EXPECT_EQ((std::map<uint32_t, size_t>){}, histogram) << "Unexpected colors";
+  ExpectSolidColor(kTargetColor);
 }
 
 }  // namespace
