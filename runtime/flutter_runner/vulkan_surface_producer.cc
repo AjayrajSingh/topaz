@@ -220,10 +220,15 @@ bool VulkanSurfaceProducer::TransitionSurfacesToExternal(
 }
 
 std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
-VulkanSurfaceProducer::ProduceSurface(const SkISize& size) {
+VulkanSurfaceProducer::ProduceSurface(
+    const SkISize& size,
+    const flow::LayerRasterCacheKey& layer_key,
+    std::unique_ptr<scenic::EntityNode> entity_node) {
   FML_DCHECK(valid_);
   last_produce_time_ = fxl::TimePoint::Now();
-  return surface_pool_->AcquireSurface(size);
+  auto surface = surface_pool_->AcquireSurface(size);
+  surface->SetRetainedInfo(layer_key, std::move(entity_node));
+  return surface;
 }
 
 void VulkanSurfaceProducer::SubmitSurface(

@@ -25,8 +25,7 @@ class VulkanSurfacePool final {
 
   ~VulkanSurfacePool();
 
-  std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
-  AcquireSurface(const SkISize& size);
+  std::unique_ptr<VulkanSurface> AcquireSurface(const SkISize& size);
 
   void SubmitSurface(
       std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
@@ -38,22 +37,56 @@ class VulkanSurfacePool final {
   // small as they can be.
   void ShrinkToFit();
 
+  // For |VulkanSurfaceProducer::HasRetainedNode|.
+  bool HasRetainedNode(const flow::LayerRasterCacheKey& key) const {
+    return retained_surfaces_.find(key) != retained_surfaces_.end();
+  }
+  // For |VulkanSurfaceProducer::GetRetainedNode|.
+  const scenic::EntityNode& GetRetainedNode(
+      const flow::LayerRasterCacheKey& key)  {
+    FML_DCHECK(HasRetainedNode(key));
+    return retained_surfaces_[key].vk_surface->GetRetainedNode();
+  }
+
+
  private:
+  // Struct for retained_surfaces_ map.
+  struct RetainedSurface {
+    // If |is_pending| is true, the |vk_surface| is still under painting
+    // (similar to those in |pending_surfaces_|) so we can't recycle the
+    // |vk_surface| yet.
+    bool is_pending;
+    std::unique_ptr<VulkanSurface> vk_surface;
+  };
+
   vulkan::VulkanProvider& vulkan_provider_;
   sk_sp<GrContext> context_;
   scenic::Session* scenic_session_;
   std::vector<std::unique_ptr<VulkanSurface>> available_surfaces_;
   std::unordered_map<uintptr_t, std::unique_ptr<VulkanSurface>>
       pending_surfaces_;
+
+  // Retained surfaces keyed by the layer that created and used the surface.
+  flow::LayerRasterCacheKey::Map<RetainedSurface>
+      retained_surfaces_;
+
   size_t trace_surfaces_created_ = 0;
   size_t trace_surfaces_reused_ = 0;
 
-  std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
-  GetCachedOrCreateSurface(const SkISize& size);
+  std::unique_ptr<VulkanSurface> GetCachedOrCreateSurface(const SkISize& size);
 
   std::unique_ptr<VulkanSurface> CreateSurface(const SkISize& size);
 
-  void RecycleSurface(uintptr_t surface_key);
+  void RecycleSurface(std::unique_ptr<VulkanSurface> surface);
+
+  void RecyclePendingSurface(uintptr_t surface_key);
+
+  // Clear the |is_pending| flag of the retained surface.
+  void SignalRetainedReady(flow::LayerRasterCacheKey key);
+
+  // Remove the corresponding surface from |retained_surfaces| and recycle it.
+  // The surface must not be pending.
+  void RecycleRetainedSurface(const flow::LayerRasterCacheKey& key);
 
   void TraceStats();
 

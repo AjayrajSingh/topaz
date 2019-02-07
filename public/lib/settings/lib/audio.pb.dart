@@ -1,34 +1,34 @@
 ///
 //  Generated code. Do not modify.
+//  source: audio.proto
 ///
-// ignore_for_file: non_constant_identifier_names,library_prefixes
+// ignore_for_file: non_constant_identifier_names,library_prefixes,unused_import
 
 // ignore: UNUSED_SHOWN_NAME
-import 'dart:core' show int, bool, double, String, List, override;
+import 'dart:core' show int, bool, double, String, List, Map, override;
 
-import 'package:protobuf/protobuf.dart';
+import 'package:protobuf/protobuf.dart' as $pb;
 
-class Audio extends GeneratedMessage {
-  static final BuilderInfo _i = new BuilderInfo('Audio')
-    ..a<double>(1, 'gain', PbFieldType.OD)
+class Audio extends $pb.GeneratedMessage {
+  static final $pb.BuilderInfo _i = new $pb.BuilderInfo('Audio')
+    ..a<double>(1, 'gain', $pb.PbFieldType.OD)
     ..aOB(2, 'muted')
     ..hasRequiredFields = false
   ;
 
   Audio() : super();
-  Audio.fromBuffer(List<int> i, [ExtensionRegistry r = ExtensionRegistry.EMPTY]) : super.fromBuffer(i, r);
-  Audio.fromJson(String i, [ExtensionRegistry r = ExtensionRegistry.EMPTY]) : super.fromJson(i, r);
+  Audio.fromBuffer(List<int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) : super.fromBuffer(i, r);
+  Audio.fromJson(String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) : super.fromJson(i, r);
   Audio clone() => new Audio()..mergeFromMessage(this);
-  BuilderInfo get info_ => _i;
+  Audio copyWith(void Function(Audio) updates) => super.copyWith((message) => updates(message as Audio));
+  $pb.BuilderInfo get info_ => _i;
   static Audio create() => new Audio();
-  static PbList<Audio> createRepeated() => new PbList<Audio>();
-  static Audio getDefault() {
-    if (_defaultInstance == null) _defaultInstance = new _ReadonlyAudio();
-    return _defaultInstance;
-  }
+  Audio createEmptyInstance() => create();
+  static $pb.PbList<Audio> createRepeated() => new $pb.PbList<Audio>();
+  static Audio getDefault() => _defaultInstance ??= create()..freeze();
   static Audio _defaultInstance;
   static void $checkItem(Audio v) {
-    if (v is! Audio) checkItemFailed(v, 'Audio');
+    if (v is! Audio) $pb.checkItemFailed(v, _i.qualifiedMessageName);
   }
 
   double get gain => $_getN(0);
@@ -41,6 +41,4 @@ class Audio extends GeneratedMessage {
   bool hasMuted() => $_has(1);
   void clearMuted() => clearField(2);
 }
-
-class _ReadonlyAudio extends Audio with ReadonlyMessageMixin {}
 

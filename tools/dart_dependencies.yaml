@@ -14,8 +14,8 @@ dependencies:
   googleapis: ^0.52.0+1
   html_unescape: ^1.0.1
   markdown: ^2.0.2
-  protobuf: ^0.10.4
-  protoc_plugin: ^0.10.5
+  protobuf: ^0.13.2
+  protoc_plugin: ^15.0.3
   strings: ^0.1.0
   tuple: ^1.0.2
   uuid: ^1.0.3

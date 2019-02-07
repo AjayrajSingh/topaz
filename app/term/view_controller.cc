@@ -13,6 +13,7 @@
 #include "lib/fxl/strings/string_printf.h"
 #include "lib/ui/input/cpp/formatting.h"
 #include "third_party/skia/include/core/SkFont.h"
+#include "third_party/skia/include/core/SkFontMetrics.h"
 #include "third_party/skia/include/core/SkPaint.h"
 #include "topaz/app/term/key_util.h"
 #include "topaz/app/term/pty_server.h"

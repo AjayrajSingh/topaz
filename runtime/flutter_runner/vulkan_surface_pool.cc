@@ -31,7 +31,7 @@ VulkanSurfacePool::VulkanSurfacePool(vulkan::VulkanProvider& vulkan_provider,
 
 VulkanSurfacePool::~VulkanSurfacePool() {}
 
-std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
+std::unique_ptr<VulkanSurface>
 VulkanSurfacePool::AcquireSurface(const SkISize& size) {
   auto surface = GetCachedOrCreateSurface(size);
 
@@ -48,7 +48,7 @@ VulkanSurfacePool::AcquireSurface(const SkISize& size) {
   return surface;
 }
 
-std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
+std::unique_ptr<VulkanSurface>
 VulkanSurfacePool::GetCachedOrCreateSurface(const SkISize& size) {
   // First try to find a surface that exactly matches |size|.
   {
@@ -121,16 +121,42 @@ void VulkanSurfacePool::SubmitSurface(
     return;
   }
 
-  uintptr_t surface_key = reinterpret_cast<uintptr_t>(vulkan_surface.get());
 
-  auto insert_iterator = pending_surfaces_.insert(std::make_pair(
-      surface_key,               // key
-      std::move(vulkan_surface)  // value
-      ));
-
-  if (insert_iterator.second) {
-    insert_iterator.first->second->SignalWritesFinished(
-        std::bind(&VulkanSurfacePool::RecycleSurface, this, surface_key));
+  const flow::LayerRasterCacheKey& retained_key =
+      vulkan_surface->GetRetainedKey();
+  if (retained_key.id() != nullptr) {
+    // Add the surface to |retained_surfaces_| if its retained key has a non-
+    // null layer (|retained_key.id()|).
+    //
+    // We have to add the entry to |retained_surfaces_| map early when it's
+    // still pending (|is_pending| = true). Otherwise (if we add the surface
+    // later when |SignalRetainedReady| is called), Flutter would fail to find
+    // the retained node before the painting is done (which could take multiple
+    // frames). Flutter would then create a new |VulkanSurface| for the layer
+    // upon the failed lookup. The new |VulkanSurface| would invalidate this
+    // surface, and before the new |VulkanSurface| is done painting, another
+    // newer |VulkanSurface| is likely to be created to replace the new
+    // |VulkanSurface|. That would make the retained rendering much less useful
+    // in improving the performance.
+    auto insert_iterator = retained_surfaces_.insert(std::make_pair(
+        retained_key,
+        RetainedSurface({true, std::move(vulkan_surface)})
+    ));
+    if (insert_iterator.second) {
+      insert_iterator.first->second.vk_surface->SignalWritesFinished(
+          std::bind(&VulkanSurfacePool::SignalRetainedReady, this, retained_key));
+    }
+  } else {
+    uintptr_t surface_key = reinterpret_cast<uintptr_t>(vulkan_surface.get());
+    auto insert_iterator = pending_surfaces_.insert(std::make_pair(
+        surface_key,               // key
+        std::move(vulkan_surface)  // value
+    ));
+    if (insert_iterator.second) {
+      insert_iterator.first->second->SignalWritesFinished(
+          std::bind(&VulkanSurfacePool::RecyclePendingSurface,
+                    this, surface_key));
+    }
   }
 }
 
@@ -147,7 +173,7 @@ std::unique_ptr<VulkanSurface> VulkanSurfacePool::CreateSurface(
   return surface;
 }
 
-void VulkanSurfacePool::RecycleSurface(uintptr_t surface_key) {
+void VulkanSurfacePool::RecyclePendingSurface(uintptr_t surface_key) {
   // Before we do anything, we must clear the surface from the collection of
   // pending surfaces.
   auto found_in_pending = pending_surfaces_.find(surface_key);
@@ -160,17 +186,40 @@ void VulkanSurfacePool::RecycleSurface(uintptr_t surface_key) {
   auto surface_to_recycle = std::move(found_in_pending->second);
   pending_surfaces_.erase(found_in_pending);
 
+  RecycleSurface(std::move(surface_to_recycle));
+}
+
+void VulkanSurfacePool::RecycleSurface(std::unique_ptr<VulkanSurface> surface) {
   // The surface may have become invalid (for example it the fences could
   // not be reset).
-  if (!surface_to_recycle->IsValid()) {
+  if (!surface->IsValid()) {
     return;
   }
 
   // Recycle the buffer by putting it in the list of available surfaces if we
   // have not reached the maximum amount of cached surfaces.
   if (available_surfaces_.size() < kMaxSurfaces) {
-    available_surfaces_.push_back(std::move(surface_to_recycle));
+    available_surfaces_.push_back(std::move(surface));
   }
+}
+
+void VulkanSurfacePool::RecycleRetainedSurface(
+    const flow::LayerRasterCacheKey& key) {
+  auto it = retained_surfaces_.find(key);
+  if (it == retained_surfaces_.end()) {
+    return;
+  }
+
+  // The surface should not be pending.
+  FML_DCHECK(!it->second.is_pending);
+
+  auto surface_to_recycle = std::move(it->second.vk_surface);
+  retained_surfaces_.erase(it);
+  RecycleSurface(std::move(surface_to_recycle));
+}
+
+void VulkanSurfacePool::SignalRetainedReady(flow::LayerRasterCacheKey key) {
+  retained_surfaces_[key].is_pending = false;
 }
 
 void VulkanSurfacePool::AgeAndCollectOldBuffers() {
@@ -203,6 +252,25 @@ void VulkanSurfacePool::AgeAndCollectOldBuffers() {
     } else {
       FML_DLOG(ERROR) << "Failed to create a new shrunk surface";
     }
+  }
+
+  // Recycle retained surfaces that are not used and not pending in this frame.
+  //
+  // It's safe to recycle any retained surfaces that are not pending no matter
+  // whether they're used or not. Hence if there's memory pressure, feel free to
+  // recycle all retained surfaces that are not pending.
+  std::vector<flow::LayerRasterCacheKey> recycle_keys;
+  for (auto&[key, retained_surface] : retained_surfaces_) {
+    if (retained_surface.is_pending ||
+      retained_surface.vk_surface->IsUsedInRetainedRendering()) {
+      // Reset the flag for the next frame
+      retained_surface.vk_surface->ResetIsUsedInRetainedRendering();
+    } else {
+      recycle_keys.push_back(key);
+    }
+  }
+  for (auto& key : recycle_keys) {
+    RecycleRetainedSurface(key);
   }
 
   TraceStats();
@@ -257,6 +325,7 @@ void VulkanSurfacePool::TraceStats() {
                 "Created", trace_surfaces_created_,               //
                 "Reused", trace_surfaces_reused_,                 //
                 "PendingInCompositor", pending_surfaces_.size(),  //
+                "Retained", retained_surfaces_.size(),            //
                 "SkiaCacheResources", skia_resources,             //
                 "SkiaCacheBytes", skia_bytes,                     //
                 "SkiaCachePurgeable", skia_cache_purgeable        //
