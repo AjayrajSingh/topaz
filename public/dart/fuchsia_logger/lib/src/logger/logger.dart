@@ -44,7 +44,7 @@ LogWriter _logWriter;
 ///
 /// If [level] is provided, only the log messages of which level is greater than
 /// equal to the provided [level] will be shown. If not provided, it defaults to
-/// [Level.INFO].
+/// [Level.ALL].
 ///
 /// If [globalTags] is provided, these tags will be added to each message logged
 /// via this logger. The logger can accept 5 global tags, however, one of those
@@ -65,7 +65,7 @@ void setupLogger({
   // set the log variable to the root logger and set the level to that
   // specified by level. We do this so subsequent calls to the log method
   // will not run the default setup method.
-  log = Logger.root..level = level ?? Level.INFO;
+  log = Logger.root..level = level ?? Level.ALL;
 
   // connect to the logger writer here. If log has already been called this
   // method will be a noop. At this point, _logWriter will not be null
