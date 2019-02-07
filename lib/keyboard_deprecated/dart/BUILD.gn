@@ -12,7 +12,7 @@ dart_library("dart") {
   ]
 
   deps = [
-    "$garnet_sdk_fidl/fuchsia.ui.input",
+    "//sdk/fidl/fuchsia.ui.input",
     "//topaz/lib/shell",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_logger",

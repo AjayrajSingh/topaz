@@ -6,9 +6,9 @@ import("//topaz/bin/dart_fidl_json/dart_fidl_json.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
 json_fidl("fuchsia.setui.json") {
-  fidl_target = "$garnet_sdk_fidl/fuchsia.setui"
+  fidl_target = "//sdk/fidl/fuchsia.setui"
 
   deps = [
-    "$garnet_sdk_fidl/fuchsia.setui",
+    "//sdk/fidl/fuchsia.setui",
   ]
 }

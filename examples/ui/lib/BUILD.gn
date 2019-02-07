@@ -46,7 +46,7 @@ source_set("skia_fonts") {
   deps = [
     ":skia_type_converters",
     ":skia_vmo",
-    "$garnet_sdk_fidl/fuchsia.fonts",
+    "//sdk/fidl/fuchsia.fonts",
     "//garnet/public/lib/fxl",
     "//third_party/skia",
   ]
@@ -61,7 +61,7 @@ source_set("skia_type_converters") {
   ]
 
   public_deps = [
-    "$garnet_sdk_fidl/fuchsia.math",
+    "//sdk/fidl/fuchsia.math",
     "//garnet/public/lib/fsl",
     "//third_party/skia",
   ]

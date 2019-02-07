@@ -18,7 +18,7 @@ dart_fuchsia_test("dart_app_service_tests") {
 
   deps = [
     "//garnet/examples/fidl/services:echo2",
-    "$garnet_sdk_fidl/fuchsia.sys",
+    "//sdk/fidl/fuchsia.sys",
     "//third_party/dart-pkg/pub/test",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",

@@ -13,7 +13,7 @@ dart_library("lib.story_shell") {
   ]
 
   deps = [
-    "$peridot_sdk_fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.modular",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/widgets:lib.widgets",

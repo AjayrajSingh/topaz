@@ -14,8 +14,8 @@ dart_library("xi_fuchsia_client") {
 
   deps = [
     "../client:xi_client",
-    "$garnet_sdk_fidl/fuchsia.xi",
-    "$peridot_sdk_fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.xi",
+    "//sdk/fidl/fuchsia.modular",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
     "//topaz/public/lib/app/dart",

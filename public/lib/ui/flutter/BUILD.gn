@@ -17,9 +17,9 @@ dart_library("flutter") {
   source_dir = "."
 
   deps = [
-    "$garnet_sdk_fidl/fuchsia.math",
-    "$garnet_sdk_fidl/fuchsia.ui.app",
-    "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
+    "//sdk/fidl/fuchsia.math",
+    "//sdk/fidl/fuchsia.ui.app",
+    "//sdk/fidl/fuchsia.ui.viewsv1",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",
     "//topaz/public/lib/app/dart",

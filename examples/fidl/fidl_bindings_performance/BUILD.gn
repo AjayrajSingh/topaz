@@ -18,7 +18,7 @@ dart_app("fidl_bindings_performance") {
   sources = []
   deps = [
     "//garnet/examples/fidl/services:echo2",
-    "$garnet_sdk_fidl/fuchsia.sys",
+    "//sdk/fidl/fuchsia.sys",
     "//third_party/dart-pkg/pub/args",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",

@@ -29,7 +29,7 @@ dart_library("dart") {
 
   deps = [
     ":modules_metrics_registry_dartlib",
-    "$peridot_sdk_fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.modular",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
     "//topaz/public/lib/entity/dart",

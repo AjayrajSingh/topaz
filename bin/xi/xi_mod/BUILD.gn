@@ -17,9 +17,9 @@ flutter_app("xi_mod") {
 
   sources = []
   deps = [
-    "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
-    "$garnet_sdk_fidl/fuchsia.xi",
-    "$peridot_sdk_fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.ui.viewsv1",
+    "//sdk/fidl/fuchsia.xi",
+    "//sdk/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/lib/xi/fuchsia_client:xi_fuchsia_client",
     "//topaz/lib/xi/widgets:xi_widgets",

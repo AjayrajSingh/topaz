@@ -18,8 +18,8 @@ dart_library("fuchsia_scenic") {
   ]
 
   deps = [
-    "$garnet_sdk_fidl/fuchsia.ui.gfx",
-    "$garnet_sdk_fidl/fuchsia.ui.scenic",
+    "//sdk/fidl/fuchsia.ui.gfx",
+    "//sdk/fidl/fuchsia.ui.scenic",
     "//topaz/public/dart/zircon",
   ]
 }

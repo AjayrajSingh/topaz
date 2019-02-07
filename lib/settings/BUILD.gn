@@ -14,7 +14,7 @@ dart_library("lib.settings") {
   ]
 
   deps = [
-    "$garnet_sdk_fidl/fuchsia.devicesettings",
+    "//sdk/fidl/fuchsia.devicesettings",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/widgets:lib.widgets",
   ]

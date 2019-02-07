@@ -12,8 +12,8 @@ dart_library("dart") {
   ]
 
   deps = [
-    "$garnet_sdk_fidl/fuchsia.device.display",
-    "$garnet_sdk_fidl/fuchsia.devicesettings",
+    "//sdk/fidl/fuchsia.device.display",
+    "//sdk/fidl/fuchsia.devicesettings",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
   ]

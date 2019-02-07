@@ -16,8 +16,8 @@ dart_library("flutter") {
   ]
 
   deps = [
-    "$garnet_sdk_fidl/fuchsia.media",
-    "$garnet_sdk_fidl/fuchsia.ui.viewsv1",
+    "//sdk/fidl/fuchsia.media",
+    "//sdk/fidl/fuchsia.ui.viewsv1",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/lib/app/dart",

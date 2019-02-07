@@ -21,8 +21,8 @@ dart_app("game_tracker_agent") {
   ]
 
   deps = [
-    "$garnet_sdk_fidl/fuchsia.auth",
-    "$peridot_sdk_fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.auth",
+    "//sdk/fidl/fuchsia.modular",
     "//topaz/examples/tictactoe/lib/tictactoe/common",
     "//topaz/examples/tictactoe/public/fidl/tictactoe:game_tracker_service",
     "//topaz/public/dart/fidl",

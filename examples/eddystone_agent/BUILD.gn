@@ -11,9 +11,9 @@ dart_app("eddystone_agent") {
 
   sources = []
   deps = [
-    "$garnet_sdk_fidl/fuchsia.bluetooth",
-    "$garnet_sdk_fidl/fuchsia.bluetooth.le",
-    "$peridot_sdk_fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.bluetooth",
+    "//sdk/fidl/fuchsia.bluetooth.le",
+    "//sdk/fidl/fuchsia.modular",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",

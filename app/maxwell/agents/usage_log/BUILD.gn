@@ -25,7 +25,7 @@ dart_app("usage_log") {
   non_dart_deps = [ ":module_usage_tracking_metrics_registry" ]
 
   deps = [
-    "$peridot_sdk_fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.modular",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/context/dart",

@@ -30,8 +30,8 @@ flutter_app("dashboard") {
   ]
 
   deps = [
-    "$garnet_sdk_fidl/fuchsia.testing.runner",
-    "$peridot_sdk_fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.testing.runner",
+    "//sdk/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/buildbucket",
     "//third_party/dart-pkg/pub/html",

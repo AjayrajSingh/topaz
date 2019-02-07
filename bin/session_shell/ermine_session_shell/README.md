@@ -9,7 +9,7 @@ story.
 This initial version implements the same approach for view hosting,
 layout and control as ``//garnet/bin/developer/[tiles|tiles_ctl]``. For
 simplicity it re-uses
-``$garnet_sdk_fidl/fuchsia.developer.tiles/tiles.fidl``.
+``//sdk/fidl/fuchsia.developer.tiles/tiles.fidl``.
 
 There is an `ermine_ctl` program you can use to list and remove stories from Ermine. This
 program will be removed as soon as sessionctl supports "list" and "remove".
