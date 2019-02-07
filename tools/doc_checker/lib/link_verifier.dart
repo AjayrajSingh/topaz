@@ -50,7 +50,8 @@ class _LinkVerifier<P> {
         final http.Response response = await http.get(link.uri);
         final int code = response.statusCode;
         if (code == HttpStatus.tooManyRequests) {
-          final int delay = int.tryParse(response.headers['retry-after']) ?? 50;
+          final int delay =
+              int.tryParse(response.headers['retry-after'] ?? '') ?? 50;
           sleep(new Duration(milliseconds: delay));
           continue;
         }
