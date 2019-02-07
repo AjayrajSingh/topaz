@@ -81,7 +81,7 @@ Future<Null> main(List<String> args) async {
     ..addOption(
       _optionDotFile,
       help: 'Path to the dotfile to generate',
-      defaultsTo: 'graph.dot',
+      defaultsTo: '',
     )
     ..addOption(
       _optionGitProject,
@@ -191,7 +191,9 @@ Future<Null> main(List<String> args) async {
     ..sort((Error a, Error b) => a.type.index - b.type.index)
     ..forEach(reportError);
 
-  graph.export('fuchsia_docs', new File(options[_optionDotFile]).openWrite());
+  if (options[_optionDotFile].isNotEmpty) {
+    graph.export('fuchsia_docs', new File(options[_optionDotFile]).openWrite());
+  }
 
   if (errors.isNotEmpty) {
     print('Found ${errors.length} error(s).');
