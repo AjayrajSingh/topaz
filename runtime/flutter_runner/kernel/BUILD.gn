@@ -51,11 +51,14 @@ template("core_snapshot") {
         "$target_gen_dir/isolate_snapshot${product_suffix}.bin"
     isolate_snapshot_instructions =
         "$target_gen_dir/isolate_snapshot_instructions${product_suffix}.bin"
+    snapshot_profile =
+        "$target_gen_dir/snapshot_profile${product_suffix}.json"
     outputs = [
       vm_snapshot_data,
       vm_snapshot_instructions,
       isolate_snapshot_data,
       isolate_snapshot_instructions,
+      snapshot_profile,
     ]
 
     if (invoker.product) {
@@ -83,6 +86,8 @@ template("core_snapshot") {
           rebase_path(isolate_snapshot_data, root_build_dir),
       "--isolate_snapshot_instructions=" +
           rebase_path(isolate_snapshot_instructions, root_build_dir),
+      "--write_v8_snapshot_profile_to=" +
+          rebase_path(snapshot_profile, root_build_dir),
     ]
     if (is_debug && !invoker.product) {
       args += [ "--enable_asserts" ]
