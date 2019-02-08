@@ -4,6 +4,7 @@
 
 import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
+import("//build/testing/environments.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
 dart_library("fuchsia_modular") {
@@ -120,4 +121,5 @@ dart_fuchsia_test("fuchsia_modular_package_integration_tests") {
     "//third_party/dart-pkg/pub/mockito",  # Remove after DX-470 is fixed
     "//third_party/dart-pkg/pub/test",
   ]
+  environments = basic_envs
 }

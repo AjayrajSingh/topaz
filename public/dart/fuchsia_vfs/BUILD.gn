@@ -4,6 +4,7 @@
 
 import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
+import("//build/testing/environments.gni")
 
 dart_library("fuchsia_vfs") {
   package_name = "fuchsia_vfs"
@@ -49,4 +50,5 @@ dart_fuchsia_test("fuchsia_vfs_package_unittests") {
     "//garnet/examples/fidl/services:echo",
     "//third_party/dart-pkg/pub/test",
   ]
+  environments = basic_envs
 }

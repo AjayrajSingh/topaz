@@ -4,6 +4,7 @@
 
 import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
+import("//build/testing/environments.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
 dart_library("sledge") {
@@ -135,4 +136,5 @@ dart_fuchsia_test("sledge_integration_tests") {
     ":sledge",
     "//third_party/dart-pkg/pub/test",
   ]
+  environments = basic_envs
 }

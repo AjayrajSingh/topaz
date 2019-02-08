@@ -30,8 +30,8 @@ flutter_app("slider_mod") {
     "//sdk/fidl/fuchsia.testing.runner",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fuchsia_logger",
-    "//topaz/public/dart/fuchsia_modular/examples/fidl:fibonacci_service",
     "//topaz/public/dart/fuchsia_modular",
+    "//topaz/public/dart/fuchsia_modular/examples/fidl:fibonacci_service",
     "//topaz/public/dart/fuchsia_modular/examples/models",
     "//topaz/public/dart/fuchsia_services",
   ]
@@ -49,6 +49,7 @@ flutter_app("slider_mod") {
 # Runs these tests using:
 #   fx shell /pkgfs/packages/topaz_modular_integration_tests/0/bin/run_topaz_modular_integration_tests.sh slider_mod_tests
 dart_fuchsia_test("slider_mod_tests") {
+  # TODO(IN-991): Use environments rather than this hack.
   package_only = true
 
   sources = [

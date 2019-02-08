@@ -8,7 +8,6 @@ import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 # The main app.
 flutter_app("driver_example_mod") {
-
   package_name = "driver_example_mod"
 
   main_dart = "lib/main.dart"
@@ -39,6 +38,7 @@ flutter_app("driver_example_mod") {
 #
 # The target application must be runnning on the machine.
 dart_fuchsia_test("driver_example_mod_target_tests") {
+  # TODO(IN-991): Use environments rather than this hack.
   package_only = true
 
   sources = []

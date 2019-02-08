@@ -5,6 +5,7 @@
 assert(is_fuchsia)
 
 import("//build/test/test_package.gni")
+import("//build/testing/environments.gni")
 import("//build/vulkan/config.gni")
 import("//garnet/bin/ui/scenic/config.gni")
 import("$flutter_root/shell/gpu/gpu.gni")
@@ -355,10 +356,10 @@ executable("flutter_runner_unittests") {
   ]
 
   deps = [
-    "//sdk/fidl/fuchsia.fonts",
     "//garnet/public/lib/component/cpp",
     "//garnet/public/lib/component/cpp/testing",
     "//garnet/public/lib/fsl",
+    "//sdk/fidl/fuchsia.fonts",
     "//third_party/googletest:gtest_main",
     "//third_party/icu",
     "//third_party/skia",
@@ -374,6 +375,7 @@ test_package("flutter_runner_tests") {
   tests = [
     {
       name = "flutter_runner_tests"
+      environments = basic_envs
     },
   ]
 

@@ -4,6 +4,7 @@
 
 import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
+import("//build/testing/environments.gni")
 
 # NOTE: You must add any Dart files to sdk_ext.gni.
 
@@ -74,4 +75,5 @@ dart_fuchsia_test("dart_zircon_test") {
       dest = "dart_zircon_test.cmx"
     },
   ]
+  environments = basic_envs
 }

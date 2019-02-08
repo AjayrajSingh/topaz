@@ -4,6 +4,7 @@
 
 import("//build/package.gni")
 import("//build/test/test_package.gni")
+import("//build/testing/environments.gni")
 
 source_set("chromium_context") {
   testonly = true
@@ -91,6 +92,7 @@ package("web_runner_tests") {
   tests = [
     {
       name = "web_runner_integration_tests"
+      environments = basic_envs
     },
     {
       name = "web_runner_pixel_tests"

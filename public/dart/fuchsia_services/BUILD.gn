@@ -4,6 +4,7 @@
 
 import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
+import("//build/testing/environments.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
 dart_library("fuchsia_services") {
@@ -67,4 +68,5 @@ dart_fuchsia_test("fuchsia_services_package_integration_tests") {
     "//third_party/dart-pkg/pub/test",
     "//zircon/public/fidl/fuchsia-io",
   ]
+  environments = basic_envs
 }
