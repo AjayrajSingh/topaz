@@ -14,6 +14,7 @@
 #include <fuchsia/ui/scenic/cpp/fidl.h>
 #include <gtest/gtest.h>
 #include <lib/component/cpp/startup_context.h>
+#include <lib/fdio/spawn.h>
 #include <lib/fdio/util.h>
 #include <lib/fit/defer.h>
 #include <lib/fit/function.h>
@@ -24,6 +25,7 @@
 #include <lib/fxl/threading/thread.h>
 #include <lib/gtest/real_loop_fixture.h>
 #include <lib/zx/time.h>
+#include <zircon/status.h>
 
 #include "topaz/tests/web_runner_tests/test_server.h"
 
@@ -80,6 +82,36 @@ void MockHttpGetResponse(web_runner_tests::TestServer* server,
   FXL_CHECK(server->WriteContent(content));
 }
 
+// Invokes the input tool for input injection.
+// See garnet/bin/ui/input/README.md or `input --help` for usage details.
+// Commands used here:
+//  * tap <x> <y> (scaled out of 1000)
+//  * text <text>
+// TODO(SCN-1262): Expose as a FIDL service.
+void Input(std::vector<const char*> args) {
+  // start with proc name, end with nullptr
+  args.insert(args.begin(), "input");
+  args.push_back(nullptr);
+
+  zx_handle_t proc;
+  zx_status_t status = fdio_spawn(ZX_HANDLE_INVALID, FDIO_SPAWN_CLONE_ALL,
+                                  "/bin/input", args.data(), &proc);
+  FXL_CHECK(status == ZX_OK) << "fdio_spawn: " << zx_status_get_string(status);
+
+  status = zx_object_wait_one(proc, ZX_PROCESS_TERMINATED,
+                              (zx::clock::get_monotonic() + kTimeout).get(),
+                              nullptr);
+  FXL_CHECK(status == ZX_OK)
+      << "zx_object_wait_one: " << zx_status_get_string(status);
+
+  zx_info_process_t info;
+  status = zx_object_get_info(proc, ZX_INFO_PROCESS, &info, sizeof(info),
+                              nullptr, nullptr);
+  FXL_CHECK(status == ZX_OK)
+      << "zx_object_get_info: " << zx_status_get_string(status);
+  FXL_CHECK(info.return_code == 0) << info.return_code;
+}
+
 // Base fixture for web runner pixel tests, containing Scenic and presentation
 // setup, and screenshot utilities.
 class WebRunnerPixelTest : public gtest::RealLoopFixture {
@@ -89,7 +121,7 @@ class WebRunnerPixelTest : public gtest::RealLoopFixture {
     scenic_ =
         context_->ConnectToEnvironmentService<fuchsia::ui::scenic::Scenic>();
     scenic_.set_error_handler([](zx_status_t status) {
-      FAIL() << "Lost connection to Scenic: " << status;
+      FAIL() << "Lost connection to Scenic: " << zx_status_get_string(status);
     });
   }
 
@@ -99,13 +131,16 @@ class WebRunnerPixelTest : public gtest::RealLoopFixture {
   // garnet/examples/ui/hello_base_view
   zx::eventpair CreatePresentationViewToken() {
     zx::eventpair view_holder_token, view_token;
-    FXL_CHECK(zx::eventpair::create(0u, &view_holder_token, &view_token) ==
-              ZX_OK);
+    zx_status_t status =
+        zx::eventpair::create(0u, &view_holder_token, &view_token);
+    FXL_CHECK(status == ZX_OK)
+        << "zx::eventpair::create: " << zx_status_get_string(status);
 
     auto presenter =
         context_->ConnectToEnvironmentService<fuchsia::ui::policy::Presenter>();
-    presenter.set_error_handler(
-        [](zx_status_t status) { FAIL() << "presenter: " << status; });
+    presenter.set_error_handler([](zx_status_t status) {
+      FAIL() << "presenter: " << zx_status_get_string(status);
+    });
     presenter->Present2(std::move(view_holder_token), nullptr);
 
     return view_token;
@@ -148,6 +183,26 @@ class WebRunnerPixelTest : public gtest::RealLoopFixture {
 
     histogram.erase(argb);
     EXPECT_EQ((std::map<uint32_t, size_t>){}, histogram) << "Unexpected colors";
+  }
+
+  void ExpectPrimaryColor(uint32_t color) {
+    std::multimap<size_t, uint32_t> inverse_histogram;
+
+    FXL_LOG(INFO) << "Looking for color " << std::hex << color;
+    EXPECT_TRUE(
+        ScreenshotUntil([color, &inverse_histogram](
+                            fuchsia::ui::scenic::ScreenshotData screenshot) {
+          std::map<uint32_t, size_t> histogram = Histogram(screenshot);
+          FXL_LOG(INFO) << histogram[color] << " px";
+
+          inverse_histogram.clear();
+          for (const auto entry : histogram) {
+            inverse_histogram.emplace(entry.second, entry.first);
+          }
+
+          return (--inverse_histogram.end())->second == color;
+        }))
+        << "Primary color: " << std::hex << (--inverse_histogram.end())->second;
   }
 
  private:
@@ -197,8 +252,9 @@ class ChromiumFidlTest : public WebRunnerPixelTest,
     auto context_provider =
         context()
             ->ConnectToEnvironmentService<chromium::web::ContextProvider>();
-    context_provider.set_error_handler(
-        [](zx_status_t status) { FAIL() << "context_provider: " << status; });
+    context_provider.set_error_handler([](zx_status_t status) {
+      FAIL() << "context_provider: " << zx_status_get_string(status);
+    });
 
     zx_handle_t incoming_service_clone =
         fdio_service_clone(context()->incoming_services()->directory().get());
@@ -207,27 +263,31 @@ class ChromiumFidlTest : public WebRunnerPixelTest,
     chromium::web::CreateContextParams params;
     params.service_directory = zx::channel(incoming_service_clone);
     context_provider->Create(std::move(params), chromium_context_.NewRequest());
-    chromium_context_.set_error_handler(
-        [](zx_status_t status) { FAIL() << "chromium_context_: " << status; });
+    chromium_context_.set_error_handler([](zx_status_t status) {
+      FAIL() << "chromium_context_: " << zx_status_get_string(status);
+    });
 
     chromium_context_->CreateFrame(chromium_frame_.NewRequest());
-    chromium_frame_.set_error_handler(
-        [](zx_status_t status) { FAIL() << "chromium_frame_: " << status; });
+    chromium_frame_.set_error_handler([](zx_status_t status) {
+      FAIL() << "chromium_frame_: " << zx_status_get_string(status);
+    });
 
     // Bind ourselves as a NavigationEventObserver on this frame.
     chromium_frame_->SetNavigationEventObserver(
         navigation_event_observer_binding_.NewBinding());
     navigation_event_observer_binding_.set_error_handler(
         [](zx_status_t status) {
-          FAIL() << "navigation_event_observer_binding_: " << status;
+          FAIL() << "navigation_event_observer_binding_: "
+                 << zx_status_get_string(status);
         });
 
     // And create a view for the frame.
     chromium_frame_->CreateView2(CreatePresentationViewToken(), nullptr,
                                  nullptr);
     chromium_frame_->GetNavigationController(navigation_.NewRequest());
-    navigation_.set_error_handler(
-        [](zx_status_t status) { FAIL() << "navigation_: " << status; });
+    navigation_.set_error_handler([](zx_status_t status) {
+      FAIL() << "navigation_: " << zx_status_get_string(status);
+    });
   }
 
   void LaunchPage(const std::string& url) { navigation_->LoadUrl(url, {}); }
@@ -256,7 +316,7 @@ class ChromiumFidlTest : public WebRunnerPixelTest,
 
 // Loads a static page with a solid color via chromium.web interfaces and
 // verifies that the color is the only color onscreen.
-TEST_F(ChromiumFidlTest, StaticChromiumFidl) {
+TEST_F(ChromiumFidlTest, Static) {
   static constexpr uint32_t kTargetColor = 0xffff00ff;
 
   web_runner_tests::TestServer server;
@@ -288,6 +348,32 @@ TEST_F(ChromiumFidlTest, StaticChromiumFidl) {
       << "Timed out waiting for OnNavigationStateChanged";
 
   ExpectSolidColor(kTargetColor);
+}
+
+// Loads a dynamic page that starts with a Fuchsia background and has a large
+// text box, with Javascript to change the background to the color typed in the
+// text box. This test verifies the initial color, taps on the text box (top
+// quarter of the screen), types a new color, and verifies the changed color.
+TEST_F(ChromiumFidlTest, Dynamic) {
+  static constexpr char kInput[] = "#40e0d0";
+  static constexpr uint32_t kBeforeColor = 0xffff00ff;
+  static constexpr uint32_t kAfterColor = 0xff40e0d0;
+
+  web_runner_tests::TestServer server;
+  FXL_CHECK(server.FindAndBindPort());
+
+  auto serve = ServeAsync(&server, [&server] {
+    ASSERT_TRUE(server.Accept());
+    MockHttpGetResponse(&server, "dynamic.html");
+  });
+
+  LaunchPage(
+      fxl::StringPrintf("http://localhost:%d/dynamic.html", server.port()));
+
+  ExpectPrimaryColor(kBeforeColor);
+  Input({"tap", "500", "125"});  // centered in top quarter of screen
+  Input({"text", kInput});
+  ExpectPrimaryColor(kAfterColor);
 }
 
 }  // namespace

@@ -87,6 +87,10 @@ package("web_runner_tests") {
 
   resources = [
     {
+      path = rebase_path("data/dynamic.html")
+      dest = "dynamic.html"
+    },
+    {
       path = rebase_path("data/static.html")
       dest = "static.html"
     },

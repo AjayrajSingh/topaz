@@ -3,7 +3,10 @@
         "fuchsia.test": {
             "injected-services": {
                 "chromium.web.ContextProvider": "fuchsia-pkg://fuchsia.com/chromium#meta/chromium.cmx",
+                "fuchsia.fonts.Provider": "fuchsia-pkg://fuchsia.com/fonts#meta/fonts.cmx",
+                "fuchsia.ui.input.ImeService": "fuchsia-pkg://fuchsia.com/ime_service#meta/ime_service.cmx",
                 "fuchsia.ui.input.ImeVisibilityService": "fuchsia-pkg://fuchsia.com/ime_service#meta/ime_service.cmx",
+                "fuchsia.ui.input.InputDeviceRegistry": "fuchsia-pkg://fuchsia.com/root_presenter#meta/root_presenter.cmx",
                 "fuchsia.ui.policy.Presenter": "fuchsia-pkg://fuchsia.com/root_presenter#meta/root_presenter.cmx",
                 "fuchsia.ui.scenic.Scenic": "fuchsia-pkg://fuchsia.com/scenic#meta/scenic.cmx",
                 "fuchsia.ui.viewsv1.ViewManager": "fuchsia-pkg://fuchsia.com/view_manager#meta/view_manager.cmx",
@@ -19,13 +22,20 @@
         "binary": "test/web_runner_pixel_tests"
     },
     "sandbox": {
+        "features": [
+            "shell-commands"
+        ],
         "services": [
             "chromium.web.ContextProvider",
+            "fuchsia.fonts.Provider",
             "fuchsia.net.SocketProvider",
             "fuchsia.netstack.Netstack",
             "fuchsia.process.Launcher",
+            "fuchsia.process.Resolver",
             "fuchsia.sys.Launcher",
+            "fuchsia.ui.input.ImeService",
             "fuchsia.ui.input.ImeVisibilityService",
+            "fuchsia.ui.input.InputDeviceRegistry",
             "fuchsia.ui.policy.Presenter",
             "fuchsia.ui.scenic.Scenic",
             "fuchsia.ui.viewsv1.ViewManager"
