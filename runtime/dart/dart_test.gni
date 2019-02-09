@@ -212,7 +212,7 @@ if (current_toolchain == dart_toolchain) {
       # directory
       _invocation_file = "$root_out_dir/$target_name"
 
-      test_spec(target_name) {
+      test_spec(":${target_name}_spec") {
         name = target_name
         location = _invocation_file
       }
