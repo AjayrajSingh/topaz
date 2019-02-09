@@ -3,75 +3,27 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:collection';
 import 'dart:ui' as ui;
 
-import 'package:lib.app.dart/app.dart';
+import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
-import 'package:fidl_fuchsia_math/fidl.dart' as fidl;
+import 'package:fidl_fuchsia_math/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_app/fidl.dart' as app;
-import 'package:fidl_fuchsia_ui_viewsv1/fidl.dart';
+import 'package:fidl_fuchsia_ui_viewsv1/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fidl/fidl.dart';
+import 'package:fuchsia_scenic_flutter/view_container.dart'
+    show
+        nextGlobalViewKey,
+        globalViewContainer,
+        ViewContainerListenerDelegate,
+        ViewContainerListenerImpl;
+import 'package:lib.app.dart/app.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
 import 'mozart.dart';
-
-export 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart' show ViewOwner;
-
-ViewContainerProxy _initViewContainer() {
-  // Analyzer doesn't know Handle must be dart:zircon's Handle
-  final Handle handle = ScenicStartupInfo.takeViewContainer();
-  if (handle == null) {
-    return null;
-  }
-  final ViewContainerProxy proxy = new ViewContainerProxy()
-    ..ctrl.bind(new InterfaceHandle<ViewContainer>(new Channel(handle)))
-    ..setListener(_ViewContainerListenerImpl.instance.createInterfaceHandle());
-
-  assert(() {
-    proxy.ctrl.error.then((ProxyError error) {
-      print('ViewContainerProxy: error: $error');
-    });
-    return true;
-  }());
-
-  return proxy;
-}
-
-final ViewContainerProxy _viewContainer = _initViewContainer();
-
-class _ViewContainerListenerImpl extends ViewContainerListener {
-  final ViewContainerListenerBinding _binding =
-      new ViewContainerListenerBinding();
-
-  InterfaceHandle<ViewContainerListener> createInterfaceHandle() {
-    return _binding.wrap(this);
-  }
-
-  static final _ViewContainerListenerImpl instance =
-      new _ViewContainerListenerImpl();
-
-  @override
-  void onChildAttached(int childKey, ViewInfo childViewInfo, void callback()) {
-    ChildViewConnection connection = _connections[childKey];
-    connection?._onAttachedToContainer(childViewInfo);
-    callback();
-  }
-
-  @override
-  void onChildUnavailable(int childKey, void callback()) {
-    ChildViewConnection connection = _connections[childKey];
-    connection?._onUnavailable();
-    callback();
-  }
-
-  final Map<int, ChildViewConnection> _connections =
-      new HashMap<int, ChildViewConnection>();
-}
 
 typedef ChildViewConnectionCallback = void Function(
     ChildViewConnection connection);
@@ -80,7 +32,7 @@ void _emptyConnectionCallback(ChildViewConnection c) {}
 /// A connection with a child view.
 ///
 /// Used with the [ChildView] widget to display a child view.
-class ChildViewConnection {
+class ChildViewConnection implements ViewContainerListenerDelegate {
   ChildViewConnection(InterfaceHandle<ViewOwner> viewOwner,
       {ChildViewConnectionCallback onAvailable,
       ChildViewConnectionCallback onUnavailable})
@@ -139,37 +91,36 @@ class ChildViewConnection {
   final ChildViewConnectionCallback _onUnavailableCallback;
   EventPair _viewHolderToken;
 
-  static int _nextViewKey = 1;
   int _viewKey;
-
   ViewProperties _currentViewProperties;
+  bool _available = false;
 
   VoidCallback _onViewInfoAvailable;
-  ViewInfo _viewInfo;
   ui.SceneHost _sceneHost;
 
-  void _onAttachedToContainer(ViewInfo viewInfo) {
-    assert(_viewInfo == null);
-    _viewInfo = viewInfo;
+  @override
+  void onAvailable() {
+    _available = true;
     if (_onViewInfoAvailable != null) {
       _onViewInfoAvailable();
     }
     _onAvailableCallback(this);
   }
 
-  void _onUnavailable() {
-    _viewInfo = null;
+  @override
+  void onUnavailable() {
+    _available = false;
     _onUnavailableCallback(this);
   }
 
   void _addChildToViewHost() {
-    if (_viewContainer == null) {
+    if (globalViewContainer == null) {
       return;
     }
     assert(_attached);
     assert(_viewHolderToken != null);
     assert(_viewKey == null);
-    assert(_viewInfo == null);
+    assert(!_available);
     assert(_sceneHost == null);
 
     final EventPairPair sceneTokens = new EventPairPair();
@@ -177,30 +128,32 @@ class ChildViewConnection {
 
     // Analyzer doesn't know Handle must be dart:zircon's Handle
     _sceneHost = new ui.SceneHost(sceneTokens.first.passHandle());
-    _viewKey = _nextViewKey++;
-    _viewContainer.addChild2(_viewKey, _viewHolderToken, sceneTokens.second);
+    _viewKey = nextGlobalViewKey();
+    globalViewContainer.addChild2(
+        _viewKey, _viewHolderToken, sceneTokens.second);
     _viewHolderToken = null;
-    assert(!_ViewContainerListenerImpl.instance._connections
-        .containsKey(_viewKey));
-    _ViewContainerListenerImpl.instance._connections[_viewKey] = this;
+    assert(
+        !ViewContainerListenerImpl.instance.containsConnectionForKey(_viewKey));
+    ViewContainerListenerImpl.instance.addConnectionForKey(_viewKey, this);
   }
 
   void _removeChildFromViewHost() {
-    if (_viewContainer == null) {
+    if (globalViewContainer == null) {
       return;
     }
     assert(!_attached);
     assert(_viewHolderToken == null);
     assert(_viewKey != null);
     assert(_sceneHost != null);
-    assert(_ViewContainerListenerImpl.instance._connections[_viewKey] == this);
+    assert(ViewContainerListenerImpl.instance.getConnectionForKey(_viewKey) ==
+        this);
     final EventPairPair viewTokens = new EventPairPair();
     assert(viewTokens.status == ZX.OK);
-    _ViewContainerListenerImpl.instance._connections.remove(_viewKey);
+    ViewContainerListenerImpl.instance.removeConnectionForKey(_viewKey);
     _viewHolderToken = viewTokens.first;
-    _viewContainer.removeChild2(_viewKey, viewTokens.second);
+    globalViewContainer.removeChild2(_viewKey, viewTokens.second);
     _viewKey = null;
-    _viewInfo = null;
+    _available = false;
     _currentViewProperties = null;
     _sceneHost.dispose();
     _sceneHost = null;
@@ -249,11 +202,11 @@ class ChildViewConnection {
       return;
     }
 
-    if (_viewContainer == null) {
+    if (globalViewContainer == null) {
       return;
     }
 
-    _viewContainer.sendSizeChangeHintHack(
+    globalViewContainer.sendSizeChangeHintHack(
         _viewKey, widthChangeFactor, heightChangeFactor);
   }
 
@@ -278,8 +231,8 @@ class ChildViewConnection {
       return null;
     }
 
-    fidl.SizeF size = new fidl.SizeF(width: width, height: height);
-    fidl.InsetF inset = new fidl.InsetF(
+    SizeF size = new SizeF(width: width, height: height);
+    InsetF inset = new InsetF(
         top: insetTop, right: insetRight, bottom: insetBottom, left: insetLeft);
     ViewLayout viewLayout = new ViewLayout(size: size, inset: inset);
     final customFocusBehavior = new CustomFocusBehavior(allowFocus: focusable);
@@ -301,7 +254,7 @@ class ChildViewConnection {
     assert(_attached);
     assert(_attachments == 1);
     assert(_viewKey != null);
-    if (_viewContainer == null) {
+    if (globalViewContainer == null) {
       return;
     }
     ViewProperties viewProperties = _createViewProperties(
@@ -309,7 +262,7 @@ class ChildViewConnection {
     if (viewProperties == null) {
       return;
     }
-    _viewContainer.setChildProperties(_viewKey, viewProperties);
+    globalViewContainer.setChildProperties(_viewKey, viewProperties);
   }
 }
 
@@ -429,7 +382,7 @@ class _RenderChildView extends RenderBox {
     _connection._setChildProperties(
         _width, _height, 0.0, 0.0, 0.0, 0.0, _focusable);
     assert(() {
-      if (_viewContainer == null) {
+      if (globalViewContainer == null) {
         _debugErrorMessage ??= new TextPainter(
             text: const TextSpan(
                 text:
@@ -446,7 +399,7 @@ class _RenderChildView extends RenderBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     assert(needsCompositing);
-    if (_connection?._viewInfo != null) {
+    if (_connection?._available == true) {
       context.addLayer(new ChildSceneLayer(
         offset: offset,
         width: _width,
@@ -456,7 +409,7 @@ class _RenderChildView extends RenderBox {
       ));
     }
     assert(() {
-      if (_viewContainer == null) {
+      if (globalViewContainer == null) {
         context.canvas.drawRect(
             offset & size, new Paint()..color = const Color(0xFF0000FF));
         _debugErrorMessage.paint(context.canvas, offset);

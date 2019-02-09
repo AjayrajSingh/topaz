@@ -2,12 +2,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/app.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
-import 'package:lib.ui.flutter/child_view.dart';
-import 'package:fidl_fuchsia_ui_viewsv1/fidl.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:fidl_fuchsia_ui_viewsv1/fidl.dart';
+import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
+import 'package:flutter/widgets.dart';
+import 'package:lib.app.dart/app.dart';
+import 'package:lib.ui.flutter/child_view.dart';
 import 'package:meta/meta.dart';
 
 /// A [Widget] that displays the view of the application it launches.
