@@ -3,6 +3,7 @@
         "garnet/packages/config/amber",
         "garnet/packages/prod/amber",
         "garnet/packages/prod/scenic_tools",
+        "garnet/packages/prod/terminal",
         "garnet/packages/prod/wlan",
         "garnet/packages/products/devtools",
         "garnet/packages/products/graphical",
@@ -11,7 +12,6 @@
         "topaz/packages/examples/noodles",
         "topaz/packages/prod/dashboard",
         "topaz/packages/prod/sysui",
-        "topaz/packages/prod/term",
         "topaz/packages/prod/text_input_mod"
     ]
 }

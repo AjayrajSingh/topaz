@@ -1,5 +1,0 @@
-{
-    "packages": [
-        "//topaz/app/term:config"
-    ]
-}

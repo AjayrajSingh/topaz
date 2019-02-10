@@ -27,7 +27,6 @@
         "topaz/packages/prod/spotify_auth_provider",
         "topaz/packages/prod/system_dashboard",
         "topaz/packages/prod/sysui",
-        "topaz/packages/prod/term",
         "topaz/packages/prod/text_input_mod",
         "topaz/packages/prod/userpicker_base_shell",
         "topaz/packages/prod/web_runner",
