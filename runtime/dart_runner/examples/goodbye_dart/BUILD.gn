@@ -63,12 +63,6 @@ package("goodbye_dart_test") {
       name = "goodbye_dart_test"
     },
   ]
-  meta = [
-    {
-      dest = "goodbye_dart_test.cmx"
-      path = rebase_path("meta/" + dest)
-    },
-  ]
   deps = [
     ":copy_goodbye_dart_test",
   ]
