@@ -361,7 +361,7 @@ static void CreateCompilationTrace(Dart_Isolate isolate) {
     if (files::WriteFile(kCompilationTraceFile,
                          reinterpret_cast<const char*>(trace),
                          trace_length)) {
-      FML_LOG(ERROR) << "Dart compilation trace written to "
+      FML_LOG(INFO) << "Dart compilation trace written to "
                      << kCompilationTraceFile;
     } else {
       FML_LOG(ERROR) << "Could not write Dart compilation trace to "
@@ -382,7 +382,7 @@ static void CreateCompilationTrace(Dart_Isolate isolate) {
     if (files::WriteFile(kTypeFeedbackFile,
                          reinterpret_cast<const char*>(feedback),
                          feedback_length)) {
-      FML_LOG(ERROR) << "Dart type feedback written to "
+      FML_LOG(INFO) << "Dart type feedback written to "
                      << kTypeFeedbackFile;
     } else {
       FML_LOG(ERROR) << "Could not write Dart type feedback to "

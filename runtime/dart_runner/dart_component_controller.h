@@ -26,7 +26,7 @@ namespace dart_runner {
 class DartComponentController : public fuchsia::sys::ComponentController {
  public:
   DartComponentController(
-      std::string label, fuchsia::sys::Package package,
+      fuchsia::sys::Package package,
       fuchsia::sys::StartupInfo startup_info,
       std::shared_ptr<component::Services> runner_incoming_services,
       fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller);

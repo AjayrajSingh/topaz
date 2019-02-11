@@ -89,13 +89,13 @@ void IsolateCleanupCallback(void* callback_data) {
 }
 
 void RunApplication(
-    DartRunner* runner, ControllerToken* token, fuchsia::sys::Package package,
+    DartRunner* runner, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
     std::shared_ptr<component::Services> runner_incoming_services,
     ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   int64_t start = Dart_TimelineGetMicros();
   deprecated_loop::MessageLoop loop;
-  DartComponentController app(token->label(), std::move(package),
+  DartComponentController app(std::move(package),
                               std::move(startup_info), runner_incoming_services,
                               std::move(controller));
   bool success = app.Setup();
@@ -115,26 +115,6 @@ void RunApplication(
   if (Dart_CurrentIsolate()) {
     Dart_ShutdownIsolate();
   }
-
-  runner->PostRemoveController(token);
-}
-
-// Find the last path component that is longer than 1 character.
-// file:///system/pkgs/hello_dart_jit -> hello_dart_jit
-// file:///pkgfs/packages/hello_dart_jit/0 -> hello_dart_jit
-std::string GetLabelFromURL(const std::string& url) {
-  size_t last_slash = url.length();
-  for (size_t i = url.length() - 1; i > 0; i--) {
-    if (url[i] == '/') {
-      size_t component_length = last_slash - i - 1;
-      if (component_length > 1) {
-        return url.substr(i + 1, component_length);
-      } else {
-        last_slash = i;
-      }
-    }
-  }
-  return url;
 }
 
 bool EntropySource(uint8_t* buffer, intptr_t count) {
@@ -209,55 +189,10 @@ void DartRunner::StartComponent(
     fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
     ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   TRACE_DURATION("dart", "StartComponent", "url", package.resolved_url);
-  std::string label = GetLabelFromURL(package.resolved_url);
-  std::thread thread(RunApplication, this, AddController(label),
+  std::thread thread(RunApplication, this, 
                      std::move(package), std::move(startup_info),
                      context_->incoming_services(), std::move(controller));
   thread.detach();
-}
-
-ControllerToken* DartRunner::AddController(std::string label) {
-  ControllerToken* token = new ControllerToken(label);
-  controllers_.push_back(token);
-  UpdateProcessLabel();
-  return token;
-}
-
-void DartRunner::RemoveController(ControllerToken* token) {
-  for (auto it = controllers_.begin(); it != controllers_.end(); ++it) {
-    if (*it == token) {
-      controllers_.erase(it);
-      break;
-    }
-  }
-  delete token;
-  UpdateProcessLabel();
-}
-
-void DartRunner::PostRemoveController(ControllerToken* token) {
-  loop_->task_runner()->PostTask([this, token] { RemoveController(token); });
-}
-
-void DartRunner::UpdateProcessLabel() {
-  std::string label;
-  if (controllers_.empty()) {
-    label = "dart_runner";
-  } else {
-    std::string base_label = "dart:" + controllers_[0]->label();
-    if (controllers_.size() < 2) {
-      label = base_label;
-    } else {
-      std::string suffix =
-          " (+" + std::to_string(controllers_.size() - 1) + ")";
-      if (base_label.size() + suffix.size() <= ZX_MAX_NAME_LEN - 1) {
-        label = base_label + suffix;
-      } else {
-        label = base_label.substr(0, ZX_MAX_NAME_LEN - 1 - suffix.size() - 3) +
-                "..." + suffix;
-      }
-    }
-  }
-  zx::process::self()->set_property(ZX_PROP_NAME, label.c_str(), label.size());
 }
 
 }  // namespace dart_runner

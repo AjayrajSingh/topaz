@@ -47,14 +47,25 @@ void AfterTask() {
   queue->RunMicrotasks();
 }
 
+// Find the last path component.
+// fuchsia-pkg://fuchsia.com/hello_dart#meta/hello_dart.cmx -> hello_dart.cmx
+std::string GetLabelFromURL(const std::string& url) {
+  for (size_t i = url.length() - 1; i > 0; i--) {
+    if (url[i] == '/') {
+      return url.substr(i + 1, url.length() - 1);
+    }
+  }
+  return url;
+}
+
 }  // namespace
 
 DartComponentController::DartComponentController(
-    std::string label, fuchsia::sys::Package package,
+    fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
     std::shared_ptr<component::Services> runner_incoming_services,
     fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller)
-    : label_(label),
+    : label_(GetLabelFromURL(package.resolved_url)),
       url_(std::move(package.resolved_url)),
       package_(std::move(package)),
       startup_info_(std::move(startup_info)),
@@ -98,9 +109,8 @@ DartComponentController::~DartComponentController() {
 
 bool DartComponentController::Setup() {
   // Name the thread after the url of the component being launched.
-  std::string label = "dart:" + label_;
-  zx::thread::self()->set_property(ZX_PROP_NAME, label.c_str(), label.size());
-  Dart_SetThreadName(label.c_str());
+  zx::thread::self()->set_property(ZX_PROP_NAME, label_.c_str(), label_.size());
+  Dart_SetThreadName(label_.c_str());
 
   if (!SetupNamespace()) {
     return false;

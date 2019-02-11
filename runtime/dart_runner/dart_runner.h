@@ -15,23 +15,10 @@
 
 namespace dart_runner {
 
-class ControllerToken {
- public:
-  explicit ControllerToken(std::string label) : label_(std::move(label)) {}
-  std::string& label() { return label_; }
-
- private:
-  std::string label_;
-
-  FXL_DISALLOW_COPY_AND_ASSIGN(ControllerToken);
-};
-
 class DartRunner : public fuchsia::sys::Runner {
  public:
   explicit DartRunner();
   ~DartRunner() override;
-
-  void PostRemoveController(ControllerToken* token);
 
  private:
   // |fuchsia::sys::Runner| implementation:
@@ -40,14 +27,9 @@ class DartRunner : public fuchsia::sys::Runner {
       ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller)
       override;
 
-  ControllerToken* AddController(std::string label);
-  void RemoveController(ControllerToken* token);
-  void UpdateProcessLabel();
-
   std::unique_ptr<component::StartupContext> context_;
   deprecated_loop::MessageLoop* loop_;
   fidl::BindingSet<fuchsia::sys::Runner> bindings_;
-  std::vector<ControllerToken*> controllers_;
 
 #if !defined(AOT_RUNTIME)
   MappedResource vm_snapshot_data_;
