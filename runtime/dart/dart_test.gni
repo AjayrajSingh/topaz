@@ -200,32 +200,35 @@ if (current_toolchain == dart_toolchain) {
                _flutter_shell_label,
                _fuchsia_tester_label,
              ] + _precompiled_kernel_target_names
+
+      metadata = {
+        test_runtime_deps = [ rebase_path(_invocation_file, root_build_dir) ]
+      }
     }
   }
 } else {
   # Not the Dart toolchain.
   template("dart_test") {
+    _main_target_name = target_name
+    _test_spec_target_name = "${target_name}_spec"
     _invocation_file = "$target_gen_dir/$target_name"
 
-    test_spec_target_name = "${target_name}_spec"
     if (is_linux || is_mac) {
       # TODO(IN-819): Delete renaming when dart tests are no longer run out of one
       # directory
       _invocation_file = "$root_out_dir/$target_name"
 
-      test_spec(test_spec_target_name) {
-        name = target_name
+      test_spec(_test_spec_target_name) {
+        name = _main_target_name
         location = _invocation_file
-
-        # TODO(joshuaseaton): Figure out how the test spec could depend on the
-        # test's dependencies, so that authors may specify 'test_runtime_deps'
-        # though metadata and have that data brought over to the bot onto which
-        # the test will be executed.
+        deps = [
+          ":$_main_target_name($dart_toolchain)",
+        ]
         testonly = true
       }
     }
 
-    action(target_name) {
+    action(_main_target_name) {
       script = "//topaz/runtime/dart/gen_test_bundle_invocation.py"
       testonly = true
       not_needed(invoker, "*")
@@ -246,12 +249,12 @@ if (current_toolchain == dart_toolchain) {
       ]
 
       deps = [
-        ":$target_name($dart_toolchain)",
+        ":$_main_target_name($dart_toolchain)",
       ]
       if (is_linux || is_mac) {
-        deps += [ ":$test_spec_target_name" ]
+        deps += [ ":$_test_spec_target_name" ]
       } else {
-        not_needed([ "test_spec_target_name" ])
+        not_needed([ "_test_spec_target_name" ])
       }
     }
   }
