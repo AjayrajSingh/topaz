@@ -2,7 +2,6 @@
     "imports": [
         "topaz/packages/tools/dart",
         "topaz/packages/tools/doc_checker",
-        "topaz/packages/tools/fidlgen_dart",
-        "topaz/packages/tools/voila"
+        "topaz/packages/tools/fidlgen_dart"
     ]
 }

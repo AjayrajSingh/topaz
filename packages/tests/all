@@ -21,7 +21,6 @@
         "topaz/packages/tests/repl",
         "topaz/packages/tests/scenic",
         "topaz/packages/tests/sledge",
-        "topaz/packages/tests/voila",
         "topaz/packages/tests/web_runner_tests"
     ]
 }
