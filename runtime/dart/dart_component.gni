@@ -207,6 +207,14 @@ template("_flutter_jit_asset_manifest") {
 #         Name of the dart package for the component. If not provided, it will
 #         be inferred from the component name.
 #
+#       package_root (optional)
+#         Path to the dart package for the component. If not provided, it will
+#         be assumed as ".".
+#
+#       sources (optional)
+#         Relative path of source files to be included in the dart package for
+#         the component at $package_root/lib.
+#
 #   main_dart (required)
 #     File containing the main function of the application. Either main_dart or
 #     components must be defined, but not both.
@@ -609,6 +617,14 @@ template("_flutter_dart_aot_package") {
 #       dart_package_name (optional)
 #         Name of the dart package for the component. If not provided, it will
 #         be inferred from the component name.
+#
+#       package_root (optional)
+#         Path to the dart package for the component. If not provided, it will
+#         be assumed as ".".
+#
+#       sources (optional)
+#         Relative path of source files to be included in the dart package for
+#         the component at $package_root/lib.
 #
 #   main_dart (required)
 #     File containing the main function of the application. Either main_dart or

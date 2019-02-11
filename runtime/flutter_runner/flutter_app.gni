@@ -36,6 +36,14 @@ import("//topaz/runtime/dart/dart_kernel.gni")
 #         Name of the dart package for the component. If not provided, it will
 #         be inferred from the component name.
 #
+#       package_root (optional)
+#         Path to the dart package for the component. If not provided, it will
+#         be assumed as ".".
+#
+#       sources (optional)
+#         Relative path of source files to be included in the dart package for
+#         the component at $package_root/lib.
+#
 #   main_dart (required)
 #     File containing the main function of the application. Either main_dart or
 #     components must be defined, but not both.
@@ -106,6 +114,14 @@ template("_flutter_jit_component") {
 #       dart_package_name (optional)
 #         Name of the dart package for the component. If not provided, it will
 #         be inferred from the component name.
+#
+#       package_root (optional)
+#         Path to the dart package for the component. If not provided, it will
+#         be assumed as ".".
+#
+#       sources (optional)
+#         Relative path of source files to be included in the dart package for
+#         the component at $package_root/lib.
 #
 #   main_dart (required)
 #     File containing the main function of the application. Either main_dart or
@@ -224,6 +240,14 @@ template("flutter_aot_app") {
 #       main_dart (required)
 #         File containing the main function of the component.
 #
+#       package_root (optional)
+#         Path to the dart package for the component. If not provided, it will
+#         be assumed as ".".
+#
+#       sources (optional)
+#         Relative path of source files to be included in the dart package for
+#         the component at $package_root/lib.
+#
 template("flutter_app") {
   assert((defined(invoker.components) && !defined(invoker.main_dart)) ||
              (!defined(invoker.components) && defined(invoker.main_dart)),
@@ -252,6 +276,14 @@ template("flutter_app") {
 #       dart_package_name (optional)
 #         Name of the dart package for the component. If not provided, it will
 #         be inferred from the component name.
+#
+#       package_root (optional)
+#         Path to the dart package for the component. If not provided, it will
+#         be assumed as ".".
+#
+#       sources (optional)
+#         Relative path of source files to be included in the dart package for
+#         the component at $package_root/lib.
 #
 template("flutter_dart_apps") {
   assert(defined(invoker.components) && !defined(invoker.main_dart),
