@@ -1,0 +1,19 @@
+{
+    "program": {
+        "binary": "bin/app"
+    },
+    "sandbox": {
+        "dev": [
+            "misc/ptmx"
+        ],
+        "features": [ "shell" ],
+        "services": [
+            "fuchsia.fonts.Provider",
+            "fuchsia.process.Launcher",
+            "fuchsia.process.Resolver",
+            "fuchsia.tracelink.Registry",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.ui.viewsv1.ViewManager"
+        ]
+    }
+}

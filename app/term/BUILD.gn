@@ -1,0 +1,77 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/package.gni")
+
+executable("bin") {
+  output_name = "term"
+
+  sources = [
+    "app.cc",
+    "app.h",
+    "key_util.cc",
+    "key_util.h",
+    "main.cc",
+    "pty_server.cc",
+    "pty_server.h",
+    "term_model.cc",
+    "term_model.h",
+    "term_params.cc",
+    "term_params.h",
+    "view_controller.cc",
+    "view_controller.h",
+  ]
+
+  deps = [
+    "//sdk/fidl/fuchsia.fonts",
+    "//sdk/fidl/fuchsia.math",
+    "//sdk/fidl/fuchsia.ui.input",
+    "//sdk/fidl/fuchsia.ui.scenic",
+    "//sdk/fidl/fuchsia.ui.viewsv1",
+    "//garnet/public/lib/component/cpp",
+    "//sdk/lib/fidl/cpp",
+    "//garnet/public/lib/fsl",
+    "//garnet/public/lib/fxl",
+    "//garnet/public/lib/ui/input/cpp",
+    "//garnet/public/lib/ui/scenic/cpp",
+    "//third_party/freetype2",
+    "//third_party/libteken",
+    "//third_party/skia",
+    "//topaz/examples/ui/lib:skia_fonts",
+    "//topaz/examples/ui/lib:skia_view",
+    "//zircon/public/lib/async-cpp",
+    "//zircon/public/lib/async-loop-cpp",
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/fit",
+    "//zircon/public/lib/hid",
+    "//zircon/public/lib/trace-provider",
+  ]
+}
+
+package("term") {
+
+  deps = [
+    ":bin",
+  ]
+
+  binary = "term"
+
+  meta = [
+    {
+      path = rebase_path("meta/term.cmx")
+      dest = "term.cmx"
+    },
+  ]
+}
+
+package("config") {
+  deprecated_system_image = true
+  package_name = "term_config"
+  resources = [
+    {
+      dest = "sysmgr/term.config"
+      path = rebase_path("config/term.config")
+    },
+  ]
+}
