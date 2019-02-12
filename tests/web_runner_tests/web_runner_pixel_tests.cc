@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 
-#include <chromium/web/cpp/fidl.h>
 #include <fuchsia/sys/cpp/fidl.h>
 #include <fuchsia/ui/app/cpp/fidl.h>
 #include <fuchsia/ui/policy/cpp/fidl.h>
@@ -15,18 +14,16 @@
 #include <gtest/gtest.h>
 #include <lib/component/cpp/startup_context.h>
 #include <lib/fdio/spawn.h>
-#include <lib/fdio/util.h>
-#include <lib/fit/defer.h>
 #include <lib/fit/function.h>
 #include <lib/fsl/vmo/vector.h>
 #include <lib/fxl/files/file.h>
 #include <lib/fxl/logging.h>
 #include <lib/fxl/strings/string_printf.h>
-#include <lib/fxl/threading/thread.h>
 #include <lib/gtest/real_loop_fixture.h>
 #include <lib/zx/time.h>
 #include <zircon/status.h>
 
+#include "topaz/tests/web_runner_tests/chromium_context.h"
 #include "topaz/tests/web_runner_tests/test_server.h"
 
 namespace {
@@ -54,28 +51,16 @@ std::map<uint32_t, size_t> Histogram(
   return histogram;
 }
 
-// Runs the test server on its own thread, with proper cleanup to prevent
-// deadlock. |serve| must terminate after |server->Accept()| returns false.
-auto ServeAsync(web_runner_tests::TestServer* server, fit::closure serve) {
-  auto server_thread = std::make_unique<fxl::Thread>(std::move(serve));
-  server_thread->Run();
-  // The socket must be closed before the thread goes out of scope so that any
-  // blocking |Accept| calls terminate so that |serve| can terminate.
-  return fit::defer(
-      [server, server_thread = std::move(server_thread)] { server->Close(); });
-}
-
 // Responds to a GET request, testing that the request looks as expected.
 void MockHttpGetResponse(web_runner_tests::TestServer* server,
                          const char* resource) {
-  std::string expected_prefix = fxl::StringPrintf("GET /%s HTTP", resource);
-  std::vector<char> buf;
+  const std::string expected_prefix =
+      fxl::StringPrintf("GET /%s HTTP", resource);
   // |Read| requires preallocate (see sys/socket.h: read)
-  buf.resize(4096);
+  std::string buf(expected_prefix.size(), 0);
 
   EXPECT_TRUE(server->Read(&buf));
-  EXPECT_GE(buf.size(), expected_prefix.size());
-  EXPECT_EQ(expected_prefix, std::string(buf.data(), expected_prefix.size()));
+  EXPECT_EQ(expected_prefix, buf);
   std::string content;
   FXL_CHECK(files::ReadFileToString(fxl::StringPrintf("/pkg/data/%s", resource),
                                     &content));
@@ -112,12 +97,11 @@ void Input(std::vector<const char*> args) {
   FXL_CHECK(info.return_code == 0) << info.return_code;
 }
 
-// Base fixture for web runner pixel tests, containing Scenic and presentation
-// setup, and screenshot utilities.
-class WebRunnerPixelTest : public gtest::RealLoopFixture {
+// Base fixture for pixel tests, containing Scenic and presentation setup, and
+// screenshot utilities.
+class PixelTest : public gtest::RealLoopFixture {
  protected:
-  WebRunnerPixelTest()
-      : context_(component::StartupContext::CreateFromStartupInfo()) {
+  PixelTest() : context_(component::StartupContext::CreateFromStartupInfo()) {
     scenic_ =
         context_->ConnectToEnvironmentService<fuchsia::ui::scenic::Scenic>();
     scenic_.set_error_handler([](zx_status_t status) {
@@ -211,6 +195,8 @@ class WebRunnerPixelTest : public gtest::RealLoopFixture {
   fuchsia::ui::scenic::ScenicPtr scenic_;
 };
 
+using WebRunnerPixelTest = PixelTest;
+
 // Loads a static page with a solid color via the component framework and
 // verifies that the color is the only color onscreen.
 TEST_F(WebRunnerPixelTest, Static) {
@@ -222,7 +208,7 @@ TEST_F(WebRunnerPixelTest, Static) {
   // Chromium and the Fuchsia network package loader both send us requests. This
   // may go away after MI4-1807; although the race seems to be in Modular, the
   // fix may remove the unnecessary net request in component framework.
-  auto serve = ServeAsync(&server, [&server] {
+  auto serve = server.ServeAsync([&server] {
     while (server.Accept()) {
       MockHttpGetResponse(&server, "static.html");
     }
@@ -245,108 +231,37 @@ TEST_F(WebRunnerPixelTest, Static) {
 }
 
 // This fixture uses chromium.web FIDL services to interact with Chromium.
-class ChromiumFidlTest : public WebRunnerPixelTest,
-                         chromium::web::NavigationEventObserver {
+class ChromiumPixelTest : public PixelTest {
  protected:
-  ChromiumFidlTest() : navigation_event_observer_binding_(this) {
-    auto context_provider =
-        context()
-            ->ConnectToEnvironmentService<chromium::web::ContextProvider>();
-    context_provider.set_error_handler([](zx_status_t status) {
-      FAIL() << "context_provider: " << zx_status_get_string(status);
-    });
-
-    zx_handle_t incoming_service_clone =
-        fdio_service_clone(context()->incoming_services()->directory().get());
-    FXL_CHECK(incoming_service_clone != ZX_HANDLE_INVALID);
-
-    chromium::web::CreateContextParams params;
-    params.service_directory = zx::channel(incoming_service_clone);
-    context_provider->Create(std::move(params), chromium_context_.NewRequest());
-    chromium_context_.set_error_handler([](zx_status_t status) {
-      FAIL() << "chromium_context_: " << zx_status_get_string(status);
-    });
-
-    chromium_context_->CreateFrame(chromium_frame_.NewRequest());
-    chromium_frame_.set_error_handler([](zx_status_t status) {
-      FAIL() << "chromium_frame_: " << zx_status_get_string(status);
-    });
-
-    // Bind ourselves as a NavigationEventObserver on this frame.
-    chromium_frame_->SetNavigationEventObserver(
-        navigation_event_observer_binding_.NewBinding());
-    navigation_event_observer_binding_.set_error_handler(
-        [](zx_status_t status) {
-          FAIL() << "navigation_event_observer_binding_: "
-                 << zx_status_get_string(status);
-        });
-
+  ChromiumPixelTest() : chromium_(context()) {
     // And create a view for the frame.
-    chromium_frame_->CreateView2(CreatePresentationViewToken(), nullptr,
-                                 nullptr);
-    chromium_frame_->GetNavigationController(navigation_.NewRequest());
-    navigation_.set_error_handler([](zx_status_t status) {
-      FAIL() << "navigation_: " << zx_status_get_string(status);
-    });
+    chromium_.frame()->CreateView2(CreatePresentationViewToken(), nullptr,
+                                   nullptr);
   }
 
-  void LaunchPage(const std::string& url) { navigation_->LoadUrl(url, {}); }
-
-  fit::function<void(chromium::web::NavigationEvent)>
-      on_navigation_state_changed_;
+  ChromiumContext* chromium() { return &chromium_; }
 
  private:
-  // |chromium::web::NavigationEventObserver|
-  void OnNavigationStateChanged(
-      chromium::web::NavigationEvent change,
-      OnNavigationStateChangedCallback callback) override {
-    if (on_navigation_state_changed_) {
-      on_navigation_state_changed_(std::move(change));
-    }
-
-    callback();
-  }
-
-  chromium::web::NavigationControllerPtr navigation_;
-  chromium::web::ContextPtr chromium_context_;
-  chromium::web::FramePtr chromium_frame_;
-  fidl::Binding<chromium::web::NavigationEventObserver>
-      navigation_event_observer_binding_;
+  ChromiumContext chromium_;
 };
 
 // Loads a static page with a solid color via chromium.web interfaces and
 // verifies that the color is the only color onscreen.
-TEST_F(ChromiumFidlTest, Static) {
+TEST_F(ChromiumPixelTest, Static) {
   static constexpr uint32_t kTargetColor = 0xffff00ff;
 
   web_runner_tests::TestServer server;
   FXL_CHECK(server.FindAndBindPort());
 
-  auto serve = ServeAsync(&server, [&server] {
+  auto serve = server.ServeAsync([&server] {
     FXL_LOG(INFO) << "Waiting for HTTP request from Chromium";
     ASSERT_TRUE(server.Accept())
         << "Did not receive HTTP request from Chromium";
     MockHttpGetResponse(&server, "static.html");
   });
 
-  std::string url =
-      fxl::StringPrintf("http://localhost:%d/static.html", server.port());
-
-  on_navigation_state_changed_ = [this,
-                                  url](chromium::web::NavigationEvent change) {
-    if (change.url && *change.url == url) {
-      EXPECT_FALSE(change.is_error);
-      on_navigation_state_changed_ = nullptr;
-
-      QuitLoop();
-    }
-  };
-
-  LaunchPage(url);
-
-  EXPECT_FALSE(RunLoopWithTimeout(kTimeout))
-      << "Timed out waiting for OnNavigationStateChanged";
-
+  chromium()->Navigate(
+      fxl::StringPrintf("http://localhost:%d/static.html", server.port()));
   ExpectSolidColor(kTargetColor);
 }
 
@@ -354,7 +269,7 @@ TEST_F(ChromiumFidlTest, Static) {
 // text box, with Javascript to change the background to the color typed in the
 // text box. This test verifies the initial color, taps on the text box (top
 // quarter of the screen), types a new color, and verifies the changed color.
-TEST_F(ChromiumFidlTest, Dynamic) {
+TEST_F(ChromiumPixelTest, Dynamic) {
   static constexpr char kInput[] = "#40e0d0";
   static constexpr uint32_t kBeforeColor = 0xffff00ff;
   static constexpr uint32_t kAfterColor = 0xff40e0d0;
@@ -362,12 +277,12 @@ TEST_F(ChromiumFidlTest, Dynamic) {
   web_runner_tests::TestServer server;
   FXL_CHECK(server.FindAndBindPort());
 
-  auto serve = ServeAsync(&server, [&server] {
+  auto serve = server.ServeAsync([&server] {
     ASSERT_TRUE(server.Accept());
     MockHttpGetResponse(&server, "dynamic.html");
   });
 
-  LaunchPage(
+  chromium()->Navigate(
       fxl::StringPrintf("http://localhost:%d/dynamic.html", server.port()));
 
   ExpectPrimaryColor(kBeforeColor);

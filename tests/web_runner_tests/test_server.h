@@ -8,7 +8,9 @@
 #include <string>
 #include <vector>
 
+#include <lib/fit/defer.h>
 #include <lib/fxl/files/unique_fd.h>
+#include <lib/fxl/threading/thread.h>
 
 namespace web_runner_tests {
 
@@ -27,7 +29,7 @@ class TestServer {
 
   // This reads data from the currently open connection into the provided
   // buffer. On success, this resizes |buf| to the number of bytes read.
-  bool Read(std::vector<char>* buf);
+  bool Read(std::string* buf);
 
   // Writes data from |buf| into the currently open connection.
   bool Write(const std::string& buf);
@@ -38,6 +40,17 @@ class TestServer {
 
   // Port number in use.
   int port() const { return port_; }
+
+  // Runs a |serve| routine on its own thread, with proper cleanup to prevent
+  // deadlock. |serve| must terminate after |Accept()| returns false.
+  auto ServeAsync(fit::closure serve) {
+    auto server_thread = std::make_unique<fxl::Thread>(std::move(serve));
+    server_thread->Run();
+    // The socket must be closed before the thread goes out of scope so that any
+    // blocking |Accept| calls terminate so that |serve| can terminate.
+    return fit::defer(
+        [this, server_thread = std::move(server_thread)] { Close(); });
+  }
 
  private:
   fxl::UniqueFD conn_;

@@ -51,7 +51,7 @@ bool TestServer::Accept() {
   return conn_.is_valid();
 }
 
-bool TestServer::Read(std::vector<char>* buf) {
+bool TestServer::Read(std::string* buf) {
   ssize_t ret = read(conn_.get(), buf->data(), buf->size());
   if (ret < 0)
     return false;
