@@ -30,8 +30,6 @@ import '{{ .URL }}' as {{ .LocalName }};
 // {fidl_async.dart} and {fidl.dart, fidl_async.dart} generate equivalent
 // packages. In AOT, the dead code will be removed by tree shaking.
 // ignore: unused_import
-import 'fidl.dart' as $strongly_connect_sync;
-// ignore: unused_import
 import 'fidl_async.dart' as $strongly_connect_async;
 
 // ignore_for_file: always_specify_types
@@ -105,6 +103,12 @@ import 'package:zircon/zircon.dart';
 {{ range .Imports -}}
 import '{{ .AsyncURL }}' as {{ .LocalName }};
 {{ end -}}
+
+// These imports improve deduplication by making uses of {fidl.dart},
+// {fidl_async.dart} and {fidl.dart, fidl_async.dart} generate equivalent
+// packages. In AOT, the dead code will be removed by tree shaking.
+// ignore: unused_import
+import 'fidl.dart' as $strongly_connect_sync;
 
 // ignore_for_file: always_specify_types
 // ignore_for_file: avoid_positional_boolean_parameters
