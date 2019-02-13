@@ -28,6 +28,7 @@ dart_library("fuchsia_scenic_flutter") {
   deps = [
     "//sdk/fidl/fuchsia.math",
     "//sdk/fidl/fuchsia.sys",
+    "//sdk/fidl/fuchsia.ui.gfx",
     "//sdk/fidl/fuchsia.ui.viewsv1",
     "//sdk/fidl/fuchsia.ui.viewsv1token",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
