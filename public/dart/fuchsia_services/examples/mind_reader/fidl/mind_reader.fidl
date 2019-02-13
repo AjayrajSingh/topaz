@@ -5,14 +5,14 @@
 library fuchsia.services.examples;
 
 [Discoverable]
-interface MindReader {
+protocol MindReader {
   /// When this method is called the service will attempt to guess
   /// what the calling process is thinking.
   ReadMind() -> (string response);
 };
 
 [Discoverable]
-interface ThoughtLeaker {
+protocol ThoughtLeaker {
   /// This service is used to leak the current thought of the process.
   /// If this service is exposed to the [MindReader] it will connect
   /// to it to extract the current thought.

@@ -5,6 +5,6 @@
 library fuchsia.examples.hello;
 
 [Discoverable]
-interface Hello {
+protocol Hello {
     Say(string request) -> (string response);
 };

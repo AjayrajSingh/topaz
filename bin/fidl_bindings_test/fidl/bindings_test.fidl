@@ -29,7 +29,7 @@ xunion ExampleXunion {
 };
 
 [Discoverable]
-interface TestServer {
+protocol TestServer {
     OneWayNoArgs();
     ReceivedOneWayNoArgs() -> (bool received);
 
@@ -98,6 +98,6 @@ union UnionTwo {
     uint32 baz;
 };
 
-interface SimpleServer {
+protocol SimpleServer {
     Ping() -> ();
 };

@@ -6,7 +6,7 @@ library fuchsia.xi.session;
 
 // Interface for the proof-of-concept xi_session_manager service.
 [Discoverable]
-interface XiSessionManager {
+protocol XiSessionManager {
     NewSession() -> (string session_id);
     CloseSession(string session_id);
     ConnectSession(string session_id, handle<socket> sock);

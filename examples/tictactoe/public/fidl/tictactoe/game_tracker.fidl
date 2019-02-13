@@ -22,7 +22,7 @@ struct ExecuteResult {
 };
 
 [Discoverable]
-interface GameTracker {
+protocol GameTracker {
     RecordWin(Player player) -> (ExecuteResult result);
 
     // Request that the game tracker start sending score updates to the message

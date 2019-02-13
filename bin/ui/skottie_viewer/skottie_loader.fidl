@@ -22,7 +22,7 @@ struct Options {
 
 // Defines the player interface to control the animation. It is returned upon
 // successful load of the animation.
-interface Player {
+protocol Player {
     // Seek to position |t| where 0 <= t <= 1.
     Seek(float32 t);
     // Play and stop at |t| = 1 if |loop| = false.
@@ -34,7 +34,7 @@ interface Player {
 [Discoverable]
 // Skottie loader exported by |ViewProvider| to load skottie JSON animations
 // into views created from it.
-interface Loader {
+protocol Loader {
     // Load the snapshot from the Vmo buffer payload. Returns a callback with
     // |Player| controller and load status |Status|. |player| is null if loading
     // failed.

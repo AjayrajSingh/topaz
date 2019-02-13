@@ -5,6 +5,6 @@
 library fuchsia.fibonacci;
 
 [Discoverable]
-interface FibonacciService {
+protocol FibonacciService {
     CalcFibonacci(uint32 n) -> (uint32 result);
 };

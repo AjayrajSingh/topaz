@@ -5,12 +5,12 @@
 library fuchsia.textinputmod;
 
 [Discoverable]
-interface TextInputModReceiver {
+protocol TextInputModReceiver {
     UserEnteredText(string text) -> ();
     UserCanceled() -> ();
 };
 
 [Discoverable]
-interface TextInputMod {
+protocol TextInputMod {
     ListenForTextInput(TextInputModReceiver receiver) -> ();
 };
