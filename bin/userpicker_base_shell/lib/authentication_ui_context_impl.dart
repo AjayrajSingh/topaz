@@ -6,7 +6,6 @@ import 'package:fidl_fuchsia_auth/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fidl/fidl.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:zircon/zircon.dart';
 
 /// Called when an authentication overlay needs to be started.

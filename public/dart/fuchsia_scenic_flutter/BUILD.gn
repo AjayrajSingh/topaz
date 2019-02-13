@@ -19,8 +19,10 @@ dart_library("fuchsia_scenic_flutter") {
     "src/child_view_connection.dart",
     "src/internal/_child_scene_layer.dart",
     "src/internal/_mozart.dart",
-    "src/internal/_view_container_listener_impl.dart",
     "src/internal/fakes/mozart_fakes.dart",
+    "src/view_container.dart",
+    "src/view_container_listener_impl.dart",
+    "view_container.dart",
   ]
 
   deps = [
