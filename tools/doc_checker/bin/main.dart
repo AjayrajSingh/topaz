@@ -86,7 +86,7 @@ Future<Null> main(List<String> args) async {
     ..addOption(
       _optionGitProject,
       help: 'Name of the Git project hosting the documentation directory',
-      defaultsTo: 'docs',
+      defaultsTo: 'fuchsia',
     );
   final ArgResults options = parser.parse(args);
 
