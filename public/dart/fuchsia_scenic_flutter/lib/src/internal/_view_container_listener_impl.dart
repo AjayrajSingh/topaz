@@ -8,14 +8,7 @@ import 'dart:collection';
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1/fidl_async.dart';
 
-/// Mixin class that allows receiving events from |ViewContainerListenerImpl|.
-abstract class ViewContainerListenerDelegate {
-  /// Called on attach
-  void onAvailable();
-
-  /// Called on detach
-  void onUnavailable();
-}
+import '../child_view_connection.dart';
 
 /// A singleton class that allows receive events from the view container.
 class ViewContainerListenerImpl extends ViewContainerListener {
@@ -25,13 +18,13 @@ class ViewContainerListenerImpl extends ViewContainerListener {
 
   ViewContainerListenerImpl._() : super();
 
-  static final Map<int, ViewContainerListenerDelegate> _connections =
-      HashMap<int, ViewContainerListenerDelegate>();
+  static final Map<int, ChildViewConnection> _connections =
+      HashMap<int, ChildViewConnection>();
 
   final ViewContainerListenerBinding _binding = ViewContainerListenerBinding();
 
   /// adds a [ChildViewConnection] for a given [key]
-  void addConnectionForKey(int key, ViewContainerListenerDelegate connection) {
+  void addConnectionForKey(int key, ChildViewConnection connection) {
     _connections[key] = connection;
   }
 
@@ -46,25 +39,25 @@ class ViewContainerListenerImpl extends ViewContainerListener {
     return _binding.wrap(this);
   }
 
-  /// returns [ViewContainerListenerDelegate] for given [key]
-  ViewContainerListenerDelegate getConnectionForKey(int key) {
+  /// returns [ChildViewConnection] for given [key]
+  ChildViewConnection getConnectionForKey(int key) {
     return _connections[key];
   }
 
   @override
   Future<Null> onChildAttached(int childKey, ViewInfo childViewInfo) async {
-    ViewContainerListenerDelegate connection = _connections[childKey];
-    connection?.onAvailable();
+    ChildViewConnection connection = _connections[childKey];
+    connection?.onAttachedToContainer(childViewInfo);
   }
 
   @override
   Future<Null> onChildUnavailable(int childKey) async {
-    ViewContainerListenerDelegate connection = _connections[childKey];
+    ChildViewConnection connection = _connections[childKey];
     connection?.onUnavailable();
   }
 
-  /// remove a [ViewContainerListenerDelegate] for a given [key]
-  ViewContainerListenerDelegate removeConnectionForKey(int key) {
+  /// remove a [ChildViewConnection] for a given [key]
+  ChildViewConnection removeConnectionForKey(int key) {
     return _connections.remove(key);
   }
 }

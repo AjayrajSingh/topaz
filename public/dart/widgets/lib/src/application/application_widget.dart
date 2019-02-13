@@ -5,7 +5,6 @@
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_viewsv1/fidl_async.dart';
-import 'package:fidl_fuchsia_ui_viewsv1token/fidl_async.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/app_async.dart';
 import 'package:lib.ui.flutter/child_view_async.dart';

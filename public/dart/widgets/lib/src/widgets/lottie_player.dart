@@ -9,7 +9,6 @@ import 'package:fidl_fuchsia_mem/fidl.dart' show Buffer;
 import 'package:fidl_fuchsia_skia_skottie/fidl.dart' as skottie;
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1/fidl.dart';
-import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.app.dart/app.dart';

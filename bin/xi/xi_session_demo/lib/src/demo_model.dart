@@ -3,15 +3,13 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-
+import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
-import 'package:fidl_fuchsia_xi_session/fidl_async.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.app_driver.dart/module_driver.dart';
 import 'package:lib.widgets.dart/model.dart';
+import 'package:fidl_fuchsia_xi_session/fidl_async.dart';
+import 'package:fidl_fuchsia_modular/fidl.dart';
 
 const String kSessionManagerURL =
     'fuchsia-pkg://fuchsia.com/xi_session_agent#meta/xi_session_agent.cmx';
