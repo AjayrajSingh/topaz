@@ -17,7 +17,7 @@ dart_app("echo_client_async_dart") {
 
   sources = []
   deps = [
-    "//garnet/examples/fidl/services:echo2",
+    "//garnet/examples/fidl/services:echo",
     "//sdk/fidl/fuchsia.sys",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_services",

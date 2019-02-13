@@ -13,7 +13,7 @@ dart_app("echo_dart") {
       main_dart = "echo_client_dart/lib/main.dart"
       sources = []
       deps = [
-        "//garnet/examples/fidl/services:echo2",
+        "//garnet/examples/fidl/services:echo",
         "//sdk/fidl/fuchsia.sys",
         "//topaz/public/dart/fidl",
         "//topaz/public/lib/app/dart",
@@ -26,7 +26,7 @@ dart_app("echo_dart") {
       main_dart = "echo_server_dart/lib/main.dart"
       sources = []
       deps = [
-        "//garnet/examples/fidl/services:echo2",
+        "//garnet/examples/fidl/services:echo",
         "//topaz/public/dart/fidl",
         "//topaz/public/lib/app/dart",
       ]

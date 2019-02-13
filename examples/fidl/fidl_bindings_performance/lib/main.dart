@@ -14,9 +14,9 @@ typedef PerfTest = Future<int> Function(String server, int number);
 StartupContext _context;
 
 const List<String> kDefaultServers = [
-  'fuchsia-pkg://fuchsia.com/echo2_server_cpp#meta/echo2_server_cpp.cmx',
-  'fuchsia-pkg://fuchsia.com/echo2_server_rust#meta/echo2_server_rust.cmx',
-  'fuchsia-pkg://fuchsia.com/echo2_server_go#meta/echo2_server_go.cmx',
+  'fuchsia-pkg://fuchsia.com/echo_server_cpp#meta/echo_server_cpp.cmx',
+  'fuchsia-pkg://fuchsia.com/echo_server_rust#meta/echo_server_rust.cmx',
+  'fuchsia-pkg://fuchsia.com/echo_server_go#meta/echo_server_go.cmx',
   'fuchsia-pkg://fuchsia.com/echo_dart#meta/echo_server_dart.cmx',
   'fuchsia-pkg://fuchsia.com/echo_server_async_dart#meta/echo_server_async_dart.cmx'
 ];
