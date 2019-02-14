@@ -275,27 +275,9 @@ int DartComponentController::SetupFileDescriptor(
   if (!fd) {
     return -1;
   }
-  zx_handle_t handles[3] = {
-      fd->handle0.release(),
-      fd->handle1.release(),
-      fd->handle2.release(),
-  };
-  uint32_t htypes[3] = {
-      static_cast<uint32_t>(fd->type0),
-      static_cast<uint32_t>(fd->type1),
-      static_cast<uint32_t>(fd->type2),
-  };
-  int valid_handle_count = 0;
-  for (int i = 0; i < 3; i++) {
-    valid_handle_count += (handles[i] == ZX_HANDLE_INVALID) ? 0 : 1;
-  }
-  if (valid_handle_count == 0) {
-    return -1;
-  }
-
-  int outfd;
-  zx_status_t status =
-      fdio_create_fd(handles, htypes, valid_handle_count, &outfd);
+  // fd->handle1 and fd->handle2 are no longer used.
+  int outfd = -1;
+  zx_status_t status = fdio_fd_create(fd->handle0.release(), &outfd);
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Failed to extract output fd: "
                    << zx_status_get_string(status);
