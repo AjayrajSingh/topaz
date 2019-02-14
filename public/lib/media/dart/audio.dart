@@ -5,14 +5,12 @@
 import 'package:fidl_fuchsia_media/fidl_async.dart';
 import 'package:fuchsia_services/services.dart';
 import 'package:fuchsia_logger/logger.dart';
-import 'package:settings_protos/audio.pb.dart' as stored_audio;
-import 'package:settings_protos/setting_store.dart';
-import 'package:settings_protos/setting_store_factory.dart';
 
 /// Type for |Audio| update callbacks.
 typedef UpdateCallback = void Function();
 
 /// System audio.
+/// TODO: Persist audio changes in the device settings.
 class Audio {
   static const double _minLevelGainDb = -60.0;
   static const double _unityGainDb = 0.0;
@@ -29,8 +27,6 @@ class Audio {
   bool _systemAudioMuted = false;
   double _systemAudioPerceivedLevel = gainToLevel(_initialGainDb);
 
-  SettingStore<stored_audio.Audio> _store;
-
   /// Constructs an Audio object.
   Audio() {
     try {
@@ -40,20 +36,10 @@ class Audio {
     }
 
     _audioService.systemGainMuteChanged.forEach(_handleGainMuteChanged);
-
-    _store = new SettingStoreFactory().createAudioStore()
-      ..addlistener(_onSettingChanged)
-      ..connect().catchError(
-          (e) => log.severe('Unable to connect to setting store service', e));
   }
 
   /// Called when properties have changed significantly.
   UpdateCallback updateCallback;
-
-  void _onSettingChanged(stored_audio.Audio value) async {
-    await setSystemAudioGainDb(value.gain);
-    await setSystemAudioMuted(value.muted);
-  }
 
   /// Disposes this object.
   void dispose() {
@@ -106,16 +92,6 @@ class Audio {
 
     _systemAudioMuted = muted;
     await _audioService.setSystemMute(_systemAudioMuted);
-
-    await _persistUserSetting();
-  }
-
-  Future<void> _persistUserSetting() async {
-    final stored_audio.Audio audio = new stored_audio.Audio()
-      ..clear()
-      ..muted = _systemAudioMuted
-      ..gain = _systemAudioGainDb;
-    await _store.commit(audio);
   }
 
   /// Gets the perceived system-wide audio level in the range [0,1]. This value
@@ -129,7 +105,6 @@ class Audio {
     _systemAudioPerceivedLevel = value.clamp(0.0, 1.0);
     _systemAudioGainDb = levelToGain(_systemAudioPerceivedLevel);
 
-    await _persistUserSetting();
     await _audioService.setSystemGain(_systemAudioGainDb);
   }
 
