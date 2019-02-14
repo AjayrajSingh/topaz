@@ -6,12 +6,13 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_mem/fidl_async.dart' as fuchsia_mem;
-import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
-import 'package:fidl_fuchsia_ui_viewsv1token/fidl_async.dart' as views_fidl;
+import 'package:fidl_fuchsia_mem/fidl_async.dart' as mem;
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular;
+import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart' as gfx;
+import 'package:fidl_fuchsia_ui_viewsv1token/fidl_async.dart' as views;
 import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:meta/meta.dart';
-import 'package:zircon/zircon.dart';
+import 'package:zircon/zircon.dart' as zx;
 
 import '../../entity/entity.dart';
 import '../../entity/internal/_entity_impl.dart';
@@ -40,7 +41,7 @@ class ModuleImpl implements Module {
   /// Returns the [fidl.ModuleContext] for the running module.
   /// This variable should not be used directly. Use the
   /// [getContext()] method instead
-  fidl.ModuleContext _moduleContext;
+  modular.ModuleContext _moduleContext;
 
   /// The default constructor for this instance.
   ///
@@ -50,7 +51,7 @@ class ModuleImpl implements Module {
   ModuleImpl({
     @required IntentHandlerImpl intentHandlerImpl,
     Lifecycle lifecycle,
-    fidl.ModuleContext moduleContext,
+    modular.ModuleContext moduleContext,
   })  : _moduleContext = moduleContext,
         assert(intentHandlerImpl != null) {
     (lifecycle ??= Lifecycle()).addTerminateListener(_terminate);
@@ -59,12 +60,12 @@ class ModuleImpl implements Module {
   }
 
   @override
-  Future<fidl.ModuleController> addModuleToStory({
+  Future<modular.ModuleController> addModuleToStory({
     @required String name,
-    @required fidl.Intent intent,
-    fidl.SurfaceRelation surfaceRelation = const fidl.SurfaceRelation(
-      arrangement: fidl.SurfaceArrangement.copresent,
-      dependency: fidl.SurfaceDependency.dependent,
+    @required modular.Intent intent,
+    modular.SurfaceRelation surfaceRelation = const modular.SurfaceRelation(
+      arrangement: modular.SurfaceArrangement.copresent,
+      dependency: modular.SurfaceDependency.dependent,
       emphasis: 0.5,
     ),
   }) async {
@@ -76,9 +77,9 @@ class ModuleImpl implements Module {
       throw ArgumentError.notNull('intent');
     }
 
-    final moduleControllerProxy = fidl.ModuleControllerProxy();
+    final moduleControllerProxy = modular.ModuleControllerProxy();
 
-    fidl.StartModuleStatus status = await _getContext().addModuleToStory(
+    modular.StartModuleStatus status = await _getContext().addModuleToStory(
         name, intent, moduleControllerProxy.ctrl.request(), surfaceRelation);
 
     _validateStartModuleStatus(status, name, intent);
@@ -102,9 +103,9 @@ class ModuleImpl implements Module {
 
     // need to create the proxy and write data immediately so other modules
     // can extract values
-    final proxy = fidl.EntityProxy();
-    final vmo = SizedVmo.fromUint8List(initialData);
-    final buffer = fuchsia_mem.Buffer(vmo: vmo, size: initialData.length);
+    final proxy = modular.EntityProxy();
+    final vmo = zx.SizedVmo.fromUint8List(initialData);
+    final buffer = mem.Buffer(vmo: vmo, size: initialData.length);
     final ref = await context.createEntity(type, buffer, proxy.ctrl.request());
 
     // use the ref value to determine if creation was successful
@@ -119,7 +120,7 @@ class ModuleImpl implements Module {
   @override
   Future<EmbeddedModule> embedModule({
     @required String name,
-    @required fidl.Intent intent,
+    @required modular.Intent intent,
   }) async {
     if (name == null || name.isEmpty) {
       throw ArgumentError.value(
@@ -129,15 +130,42 @@ class ModuleImpl implements Module {
       throw ArgumentError.notNull('intent');
     }
 
-    final moduleController = fidl.ModuleControllerProxy();
-    final viewOwner = new InterfacePair<views_fidl.ViewOwner>();
+    final moduleController = modular.ModuleControllerProxy();
+    final viewOwner = new InterfacePair<views.ViewOwner>();
+    final status = await _getContext().embedModule(
+        name, intent, moduleController.ctrl.request(), viewOwner.passRequest());
+
+    _validateStartModuleStatus(status, name, intent);
+
+    return EmbeddedModule.fromViewOwner(
+        moduleController: moduleController, viewOwner: viewOwner.passHandle());
+  }
+
+  @override
+  Future<EmbeddedModule> embedModuleNew({
+    @required String name,
+    @required modular.Intent intent,
+  }) async {
+    if (name == null || name.isEmpty) {
+      throw ArgumentError.value(
+          name, 'name', 'embedModuleNew should be called with a valid name');
+    }
+    if (intent == null) {
+      throw ArgumentError.notNull('intent');
+    }
+
+    final moduleController = modular.ModuleControllerProxy();
+    final viewOwner = new InterfacePair<views.ViewOwner>();
     final status = await _getContext().embedModule(
         name, intent, moduleController.ctrl.request(), viewOwner.passRequest());
 
     _validateStartModuleStatus(status, name, intent);
 
     return EmbeddedModule(
-        moduleController: moduleController, viewOwner: viewOwner.passHandle());
+        moduleController: moduleController,
+        viewHolderToken: gfx.ImportToken(
+            value: zx.EventPair(
+                viewOwner.passHandle().passChannel().passHandle())));
   }
 
   @override
@@ -162,14 +190,14 @@ class ModuleImpl implements Module {
   }
 
   @override
-  OngoingActivity startOngoingActivity(fidl.OngoingActivityType type) {
-    final proxy = fidl.OngoingActivityProxy();
+  OngoingActivity startOngoingActivity(modular.OngoingActivityType type) {
+    final proxy = modular.OngoingActivityProxy();
     _getContext().startOngoingActivity(type, proxy.ctrl.request());
 
     return OngoingActivityImpl(proxy);
   }
 
-  fidl.ModuleContext _getContext() => _moduleContext ??= getModuleContext();
+  modular.ModuleContext _getContext() => _moduleContext ??= getModuleContext();
 
   void _proxyIntentToIntentHandler(Intent intent) {
     if (_intentHandler == null) {
@@ -188,11 +216,11 @@ class ModuleImpl implements Module {
   }
 
   void _validateStartModuleStatus(
-      fidl.StartModuleStatus status, String name, fidl.Intent intent) {
+      modular.StartModuleStatus status, String name, modular.Intent intent) {
     switch (status) {
-      case fidl.StartModuleStatus.success:
+      case modular.StartModuleStatus.success:
         break;
-      case fidl.StartModuleStatus.noModulesFound:
+      case modular.StartModuleStatus.noModulesFound:
         throw ModuleResolutionException(
             'no modules found for intent [$intent]');
         break;

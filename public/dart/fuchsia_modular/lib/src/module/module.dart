@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl;
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular;
 import 'package:fuchsia_services/services.dart';
 import 'package:meta/meta.dart';
 
@@ -41,9 +41,9 @@ abstract class Module {
   /// a default relation is used. Note, [surfaceRelation] is an optional
   /// parameter so a default value will be provided:
   /// ```
-  /// fidl.SurfaceRelation surfaceRelation = const fidl.SurfaceRelation(
-  ///    arrangement: fidl.SurfaceArrangement.copresent,
-  ///    dependency: fidl.SurfaceDependency.dependent,
+  /// modular.SurfaceRelation surfaceRelation = const modular.SurfaceRelation(
+  ///    arrangement: modular.SurfaceArrangement.copresent,
+  ///    dependency: modular.SurfaceDependency.dependent,
   ///    emphasis: 0.5,
   /// )
   ///```
@@ -54,7 +54,7 @@ abstract class Module {
   /// be closed). If the [intent] is resolved to the same module, the module
   /// will get the intent.
   ///
-  /// A [fidl.ModuleController] is returned to the caller to control the start
+  /// A [modular.ModuleController] is returned to the caller to control the start
   /// Module instance. Closing this connection doesn't affect its Module
   /// instance; it just relinquishes the ability of the caller to control the
   /// Module instance.
@@ -80,10 +80,10 @@ abstract class Module {
   /// Module().addModuleToStory(name: 'foo', intent: foo_intent);
   /// Module().addModuleToStory(name: 'bar', intent: bar_intent);
   /// ```
-  Future<fidl.ModuleController> addModuleToStory({
+  Future<modular.ModuleController> addModuleToStory({
     @required String name,
-    @required fidl.Intent intent,
-    fidl.SurfaceRelation surfaceRelation,
+    @required modular.Intent intent,
+    modular.SurfaceRelation surfaceRelation,
   });
 
   /// Creates an entity that will live for the lifetime of the story.
@@ -99,8 +99,8 @@ abstract class Module {
   /// display the view from the new module.
   ///
   /// The method will complete with an [EmbeddedModule] which contains the
-  /// [fidl.ModuleController] and the [InterfaceHandle<views_fidl.ViewOwner>].
-  /// The view owner handle can be used to create view to display in your
+  /// [modular.ModuleController] and the [gfx.ImportToken].
+  /// The token can be used to embed the child module's view to display in your
   /// module's view hierarchy. This is commonly done in Flutter modules with
   /// the ChildView widget.
   ///
@@ -108,7 +108,14 @@ abstract class Module {
   @experimental
   Future<EmbeddedModule> embedModule({
     @required String name,
-    @required fidl.Intent intent,
+    @required modular.Intent intent,
+  });
+
+  /// TEMPORARY, for transition purposes only.
+  @experimental
+  Future<EmbeddedModule> embedModuleNew({
+    @required String name,
+    @required modular.Intent intent,
   });
 
   /// Registers the [intentHandler] with this.
@@ -147,5 +154,5 @@ abstract class Module {
   /// system can make informed decisions about power/memory management. For
   /// example, if the module indicates that it is playing a video the system
   /// can prevent the display from dimming when not in use.
-  OngoingActivity startOngoingActivity(fidl.OngoingActivityType type);
+  OngoingActivity startOngoingActivity(modular.OngoingActivityType type);
 }

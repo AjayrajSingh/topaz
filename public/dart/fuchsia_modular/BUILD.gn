@@ -51,9 +51,10 @@ dart_library("fuchsia_modular") {
 
   deps = [
     "//sdk/fidl/fuchsia.auth",
-    "//sdk/fidl/fuchsia.sys",
-    "//sdk/fidl/fuchsia.ui.viewsv1token",
     "//sdk/fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.sys",
+    "//sdk/fidl/fuchsia.ui.gfx",
+    "//sdk/fidl/fuchsia.ui.viewsv1token",
     "//third_party/dart-pkg/pub/async",
     "//third_party/dart-pkg/pub/meta",
     "//topaz/public/dart/fidl",
