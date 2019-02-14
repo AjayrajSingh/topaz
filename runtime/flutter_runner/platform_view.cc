@@ -15,6 +15,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 #include "vsync_waiter.h"
+#include "trace/event.h"
 
 namespace flutter {
 
@@ -314,6 +315,7 @@ void PlatformView::OnScenicError(std::string error) {
 
 void PlatformView::OnScenicEvent(
     std::vector<fuchsia::ui::scenic::Event> events) {
+  TRACE_DURATION("flutter", "PlatformView::OnScenicEvent");
   for (const auto& event : events) {
     switch (event.Which()) {
       case fuchsia::ui::scenic::Event::Tag::kGfx:
@@ -443,8 +445,23 @@ static blink::PointerData::DeviceKind GetKindFromPointerType(
   }
 }
 
+// TODO(SCN-1278): Remove this.
+// Turns two floats (high bits, low bits) into a 64-bit uint.
+static trace_flow_id_t PointerTraceHACK(float fa, float fb) {
+  uint32_t ia, ib;
+  memcpy(&ia, &fa, sizeof(uint32_t));
+  memcpy(&ib, &fb, sizeof(uint32_t));
+  return (((uint64_t)ia) << 32) | ib;
+}
+
 bool PlatformView::OnHandlePointerEvent(
     const fuchsia::ui::input::PointerEvent& pointer) {
+  TRACE_DURATION("flutter", "PlatformView::OnHandlePointerEvent");
+  // TODO(SCN-1278): Use proper trace_id for tracing flow.
+  trace_flow_id_t trace_id =
+      PointerTraceHACK(pointer.radius_major, pointer.radius_minor);
+  TRACE_FLOW_END("input", "dispatch_event_to_client", trace_id);
+
   blink::PointerData pointer_data;
   pointer_data.time_stamp = pointer.event_time / 1000;
   pointer_data.change = GetChangeFromPointerEventPhase(pointer.phase);

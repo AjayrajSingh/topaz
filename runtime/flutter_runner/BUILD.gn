@@ -148,6 +148,7 @@ template("flutter_runner") {
              "//topaz/public/dart-pkg/fuchsia",
              "//topaz/public/lib/ui/flutter/sdk_ext",
              "//topaz/runtime/dart/utils",
+             "//zircon/public/lib/trace",
              "//zircon/public/lib/trace-provider",
              "//zircon/public/fidl/fuchsia-io",
            ] + extra_deps + flutter_deps
