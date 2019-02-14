@@ -432,7 +432,7 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
   FXL_DCHECK(credential.get().size() > 0);
   FXL_DCHECK(access_token.get().size() > 0);
 
-  auto request = OAuthRequestBuilder(kGooglePeopleGetEndpoint, "GET")
+  auto request = OAuthRequestBuilder(kGoogleUserInfoEndpoint, "GET")
                      .SetAuthorizationHeader(access_token.get());
 
   auto request_factory = [request = std::move(request)] {
@@ -446,31 +446,39 @@ void GoogleAuthProviderImpl::GetUserProfile(fidl::StringPtr credential,
 
     auto oauth_response = ParseOAuthResponse(std::move(response));
     if (oauth_response.status != AuthProviderStatus::OK) {
-      LogOauthResponse("GetUserProfile", oauth_response);
+      LogOauthResponse("UserInfo", oauth_response);
       get_persistent_credential_callback_(oauth_response.status, credential,
                                           std::move(user_profile_info));
       return;
     }
 
-    if (oauth_response.json_response.HasMember("id")) {
-      user_profile_info->id = oauth_response.json_response["id"].GetString();
+    if (oauth_response.json_response.HasMember("sub")) {
+      user_profile_info->id = oauth_response.json_response["sub"].GetString();
+    } else {
+      LogOauthResponse("UserInfo", oauth_response);
+      FX_LOG(INFO, NULL, "Missing unique identifier in UserInfo response");
+      get_persistent_credential_callback_(
+          AuthProviderStatus::OAUTH_SERVER_ERROR, nullptr,
+          std::move(user_profile_info));
+      return;
     }
 
-    if (oauth_response.json_response.HasMember("displayName")) {
+    if (oauth_response.json_response.HasMember("name")) {
       user_profile_info->display_name =
-          oauth_response.json_response["displayName"].GetString();
+          oauth_response.json_response["name"].GetString();
     }
 
-    if (oauth_response.json_response.HasMember("url")) {
-      user_profile_info->url = oauth_response.json_response["url"].GetString();
+    if (oauth_response.json_response.HasMember("profile")) {
+      user_profile_info->url =
+          oauth_response.json_response["profile"].GetString();
     }
 
-    if (oauth_response.json_response.HasMember("image")) {
+    if (oauth_response.json_response.HasMember("picture")) {
       user_profile_info->image_url =
-          oauth_response.json_response["image"]["url"].GetString();
+          oauth_response.json_response["picture"].GetString();
     }
 
-    FX_LOG(INFO, NULL, "Received valid UserProfile");
+    FX_LOG(INFO, NULL, "Received valid UserInfo response");
     get_persistent_credential_callback_(oauth_response.status, credential,
                                         std::move(user_profile_info));
   });

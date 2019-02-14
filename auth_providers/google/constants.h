@@ -16,8 +16,8 @@ constexpr char kGoogleOAuthTokenEndpoint[] =
     "https://www.googleapis.com/oauth2/v4/token";
 constexpr char kGoogleRevokeTokenEndpoint[] =
     "https://accounts.google.com/o/oauth2/revoke";
-constexpr char kGooglePeopleGetEndpoint[] =
-    "https://www.googleapis.com/plus/v1/people/me";
+constexpr char kGoogleUserInfoEndpoint[] =
+    "https://www.googleapis.com/oauth2/v3/userinfo";
 constexpr char kFirebaseAuthEndpoint[] =
     "https://www.googleapis.com/identitytoolkit/v3/relyingparty/"
     "verifyAssertion";
@@ -25,16 +25,15 @@ constexpr char kRedirectUri[] = "https://localhost/fuchsiaoauth2redirect";
 constexpr char kWebViewUrl[] = "web_view";
 
 constexpr auto kScopes = {
+    // Used by google_auth_provider for retrieving unique user profile id.
     "openid",
-    "email",
-    "https://www.googleapis.com/auth/assistant",
+    // Used by google_auth_provider for retrieving user profile attributes,
+    // specifically display name, profile url and profile image.
+    "profile", "https://www.googleapis.com/auth/assistant",
     "https://www.googleapis.com/auth/gmail.modify",
-    "https://www.googleapis.com/auth/userinfo.email",
-    "https://www.googleapis.com/auth/userinfo.profile",
     "https://www.googleapis.com/auth/youtube.readonly",
     "https://www.googleapis.com/auth/contacts",
     "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/plus.login",
     "https://www.googleapis.com/auth/calendar.readonly",
     "https://www.googleapis.com/auth/devstorage.read_write"};
 
