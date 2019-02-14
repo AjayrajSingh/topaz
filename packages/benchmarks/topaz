@@ -3,7 +3,6 @@
         "garnet/packages/benchmarks/buildbot"
     ],
     "packages": [
-        "//topaz/tests/benchmarks:topaz_benchmarks",
-        "//topaz/tests/benchmarks/story_startup:startup_benchmarks"
+        "//topaz/tests/benchmarks:topaz_benchmarks"
     ]
 }

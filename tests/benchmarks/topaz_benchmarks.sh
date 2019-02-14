@@ -20,8 +20,6 @@ if [ "${vulkan_is_supported_result}" = '1' ]; then
   # Run the gfx benchmarks in the current shell environment, because they write
   # to (hidden) global state used by runbench_finish.
 
-  # DISABLED: See BLD-324
-  # . /pkgfs/packages/startup_benchmarks/0/bin/startup_benchmarks.sh "$@"
   # DISABLED: See SCN-1223
   # . /pkgfs/packages/topaz_benchmarks/0/bin/gfx_benchmarks.sh "$@"
   echo 'Graphics performance tests disabled'
