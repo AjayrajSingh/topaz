@@ -8,14 +8,9 @@ import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.ui.flutter/child_view.dart';
 
-import 'user_watcher_impl.dart';
-
 /// Handles adding, removing, and logging, and controlling users.
 class BaseShellUserManager {
   final UserProvider _userProvider;
-
-  UserControllerProxy _userControllerProxy;
-  UserWatcherImpl _userWatcherImpl;
 
   final StreamController<void> _userLogoutController =
       StreamController<void>.broadcast();
@@ -53,24 +48,14 @@ class BaseShellUserManager {
   /// to open a [ChildViewConnection] to display the session shell.
   InterfaceHandle<ViewOwner> login(String accountId,
       InterfaceHandle<ServiceProvider> serviceProviderHandle) {
-    _userControllerProxy?.ctrl?.close();
-    _userControllerProxy = UserControllerProxy();
-    _userWatcherImpl?.close();
-    _userWatcherImpl = UserWatcherImpl(onUserLogout: () {
-      _userLogoutController.add(null);
-    });
-
     final InterfacePair<ViewOwner> viewOwner = InterfacePair<ViewOwner>();
     final UserLoginParams params = UserLoginParams(
       accountId: accountId,
       viewOwner: viewOwner.passRequest(),
       services: serviceProviderHandle,
-      userController: _userControllerProxy.ctrl.request(),
     );
 
     _userProvider.login(params);
-
-    _userControllerProxy.watch(_userWatcherImpl.getHandle());
 
     return viewOwner.passHandle();
   }
@@ -99,9 +84,7 @@ class BaseShellUserManager {
   }
 
   void close() {
-    _userControllerProxy.ctrl.close();
     _userLogoutController.close();
-    _userWatcherImpl.close();
   }
 }
 
