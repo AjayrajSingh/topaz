@@ -25,7 +25,6 @@
         "topaz/packages/prod/modules_index",
         "topaz/packages/prod/mondrian",
         "topaz/packages/prod/skottie_viewer",
-        "topaz/packages/prod/spotify_auth_provider",
         "topaz/packages/prod/system_dashboard",
         "topaz/packages/prod/term",
         "topaz/packages/prod/text_input_mod",

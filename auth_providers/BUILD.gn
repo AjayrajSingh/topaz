@@ -26,6 +26,5 @@ executable("auth_provider_unittests") {
     "//third_party/googletest:gtest_main",
     "//topaz/auth_providers/google:unittests",
     "//topaz/auth_providers/oauth:unittests",
-    "//topaz/auth_providers/spotify:unittests",
   ]
 }

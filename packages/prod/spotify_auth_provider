@@ -1,5 +1,0 @@
-{
-    "packages": [
-        "//topaz/auth_providers/spotify:spotify_auth_provider"
-    ]
-}
