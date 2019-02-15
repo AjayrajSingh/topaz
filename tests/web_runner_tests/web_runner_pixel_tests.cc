@@ -30,6 +30,7 @@ namespace {
 
 // Max time to wait in failure cases before bailing.
 constexpr zx::duration kTimeout = zx::sec(15);
+constexpr uint32_t kBlankColor = 0x00000000;
 
 std::map<uint32_t, size_t> Histogram(
     const fuchsia::ui::scenic::ScreenshotData& screenshot) {
@@ -107,6 +108,16 @@ class PixelTest : public gtest::RealLoopFixture {
     scenic_.set_error_handler([](zx_status_t status) {
       FAIL() << "Lost connection to Scenic: " << zx_status_get_string(status);
     });
+
+    // FLK-49
+    //
+    // These tests can flake when a screenshot captures a frame from the
+    // previous test, which can advance the test logic early. This is a
+    // temporary solution that waits for a blank on setup. Better solutions
+    // include hermetic Scenic (complicated by CF-605) or refactoring to use
+    // view state events (probably the best solution; greatly improves
+    // determinism at the expense of added harness complexity).
+    FXL_CHECK(WaitForBlank());
   }
 
   component::StartupContext* context() { return context_.get(); }
@@ -131,7 +142,7 @@ class PixelTest : public gtest::RealLoopFixture {
   }
 
   bool ScreenshotUntil(
-      fit::function<bool(fuchsia::ui::scenic::ScreenshotData)> condition,
+      fit::function<bool(fuchsia::ui::scenic::ScreenshotData, bool)> condition,
       zx::duration timeout = kTimeout) {
     zx::time start = zx::clock::get_monotonic();
     while (zx::clock::get_monotonic() - start <= timeout) {
@@ -145,8 +156,8 @@ class PixelTest : public gtest::RealLoopFixture {
             QuitLoop();
           });
 
-      if (!RunLoopWithTimeout(timeout) && ok &&
-          condition(std::move(screenshot))) {
+      if (!RunLoopWithTimeout(timeout) &&
+          condition(std::move(screenshot), ok)) {
         return true;
       }
     }
@@ -154,12 +165,24 @@ class PixelTest : public gtest::RealLoopFixture {
     return false;
   }
 
+  // Blank can manifest as invalid screenshots or blackness.
+  bool WaitForBlank() {
+    return ScreenshotUntil(
+        [](fuchsia::ui::scenic::ScreenshotData screenshot, bool status) {
+          return !status || Histogram(screenshot)[kBlankColor] > 0u;
+        });
+  }
+
   void ExpectSolidColor(uint32_t argb) {
     std::map<uint32_t, size_t> histogram;
 
     FXL_LOG(INFO) << "Looking for color " << std::hex << argb;
     EXPECT_TRUE(ScreenshotUntil(
-        [argb, &histogram](fuchsia::ui::scenic::ScreenshotData screenshot) {
+        [argb, &histogram](fuchsia::ui::scenic::ScreenshotData screenshot,
+                           bool status) {
+          if (!status)
+            return false;
+
           histogram = Histogram(screenshot);
           FXL_LOG(INFO) << histogram[argb] << " px";
           return histogram[argb] > 0u;
@@ -173,9 +196,12 @@ class PixelTest : public gtest::RealLoopFixture {
     std::multimap<size_t, uint32_t> inverse_histogram;
 
     FXL_LOG(INFO) << "Looking for color " << std::hex << color;
-    EXPECT_TRUE(
-        ScreenshotUntil([color, &inverse_histogram](
-                            fuchsia::ui::scenic::ScreenshotData screenshot) {
+    EXPECT_TRUE(ScreenshotUntil(
+        [color, &inverse_histogram](
+            fuchsia::ui::scenic::ScreenshotData screenshot, bool status) {
+          if (!status)
+            return false;
+
           std::map<uint32_t, size_t> histogram = Histogram(screenshot);
           FXL_LOG(INFO) << histogram[color] << " px";
 
