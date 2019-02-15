@@ -11,9 +11,6 @@ layout and control as ``//garnet/bin/developer/[tiles|tiles_ctl]``. For
 simplicity it re-uses
 ``//sdk/fidl/fuchsia.developer.tiles/tiles.fidl``.
 
-There is an `ermine_ctl` program you can use to list and remove stories from Ermine. This
-program will be removed as soon as sessionctl supports "list" and "remove".
-
 When built as part of the default package for topaz, Ermine is launched
 by device_runner after the user logs in.
 
