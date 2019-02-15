@@ -309,6 +309,7 @@ template("flutter_dart_jit_component") {
 
     # Look through the package meta for cmx file for this component, and merge
     # in the runner.
+    found_cmx = false
     foreach(item, package_meta) {
       dest = item.path
       if (defined(item.dest)) {
@@ -327,8 +328,10 @@ template("flutter_dart_jit_component") {
         item.path = merged_outputs[0]
         cmx_deps += [ ":$merged" ]
         cmx_filtered_meta += [ item ]
+        found_cmx = true
       }
     }
+    assert(found_cmx, "could not find ${component.component_name}.cmx for component ${component.component_name}!")
 
     component_name = component.component_name
 
@@ -690,6 +693,7 @@ template("flutter_dart_aot_component") {
 
     # Look through the package meta for cmx file for this component, and merge
     # in the runner.
+    found_cmx = false
     foreach(item, package_meta) {
       dest = item.path
       if (defined(item.dest)) {
@@ -708,8 +712,10 @@ template("flutter_dart_aot_component") {
         item.path = merged_outputs[0]
         cmx_deps += [ ":$merged" ]
         cmx_filtered_meta += [ item ]
+        found_cmx = true
       }
     }
+    assert(found_cmx, "could not find ${component.component_name}.cmx for component ${component.component_name}!")
 
     component_name = component.component_name
 
