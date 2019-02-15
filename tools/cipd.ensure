@@ -6,20 +6,20 @@ $ParanoidMode CheckPresence
 
 # Chromium fidl
 @Subdir third_party/chromium/fidl/chromium.web
-chromium/fuchsia/fidl ka5L298OgUuFtu0pN2GSx5XdraVI0GkGj0fdsOoYiYcC
+chromium/fuchsia/fidl FT65qhVAddN1kS9xoNI3XoXVyuWgl7BW3Q9bLSOhjzIC
 
 # Chromium and web_runner amd64 / x64 implementation
 @Subdir third_party/chromium/arch/x64
-chromium/fuchsia/webrunner-amd64 RT8EF51GLGMjRx_3Gu9pzTq_kHejY66i_nk0n268AmEC
+chromium/fuchsia/webrunner-amd64 T9P36hY1x-SY4t1cDIhGz11D99LSDpL91j5a8ukv3tIC
 
 # Chromium and web_runner arm64 / aarch64 implementation
 @Subdir third_party/chromium/arch/arm64
-chromium/fuchsia/webrunner-arm64 Fcga2BDas68BpoNf1oGEp4OD9ozjITX1MtwNE4GXnqcC
+chromium/fuchsia/webrunner-arm64 y5jrK1UjNlk7ADusRujyRt-V0q-scsRQlS57hH56vhAC
 
 # cast_runner amd64 / x64 implementation
 @Subdir third_party/cast_runner/arch/x64
-chromium/fuchsia/castrunner-amd64 mN1TnaQywkDG0mdtMIIfhxZhYNWQ98DgNOVeReDHxsYC
+chromium/fuchsia/castrunner-amd64 kwoU66obuGFXKzyQEr139y1ukfr05IiVovwx7PiiL0UC
 
 # cast_runner arm64 / aarch64 implementation
 @Subdir third_party/cast_runner/arch/arm64
-chromium/fuchsia/castrunner-arm64 FoD3v0pAeMIiMIrV_mGM-S63isiHOwHn8apv8r_VBO0C
+chromium/fuchsia/castrunner-arm64 OldyjftC7D7DkQ6kS4lZZxs0Ow8ZvFzpzI4638uaw34C
