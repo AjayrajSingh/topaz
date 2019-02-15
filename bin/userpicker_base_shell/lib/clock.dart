@@ -5,7 +5,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:sysui_widgets/time_stringer.dart';
+
+import 'time_stringer.dart';
 
 /// System Clock in the Base Shell
 class Clock extends StatelessWidget {

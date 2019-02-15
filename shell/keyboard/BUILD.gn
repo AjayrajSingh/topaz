@@ -17,7 +17,6 @@ dart_library("keyboard") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/shell/widgets",
   ]
 }
 

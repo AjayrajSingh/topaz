@@ -40,6 +40,7 @@ flutter_app("userpicker_base_shell") {
     "authentication_ui_context_impl.dart",
     "circular_button.dart",
     "clock.dart",
+    "time_stringer.dart",
     "user_list.dart",
     "user_picker_base_shell_model.dart",
     "user_picker_base_shell_screen.dart",
@@ -62,6 +63,5 @@ flutter_app("userpicker_base_shell") {
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/ui/flutter",
-    "//topaz/shell/widgets",
   ]
 }
