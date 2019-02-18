@@ -31,18 +31,18 @@ dart_library("lib.widgets") {
 
   deps = [
     "//sdk/fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.ui.app",
+    "//sdk/fidl/fuchsia.ui.gfx",
     "//sdk/fidl/fuchsia.ui.policy",
-    "//sdk/fidl/fuchsia.ui.viewsv1",
-    "//sdk/fidl/fuchsia.ui.viewsv1token",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/flutter_image",
     "//topaz/bin/ui/skottie_viewer:skottie_loader",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/device/dart",
     "//topaz/public/lib/module/dart",
-    "//topaz/public/lib/ui/flutter",
     "//topaz/public/lib/user/dart",
     "//zircon/public/fidl/fuchsia-cobalt",
   ]
