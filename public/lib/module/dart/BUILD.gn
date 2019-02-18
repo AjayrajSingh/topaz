@@ -16,13 +16,15 @@ dart_library("dart") {
   ]
 
   deps = [
-    "//sdk/fidl/fuchsia.ui.viewsv1",
     "//sdk/fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.ui.gfx",
+    "//sdk/fidl/fuchsia.ui.viewsv1",
+    "//sdk/fidl/fuchsia.ui.viewsv1token",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
+    "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/component/dart",
     "//topaz/public/lib/story/dart",
-    "//topaz/public/lib/ui/flutter",
   ]
 }

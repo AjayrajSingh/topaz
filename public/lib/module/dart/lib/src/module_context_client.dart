@@ -6,13 +6,16 @@ import 'dart:async';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart' as fidl;
-// See DNO-201 for details on the _view_token path.
+import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
+import 'package:fuchsia_scenic_flutter/child_view.dart' show ChildView;
+import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
+    show ChildViewConnection;
 import 'package:lib.app.dart/logging.dart';
 import 'package:lib.component.dart/component.dart';
 import 'package:lib.story.dart/story.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:meta/meta.dart';
+import 'package:zircon/zircon.dart';
 
 import 'module_controller_client.dart';
 
@@ -251,7 +254,9 @@ class ModuleContextClient {
 
           // TODO(MS-1437): viewOwner error handling.
           ChildViewConnection connection =
-              new ChildViewConnection(viewOwner.passHandle());
+              ChildViewConnection.fromImportToken(ImportToken(
+            value: EventPair(viewOwner.passHandle().passChannel().passHandle()),
+          ));
 
           EmbeddedModule result = new EmbeddedModule(
             controller: controller,
