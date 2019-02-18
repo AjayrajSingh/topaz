@@ -6,12 +6,15 @@ import 'dart:async';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:fidl_fuchsia_xi_session/fidl_async.dart';
-import 'package:lib.ui.flutter/child_view.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
+    show ChildViewConnection;
 import 'package:lib.app_driver.dart/module_driver.dart';
+import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets.dart/model.dart';
+import 'package:zircon/zircon.dart';
 
 const String kSessionManagerURL =
     'fuchsia-pkg://fuchsia.com/xi_session_agent#meta/xi_session_agent.cmx';
@@ -107,7 +110,9 @@ class DemoModel extends Model {
         intentBuilder.intent,
         editorController.proxy.ctrl.request(),
         viewOwner.passRequest(), (StartModuleStatus status) {
-      editorConn = ChildViewConnection(viewOwner.passHandle());
+      editorConn = ChildViewConnection.fromImportToken(ImportToken(
+        value: EventPair(viewOwner.passHandle().passChannel().passHandle()),
+      ));
       log.info('Start embeddable intent status = $status');
     });
   }

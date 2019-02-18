@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.ui.flutter/child_view.dart';
+import 'package:fuchsia_scenic_flutter/child_view.dart' show ChildView;
 import 'package:lib.widgets.dart/model.dart';
 
 import 'demo_model.dart';
