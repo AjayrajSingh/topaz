@@ -18,7 +18,6 @@ flutter_app("simple_flutter") {
         "//sdk/fidl/fuchsia.ui.viewsv1",
         "//third_party/dart-pkg/git/flutter/packages/flutter",
         "//topaz/public/dart/widgets:lib.widgets",
-        "//topaz/public/lib/ui/flutter",
       ]
     },
     {

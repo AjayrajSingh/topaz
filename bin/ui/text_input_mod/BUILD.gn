@@ -23,7 +23,6 @@ flutter_app("text_input_mod") {
     "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/module/dart",
     "//topaz/public/lib/module_resolver/dart",
-    "//topaz/public/lib/ui/flutter",
     "//topaz/public/lib/widgets/dart",
   ]
 

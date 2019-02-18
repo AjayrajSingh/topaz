@@ -19,7 +19,6 @@ flutter_app("localized_mod") {
     "//third_party/dart/third_party/pkg/intl",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app_driver/dart",
-    "//topaz/public/lib/ui/flutter",
   ]
 
   meta = [
