@@ -20,10 +20,10 @@ import 'package:lib.lifecycle.dart/lifecycle.dart';
 import 'package:lib.module.dart/module.dart';
 import 'package:lib.schemas.dart/entity_codec.dart';
 import 'package:lib.story.dart/story.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
-import 'package:modules_metrics_registry/modules_metrics_registry.dart' as modules_metrics_registry;
+import 'package:modules_metrics_registry/modules_metrics_registry.dart'
+    as modules_metrics_registry;
 
 import 'service_client.dart';
 
@@ -37,8 +37,6 @@ export 'package:lib.module_resolver.dart/intent_builder.dart'
 export 'package:lib.module.dart/module.dart'
     show ModuleControllerClient, EmbeddedModule;
 export 'package:lib.story.dart/story.dart' show LinkClient;
-export 'package:lib.ui.flutter/child_view.dart'
-    show ChildView, ChildViewConnection;
 
 /// Function definition to handle [data] that is received from a message queue.
 typedef OnReceiveMessage = void Function(Uint8List data, void Function() ack);
@@ -126,7 +124,7 @@ class ModuleDriver {
   final List<OnTerminateAsync> _onTerminatesAsync = <OnTerminateAsync>[];
 
   /// Deprecated: Use package:fuchsia_modular/module.dart instead
-  /// 
+  ///
   /// Create a new [ModuleDriver].
   ///
   ///     ModuleDriver module = new ModuleDriver();
