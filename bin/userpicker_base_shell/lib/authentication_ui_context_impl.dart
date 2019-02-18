@@ -19,7 +19,7 @@ class AuthenticationUiContextImpl extends AuthenticationUiContext {
   /// Called when an aunthentication overlay needs to be stopped.
   final VoidCallback _onStopOverlay;
 
-  /// Builds an AuthenticationUiContext that takes |ViewOwner| callbacks to
+  /// Builds an AuthenticationUiContext that takes |ImportToken| callbacks to
   /// start and stop an authentication display overlay.
   AuthenticationUiContextImpl(
       {OnStartOverlay onStartOverlay, VoidCallback onStopOverlay})
@@ -27,12 +27,10 @@ class AuthenticationUiContextImpl extends AuthenticationUiContext {
         _onStopOverlay = onStopOverlay;
 
   @override
-  // TODO(SCN-1018): Remove this temporary workaround.
   void startOverlay(InterfaceHandle<ViewOwner> viewOwner) =>
       startOverlay2(new EventPair(viewOwner?.passChannel()?.passHandle()));
 
   @override
-  // TODO(SCN-1018): Remove this temporary workaround.
   // ignore: override_on_non_overriding_method
   void startOverlay2(EventPair viewHolderToken) =>
       _onStartOverlay?.call(viewHolderToken);

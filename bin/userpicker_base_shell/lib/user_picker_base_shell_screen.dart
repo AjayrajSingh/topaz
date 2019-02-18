@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 import 'package:fidl_fuchsia_sys/fidl.dart';
-import 'package:lib.ui.flutter/child_view.dart';
+import 'package:fuchsia_scenic_flutter/child_view.dart' show ChildView;
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 

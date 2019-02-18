@@ -14,18 +14,17 @@ dart_library("lib.base_shell") {
   ]
 
   deps = [
+    "//sdk/fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.modular.auth",
     "//sdk/fidl/fuchsia.netstack",
     "//sdk/fidl/fuchsia.timezone",
     "//sdk/fidl/fuchsia.ui.input",
     "//sdk/fidl/fuchsia.ui.viewsv1",
-    "//sdk/fidl/fuchsia.modular",
-    "//sdk/fidl/fuchsia.modular.auth",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/ui/flutter",
     "//zircon/public/fidl/fuchsia-net:fuchsia-net",
   ]
 }

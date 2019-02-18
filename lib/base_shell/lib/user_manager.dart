@@ -6,7 +6,6 @@ import 'package:fidl_fuchsia_modular_auth/fidl.dart';
 import 'package:fidl_fuchsia_sys/fidl.dart';
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 
 /// Handles adding, removing, and logging, and controlling users.
 class BaseShellUserManager {
