@@ -6,13 +6,13 @@ use fidl_fuchsia_math::{InsetF, SizeF};
 use fidl_fuchsia_textinputmod::{
     TextInputModMarker, TextInputModProxy, TextInputModReceiverMarker, TextInputModReceiverRequest,
 };
-use fidl_fuchsia_ui_viewsv1::{
-    CustomFocusBehavior, ViewLayout, ViewProperties, ViewProviderMarker,
-};
-use fidl_fuchsia_ui_viewsv1token::ViewOwnerMarker;
+use fidl_fuchsia_ui_app::ViewProviderMarker;
+use fidl_fuchsia_ui_gfx::{ExportToken, ImportToken};
+use fidl_fuchsia_ui_viewsv1::{CustomFocusBehavior, ViewLayout, ViewProperties};
 use fuchsia_app::client::{App, Launcher};
 use fuchsia_async as fasync;
 use fuchsia_scenic::{EntityNode, ImportNode, SessionPtr};
+use fuchsia_zircon as zx;
 use futures::{TryFutureExt, TryStreamExt};
 
 pub struct AskBox {
@@ -24,16 +24,21 @@ pub struct AskBox {
 
 impl AskBox {
     fn setup_view(
-        app: &App, key: u32, session: &SessionPtr,
-        view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy, import_node: &ImportNode,
+        app: &App,
+        key: u32,
+        session: &SessionPtr,
+        view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
+        import_node: &ImportNode,
     ) -> Result<EntityNode, Error> {
         let view_provider = app.connect_to_service(ViewProviderMarker)?;
-        let (view_owner_client, view_owner_server) = create_endpoints::<ViewOwnerMarker>()?;
-        view_provider.create_view(view_owner_server, None)?;
+        let (import, export) = zx::EventPair::create()?;
+        let view_holder_token = ImportToken { value: import };
+        let view_token = ExportToken { value: export };
+        view_provider.create_view(view_token.value, None, None)?;
         let host_node = EntityNode::new(session.clone());
         let host_import_token = host_node.export_as_request();
 
-        view_container.add_child(key, view_owner_client, host_import_token)?;
+        view_container.add_child2(key, view_holder_token.value, host_import_token)?;
         import_node.add_child(&host_node);
         Ok(host_node)
     }
@@ -76,7 +81,8 @@ impl AskBox {
     }
 
     pub fn focus(
-        &mut self, _view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
+        &mut self,
+        _view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
     ) -> Result<(), Error> {
         // TODO: add correct scenic focusing call here
         println!("Want to focus {}", self.key);
@@ -84,15 +90,18 @@ impl AskBox {
     }
 
     pub fn remove(
-        &mut self, view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
+        &mut self,
+        view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
     ) -> Result<(), Error> {
         view_container.remove_child(self.key, None)?;
         Ok(())
     }
 
     pub fn new(
-        key: u32, session: &SessionPtr,
-        view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy, import_node: &ImportNode,
+        key: u32,
+        session: &SessionPtr,
+        view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
+        import_node: &ImportNode,
     ) -> Result<AskBox, Error> {
         let app = Launcher::new()?.launch(
             "fuchsia-pkg://fuchsia.com/text_input_mod#meta/text_input_mod.cmx".to_string(),
@@ -102,16 +111,13 @@ impl AskBox {
         let host_node = Self::setup_view(&app, key, session, view_container, import_node)?;
         let text_input_mod = Self::setup_text_mod_receiver(&app)?;
 
-        Ok(AskBox {
-            _app: app,
-            key,
-            host_node,
-            text_input_mod,
-        })
+        Ok(AskBox { _app: app, key, host_node, text_input_mod })
     }
 
     pub fn layout(
-        &self, view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy, width: f32,
+        &self,
+        view_container: &fidl_fuchsia_ui_viewsv1::ViewContainerProxy,
+        width: f32,
         height: f32,
     ) -> Result<(), Error> {
         let x_inset = width * 0.1;
@@ -119,16 +125,8 @@ impl AskBox {
         let mut view_properties = ViewProperties {
             custom_focus_behavior: Some(Box::new(CustomFocusBehavior { allow_focus: true })),
             view_layout: Some(Box::new(ViewLayout {
-                inset: InsetF {
-                    bottom: 0.0,
-                    left: 0.0,
-                    right: 0.0,
-                    top: 0.0,
-                },
-                size: SizeF {
-                    width: width - 2.0 * x_inset,
-                    height: height - 2.0 * y_inset,
-                },
+                inset: InsetF { bottom: 0.0, left: 0.0, right: 0.0, top: 0.0 },
+                size: SizeF { width: width - 2.0 * x_inset, height: height - 2.0 * y_inset },
             })),
         };
         view_container.set_child_properties(self.key, Some(OutOfLine(&mut view_properties)))?;

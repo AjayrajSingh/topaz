@@ -4,8 +4,8 @@
 
 use crate::ask_box::AskBox;
 use failure::{Error, ResultExt};
-use fidl::encoding::OutOfLine;
 use fidl::encoding::Decodable;
+use fidl::encoding::OutOfLine;
 use fidl::endpoints::{create_proxy, ClientEnd, ServerEnd};
 use fidl_fuchsia_math::{InsetF, RectF, SizeF};
 use fidl_fuchsia_modular::{
@@ -21,7 +21,7 @@ use fidl_fuchsia_ui_viewsv1::{
 };
 use fuchsia_app::client::connect_to_service;
 use fuchsia_async as fasync;
-use fuchsia_scenic::{EntityNode, ImportNode, Material, Rectangle, Session, SessionPtr, ShapeNode};
+use fuchsia_scenic::{EntityNode, ImportNode, Material, Rectangle, SessionPtr, ShapeNode};
 use fuchsia_zircon as zx;
 use futures::{future::ready as fready, TryFutureExt, TryStreamExt};
 use itertools::Itertools;
@@ -66,7 +66,11 @@ struct ViewData {
 
 impl ViewData {
     pub fn new(
-        key: u32, url: String, story_id: String, allow_focus: bool, host_node: EntityNode,
+        key: u32,
+        url: String,
+        story_id: String,
+        allow_focus: bool,
+        host_node: EntityNode,
     ) -> ViewData {
         ViewData {
             key: key,
@@ -100,16 +104,11 @@ pub type ErmineViewPtr = Arc<Mutex<ErmineView>>;
 impl ErmineView {
     pub fn new(
         view_listener_request: ServerEnd<ViewListenerMarker>,
-        view: fidl_fuchsia_ui_viewsv1::ViewProxy, mine: zx::EventPair,
-        scenic: fidl_fuchsia_ui_scenic::ScenicProxy,
+        view: fidl_fuchsia_ui_viewsv1::ViewProxy,
+        mine: zx::EventPair,
+        session: SessionPtr,
+        session_listener_server: ServerEnd<SessionListenerMarker>,
     ) -> Result<ErmineViewPtr, Error> {
-        let (session_listener_client, session_listener_server) = zx::Channel::create()?;
-        let session_listener = ClientEnd::new(session_listener_client);
-
-        let (session_proxy, session_request) = create_proxy()?;
-        scenic.create_session(session_request, Some(session_listener))?;
-        let session = Session::new(session_proxy);
-
         let (view_container_proxy, view_container_request) = create_proxy()?;
 
         view.get_container(view_container_request)?;
@@ -142,13 +141,12 @@ impl ErmineView {
     }
 
     fn setup_session_listener(
-        view_controller: &ErmineViewPtr, session_listener_server: zx::Channel,
+        view_controller: &ErmineViewPtr,
+        session_listener_server: ServerEnd<SessionListenerMarker>,
     ) -> Result<(), Error> {
-        let session_listener_request =
-            ServerEnd::<SessionListenerMarker>::new(session_listener_server);
         let view_controller = view_controller.clone();
         fasync::spawn(
-            session_listener_request
+            session_listener_server
                 .into_stream()?
                 .map_ok(move |request| match request {
                     SessionListenerRequest::OnScenicEvent { events, .. } => {
@@ -163,17 +161,15 @@ impl ErmineView {
     }
 
     fn setup_view_listener(
-        view_controller: &ErmineViewPtr, view_listener_request: ServerEnd<ViewListenerMarker>,
+        view_controller: &ErmineViewPtr,
+        view_listener_request: ServerEnd<ViewListenerMarker>,
     ) -> Result<(), Error> {
         let view_controller = view_controller.clone();
         fasync::spawn(
             view_listener_request
                 .into_stream()?
                 .try_for_each(
-                    move |ViewListenerRequest::OnPropertiesChanged {
-                              properties,
-                              responder,
-                          }| {
+                    move |ViewListenerRequest::OnPropertiesChanged { properties, responder }| {
                         view_controller.lock().handle_properies_changed(&properties);
                         fready(responder.send())
                     },
@@ -191,10 +187,7 @@ impl ErmineView {
         let view_container_listener_request =
             ServerEnd::<ViewContainerListenerMarker>::new(view_container_listener_server);
 
-        view_controller
-            .lock()
-            .view_container
-            .set_listener(Some(view_container_listener))?;
+        view_controller.lock().view_container.set_listener(Some(view_container_listener))?;
 
         fasync::spawn(
             view_container_listener_request
@@ -204,10 +197,7 @@ impl ErmineView {
                         view_controller.lock().update();
                         fready(responder.send())
                     }
-                    ViewContainerListenerRequest::OnChildUnavailable {
-                        responder,
-                        child_key,
-                    } => {
+                    ViewContainerListenerRequest::OnChildUnavailable { responder, child_key } => {
                         view_controller
                             .lock()
                             .remove_story(child_key)
@@ -228,18 +218,11 @@ impl ErmineView {
     }
 
     fn setup_scene(&self) {
-        self.import_node
-            .resource()
-            .set_event_mask(gfx::METRICS_EVENT_MASK);
+        self.import_node.resource().set_event_mask(gfx::METRICS_EVENT_MASK);
         self.import_node.add_child(&self.background_node);
         self.import_node.add_child(&self.container_node);
         let material = Material::new(self.session.clone());
-        material.set_color(ColorRgba {
-            red: 0xb3,
-            green: 0x1b,
-            blue: 0x1b,
-            alpha: 0x80,
-        });
+        material.set_color(ColorRgba { red: 0xb3, green: 0x1b, blue: 0x1b, alpha: 0x80 });
         self.background_node.set_material(&material);
     }
 
@@ -251,8 +234,7 @@ impl ErmineView {
             self.width,
             self.height,
         ));
-        self.background_node
-            .set_translation(center_x, center_y, 0.0);
+        self.background_node.set_translation(center_x, center_y, 0.0);
         self.present();
     }
 
@@ -284,13 +266,15 @@ impl ErmineView {
     }
 
     pub fn add_child_view_for_story_attach(
-        &mut self, key: u32, story_id: String, view_holder_token: zx::EventPair,
+        &mut self,
+        key: u32,
+        story_id: String,
+        view_holder_token: zx::EventPair,
     ) -> Result<(), Error> {
         let host_node = EntityNode::new(self.session.clone());
         let host_import_token = host_node.export_as_request();
 
-        self.view_container
-            .add_child2(key, view_holder_token, host_import_token)?;
+        self.view_container.add_child2(key, view_holder_token, host_import_token)?;
 
         self.import_node.add_child(&host_node);
         let view_data = ViewData::new(key, "".to_string(), story_id, true, host_node);
@@ -301,10 +285,7 @@ impl ErmineView {
     }
 
     pub fn remove_view_for_story(&mut self, story_id: &String) -> Result<(), Error> {
-        let result = self
-            .views
-            .iter()
-            .find(|(_key, view)| view.story_id == *story_id);
+        let result = self.views.iter().find(|(_key, view)| view.story_id == *story_id);
 
         if let Some((key, _view)) = result {
             self.remove_story(*key)?;
@@ -315,14 +296,9 @@ impl ErmineView {
 
     pub fn remove_story(&mut self, key: u32) -> Result<(), Error> {
         if self.views.remove(&key).is_some() {
-            self.view_container
-                .remove_child(key, None)
-                .unwrap_or_else(|e| {
-                    eprintln!(
-                        "view_container.remove_child failed for key {} with {}",
-                        key, e
-                    );
-                });
+            self.view_container.remove_child(key, None).unwrap_or_else(|e| {
+                eprintln!("view_container.remove_child failed for key {} with {}", key, e);
+            });
             self.layout()?;
             self.update();
         }
@@ -335,18 +311,11 @@ impl ErmineView {
         let mut sizes = Vec::new();
         let mut fs = Vec::new();
         for (key, view) in &self.views {
-            let bounds = view.bounds.as_ref().unwrap_or(&RectF {
-                x: 0.0,
-                y: 0.0,
-                width: 0.0,
-                height: 0.0,
-            });
+            let bounds =
+                view.bounds.as_ref().unwrap_or(&RectF { x: 0.0, y: 0.0, width: 0.0, height: 0.0 });
             keys.push(*key);
             urls.push(view.url.clone());
-            sizes.push(SizeF {
-                width: bounds.width,
-                height: bounds.height,
-            });
+            sizes.push(SizeF { width: bounds.width, height: bounds.height });
             fs.push(true);
         }
         (keys, urls, sizes, fs)
@@ -383,15 +352,10 @@ impl ErmineView {
         let package = format!("fuchsia-pkg://fuchsia.com/{}#meta/{}.cmx", text, text);
         let (story_puppet_master, story_puppet_master_end) =
             create_proxy().context("handle_suggestion control_story")?;
-        self.puppet_master
-            .control_story(&story_name, story_puppet_master_end)?;
+        self.puppet_master.control_story(&story_name, story_puppet_master_end)?;
         let mut commands = [StoryCommand::AddMod(AddMod {
             mod_name_transitional: Some(random_mod_name()),
-            intent: Intent {
-                action: None,
-                handler: Some(package),
-                parameters: None,
-            },
+            intent: Intent { action: None, handler: Some(package), parameters: None },
             surface_parent_mod_name: None,
             surface_relation: SurfaceRelation {
                 arrangement: SurfaceArrangement::None,
@@ -405,11 +369,9 @@ impl ErmineView {
             .context("handle_suggestion story_puppet_master.enqueue")?;
         let f = story_puppet_master.execute();
         fasync::spawn(
-            f.map_ok(move |_| {})
-                .unwrap_or_else(|e| eprintln!("puppetmaster error: {:?}", e)),
+            f.map_ok(move |_| {}).unwrap_or_else(|e| eprintln!("puppetmaster error: {:?}", e)),
         );
-        self.story_puppet_masters
-            .insert(story_name, story_puppet_master);
+        self.story_puppet_masters.insert(story_name, story_puppet_master);
 
         Ok(())
     }
@@ -422,12 +384,8 @@ impl ErmineView {
             let rows = (columns + num_tiles - 1) / columns;
             let tile_height = (self.height / rows as f32).floor();
 
-            for (row_index, view_chunk) in self
-                .views
-                .iter_mut()
-                .chunks(columns)
-                .into_iter()
-                .enumerate()
+            for (row_index, view_chunk) in
+                self.views.iter_mut().chunks(columns).into_iter().enumerate()
             {
                 let tiles_in_row = if row_index == rows - 1 && (num_tiles % columns) != 0 {
                     num_tiles % columns
@@ -448,22 +406,13 @@ impl ErmineView {
                             allow_focus: view.allow_focus,
                         })),
                         view_layout: Some(Box::new(ViewLayout {
-                            inset: InsetF {
-                                bottom: 0.0,
-                                left: 0.0,
-                                right: 0.0,
-                                top: 0.0,
-                            },
-                            size: SizeF {
-                                width: tile_bounds.width,
-                                height: tile_bounds.height,
-                            },
+                            inset: InsetF { bottom: 0.0, left: 0.0, right: 0.0, top: 0.0 },
+                            size: SizeF { width: tile_bounds.width, height: tile_bounds.height },
                         })),
                     };
                     self.view_container
                         .set_child_properties(view.key, Some(OutOfLine(&mut view_properties)))?;
-                    view.host_node
-                        .set_translation(tile_bounds.x, tile_bounds.y, 0.0);
+                    view.host_node.set_translation(tile_bounds.x, tile_bounds.y, 0.0);
                     view.bounds = Some(tile_bounds);
                 }
             }

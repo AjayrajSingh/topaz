@@ -13,19 +13,19 @@ use fidl_fuchsia_modular::{
     SessionShellRequestStream, StoryProviderProxy, StoryProviderWatcherMarker,
     StoryProviderWatcherRequest, StoryState,
 };
+use fidl_fuchsia_ui_app::{ViewProviderMarker, ViewProviderRequest, ViewProviderRequestStream};
+use fidl_fuchsia_ui_gfx as gfx;
 use fidl_fuchsia_ui_input::{
     KeyboardEvent, KeyboardEventPhase, MODIFIER_LEFT_SUPER, MODIFIER_RIGHT_SUPER,
 };
 use fidl_fuchsia_ui_policy::{
     KeyboardCaptureListenerHackMarker, KeyboardCaptureListenerHackRequest, PresentationProxy,
 };
-use fidl_fuchsia_ui_viewsv1::{
-    ViewManagerMarker, ViewManagerProxy, ViewProviderMarker, ViewProviderRequest::CreateView,
-    ViewProviderRequestStream,
-};
-use fidl_fuchsia_ui_viewsv1token::ViewOwnerMarker;
+use fidl_fuchsia_ui_scenic::{ScenicMarker, ScenicProxy};
+use fidl_fuchsia_ui_viewsv1 as deprecated;
 use fuchsia_app::{self as component, client::connect_to_service};
 use fuchsia_async as fasync;
+use fuchsia_scenic::Session;
 use fuchsia_zircon as zx;
 use futures::{future::ready as fready, TryFutureExt, TryStreamExt};
 use lazy_static::lazy_static;
@@ -38,7 +38,8 @@ mod view;
 use crate::view::{ErmineView, ErmineViewPtr};
 
 pub struct App {
-    view_manager: ViewManagerProxy,
+    scenic: ScenicProxy,
+    view_manager: deprecated::ViewManagerProxy,
     views: Vec<ErmineViewPtr>,
     session_shell_context: SessionShellContextProxy,
     story_provider: StoryProviderProxy,
@@ -54,14 +55,14 @@ lazy_static! {
 
 impl App {
     pub fn new() -> Result<AppPtr, Error> {
-        let view_manager = connect_to_service::<ViewManagerMarker>()?;
+        let scenic = connect_to_service::<ScenicMarker>()?;
+        let view_manager = connect_to_service::<deprecated::ViewManagerMarker>()?;
         let session_shell_context = connect_to_service::<SessionShellContextMarker>()?;
         let (story_provider, story_provider_end) = create_proxy()?;
-        session_shell_context
-            .clone()
-            .get_story_provider(story_provider_end)?;
+        session_shell_context.clone().get_story_provider(story_provider_end)?;
 
         let app = Arc::new(Mutex::new(App {
+            scenic,
             view_manager,
             views: vec![],
             session_shell_context,
@@ -74,35 +75,54 @@ impl App {
         Ok(app)
     }
 
-    pub fn spawn_view_provider_server(chan: fasync::Channel) {
+    pub fn spawn_v1_view_provider_server(chan: fasync::Channel) {
         fasync::spawn(
-            ViewProviderRequestStream::from_channel(chan)
+            deprecated::ViewProviderRequestStream::from_channel(chan)
                 .try_for_each(move |req| {
-                    let CreateView { view_owner, .. } = req;
-                    APP.lock()
-                        .create_view(view_owner)
-                        .expect("Create view failed");
+                    let deprecated::ViewProviderRequest::CreateView { view_owner, .. } = req;
+                    let view_token = gfx::ExportToken {
+                        value: zx::EventPair::from(zx::Handle::from(view_owner.into_channel())),
+                    };
+                    APP.lock().create_view(view_token).expect("Create view failed");
                     futures::future::ready(Ok(()))
                 })
                 .unwrap_or_else(|e| eprintln!("error running view_provider server: {:?}", e)),
         )
     }
 
-    pub fn create_view(&mut self, req: ServerEnd<ViewOwnerMarker>) -> Result<(), Error> {
+    pub fn spawn_view_provider_server(chan: fasync::Channel) {
+        fasync::spawn(
+            ViewProviderRequestStream::from_channel(chan)
+                .try_for_each(move |req| {
+                    let ViewProviderRequest::CreateView { token, .. } = req;
+                    let view_token = gfx::ExportToken { value: token };
+                    APP.lock().create_view(view_token).expect("Create view failed");
+                    futures::future::ready(Ok(()))
+                })
+                .unwrap_or_else(|e| eprintln!("error running view_provider server: {:?}", e)),
+        )
+    }
+
+    pub fn create_view(&mut self, view_token: gfx::ExportToken) -> Result<(), Error> {
         let (view, view_server_end) = create_proxy()?;
         let (view_listener, view_listener_server) = zx::Channel::create()?;
         let view_listener_request = ServerEnd::new(view_listener_server);
         let (mine, theirs) = zx::EventPair::create()?;
-        self.view_manager.create_view(
+        self.view_manager.create_view2(
             view_server_end,
-            req,
+            view_token.value,
             ClientEnd::new(view_listener),
             theirs,
             None,
         )?;
-        let (scenic, scenic_request) = create_proxy()?;
-        self.view_manager.get_scenic(scenic_request)?;
-        let view_ptr = ErmineView::new(view_listener_request, view, mine, scenic)?;
+
+        let (session_listener_client, session_listener_request) = create_endpoints()?;
+        let (session_proxy, session_request) = create_proxy()?;
+        self.scenic.create_session(session_request, Some(session_listener_client))?;
+        let session = Session::new(session_proxy);
+
+        let view_ptr =
+            ErmineView::new(view_listener_request, view, mine, session, session_listener_request)?;
         self.views.push(view_ptr);
         Ok(())
     }
@@ -143,9 +163,7 @@ impl App {
 
     pub fn setup_keyboard_hack(&mut self) -> Result<(), Error> {
         let (presentation_proxy, presentation_request) = create_proxy()?;
-        self.session_shell_context
-            .clone()
-            .get_presentation(presentation_request)?;
+        self.session_shell_context.clone().get_presentation(presentation_request)?;
         self.presentation_proxy = Some(presentation_proxy);
 
         self.watch_for_key_event(0x20, MODIFIER_LEFT_SUPER)?;
@@ -162,8 +180,7 @@ impl App {
 
     pub fn request_start_story(&mut self, story_id: String) -> Result<(), Error> {
         let (story_controller, story_controller_end) = create_proxy()?;
-        self.story_provider
-            .get_controller(&story_id, story_controller_end)?;
+        self.story_provider.get_controller(&story_id, story_controller_end)?;
         story_controller.request_start()?;
         Ok(())
     }
@@ -181,7 +198,9 @@ impl App {
     }
 
     pub fn add_child_view_for_story_attach(
-        &mut self, story_id: String, view_holder_token: zx::EventPair,
+        &mut self,
+        story_id: String,
+        view_holder_token: zx::EventPair,
     ) -> Result<(), Error> {
         let key_to_use = self.next_story_key();
         self.views[0].lock().add_child_view_for_story_attach(
@@ -232,11 +251,7 @@ impl App {
             #[allow(unreachable_patterns)]
             SessionShellRequestStream::from_channel(chan)
                 .try_for_each(move |req| match req {
-                    SessionShellRequest::AttachView {
-                        view_id,
-                        view_owner,
-                        ..
-                    } => {
+                    SessionShellRequest::AttachView { view_id, view_owner, .. } => {
                         println!("AttachView {:?}", view_id.story_id);
                         let view_holder_token: zx::EventPair =
                             zx::EventPair::from(zx::Handle::from(view_owner.into_channel()));
@@ -265,11 +280,7 @@ impl App {
             story_watcher_request
                 .into_stream()?
                 .map_ok(move |request| match request {
-                    StoryProviderWatcherRequest::OnChange {
-                        story_info,
-                        story_state,
-                        ..
-                    } => {
+                    StoryProviderWatcherRequest::OnChange { story_info, story_state, .. } => {
                         if story_state == StoryState::Stopped {
                             APP.lock()
                                 .request_start_story(story_info.id.to_string())
@@ -279,11 +290,11 @@ impl App {
                         }
                     }
                     StoryProviderWatcherRequest::OnDelete { story_id, .. } => {
-                        APP.lock()
-                            .remove_view_for_story(story_id.to_string())
-                            .unwrap_or_else(|e| {
+                        APP.lock().remove_view_for_story(story_id.to_string()).unwrap_or_else(
+                            |e| {
                                 eprintln!("error removing story {}: {:?}", story_id, e);
-                            });
+                            },
+                        );
                     }
                 })
                 .try_collect::<()>()
@@ -294,11 +305,9 @@ impl App {
         fasync::spawn(
             f.map_ok(move |r| {
                 for story in r {
-                    APP.lock()
-                        .request_start_story(story.id.to_string())
-                        .unwrap_or_else(|e| {
-                            eprintln!("error adding view for initial story {}: {:?}", story.id, e);
-                        });
+                    APP.lock().request_start_story(story.id.to_string()).unwrap_or_else(|e| {
+                        eprintln!("error adding view for initial story {}: {:?}", story.id, e);
+                    });
                 }
             })
             .unwrap_or_else(|e| eprintln!("get_stories error: {:?}", e)),
@@ -326,6 +335,9 @@ fn main() -> Result<(), Error> {
     let mut executor = fasync::Executor::new().context("Error creating executor")?;
 
     let fut = component::server::ServicesServer::new()
+        .add_service((deprecated::ViewProviderMarker::NAME, move |chan| {
+            App::spawn_v1_view_provider_server(chan);
+        }))
         .add_service((ViewProviderMarker::NAME, move |chan| {
             App::spawn_view_provider_server(chan);
         }))
