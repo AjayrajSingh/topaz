@@ -22,6 +22,5 @@ dart_library("flutter") {
     "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/lib/app/dart",
     "//topaz/public/lib/mediaplayer/dart",
-    "//topaz/public/lib/ui/flutter",
   ]
 }

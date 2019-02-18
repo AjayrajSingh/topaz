@@ -13,8 +13,6 @@ import 'package:flutter/widgets.dart';
 import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
     show ChildViewConnection;
 import 'package:lib.mediaplayer.dart/audio_player_controller.dart';
-import 'package:lib.ui.flutter/child_view.dart' as deprecated
-    show ChildViewConnection;
 import 'package:zircon/zircon.dart';
 
 /// Controller for MediaPlayer widgets.
@@ -24,8 +22,6 @@ class MediaPlayerController extends AudioPlayerController
 
   Timer _hideTimer;
 
-  bool _shouldCreateNewChildView = false;
-  deprecated.ChildViewConnection _deprecatedVideoViewConnection;
   ChildViewConnection _videoViewConnection;
 
   Size _videoSize = Size.zero;
@@ -39,9 +35,7 @@ class MediaPlayerController extends AudioPlayerController
     _close(); // Initialize stuff.
   }
 
-  set shouldCreateNewChildView(bool should) {
-    _shouldCreateNewChildView = should;
-  }
+  set shouldCreateNewChildView(bool should) {}
 
   @override
   void open(Uri uri, {HttpHeaders headers}) {
@@ -57,14 +51,8 @@ class MediaPlayerController extends AudioPlayerController
       assert(viewTokens.status == ZX.OK);
       player.createView2(viewTokens.first);
 
-      if (_shouldCreateNewChildView) {
-        _videoViewConnection =
-            ChildViewConnection.fromViewHolderToken(viewTokens.second);
-      } else {
-        _deprecatedVideoViewConnection =
-            deprecated.ChildViewConnection.fromViewHolderToken(
-                viewTokens.second);
-      }
+      _videoViewConnection =
+          ChildViewConnection.fromViewHolderToken(viewTokens.second);
     }
   }
 
@@ -76,7 +64,6 @@ class MediaPlayerController extends AudioPlayerController
   }
 
   void _close() {
-    _deprecatedVideoViewConnection = null;
     _videoViewConnection = null;
   }
 
@@ -146,8 +133,7 @@ class MediaPlayerController extends AudioPlayerController
   Size get videoPhysicalSize => hasVideo ? _videoSize : Size.zero;
 
   /// Gets the video view connection.
-  deprecated.ChildViewConnection get videoViewConnection =>
-      _deprecatedVideoViewConnection;
+  ChildViewConnection get videoViewConnection => _videoViewConnection;
   ChildViewConnection get videoViewConnectionNew => _videoViewConnection;
 
   @override

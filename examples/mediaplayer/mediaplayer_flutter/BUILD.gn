@@ -23,7 +23,6 @@ flutter_app("mediaplayer_flutter") {
         "//topaz/public/dart/fuchsia",
         "//topaz/public/lib/app/dart",
         "//topaz/public/lib/mediaplayer/flutter",
-        "//topaz/public/lib/ui/flutter",
       ]
     },
   ]

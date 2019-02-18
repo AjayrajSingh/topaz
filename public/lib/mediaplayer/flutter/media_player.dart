@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fuchsia_scenic_flutter/child_view.dart' show ChildView;
 import 'package:lib.mediaplayer.flutter/media_player_controller.dart';
 import 'package:lib.mediaplayer.flutter/progress_notifier.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
