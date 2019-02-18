@@ -4,16 +4,13 @@
 
 import 'dart:convert';
 
-import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
+import 'package:fidl_fuchsia_ui_gfx/fidl.dart' show ImportToken;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
 import 'package:mondrian/models/surface/surface.dart';
 import 'package:mondrian/models/surface/surface_graph.dart';
 import 'package:mondrian/models/surface/surface_properties.dart';
-
-class MockInterfaceHandle extends Mock implements InterfaceHandle<ViewOwner> {}
+import 'package:zircon/zircon.dart';
 
 void main() {
   test('toJson and back again with a single surface', () {
@@ -27,7 +24,7 @@ void main() {
     );
     graph
       ..addSurface('value', properties, '', relation, null, '')
-      ..connectView('value', new MockInterfaceHandle())
+      ..connectViewFromImportToken('value', ImportToken(value: EventPair(null)))
       ..focusSurface('value');
     expect(graph.focusStack.length, 1);
     String encoded = json.encode(graph);
@@ -56,7 +53,8 @@ void main() {
     );
     graph
       ..addSurface('parent', properties, '', relation, null, '')
-      ..connectView('parent', new MockInterfaceHandle())
+      ..connectViewFromImportToken(
+          'parent', ImportToken(value: EventPair(null)))
       ..focusSurface('parent');
     expect(graph.focusStack.length, 1);
 
@@ -68,7 +66,7 @@ void main() {
     );
     graph
       ..addSurface('child', properties, 'parent', relation, null, '')
-      ..connectView('child', new MockInterfaceHandle())
+      ..connectViewFromImportToken('child', ImportToken(value: EventPair(null)))
       ..focusSurface('child');
     expect(graph.focusStack.length, 2);
 
@@ -110,7 +108,8 @@ void main() {
     );
     graph
       ..addSurface('parent', properties, '', relation, null, '')
-      ..connectView('parent', new MockInterfaceHandle())
+      ..connectViewFromImportToken(
+          'parent', ImportToken(value: EventPair(null)))
       ..focusSurface('parent');
     expect(graph.focusStack.length, 1);
 
@@ -122,7 +121,7 @@ void main() {
     );
     graph
       ..addSurface('child1', properties, 'parent', relation, null, '')
-      ..connectView('child1', new MockInterfaceHandle())
+      ..connectViewFromImportToken('child', ImportToken(value: EventPair(null)))
       ..focusSurface('child1');
     expect(graph.focusStack.length, 2);
 
@@ -134,7 +133,8 @@ void main() {
     );
     graph
       ..addSurface('child2', properties, 'parent', relation, null, '')
-      ..connectView('child2', new MockInterfaceHandle())
+      ..connectViewFromImportToken(
+          'child2', ImportToken(value: EventPair(null)))
       ..focusSurface('child2');
     expect(graph.focusStack.length, 3);
 
@@ -183,12 +183,14 @@ void main() {
     graph
       ..addSurface('parent', new SurfaceProperties(), '', new SurfaceRelation(),
           null, '')
-      ..connectView('parent', new MockInterfaceHandle())
+      ..connectViewFromImportToken(
+          'parent', ImportToken(value: EventPair(null)))
       ..focusSurface('parent')
       // Now add external surface
       ..addSurface(
           'external', externalProp, 'parent', new SurfaceRelation(), null, '')
-      ..connectView('external', new MockInterfaceHandle())
+      ..connectViewFromImportToken(
+          'external', ImportToken(value: EventPair(null)))
       ..focusSurface('external')
       // Now dismiss the external surface
       ..dismissSurface('external');
@@ -207,13 +209,13 @@ void main() {
     );
     graph
       ..addSurface('value', properties, '', relation, null, '')
-      ..connectView('value', new MockInterfaceHandle())
+      ..connectViewFromImportToken('value', ImportToken(value: EventPair(null)))
       ..focusSurface('value');
     expect(graph.treeSize, 2);
 
     graph
       ..addSurface('value', properties, '', relation, null, '')
-      ..connectView('value', new MockInterfaceHandle())
+      ..connectViewFromImportToken('value', ImportToken(value: EventPair(null)))
       ..focusSurface('value');
     expect(graph.treeSize, 2);
   });
@@ -229,19 +231,21 @@ void main() {
     );
     graph
       ..addSurface('value', properties, '', relation, null, '')
-      ..connectView('value', new MockInterfaceHandle())
+      ..connectViewFromImportToken('value', ImportToken(value: EventPair(null)))
       ..focusSurface('value');
     expect(graph.treeSize, 2);
 
     graph
       ..addSurface('value.child', properties, '', relation, null, '')
-      ..connectView('value.child', new MockInterfaceHandle())
+      ..connectViewFromImportToken(
+          'value.child', ImportToken(value: EventPair(null)))
       ..focusSurface('value.child');
     expect(graph.treeSize, 3);
 
     graph
       ..addSurface('value.child', properties, '', relation, null, '')
-      ..connectView('value.child', new MockInterfaceHandle())
+      ..connectViewFromImportToken(
+          'value.child', ImportToken(value: EventPair(null)))
       ..focusSurface('value.child');
     expect(graph.treeSize, 3);
   });
@@ -257,22 +261,22 @@ void main() {
     );
     graph
       ..addSurface('value', properties, '', relation, null, '')
-      ..connectView('value', new MockInterfaceHandle())
+      ..connectViewFromImportToken('value', ImportToken(value: EventPair(null)))
       ..focusSurface('value');
     expect(graph.treeSize, 2);
 
     graph
       ..addSurface('value.child', properties, '', relation, null, '')
-      ..connectView('value.child', new MockInterfaceHandle())
+      ..connectViewFromImportToken(
+          'value.child', ImportToken(value: EventPair(null)))
       ..focusSurface('value.child');
     expect(graph.treeSize, 3);
 
-    MockInterfaceHandle handle = new MockInterfaceHandle();
     graph
       ..addSurface('value.child', properties, '', relation, null, '')
-      ..connectView('value.child', handle)
+      ..connectViewFromImportToken(
+          'value.child', ImportToken(value: EventPair(null)))
       ..focusSurface('value.child');
     expect(graph.treeSize, 3);
-    verifyZeroInteractions(handle);
   });
 }

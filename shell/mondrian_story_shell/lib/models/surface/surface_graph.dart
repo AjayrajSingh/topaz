@@ -6,10 +6,13 @@ import 'dart:developer' show Timeline;
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_ui_gfx/fidl.dart' show ImportToken;
 import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
+import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
+    show ChildViewConnection;
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:zircon/zircon.dart' show EventPair;
 
 import '../tree/spanning_tree.dart';
 import '../tree/tree.dart';
@@ -213,8 +216,13 @@ class SurfaceGraph extends Model {
   /// True if surface has been dismissed and not subsequently focused
   bool isDismissed(String id) => _dismissedSurfaces.contains(id);
 
-  /// Used to update a [Surface] with a live ChildViewConnection
   void connectView(String id, InterfaceHandle<ViewOwner> viewOwner) {
+    connectViewFromImportToken(id,
+        ImportToken(value: EventPair(viewOwner.passChannel().passHandle())));
+  }
+
+  /// Used to update a [Surface] with a live ChildViewConnection
+  void connectViewFromImportToken(String id, ImportToken viewHolderToken) {
     final Surface surface = _surfaces[id];
     if (surface != null) {
       if (surface.connection != null) {
@@ -224,8 +232,8 @@ class SurfaceGraph extends Model {
       }
       log.fine('connectView $surface');
       surface
-        ..connection = new ChildViewConnection(
-          viewOwner,
+        ..connection = ChildViewConnection.fromViewHolderToken(
+          viewHolderToken.value,
           onAvailable: (ChildViewConnection connection) {
             Timeline.instantSync('surface available', arguments: {'id': '$id'});
 

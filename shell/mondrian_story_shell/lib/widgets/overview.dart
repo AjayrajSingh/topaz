@@ -4,11 +4,11 @@
 
 import 'dart:math' as math;
 
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fuchsia_scenic_flutter/child_view.dart' show ChildView;
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../models/surface/surface.dart';

@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fuchsia_scenic_flutter/child_view.dart' show ChildView;
 import 'package:lib.app.dart/logging.dart';
-import 'package:lib.ui.flutter/child_view.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../models/surface/surface.dart';
@@ -211,7 +211,7 @@ class SurfaceRelationships extends StatelessWidget {
         decoration: _labelBoxDecoration(true, true),
         alignment: Alignment.centerRight,
         child: new Text(
-          'Depth ${i+2}',
+          'Depth ${i + 2}',
           style: new TextStyle(
             color: Colors.black,
             fontSize: 10.0,

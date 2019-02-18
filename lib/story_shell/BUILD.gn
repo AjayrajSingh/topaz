@@ -13,11 +13,7 @@ dart_library("lib.story_shell") {
   ]
 
   deps = [
-    "//sdk/fidl/fuchsia.modular",
-    "//topaz/public/dart/fidl",
-    "//topaz/public/dart/fuchsia",
-    "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/ui/flutter",
+    "//sdk/fidl/fuchsia.ui.input",
+    "//sdk/fidl/fuchsia.ui.policy",
   ]
 }
