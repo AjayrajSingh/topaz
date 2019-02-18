@@ -25,7 +25,6 @@ flutter_app("latin-ime") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
     "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/ui/flutter",
     "//topaz/shell/keyboard",
   ]
 }
