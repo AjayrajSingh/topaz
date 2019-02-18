@@ -122,23 +122,7 @@ class ModuleImpl implements Module {
     @required String name,
     @required modular.Intent intent,
   }) async {
-    if (name == null || name.isEmpty) {
-      throw ArgumentError.value(
-          name, 'name', 'embedModule should be called with a valid name');
-    }
-    if (intent == null) {
-      throw ArgumentError.notNull('intent');
-    }
-
-    final moduleController = modular.ModuleControllerProxy();
-    final viewOwner = new InterfacePair<views.ViewOwner>();
-    final status = await _getContext().embedModule(
-        name, intent, moduleController.ctrl.request(), viewOwner.passRequest());
-
-    _validateStartModuleStatus(status, name, intent);
-
-    return EmbeddedModule.fromViewOwner(
-        moduleController: moduleController, viewOwner: viewOwner.passHandle());
+    return embedModuleNew(name: name, intent: intent);
   }
 
   @override

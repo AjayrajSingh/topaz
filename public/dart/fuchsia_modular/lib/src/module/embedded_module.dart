@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular;
 import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart' as gfx;
-import 'package:fidl_fuchsia_ui_viewsv1token/fidl_async.dart' as views;
 import 'package:meta/meta.dart';
 
 /// The result of calling [Module#embedModule] on the Module.
@@ -14,7 +12,7 @@ import 'package:meta/meta.dart';
 /// a [gfx.ImportToken] object. The combination of these objects can be used to
 /// embed the new module's view into your own view hierarchy.
 class EmbeddedModule {
-  /// The |modular.ModuleController| which can be used to control the embedded
+  /// The [modular.ModuleController] which can be used to control the embedded
   /// module.
   final modular.ModuleController moduleController;
 
@@ -23,22 +21,10 @@ class EmbeddedModule {
   /// screen.
   final gfx.ImportToken viewHolderToken;
 
-  /// DEPRECATED, for transition purposes only
-  final InterfaceHandle<views.ViewOwner> viewOwner;
-
   /// Constructor
   EmbeddedModule({
     @required this.moduleController,
     @required this.viewHolderToken,
-  })  : viewOwner = null,
-        assert(moduleController != null),
+  })  : assert(moduleController != null),
         assert(viewHolderToken != null);
-
-  /// DEPRECATED, for transition purposes only
-  EmbeddedModule.fromViewOwner({
-    @required this.moduleController,
-    @required this.viewOwner,
-  })  : viewHolderToken = null,
-        assert(moduleController != null),
-        assert(viewOwner != null);
 }
