@@ -157,8 +157,8 @@ class ChildViewConnection implements ViewContainerListenerDelegate {
     if (shared.globalViewContainer == null) {
       return;
     }
-    assert(_attached);
     assert(_viewHolderToken.value.isValid);
+    assert(_attached);
     assert(_viewKey == null);
     assert(!_available);
     assert(_sceneHost == null);
@@ -227,10 +227,8 @@ class ChildViewConnection implements ViewContainerListenerDelegate {
     if (shared.globalViewContainer == null) {
       return;
     }
-    assert(_viewHolderToken != null);
-    assert(_viewHolderToken.value != null);
-    assert(!_attached);
     assert(!_viewHolderToken.value.isValid);
+    assert(!_attached);
     assert(_viewKey != null);
     assert(_sceneHost != null);
     assert(ViewContainerListenerImpl.instance.getConnectionForKey(_viewKey) ==

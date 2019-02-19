@@ -11,7 +11,7 @@ class _HandleWrapper<T> {
   _HandleWrapper(this._handle);
 
   Handle get handle => _handle;
-  bool get isValid => handle?.isValid;
+  bool get isValid => handle?.isValid ?? false;
 
   void close() {
     _handle.close();
