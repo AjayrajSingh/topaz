@@ -30,11 +30,7 @@ constexpr auto kScopes = {
     // Used by google_auth_provider for retrieving user profile attributes,
     // specifically display name, profile url and profile image.
     "profile", "https://www.googleapis.com/auth/assistant",
-    "https://www.googleapis.com/auth/gmail.modify",
     "https://www.googleapis.com/auth/youtube.readonly",
-    "https://www.googleapis.com/auth/contacts",
     "https://www.googleapis.com/auth/drive",
-    "https://www.googleapis.com/auth/calendar.readonly",
     "https://www.googleapis.com/auth/devstorage.read_write"};
-
 }  // namespace google_auth_provider
