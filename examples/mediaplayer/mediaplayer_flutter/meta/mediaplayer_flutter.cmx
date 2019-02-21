@@ -3,7 +3,7 @@
         "data": "data/mediaplayer_flutter"
     },
     "sandbox": {
-        "features": [ "persistent-storage" ],
+        "features": [ "deprecated-global-persistent-storage" ],
         "services": [
             "fuchsia.fonts.Provider",
             "fuchsia.mediaplayer.Player",

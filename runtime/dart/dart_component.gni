@@ -108,6 +108,7 @@ template("_flutter_dart_jit_package") {
   package(target_name) {
     forward_variables_from(invoker,
                            [
+                             "deprecated_global_persistent_storage",
                              "testonly",
                              "tests",
                            ])
@@ -528,6 +529,7 @@ template("_flutter_dart_aot_package") {
   package(target_name) {
     forward_variables_from(invoker,
                            [
+                             "deprecated_global_persistent_storage",
                              "testonly",
                              "tests",
                            ])

@@ -5,6 +5,7 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("mediaplayer_flutter") {
+  deprecated_global_persistent_storage = "//build"
   components = [
     {
       component_name = "mediaplayer_flutter"
