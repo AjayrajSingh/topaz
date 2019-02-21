@@ -1,7 +1,7 @@
 {
     "imports": [
-        "garnet/packages/prod/scenic_tools",
         "garnet/packages/products/graphical",
+        "garnet/packages/tools/scenic",
         "topaz/packages/config/term",
         "topaz/packages/prod/term"
     ]

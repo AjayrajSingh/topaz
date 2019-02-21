@@ -1,10 +1,10 @@
 {
     "imports": [
-        "garnet/packages/prod/netstack_tools",
-        "garnet/packages/prod/scenic_tools",
         "garnet/packages/prod/timezone",
         "garnet/packages/prod/wlan",
         "garnet/packages/products/graphical",
+        "garnet/packages/tools/netstack",
+        "garnet/packages/tools/scenic",
         "topaz/packages/config/dashboard",
         "topaz/packages/prod/dashboard",
         "topaz/packages/prod/flutter",

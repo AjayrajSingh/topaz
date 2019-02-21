@@ -1,6 +1,6 @@
 {
     "imports": [
-        "garnet/packages/prod/scenic_tools"
+        "garnet/packages/tools/scenic"
     ],
     "packages": [
         "//topaz/bin/flutter_screencap_test:flutter_screencap_test_app"
