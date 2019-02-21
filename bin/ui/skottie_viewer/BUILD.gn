@@ -7,7 +7,6 @@ import("//build/package.gni")
 
 fidl("skottie_loader") {
   name = "fuchsia.skia.skottie"
-  sdk_category = "partner"
 
   sources = [
     "skottie_loader.fidl",
