@@ -89,6 +89,10 @@ void SessionConnection::EnqueueClearOps() {
 }
 
 void SessionConnection::PresentSession() {
+  TRACE_DURATION("gfx", "SessionConnection::PresentSession");
+  TRACE_FLOW_BEGIN("gfx", "Session::Present", next_present_trace_id_);
+  next_present_trace_id_++;
+
   ToggleSignal(vsync_event_handle_, false);
   session_wrapper_.Present(
       0,  // presentation_time. (placeholder).

@@ -6,6 +6,7 @@
 #define TOPAZ_RUNTIME_FLUTTER_RUNNER_SESSION_CONNECTION_H_
 
 #include <lib/fit/function.h>
+#include <trace/event.h>
 #include <zx/eventpair.h>
 
 #include "flutter/flow/compositor_context.h"
@@ -83,6 +84,12 @@ class SessionConnection final {
   std::unique_ptr<VulkanSurfaceProducer> surface_producer_;
   flow::SceneUpdateContext scene_update_context_;
   zx_handle_t vsync_event_handle_;
+
+  // A flow event trace id for following |Session::Present| calls into
+  // Scenic.  This will be incremented each |Session::Present| call.  By
+  // convention, the Scenic side will also contain its own trace id that
+  // begins at 0, and is incremented each |Session::Present| call.
+  uint64_t next_present_trace_id_ = 0;
 
   void EnqueueClearOps();
 
