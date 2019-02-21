@@ -18,7 +18,6 @@
         "topaz/packages/tests/flutter_screencap_test_app",
         "topaz/packages/tests/key_listener_test",
         "topaz/packages/tests/modular_integration_tests",
-        "topaz/packages/tests/repl",
         "topaz/packages/tests/scenic",
         "topaz/packages/tests/sledge",
         "topaz/packages/tests/web_runner_tests"
