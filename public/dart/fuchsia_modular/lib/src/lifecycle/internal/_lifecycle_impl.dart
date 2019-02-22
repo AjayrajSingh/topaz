@@ -29,7 +29,7 @@ class LifecycleImpl extends fidl.Lifecycle implements Lifecycle {
   final fidl.LifecycleBinding _lifecycleBinding = fidl.LifecycleBinding();
 
   // A set of all registered terminate listeners
-  final _terminateListeners = Set<Future<void> Function()>();
+  final _terminateListeners = <Future<void> Function()>{};
 
   /// Initializes this [LifecycleImpl] instance
   LifecycleImpl() {

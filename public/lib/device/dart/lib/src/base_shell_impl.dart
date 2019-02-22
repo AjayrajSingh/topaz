@@ -25,7 +25,7 @@ class BaseShellImpl implements BaseShell, Lifecycle {
   final UserProviderProxy _userProviderProxy = new UserProviderProxy();
   final PresentationProxy _presentationProxy = new PresentationProxy();
   final Set<AuthenticationUiContextBinding> _authUiContextBindingSet =
-      new Set<AuthenticationUiContextBinding>();
+      <AuthenticationUiContextBinding>{};
 
   /// Called when [initialize] occurs.
   final OnBaseShellReady onReady;

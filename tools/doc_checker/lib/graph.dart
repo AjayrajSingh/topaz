@@ -27,7 +27,7 @@ class Graph {
 
   /// Inserts a new edge.
   void addEdge({Node from, Node to}) =>
-      _edges.putIfAbsent(from, () => new Set<Node>()).add(to);
+      _edges.putIfAbsent(from, () => <Node>{}).add(to);
 
   /// Removes and returns all singletons from the graph.
   List<Node> removeSingletons() {

@@ -28,11 +28,11 @@ Map<String, BaseType> schemaDescriptionB() {
 void main() {
   group('Test _createSchemaMap', () {
     test('empty set of KV', () {
-      Map<Uint8List, Schema> map = createSchemaMap(new Set<KeyValue>());
+      Map<Uint8List, Schema> map = createSchemaMap(<KeyValue>{});
       expect(map.isEmpty, equals(true));
     });
     test('2 schema KVs', () {
-      Set<KeyValue> keyValues = new Set<KeyValue>();
+      Set<KeyValue> keyValues = <KeyValue>{};
 
       // Add 2 KeyValues encoding 2 different schemas.
       final schemaA = new Schema(schemaDescriptionA());

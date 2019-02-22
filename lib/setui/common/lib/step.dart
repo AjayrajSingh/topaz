@@ -66,7 +66,7 @@ class Step {
 
   /// Returns all next steps. Used by syllabus to discover all routes
   Set<String> get nextSteps {
-    final Set<String> steps = new Set()..addAll(_results.values);
+    final Set<String> steps = Set<String>.from(_results.values);
 
     if (_defaultTransition != null) {
       steps.add(_defaultTransition);

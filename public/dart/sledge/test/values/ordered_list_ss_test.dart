@@ -45,7 +45,7 @@ class RelativeOrderChecker<T> extends Checker<OrderedListValue<T>> {
   void check(OrderedListValue<T> orderedList) {
     var list = orderedList.toList();
     for (T a in list) {
-      graph.putIfAbsent(a, () => new Set<T>());
+      graph.putIfAbsent(a, () => <T>{});
     }
     // Iterate over all the pairs (i,j) contained in [0, list.length), with i<j.
     for (int i = 0; i < list.length; i++) {

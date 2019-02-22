@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 
 /// Base class for classes that provide data via [InheritedWidget]s.
 abstract class Model extends Listenable {
-  final Set<VoidCallback> _listeners = new Set<VoidCallback>();
+  final Set<VoidCallback> _listeners = <VoidCallback>{};
   int _version = 0;
   int _microtaskVersion = 0;
 

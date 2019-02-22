@@ -44,7 +44,7 @@ class UserPickerBaseShellModel extends CommonBaseShellModel
   bool _showingUserActions = false;
   bool _addingUser = false;
   bool _loadingChildView = false;
-  final Set<Account> _draggedUsers = new Set<Account>();
+  final Set<Account> _draggedUsers = <Account>{};
 
   /// Constructor
   UserPickerBaseShellModel({

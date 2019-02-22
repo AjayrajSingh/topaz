@@ -38,8 +38,8 @@ class Composer {
   /// Constructor
   Composer({
     this.layoutContext = defaultContext,
-  })  : _hiddenSurfaces = Set(),
-        _focusedSurfaces = Set(),
+  })  : _hiddenSurfaces = <String>{},
+        _focusedSurfaces = <String>{},
         _surfaceTree = new SurfaceTree();
 
   /// Add a Surface to the tree. [parentId] is an optional paramater used when

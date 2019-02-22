@@ -85,7 +85,7 @@ class SurfaceRelationships extends StatelessWidget {
       BuildContext context, BoxConstraints constraints, SurfaceGraph graph) {
     Map<String, GlobalKey> surfaceKeys = <String, GlobalKey>{};
     GlobalKey stackKey = new GlobalKey();
-    Set<Surface> firstDepthSurfaces = new Set<Surface>();
+    Set<Surface> firstDepthSurfaces = <Surface>{};
 
     for (Surface s in graph.focusStack.toList()) {
       firstDepthSurfaces.add(s.root);
@@ -582,7 +582,7 @@ class _RelationshipTreeEdges extends CustomPainter {
         }
       }
 
-      Set<Surface> nextSurfaces = new Set<Surface>();
+      Set<Surface> nextSurfaces = <Surface>{};
       for (Surface s in currentSurfaces) {
         for (int i = 0; i < s.children.length; i++) {
           nextSurfaces.add(s.children.toList()[i]);

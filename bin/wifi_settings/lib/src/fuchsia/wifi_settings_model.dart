@@ -229,7 +229,7 @@ class WifiSettingsModel extends Model {
       // First sort APs by signal strength so when we de-dupe we drop the
       // weakest ones
       scanResult.aps.sort((wlan.Ap a, wlan.Ap b) => b.rssiDbm - a.rssiDbm);
-      Set<String> seenNames = Set<String>();
+      Set<String> seenNames = <String>{};
 
       for (wlan.Ap ap in scanResult.aps) {
         // Dedupe: if we've seen this ssid before, skip it.

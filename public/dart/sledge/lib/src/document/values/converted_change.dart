@@ -60,7 +60,7 @@ class ConvertedChange<K, V> {
   /// Constructor.
   ConvertedChange([changedEntries, deletedKeys])
       : changedEntries = changedEntries ?? <K, V>{},
-        deletedKeys = deletedKeys ?? new Set<K>();
+        deletedKeys = deletedKeys ?? <K>{};
 
   /// Copy constructor.
   ConvertedChange.from(ConvertedChange<K, V> change)

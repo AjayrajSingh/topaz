@@ -88,7 +88,7 @@ void main() {
       expect(deserializedChange.changedEntries[short], equals(1));
       expect(deserializedChange.changedEntries[long], equals(10));
       final change2 = new ConvertedChange<String, int>(
-          <String, int>{}, [short, long].toSet());
+          <String, int>{}, <String>{short, long});
       final deserializedChange2 = conv.deserialize(conv.serialize(change2));
       expect(deserializedChange2.deletedKeys.length, equals(2));
       expect(deserializedChange2.deletedKeys.contains(short), isTrue);

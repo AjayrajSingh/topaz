@@ -109,7 +109,7 @@ class ModuleDriver {
   /// Message queue token completer
   final LoggerProxy _logger = new LoggerProxy();
   final DateTime _initializationTime;
-  final Set<String> _firstObservationSent = new Set<String>();
+  final Set<String> _firstObservationSent = <String>{};
   LifecycleHost _lifecycle;
   IntentHandlerImpl _intentHandler;
   String _packageName = 'modulePackageNameNotYetSet';

@@ -15,7 +15,7 @@ final DateFormat _kMeridiemOnlyFormat = new DateFormat('a', 'en_US');
 
 /// Creates time strings and notifies when they change.
 class TimeStringer extends Listenable {
-  final Set<VoidCallback> _listeners = new Set<VoidCallback>();
+  final Set<VoidCallback> _listeners = <VoidCallback>{};
   Timer _timer;
   int _offsetMinutes = 0;
 

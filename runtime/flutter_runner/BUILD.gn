@@ -142,7 +142,6 @@ template("flutter_runner") {
              "//third_party/dart/runtime/bin:libdart_builtin${product_suffix}",
              "//third_party/rapidjson",
              "//third_party/skia",
-             "//third_party/skia:gpu",
              "//third_party/tonic",
              "//third_party/zlib:minizip",
              "//topaz/lib/deprecated_loop",

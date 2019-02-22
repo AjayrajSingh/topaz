@@ -116,7 +116,7 @@ class SyllabusParser {
 
     // Validate each individual step.
     for (String stepName in stepNames) {
-      final Set<String> encounteredSteps = new Set();
+      final Set<String> encounteredSteps = <String>{};
       final ParseResult stepResult =
           _validateStep(steps[stepName], stepNames, encounteredSteps);
 
@@ -133,7 +133,7 @@ class SyllabusParser {
     }
 
     // Traverse to find reachable nodes
-    final Set<String> reachableNodes = new Set();
+    final Set<String> reachableNodes = <String>{};
     final List<String> pendingVisits = [entry];
 
     while (pendingVisits.isNotEmpty) {

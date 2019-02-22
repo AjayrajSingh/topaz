@@ -36,7 +36,7 @@ class TestStartupContext implements StartupContext {
 
 class TestServiceProvider implements ServiceProviderProxy {
   final ServiceProviderImpl _testServices = new ServiceProviderImpl();
-  final Set<String> _serviceNames = new Set<String>();
+  final Set<String> _serviceNames = <String>{};
 
   void _withTestService<T>(ServiceConnector<T> connector, String serviceName) {
     if (_serviceNames.contains(serviceName)) {

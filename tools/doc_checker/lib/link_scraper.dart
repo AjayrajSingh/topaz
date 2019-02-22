@@ -23,7 +23,7 @@ class LinkScraper {
 class _Visitor implements NodeVisitor {
   static const String _key = 'href';
 
-  final Set<String> links = new Set<String>();
+  final Set<String> links = <String>{};
 
   @override
   bool visitElementBefore(Element element) {

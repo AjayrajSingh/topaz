@@ -39,7 +39,7 @@ class SurfaceGraph extends Model {
   final List<String> _focusedSurfaces = <String>[];
 
   /// The stack of previous focusedSurfaces, most focused at end
-  final Set<String> _dismissedSurfaces = new Set<String>();
+  final Set<String> _dismissedSurfaces = <String>{};
 
   /// A mapping between surfaces that were brought in as ModuleSource::External
   /// surfaces (e.g. suggestions) and surfaces that were visually present at

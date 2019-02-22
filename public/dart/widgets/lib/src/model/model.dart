@@ -9,7 +9,7 @@ import 'package:flutter/widgets.dart';
 
 /// Base class for classes that provide data via [InheritedWidget]s.
 abstract class Model implements Listenable {
-  final _listeners = Set<VoidCallback>();
+  final _listeners = <VoidCallback>{};
   final _modifications = <VoidCallback>[];
   int _version = 0;
   int _microtaskVersion = 0;
@@ -194,7 +194,7 @@ class ScopedModelDescendant<T extends Model> extends StatelessWidget {
 /// Mixin to enable a model to provide tickers for animations.
 mixin TickerProviderModelMixin on Model
     implements TickerProvider {
-  final _tickers = Set<Ticker>();
+  final _tickers = <Ticker>{};
 
   /// Creates a ticker with the given callback.
   @override

@@ -28,7 +28,7 @@ class _RollbackException implements Exception {}
 /// changes to Ledger.
 class Transaction {
   // List of Documents modified during the transaction.
-  final Set<Document> _documents = new Set<Document>();
+  final Set<Document> _documents = <Document>{};
   final Sledge _sledge;
   final ledger.PageProxy _pageProxy;
   final ledger.PageSnapshotProxy _pageSnapshotProxy;
