@@ -12,6 +12,7 @@
       "//topaz/lib/setui/settings/common:lib_setui_settings_common_test",
       "//topaz/lib/setui/settings/service:lib_setui_service_test",
       "//topaz/lib/setui/settings/testing:lib_setui_settings_testing_test",
+      "//topaz/public/dart/fuchsia_inspect:fuchsia_inspect_package_unittests",
       "//topaz/public/dart/fuchsia_logger:fuchsia_logger_package_unittests",
       "//topaz/public/dart/fuchsia_modular:fuchsia_modular_package_unittests",
       "//topaz/public/dart/fuchsia_services:fuchsia_services_package_unittests",

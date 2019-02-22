@@ -1,0 +1,43 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_library.gni")
+import("//topaz/runtime/dart/dart_test.gni")
+
+dart_library("fuchsia_inspect") {
+  package_name = "fuchsia_inspect"
+
+  sdk_category = "partner"
+
+  source_dir = "lib"
+
+  sources = [
+    "inspect.dart",
+    "src/vmo_writer.dart",
+    "src/vmo_heap.dart",
+    "src/inspect.dart",
+  ]
+
+  deps = [
+    "//third_party/dart-pkg/pub/meta",
+    "//topaz/public/dart/fuchsia_services",
+    "//topaz/public/dart/zircon",
+  ]
+}
+
+# Runs these tests using:
+#   fx run-host-tests fuchsia_inspect_package_unittests
+
+dart_test("fuchsia_inspect_package_unittests") {
+  sources = [
+    "internal/vmo_state_test.dart",
+  ]
+
+  deps = [
+    ":fuchsia_inspect",
+    "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}
+
