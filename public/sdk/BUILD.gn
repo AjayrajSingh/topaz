@@ -39,6 +39,6 @@ sdk("topaz") {
   deps = [
     ":dart_support",
     ":fidl_dart",
-    "//garnet/public/sdk:garnet_molecule",
+    "//sdk:core_molecule",
   ]
 }
