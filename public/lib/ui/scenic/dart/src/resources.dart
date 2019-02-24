@@ -28,20 +28,6 @@ class Resource {
 
 ui_gfx.Value vector1(double val) => new ui_gfx.Value.withVector1(val);
 
-class ViewHolder extends Resource {
-  ViewHolder(Session session, EventPair token, String debugName)
-      : super._create(
-            session,
-            ui_gfx.ResourceArgs.withViewHolder(
-                ui_gfx.ViewHolderArgs(token: token, debugName: debugName)));
-
-  void setViewProperties(ui_gfx.ViewProperties viewProperties) {
-    session.enqueue(new ui_gfx.Command.withSetViewProperties(
-        new ui_gfx.SetViewPropertiesCmd(
-            viewHolderId: id, properties: viewProperties)));
-  }
-}
-
 class Node extends Resource {
   Node._create(Session session, ui_gfx.ResourceArgs resource)
       : super._create(session, resource);
@@ -81,11 +67,6 @@ class ContainerNode extends Node {
       : super._import(session, token, spec);
 
   void addChild(Node child) {
-    session.enqueue(new ui_gfx.Command.withAddChild(
-        new ui_gfx.AddChildCmd(nodeId: id, childId: child.id)));
-  }
-
-  void addViewHolderAsChild(ViewHolder child) {
     session.enqueue(new ui_gfx.Command.withAddChild(
         new ui_gfx.AddChildCmd(nodeId: id, childId: child.id)));
   }
