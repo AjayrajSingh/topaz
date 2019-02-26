@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 // ignore_for_file: one_member_abstracts
+
 import 'intent.dart';
 
 /// The [IntentHandler] class is an abstract class which is intended to be
