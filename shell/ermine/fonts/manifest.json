@@ -1,0 +1,25 @@
+{
+  "families": [
+    {
+      "family": "Roboto Mono",
+      "aliases": [
+        "RobotoMono"
+      ],
+      "fallback_group": "monospace",
+      "fallback": true,
+      "fonts": [
+        {
+          "asset": "/system/data/vendor/fonts/RobotoMono-Regular.ttf"
+        },
+        {
+          "asset": "/system/data/vendor/fonts/RobotoMono-Light.ttf",
+          "weight": 300
+        },
+        {
+          "asset": "/system/data/vendor/fonts/RobotoMono-Medium.ttf",
+          "weight": 500
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 {
     "packages": [
-        "//topaz/bin/session_shell/ermine_session_shell:launch_ermine",
-        "//topaz/bin/session_shell/ermine_session_shell:config"
+        "//topaz/shell/ermine:launch_ermine",
+        "//topaz/shell/ermine:ermine_basemgr",
+        "//topaz/shell/ermine:ermine_fonts"
     ]
 }

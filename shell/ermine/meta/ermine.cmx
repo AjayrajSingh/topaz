@@ -1,0 +1,28 @@
+{
+    "program": {
+        "data": "data/ermine"
+    },
+    "sandbox": {
+        "pkgfs": [ "packages" ],
+        "services": [
+            "fuchsia.cobalt.LoggerFactory",
+            "fuchsia.fonts.Provider",
+            "fuchsia.logger.LogSink",
+            "fuchsia.modular.Clipboard",
+            "fuchsia.modular.ComponentContext",
+            "fuchsia.modular.ContextWriter",
+            "fuchsia.modular.IntelligenceServices",
+            "fuchsia.modular.SessionShellContext",
+            "fuchsia.modular.SuggestionProvider",
+            "fuchsia.modular.ModuleContext",
+            "fuchsia.modular.PuppetMaster",
+            "fuchsia.sys.Environment",
+            "fuchsia.sys.Launcher",
+            "fuchsia.ui.input.ImeService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.ui.viewsv1.ViewManager"
+        ],
+        "system": [ "data/sysui" ]
+    }
+}

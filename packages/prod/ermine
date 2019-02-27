@@ -7,6 +7,7 @@
         "topaz/packages/prod/wifi_settings"
     ],
     "packages": [
-        "//topaz/bin/session_shell/ermine_session_shell:ermine"
+        "//topaz/shell/ermine:ermine",
+        "//topaz/shell/ermine:ermine_ask_module"
     ]
 }
