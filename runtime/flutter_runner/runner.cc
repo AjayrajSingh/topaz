@@ -22,7 +22,11 @@ namespace flutter {
 
 static void SetProcessName() {
   std::stringstream stream;
+#if defined(DART_PRODUCT)
+  stream << "io.flutter.product_runner.";
+#else
   stream << "io.flutter.runner.";
+#endif
   if (blink::DartVM::IsRunningPrecompiledCode()) {
     stream << "aot";
   } else {
