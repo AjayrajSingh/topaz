@@ -4,7 +4,6 @@
       "name": "flutter_screencap",
       "exec": [
         "fuchsia-pkg://fuchsia.com/basemgr#meta/basemgr.cmx",
-        "--account_provider=fuchsia-pkg://fuchsia.com/dev_token_manager#meta/dev_token_manager.cmx",
         "--base_shell=fuchsia-pkg://fuchsia.com/dev_base_shell#meta/dev_base_shell.cmx",
         "--session_shell=fuchsia-pkg://fuchsia.com/dev_session_shell#meta/dev_session_shell.cmx",
         "--session_shell_args=--root_module=fuchsia-pkg://fuchsia.com/flutter_screencap_test_app#meta/flutter_screencap_test_app.cmx",
