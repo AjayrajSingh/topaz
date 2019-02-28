@@ -24,7 +24,7 @@ executable("auth_provider_unittests") {
   testonly = true
 
   deps = [
-    "//garnet/public/lib/fxl:fxl_printers",
+    "//garnet/public/lib/fxl:printers",
     "//third_party/googletest:gtest_main",
     "//topaz/auth_providers/google:unittests",
     "//topaz/auth_providers/oauth:unittests",

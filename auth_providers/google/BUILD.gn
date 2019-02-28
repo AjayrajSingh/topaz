@@ -73,7 +73,7 @@ source_set("unittests") {
     ":lib",
     "//sdk/fidl/fuchsia.auth",
     "//sdk/lib/fidl/cpp",
-    "//garnet/public/lib/fxl:fxl_printers",
+    "//garnet/public/lib/fxl:printers",
     "//garnet/public/lib/gtest:gtest",
     "//garnet/public/lib/network_wrapper:fake",
     "//peridot/lib/rapidjson",

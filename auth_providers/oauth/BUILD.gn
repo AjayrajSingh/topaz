@@ -33,7 +33,7 @@ source_set("unittests") {
     ":oauth",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/fxl",
-    "//garnet/public/lib/fxl:fxl_printers",
+    "//garnet/public/lib/fxl:printers",
     "//peridot/lib/rapidjson",
     "//third_party/googletest:gtest",
   ]
