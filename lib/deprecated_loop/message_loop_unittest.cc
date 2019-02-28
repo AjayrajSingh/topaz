@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 #include "lib/fsl/tasks/fd_waiter.h"
-#include "lib/fxl/files/unique_fd.h"
+#include "src/lib/files/unique_fd.h"
 #include "lib/fxl/functional/closure.h"
 #include "lib/fxl/macros.h"
 

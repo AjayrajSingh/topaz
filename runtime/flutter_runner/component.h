@@ -26,7 +26,7 @@
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
 #include "lib/fidl/cpp/interface_request.h"
-#include "lib/fxl/files/unique_fd.h"
+#include "src/lib/files/unique_fd.h"
 #include "lib/svc/cpp/service_provider_bridge.h"
 #include "lib/svc/cpp/services.h"
 #include "topaz/lib/deprecated_loop/thread.h"

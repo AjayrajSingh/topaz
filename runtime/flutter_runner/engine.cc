@@ -13,7 +13,7 @@
 #include "flutter/shell/common/rasterizer.h"
 #include "flutter/shell/common/run_configuration.h"
 #include "fuchsia_font_manager.h"
-#include "lib/fxl/files/file.h"
+#include "src/lib/files/file.h"
 #include "platform_view.h"
 #include "task_runner_adapter.h"
 #include "topaz/lib/deprecated_loop/message_loop.h"
