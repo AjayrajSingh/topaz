@@ -444,12 +444,10 @@ Handle _decodeHandle(Decoder decoder, int offset, bool nullable) {
 // We could also explore having a Handle be itself a subtype of HandleWrapper
 // to further standardize handling of handles.
 
-class HandleType extends FidlType<Handle> {
+class HandleType extends NullableFidlType<Handle> {
   const HandleType({
-    this.nullable,
-  }) : super(encodedSize: 4);
-
-  final bool nullable;
+    bool nullable,
+  }) : super(encodedSize: 4, nullable: nullable);
 
   @override
   void encode(Encoder encoder, Handle value, int offset) {
@@ -461,12 +459,10 @@ class HandleType extends FidlType<Handle> {
       _decodeHandle(decoder, offset, nullable);
 }
 
-class ChannelType extends FidlType<Channel> {
+class ChannelType extends NullableFidlType<Channel> {
   const ChannelType({
-    this.nullable,
-  }) : super(encodedSize: 4);
-
-  final bool nullable;
+    bool nullable,
+  }) : super(encodedSize: 4, nullable: nullable);
 
   @override
   void encode(Encoder encoder, Channel value, int offset) {
@@ -478,12 +474,10 @@ class ChannelType extends FidlType<Channel> {
       new Channel(_decodeHandle(decoder, offset, nullable));
 }
 
-class EventPairType extends FidlType<EventPair> {
+class EventPairType extends NullableFidlType<EventPair> {
   const EventPairType({
-    this.nullable,
-  }) : super(encodedSize: 4);
-
-  final bool nullable;
+    bool nullable,
+  }) : super(encodedSize: 4, nullable: nullable);
 
   @override
   void encode(Encoder encoder, EventPair value, int offset) {
@@ -495,12 +489,10 @@ class EventPairType extends FidlType<EventPair> {
       new EventPair(_decodeHandle(decoder, offset, nullable));
 }
 
-class SocketType extends FidlType<Socket> {
+class SocketType extends NullableFidlType<Socket> {
   const SocketType({
-    this.nullable,
-  }) : super(encodedSize: 4);
-
-  final bool nullable;
+    bool nullable,
+  }) : super(encodedSize: 4, nullable: nullable);
 
   @override
   void encode(Encoder encoder, Socket value, int offset) {
@@ -512,12 +504,10 @@ class SocketType extends FidlType<Socket> {
       new Socket(_decodeHandle(decoder, offset, nullable));
 }
 
-class VmoType extends FidlType<Vmo> {
+class VmoType extends NullableFidlType<Vmo> {
   const VmoType({
-    this.nullable,
-  }) : super(encodedSize: 4);
-
-  final bool nullable;
+    bool nullable,
+  }) : super(encodedSize: 4, nullable: nullable);
 
   @override
   void encode(Encoder encoder, Vmo value, int offset) {
@@ -529,12 +519,10 @@ class VmoType extends FidlType<Vmo> {
       new Vmo(_decodeHandle(decoder, offset, nullable));
 }
 
-class InterfaceHandleType<T> extends FidlType<InterfaceHandle<T>> {
+class InterfaceHandleType<T> extends NullableFidlType<InterfaceHandle<T>> {
   const InterfaceHandleType({
-    this.nullable,
-  }) : super(encodedSize: 4);
-
-  final bool nullable;
+    bool nullable,
+  }) : super(encodedSize: 4, nullable: nullable);
 
   @override
   void encode(Encoder encoder, InterfaceHandle<T> value, int offset) {
@@ -548,12 +536,10 @@ class InterfaceHandleType<T> extends FidlType<InterfaceHandle<T>> {
   }
 }
 
-class InterfaceRequestType<T> extends FidlType<InterfaceRequest<T>> {
+class InterfaceRequestType<T> extends NullableFidlType<InterfaceRequest<T>> {
   const InterfaceRequestType({
-    this.nullable,
-  }) : super(encodedSize: 4);
-
-  final bool nullable;
+    bool nullable,
+  }) : super(encodedSize: 4, nullable: nullable);
 
   @override
   void encode(Encoder encoder, InterfaceRequest<T> value, int offset) {
@@ -567,14 +553,13 @@ class InterfaceRequestType<T> extends FidlType<InterfaceRequest<T>> {
   }
 }
 
-class StringType extends FidlType<String> {
+class StringType extends NullableFidlType<String> {
   const StringType({
     this.maybeElementCount,
-    this.nullable,
-  }) : super(encodedSize: 16);
+    bool nullable,
+  }) : super(encodedSize: 16, nullable: nullable);
 
   final int maybeElementCount;
-  final bool nullable;
 
   // See fidl_string_t.
 
@@ -1008,16 +993,15 @@ class MethodType extends FidlType<Null> {
   }
 }
 
-class VectorType<T extends List> extends FidlType<T> {
+class VectorType<T extends List> extends NullableFidlType<T> {
   const VectorType({
     this.element,
     this.maybeElementCount,
-    this.nullable,
-  }) : super(encodedSize: 16);
+    bool nullable,
+  }) : super(encodedSize: 16, nullable: nullable);
 
   final FidlType element;
   final int maybeElementCount;
-  final bool nullable;
 
   @override
   void encode(Encoder encoder, T value, int offset) {
