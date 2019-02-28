@@ -165,6 +165,12 @@ abstract class FidlType<T> {
   }
 }
 
+abstract class NullableFidlType<T> extends FidlType<T> {
+  const NullableFidlType({encodedSize, this.nullable}) : super(encodedSize: encodedSize);
+
+  final bool nullable;
+}
+
 class BoolType extends FidlType<bool> {
   const BoolType() : super(encodedSize: 1);
 
@@ -734,6 +740,7 @@ void _encodeEnvelopeAbsent(Encoder encoder, int offset) {
 enum _envelopeMode {
   kAllowUnknown,
   kDisallowUnknown,
+  kMustBeAbsent,
 }
 
 T _decodeEnvelope<T>(Decoder decoder, int offset, _envelopeMode mode, FidlType<T> fieldType) {
@@ -742,6 +749,8 @@ T _decodeEnvelope<T>(Decoder decoder, int offset, _envelopeMode mode, FidlType<T
   final fieldPresent = decoder.decodeUint64(offset + 8);
   switch (fieldPresent) {
     case kAllocPresent:
+      if (mode == _envelopeMode.kMustBeAbsent)
+        throw new FidlError('expected empty envelope');
       final fieldKnown = fieldType != null;
       if (fieldKnown) {
         final fieldOffset = decoder.claimMemory(fieldType.encodedSize);
@@ -900,41 +909,57 @@ class UnionType<T extends Union> extends FidlType<T> {
   }
 }
 
-class XUnionType<T extends XUnion> extends FidlType<T> {
+class XUnionType<T extends XUnion> extends NullableFidlType<T> {
   const XUnionType({
     int encodedSize,
     this.members,
     this.ctor,
-  }) : super(encodedSize: encodedSize);
+    bool nullable,
+  }) : super(encodedSize: encodedSize, nullable: nullable);
 
   final Map<int, FidlType> members;
   final XUnionFactory<T> ctor;
 
   @override
   void encode(Encoder encoder, T value, int offset) {
-    final int ordinal = value.$ordinal;
-    final FidlType fieldType = members[ordinal];
-    if (fieldType == null)
-      throw new FidlError('Bad xunion ordinal: $ordinal');
-    encoder.encodeUint32(ordinal, offset);
     final int envelopeOffset = offset + 8;
-    _encodeEnvelopePresent(encoder, envelopeOffset, value.$data, fieldType);
+    if (value == null) {
+      if (!nullable) {
+        _throwIfNotNullable(nullable);
+      }
+      encoder.encodeUint32(0, offset);
+      _encodeEnvelopeAbsent(encoder, envelopeOffset);
+    } else {
+      final int ordinal = value.$ordinal;
+      final FidlType fieldType = members[ordinal];
+      if (fieldType == null)
+        throw new FidlError('Bad xunion ordinal: $ordinal');
+      encoder.encodeUint32(ordinal, offset);
+      _encodeEnvelopePresent(encoder, envelopeOffset, value.$data, fieldType);
+    }
   }
 
   @override
   T decode(Decoder decoder, int offset) {
-    final int ordinal = decoder.decodeUint32(offset);
-    if (ordinal == 0)
-      throw new FidlError('Empty xunion not yet supported');
-    final fieldType = members[ordinal];
-    if (fieldType == null)
-      throw new FidlError('Bad xunion ordinal: $ordinal');
     final int envelopeOffset = offset + 8;
-    final field = _decodeEnvelope(
-      decoder, envelopeOffset, _envelopeMode.kDisallowUnknown, fieldType);
-    if (field == null)
-      throw new FidlError('Bad xunion: missing content');
-    return ctor(ordinal, field);
+    final int ordinal = decoder.decodeUint32(offset);
+    if (ordinal == 0) {
+      if (!nullable) {
+        throw new FidlError('Zero xunion ordinal on non-nullable');
+      }
+      _decodeEnvelope(
+        decoder, envelopeOffset, _envelopeMode.kMustBeAbsent, null);
+      return null;
+    } else {
+      final fieldType = members[ordinal];
+      if (fieldType == null)
+        throw new FidlError('Bad xunion ordinal: $ordinal');
+      final field = _decodeEnvelope(
+        decoder, envelopeOffset, _envelopeMode.kDisallowUnknown, fieldType);
+      if (field == null)
+        throw new FidlError('Bad xunion: missing content');
+      return ctor(ordinal, field);
+    }
   }
 }
 

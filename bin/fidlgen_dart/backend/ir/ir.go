@@ -76,11 +76,13 @@ type UnionMember struct {
 
 // XUnion represents a union declaration.
 type XUnion struct {
-	Name       string
-	TagName    string
-	Members    []XUnionMember
-	TypeSymbol string
-	TypeExpr   string
+	Name          string
+	TagName       string
+	Members       []XUnionMember
+	TypeSymbol    string
+	TypeExpr      string
+	OptTypeSymbol string
+	OptTypeExpr   string
 	Documented
 }
 
@@ -469,7 +471,15 @@ func (c *compiler) inExternalLibrary(ci types.CompoundIdentifier) bool {
 }
 
 func (c *compiler) typeSymbolForCompoundIdentifier(ident types.CompoundIdentifier) string {
-	t := fmt.Sprintf("k%s_Type", ident.Name)
+	return c._typeSymbolForCompoundIdentifier(ident, "Type")
+}
+
+func (c *compiler) optTypeSymbolForCompoundIdentifier(ident types.CompoundIdentifier) string {
+	return c._typeSymbolForCompoundIdentifier(ident, "OptType")
+}
+
+func (c *compiler) _typeSymbolForCompoundIdentifier(ident types.CompoundIdentifier, suffix string) string {
+	t := fmt.Sprintf("k%s_%s", ident.Name, suffix)
 	if c.inExternalLibrary(ident) {
 		return fmt.Sprintf("%s.%s", libraryPrefix(ident.Library), t)
 	}
@@ -660,10 +670,15 @@ func (c *compiler) compileType(val types.Type) Type {
 				r.SyncDecl = fmt.Sprintf("$sync.%s", t)
 			}
 			r.AsyncDecl = r.SyncDecl
-			r.typeExpr = c.typeSymbolForCompoundIdentifier(types.ParseCompoundIdentifier(val.Identifier))
 			if val.Nullable {
-				r.typeExpr = fmt.Sprintf("const $fidl.PointerType<%s>(element: %s)",
-					t, r.typeExpr)
+				if r.declType != types.XUnionDeclType {
+					r.typeExpr = fmt.Sprintf("const $fidl.PointerType<%s>(element: %s)",
+						t, c.typeSymbolForCompoundIdentifier(types.ParseCompoundIdentifier(val.Identifier)))
+				} else {
+					r.typeExpr = c.optTypeSymbolForCompoundIdentifier(types.ParseCompoundIdentifier(val.Identifier))
+				}
+			} else {
+				r.typeExpr = c.typeSymbolForCompoundIdentifier(types.ParseCompoundIdentifier(val.Identifier))
 			}
 		case types.InterfaceDeclType:
 			r.Decl = fmt.Sprintf("$fidl.InterfaceHandle<%s>", t)
@@ -969,16 +984,23 @@ func (c *compiler) compileXUnion(val types.XUnion) XUnion {
 
 	ci := types.ParseCompoundIdentifier(val.Name)
 	r := XUnion{
-		Name:       c.compileUpperCamelCompoundIdentifier(ci, ""),
-		TagName:    c.compileUpperCamelCompoundIdentifier(ci, "Tag"),
-		TypeSymbol: c.typeSymbolForCompoundIdentifier(ci),
-		Members:    members,
-		Documented: docString(val),
+		Name:          c.compileUpperCamelCompoundIdentifier(ci, ""),
+		TagName:       c.compileUpperCamelCompoundIdentifier(ci, "Tag"),
+		TypeSymbol:    c.typeSymbolForCompoundIdentifier(ci),
+		OptTypeSymbol: c.optTypeSymbolForCompoundIdentifier(ci),
+		Members:       members,
+		Documented:    docString(val),
 	}
 	r.TypeExpr = fmt.Sprintf(`const $fidl.XUnionType<%s>(
   encodedSize: %v,
   members: %s,
   ctor: %s._ctor,
+)`, r.Name, val.Size, formatXUnionMemberList(r.Members), r.Name)
+	r.OptTypeExpr = fmt.Sprintf(`const $fidl.XUnionType<%s>(
+encodedSize: %v,
+members: %s,
+ctor: %s._ctor,
+nullable: true,
 )`, r.Name, val.Size, formatXUnionMemberList(r.Members), r.Name)
 
 	return r
