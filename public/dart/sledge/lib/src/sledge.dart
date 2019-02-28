@@ -83,20 +83,10 @@ class Sledge {
 
     _ledgerProxy.ctrl.bind(ledgerHandle);
 
-    _ledgerProxy.getPage(pageId.id, _pageProxy.ctrl.request(),
-        (ledger.Status status) {
-      if (initializationCompleter.isCompleted) {
-        return;
-      }
-      if (status != ledger.Status.ok) {
-        initializationCompleter.complete(false);
-        return;
-      }
-      _modificationQueue =
-          new ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
-      _subscribe(initializationCompleter);
-    });
-
+    _ledgerProxy.getPageNew(pageId.id, _pageProxy.ctrl.request());
+    _modificationQueue =
+        new ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
+    _subscribe(initializationCompleter);
     _initializationSucceeded = initializationCompleter.future;
   }
 

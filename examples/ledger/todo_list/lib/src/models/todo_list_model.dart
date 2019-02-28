@@ -39,10 +39,7 @@ class TodoListModel extends Model implements ledger.PageWatcher {
     componentContext.getLedger(
       _ledger.ctrl.request(),
     );
-    _ledger.getRootPage(
-      _page.ctrl.request(),
-      handleLedgerResponse('getRootPage'),
-    );
+    _ledger.getRootPageNew(_page.ctrl.request());
 
     ledger.PageSnapshotProxy snapshot = new ledger.PageSnapshotProxy();
     _page.getSnapshot(
