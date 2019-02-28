@@ -9,7 +9,7 @@ const XUnion = `
 {{- define "XUnionDeclaration" -}}
 enum {{ .TagName }} {
 {{- range .Members }}
-  {{ .Name }}, // ordinal = {{ .Ordinal }}
+  {{ .Name }}, // {{ .Ordinal | printf "%#x" }}
 {{- end }}
 }
 

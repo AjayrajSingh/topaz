@@ -903,7 +903,9 @@ func (c *compiler) compileTable(val types.Table) Table {
 	}
 
 	for _, v := range val.Members {
-		r.Members = append(r.Members, c.compileTableMember(v))
+		if !v.Reserved {
+			r.Members = append(r.Members, c.compileTableMember(v))
+		}
 	}
 
 	r.TypeExpr = fmt.Sprintf(`const $fidl.TableType<%s>(

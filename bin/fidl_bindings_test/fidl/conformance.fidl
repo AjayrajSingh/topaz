@@ -12,3 +12,65 @@ struct TestEmptyStructSandwich {
   EmptyStruct es;
   string after;
 };
+
+table SimpleTable {
+    1: int64 x;
+    2: reserved;
+    3: reserved;
+    4: reserved;
+    5: int64 y;
+};
+
+struct TestSimpleTable {
+    SimpleTable table;
+};
+
+table TableWithStringAndVector {
+    1: string foo;
+    2: int32 bar;
+    3: vector<uint8> baz;
+};
+
+struct TestTableWithStringAndVector {
+    TableWithStringAndVector table;
+};
+
+union SimpleUnion {
+    int32 i32;
+    int64 i64;
+    Int64Struct s;
+    Int64Struct? os;
+    string str;
+};
+
+struct Int64Struct {
+    int64 x;
+};
+
+xunion SampleXUnion {
+    uint32 u;
+    SimpleUnion su;
+    SimpleTable st;
+};
+
+struct TestInlineXUnionInStruct {
+    string before;
+    SampleXUnion xu;
+    string after;
+};
+
+struct TestOptionalXUnionInStruct {
+    string before;
+    SampleXUnion? xu;
+    string after;
+};
+
+table XUnionInTable {
+    1: string before;
+    2: SampleXUnion xu;
+    3: string after;
+};
+
+struct TestXUnionInTable {
+    XUnionInTable value;
+};
