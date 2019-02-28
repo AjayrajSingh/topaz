@@ -31,8 +31,6 @@ class Message {
       data.setUint32(kMessageTxidOffset, value, Endian.little);
 
   int get ordinal => data.getUint32(kMessageOrdinalOffset, Endian.little);
-  set ordinal(int value) =>
-      data.setUint32(kMessageOrdinalOffset, value, Endian.little);
 
   void hexDump() {
     const int width = 16;

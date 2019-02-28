@@ -146,7 +146,8 @@ class {{ .ProxyName }} extends $fidl.Proxy<{{ .Name }}>
       return;
     }
 
-    final $fidl.Encoder $encoder = new $fidl.Encoder({{ .OrdinalName }});
+    final $fidl.Encoder $encoder = new $fidl.Encoder();
+    $encoder.encodeMessageHeader({{ .OrdinalName }}, 0);
     {{- if .Request }}
     $encoder.alloc({{ .RequestSize }} - $fidl.kMessageHeaderSize);
     final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.request;
@@ -195,7 +196,8 @@ class {{ .EventsName }} {
   {{- if not .HasRequest }}
     {{- if .HasResponse }}
   void {{ template "ResponseMethodSignature" . }} {
-    final $fidl.Encoder $encoder = new $fidl.Encoder({{ .OrdinalName }});
+    final $fidl.Encoder $encoder = new $fidl.Encoder();
+    $encoder.encodeMessageHeader({{ .OrdinalName }}, 0);
       {{- if .Response }}
     $encoder.alloc({{ .ResponseSize }} - $fidl.kMessageHeaderSize);
     final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
@@ -226,7 +228,8 @@ class {{ .BindingName }} extends $fidl.Binding<{{ .Name }}> {
     {{- if .HasResponse }}
   Function _{{ .Name }}Responder($fidl.MessageSink $respond, int $txid) {
     return ({{ template "Params" .Response }}) {
-      final $fidl.Encoder $encoder = new $fidl.Encoder({{ .OrdinalName }});
+      final $fidl.Encoder $encoder = new $fidl.Encoder();
+      $encoder.encodeMessageHeader({{ .OrdinalName }}, $txid);
       {{- if .Response }}
       $encoder.alloc({{ .ResponseSize }} - $fidl.kMessageHeaderSize);
       final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
@@ -234,9 +237,7 @@ class {{ .BindingName }} extends $fidl.Binding<{{ .Name }}> {
       {{- range $index, $response := .Response }}
       $types[{{ $index }}].encode($encoder, {{ .Name }}, 0);
       {{- end }}
-      $fidl.Message $message = $encoder.message;
-      $message.txid = $txid;
-      $respond($message);
+      $respond($encoder.message);
     };
   }
     {{- end }}
@@ -546,7 +547,8 @@ class {{ .ProxyName }} extends $fidl.AsyncProxy<{{ .Name }}>
         return new Future.error(new $fidl.FidlStateException('The proxy is closed.'));
       }
 
-      final $fidl.Encoder $encoder = new $fidl.Encoder({{ .OrdinalName }});
+      final $fidl.Encoder $encoder = new $fidl.Encoder();
+      $encoder.encodeMessageHeader({{ .OrdinalName }}, 0);
       {{- if .Request }}
         $encoder.alloc({{ .RequestSize }} - $fidl.kMessageHeaderSize);
         final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.request;
@@ -591,7 +593,8 @@ class {{ .BindingName }} extends $fidl.AsyncBinding<{{ .Name }}> {
         {{- if not .HasRequest }}
           if (impl.{{ .Name }} != null) {
             $subscriptions.add(impl.{{ .Name }}.listen(($response) {
-              final $fidl.Encoder $encoder = new $fidl.Encoder({{ .OrdinalName }});
+              final $fidl.Encoder $encoder = new $fidl.Encoder();
+              $encoder.encodeMessageHeader({{ .OrdinalName }}, 0);
               $encoder.alloc({{ .ResponseSize }} - $fidl.kMessageHeaderSize);
               final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
               {{ template "EncodeResponse" . }}
@@ -624,15 +627,14 @@ class {{ .BindingName }} extends $fidl.AsyncBinding<{{ .Name }}> {
 
               {{- if .HasResponse }}
                 $future.then(($response) {
-                  final $fidl.Encoder $encoder = new $fidl.Encoder({{ .OrdinalName }});
+                  final $fidl.Encoder $encoder = new $fidl.Encoder();
+                  $encoder.encodeMessageHeader({{ .OrdinalName }}, $message.txid);
                   {{- if .Response }}
                     $encoder.alloc({{ .ResponseSize }} - $fidl.kMessageHeaderSize);
                     final List<$fidl.MemberType> $types = {{ .TypeSymbol }}.response;
                     {{ template "EncodeResponse" . -}}
                   {{- end }}
-                  $fidl.Message $responseMessage = $encoder.message;
-                  $responseMessage.txid = $message.txid;
-                  $respond($responseMessage);
+                  $respond($encoder.message);
                 }, onError: (_e) {
                   close();
                   final String _name = {{ .TypeSymbol }}.name;

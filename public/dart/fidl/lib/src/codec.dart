@@ -29,10 +29,6 @@ void _throwIfNegative(int value) {
 const int _kInitialBufferSize = 1024;
 
 class Encoder {
-  Encoder(int ordinal) {
-    _encodeMessageHeader(ordinal);
-  }
-
   Message get message {
     final ByteData trimmed = new ByteData.view(data.buffer, 0, _extent);
     return new Message(trimmed, _handles, _extent, _handles.length);
@@ -75,9 +71,10 @@ class Encoder {
     _handles.add(value);
   }
 
-  void _encodeMessageHeader(int ordinal) {
+  void encodeMessageHeader(int ordinal, int txid) {
     alloc(kMessageHeaderSize);
     encodeUint32(ordinal, kMessageOrdinalOffset);
+    encodeUint32(txid, kMessageTxidOffset);
   }
 
   void encodeBool(bool value, int offset) {
