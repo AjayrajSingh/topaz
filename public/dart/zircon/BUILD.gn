@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_library.gni")
-import("//build/testing/test_spec.gni")
 import("//topaz/runtime/dart/dart_test.gni")
 
 dart_library("zircon") {
@@ -38,14 +37,5 @@ if (is_linux || is_mac) {
     outputs = [
       "$root_out_dir/test_extract_zircon_constants",
     ]
-
-    deps = [
-      ":test_extract_zircon_constants_spec"
-    ]
-  }
-
-  test_spec("test_extract_zircon_constants_spec") {
-    name = "test_extract_zircon_constants"
-    location = "$root_out_dir/test_extract_zircon_constants"
   }
 }

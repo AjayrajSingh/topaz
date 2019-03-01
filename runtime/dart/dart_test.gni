@@ -4,7 +4,6 @@
 
 import("//build/dart/dart_library.gni")
 import("//build/dart/toolchain.gni")
-import("//build/testing/test_spec.gni")
 import("//topaz/runtime/dart/dart_kernel.gni")
 
 # Defines a Dart test suite
@@ -210,22 +209,12 @@ if (current_toolchain == dart_toolchain) {
   # Not the Dart toolchain.
   template("dart_test") {
     _main_target_name = target_name
-    _test_spec_target_name = "${target_name}_spec"
     _invocation_file = "$target_gen_dir/$target_name"
 
     if (is_linux || is_mac) {
       # TODO(IN-819): Delete renaming when dart tests are no longer run out of one
       # directory
       _invocation_file = "$root_out_dir/$target_name"
-
-      test_spec(_test_spec_target_name) {
-        name = _main_target_name
-        location = _invocation_file
-        deps = [
-          ":$_main_target_name($dart_toolchain)",
-        ]
-        testonly = true
-      }
     }
 
     action(_main_target_name) {
@@ -251,11 +240,6 @@ if (current_toolchain == dart_toolchain) {
       deps = [
         ":$_main_target_name($dart_toolchain)",
       ]
-      if (is_linux || is_mac) {
-        deps += [ ":$_test_spec_target_name" ]
-      } else {
-        not_needed([ "_test_spec_target_name" ])
-      }
     }
   }
 }
