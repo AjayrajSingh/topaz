@@ -30,4 +30,6 @@ source_set("sdk_ext") {
     "//third_party/tonic",
     "//topaz/public/dart-pkg/zircon",
   ]
+
+  public_configs = [ "//topaz/public/dart-pkg:config" ]
 }

@@ -32,17 +32,19 @@ source_set("sdk_ext") {
 
   deps = [
     "//garnet/public/lib/fsl",
-    "//garnet/public/lib/fxl",
     "//third_party/dart/runtime:dart_api",
     "//zircon/public/lib/async-default",
     "//zircon/public/lib/zx",
   ]
 
   public_deps = [
+    "//garnet/public/lib/fxl",
     "//third_party/tonic",
     "//zircon/public/lib/async-cpp",
     "//zircon/public/lib/fdio",
   ]
+
+  public_configs = [ "//topaz/public/dart-pkg:config" ]
 }
 
 # This is just so that we can run dart analysis on these files.
