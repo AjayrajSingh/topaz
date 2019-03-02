@@ -135,7 +135,6 @@ template("flutter_runner") {
              "//garnet/public/lib/fxl",
              "//garnet/public/lib/icu_data/cpp",
              "//garnet/public/lib/svc/cpp",
-             "//garnet/public/lib/ui/gfx/cpp",
              "//garnet/public/lib/vulkan",
              "//sdk/fidl/fuchsia.modular",
              "//sdk/lib/ui/scenic/cpp",

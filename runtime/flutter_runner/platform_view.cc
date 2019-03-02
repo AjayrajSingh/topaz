@@ -10,7 +10,6 @@
 
 #include "flutter/lib/ui/window/pointer_data.h"
 #include "lib/component/cpp/connect.h"
-#include "lib/ui/gfx/cpp/math.h"
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
@@ -18,6 +17,43 @@
 #include "trace/event.h"
 
 namespace flutter {
+
+#ifdef SCENIC_VIEWS2
+namespace {
+
+inline fuchsia::ui::gfx::vec3 Add(
+    const fuchsia::ui::gfx::vec3& a, const fuchsia::ui::gfx::vec3& b) {
+  return {.x = a.x + b.x, .y = a.y + b.y, .z = a.z + b.z};
+}
+
+inline fuchsia::ui::gfx::vec3 Subtract(
+    const fuchsia::ui::gfx::vec3& a, const fuchsia::ui::gfx::vec3& b) {
+  return {.x = a.x - b.x, .y = a.y - b.y, .z = a.z - b.z};
+}
+
+inline fuchsia::ui::gfx::BoundingBox InsetBy(
+    const fuchsia::ui::gfx::BoundingBox& box,
+    const fuchsia::ui::gfx::vec3& inset_from_min,
+    const fuchsia::ui::gfx::vec3& inset_from_max) {
+  return {.min = Add(box.min, inset_from_min),
+          .max = Subtract(box.max, inset_from_max)};
+}
+
+inline fuchsia::ui::gfx::BoundingBox ViewPropertiesLayoutBox(
+    const fuchsia::ui::gfx::ViewProperties& view_properties) {
+  return InsetBy(view_properties.bounding_box, view_properties.inset_from_min,
+                 view_properties.inset_from_max);
+}
+
+inline fuchsia::ui::gfx::vec3 Max(const fuchsia::ui::gfx::vec3& v,
+                                  float min_val) {
+  return {.x = std::max(v.x, min_val),
+          .y = std::max(v.y, min_val),
+          .z = std::max(v.z, min_val)};
+}
+
+}
+#endif  // SCENIC_VIEWS2
 
 constexpr char kFlutterPlatformChannel[] = "flutter/platform";
 constexpr char kTextInputChannel[] = "flutter/textinput";
@@ -162,10 +198,10 @@ void PlatformView::OnPropertiesChanged(
 void PlatformView::OnPropertiesChanged(
     const fuchsia::ui::gfx::ViewProperties& view_properties) {
   fuchsia::ui::gfx::BoundingBox layout_box =
-      scenic::ViewPropertiesLayoutBox(view_properties);
+      ViewPropertiesLayoutBox(view_properties);
 
   fuchsia::ui::gfx::vec3 logical_size =
-      scenic::Max(layout_box.max - layout_box.min, 0.f);
+      Max(Subtract(layout_box.max, layout_box.min), 0.f);
 
   metrics_.size.width = logical_size.x;
   metrics_.size.height = logical_size.y;
