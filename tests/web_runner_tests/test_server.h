@@ -6,11 +6,11 @@
 #define TOPAZ_TESTS_WEB_RUNNER_TESTS_TEST_SERVER_H_
 
 #include <string>
+#include <thread>
 #include <vector>
 
 #include <lib/fit/defer.h>
 #include <src/lib/files/unique_fd.h>
-#include <lib/fxl/threading/thread.h>
 
 namespace web_runner_tests {
 
@@ -43,13 +43,15 @@ class TestServer {
 
   // Runs a |serve| routine on its own thread, with proper cleanup to prevent
   // deadlock. |serve| must terminate after |Accept()| returns false.
-  auto ServeAsync(fit::closure serve) {
-    auto server_thread = std::make_unique<fxl::Thread>(std::move(serve));
-    server_thread->Run();
+  template<typename T>
+  auto ServeAsync(T serve) {
+    auto server = std::thread(std::move(serve));
     // The socket must be closed before the thread goes out of scope so that any
     // blocking |Accept| calls terminate so that |serve| can terminate.
-    return fit::defer(
-        [this, server_thread = std::move(server_thread)] { Close(); });
+    return fit::defer([this, server = std::move(server)]() mutable {
+      Close();
+      server.join();
+    });
   }
 
  private:

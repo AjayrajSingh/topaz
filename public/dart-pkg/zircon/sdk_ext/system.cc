@@ -6,11 +6,14 @@
 
 #include <array>
 
+#include <ddk/device.h>
 #include <fcntl.h>
+#include <fs/vfs.h>
+#include <fuchsia/device/manager/cpp/fidl.h>
+#include <lib/fdio/directory.h>
 #include <lib/fdio/io.h>
 #include <lib/fdio/limits.h>
 #include <lib/fdio/namespace.h>
-#include <lib/fdio/util.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <zircon/process.h>
@@ -118,9 +121,6 @@ Dart_Handle ConstructDartObject(const char* class_name, Args&&... args) {
       Dart_HandleFromPersistent(class_library.GetClass("zircon", class_name));
   FXL_DCHECK(!tonic::LogIfError(type));
 
-  const char* cstr;
-  Dart_StringToCString(Dart_ToString(type), &cstr);
-
   std::array<Dart_Handle, sizeof...(Args)> args_array{
       {std::forward<Args>(args)...}};
   Dart_Handle object =
@@ -129,7 +129,7 @@ Dart_Handle ConstructDartObject(const char* class_name, Args&&... args) {
   return object;
 }
 
-fxl::UniqueFD FdFromPath(std::string path) {
+fdio_ns_t* GetNamespace() {
   // Grab the fdio_ns_t* out of the isolate.
   Dart_Handle zircon_lib = Dart_LookupLibrary(ToDart("dart:zircon"));
   FXL_DCHECK(!tonic::LogIfError(zircon_lib));
@@ -143,9 +143,12 @@ fxl::UniqueFD FdFromPath(std::string path) {
   Dart_Handle result = Dart_IntegerToUint64(namespace_field, &fdio_ns_ptr);
   FXL_DCHECK(!tonic::LogIfError(result));
 
+  return reinterpret_cast<fdio_ns_t*>(fdio_ns_ptr);
+}
+
+fxl::UniqueFD FdFromPath(std::string path) {
   // Get a VMO for the file.
-  fdio_ns_t* ns = reinterpret_cast<fdio_ns_t*>(fdio_ns_ptr);
-  fxl::UniqueFD dirfd(fdio_ns_opendir(ns));
+  fxl::UniqueFD dirfd(fdio_ns_opendir(GetNamespace()));
   if (!dirfd.is_valid())
     return fxl::UniqueFD();
 
@@ -171,6 +174,13 @@ Dart_Handle System::ChannelCreate(uint32_t options) {
   }
 }
 
+zx_status_t System::ConnectToService(std::string path, fxl::RefPtr<Handle> channel) {
+  return fdio_ns_connect(GetNamespace(), path.c_str(),
+                         ZX_FS_RIGHT_READABLE | ZX_FS_RIGHT_WRITABLE,
+                         channel->ReleaseHandle());
+
+}
+
 Dart_Handle System::ChannelFromFile(std::string path) {
   fxl::UniqueFD fd = FdFromPath(path);
   if (!fd.is_valid()) {
@@ -191,6 +201,7 @@ zx_status_t System::ChannelWrite(fxl::RefPtr<Handle> channel,
                                  const tonic::DartByteData& data,
                                  std::vector<Handle*> handles) {
   if (!channel || !channel->is_valid()) {
+    data.Release();
     return ZX_ERR_BAD_HANDLE;
   }
 
@@ -207,6 +218,7 @@ zx_status_t System::ChannelWrite(fxl::RefPtr<Handle> channel,
     handle->ReleaseHandle();
   }
 
+  data.Release();
   return status;
 }
 
@@ -360,7 +372,7 @@ zx_status_t System::VmoWrite(fxl::RefPtr<Handle> vmo,
                              const tonic::DartByteData& data) {
   if (!vmo || !vmo->is_valid()) {
     data.Release();
-    ZX_ERR_BAD_HANDLE;
+    return ZX_ERR_BAD_HANDLE;
   }
 
   zx_status_t status =
@@ -443,6 +455,7 @@ uint64_t System::ClockGet(uint32_t clock_id) {
   V(System, ChannelWrite)          \
   V(System, ChannelQueryAndRead)   \
   V(System, EventpairCreate)       \
+  V(System, ConnectToService)      \
   V(System, SocketCreate)          \
   V(System, SocketWrite)           \
   V(System, SocketRead)            \

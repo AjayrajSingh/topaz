@@ -24,7 +24,7 @@ abstract class FieldValue implements Comparable<Value> {
 /// Template to ease the implementation of FieldValue specializations.
 abstract class _TemplatedFieldValue<T extends Comparable<T>>
     implements FieldValue {
-  final _converter = new Converter<T>();
+  final _converter = Converter<T>();
   T _value;
 
   _TemplatedFieldValue(this._value);
@@ -70,6 +70,6 @@ class NumFieldValue extends _TemplatedFieldValue<num> {
     if (documentValue is LastOneWinsValue<double>) {
       return documentValue.value;
     }
-    throw new ArgumentError('`documentValue` does not store a num.');
+    throw ArgumentError('`documentValue` does not store a num.');
   }
 }

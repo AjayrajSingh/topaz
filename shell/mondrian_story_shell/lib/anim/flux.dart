@@ -19,7 +19,7 @@ abstract class FluxAnimation<T> extends Animation<T> {
   factory FluxAnimation.fromAnimation(Animation<T> animation, T velocity) =>
       animation is FluxAnimation
           ? animation
-          : new _FluxAnimationWrapper<T>(animation, velocity);
+          : _FluxAnimationWrapper<T>(animation, velocity);
 
   /// The instantaneous change in the value in natural units per second.
   T get velocity;
@@ -278,7 +278,7 @@ class MovingTargetAnimation<T> extends FluxAnimation<T>
     @required T velocity,
   })  : _vsync = vsync,
         assert(target != null),
-        target = new FluxAnimation<T>.fromAnimation(target, velocity),
+        target = FluxAnimation<T>.fromAnimation(target, velocity),
         assert(vsync != null),
         assert(simulate != null) {
     _value = value;
@@ -317,7 +317,7 @@ class MovingTargetAnimation<T> extends FluxAnimation<T>
       // where velocityOrigin is the 'zero' velocity. However, this introduces
       // a zeroVelocity parameter complexity to the API and may be confusing.
       ? target
-      : new ChainedAnimation<T>(this, then: target);
+      : ChainedAnimation<T>(this, then: target);
 
   void _scheduleUpdate() {
     if (_lastUpdateCallbackId != null) {
@@ -334,7 +334,7 @@ class MovingTargetAnimation<T> extends FluxAnimation<T>
   void _update() {
     Sim<T> sim = simulate(value, target.value, velocity);
     _disposeAnimation();
-    _animation = new SimAnimationController<T>(vsync: _vsync, sim: sim)
+    _animation = SimAnimationController<T>(vsync: _vsync, sim: sim)
       ..addListener(notifyListeners)
       ..addStatusListener(notifyStatusListeners);
     if (!_animation.isCompleted) {
@@ -436,7 +436,7 @@ class ChainedAnimation<T> extends FluxAnimation<T>
         AnimationLazyListenerMixin {
   /// Construct a chained animation starting with animation followed by then.
   ChainedAnimation(this._animation, {FluxAnimation<T> then})
-      : _next = (then == null) ? null : new ChainedAnimation<T>(then) {
+      : _next = (then == null) ? null : ChainedAnimation<T>(then) {
     _active = (_next != null && _animation.isCompleted) ? _next : _animation;
   }
 
@@ -447,7 +447,7 @@ class ChainedAnimation<T> extends FluxAnimation<T>
   /// Returns a new FluxAnimation that runs the current animation,
   /// followed by the one specified in the argument when it is complete.
   ChainedAnimation<T> then(FluxAnimation<T> next) =>
-      new ChainedAnimation<T>(_animation, then: next);
+      ChainedAnimation<T>(_animation, then: next);
 
   @override
   AnimationStatus get status => _active.status;

@@ -16,6 +16,7 @@ flutter_app("button_flutter") {
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/lib/ui/flutter",
+    "//topaz/public/dart/fuchsia_scenic_flutter",
+    "//topaz/public/dart/fuchsia_logger",
   ]
 }

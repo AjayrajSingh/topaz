@@ -201,7 +201,8 @@ void main() {
       });
     });
 
-    DirectoryProxy _getProxyForDir(PseudoDir dir, [int flags = 0]) {
+    DirectoryProxy _getProxyForDir(PseudoDir dir,
+        [int flags = openRightReadable | openRightWritable]) {
       DirectoryProxy proxy = DirectoryProxy();
       var status = dir.connect(
           flags, 0, InterfaceRequest(proxy.ctrl.request().passChannel()));
@@ -211,7 +212,8 @@ void main() {
 
     test('open passes', () async {
       PseudoDir dir = PseudoDir();
-      DirectoryProxy proxy = _getProxyForDir(dir, openFlagDescribe);
+      DirectoryProxy proxy =
+          _getProxyForDir(dir, openRightReadable | openFlagDescribe);
 
       await proxy.onOpen.first.then((response) {
         expect(response.s, ZX.OK);
@@ -249,7 +251,7 @@ void main() {
       var validFlags = [
         openRightReadable,
         openRightWritable,
-        openFlagDirectory,
+        openRightReadable | openFlagDirectory,
         openFlagNodeReference
       ];
 
@@ -639,7 +641,7 @@ void main() {
         _validateExpectedDirents(expectedDirents, response);
       });
 
-      test('readdir works when new node is added', () async {
+      test('readdir works when node is added', () async {
         PseudoDir dir = PseudoDir();
         PseudoDir subDir = PseudoDir();
         var file1 = PseudoFile.readOnlyStr(() => 'file1');
@@ -663,7 +665,7 @@ void main() {
         _validateExpectedDirents(expectedDirents, response);
       });
 
-      test('readdir works when new node is added and only first node was read',
+      test('readdir works when node is added and only first node was read',
           () async {
         PseudoDir dir = PseudoDir();
         PseudoDir subDir = PseudoDir();
@@ -722,10 +724,10 @@ void main() {
         PseudoDir dir = _setUpDir();
 
         var proxy = _getProxyForDir(dir);
-        var paths = ['.', ''];
+        var paths = ['.', './', './/', './//', './/.//./'];
         for (var path in paths) {
           DirectoryProxy newProxy = DirectoryProxy();
-          await proxy.open(0, 0, path,
+          await proxy.open(openRightReadable, 0, path,
               InterfaceRequest(newProxy.ctrl.request().passChannel()));
 
           // open file 1 in proxy and check contents to make sure correct dir was opened.
@@ -739,7 +741,26 @@ void main() {
         var proxy = _getProxyForDir(dir);
 
         // open file 1 check contents.
-        await _openFileAndAssert(proxy, 'file1', 100, 'file1');
+        var paths = ['file1', './file1', './/file1', './//file1'];
+        for (var path in paths) {
+          await _openFileAndAssert(proxy, path, 100, 'file1');
+        }
+      });
+
+      test('open fails for empty path', () async {
+        PseudoDir dir = _setUpDir();
+
+        var proxy = _getProxyForDir(dir);
+        var newProxy = DirectoryProxy();
+        await proxy.open(openRightReadable | openFlagDescribe, 0, '',
+            InterfaceRequest(newProxy.ctrl.request().passChannel()));
+
+        await newProxy.onOpen.first.then((response) {
+          expect(response.s, isNot(ZX.OK));
+          expect(response.info, isNull);
+        }).catchError((err) async {
+          fail(err.toString());
+        });
       });
 
       test('open file fails for path ending with "/"', () async {
@@ -797,11 +818,11 @@ void main() {
 
         var proxy = _getProxyForDir(dir);
         DirectoryProxy subDirProxy = DirectoryProxy();
-        await proxy.open(0, 0, 'subDir',
+        await proxy.open(openRightReadable, 0, 'subDir',
             InterfaceRequest(subDirProxy.ctrl.request().passChannel()));
 
         FileProxy fileProxy = FileProxy();
-        await proxy.open(0, 0, 'file1',
+        await proxy.open(openRightReadable, 0, 'file1',
             InterfaceRequest(fileProxy.ctrl.request().passChannel()));
         dir.close();
         proxy.ctrl.whenClosed.asStream().listen(expectAsync1((_) {}));
@@ -815,11 +836,52 @@ void main() {
         var proxy = _getProxyForDir(dir);
 
         DirectoryProxy dirProxy = DirectoryProxy();
-        await proxy.open(0, 0, 'subDir',
+        await proxy.open(openRightReadable, 0, 'subDir',
             InterfaceRequest(dirProxy.ctrl.request().passChannel()));
 
         // open file 2 check contents to make sure correct dir was opened.
         await _openFileAndAssert(dirProxy, 'file2', 100, 'file2');
+      });
+
+      test('directory rights are hierarchical (open dir)', () async {
+        PseudoDir dir = _setUpDir();
+
+        var proxy = _getProxyForDir(dir, openRightReadable);
+
+        var newProxy = DirectoryProxy();
+        await proxy.open(openRightWritable | openFlagDescribe, 0, 'subDir',
+            InterfaceRequest(newProxy.ctrl.request().passChannel()));
+
+        await newProxy.onOpen.first.then((response) {
+          expect(response.s, ZX.ERR_ACCESS_DENIED);
+          expect(response.info, isNull);
+        }).catchError((err) async {
+          fail(err.toString());
+        });
+      });
+
+      test('directory rights are hierarchical (open file)', () async {
+        PseudoDir dir = _setUpDir();
+
+        var proxy = _getProxyForDir(dir, openRightWritable);
+
+        var newProxy = DirectoryProxy();
+        await proxy.open(openRightWritable | openFlagDescribe, 0, 'subDir',
+            InterfaceRequest(newProxy.ctrl.request().passChannel()));
+
+        await newProxy.onOpen.first.then((response) {
+          expect(response.s, ZX.OK);
+          expect(response.info, isNotNull);
+        }).catchError((err) async {
+          fail(err.toString());
+        });
+
+        FileProxy fileProxy = FileProxy();
+        await newProxy.open(openRightReadable, 0, 'file2',
+            InterfaceRequest(fileProxy.ctrl.request().passChannel()));
+
+        // channel should be closed
+        fileProxy.ctrl.whenClosed.asStream().listen(expectAsync1((_) {}));
       });
 
       test('open sub dir with "/" at end', () async {
@@ -828,7 +890,7 @@ void main() {
         var proxy = _getProxyForDir(dir);
 
         DirectoryProxy dirProxy = DirectoryProxy();
-        await proxy.open(0, 0, 'subDir/',
+        await proxy.open(openRightReadable, 0, 'subDir/',
             InterfaceRequest(dirProxy.ctrl.request().passChannel()));
 
         // open file 2 check contents to make sure correct dir was opened.
@@ -853,23 +915,54 @@ void main() {
         expect(response.s, ZX.ERR_BAD_HANDLE);
       });
 
-      test('able to open a file for NodeReference', () async {
+      test('not allowed to open a file for NodeReference', () async {
         PseudoDir dir = _setUpDir();
 
         var proxy = _getProxyForDir(dir, openFlagNodeReference);
 
         // open file 2 in subDir.
-        await _openFileAndAssert(proxy, 'subDir/file2', 100, 'file2');
+        FileProxy fileProxy = FileProxy();
+        await proxy.open(openRightReadable, 0, 'subDir/file2',
+            InterfaceRequest(fileProxy.ctrl.request().passChannel()));
+
+        // channel should be closed
+        fileProxy.ctrl.whenClosed.asStream().listen(expectAsync1((_) {}));
+      });
+
+      test('clone with same rights', () async {
+        PseudoDir dir = _setUpDir();
+
+        var proxy = _getProxyForDir(dir, openRightReadable | openRightWritable);
+        DirectoryProxy cloneProxy = DirectoryProxy();
+        await proxy.clone(cloneFlagSameRights | openFlagDescribe,
+            InterfaceRequest(cloneProxy.ctrl.request().passChannel()));
+
+        var subDirProxy = DirectoryProxy();
+        await cloneProxy.open(
+            openRightReadable | openRightWritable | openFlagDescribe,
+            0,
+            'subDir',
+            InterfaceRequest(subDirProxy.ctrl.request().passChannel()));
+
+        await subDirProxy.onOpen.first.then((response) {
+          expect(response.s, ZX.OK);
+          expect(response.info, isNotNull);
+        }).catchError((err) async {
+          fail(err.toString());
+        });
+
+        // open file 2 check contents to make sure correct dir was opened.
+        await _openFileAndAssert(subDirProxy, 'file2', 100, 'file2');
       });
     });
 
     test('test clone', () async {
       PseudoDir dir = PseudoDir();
 
-      var proxy = _getProxyForDir(dir, 0);
+      var proxy = _getProxyForDir(dir, openRightReadable);
 
       DirectoryProxy newProxy = DirectoryProxy();
-      await proxy.clone(openFlagDescribe,
+      await proxy.clone(openRightReadable | openFlagDescribe,
           InterfaceRequest(newProxy.ctrl.request().passChannel()));
 
       await newProxy.onOpen.first.then((response) {
@@ -880,10 +973,27 @@ void main() {
       });
     });
 
+    test('clone should fail if requested rights exceed source rights',
+        () async {
+      PseudoDir dir = PseudoDir();
+      var proxy = _getProxyForDir(dir, openRightReadable);
+
+      var clonedProxy = DirectoryProxy();
+      await proxy.clone(openRightWritable | openFlagDescribe,
+          InterfaceRequest(clonedProxy.ctrl.request().passChannel()));
+
+      await clonedProxy.onOpen.first.then((response) {
+        expect(response.s, ZX.ERR_ACCESS_DENIED);
+        expect(response.info, isNull);
+      }).catchError((err) async {
+        fail(err.toString());
+      });
+    });
+
     test('test clone fails for invalid flags', () async {
       PseudoDir dir = PseudoDir();
 
-      var proxy = _getProxyForDir(dir, 0);
+      var proxy = _getProxyForDir(dir, openRightReadable);
 
       DirectoryProxy newProxy = DirectoryProxy();
       await proxy.clone(openFlagTruncate | openFlagDescribe,
@@ -891,6 +1001,24 @@ void main() {
 
       await newProxy.onOpen.first.then((response) {
         expect(response.s, isNot(ZX.OK));
+        expect(response.info, isNull);
+      }).catchError((err) async {
+        fail(err.toString());
+      });
+    });
+
+    test('test clone disallows both cloneFlagSameRights and specific rights',
+        () async {
+      PseudoDir dir = PseudoDir();
+      var proxy = _getProxyForDir(dir, openRightReadable);
+
+      var clonedProxy = DirectoryProxy();
+      await proxy.clone(
+          openRightReadable | cloneFlagSameRights | openFlagDescribe,
+          InterfaceRequest(clonedProxy.ctrl.request().passChannel()));
+
+      await clonedProxy.onOpen.first.then((response) {
+        expect(response.s, ZX.ERR_INVALID_ARGS);
         expect(response.info, isNull);
       }).catchError((err) async {
         fail(err.toString());
@@ -950,7 +1078,8 @@ class _TestVnode extends Vnode {
 
   @override
   int connect(int flags, int mode, InterfaceRequest<Node> request,
-      [int parentFlags = -1]) {
+      [int parentFlags =
+          openRightReadable | openRightWritable | openRightAdmin]) {
     throw UnimplementedError();
   }
 

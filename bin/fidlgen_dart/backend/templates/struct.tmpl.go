@@ -78,7 +78,7 @@ class {{ .Name }} extends $fidl.Struct {
     )';
   }
 
-  static {{ .Name }} _ctor(List<Object> argv) => new {{ .Name }}._(argv);
+  static {{ .Name }} _ctor(List<Object> argv) => {{ .Name }}._(argv);
 }
 
 // See FIDL-308:

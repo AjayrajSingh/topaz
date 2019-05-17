@@ -12,7 +12,7 @@ import 'package:test/test.dart';
 class MockAction extends Mock implements Action<TestBlueprint> {}
 
 class TestBlueprint extends Blueprint {
-  final MockAction action = new MockAction();
+  final MockAction action = MockAction();
 
   TestBlueprint(String name) : super(name, 'TestBlueprint');
 
@@ -25,14 +25,14 @@ class TestBlueprint extends Blueprint {
 void main() {
   // Make sure first action is launched.
   test('test_start', () {
-    final Step entry = new Step('step1', 'action1');
-    final TestBlueprint actionBlueprint = new TestBlueprint('action1');
+    final Step entry = Step('step1', 'action1');
+    final TestBlueprint actionBlueprint = TestBlueprint('action1');
 
-    final Syllabus syllabus = new Syllabus([entry], entry);
+    final Syllabus syllabus = Syllabus([entry], entry);
 
-    final Roster roster = new Roster()..add(actionBlueprint);
+    final Roster roster = Roster()..add(actionBlueprint);
 
-    new Conductor(syllabus, roster).start();
+    Conductor(syllabus, roster).start();
     MockAction action = actionBlueprint.action;
     verify(action.launch());
   });
@@ -40,17 +40,17 @@ void main() {
   // Ensure we proceed to the next step when the current step's action is
   // missing
   test('test_advance', () {
-    final Step step2 = new Step('step2', 'action2');
-    final TestBlueprint actionBlueprint = new TestBlueprint('action2');
+    final Step step2 = Step('step2', 'action2');
+    final TestBlueprint actionBlueprint = TestBlueprint('action2');
 
-    final Step entry = new Step('step1', 'action1')
+    final Step entry = Step('step1', 'action1')
       ..defaultTransition = step2.key;
 
-    final Syllabus syllabus = new Syllabus([step2, entry], entry);
+    final Syllabus syllabus = Syllabus([step2, entry], entry);
 
-    final Roster roster = new Roster()..add(actionBlueprint);
+    final Roster roster = Roster()..add(actionBlueprint);
 
-    new Conductor(syllabus, roster).start();
+    Conductor(syllabus, roster).start();
     verify(actionBlueprint.action.launch());
   });
 }

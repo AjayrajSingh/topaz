@@ -6,13 +6,11 @@
 
 #include <map>
 
-#include "topaz/lib/deprecated_loop/message_loop.h"
-
-namespace flutter {
+namespace flutter_runner {
 
 thread_local std::map<intptr_t, fit::closure> tTaskObservers;
 
-static void ExecuteAfterTaskObservers() {
+void ExecuteAfterTaskObservers() {
   for (const auto& callback : tTaskObservers) {
     callback.second();
   }
@@ -20,24 +18,13 @@ static void ExecuteAfterTaskObservers() {
 
 void CurrentMessageLoopAddAfterTaskObserver(intptr_t key,
                                             fit::closure observer) {
-  if (!observer) {
-    return;
+  if (observer) {
+    tTaskObservers[key] = std::move(observer);
   }
-
-  if (tTaskObservers.size() == 0) {
-    deprecated_loop::MessageLoop::GetCurrent()->SetAfterTaskCallback(
-        std::bind(&ExecuteAfterTaskObservers));
-  }
-
-  tTaskObservers[key] = std::move(observer);
 }
 
 void CurrentMessageLoopRemoveAfterTaskObserver(intptr_t key) {
   tTaskObservers.erase(key);
-
-  if (tTaskObservers.size() == 0) {
-    deprecated_loop::MessageLoop::GetCurrent()->ClearAfterTaskCallback();
-  }
 }
 
-}  // namespace flutter
+}  // namespace flutter_runner

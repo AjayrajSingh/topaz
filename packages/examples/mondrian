@@ -1,6 +1,0 @@
-{
-    "packages": [
-        "//topaz/lib/story_shell/examples/example_manual_relationships",
-        "//topaz/lib/story_shell/examples/mondrian_test"
-    ]
-}

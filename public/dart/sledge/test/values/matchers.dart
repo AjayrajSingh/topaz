@@ -12,7 +12,7 @@ import 'package:sledge/src/document/values/key_value.dart';
 import 'package:sledge/src/sledge_errors.dart';
 import 'package:test/test.dart';
 
-const Equality<List<int>> _listEquality = const ListEquality<int>();
+const Equality<List<int>> _listEquality = ListEquality<int>();
 
 class KeyValueEquality implements Equality<KeyValue> {
   // Default constructor;
@@ -35,11 +35,11 @@ class KeyValueEquality implements Equality<KeyValue> {
   }
 }
 
-const _keyValueEquality = const KeyValueEquality();
+const _keyValueEquality = KeyValueEquality();
 const ListEquality _keyValueListEquality =
-    const ListEquality<KeyValue>(_keyValueEquality);
+    ListEquality<KeyValue>(_keyValueEquality);
 const ListEquality _keysListEquality =
-    const ListEquality<List<int>>(_listEquality);
+    ListEquality<List<int>>(_listEquality);
 
 class KeyValueMatcher extends Matcher {
   final KeyValue _kv;
@@ -98,4 +98,4 @@ class OrderedListChangeMatcher extends Matcher {
 
 /// Matcher for InternalSledgeErrors.
 final Matcher throwsInternalError =
-    throwsA(new TypeMatcher<InternalSledgeError>());
+    throwsA(TypeMatcher<InternalSledgeError>());

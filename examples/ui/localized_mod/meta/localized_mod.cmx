@@ -9,8 +9,7 @@
             "fuchsia.modular.Clipboard",
             "fuchsia.modular.ContextWriter",
             "fuchsia.sys.Environment",
-            "fuchsia.ui.scenic.Scenic",
-            "fuchsia.ui.viewsv1.ViewManager"
+            "fuchsia.ui.scenic.Scenic"
         ]
     }
 }

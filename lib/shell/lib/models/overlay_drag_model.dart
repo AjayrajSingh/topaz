@@ -13,7 +13,7 @@ export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
 const RK4SpringDescription _kSimulationDesc =
-    const RK4SpringDescription(tension: 450.0, friction: 50.0);
+    RK4SpringDescription(tension: 450.0, friction: 50.0);
 
 /// Tracks any ongoing vertical drag that effects the overlay.
 class OverlayDragModel extends TickingModel {
@@ -38,7 +38,7 @@ class OverlayDragModel extends TickingModel {
   /// Wraps [ModelFinder.of] for this [Model]. See [ModelFinder.of] for more
   /// details.
   static OverlayDragModel of(BuildContext context) =>
-      new ModelFinder<OverlayDragModel>().of(context);
+      ModelFinder<OverlayDragModel>().of(context);
 
   /// Called when a vertical drag starts.
   void start() {}
@@ -69,7 +69,7 @@ class OverlayDragModel extends TickingModel {
     }
 
     /// Spring offset to 0.0.  Set effectedModel to null when 0.0.
-    _resetSimulation = new RK4SpringSimulation(
+    _resetSimulation = RK4SpringSimulation(
       initValue: offset,
       desc: _kSimulationDesc,
     )..target = 0.0;

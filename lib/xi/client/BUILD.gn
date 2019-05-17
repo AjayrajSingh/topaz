@@ -9,10 +9,17 @@ dart_library("xi_client") {
 
   sources = [
     "client.dart",
+    "src/handler_interface.dart",
+    "src/core_interface.dart",
+    "src/handler_adapter.dart",
+    "src/view_interface.dart",
+    "src/view_impl.dart",
+    "src/core_impl.dart",
+    "src/client.dart",
   ]
 
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/lib/app/dart",
+    "//topaz/public/dart/fuchsia_logger",
   ]
 }

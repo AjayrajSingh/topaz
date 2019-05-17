@@ -26,24 +26,24 @@ class DocumentId {
   DocumentId(this.schema, [Uint8List identifier]) {
     identifier ??= _randomByteArrayForSubIds();
     if (identifier.length != _subIdByteCount) {
-      throw new ArgumentError(
+      throw ArgumentError(
           'Identifier does not contain $_subIdByteCount bytes.'
           'Found ${identifier.length} bytes instead.');
     }
-    _subId = new Uint8List.fromList(identifier);
+    _subId = Uint8List.fromList(identifier);
   }
 
   /// Convenience factory that builds a DocumentId from the [identifier]'s 8 lowest bytes.
   factory DocumentId.fromIntId(Schema schema, int identifier) {
-    Uint8List bytes = new Uint8List(_subIdByteCount)
+    Uint8List bytes = Uint8List(_subIdByteCount)
       ..buffer.asByteData().setUint64(0, identifier, Endian.little);
-    return new DocumentId(schema, bytes);
+    return DocumentId(schema, bytes);
   }
 
   /// Returns the [prefixLength] bytes long prefix to be used to store in Ledger the
   /// document identified with this DocumentId.
   Uint8List get prefix {
-    Uint8List prefix = new Uint8List(_schemahashByteCount + _subIdByteCount);
+    Uint8List prefix = Uint8List(_schemahashByteCount + _subIdByteCount);
     Uint8List schemaHash = schema.hash;
     assert(schemaHash.length == _schemahashByteCount);
     prefix..setAll(0, schemaHash)..setAll(_schemahashByteCount, _subId);
@@ -51,7 +51,7 @@ class DocumentId {
   }
 
   /// Returns the identifier that can be used to create the same DocumentId.
-  Uint8List get subId => new Uint8List.fromList(_subId);
+  Uint8List get subId => Uint8List.fromList(_subId);
 
   static Uint8List _randomByteArrayForSubIds() =>
       utils.randomUint8List(_subIdByteCount);

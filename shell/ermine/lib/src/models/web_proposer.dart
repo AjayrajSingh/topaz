@@ -18,26 +18,31 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart'
         UserInput;
 import 'package:fuchsia_modular/module.dart';
 import 'package:fuchsia_modular/proposal.dart';
-import 'package:fuchsia_services/services.dart'
-    show connectToEnvironmentService;
+import 'package:fuchsia_services/services.dart';
 
 /// Proposes suggestions for queries matching http(s) prefix or web search.
 class WebProposer extends QueryHandler {
-  final ProposalPublisherProxy _proposalPublisherProxy =
-      ProposalPublisherProxy();
-  final QueryHandlerBinding _queryHandlerBinding = QueryHandlerBinding();
+  final _proposalPublisherProxy = ProposalPublisherProxy();
+  final _queryHandlerBinding = QueryHandlerBinding();
 
   /// Starts the proposal process.
   void start() {
-    IntelligenceServicesProxy intelligenceServicesProxy =
-        IntelligenceServicesProxy();
-    connectToEnvironmentService(intelligenceServicesProxy);
+    final intelligenceServicesProxy = IntelligenceServicesProxy();
+    StartupContext.fromStartupInfo()
+        .incoming
+        .connectToService(intelligenceServicesProxy);
     intelligenceServicesProxy
       ..getProposalPublisher(_proposalPublisherProxy.ctrl.request())
       ..registerQueryHandler(
         _queryHandlerBinding.wrap(this),
       );
     intelligenceServicesProxy.ctrl.close();
+  }
+
+  /// Stops the proposal process.
+  void stop() {
+    _proposalPublisherProxy.ctrl.close();
+    _queryHandlerBinding.close();
   }
 
   @override
@@ -47,7 +52,7 @@ class WebProposer extends QueryHandler {
     if (url != null && url.length >= 2) {
       if (url.startsWith('http://') || url.startsWith('https://')) {
         proposals = await Future.wait([_createPackageProposal(url, url)]);
-      } else {
+      } else if (!url.startsWith('fuchsia-pkg://')) {
         String search = 'https://www.google.com/search?q=${input.text}';
         proposals = await Future.wait([_createPackageProposal(search, url)]);
       }

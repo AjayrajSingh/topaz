@@ -61,14 +61,14 @@ void main() {
 
       // Must wait one async cycle for value to propagate.
       streamController.add('stream');
-      await new Future.delayed(Duration.zero);
+      await Future.delayed(Duration.zero);
 
       expect(providers.getFromType(String).get(buildContext), 'stream');
       expect(providers.getFromType(String).get(buildContext), 'stream');
 
       // Must wait one async cycle for value to propagate.
       streamController.add('stream2');
-      await new Future.delayed(Duration.zero);
+      await Future.delayed(Duration.zero);
 
       expect(providers.getFromType(String).get(buildContext), 'stream2');
 

@@ -12,14 +12,14 @@ class TodoListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: Retrieve the list of items from Sledge.
     final List<TodoItem> todoItems = <TodoItem>[]
-      ..add(new TodoItem('foo'))
-      ..add(new TodoItem('bar'))
-      ..add(new TodoItem('baz'));
+      ..add(TodoItem('foo'))
+      ..add(TodoItem('bar'))
+      ..add(TodoItem('baz'));
 
-    return new ListView(
+    return ListView(
         shrinkWrap: true,
         children: todoItems
-            .map((TodoItem todoItem) => new TodoItemWidget(todoItem))
+            .map((TodoItem todoItem) => TodoItemWidget(todoItem))
             .toList());
   }
 }

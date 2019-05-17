@@ -1,8 +1,0 @@
-{
-  "imports": [
-    "topaz/packages/prod/chromium"
-  ],
-  "packages": [
-    "//topaz/runtime/chromium:web_runner"
-  ]
-}

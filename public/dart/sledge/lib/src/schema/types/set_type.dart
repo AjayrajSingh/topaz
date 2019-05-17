@@ -14,12 +14,12 @@ import '../base_type.dart';
 /// The Sledge type for Set of [Uint8List].
 /// Last One Wins strategy is applied for conflict resolution per entry.
 class BytelistSet implements BaseType {
-  static const _listEquality = const ListEquality<int>();
+  static const _listEquality = ListEquality<int>();
 
   @override
   String toJson() => 'BytelistSet';
 
   @override
-  Value newValue(ConnectionId connectionId) => new SetValue<Uint8List>(
+  Value newValue(ConnectionId connectionId) => SetValue<Uint8List>(
       equals: _listEquality.equals, hashCode: _listEquality.hash);
 }

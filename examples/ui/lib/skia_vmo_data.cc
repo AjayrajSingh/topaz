@@ -4,17 +4,17 @@
 
 #include "examples/ui/lib/skia_vmo_data.h"
 
+#include <lib/zx/vmar.h>
+#include <trace/event.h>
+
 #include <atomic>
 
-#include <trace/event.h>
-#include <zx/vmar.h>
-
-#include "lib/fxl/logging.h"
+#include "src/lib/fxl/logging.h"
 
 static_assert(sizeof(size_t) == sizeof(uint64_t),
               "Fuchsia should always be 64-bit");
 
-namespace mozart {
+namespace scenic {
 namespace {
 
 std::atomic<int32_t> g_count;
@@ -38,7 +38,7 @@ sk_sp<SkData> MakeSkDataFromVMO(const fsl::SizedVmo& vmo) {
   uint64_t size = vmo.size();
   uintptr_t buffer = 0u;
   zx_status_t status = zx::vmar::root_self()->map(0, vmo.vmo(), 0u, size,
-                                                 ZX_VM_PERM_READ, &buffer);
+                                                  ZX_VM_PERM_READ, &buffer);
   if (status != ZX_OK)
     return nullptr;
 
@@ -56,4 +56,4 @@ sk_sp<SkData> MakeSkDataFromVMO(const fsl::SizedVmo& vmo) {
   return data;
 }
 
-}  // namespace mozart
+}  // namespace scenic

@@ -17,7 +17,7 @@ class SuccessCase<T> {
 
   static void run<T>(String name, T input, $fidl.FidlType<T> type, Uint8List bytes) {
     group(name, () {
-      new SuccessCase(input, type, bytes)
+      SuccessCase(input, type, bytes)
         .._checkEncode()
         .._checkDecode();
     });
@@ -25,18 +25,18 @@ class SuccessCase<T> {
 
   void _checkEncode() {
     test('encode', () {
-      final $fidl.Encoder $encoder = new $fidl.Encoder()
+      final $fidl.Encoder $encoder = $fidl.Encoder()
         ..alloc(type.encodedSize);
       type.encode($encoder, input, 0);
       final message = $encoder.message;
-      expect(new Uint8List.view(message.data.buffer, 0, message.dataLength), equals(bytes));
+      expect(Uint8List.view(message.data.buffer, 0, message.dataLength), equals(bytes));
     });
   }
 
   void _checkDecode() {
     test('decode', () {
-      final $fidl.Decoder $decoder = new $fidl.Decoder(
-        new $fidl.Message(new ByteData.view(bytes.buffer, 0, bytes.length), [], bytes.length, 0))
+      final $fidl.Decoder $decoder = $fidl.Decoder(
+        $fidl.Message(ByteData.view(bytes.buffer, 0, bytes.length), [], bytes.length, 0))
           ..claimMemory(type.encodedSize);
         final $actual = type.decode($decoder, 0);
         expect($actual, equals(input));
@@ -66,7 +66,7 @@ void main() {
 
     SuccessCase.run('simpletable-x-and-y',
       TestSimpleTable(
-        table: new SimpleTable(x: 42, y: 67),
+        table: SimpleTable(x: 42, y: 67),
       ),
       kTestSimpleTable_Type,
       Uint8List.fromList([
@@ -89,7 +89,7 @@ void main() {
 
     SuccessCase.run('simpletable-just-y',
       TestSimpleTable(
-        table: new SimpleTable(y: 67),
+        table: SimpleTable(y: 67),
       ),
       kTestSimpleTable_Type,
       Uint8List.fromList([
@@ -111,7 +111,7 @@ void main() {
 
     SuccessCase.run('table-with-string-and-vector-1',
       TestTableWithStringAndVector(
-        table: new TableWithStringAndVector(
+        table: TableWithStringAndVector(
           foo: 'hello',
           bar: 27,
         ),
@@ -132,7 +132,7 @@ void main() {
     );
 
     SuccessCase.run('empty-table',
-      TestSimpleTable(table: new SimpleTable()),
+      TestSimpleTable(table: SimpleTable()),
       kTestSimpleTable_Type,
       Uint8List.fromList([
         0, 0, 0, 0, 0, 0, 0, 0, // max ordinal
@@ -225,7 +225,7 @@ void main() {
 
     SuccessCase.run('xunion-in-table-xunion-absent',
       TestXUnionInTable(
-        value: new XUnionInTable(
+        value: XUnionInTable(
           before: 'before',
           after: 'after',
         )
@@ -265,7 +265,7 @@ void main() {
 
     SuccessCase.run('xunion-in-table-xunion-present',
       TestXUnionInTable(
-        value: new XUnionInTable(
+        value: XUnionInTable(
           before: 'before',
           xu: SampleXUnion.withU(0xdeadbeef),
           after: 'after',

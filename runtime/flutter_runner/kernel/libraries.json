@@ -53,9 +53,6 @@
         ],
         "uri": "../../../../third_party/dart/sdk/lib/async/async.dart"
       },
-      "mozart.internal": {
-        "uri": "../../../../topaz/public/lib/ui/flutter/sdk_ext/mozart.dart"
-      },
       "collection": {
         "patches": [
           "../../../../third_party/dart/runtime/lib/collection_patch.dart",

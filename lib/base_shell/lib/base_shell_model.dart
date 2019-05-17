@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_ui_policy/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
+import 'package:fidl_fuchsia_ui_policy/fidl_async.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:meta/meta.dart';
 

@@ -34,7 +34,18 @@ class LogMessage {
   /// The initial log record
   final LogRecord record;
 
-  /// Any additional tags to append to the record.
+  /// The base name for the logger. This is the name that is assigned in
+  /// setupLogger whereas the name in the record is the name that comes from
+  /// the dart logger instance.
+  final String loggerBaseName;
+
+  /// A string that can be included to identify the call site of this log message
+  final String codeLocation;
+
+  /// Any additional tags to append to the record. When the record it sent to the
+  /// logger it will include these tags after the name and code location if they are
+  /// present. Any tags which are over the limit of the [_maxCombinedTags] will
+  /// be dropped.
   final List<String> tags;
 
   /// The id of the process which this log message is associated with
@@ -46,13 +57,15 @@ class LogMessage {
   /// The time that this message was created
   final int systemTime = Platform.isFuchsia
       ? System.clockGet(_zxClockMonotonic)
-      : new DateTime.now().microsecondsSinceEpoch * 1000;
+      : DateTime.now().microsecondsSinceEpoch * 1000;
 
   /// The default constructor
   LogMessage({
     @required this.record,
     @required this.processId,
     @required this.threadId,
+    this.loggerBaseName,
+    this.codeLocation,
     this.tags = const [],
   })  : assert(record != null),
         assert(processId != null),
@@ -69,13 +82,20 @@ class LogMessage {
       ..setUint32(28, 0, Endian.little); // TODO(120860552) droppedLogs
     int byteOffset = 32;
 
-    // Write global tags
     int totalTagCount = 0;
-    for (final tag in tags) {
-      if (tag != null && totalTagCount < _maxCombinedTags) {
+    void addTag(String tag) {
+      if (totalTagCount < _maxCombinedTags) {
         byteOffset = _setTag(bytes, byteOffset, tag);
         totalTagCount++;
       }
+    }
+
+    addTag(loggerBaseName);
+    addTag(record.loggerName);
+    addTag(codeLocation);
+
+    if (tags != null) {
+      tags.forEach(addTag);
     }
 
     // We need to skip the local tags section since we do not support them
@@ -129,7 +149,7 @@ class LogMessage {
   }
 
   int _setTag(ByteData bytes, int byteOffset, String tag) {
-    if (tag == null || tag == 'null') {
+    if (tag == null || tag == 'null' || tag.isEmpty) {
       return byteOffset;
     }
     int nextOffset = _setString(bytes, byteOffset + 1, tag, _maxTagLength);

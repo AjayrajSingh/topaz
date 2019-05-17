@@ -5,7 +5,7 @@
 #include "topaz/bin/ui/skottie_viewer/view.h"
 
 #include "lib/fsl/vmo/vector.h"
-#include "lib/fxl/logging.h"
+#include "src/lib/fxl/logging.h"
 #include "third_party/skia/include/core/SkColor.h"
 
 namespace skottie {
@@ -57,14 +57,14 @@ void View::Load(fuchsia::mem::Buffer payload,
   status.error = logger->has_errors();
   status.message = logger->log();
 
-  fuchsia::skia::skottie::PlayerPtr player;
+  fidl::InterfaceHandle<fuchsia::skia::skottie::Player> player;
   if (animation_) {
     duration_ = animation_->duration();
     status.duration = animation_->duration();
     player_binding_.Bind(player.NewRequest());
   }
 
-  callback(std::move(status), player);
+  callback(std::move(status), std::move(player));
 }
 
 void View::Seek(float t) {
@@ -114,8 +114,8 @@ void View::OnSceneInvalidated(
 void View::Draw(SkCanvas* canvas) {
   FXL_DCHECK(animation_);
 
-  const auto rect = SkRect::MakeSize(
-      SkSize::Make(logical_size().width, logical_size().height));
+  const auto rect =
+      SkRect::MakeSize(SkSize::Make(logical_size().x, logical_size().y));
 
   SkAutoCanvasRestore acr(canvas, true);
   animation_->render(canvas, &rect);

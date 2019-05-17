@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:lib.widgets/utils.dart';
 
 /// Key/value store used to display debug state using a [DebugStatusWidget].

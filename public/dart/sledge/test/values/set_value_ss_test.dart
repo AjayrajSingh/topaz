@@ -4,7 +4,7 @@
 
 // ignore_for_file: implementation_imports, avoid_catches_without_on_clauses
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/src/document/values/set_value.dart';
 import 'package:test/test.dart';
 
@@ -16,11 +16,11 @@ class SetFleetFactory<E> {
 
   // Returns Fleet of [count] SetValues.
   Fleet<SetValue<E>> newFleet(int count) {
-    return new Fleet<SetValue<E>>(count, (index) => new SetValue<E>());
+    return Fleet<SetValue<E>>(count, (index) => SetValue<E>());
   }
 }
 
-const SetFleetFactory<int> intSetFleetFactory = const SetFleetFactory<int>();
+const SetFleetFactory<int> intSetFleetFactory = SetFleetFactory<int>();
 
 void main() async {
   setupLogger();

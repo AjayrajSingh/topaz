@@ -13,7 +13,7 @@ dart_jit_app("hello_app_dart_jit") {
   sources = []
   deps = [
     "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
+    "//topaz/public/dart/fuchsia_services",
     "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces",
   ]
 
@@ -34,7 +34,7 @@ dart_aot_app("hello_app_dart_aot") {
   sources = []
   deps = [
     "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
+    "//topaz/public/dart/fuchsia_services",
     "//topaz/runtime/dart_runner/examples/hello_app_dart/interfaces:interfaces",
   ]
   meta = [

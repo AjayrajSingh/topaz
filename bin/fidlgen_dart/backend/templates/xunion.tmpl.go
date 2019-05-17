@@ -9,13 +9,13 @@ const XUnion = `
 {{- define "XUnionDeclaration" -}}
 enum {{ .TagName }} {
 {{- range .Members }}
-  {{ .Name }}, // {{ .Ordinal | printf "%#x" }}
+  {{ .Tag }}, // {{ .Ordinal | printf "%#x" }}
 {{- end }}
 }
 
-const Map<int, {{ .TagName }}> _{{ .TagName }}_map = const {
+const Map<int, {{ .TagName }}> _{{ .TagName }}_map = {
 {{- range .Members }}
-  {{ .Ordinal }}: {{ $.TagName }}.{{ .Name }},
+  {{ .Ordinal }}: {{ $.TagName }}.{{ .Tag }},
 {{- end }}
 };
 
@@ -34,7 +34,7 @@ class {{ .Name }} extends $fidl.XUnion {
   final int _ordinal;
   final _data;
 
-  {{ .TagName }} get tag => _{{ .TagName }}_map[_ordinal];
+  {{ .TagName }} get $tag => _{{ .TagName }}_map[_ordinal];
 
 {{range .Members }}
   {{ .Type.Decl }} get {{ .Name }} {
@@ -65,7 +65,7 @@ class {{ .Name }} extends $fidl.XUnion {
   Object get $data => _data;
 
   static {{ .Name }} _ctor(int ordinal, Object data) {
-    return new {{ .Name }}._(ordinal, data);
+    return {{ .Name }}._(ordinal, data);
   }
 }
 

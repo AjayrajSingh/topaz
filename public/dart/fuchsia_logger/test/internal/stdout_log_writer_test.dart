@@ -74,6 +74,13 @@ void main() {
         logger.info('foo');
       }, (l) => expect(l, matches(r'INFO:stdout_log_writer_test.dart\(\d+\)')));
     });
+
+    test('includes named logger name', () {
+      _overridePrint((logger, writer) {
+        logger.info('foo');
+      }, (l) => expect(l, '[INFO:named-logger] foo'),
+          namedLogger: Logger('named-logger'));
+    });
   });
 
   group('tags', () {
@@ -89,12 +96,15 @@ void main() {
 // helper method for capturing stdout. Code executed within the [zoned] function
 // will pass the logged output to the [receiver] function with the line that
 // would have gone to stdout.
-void _overridePrint(void Function(Logger, StdoutLogWriter) zoned,
-    void Function(String) receiver) {
+void _overridePrint(
+  void Function(Logger, StdoutLogWriter) zoned,
+  void Function(String) receiver, {
+  Logger namedLogger,
+}) {
   runZoned(
     () {
-      final logger = Logger('foo');
-      zoned(logger, StdoutLogWriter(logger: logger));
+      final logger = namedLogger ?? Logger.root;
+      zoned(logger, StdoutLogWriter(logStream: logger.onRecord));
       logger.clearListeners();
     },
     zoneSpecification: ZoneSpecification(

@@ -5,7 +5,6 @@
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("mediaplayer_flutter") {
-  deprecated_global_persistent_storage = "//build"
   components = [
     {
       component_name = "mediaplayer_flutter"
@@ -17,12 +16,13 @@ flutter_app("mediaplayer_flutter") {
         "config.dart",
       ]
       deps = [
-        "//sdk/fidl/fuchsia.ui.viewsv1",
         "//sdk/fidl/fuchsia.modular",
         "//third_party/dart-pkg/git/flutter/packages/flutter",
         "//topaz/public/dart/fidl",
         "//topaz/public/dart/fuchsia",
-        "//topaz/public/lib/app/dart",
+        "//topaz/public/dart/fuchsia_logger",
+        "//topaz/public/dart/fuchsia_modular",
+        "//topaz/public/dart/fuchsia_services",
         "//topaz/public/lib/mediaplayer/flutter",
       ]
     },

@@ -4,13 +4,13 @@
 
 #include "topaz/app/term/view_controller.h"
 
-#include <unistd.h>
-
+#include <fuchsia/fonts/cpp/fidl.h>
 #include <lib/async/default.h>
+#include <unistd.h>
 #include <zircon/status.h>
 
-#include "lib/fxl/logging.h"
-#include "lib/fxl/strings/string_printf.h"
+#include "src/lib/fxl/logging.h"
+#include "src/lib/fxl/strings/string_printf.h"
 #include "lib/ui/input/cpp/formatting.h"
 #include "third_party/skia/include/core/SkFont.h"
 #include "third_party/skia/include/core/SkFontMetrics.h"
@@ -83,11 +83,12 @@ void ViewController::StartCommandIfNeeded() {
   if (argv.empty())
     argv = {kShell};
 
-  zx_status_t status = pty_.Run(argv,
-                                [this](const void* bytes, size_t num_bytes) {
-                                  OnDataReceived(bytes, num_bytes);
-                                },
-                                [this] { OnCommandTerminated(); });
+  zx_status_t status = pty_.Run(
+      argv,
+      [this](const void* bytes, size_t num_bytes) {
+        OnDataReceived(bytes, num_bytes);
+      },
+      [this] { OnCommandTerminated(); });
   if (status != ZX_OK) {
     FXL_LOG(ERROR) << "Error starting command: " << status << " ("
                    << zx_status_get_string(status) << ")";
@@ -123,7 +124,7 @@ void ViewController::OnSceneInvalidated(
 }
 
 void ViewController::OnPropertiesChanged(
-    fuchsia::ui::viewsv1::ViewProperties old_properties) {
+    fuchsia::ui::gfx::ViewProperties old_properties) {
   ComputeMetrics();
   Resize();
 }
@@ -132,8 +133,8 @@ void ViewController::Resize() {
   if (!has_logical_size() || !regular_typeface_)
     return;
 
-  uint32_t columns = std::max(logical_size().width / advance_width_, 1.f);
-  uint32_t rows = std::max(logical_size().height / line_height_, 1.f);
+  uint32_t columns = std::max(logical_size().x / advance_width_, 1.f);
+  uint32_t rows = std::max(logical_size().y / line_height_, 1.f);
   TermModel::Size current = model_.GetSize();
   if (current.columns != columns || current.rows != rows) {
     model_.SetSize(TermModel::Size(rows, columns), false);
@@ -183,7 +184,8 @@ void ViewController::DrawContent(SkCanvas* canvas) {
                                           ch.foreground_color.blue));
 
           canvas->drawSimpleText(&ch.code_point, sizeof(ch.code_point),
-              SkTextEncoding::kUTF32, x, y + ascent_, fg_font, fg_paint);
+                                 SkTextEncoding::kUTF32, x, y + ascent_,
+                                 fg_font, fg_paint);
         }
       }
     }
@@ -227,8 +229,7 @@ void ViewController::OnSetKeypadMode(bool application_mode) {
   keypad_application_mode_ = application_mode;
 }
 
-bool ViewController::OnInputEvent(fuchsia::ui::input::InputEvent event) {
-  bool handled = false;
+void ViewController::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   if (event.is_keyboard()) {
     const fuchsia::ui::input::KeyboardEvent& keyboard = event.keyboard();
     if (keyboard.phase == fuchsia::ui::input::KeyboardEventPhase::PRESSED ||
@@ -245,7 +246,6 @@ bool ViewController::OnInputEvent(fuchsia::ui::input::InputEvent event) {
         Resize();
       }
       OnKeyPressed(std::move(event));
-      handled = true;
     }
   } else if (event.is_focus()) {
     const fuchsia::ui::input::FocusEvent& focus = event.focus();
@@ -256,9 +256,7 @@ bool ViewController::OnInputEvent(fuchsia::ui::input::InputEvent event) {
     } else {
       InvalidateScene();
     }
-    handled = true;
   }
-  return handled;
 }
 
 void ViewController::OnKeyPressed(fuchsia::ui::input::InputEvent key_event) {

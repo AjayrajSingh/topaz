@@ -2,13 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/app.dart';
-import 'package:fidl_fuchsia_auth/fidl.dart';
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_auth/fidl_async.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fidl/fidl.dart';
-import 'package:lib.app.dart/app.dart' show StartupContext;
+import 'package:fuchsia_services/services.dart' show StartupContext;
 import 'package:lib.device.dart/device.dart';
 import 'package:lib.widgets/widgets.dart' show WindowMediaQuery;
 import 'package:meta/meta.dart';
@@ -28,11 +27,11 @@ class BaseShellWidget<T extends BaseShellModel> extends StatelessWidget {
 
   /// The bindings for the [BaseShell] service implemented by [BaseShellImpl].
   final Set<BaseShellBinding> _baseShellBindingSet =
-      new Set<BaseShellBinding>();
+      Set<BaseShellBinding>();
 
   /// The bindings for the [Lifecycle] service implemented by [BaseShellImpl].
   final Set<LifecycleBinding> _lifecycleBindingSet =
-      new Set<LifecycleBinding>();
+      Set<LifecycleBinding>();
 
   /// The [BaseShell] to [advertise].
   final BaseShellImpl _baseShell;
@@ -55,14 +54,14 @@ class BaseShellWidget<T extends BaseShellModel> extends StatelessWidget {
         );
 
   @override
-  Widget build(BuildContext context) => new MaterialApp(
-        home: new Material(
-          child: new Directionality(
+  Widget build(BuildContext context) => MaterialApp(
+        home: Material(
+          child: Directionality(
             textDirection: TextDirection.ltr,
-            child: new WindowMediaQuery(
+            child: WindowMediaQuery(
               child: _baseShellModel == null
                   ? child
-                  : new ScopedModel<T>(model: _baseShellModel, child: child),
+                  : ScopedModel<T>(model: _baseShellModel, child: child),
             ),
           ),
         ),
@@ -71,14 +70,14 @@ class BaseShellWidget<T extends BaseShellModel> extends StatelessWidget {
   /// Advertises [_baseShell] as a [BaseShell] to the rest of the system via
   /// the [StartupContext].
   void advertise() {
-    startupContext.outgoingServices
-      ..addServiceForName((InterfaceRequest<BaseShell> request) {
-        BaseShellBinding binding = new BaseShellBinding()
+    startupContext.outgoing
+      ..addPublicService((InterfaceRequest<BaseShell> request) {
+        BaseShellBinding binding = BaseShellBinding()
           ..bind(_baseShell, request);
         _baseShellBindingSet.add(binding);
       }, BaseShell.$serviceName)
-      ..addServiceForName((InterfaceRequest<Lifecycle> request) {
-        LifecycleBinding binding = new LifecycleBinding()
+      ..addPublicService((InterfaceRequest<Lifecycle> request) {
+        LifecycleBinding binding = LifecycleBinding()
           ..bind(_baseShell, request);
         _lifecycleBindingSet.add(binding);
       }, Lifecycle.$serviceName);
@@ -88,7 +87,7 @@ class BaseShellWidget<T extends BaseShellModel> extends StatelessWidget {
     BaseShellModel baseShellModel,
     AuthenticationUiContext authenticationUiContext,
   ) {
-    return new BaseShellImpl(
+    return BaseShellImpl(
       authenticationUiContext: authenticationUiContext,
       onReady: baseShellModel?.onReady,
       onStop: () {

@@ -16,27 +16,27 @@ import 'package:flutter/material.dart';
 // CoveredMineNode and ExposedMineNode, none of them holding state.
 
 // Colors for each mine count (0-8):
-const List<Color> textColors = const <Color>[
-  const Color(0xFF555555),
-  const Color(0xFF0094FF), // blue
-  const Color(0xFF13A023), // green
-  const Color(0xFFDA1414), // red
-  const Color(0xFF1E2347), // black
-  const Color(0xFF7F0037), // dark red
-  const Color(0xFF000000),
-  const Color(0xFF000000),
-  const Color(0xFF000000),
+const List<Color> textColors = <Color>[
+  Color(0xFF555555),
+  Color(0xFF0094FF), // blue
+  Color(0xFF13A023), // green
+  Color(0xFFDA1414), // red
+  Color(0xFF1E2347), // black
+  Color(0xFF7F0037), // dark red
+  Color(0xFF000000),
+  Color(0xFF000000),
+  Color(0xFF000000),
 ];
 
 final List<TextStyle> textStyles = textColors.map((Color color) {
-  return new TextStyle(color: color, fontWeight: FontWeight.bold);
+  return TextStyle(color: color, fontWeight: FontWeight.bold);
 }).toList();
 
 enum CellState { covered, exploded, cleared, flagged, shown }
 
 class MineDigger extends StatefulWidget {
   @override
-  MineDiggerState createState() => new MineDiggerState();
+  MineDiggerState createState() => MineDiggerState();
 }
 
 class MineDiggerState extends State<MineDigger> {
@@ -48,7 +48,7 @@ class MineDiggerState extends State<MineDigger> {
   bool hasWon;
   int detectedCount;
   Timer timer;
-  Stopwatch gameTime = new Stopwatch();
+  Stopwatch gameTime = Stopwatch();
 
   // |cells| keeps track of the positions of the mines.
   List<List<bool>> cells;
@@ -75,21 +75,21 @@ class MineDiggerState extends State<MineDigger> {
 
     timer?.cancel();
 
-    timer = new Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
         setState((){
           // time blah blah
           });
       });
 
     // Initialize matrices.
-    cells = new List<List<bool>>.generate(rows, (int row) {
-      return new List<bool>.filled(cols, false);
+    cells = List<List<bool>>.generate(rows, (int row) {
+      return List<bool>.filled(cols, false);
     });
-    uiState = new List<List<CellState>>.generate(rows, (int row) {
-      return new List<CellState>.filled(cols, CellState.covered);
+    uiState = List<List<CellState>>.generate(rows, (int row) {
+      return List<CellState>.filled(cols, CellState.covered);
     });
     // Place the mines.
-    Random random = new Random();
+    Random random = Random();
     int minesRemaining = totalMineCount;
     while (minesRemaining > 0) {
       int pos = random.nextInt(rows * cols);
@@ -125,7 +125,7 @@ class MineDiggerState extends State<MineDigger> {
             state = cells[iy][ix] ? CellState.shown : state;
         }
         if (state == CellState.covered || state == CellState.flagged) {
-          row.add(new GestureDetector(
+          row.add(GestureDetector(
             onTap: () {
               if (state == CellState.covered)
                 probe(ix, iy);
@@ -134,9 +134,9 @@ class MineDiggerState extends State<MineDigger> {
               // TODO(cpu): Add audio or haptic feedback.
               flag(ix, iy);
             },
-            child: new Listener(
+            child: Listener(
               onPointerDown: _pointerDownHandlerFor(ix, iy),
-              child: new CoveredMineNode(
+              child: CoveredMineNode(
                 flagged: state == CellState.flagged,
                 posX: ix,
                 posY: iy
@@ -149,17 +149,17 @@ class MineDiggerState extends State<MineDigger> {
             hasCoveredCell = true;
           }
         } else {
-          row.add(new ExposedMineNode(
+          row.add(ExposedMineNode(
             state: state,
             count: count
           ));
         }
       }
       flexRows.add(
-        new Row(
+        Row(
           children: row,
           mainAxisAlignment: MainAxisAlignment.center,
-          key: new ValueKey<int>(iy)
+          key: ValueKey<int>(iy)
         )
       );
     }
@@ -172,11 +172,11 @@ class MineDiggerState extends State<MineDigger> {
       }
     }
 
-    return new Container(
-      padding: const EdgeInsets.all(10.0),
-      margin: const EdgeInsets.all(10.0),
-      color: const Color(0xFF6B6B6B),
-      child: new Column(children: flexRows)
+    return Container(
+      padding: EdgeInsets.all(10.0),
+      margin: EdgeInsets.all(10.0),
+      color: Color(0xFF6B6B6B),
+      child: Column(children: flexRows)
     );
   }
 
@@ -187,20 +187,20 @@ class MineDiggerState extends State<MineDigger> {
         'Kaboom! Try harder [press here]';
 
     int elapsed = gameTime.elapsedMilliseconds ~/ 1000;
-    return new AppBar(
+    return AppBar(
       // FIXME: Strange to have the app bar be tapable.
-      title: new Listener(
+      title: Listener(
         onPointerDown: handleAppBarPointerDown,
-        child: new Text(appBarCaption,
+        child: Text(appBarCaption,
           style: Theme.of(context).primaryTextTheme.title)
       ),
       centerTitle: true,
       actions: <Widget>[
-        new Container(
-          child: new Text('$elapsed seconds'),
+        Container(
+          child: Text('$elapsed seconds'),
           color: Colors.teal,
-          margin: const EdgeInsets.all(14.0),
-          padding: const EdgeInsets.all(2.0))
+          margin: EdgeInsets.all(14.0),
+          padding: EdgeInsets.all(2.0))
         ]
     );
   }
@@ -210,12 +210,12 @@ class MineDiggerState extends State<MineDigger> {
     // We build the board before we build the app bar because we compute the win state
     // during build step.
     Widget board = buildBoard();
-    return new MaterialApp(
+    return MaterialApp(
       title: 'Mine Digger',
-      home: new Scaffold(
+      home: Scaffold(
         appBar: buildAppBar(context),
-        body: new Container(
-          child: new Center(child: board),
+        body: Container(
+          child: Center(child: board),
           color: Colors.grey[50],
         ),
       ),
@@ -305,19 +305,19 @@ class MineDiggerState extends State<MineDigger> {
 }
 
 Widget buildCell(Widget child) {
-  return new Container(
-    padding: const EdgeInsets.all(1.0),
+  return Container(
+    padding: EdgeInsets.all(1.0),
     height: 27.0, width: 27.0,
-    color: const Color(0xFFC0C0C0),
-    margin: const EdgeInsets.all(2.0),
+    color: Color(0xFFC0C0C0),
+    margin: EdgeInsets.all(2.0),
     child: child
   );
 }
 
 Widget buildInnerCell(Widget child) {
-  return new Container(
-    padding: const EdgeInsets.all(1.0),
-    margin: const EdgeInsets.all(3.0),
+  return Container(
+    padding: EdgeInsets.all(1.0),
+    margin: EdgeInsets.all(3.0),
     height: 17.0, width: 17.0,
     child: child
   );
@@ -335,8 +335,8 @@ class CoveredMineNode extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget text;
     if (flagged) {
-      text = buildInnerCell(new RichText(
-        text: new TextSpan(
+      text = buildInnerCell(RichText(
+        text: TextSpan(
           text: 'm',    // TODO(cpu) this should be \u2691
           style: textStyles[5],
         ),
@@ -344,10 +344,10 @@ class CoveredMineNode extends StatelessWidget {
       ));
     }
 
-    Container inner = new Container(
-      margin: const EdgeInsets.all(2.0),
+    Container inner = Container(
+      margin: EdgeInsets.all(2.0),
       height: 17.0, width: 17.0,
-      color: const Color(0xFFD9D9D9),
+      color: Color(0xFFD9D9D9),
       child: text,
     );
 
@@ -368,8 +368,8 @@ class ExposedMineNode extends StatelessWidget {
     if (state == CellState.cleared) {
       // Uncovered cell with nearby mine count.
       if (count != 0) {
-        text = new RichText(
-          text: new TextSpan(
+        text = RichText(
+          text: TextSpan(
             text: '$count',
             style: textStyles[count],
           ),
@@ -379,8 +379,8 @@ class ExposedMineNode extends StatelessWidget {
     } else {
       // Exploded mine or shown mine for 'game over'.
       int color = state == CellState.exploded ? 3 : 0;
-      text = new RichText(
-        text: new TextSpan(
+      text = RichText(
+        text: TextSpan(
           text: '*',   // TODO(cpu) this should be \u2600
           style: textStyles[color],
         ),
@@ -392,5 +392,5 @@ class ExposedMineNode extends StatelessWidget {
 }
 
 void main() {
-  runApp(new MineDigger());
+  runApp(MineDigger());
 }

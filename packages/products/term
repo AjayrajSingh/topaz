@@ -1,8 +1,0 @@
-{
-    "imports": [
-        "garnet/packages/products/graphical",
-        "garnet/packages/tools/scenic",
-        "topaz/packages/config/term",
-        "topaz/packages/prod/term"
-    ]
-}

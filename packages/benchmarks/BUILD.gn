@@ -1,0 +1,18 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("all") {
+  testonly = true
+  public_deps = [
+    "//topaz/packages/benchmarks:topaz",
+  ]
+}
+
+group("topaz") {
+  testonly = true
+  public_deps = [
+    "//garnet/packages/benchmarks:buildbot",
+    "//topaz/tests/benchmarks:all",
+  ]
+}

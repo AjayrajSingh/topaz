@@ -6,7 +6,7 @@
 
 #include <mutex>
 
-namespace flutter {
+namespace flutter_runner {
 
 namespace {
 
@@ -49,4 +49,4 @@ void VsyncRecorder::UpdateVsyncInfo(
   }
 }
 
-}  // namespace flutter
+}  // namespace flutter_runner

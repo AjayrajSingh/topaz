@@ -20,7 +20,7 @@ import '../models/tree/tree.dart';
 import '../widgets/gestures.dart';
 import 'surface_frame.dart';
 
-const SpringDescription _kSimSpringDescription = const SpringDescription(
+const SpringDescription _kSimSpringDescription = SpringDescription(
   mass: 1.0,
   stiffness: 220.0,
   damping: 29.0,
@@ -50,7 +50,7 @@ class SurfaceStage extends StatelessWidget {
         forms
             .reduceForest(
               (SurfaceForm f, Iterable<_SurfaceInstance> children) =>
-                  new _SurfaceInstance(
+                  _SurfaceInstance(
                     form: f,
                     dependents: children.toList(),
                     useGestures: useGestures,
@@ -71,14 +71,14 @@ class SurfaceStage extends StatelessWidget {
       // toward the edges of the screen from moving or dismissing the
       // associated surfaces.
       children.addAll(<Widget>[
-        new Positioned(
+        Positioned(
           left: -_kGestureWidth,
           top: _kGestureWidth,
           bottom: _kGestureWidth,
           width: 2.0 * _kGestureWidth,
           child: _createIgnoringGestureDetector(Direction.left),
         ),
-        new Positioned(
+        Positioned(
           right: -_kGestureWidth,
           top: _kGestureWidth,
           bottom: _kGestureWidth,
@@ -87,7 +87,7 @@ class SurfaceStage extends StatelessWidget {
         ),
       ]);
     }
-    return new Stack(
+    return Stack(
       fit: StackFit.expand,
       children: children,
     );
@@ -96,7 +96,7 @@ class SurfaceStage extends StatelessWidget {
   /// This gesture detector fights in the arena and ignores the horizontal drags
   /// in the given [direction] if it wins.
   Widget _createIgnoringGestureDetector(Direction direction) {
-    return new UnidirectionalHorizontalGestureDetector(
+    return UnidirectionalHorizontalGestureDetector(
       direction: direction,
       behavior: HitTestBehavior.translucent,
       onHorizontalDragStart: (DragStartDetails details) {},
@@ -127,7 +127,7 @@ class _SurfaceInstance extends StatefulWidget {
   final bool useGestures;
 
   @override
-  _SurfaceInstanceState createState() => new _SurfaceInstanceState();
+  _SurfaceInstanceState createState() => _SurfaceInstanceState();
 }
 
 class DummyTickerProvider implements TickerProvider {
@@ -162,7 +162,7 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
     return ManualAnimation<Rect>(
       value: widget.form.initPosition,
       velocity: Rect.zero,
-      builder: (Rect value, Rect velocity) => new MovingTargetAnimation<Rect>(
+      builder: (Rect value, Rect velocity) => MovingTargetAnimation<Rect>(
               vsync: tickerProvider,
               simulate: _kFormSimulate,
               target: _target,
@@ -182,11 +182,11 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
 
   FluxAnimation<Rect> get _target {
     final SurfaceForm f = widget.form;
-    final _SurfaceInstanceState parentSurfaceState =
-        context.ancestorStateOfType(const TypeMatcher<_SurfaceInstanceState>());
+    final _SurfaceInstanceState parentSurfaceState = context
+        ?.ancestorStateOfType(const TypeMatcher<_SurfaceInstanceState>());
     return parentSurfaceState == null
-        ? new ManualAnimation<Rect>(value: f.position, velocity: Rect.zero)
-        : new TransformedAnimation<Rect>(
+        ? ManualAnimation<Rect>(value: f.position, velocity: Rect.zero)
+        : TransformedAnimation<Rect>(
             animation: parentSurfaceState.animation,
             valueTransform: (Rect r) => f.position.shift(
                 r.center - parentSurfaceState.widget.form.position.center),
@@ -196,7 +196,7 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
 
   @override
   Widget build(BuildContext context) {
-    return new AnimatedBuilder(
+    return AnimatedBuilder(
       animation: _animation,
       builder: (BuildContext context, Widget child) {
         Size parentSize = MediaQuery.of(context).size;
@@ -219,12 +219,12 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
               );
 
         final stackChildren = <Widget>[
-          new Positioned(
+          Positioned(
             left: left,
             top: top,
             bottom: bottom,
             right: right,
-            child: new SurfaceFrame(
+            child: SurfaceFrame(
               child: form.parts.keys.first,
               depth: surfaceDepth,
               // HACK(alangardner): May need explicit interactable parameter
@@ -235,7 +235,7 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
 
         if (widget.useGestures) {
           stackChildren.addAll([
-            new Positioned(
+            Positioned(
               left: left - _kGestureWidth,
               top: top + _kGestureWidth,
               bottom: bottom + _kGestureWidth,
@@ -246,7 +246,7 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
                 Direction.right,
               ),
             ),
-            new Positioned(
+            Positioned(
               right: right - _kGestureWidth,
               top: top + _kGestureWidth,
               bottom: bottom + _kGestureWidth,
@@ -259,7 +259,7 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
             ),
           ]);
         }
-        return new Stack(
+        return Stack(
           fit: StackFit.expand,
           children: stackChildren..addAll(widget.dependents),
         );
@@ -272,7 +272,7 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
     SurfaceForm form,
     Direction direction,
   ) {
-    return new UnidirectionalHorizontalGestureDetector(
+    return UnidirectionalHorizontalGestureDetector(
       direction: direction,
       behavior: HitTestBehavior.translucent,
       onHorizontalDragStart: (DragStartDetails details) {
@@ -332,14 +332,14 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
   }
 
   Offset _toFractional(Offset absoluteOffset, Size size) {
-    return new Offset(
+    return Offset(
       absoluteOffset.dx / size.width,
       absoluteOffset.dy / size.height,
     );
   }
 
   Offset _toAbsolute(Offset fractionalOffset, Size size) {
-    return new Offset(
+    return Offset(
       fractionalOffset.dx * size.width,
       fractionalOffset.dy * size.height,
     );
@@ -347,23 +347,23 @@ class _SurfaceInstanceState extends State<_SurfaceInstance>
 }
 
 const double _kEpsilon = 1e-3;
-const Tolerance _kTolerance = const Tolerance(
+const Tolerance _kTolerance = Tolerance(
   distance: _kEpsilon,
   time: _kEpsilon,
   velocity: _kEpsilon,
 );
 
 Sim<Rect> _kFormSimulate(Rect value, Rect target, Rect velocity) =>
-    new IndependentRectSim(
-      positionSim: new Independent2DSim(
-        xSim: new SpringSimulation(
+    IndependentRectSim(
+      positionSim: Independent2DSim(
+        xSim: SpringSimulation(
           _kSimSpringDescription,
           value.center.dx,
           target.center.dx,
           velocity.center.dx,
           tolerance: _kTolerance,
         ),
-        ySim: new SpringSimulation(
+        ySim: SpringSimulation(
           _kSimSpringDescription,
           value.center.dy,
           target.center.dy,
@@ -371,15 +371,15 @@ Sim<Rect> _kFormSimulate(Rect value, Rect target, Rect velocity) =>
           tolerance: _kTolerance,
         ),
       ),
-      sizeSim: new Independent2DSim(
-        xSim: new SpringSimulation(
+      sizeSim: Independent2DSim(
+        xSim: SpringSimulation(
           _kSimSpringDescription,
           value.size.width,
           target.size.width,
           velocity.size.width,
           tolerance: _kTolerance,
         ),
-        ySim: new SpringSimulation(
+        ySim: SpringSimulation(
           _kSimSpringDescription,
           value.size.height,
           target.size.height,

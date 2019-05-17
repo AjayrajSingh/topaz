@@ -7,7 +7,7 @@
 
 #include <string>
 
-#include "lib/fxl/command_line.h"
+#include "src/lib/fxl/command_line.h"
 
 namespace examples {
 

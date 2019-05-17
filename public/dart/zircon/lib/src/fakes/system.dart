@@ -104,86 +104,92 @@ class System {
 
   // Channel operations.
   static HandlePairResult channelCreate([int options = 0]) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.channelCreate() is not implemented on this platform.');
   }
 
   static HandleResult channelFromFile(String path) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.channelFromFile() is not implemented on this platform.');
   }
 
   static int channelWrite(Handle channel, ByteData data, List<Handle> handles) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.channelWrite() is not implemented on this platform.');
   }
 
   static ReadResult channelQueryAndRead(Handle channel) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.channelQueryAndRead() is not implemented on this platform.');
   }
 
   // Eventpair operations.
   static HandlePairResult eventpairCreate([int options = 0]) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.eventpairCreate() is not implemented on this platform.');
   }
 
   // Socket operations.
   static HandlePairResult socketCreate([int options = 0]) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.socketCreate() is not implemented on this platform.');
   }
 
   static WriteResult socketWrite(Handle socket, ByteData data, int options) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.socketWrite() is not implemented on this platform.');
   }
 
   static ReadResult socketRead(Handle socket, int size) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.socketRead() is not implemented on this platform.');
   }
 
   // Vmo operations.
   static HandleResult vmoCreate(int size, [int options = 0]) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.vmoCreate() is not implemented on this platform.');
   }
 
   static FromFileResult vmoFromFile(String path) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.vmoFromFile() is not implemented on this platform.');
   }
 
   static GetSizeResult vmoGetSize(Handle vmo) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.vmoGetSize() is not implemented on this platform.');
   }
 
   static int vmoSetSize(Handle vmo, int size) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.vmoSetSize() is not implemented on this platform.');
   }
 
   static int vmoWrite(Handle vmo, int offset, ByteData bytes) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.vmoWrite() is not implemented on this platform.');
   }
 
   static ReadResult vmoRead(Handle vmo, int offset, int size) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.vmoRead() is not implemented on this platform.');
   }
 
   static MapResult vmoMap(Handle vmo) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.vmoMap() is not implemented on this platform.');
   }
 
   // Time operations.
   static int clockGet(int clockId) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'System.timeGet() is not implemented on this platform.');
+  }
+
+  // System operations.
+  static int connectToService(String path, Handle channel) {
+    throw UnimplementedError(
+        'System.connectToService() is not implemented on this platform.');
   }
 }

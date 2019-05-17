@@ -17,7 +17,7 @@ class FrameRateTracer {
   /// an observation to cobalt.
   final cobalt.Logger cobaltLogger;
 
-  DateTime _animationStart = new DateTime.now();
+  DateTime _animationStart = DateTime.now();
   int _frames = 0;
   String _currentTargetName;
   int _currentCobaltMetricId;
@@ -29,7 +29,7 @@ class FrameRateTracer {
   void start({String targetName, int cobaltMetricId}) {
     _currentTargetName = targetName;
     _currentCobaltMetricId = cobaltMetricId;
-    _animationStart = new DateTime.now();
+    _animationStart = DateTime.now();
     _frames = 0;
   }
 
@@ -44,7 +44,7 @@ class FrameRateTracer {
       return;
     }
     int microSeconds =
-        new DateTime.now().difference(_animationStart).inMicroseconds;
+        DateTime.now().difference(_animationStart).inMicroseconds;
     double frameRate = _frames.toDouble() * 1000000.0 / microSeconds.toDouble();
     String prefix = _currentTargetName?.isEmpty ?? true
         ? '$name'

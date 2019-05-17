@@ -15,8 +15,24 @@
             "fuchsia.ui.input.ImeService",
             "fuchsia.ui.policy.Presenter",
             "fuchsia.ui.scenic.Scenic",
-            "fuchsia.ui.viewsv1.ViewManager",
             "fuchsia.wlan.service.Wlan"
         ]
+    },
+    "facets": {
+        "fuchsia.module": {
+            "@version": 2,
+            "suggestion_headline": "embed a xi editor",
+            "intent_filters": [
+                {
+                "action": "com.fuchsia.xi.embed",
+                "parameters": [
+                    {
+                    "name": "session-id",
+                    "type": "com.fuchsia.xi.session-id"
+                    }
+                ]
+                }
+            ]
+        }
     }
 }

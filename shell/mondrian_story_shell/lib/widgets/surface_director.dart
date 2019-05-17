@@ -4,7 +4,7 @@
 
 import 'dart:math' as math;
 
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lib.widgets/model.dart';
@@ -28,7 +28,7 @@ import 'surface_stage.dart';
 /// Directs the layout of the SurfaceSpace
 class SurfaceDirector extends StatefulWidget {
   @override
-  _SurfaceDirectorState createState() => new _SurfaceDirectorState();
+  _SurfaceDirectorState createState() => _SurfaceDirectorState();
 }
 
 class _SurfaceDirectorState extends State<SurfaceDirector> {
@@ -40,14 +40,14 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
     double depth,
     FractionalOffset offscreen,
   ) {
-    return new SurfaceForm.single(
-      key: new GlobalObjectKey(ps.surface.node),
+    return SurfaceForm.single(
+      key: GlobalObjectKey(ps.surface.node),
       child: MondrianChildView(
         surface: ps.surface,
         interactable: depth <= 0.0,
       ),
       position: ps.position,
-      initPosition: ps.position.shift(new Offset(offscreen.dx, offscreen.dy)),
+      initPosition: ps.position.shift(Offset(offscreen.dx, offscreen.dy)),
       depth: depth,
       friction: depth > 0.0
           ? kDragFrictionInfinite
@@ -71,13 +71,13 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
 
   SurfaceForm _orphanedForm(
       Surface surface, SurfaceForm form, FractionalOffset offscreen) {
-    return new SurfaceForm.single(
+    return SurfaceForm.single(
       key: form.key,
       child: MondrianChildView(
         surface: surface,
         interactable: false,
       ),
-      position: form.position.shift(new Offset(offscreen.dx, offscreen.dy)),
+      position: form.position.shift(Offset(offscreen.dx, offscreen.dy)),
       initPosition: form.initPosition,
       depth: form.depth,
       friction: kDragFrictionInfinite,
@@ -197,7 +197,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
         focusStack.removeLast();
       }
     }
-    Forest<Surface> dependentSpanningTrees = new Forest<Surface>();
+    Forest<Surface> dependentSpanningTrees = Forest<Surface>();
     if (placedSurfaces.isNotEmpty) {
       // Get the dependent spanning trees for each tree off of the root
       for (Tree<String> childTree in graph.root.children) {
@@ -229,7 +229,7 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
         dependentSpanningTrees.mapForest((Surface s) => placedSurfaces[s]);
 
     for (SurfaceForm orphan in _orphanedForms) {
-      formForest.add(new Tree<SurfaceForm>(value: orphan));
+      formForest.add(Tree<SurfaceForm>(value: orphan));
     }
 
     /// Determine the max and min depths of all visible surfaces.
@@ -253,9 +253,9 @@ class _SurfaceDirectorState extends State<SurfaceDirector> {
       }
     }
 
-    return new ScopedModel<DepthModel>(
-      model: new DepthModel(minDepth: minDepth, maxDepth: maxDepth),
-      child: new SurfaceStage(forms: formForest),
+    return ScopedModel<DepthModel>(
+      model: DepthModel(minDepth: minDepth, maxDepth: maxDepth),
+      child: SurfaceStage(forms: formForest),
     );
   }
 }

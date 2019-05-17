@@ -13,6 +13,7 @@ dart_library("fidl") {
 
   sources = [
     "fidl.dart",
+    "src/bits.dart",
     "src/codec.dart",
     "src/enum.dart",
     "src/error.dart",

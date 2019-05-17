@@ -18,10 +18,10 @@ dart_library("dart") {
     "//sdk/fidl/fuchsia.device.display",
     "//sdk/fidl/fuchsia.math",
     "//sdk/fidl/fuchsia.media",
-    "//sdk/fidl/fuchsia.mediaplayer",
+    "//sdk/fidl/fuchsia.media.audio",
+    "//sdk/fidl/fuchsia.media.playback",
     "//sdk/fidl/fuchsia.net.oldhttp",
     "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
     "//topaz/public/lib/settings:settings_protos",
   ]
 }

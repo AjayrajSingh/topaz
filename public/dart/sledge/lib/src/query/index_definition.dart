@@ -20,7 +20,7 @@ class IndexDefinition {
 
   /// Stores the name of the field concerned by the index, and what kind of comparison is
   /// done over the said field.
-  final _filterMap = new SplayTreeMap<String, _ComparisonType>();
+  final _filterMap = SplayTreeMap<String, _ComparisonType>();
 
   static const _jsonFieldsMapKey = 'fields';
   static const _jsonSchemaKey = 'schema';
@@ -36,11 +36,11 @@ class IndexDefinition {
     for (final fieldWithEquality in fieldsWithEquality) {
       _checkBelongsToSchema(fieldWithEquality);
       if (_filterMap.containsKey(fieldWithEquality)) {
-        throw new ArgumentError(
+        throw ArgumentError(
             'Field `$fieldWithEquality` must not appear multiple times in fieldsWithEquality.');
       }
       if (fieldWithInequality == fieldWithEquality) {
-        throw new ArgumentError(
+        throw ArgumentError(
             'Field `$fieldWithEquality` must not be part of both fieldsWithEquality and fieldWithInequality.');
       }
       _filterMap[fieldWithEquality] = _ComparisonType.equality;
@@ -67,7 +67,7 @@ class IndexDefinition {
       }
     });
     Schema schema = Schema.fromJson(map[_jsonSchemaKey]);
-    return new IndexDefinition(schema,
+    return IndexDefinition(schema,
         fieldsWithEquality: fieldsWithEquality,
         fieldWithInequality: fieldWithInequality);
   }
@@ -76,7 +76,7 @@ class IndexDefinition {
   /// Called by dart:convert's JsonCodec.
   dynamic toJson() {
     Map<String, int> jsonFieldMap = _filterMap
-        .map((key, value) => new MapEntry<String, int>(key, value.index));
+        .map((key, value) => MapEntry<String, int>(key, value.index));
     final jsonMap = <String, dynamic>{
       _jsonFieldsMapKey: jsonFieldMap,
       _jsonSchemaKey: _schema
@@ -86,7 +86,7 @@ class IndexDefinition {
 
   void _checkBelongsToSchema(String field) {
     if (!_schema.schemaDescription.containsKey(field)) {
-      throw new ArgumentError('Field `$field` is not part of the schema.');
+      throw ArgumentError('Field `$field` is not part of the schema.');
     }
   }
 

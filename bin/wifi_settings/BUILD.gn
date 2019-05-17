@@ -28,9 +28,8 @@ flutter_app("wifi_settings") {
     "//sdk/fidl/fuchsia.wlan.service",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/lib/settings:lib.settings",
-    "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/app_driver/dart",
-    "//topaz/public/lib/schemas/dart",
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_services",
+    "//topaz/public/dart/widgets:lib.widgets"
   ]
 }

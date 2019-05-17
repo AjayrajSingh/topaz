@@ -2,8 +2,10 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/config.gni")
 import("//build/fidl/fidl.gni")
 import("//build/package.gni")
+import("//peridot/build/modular_config/modular_config.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("ermine") {
@@ -30,16 +32,32 @@ dart_library("ermine_library") {
 
   sources = [
     "main.dart",
+    "src/models/app_model.dart",
+    "src/models/default_proposer.dart",
+    "src/models/ermine_service_provider.dart",
+    "src/models/package_proposer.dart",
+    "src/models/story_manager.dart",
+    "src/models/story_model.dart",
+    "src/models/web_proposer.dart",
+    "src/modules/ask_model.dart",
+    "src/modules/ask_module.dart",
+    "src/modules/ask_sheet.dart",
+    "src/modules/ask_suggestion_list.dart",
+    "src/modules/ask_text_field.dart",
+    "src/utils/elevations.dart",
+    "src/utils/key_chord_listener.dart",
+    "src/utils/session_shell_services.dart",
+    "src/widgets/app.dart",
+    "src/widgets/stories.dart",
   ]
 
   deps = [
     ":shell.ermine",
+    "//sdk/fidl/fuchsia.modular",
     "//sdk/fidl/fuchsia.ui.app",
-    "//sdk/fidl/fuchsia.ui.gfx",
     "//sdk/fidl/fuchsia.ui.input",
     "//sdk/fidl/fuchsia.ui.policy",
-    "//sdk/fidl/fuchsia.ui.viewsv1token",
-    "//sdk/fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.ui.views",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/flutter_svg",
     "//third_party/dart-pkg/pub/uuid",
@@ -48,13 +66,10 @@ dart_library("ermine_library") {
     "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/dart/fuchsia_services",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/module_resolver/dart",
-    "//topaz/public/lib/story/dart",
   ]
 }
 
 flutter_app("ermine_ask_module") {
-
   main_dart = "lib/src/modules/ask_module.dart"
 
   package_name = "ermine_ask_module"
@@ -73,7 +88,6 @@ flutter_app("ermine_ask_module") {
     "//sdk/fidl/fuchsia.modular",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/widgets/dart",
   ]
 }
@@ -86,47 +100,26 @@ fidl("shell.ermine") {
   ]
 }
 
-package("launch_ermine") {
-  deprecated_system_image = true
-
-  resources = [
-    {
-      path = rebase_path("config/base_shell_config.json")
-      dest = "sysui/base_shell_config.json"
-    },
-  ]
+modular_config("ermine_modular_config") {
+  config = "config/modular_config.json"
 }
 
-package("ermine_basemgr") {
-  deprecated_system_image = true
+config_data("ermine_fonts") {
+  for_pkg = "fonts"
 
-  resources = [
-    {
-      path = rebase_path("config/basemgr.config")
-      dest = "sysmgr/basemgr.config"
-    },
+  sources = [
+    "fonts/manifest.json",
   ]
-}
 
-package("ermine_fonts") {
-  deprecated_system_image = true
+  sources += rebase_path([
+                           "RobotoMono-Light.ttf",
+                           "RobotoMono-Medium.ttf",
+                           "RobotoMono-Regular.ttf",
+                         ],
+                         "",
+                         "//garnet/bin/fonts/third_party/robotomono/")
 
-  resources = [
-    {
-      path = rebase_path("fonts/manifest.json")
-      dest = "vendor/fonts/manifest.json"
-    },
-    {
-      path = rebase_path("//garnet/bin/fonts/third_party/robotomono/RobotoMono-Regular.ttf")
-      dest = "vendor/fonts/RobotoMono-Regular.ttf"
-    },
-    {
-      path = rebase_path("//garnet/bin/fonts/third_party/robotomono/RobotoMono-Medium.ttf")
-      dest = "vendor/fonts/RobotoMono-Medium.ttf"
-    },
-    {
-      path = rebase_path("//garnet/bin/fonts/third_party/robotomono/RobotoMono-Light.ttf")
-      dest = "vendor/fonts/RobotoMono-Light.ttf"
-    },
+  outputs = [
+    "fonts/{{source_file_part}}",
   ]
 }

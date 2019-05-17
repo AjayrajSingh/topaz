@@ -41,7 +41,7 @@ abstract class Module {
   /// a default relation is used. Note, [surfaceRelation] is an optional
   /// parameter so a default value will be provided:
   /// ```
-  /// modular.SurfaceRelation surfaceRelation = const modular.SurfaceRelation(
+  /// modular.SurfaceRelation surfaceRelation = modular.SurfaceRelation(
   ///    arrangement: modular.SurfaceArrangement.copresent,
   ///    dependency: modular.SurfaceDependency.dependent,
   ///    emphasis: 0.5,
@@ -54,10 +54,12 @@ abstract class Module {
   /// be closed). If the [intent] is resolved to the same module, the module
   /// will get the intent.
   ///
-  /// A [modular.ModuleController] is returned to the caller to control the start
-  /// Module instance. Closing this connection doesn't affect its Module
+  /// A [modular.ModuleControllerProxy] is returned to the caller to control the started
+  /// Module instance. Closing this connection to the proxy doesn't affect its Module
   /// instance; it just relinquishes the ability of the caller to control the
-  /// Module instance.
+  /// Module instance. To explicitly stop the running module callers should call
+  /// [module.ModuleControllerPoxy#stop] method which will cause the module instance
+  /// to shutdown and be removed from the story.
   ///
   /// The [name] parameter can be used identify a view in the resulting story
   /// and can be used to either update a running module with a new [intent] or
@@ -80,7 +82,7 @@ abstract class Module {
   /// Module().addModuleToStory(name: 'foo', intent: foo_intent);
   /// Module().addModuleToStory(name: 'bar', intent: bar_intent);
   /// ```
-  Future<modular.ModuleController> addModuleToStory({
+  Future<modular.ModuleControllerProxy> addModuleToStory({
     @required String name,
     @required modular.Intent intent,
     modular.SurfaceRelation surfaceRelation,
@@ -99,7 +101,7 @@ abstract class Module {
   /// display the view from the new module.
   ///
   /// The method will complete with an [EmbeddedModule] which contains the
-  /// [modular.ModuleController] and the [gfx.ImportToken].
+  /// [modular.ModuleController] and the [views.ViewHolderToken].
   /// The token can be used to embed the child module's view to display in your
   /// module's view hierarchy. This is commonly done in Flutter modules with
   /// the ChildView widget.
@@ -107,13 +109,6 @@ abstract class Module {
   /// If no modules are found a [ModuleResolutionException] will be thrown.
   @experimental
   Future<EmbeddedModule> embedModule({
-    @required String name,
-    @required modular.Intent intent,
-  });
-
-  /// TEMPORARY, for transition purposes only.
-  @experimental
-  Future<EmbeddedModule> embedModuleNew({
     @required String name,
     @required modular.Intent intent,
   });

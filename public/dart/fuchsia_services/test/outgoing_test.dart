@@ -12,21 +12,21 @@ import 'package:test/test.dart';
 void main() {
   group('outgoing', () {
     test('connect to service calls correct service', () async {
-      final impl = Outgoing();
-      StreamController<bool> streamController =
-          new StreamController.broadcast();
-      Stream stream = streamController.stream;
-      impl.addPublicService((_) {
-        streamController
-          ..add(true)
-          ..close();
-      }, 'foo');
+      final outgoingImpl = Outgoing();
+      final dirProxy = DirectoryProxy();
+      final nodeProxy = NodeProxy();
+      final streamController = StreamController<bool>.broadcast();
+      final stream = streamController.stream;
 
-      var proxy = DirectoryProxy();
-      impl.serve(InterfaceRequest(proxy.ctrl.request().passChannel()));
+      outgoingImpl
+        ..addPublicService((_) {
+          streamController
+            ..add(true)
+            ..close();
+        }, 'foo',)
+        ..serve(InterfaceRequest(dirProxy.ctrl.request().passChannel()));
 
-      var nodeProxy = NodeProxy();
-      await proxy.open(0, 0, 'public/foo', nodeProxy.ctrl.request());
+      await dirProxy.open(0, 0, 'public/foo', nodeProxy.ctrl.request());
       stream.listen(expectAsync1((response) {
         expect(response, true);
       }));

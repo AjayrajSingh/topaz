@@ -5,11 +5,12 @@
 import 'dart:async';
 
 import 'package:fidl/fidl.dart' as fidl;
-import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+import 'package:fidl_fuchsia_ledger/fidl_async.dart' as ledger;
 import 'package:fidl_fuchsia_sys/fidl_async.dart'
-    show LaunchInfo, ComponentControllerProxy;
-import 'package:lib.app.dart/app_async.dart' show Services, StartupContext;
+    show LaunchInfo, ComponentControllerProxy, LauncherProxy;
+import 'package:fuchsia_services/services.dart';
 import 'package:sledge/sledge.dart';
+import 'package:zircon/zircon.dart';
 
 /// References a service that provides channels to a unique Ledger instance.
 class LedgerTestInstanceProvider {
@@ -17,7 +18,7 @@ class LedgerTestInstanceProvider {
   LedgerTestInstanceProvider(this.services, this._controller);
 
   /// The service providing channels to Ledger.
-  Services services;
+  Incoming services;
   // Prevents the controller from being GCed, which would result in the service
   // being closed.
   // ignore: unused_field
@@ -29,13 +30,18 @@ class LedgerTestInstanceProvider {
 Future<LedgerTestInstanceProvider> newLedgerTestInstanceProvider() async {
   String server =
       'fuchsia-pkg://fuchsia.com/ledger_test_instance_provider#meta/ledger_test_instance_provider.cmx';
-  final Services services = new Services();
-  final LaunchInfo launchInfo =
-      new LaunchInfo(url: server, directoryRequest: services.request());
-  final context = new StartupContext.fromStartupInfo();
-  final ComponentControllerProxy controller = new ComponentControllerProxy();
-  await context.launcher.createComponent(launchInfo, controller.ctrl.request());
-  return new LedgerTestInstanceProvider(services, controller);
+
+  final incoming = Incoming();
+  final LaunchInfo launchInfo = LaunchInfo(
+      url: server, directoryRequest: incoming.request().passChannel());
+  final context = StartupContext.fromStartupInfo();
+  final ComponentControllerProxy controller = ComponentControllerProxy();
+
+  final launcher = LauncherProxy();
+  context.incoming.connectToService(launcher);
+  await launcher.createComponent(launchInfo, controller.ctrl.request());
+
+  return LedgerTestInstanceProvider(incoming, controller);
 }
 
 /// Sledge subclass that makes sure the ComponentControllerProxy does not get GCed.
@@ -54,12 +60,15 @@ class _SledgeForTesting extends Sledge {
 Future<Sledge> newSledgeForTesting(
     {SledgePageId pageId,
     LedgerTestInstanceProvider ledgerInstanceProvider}) async {
-  pageId ??= new SledgePageId('');
+  pageId ??= SledgePageId('');
   ledgerInstanceProvider ??= await newLedgerTestInstanceProvider();
-  fidl.InterfaceHandle<ledger.Ledger> ledgerHandle =
-      await ledgerInstanceProvider.services
-          .connectToServiceByName<ledger.Ledger>(ledger.Ledger.$serviceName);
-  final sledge = new _SledgeForTesting(
-      ledgerHandle, pageId, ledgerInstanceProvider._controller);
+  final pair = ChannelPair();
+  ledgerInstanceProvider.services.connectToServiceByNameWithChannel(
+      ledger.Ledger.$serviceName, pair.first);
+
+  final sledge = _SledgeForTesting(
+      fidl.InterfaceHandle<ledger.Ledger>(pair.second),
+      pageId,
+      ledgerInstanceProvider._controller);
   return sledge;
 }

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 
 void main() {
   setupLogger(name: 'button_flutter');

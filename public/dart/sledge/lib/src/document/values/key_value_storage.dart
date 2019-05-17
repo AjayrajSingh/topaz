@@ -20,10 +20,10 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
 
   /// Creates a storage using the provided [equals] as equality.
   KeyValueStorage({bool equals(K key1, K key2), int hashCode(K key)})
-      : _storage = new HashMap<K, V>(equals: equals, hashCode: hashCode),
-        _changeToRollback = new ConvertedChange(
-            new HashMap<K, V>(equals: equals, hashCode: hashCode),
-            new HashSet<K>(equals: equals, hashCode: hashCode));
+      : _storage = HashMap<K, V>(equals: equals, hashCode: hashCode),
+        _changeToRollback = ConvertedChange(
+            HashMap<K, V>(equals: equals, hashCode: hashCode),
+            HashSet<K>(equals: equals, hashCode: hashCode));
 
   @override
   V operator [](Object key) => _storage[key];
@@ -59,7 +59,7 @@ class KeyValueStorage<K, V> extends MapBase<K, V> with MapMixin<K, V> {
 
   /// Retrieves the current transaction's data.
   ConvertedChange<K, V> getChange() {
-    final change = new ConvertedChange<K, V>();
+    final change = ConvertedChange<K, V>();
     // [_changeToRollback.deletedKeys] is a collection of keys that were not in
     // [_storage] when the transaction started, but were affected by this
     // transaction.

@@ -29,6 +29,7 @@ void main() {
       _validateFixedBlock(buffer, 0, 1, 2);
 
       expect(buffer[32], equals(4));
+      // The name of the logger
       expect(utf8.decode(buffer.sublist(33, 37)), equals('TEST'));
       expect(utf8.decode(buffer.sublist(38, 41)), equals('foo'));
       expect(buffer[41], equals(0));
@@ -44,6 +45,7 @@ void main() {
       final buffer = bytes.buffer.asUint8List();
       _validateFixedBlock(buffer, 3, 1, 2);
 
+      // The name of the logger
       expect(buffer[32], equals(4));
       expect(utf8.decode(buffer.sublist(33, 37)), equals('TEST'));
       int end = 37;
@@ -73,6 +75,7 @@ void main() {
       final buffer = bytes.buffer.asUint8List();
       _validateFixedBlock(buffer, 2, 1, 2);
 
+      // The name of the logger
       expect(buffer[32], equals(4));
       expect(utf8.decode(buffer.sublist(33, 37)), equals('TEST'));
       int end = 37;
@@ -104,6 +107,7 @@ void main() {
       final buffer = bytes.buffer.asUint8List();
       _validateFixedBlock(buffer, -2, 1, 2);
 
+      // The name of the logger
       expect(buffer[32], equals(4));
       expect(utf8.decode(buffer.sublist(33, 37)), equals('TEST'));
       int start = 37;
@@ -130,15 +134,53 @@ void main() {
       expect(buffer[end++], equals(0));
       expect(bytes.lengthInBytes, equals(end));
     });
+
+    test('convert to bytes with tags and named Logger', () {
+      final tags = ['tag'];
+      final message = _makeMessage(
+        Level.FINE,
+        'bar',
+        tags: tags,
+        loggerName: 'test-logger',
+      );
+
+      final bytes = message.toBytes();
+      final buffer = bytes.buffer.asUint8List();
+      _validateFixedBlock(buffer, -2, 1, 2);
+
+      // The name of the logger
+      expect(buffer[32], equals(4));
+      expect(utf8.decode(buffer.sublist(33, 37)), equals('TEST'));
+      int start = 37;
+
+      // verify that the named logger gets added after the tags
+      expect(buffer[start], equals('test-logger'.length));
+      int end = start + buffer[start] + 1;
+      start++;
+      expect(utf8.decode(buffer.sublist(start, end)), equals('test-logger'));
+
+      // verify the first tag
+      start = end;
+      expect(buffer[start], equals(tags[0].length));
+      end = start + buffer[start] + 1;
+      start++;
+      expect(utf8.decode(buffer.sublist(start, end)), equals(tags[0]));
+
+      // dividing 0 byte
+      expect(buffer[end++], equals(0));
+
+      start = end;
+      expect(utf8.decode(buffer.sublist(start, start + 3)), equals('bar'));
+      end = start + 3;
+      expect(buffer[end++], equals(0));
+      expect(bytes.lengthInBytes, equals(end));
+    });
   });
 }
 
-List<String> _allTags(String name, List<String> tags) =>
-    (name != null ? [name] : [])..addAll(tags ?? []);
-
 /// Convert from little endian format bytes to an unsiged 32 bit int.
 int _bytesToInt32(List<int> bytes) {
-  ByteData byteData = new ByteData(4);
+  ByteData byteData = ByteData(4);
   for (int i = 0; i < 4; i++) {
     byteData.setInt8(i, bytes[i]);
   }
@@ -147,7 +189,7 @@ int _bytesToInt32(List<int> bytes) {
 
 /// Convert from little endian format bytes to an unsiged 64 bit int.
 int _bytesToUint64(List<int> bytes) {
-  ByteData byteData = new ByteData(8);
+  ByteData byteData = ByteData(8);
   for (int i = 0; i < 8; i++) {
     byteData.setInt8(i, bytes[i]);
   }
@@ -160,12 +202,14 @@ LogMessage _makeMessage(Level level, String message,
         String name = 'TEST',
         Object error,
         StackTrace stackTrace,
-        List<String> tags}) =>
+        List<String> tags,
+        String loggerName = ''}) =>
     LogMessage(
-      record: LogRecord(level, message, null, error, stackTrace),
+      record: LogRecord(level, message, loggerName, error, stackTrace),
       processId: processId,
       threadId: threadId,
-      tags: _allTags(name, tags),
+      loggerBaseName: name,
+      tags: tags,
     );
 
 void _validateFixedBlock(
@@ -176,7 +220,7 @@ void _validateFixedBlock(
   // Log time should be within the last 30 seconds
   int nowNanos = Platform.isFuchsia
       ? System.clockGet(_zxClockMonotonic)
-      : new DateTime.now().microsecondsSinceEpoch * 1000;
+      : DateTime.now().microsecondsSinceEpoch * 1000;
   int logNanos = _bytesToUint64(data.sublist(16, 24));
 
   expect(logNanos, lessThanOrEqualTo(nowNanos));

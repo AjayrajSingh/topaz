@@ -9,8 +9,7 @@
 
 // Utility functions that set up /tmp for the dart_runner and flutter_runner.
 
-namespace fuchsia {
-namespace dart {
+namespace dart_utils {
 
 // Set up a memfs bound to /tmp in the process-wide namespace that has the
 // lifetime of the process.
@@ -20,7 +19,6 @@ void SetupRunnerTemp();
 // /tmp in the given namespace.
 void SetupComponentTemp(fdio_ns_t* ns);
 
-}  // namespace dart
-}  // namespace fuchsia
+}  // namespace dart_utils
 
 #endif  // TOPAZ_RUNTIME_DART_UTILS_TEMPFS_H_

@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:lib.widgets/model.dart';
 
 import 'src/fuchsia/wifi_settings_model.dart';
@@ -13,11 +13,11 @@ import 'src/wlan_manager.dart';
 void main() {
   setupLogger(name: 'wifi_settings');
 
-  Widget app = new MaterialApp(
-    home: new Container(
-      child: new ScopedModel<WifiSettingsModel>(
-        model: new WifiSettingsModel(),
-        child: const WlanManager(),
+  Widget app = MaterialApp(
+    home: Container(
+      child: ScopedModel<WifiSettingsModel>(
+        model: WifiSettingsModel(),
+        child: WlanManager(),
       ),
     ),
   );

@@ -13,7 +13,7 @@ void main() async {
 
   group('one way', () {
     setUpAll(() async {
-      server = new TestServerInstance();
+      server = TestServerInstance();
       await server.start();
     });
 
@@ -36,9 +36,9 @@ void main() async {
 
     test('three args', () async {
       final primes =
-          new Uint8List.fromList([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]);
+          Uint8List.fromList([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]);
       await server.proxy.oneWayThreeArgs(
-          23, 42, new NoHandleStruct(foo: 'hello', bar: 1729, baz: primes));
+          23, 42, NoHandleStruct(foo: 'hello', bar: 1729, baz: primes));
       final threeReply = await server.proxy.receivedOneWayThreeArgs();
       expect(threeReply.x, equals(23));
       expect(threeReply.y, equals(42));
@@ -49,9 +49,9 @@ void main() async {
 
     test('table', () async {
       final primes =
-          new Uint8List.fromList([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]);
+          Uint8List.fromList([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]);
       await server.proxy.oneWayExampleTable(
-          new ExampleTable(foo: 'hello', bar: 1729, baz: primes));
+          ExampleTable(foo: 'hello', bar: 1729, baz: primes));
       final received = await server.proxy.receivedOneWayExampleTable();
       expect(received.foo, equals('hello'));
       expect(received.bar, equals(1729));
@@ -60,7 +60,7 @@ void main() async {
 
     test('partial table', () async {
       await server.proxy.oneWayExampleTable(
-          new ExampleTable(bar: 1729)); // not seting foo, nor baz
+          ExampleTable(bar: 1729)); // not seting foo, nor baz
       final received = await server.proxy.receivedOneWayExampleTable();
       expect(received.foo, equals(null));
       expect(received.bar, equals(1729));
@@ -69,7 +69,7 @@ void main() async {
 
     test('empty table', () async {
       await server.proxy.oneWayExampleTable(
-          new ExampleTable());
+          ExampleTable());
       final received = await server.proxy.receivedOneWayExampleTable();
       expect(received.foo, equals(null));
       expect(received.bar, equals(null));
@@ -96,13 +96,34 @@ void main() async {
 
     test('xunion with vector of bytes', () async {
       final primes =
-          new Uint8List.fromList([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]);
+          Uint8List.fromList([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]);
       await server.proxy.oneWayExampleXunion(
         ExampleXunion.withBaz(primes));
       final received = await server.proxy.receivedOneWayExampleXunion();
       expect(received.foo, equals(null));
       expect(received.bar, equals(null));
       expect(received.baz, unorderedEquals(primes));
+    });
+
+    test('bits with single bit', () async {
+      await server.proxy.oneWayExampleBits(ExampleBits.memberB);
+      final received = await server.proxy.receivedOneWayExampleBits();
+      expect(received, equals(ExampleBits.memberB));
+    });
+
+    test('bits with multiple bits', () async {
+      await server.proxy.oneWayExampleBits(
+        ExampleBits.memberB | ExampleBits.memberC);
+      final received = await server.proxy.receivedOneWayExampleBits();
+      expect(received, equals(
+        ExampleBits.memberB | ExampleBits.memberC));
+    });
+
+    test('bits with no bit set', () async {
+      await server.proxy.oneWayExampleBits(ExampleBits.$none);
+      final received = await server.proxy.receivedOneWayExampleBits();
+      expect(received, equals(
+        ExampleBits.memberB & ExampleBits.memberA /* 0 too */));
     });
   });
 }

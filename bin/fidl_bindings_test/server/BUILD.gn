@@ -21,6 +21,6 @@ dart_app("fidl_bindings_test_server") {
   deps = [
     "//topaz/bin/fidl_bindings_test/fidl:bindings_test",
     "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
+    "//topaz/public/dart/fuchsia_services",
   ]
 }

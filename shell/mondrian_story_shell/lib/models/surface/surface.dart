@@ -4,10 +4,10 @@
 
 import 'dart:math' as math;
 
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
 import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
     show ChildViewConnection;
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../../models/surface/surface_transition.dart';
@@ -24,7 +24,7 @@ class Surface extends Model {
   /// Public constructor
   Surface(this._graph, this.node, this.properties, this.relation,
       this.compositionPattern, this.placeholderColor) {
-    transitionModel = new SurfaceTransitionModel()
+    transitionModel = SurfaceTransitionModel()
 
       // notify listeners of Surface model to changes that happen in
       // surface_transition, so we can use the same model in builders
@@ -33,9 +33,9 @@ class Surface extends Model {
   }
 
   Surface.fromJson(Map<String, dynamic> json, this._graph)
-      : node = new Tree<String>(value: json['id']),
+      : node = Tree<String>(value: json['id']),
         compositionPattern = json['compositionPattern'],
-        properties = new SurfaceProperties.fromJson(
+        properties = SurfaceProperties.fromJson(
             json['surfaceProperties'].cast<String, dynamic>()),
         relation = SurfaceRelationUtil.decode(
             json['surfaceRelation'].cast<String, String>()),
@@ -126,7 +126,7 @@ class Surface extends Model {
 
   /// Returns a Tree for this surface
   Tree<Surface> get tree {
-    Tree<Surface> t = new Tree<Surface>(value: this);
+    Tree<Surface> t = Tree<Surface>(value: this);
     for (Surface child in children) {
       t.add(child.tree);
     }

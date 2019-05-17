@@ -15,12 +15,12 @@ class Graph {
 
   /// Returns or creates a node with the given [label].
   Node getNode(String label) =>
-      _nodes.putIfAbsent(label, () => new Node._internal(label, _nextId++));
+      _nodes.putIfAbsent(label, () => Node._internal(label, _nextId++));
 
   /// Sets the graph's root node.
   set root(Node node) {
     if (!_nodes.containsValue(node)) {
-      throw new Exception('Unknown node: $node');
+      throw Exception('Unknown node: $node');
     }
     _root = node;
   }
@@ -75,7 +75,7 @@ class Graph {
 
   /// Creates a string representation of this graph in the DOT format.
   void export(String name, StringSink out) {
-    const List<String> colors = const <String>[
+    const List<String> colors = <String>[
       '#4285f4',
       '#f4b400',
       '#0f9d58',

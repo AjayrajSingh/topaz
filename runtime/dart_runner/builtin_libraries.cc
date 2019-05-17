@@ -5,17 +5,18 @@
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 
 #include <lib/fdio/namespace.h>
-#include <zx/channel.h>
+#include <lib/zx/channel.h>
 
 #include "dart-pkg/fuchsia/sdk_ext/fuchsia.h"
-#include "lib/fxl/arraysize.h"
-#include "lib/fxl/logging.h"
+#include "src/lib/fxl/logging.h"
 #include "third_party/dart/runtime/bin/io_natives.h"
 #include "third_party/dart/runtime/include/dart_api.h"
 #include "third_party/tonic/converter/dart_converter.h"
 #include "third_party/tonic/dart_microtask_queue.h"
 #include "third_party/tonic/logging/dart_error.h"
-#include "topaz/lib/deprecated_loop/message_loop.h"
+#include "topaz/runtime/dart/utils/inlines.h"
+
+#include "topaz/runtime/dart_runner/logging.h"
 
 using tonic::ToDart;
 
@@ -41,11 +42,14 @@ const struct NativeEntry {
 Dart_NativeFunction BuiltinNativeLookup(Dart_Handle name, int argument_count,
                                         bool* auto_setup_scope) {
   const char* function_name = nullptr;
-  DART_CHECK_VALID(Dart_StringToCString(name, &function_name));
+  Dart_Handle result = Dart_StringToCString(name, &function_name);
+  if (Dart_IsError(result)) {
+    Dart_PropagateError(result);
+  }
   FXL_DCHECK(function_name != nullptr);
   FXL_DCHECK(auto_setup_scope != nullptr);
   *auto_setup_scope = true;
-  size_t num_entries = arraysize(kBuiltinEntries);
+  size_t num_entries = dart_utils::ArraySize(kBuiltinEntries);
   for (size_t i = 0; i < num_entries; i++) {
     const NativeEntry& entry = kBuiltinEntries[i];
     if (!strcmp(function_name, entry.name) &&
@@ -57,7 +61,7 @@ Dart_NativeFunction BuiltinNativeLookup(Dart_Handle name, int argument_count,
 }
 
 const uint8_t* BuiltinNativeSymbol(Dart_NativeFunction native_function) {
-  size_t num_entries = arraysize(kBuiltinEntries);
+  size_t num_entries = dart_utils::ArraySize(kBuiltinEntries);
   for (size_t i = 0; i < num_entries; i++) {
     const NativeEntry& entry = kBuiltinEntries[i];
     if (entry.function == native_function)
@@ -102,41 +106,55 @@ void InitBuiltinLibrariesForIsolate(
   // dart:fuchsia.builtin ------------------------------------------------------
 
   Dart_Handle builtin_lib = Dart_LookupLibrary(ToDart("dart:fuchsia.builtin"));
-  DART_CHECK_VALID(Dart_SetNativeResolver(builtin_lib, BuiltinNativeLookup,
-                                          BuiltinNativeSymbol));
+  FXL_CHECK(!tonic::LogIfError(builtin_lib));
+  Dart_Handle result = Dart_SetNativeResolver(builtin_lib, BuiltinNativeLookup,
+                                              BuiltinNativeSymbol);
+  FXL_CHECK(!tonic::LogIfError(result));
 
   // dart:io -------------------------------------------------------------------
 
   Dart_Handle io_lib = Dart_LookupLibrary(ToDart("dart:io"));
-  DART_CHECK_VALID(Dart_SetNativeResolver(io_lib, dart::bin::IONativeLookup,
-                                          dart::bin::IONativeSymbol));
+  FXL_CHECK(!tonic::LogIfError(io_lib));
+  result = Dart_SetNativeResolver(io_lib, dart::bin::IONativeLookup,
+                                  dart::bin::IONativeSymbol);
+  FXL_CHECK(!tonic::LogIfError(result));
 
   // dart:zircon ---------------------------------------------------------------
 
   Dart_Handle zircon_lib = Dart_LookupLibrary(ToDart("dart:zircon"));
-  DART_CHECK_VALID(zircon_lib);
+  FXL_CHECK(!tonic::LogIfError(zircon_lib));
   // NativeResolver already set by fuchsia::dart::Initialize().
 
   // Core libraries ------------------------------------------------------------
 
   Dart_Handle async_lib = Dart_LookupLibrary(ToDart("dart:async"));
+  FXL_CHECK(!tonic::LogIfError(async_lib));
+
   Dart_Handle core_lib = Dart_LookupLibrary(ToDart("dart:core"));
+  FXL_CHECK(!tonic::LogIfError(core_lib));
+
   Dart_Handle internal_lib = Dart_LookupLibrary(ToDart("dart:_internal"));
+  FXL_CHECK(!tonic::LogIfError(internal_lib));
+
   Dart_Handle isolate_lib = Dart_LookupLibrary(ToDart("dart:isolate"));
+  FXL_CHECK(!tonic::LogIfError(isolate_lib));
 
 #if !defined(AOT_RUNTIME)
   // AOT: These steps already happened at compile time in gen_snapshot.
 
   // We need to ensure that all the scripts loaded so far are finalized
   // as we are about to invoke some Dart code below to setup closures.
-  DART_CHECK_VALID(Dart_FinalizeLoading(false));
+  result = Dart_FinalizeLoading(false);
+  FXL_CHECK(!tonic::LogIfError(result));
 #endif
 
   // Setup the internal library's 'internalPrint' function.
   Dart_Handle print =
       Dart_Invoke(builtin_lib, ToDart("_getPrintClosure"), 0, nullptr);
-  DART_CHECK_VALID(print);
-  DART_CHECK_VALID(Dart_SetField(internal_lib, ToDart("_printClosure"), print));
+  FXL_CHECK(!tonic::LogIfError(print));
+
+  result = Dart_SetField(internal_lib, ToDart("_printClosure"), print);
+  FXL_CHECK(!tonic::LogIfError(result));
 
   // Set up the 'scheduleImmediate' closure.
   Dart_Handle schedule_immediate_closure;
@@ -145,65 +163,73 @@ void InitBuiltinLibrariesForIsolate(
     schedule_immediate_closure = Dart_Invoke(
         isolate_lib, ToDart("_getIsolateScheduleImmediateClosure"), 0, nullptr);
   } else {
-    // Running on deprecated_loop::MessageLoop.
+    // Running on async::Loop.
     schedule_immediate_closure = Dart_Invoke(
         builtin_lib, ToDart("_getScheduleMicrotaskClosure"), 0, nullptr);
   }
-  DART_CHECK_VALID(schedule_immediate_closure);
+  FXL_CHECK(!tonic::LogIfError(schedule_immediate_closure));
 
   Dart_Handle schedule_args[1];
   schedule_args[0] = schedule_immediate_closure;
-  DART_CHECK_VALID(Dart_Invoke(
-      async_lib, ToDart("_setScheduleImmediateClosure"), 1, schedule_args));
+  result = Dart_Invoke(async_lib, ToDart("_setScheduleImmediateClosure"), 1,
+                       schedule_args);
+  FXL_CHECK(!tonic::LogIfError(result));
 
   // Set up the namespace in dart:io.
   Dart_Handle namespace_type =
       Dart_GetType(io_lib, ToDart("_Namespace"), 0, nullptr);
-  DART_CHECK_VALID(namespace_type);
+  FXL_CHECK(!tonic::LogIfError(namespace_type));
+
   Dart_Handle namespace_args[1];
   namespace_args[0] = ToDart(reinterpret_cast<intptr_t>(namespc));
-  DART_CHECK_VALID(namespace_args[0]);
-  DART_CHECK_VALID(Dart_Invoke(namespace_type, ToDart("_setupNamespace"), 1,
-                               namespace_args));
+  result =
+      Dart_Invoke(namespace_type, ToDart("_setupNamespace"), 1, namespace_args);
+  FXL_CHECK(!tonic::LogIfError(result));
 
   // Set up the namespace in dart:zircon.
   namespace_type = Dart_GetType(zircon_lib, ToDart("_Namespace"), 0, nullptr);
-  DART_CHECK_VALID(namespace_type);
-  DART_CHECK_VALID(Dart_SetField(namespace_type, ToDart("_namespace"),
-                                 ToDart(reinterpret_cast<intptr_t>(namespc))));
+  FXL_CHECK(!tonic::LogIfError(namespace_type));
+
+  result = Dart_SetField(namespace_type, ToDart("_namespace"),
+                         ToDart(reinterpret_cast<intptr_t>(namespc)));
+  FXL_CHECK(!tonic::LogIfError(result));
 
   // Set up stdout and stderr.
   Dart_Handle stdio_args[3];
   stdio_args[0] = Dart_NewInteger(0);
-  DART_CHECK_VALID(stdio_args[0]);
   stdio_args[1] = Dart_NewInteger(stdoutfd);
-  DART_CHECK_VALID(stdio_args[1]);
   stdio_args[2] = Dart_NewInteger(stderrfd);
-  DART_CHECK_VALID(stdio_args[2]);
-  DART_CHECK_VALID(Dart_Invoke(io_lib, ToDart("_setStdioFDs"), 3, stdio_args));
+  result = Dart_Invoke(io_lib, ToDart("_setStdioFDs"), 3, stdio_args);
+  FXL_CHECK(!tonic::LogIfError(result));
 
   // Disable some dart:io operations.
   Dart_Handle embedder_config_type =
       Dart_GetType(io_lib, ToDart("_EmbedderConfig"), 0, nullptr);
-  DART_CHECK_VALID(embedder_config_type);
-  DART_CHECK_VALID(
-      Dart_SetField(embedder_config_type, ToDart("_mayExit"), Dart_False()));
+  FXL_CHECK(!tonic::LogIfError(embedder_config_type));
+
+  result =
+      Dart_SetField(embedder_config_type, ToDart("_mayExit"), Dart_False());
+  FXL_CHECK(!tonic::LogIfError(result));
 
   // Set the script location.
-  DART_CHECK_VALID(
-      Dart_SetField(builtin_lib, ToDart("_rawScript"), ToDart(script_uri)));
+  result = Dart_SetField(builtin_lib, ToDart("_rawScript"), ToDart(script_uri));
+  FXL_CHECK(!tonic::LogIfError(result));
 
   // Setup the uriBase with the base uri of the fidl app.
   Dart_Handle uri_base =
       Dart_Invoke(io_lib, ToDart("_getUriBaseClosure"), 0, nullptr);
-  DART_CHECK_VALID(uri_base);
-  DART_CHECK_VALID(
-      Dart_SetField(core_lib, ToDart("_uriBaseClosure"), uri_base));
+  FXL_CHECK(!tonic::LogIfError(uri_base));
+
+  result = Dart_SetField(core_lib, ToDart("_uriBaseClosure"), uri_base);
+  FXL_CHECK(!tonic::LogIfError(result));
 
   Dart_Handle setup_hooks = ToDart("_setupHooks");
-  DART_CHECK_VALID(Dart_Invoke(builtin_lib, setup_hooks, 0, nullptr));
-  DART_CHECK_VALID(Dart_Invoke(io_lib, setup_hooks, 0, nullptr));
-  DART_CHECK_VALID(Dart_Invoke(isolate_lib, setup_hooks, 0, nullptr));
+  result = Dart_Invoke(builtin_lib, setup_hooks, 0, nullptr);
+  FXL_CHECK(!tonic::LogIfError(result));
+  result = Dart_Invoke(io_lib, setup_hooks, 0, nullptr);
+  FXL_CHECK(!tonic::LogIfError(result));
+  result = Dart_Invoke(isolate_lib, setup_hooks, 0, nullptr);
+  FXL_CHECK(!tonic::LogIfError(result));
 }
 
 }  // namespace dart_runner

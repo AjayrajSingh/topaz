@@ -37,7 +37,7 @@ void main() {
     test('Intents with const parameter lists can still be modified', () {
       final fidlIntent = fidl.Intent(
         action: 'action',
-        parameters: const [],
+        parameters: [],
       );
       // Should be able to modify the parameters on the intent.
       // note: there are helper methods for this task but we want to

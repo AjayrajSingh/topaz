@@ -10,10 +10,10 @@ import 'package:flutter/widgets.dart';
 import 'constants.dart' as constants;
 import 'keys.dart';
 
-const Color _borderColor = const Color(0xFFE8EAED);
-const Color _backgroundColor = const Color(0xFFFFFFFF);
-const Color _contentColor = const Color(0xFF202124);
-const TextStyle _defaultTextStyle = const TextStyle(
+const Color _borderColor = Color(0xFFE8EAED);
+const Color _backgroundColor = Color(0xFFFFFFFF);
+const Color _contentColor = Color(0xFF202124);
+const TextStyle _defaultTextStyle = TextStyle(
   color: _contentColor,
   fontFamily: 'GoogleSans',
   fontSize: 16.0,
@@ -97,7 +97,7 @@ class Keyboard extends StatefulWidget {
   final VoidCallback onHide;
 
   /// Constructor.
-  const Keyboard(
+  Keyboard(
       {Key key,
       this.onText,
       this.onSuggestion,
@@ -127,7 +127,7 @@ class KeyboardState extends State<Keyboard> {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.fromLTRB(
+        padding: EdgeInsets.fromLTRB(
           constants.borderWidth,
           constants.borderWidth,
           constants.borderWidth,
@@ -144,7 +144,7 @@ class KeyboardState extends State<Keyboard> {
                 top: Radius.circular(constants.cornerRadius / _cornerFactor)),
             color: _backgroundColor,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: _sidePadding),
+              padding: EdgeInsets.symmetric(horizontal: _sidePadding),
               child: _keyboards.containsKey(_currentKeyboard)
                   ? _keyboards[_currentKeyboard]
                   : Offstage(),

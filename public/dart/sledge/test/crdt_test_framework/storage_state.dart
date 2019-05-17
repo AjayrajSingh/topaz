@@ -29,10 +29,10 @@ class StorageState {
 
     timestamp ??= globalIncrementalTimer++;
     for (final entry in change.changedEntries) {
-      _storage[entry.key] = new Entry(entry.value, timestamp);
+      _storage[entry.key] = Entry(entry.value, timestamp);
     }
     for (final key in change.deletedKeys) {
-      _storage[key] = new Entry.deleted(timestamp);
+      _storage[key] = Entry.deleted(timestamp);
     }
     // TODO: check that changedEntries and deletedKeys do not intersect.
     _onChangeCallback?.call(change);
@@ -62,12 +62,12 @@ class StorageState {
             _storage[entry.key] = entry.value;
           }
         } else {
-          changedEntries.add(new KeyValue(entry.key, entry.value.value));
+          changedEntries.add(KeyValue(entry.key, entry.value.value));
           _storage[entry.key] = other._storage[entry.key];
         }
       }
     }
-    final change = new Change(changedEntries, deletedKeys);
+    final change = Change(changedEntries, deletedKeys);
     if (change.changedEntries.isNotEmpty || change.deletedKeys.isNotEmpty) {
       _onChangeCallback?.call(change);
     }
@@ -79,7 +79,7 @@ class StorageState {
     for (final key in _storage.keys) {
       Entry value = _storage[key];
       if (!value.isDeleted && hasPrefix(key, keyPrefix)) {
-        entries.add(new KeyValue(key, value.value));
+        entries.add(KeyValue(key, value.value));
       }
     }
     return entries;

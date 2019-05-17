@@ -15,15 +15,15 @@ class QueryBuilder {
   void _addFieldComparison(
       String fieldPath, dynamic value, ComparisonType comparison) {
     if (_comparisons.containsKey(fieldPath)) {
-      throw new ArgumentError(
+      throw ArgumentError(
           "Can't add multiple restrictions to the same field ($fieldPath).");
     }
     if (value is num) {
       _comparisons[fieldPath] =
-          new QueryFieldComparison(new NumFieldValue(value), comparison);
+          QueryFieldComparison(NumFieldValue(value), comparison);
       return;
     }
-    throw new ArgumentError(
+    throw ArgumentError(
         'The type `${value.runtimeType.toString()}` used on field `$fieldPath` is not supported in queries.');
   }
 
@@ -74,6 +74,6 @@ class QueryBuilder {
 
   /// Returns a new Query possessing all the filters previously added to this.
   Query build() {
-    return new Query(_schema, comparisons: _comparisons);
+    return Query(_schema, comparisons: _comparisons);
   }
 }

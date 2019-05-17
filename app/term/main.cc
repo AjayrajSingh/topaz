@@ -5,8 +5,8 @@
 #include <lib/async-loop/cpp/loop.h>
 #include <trace-provider/provider.h>
 
-#include "lib/fxl/log_settings_command_line.h"
-#include "lib/fxl/logging.h"
+#include "src/lib/fxl/log_settings_command_line.h"
+#include "src/lib/fxl/logging.h"
 #include "topaz/app/term/app.h"
 #include "topaz/app/term/term_params.h"
 

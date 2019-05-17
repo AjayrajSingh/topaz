@@ -106,7 +106,7 @@ class SettingsPage extends StatelessWidget {
             child: Container(
           width: 64.0,
           height: 64.0,
-          child: const FuchsiaSpinner(),
+          child: FuchsiaSpinner(),
         )),
       ));
       return Container(
@@ -115,7 +115,7 @@ class SettingsPage extends StatelessWidget {
       );
     } else {
       return ListView(
-          physics: const BouncingScrollPhysics(),
+          physics: BouncingScrollPhysics(),
           padding: verticalInsets,
           children: children..addAll(sections));
     }

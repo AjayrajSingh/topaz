@@ -35,10 +35,10 @@ declare_args() {
   }
 
   # Whether experimental space dart mode is enabled for Flutter applications.
-  flutter_space_dart = true
+  flutter_space_dart = !is_debug
 
   # Whether experimental space dart mode is enabled for Dart applications.
-  dart_space_dart = true
+  dart_space_dart = !is_debug
 }
 
 declare_args() {
@@ -105,7 +105,8 @@ dart_product_app = "flutter_dart_jit_component"
 #       component_resources (required)
 #         Resources of this component.
 template("_flutter_dart_jit_package") {
-  package(target_name) {
+  _package_target_name = "${target_name}_pkg"
+  package(_package_target_name) {
     forward_variables_from(invoker,
                            [
                              "deprecated_global_persistent_storage",
@@ -141,6 +142,14 @@ template("_flutter_dart_jit_package") {
     }
 
     meta = invoker.cmx_filtered_meta
+  }
+
+  group(target_name) {
+    deps = [
+      ":${_package_target_name}",
+    ]
+    data_deps = invoker.runner_package_deps
+    forward_variables_from(invoker, [ "testonly" ])
   }
 }
 
@@ -239,7 +248,7 @@ template("flutter_dart_jit_component") {
   components += invoker.components
 
   if (defined(invoker.flutter_driver_extendable)) {
-    flutter_driver_extendable = invoker.flutter_driver_extendable
+    flutter_driver_extendable = invoker.flutter_driver_extendable && is_debug
   } else {
     flutter_driver_extendable = false
   }
@@ -252,6 +261,9 @@ template("flutter_dart_jit_component") {
   # Inject appropriate "runner" into Component manifests
   cmx_filtered_meta = []
   cmx_deps = []
+
+  # This is the set of runner packages required by components in this package.
+  runner_package_deps = []
 
   # Build the kernel for each of the components, and bundle them in the same
   # scope for later packaging.
@@ -269,11 +281,9 @@ template("flutter_dart_jit_component") {
       }
 
       gen_bytecode = false
-      interpreter = false
       if ((defined(invoker.space_dart) && invoker.space_dart) ||
           flutter_space_dart) {
         gen_bytecode = true
-        interpreter = true
       }
 
       product_suffix = ""
@@ -283,6 +293,9 @@ template("flutter_dart_jit_component") {
 
       runtime_meta =
           "//topaz/runtime/flutter_runner/meta/jit${product_suffix}_runtime"
+      runner_package_deps += [
+        "//topaz/runtime/flutter_runner:flutter_jit${product_suffix}_runner",
+      ]
     } else if (component.component_type == "dart") {
       product = !is_debug
       if (defined(invoker.product)) {
@@ -299,13 +312,14 @@ template("flutter_dart_jit_component") {
       }
 
       gen_bytecode = false
-      interpreter = false
       if ((defined(invoker.space_dart) && invoker.space_dart) ||
           dart_space_dart) {
         gen_bytecode = true
-        interpreter = true
       }
-      runtime_meta = "//topaz/runtime/dart_runner/meta/jit${product_suffix}_runtime"
+      runtime_meta =
+          "//topaz/runtime/dart_runner/meta/jit${product_suffix}_runtime"
+      runner_package_deps +=
+          [ "//topaz/runtime/dart_runner:dart_jit${product_suffix}_runner" ]
     }
 
     # Look through the package meta for cmx file for this component, and merge
@@ -332,7 +346,9 @@ template("flutter_dart_jit_component") {
         found_cmx = true
       }
     }
-    assert(found_cmx, "could not find ${component.component_name}.cmx for component ${component.component_name}!")
+    assert(
+        found_cmx,
+        "could not find ${component.component_name}.cmx for component ${component.component_name}!")
 
     component_name = component.component_name
 
@@ -396,6 +412,7 @@ template("flutter_dart_jit_component") {
                              ])
       deps = component.deps
       sources = component.sources
+      sources_required = false
       if (defined(component.dart_package_name)) {
         package_name = component.dart_package_name
       } else if (defined(invoker.package_name)) {
@@ -413,6 +430,10 @@ template("flutter_dart_jit_component") {
         component_name,
       ]
 
+      # The variable 'product' is already defined in this scope. This line makes
+      # explicit that that definition is passed to dart_kernel().
+      product = product
+
       # TODO(CP-140): Should be forwarded from the component.
       non_dart_deps = []
       if (defined(invoker.non_dart_deps)) {
@@ -420,13 +441,7 @@ template("flutter_dart_jit_component") {
       }
 
       if (flutter_driver_extendable) {
-        deps += [
-          "//sdk/fidl/fuchsia.testing.runner",
-          "//sdk/fidl/fuchsia.modular",
-          "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
-          "//topaz/public/lib/app/dart",
-          "//topaz/public/lib/module/dart",
-        ]
+        deps += [ "//third_party/dart-pkg/git/flutter/packages/flutter_driver" ]
 
         non_dart_deps +=
             [ ":${kernel_name}_extensions_wrapper($target_toolchain)" ]
@@ -526,7 +541,8 @@ template("flutter_dart_jit_component") {
 #       component_resources (required)
 #         Resources of this component.
 template("_flutter_dart_aot_package") {
-  package(target_name) {
+  _package_target_name = "${target_name}_pkg"
+  package(_package_target_name) {
     forward_variables_from(invoker,
                            [
                              "deprecated_global_persistent_storage",
@@ -596,6 +612,14 @@ template("_flutter_dart_aot_package") {
 
     meta = invoker.cmx_filtered_meta
   }
+
+  group(target_name) {
+    deps = [
+      ":${_package_target_name}",
+    ]
+    data_deps = invoker.runner_package_deps
+    forward_variables_from(invoker, [ "testonly" ])
+  }
 }
 
 # Defines AOT runtime components to be further distributed in one package.
@@ -662,6 +686,9 @@ template("flutter_dart_aot_component") {
   cmx_filtered_meta = []
   cmx_deps = []
 
+  # This is the set of runner packages required by components in this package.
+  runner_package_deps = []
+
   # Build the kernel for each of the components, and bundle them in the same
   # scope for later packaging.
   components_with_kernel = []
@@ -688,9 +715,14 @@ template("flutter_dart_aot_component") {
     if (component.component_type == "flutter") {
       runtime_meta =
           "//topaz/runtime/flutter_runner/meta/aot${product_suffix}_runtime"
+      runner_package_deps += [
+        "//topaz/runtime/flutter_runner:flutter_aot${product_suffix}_runner",
+      ]
     } else if (component.component_type == "dart") {
       runtime_meta =
           "//topaz/runtime/dart_runner/meta/aot${product_suffix}_runtime"
+      runner_package_deps +=
+          [ "//topaz/runtime/dart_runner:dart_aot${product_suffix}_runner" ]
     }
 
     # Look through the package meta for cmx file for this component, and merge
@@ -717,7 +749,9 @@ template("flutter_dart_aot_component") {
         found_cmx = true
       }
     }
-    assert(found_cmx, "could not find ${component.component_name}.cmx for component ${component.component_name}!")
+    assert(
+        found_cmx,
+        "could not find ${component.component_name}.cmx for component ${component.component_name}!")
 
     component_name = component.component_name
 
@@ -748,6 +782,12 @@ template("flutter_dart_aot_component") {
             [ "//topaz/runtime/dart_runner/kernel:kernel_platform_files" ]
         platform_path = "$root_out_dir/dart_runner_patched_sdk"
       }
+      sources_required = false
+
+      # The variable 'product' is already defined in this scope. This line makes
+      # explicit that that definition is passed to dart_kernel().
+      product = product
+      aot = true
 
       # TODO(CP-140): These variables should be from the component
       forward_variables_from(invoker,
@@ -765,10 +805,6 @@ template("flutter_dart_aot_component") {
       }
 
       main_dart = component.main_dart
-      args = [
-        "--aot",
-        "--tfa",
-      ]
     }
 
     # TODO(rmacnak): VM snapshot is ignored. Allow skipping its generation.
@@ -861,7 +897,10 @@ template("flutter_dart_aot_component") {
             rebase_path(shared_snapshot_instructions_path),
         "--print-instructions-sizes-to=" + rebase_path(stats_json_path),
       ]
-      if (is_debug && !product) {
+      # No asserts in debug or release product.
+      # No asserts in release with flutter_profile=true (non-product)
+      # Yes asserts in non-product debug.
+      if (!product && (!flutter_profile || is_debug)) {
         args += [ "--enable_asserts" ]
       }
       args += [ rebase_path(kernel_path) ]

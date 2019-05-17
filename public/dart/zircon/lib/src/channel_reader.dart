@@ -32,7 +32,7 @@ class ChannelReader {
 
   void bind(Channel channel) {
     if (isBound) {
-      throw new ZirconApiError('ChannelReader is already bound.');
+      throw ZirconApiError('ChannelReader is already bound.');
     }
     _channel = channel;
     _asyncWait();
@@ -40,7 +40,7 @@ class ChannelReader {
 
   Channel unbind() {
     if (!isBound) {
-      throw new ZirconApiError('ChannelReader is not bound');
+      throw ZirconApiError('ChannelReader is not bound');
     }
     _waiter?.cancel();
     final Channel result = _channel;
@@ -82,7 +82,7 @@ class ChannelReader {
     assert(isBound);
     if (status != ZX.OK) {
       close();
-      _errorSoon(new ChannelReaderError(
+      _errorSoon(ChannelReaderError(
           'Wait completed with status ${getStringForStatus(status)} ($status)',
           null));
       return;
@@ -99,7 +99,7 @@ class ChannelReader {
         }
       } else if ((pending & Channel.PEER_CLOSED) != 0) {
         close();
-        _errorSoon(new ChannelReaderError('Peer unexpectedly closed', null));
+        _errorSoon(ChannelReaderError('Peer unexpectedly closed', null));
       }
       // ignore: avoid_catching_errors
     } on Error catch (_) {
@@ -111,7 +111,7 @@ class ChannelReader {
     } catch (e, s) {
       print(e);
       close();
-      _errorSoon(new ChannelReaderError(e, s));
+      _errorSoon(ChannelReaderError(e, s));
     }
   }
 }

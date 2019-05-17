@@ -1,0 +1,10 @@
+{
+    "program": {
+        "data": "data/dart_fidl_benchmarks"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.sys.Environment"
+        ]
+    }
+}

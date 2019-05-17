@@ -11,6 +11,11 @@ part of zircon;
 class EventPair extends _HandleWrapper<EventPair> {
   EventPair(Handle handle) : super(handle);
 
+  /// Duplicate this [EventPair] with the given rights.
+  EventPair duplicate(int rights) {
+    return EventPair(handle.duplicate(rights));
+  }
+
   // Signals
   static const int SIGNALED = ZX.EVENTPAIR_SIGNALED;
   static const int PEER_CLOSED = ZX.EVENTPAIR_PEER_CLOSED;

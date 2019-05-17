@@ -15,15 +15,13 @@ dart_library("settings_protos") {
     "audio.pbserver.dart",
     "setting_store.dart",
     "setting_store_factory.dart",
-    "setting_store_factory_legacy.dart",
-    "setting_store_legacy.dart",
   ]
 
   deps = [
     "//sdk/fidl/fuchsia.devicesettings",
     "//third_party/dart-pkg/pub/protobuf",
     "//topaz/public/dart/fidl",
+    "//topaz/public/dart/fuchsia_logger",
     "//topaz/public/dart/fuchsia_services",
-    "//topaz/public/lib/app/dart",
   ]
 }

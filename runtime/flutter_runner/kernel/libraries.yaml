@@ -153,9 +153,6 @@ flutter_runner:
     ui:
       uri: "../../../../third_party/flutter/lib/ui/ui.dart"
 
-    mozart.internal:
-      uri: "../../../../topaz/public/lib/ui/flutter/sdk_ext/mozart.dart"
-
     _vmservice:
       uri: "../../../../third_party/dart/sdk/lib/vmservice/vmservice.dart"
 

@@ -19,7 +19,7 @@ FidlMerge Template for JSON generation.
 
 {{- define "FidlInclude" }}
 import 'dart:typed_data';
-import 'package:fidl{{- range .Name.Parts }}_{{ . }}{{ end }}/fidl.dart';
+import 'package:fidl{{- range .Name.Parts }}_{{ . }}{{ end }}/fidl_async.dart';
 {{ end }}
 
 {{/*
@@ -194,6 +194,47 @@ class {{ $type }}Converter {
 {{ end }}
 {{- end }}
 
+{{- define "TableConverterDecls" }}
+  {{- range .Tables }}
+{{- if eq .MaxHandles 0 }}
+{{ $type := execTmpl "TypeTemplate" .Name }}
+{{ $className := (execTmpl "CvtClassTemplate" .Name) }}
+class {{ $className}} {
+  static Object toJson(Object tableVal) {
+    if (tableVal is {{ $type }}) {
+      return {
+      {{- range .Members }}
+        {{- if not .Reserved }}
+        {{- $member_name := toLowerCamelCase .Name }}
+        {{- $value_expr := printf "tableVal.%s" $member_name }}
+        '{{ .Name }}': {{ printf (execTmpl "EncodeMember" .) $value_expr }},
+        {{- end }}
+      {{- end }}
+      };
+    }
+    return null;
+  }
+
+  static {{ $type }} fromJson(Map<String, dynamic> json) {
+    if (json == null) {
+      return null;
+    }
+
+    return {{ $type }}(
+{{- range .Members }}
+  {{- if eq .Reserved false }}
+  {{- $jsonVal := printf "json['%s']" .Name }}
+      {{ toLowerCamelCase .Name}}: {{ $jsonVal }} != null ? {{ printf (execTmpl "DecodeMember" .) $jsonVal }} : null,
+  {{- end }}
+{{- end }}
+    );
+  }
+}
+
+{{- end }}
+  {{- end }}
+{{- end }}
+
 {{- define "StructConverterDecls" }}
   {{- range .Structs }}
 {{- if eq .MaxHandles 0 }}
@@ -232,7 +273,7 @@ class {{ $className }} {
 {{- end }}
 
 {{- define "UnionConverterDecls" -}}
-  {{- range .Unions -}}
+  {{- range . -}}
 {{- if eq .MaxHandles 0 }}
 {{- $type := execTmpl "TypeTemplate" .Name }}
 {{- $typeKey := "type" }}
@@ -241,7 +282,7 @@ class {{ $className }} {
 class {{ $className }} {
   static Object toJson(Object unionVal) {
     if (unionVal is {{ $type }}) {
-      switch(unionVal.tag) {
+      switch(unionVal.$tag) {
       {{- range .Members }}
         {{- $member_name := toLowerCamelCase .Name }}
          {{- $value_expr := print "unionVal." $member_name }}
@@ -282,8 +323,10 @@ class {{ $className }} {
   {{- template "FileHeader" . }}
   {{- template "FidlInclude" . }}
   {{- template "EnumConverterDecls" . }}
-  {{- template "UnionConverterDecls" . }}
+  {{- template "UnionConverterDecls" .Unions }}
+  {{- template "UnionConverterDecls" .XUnions }}
   {{- template "StructConverterDecls" . }}
+  {{- template "TableConverterDecls" . }}
 {{- end }}
 
 {{- define "Main" }}

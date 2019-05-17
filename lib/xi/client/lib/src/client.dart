@@ -4,7 +4,8 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:lib.app.dart/logging.dart';
+
+import 'package:fuchsia_logger/logger.dart';
 
 /// ignore_for_file: avoid_annotating_with_dynamic
 
@@ -57,7 +58,7 @@ abstract class XiClient {
   ///     process.stdout.listen(streamController.add);
   ///
   StreamController<List<int>> streamController =
-      new StreamController<List<int>>();
+      StreamController<List<int>>();
 
   /// [XiClient] constructor.
   XiClient() {

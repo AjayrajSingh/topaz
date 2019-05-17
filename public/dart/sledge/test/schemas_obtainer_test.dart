@@ -15,13 +15,13 @@ import 'package:test/test.dart';
 
 Map<String, BaseType> schemaDescriptionA() {
   return <String, BaseType>{
-    'boolA': new Boolean(),
+    'boolA': Boolean(),
   };
 }
 
 Map<String, BaseType> schemaDescriptionB() {
   return <String, BaseType>{
-    'boolB': new Boolean(),
+    'boolB': Boolean(),
   };
 }
 
@@ -35,8 +35,8 @@ void main() {
       Set<KeyValue> keyValues = <KeyValue>{};
 
       // Add 2 KeyValues encoding 2 different schemas.
-      final schemaA = new Schema(schemaDescriptionA());
-      final schemaB = new Schema(schemaDescriptionB());
+      final schemaA = Schema(schemaDescriptionA());
+      final schemaB = Schema(schemaDescriptionB());
       final schemaPrefix =
           sledge_storage.prefixForType(sledge_storage.KeyValueType.schema);
       final keyA = concatUint8Lists(schemaPrefix, schemaA.hash);
@@ -44,8 +44,8 @@ void main() {
       final keyB = concatUint8Lists(schemaPrefix, schemaB.hash);
       final valueB = getUint8ListFromString(json.encode(schemaB));
       keyValues
-        ..add(new KeyValue(keyA, valueA))
-        ..add(new KeyValue(keyB, valueB));
+        ..add(KeyValue(keyA, valueA))
+        ..add(KeyValue(keyB, valueB));
 
       Map<Uint8List, Schema> map = createSchemaMap(keyValues);
       expect(map.length, equals(2));

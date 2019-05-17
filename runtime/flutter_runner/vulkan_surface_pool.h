@@ -10,7 +10,7 @@
 #include "flutter/fml/macros.h"
 #include "vulkan_surface.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 class VulkanSurfacePool final {
  public:
@@ -28,7 +28,7 @@ class VulkanSurfacePool final {
   std::unique_ptr<VulkanSurface> AcquireSurface(const SkISize& size);
 
   void SubmitSurface(
-      std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
+      std::unique_ptr<flutter::SceneUpdateContext::SurfaceProducerSurface>
           surface);
 
   void AgeAndCollectOldBuffers();
@@ -38,12 +38,12 @@ class VulkanSurfacePool final {
   void ShrinkToFit();
 
   // For |VulkanSurfaceProducer::HasRetainedNode|.
-  bool HasRetainedNode(const flow::LayerRasterCacheKey& key) const {
+  bool HasRetainedNode(const flutter::LayerRasterCacheKey& key) const {
     return retained_surfaces_.find(key) != retained_surfaces_.end();
   }
   // For |VulkanSurfaceProducer::GetRetainedNode|.
   const scenic::EntityNode& GetRetainedNode(
-      const flow::LayerRasterCacheKey& key)  {
+      const flutter::LayerRasterCacheKey& key)  {
     FML_DCHECK(HasRetainedNode(key));
     return retained_surfaces_[key].vk_surface->GetRetainedNode();
   }
@@ -67,7 +67,7 @@ class VulkanSurfacePool final {
       pending_surfaces_;
 
   // Retained surfaces keyed by the layer that created and used the surface.
-  flow::LayerRasterCacheKey::Map<RetainedSurface>
+  flutter::LayerRasterCacheKey::Map<RetainedSurface>
       retained_surfaces_;
 
   size_t trace_surfaces_created_ = 0;
@@ -82,15 +82,15 @@ class VulkanSurfacePool final {
   void RecyclePendingSurface(uintptr_t surface_key);
 
   // Clear the |is_pending| flag of the retained surface.
-  void SignalRetainedReady(flow::LayerRasterCacheKey key);
+  void SignalRetainedReady(flutter::LayerRasterCacheKey key);
 
   // Remove the corresponding surface from |retained_surfaces| and recycle it.
   // The surface must not be pending.
-  void RecycleRetainedSurface(const flow::LayerRasterCacheKey& key);
+  void RecycleRetainedSurface(const flutter::LayerRasterCacheKey& key);
 
   void TraceStats();
 
   FML_DISALLOW_COPY_AND_ASSIGN(VulkanSurfacePool);
 };
 
-}  // namespace flutter
+}  // namespace flutter_runner

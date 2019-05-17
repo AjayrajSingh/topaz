@@ -7,6 +7,6 @@ import("//build/fidl/fidl.gni")
 fidl("dart.fidl.json.test") {
   name = "test.dart.fidl.json"
   sources = [
-    "types.fidl",
+    "types.test.fidl",
   ]
 }

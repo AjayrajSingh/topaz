@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'package:flutter/material.dart';
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart'
     show
@@ -22,17 +21,18 @@ import 'package:fidl_fuchsia_shell_ermine/fidl_async.dart' show AskBarProxy;
 import 'package:fidl_fuchsia_sys/fidl_async.dart'
     show
         ComponentControllerProxy,
+        LauncherProxy,
         LaunchInfo,
         ServiceList,
         ServiceProviderBinding;
 import 'package:fidl_fuchsia_ui_app/fidl_async.dart' show ViewProviderProxy;
-import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart'
-    show ExportToken, ImportToken;
+import 'package:fidl_fuchsia_ui_views/fidl_async.dart'
+    show ViewToken, ViewHolderToken;
 import 'package:fidl_fuchsia_ui_policy/fidl_async.dart' show PresentationProxy;
-import 'package:fuchsia_services/services.dart'
-    show connectToEnvironmentService, ServicesConnector, StartupContext;
+import 'package:flutter/material.dart';
 import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
     show ChildViewConnection;
+import 'package:fuchsia_services/services.dart';
 import 'package:lib.widgets/model.dart' show Model;
 import 'package:lib.widgets/utils.dart' show PointerEventsListener;
 import 'package:zircon/zircon.dart';
@@ -40,6 +40,7 @@ import 'package:zircon/zircon.dart';
 import '../utils/elevations.dart';
 import '../utils/key_chord_listener.dart' show KeyChordListener;
 import '../utils/session_shell_services.dart' show SessionShellServices;
+import 'default_proposer.dart' show DefaultProposer;
 import 'ermine_service_provider.dart' show ErmineServiceProvider;
 import 'package_proposer.dart' show PackageProposer;
 import 'story_manager.dart'
@@ -63,6 +64,7 @@ class AppModel extends Model {
   final _componentControllerProxy = ComponentControllerProxy();
   final _suggestionProvider = SuggestionProviderProxy();
   final _ask = AskBarProxy();
+  final _defaultProposer = DefaultProposer();
   final _packageProposer = PackageProposer();
   final _webProposer = WebProposer();
 
@@ -80,9 +82,14 @@ class AppModel extends Model {
   StoryManager storyManager;
 
   AppModel() {
-    connectToEnvironmentService(_sessionShellContext);
-    connectToEnvironmentService(_componentContext);
-    connectToEnvironmentService(_puppetMaster);
+    StartupContext.fromStartupInfo()
+        .incoming
+        .connectToService(_sessionShellContext);
+    StartupContext.fromStartupInfo()
+        .incoming
+        .connectToService(_componentContext);
+    StartupContext.fromStartupInfo().incoming.connectToService(_puppetMaster);
+    _defaultProposer.start();
     _packageProposer.start();
     _webProposer.start();
 
@@ -99,7 +106,11 @@ class AppModel extends Model {
     storyManager = StoryManager(
       context: _sessionShellContext,
       puppetMaster: _puppetMaster,
-    )..advertise(startupContext);
+    )
+      ..advertise(startupContext)
+      ..addListener(() {
+        _packageProposer.focusedStoryId = storyManager.focusedStoryId;
+      });
 
     _storyProvider.watch(
       _storyProviderWatcherBinding.wrap(StoryProviderWatcherImpl(storyManager)),
@@ -111,7 +122,8 @@ class AppModel extends Model {
 
     KeyChordListener(
       onMeta: onMeta,
-      onLogout: _sessionShellContext.logout,
+      onFullscreen: storyManager.toggleFullscreen,
+      onLogout: onLogout,
       onCancel: onCancel,
     ).listen(_presentation);
 
@@ -127,12 +139,14 @@ class AppModel extends Model {
   }
 
   void _loadAskBar() {
-    final serviceConnector = ServicesConnector();
+    final incoming = Incoming();
+    final launcherProxy = LauncherProxy();
+    startupContext.incoming.connectToService(launcherProxy);
 
-    startupContext.launcher.createComponent(
+    launcherProxy.createComponent(
       LaunchInfo(
         url: _kErmineAskModuleUrl,
-        directoryRequest: serviceConnector.request(),
+        directoryRequest: incoming.request().passChannel(),
         additionalServices: ServiceList(
           names: <String>[
             PuppetMaster.$serviceName,
@@ -152,16 +166,16 @@ class AppModel extends Model {
     );
 
     final viewProvider = ViewProviderProxy();
-    serviceConnector
-      ..connectToService(viewProvider.ctrl)
-      ..connectToService(_ask.ctrl)
+    incoming
+      ..connectToService(viewProvider)
+      ..connectToService(_ask)
       ..close();
 
     // Create a token pair for the newly-created View.
     final tokenPair = EventPairPair();
     assert(tokenPair.status == ZX.OK);
-    final viewHolderToken = ImportToken(value: tokenPair.first);
-    final viewToken = ExportToken(value: tokenPair.second);
+    final viewHolderToken = ViewHolderToken(value: tokenPair.first);
+    final viewToken = ViewToken(value: tokenPair.second);
 
     viewProvider.createView(viewToken.value, null, null);
     viewProvider.ctrl.close();
@@ -172,8 +186,7 @@ class AppModel extends Model {
       ..onVisible.forEach((_) => askVisibility.value = true)
       ..load(elevations.systemOverlayElevation);
 
-    askChildViewConnection.value =
-        ChildViewConnection.fromImportToken(viewHolderToken);
+    askChildViewConnection.value = ChildViewConnection(viewHolderToken);
   }
 
   /// Shows the Ask bar and sets the focus on it.
@@ -182,4 +195,28 @@ class AppModel extends Model {
   /// Called when tapped behind Ask bar, quick settings, notifications or the
   /// Escape key was pressed.
   void onCancel() => _ask.hide();
+
+  /// Called when the user initiates logout (using keyboard or UI).
+  void onLogout() {
+    askChildViewConnection.value = null;
+    _sessionShellContext.logout();
+    storyManager.stop();
+    _pointerEventsListener.stop();
+    _defaultProposer.stop();
+    _packageProposer.stop();
+    _webProposer.stop();
+
+    _storyProviderWatcherBinding.close();
+    _focusRequestWatcherBinding.close();
+
+    _sessionShellContext.ctrl.close();
+    _componentContext.ctrl.close();
+    _presentation.ctrl.close();
+    _storyProvider.ctrl.close();
+    _puppetMaster.ctrl.close();
+    _focusController.ctrl.close();
+    _componentControllerProxy.ctrl.close();
+    _suggestionProvider.ctrl.close();
+    _ask.ctrl.close();
+  }
 }

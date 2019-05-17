@@ -1,5 +1,0 @@
-{
-    "packages": [
-        "//topaz/examples/ui/simple_flutter:simple_flutter"
-    ]
-}

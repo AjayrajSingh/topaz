@@ -20,19 +20,19 @@ class _TodoItem extends StatelessWidget {
     final ThemeData themeData = Theme.of(context);
 
     List<Widget> rowChildren = <Widget>[
-      new Expanded(child: new Text(content)),
-      new SizedBox(
+      Expanded(child: Text(content)),
+      SizedBox(
         width: 72.0,
-        child: new IconButton(
-          icon: const Icon(Icons.done),
+        child: IconButton(
+          icon: Icon(Icons.done),
           color: themeData.primaryColor,
           onPressed: onDone,
         ),
       ),
     ];
-    return new Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: new Row(
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 16.0),
+      child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: rowChildren),
     );
@@ -58,15 +58,15 @@ class TodoListModuleScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      body: new ScopedModelDescendant<TodoListModel>(builder: (
+    return Scaffold(
+      body: ScopedModelDescendant<TodoListModel>(builder: (
         BuildContext context,
         Widget child,
         TodoListModel model,
       ) {
         List<Widget> listItems = <Widget>[];
         model.items.forEach((List<int> key, String value) {
-          listItems.add(new _TodoItem(
+          listItems.add(_TodoItem(
             content: value,
             onDone: () {
               onItemDone(key);
@@ -75,18 +75,18 @@ class TodoListModuleScreen extends StatelessWidget {
         });
 
         List<Widget> slivers = <Widget>[
-          new SliverAppBar(
+          SliverAppBar(
             expandedHeight: _appBarHeight,
             pinned: true,
-            flexibleSpace: const FlexibleSpaceBar(
-              title: const Text('Todo List'),
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text('Todo List'),
             ),
           ),
-          new SliverToBoxAdapter(child: new NewItemInput(onNewItem: onNewItem)),
-          new SliverList(delegate: new SliverChildListDelegate(listItems))
+          SliverToBoxAdapter(child: NewItemInput(onNewItem: onNewItem)),
+          SliverList(delegate: SliverChildListDelegate(listItems))
         ];
 
-        return new Material(child: new CustomScrollView(slivers: slivers));
+        return Material(child: CustomScrollView(slivers: slivers));
       }),
     );
   }

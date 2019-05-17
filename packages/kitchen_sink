@@ -1,6 +1,0 @@
-{
-    "imports": [
-        "peridot/packages/kitchen_sink",
-        "topaz/packages/all"
-    ]
-}

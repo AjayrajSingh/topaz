@@ -9,20 +9,20 @@ import 'helpers.dart';
 
 void main() {
   test('Save a document', () async {
-    final pageId = new SledgePageId('some page');
+    final pageId = SledgePageId('some page');
     final ledgerInstanceProvider = await newLedgerTestInstanceProvider();
     final activeSledge = await newSledgeForTesting(
         ledgerInstanceProvider: ledgerInstanceProvider, pageId: pageId);
     Map<String, BaseType> schemaDescription = <String, BaseType>{
-      'someInteger': new Integer()
+      'someInteger': Integer()
     };
-    Schema schema = new Schema(schemaDescription);
-    DocumentId id = new DocumentId(schema);
+    Schema schema = Schema(schemaDescription);
+    DocumentId id = DocumentId(schema);
 
     // Store a document in Sledge.
     await activeSledge.runInTransaction(() async {
       final List<Document> documents =
-          await activeSledge.getDocuments(new Query(schema));
+          await activeSledge.getDocuments(Query(schema));
       assert(documents.isEmpty);
       assert(await activeSledge.documentExists(id) == false);
 
@@ -39,7 +39,7 @@ void main() {
         ledgerInstanceProvider: ledgerInstanceProvider, pageId: pageId);
     await passiveSledge.runInTransaction(() async {
       final List<Document> documents =
-          await passiveSledge.getDocuments(new Query(schema));
+          await passiveSledge.getDocuments(Query(schema));
       assert(documents.isNotEmpty);
       assert(await passiveSledge.documentExists(id) == true);
       Document doc = await passiveSledge.getDocument(id);
@@ -48,13 +48,13 @@ void main() {
 
     // Verify that the document is not present in a Sledge instance
     // created with a different page.
-    final unrelatedPageId = new SledgePageId('some other page');
+    final unrelatedPageId = SledgePageId('some other page');
     final unrelatedSledge = await newSledgeForTesting(
         ledgerInstanceProvider: ledgerInstanceProvider,
         pageId: unrelatedPageId);
     await unrelatedSledge.runInTransaction(() async {
       final List<Document> documents =
-          await unrelatedSledge.getDocuments(new Query(schema));
+          await unrelatedSledge.getDocuments(Query(schema));
       assert(documents.isEmpty);
     });
 
@@ -69,7 +69,7 @@ void main() {
     int someInteger;
     while (someInteger != 43) {
       await passiveSledge.runInTransaction(() async {
-        Document doc = await passiveSledge.getDocument(id);
+        Document doc = await Future(() => passiveSledge.getDocument(id));
         someInteger = doc['someInteger'].value;
       });
     }

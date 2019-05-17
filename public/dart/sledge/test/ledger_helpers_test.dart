@@ -7,8 +7,8 @@
 import 'dart:typed_data';
 
 // ignore_for_file: library_prefixes
-import 'package:lib.app.dart/logging.dart';
-import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+import 'package:fuchsia_logger/logger.dart';
+import 'package:fidl_fuchsia_ledger/fidl_async.dart' as ledger;
 import 'package:sledge/src/ledger_helpers.dart';
 import 'package:sledge/src/document/change.dart';
 import 'package:test/test.dart';
@@ -20,29 +20,29 @@ void main() {
 
   group('Transform ledger types.', () {
     test('Convert empty change', () {
-      const emptyPageChange = const ledger.PageChange(
+      const emptyPageChange = ledger.PageChange(
           timestamp: 0,
-          changedEntries: const <ledger.Entry>[],
-          deletedKeys: const <Uint8List>[]);
+          changedEntries: <ledger.Entry>[],
+          deletedKeys: <Uint8List>[]);
       final change = getChangeFromPageChange(emptyPageChange);
-      expect(change, new ChangeMatcher(new Change()));
+      expect(change, ChangeMatcher(Change()));
     });
 
     test('Convert non empty change', () {
-      final pageChange = new ledger.PageChange(
+      final pageChange = ledger.PageChange(
           timestamp: 0,
           changedEntries: <ledger.Entry>[],
           deletedKeys: <Uint8List>[
-            new Uint8List.fromList([0]),
-            new Uint8List.fromList([1, 2])
+            Uint8List.fromList([0]),
+            Uint8List.fromList([1, 2])
           ]);
-      final ourChange = new Change([], [
-        new Uint8List.fromList([0]),
-        new Uint8List.fromList([1, 2])
+      final ourChange = Change([], [
+        Uint8List.fromList([0]),
+        Uint8List.fromList([1, 2])
       ]);
 
       final change = getChangeFromPageChange(pageChange);
-      expect(change, new ChangeMatcher(ourChange));
+      expect(change, ChangeMatcher(ourChange));
     });
   });
 }

@@ -3,7 +3,7 @@
 // found in the LICENSE file
 
 /// List of active repos under fuchsia.googlesource.com which can be linked to.
-const List<String> validProjects = const <String>[
+const List<String> validProjects = <String>[
   'atom-language-fidl',
   'cobalt',
   'fargo',

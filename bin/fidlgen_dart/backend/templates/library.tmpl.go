@@ -16,11 +16,12 @@ const Library = `
 library {{ .LibraryName }};
 
 import 'dart:async';
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart' as $fidl;
 import 'package:meta/meta.dart';
-import 'package:zircon/zircon.dart';
+import 'package:zircon/zircon.dart' as $zx;
 
 {{ range .Imports -}}
 import '{{ .URL }}' as {{ .LocalName }};
@@ -58,6 +59,9 @@ import 'fidl_async.dart' as $strongly_connect_async;
 {{ range $enum := .Enums -}}
 {{ template "EnumDeclaration" $enum }}
 {{ end -}}
+{{ range $bits := .Bits -}}
+{{ template "BitsDeclaration" $bits }}
+{{ end -}}
 {{ range $union := .Unions -}}
 {{ template "UnionDeclaration" $union }}
 {{ end -}}
@@ -93,22 +97,18 @@ export 'fidl.dart' show {{ range $index, $item := . }}
 
 library {{ .LibraryName }}_async;
 
-import 'dart:async';
+import 'dart:async' as $async;
+import 'dart:core' hide Set;
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart' as $fidl;
 import 'package:meta/meta.dart';
-import 'package:zircon/zircon.dart';
+import 'package:zircon/zircon.dart' as $zx;
 
 {{ range .Imports -}}
 import '{{ .AsyncURL }}' as {{ .LocalName }};
 {{ end -}}
-
-// These imports improve deduplication by making uses of {fidl.dart},
-// {fidl_async.dart} and {fidl.dart, fidl_async.dart} generate equivalent
-// packages. In AOT, the dead code will be removed by tree shaking.
-// ignore: unused_import
-import 'fidl.dart' as $strongly_connect_sync;
 
 // ignore_for_file: always_specify_types
 // ignore_for_file: avoid_positional_boolean_parameters
@@ -139,6 +139,9 @@ import 'fidl.dart' as $strongly_connect_sync;
 {{ end -}}
 {{ range $enum := .Enums -}}
 {{ template "EnumDeclaration" $enum }}
+{{ end -}}
+{{ range $bits := .Bits -}}
+{{ template "BitsDeclaration" $bits }}
 {{ end -}}
 {{ range $union := .Unions -}}
 {{ template "UnionDeclaration" $union }}
@@ -171,13 +174,13 @@ typedef _VoidCallback = void Function();
 
 library {{ .LibraryName }}_test;
 
-import 'dart:async' show Future, Stream;
-import 'dart:core' hide Error;
+import 'dart:async' as $async;
+import 'dart:core' hide Error, Future, Match, Set, Stream, Type;
 import 'dart:typed_data';
 
 import 'package:fidl/fidl.dart' as $fidl;
 import 'package:meta/meta.dart';
-import 'package:zircon/zircon.dart';
+import 'package:zircon/zircon.dart' as $zx;
 
 {{ range .Imports -}}
 import '{{ .AsyncURL }}' as {{ .LocalName }};

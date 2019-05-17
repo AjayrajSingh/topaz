@@ -33,7 +33,7 @@ class ValueSlider extends StatelessWidget {
                   ),
                   Container(
                     alignment: Alignment.center,
-                    child: new Text('Value: ${snapshot.data.toInt()}',
+                    child: Text('Value: ${snapshot.data.toInt()}',
                         style: Theme.of(context).textTheme.display1),
                   ),
                 ],
@@ -64,7 +64,7 @@ class ValueSlider extends StatelessWidget {
           } else {
             return Container(
               alignment: Alignment.center,
-              child: new Text('Result: ${snapshot.data}',
+              child: Text('Result: ${snapshot.data}',
                   style: Theme.of(context).textTheme.display1),
               key: Key('fib-result-widget-key'),
             );

@@ -4,7 +4,7 @@
 
 import 'dart:ui' show lerpDouble;
 
-import 'package:fidl_fuchsia_modular_auth/fidl.dart';
+import 'package:fidl_fuchsia_modular_auth/fidl_async.dart';
 import 'package:flutter/material.dart';
 
 import 'user_list.dart';
@@ -17,33 +17,33 @@ const double _kRemovalTargetSize = 112.0;
 class UserPickerScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return new ScopedModelDescendant<UserPickerBaseShellModel>(
+    return ScopedModelDescendant<UserPickerBaseShellModel>(
       builder: (
         BuildContext context,
         Widget child,
         UserPickerBaseShellModel model,
       ) {
-        return new Material(
+        return Material(
           color: Colors.grey[900],
-          child: new Stack(
+          child: Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
               /// Add user picker for selecting users and adding new users
-              new Align(
+              Align(
                 alignment: FractionalOffset.bottomRight,
-                child: new RepaintBoundary(
-                  child: new UserList(
+                child: RepaintBoundary(
+                  child: UserList(
                     loginDisabled: false,
                   ),
                 ),
               ),
 
               // Add user removal target
-              new Align(
+              Align(
                 alignment: FractionalOffset.center,
-                child: new RepaintBoundary(
-                  child: new Container(
-                    child: new DragTarget<Account>(
+                child: RepaintBoundary(
+                  child: Container(
+                    child: DragTarget<Account>(
                       onWillAccept: (Account data) => true,
                       onAccept: model.removeUser,
                       builder: (
@@ -51,7 +51,7 @@ class UserPickerScreen extends StatelessWidget {
                         List<Account> candidateData,
                         __,
                       ) =>
-                          new _UserRemovalTarget(
+                          _UserRemovalTarget(
                             show: model.showingRemoveUserTarget,
                             grow: candidateData.isNotEmpty,
                           ),
@@ -79,7 +79,7 @@ class _UserRemovalTarget extends StatefulWidget {
   const _UserRemovalTarget({this.show, this.grow});
 
   @override
-  _UserRemovalTargetState createState() => new _UserRemovalTargetState();
+  _UserRemovalTargetState createState() => _UserRemovalTargetState();
 }
 
 class _UserRemovalTargetState extends State<_UserRemovalTarget>
@@ -93,24 +93,24 @@ class _UserRemovalTargetState extends State<_UserRemovalTarget>
   @override
   void initState() {
     super.initState();
-    _masterAnimationController = new AnimationController(
+    _masterAnimationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: Duration(milliseconds: 500),
     );
-    _initialScaleController = new AnimationController(
+    _initialScaleController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250),
+      duration: Duration(milliseconds: 250),
     );
-    _initialScaleCurvedAnimation = new CurvedAnimation(
+    _initialScaleCurvedAnimation = CurvedAnimation(
       parent: _initialScaleController,
       curve: Curves.fastOutSlowIn,
       reverseCurve: Curves.fastOutSlowIn,
     );
-    _scaleController = new AnimationController(
+    _scaleController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 250),
+      duration: Duration(milliseconds: 250),
     );
-    _scaleCurvedAnimation = new CurvedAnimation(
+    _scaleCurvedAnimation = CurvedAnimation(
       parent: _scaleController,
       curve: Curves.fastOutSlowIn,
       reverseCurve: Curves.fastOutSlowIn,
@@ -154,32 +154,32 @@ class _UserRemovalTargetState extends State<_UserRemovalTarget>
   }
 
   @override
-  Widget build(BuildContext context) => new Container(
-        child: new AnimatedBuilder(
+  Widget build(BuildContext context) => Container(
+        child: AnimatedBuilder(
           animation: _masterAnimationController,
-          builder: (BuildContext context, Widget child) => new Transform(
+          builder: (BuildContext context, Widget child) => Transform(
                 alignment: FractionalOffset.center,
-                transform: new Matrix4.identity().scaled(
+                transform: Matrix4.identity().scaled(
                   lerpDouble(1.0, 0.7, _scaleCurvedAnimation.value) *
                       _initialScaleCurvedAnimation.value,
                   lerpDouble(1.0, 0.7, _scaleCurvedAnimation.value) *
                       _initialScaleCurvedAnimation.value,
                 ),
-                child: new Container(
+                child: Container(
                   width: _kRemovalTargetSize,
                   height: _kRemovalTargetSize,
-                  decoration: new BoxDecoration(
+                  decoration: BoxDecoration(
                     borderRadius:
-                        new BorderRadius.circular(_kRemovalTargetSize / 2.0),
-                    border: new Border.all(color: Colors.white.withAlpha(200)),
+                        BorderRadius.circular(_kRemovalTargetSize / 2.0),
+                    border: Border.all(color: Colors.white.withAlpha(200)),
                     color: Colors.white.withAlpha(
                         lerpDouble(0, 100.0, _scaleCurvedAnimation.value)
                             .toInt()),
                   ),
                   child: Center(
-                    child: const Text(
+                    child: Text(
                       'REMOVE',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 16.0,
                       ),

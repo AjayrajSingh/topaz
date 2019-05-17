@@ -34,12 +34,12 @@ class Message {
 
   void hexDump() {
     const int width = 16;
-    Uint8List list = new Uint8List.view(data.buffer, 0);
-    StringBuffer buffer = new StringBuffer();
-    final RegExp isPrintable = new RegExp(r'\w');
+    Uint8List list = Uint8List.view(data.buffer, 0);
+    StringBuffer buffer = StringBuffer();
+    final RegExp isPrintable = RegExp(r'\w');
     for (int i = 0; i < dataLength; i += width) {
-      StringBuffer hex = new StringBuffer();
-      StringBuffer printable = new StringBuffer();
+      StringBuffer hex = StringBuffer();
+      StringBuffer printable = StringBuffer();
       for (int j = 0; j < width && i + j < dataLength; j++) {
         int v = list[i + j];
         String s = v.toRadixString(16);
@@ -48,7 +48,7 @@ class Message {
         else
           hex.write('$s ');
 
-        s = new String.fromCharCode(v);
+        s = String.fromCharCode(v);
         if (isPrintable.hasMatch(s)) {
           printable.write(s);
         } else {

@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:fidl_fuchsia_devicesettings/fidl.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fidl_fuchsia_devicesettings/fidl_async.dart';
+import 'package:fuchsia_logger/logger.dart';
+import 'package:fuchsia_services/services.dart';
 import 'package:meta/meta.dart';
 
-const String _lastUpdateFilePath = '/config/build-info/last-update';
+const String _lastUpdateFilePath = '/config/build-info/latest-commit-date';
 const String _factoryResetKey = 'FactoryReset';
 
 /// Class to provide device-specific details, such as build information.
@@ -15,7 +15,7 @@ class DeviceInfo {
 
   /// Returns the date the source code was last updated.
   static DateTime getSourceDate() {
-    final File updateFile = new File(_lastUpdateFilePath);
+    final File updateFile = File(_lastUpdateFilePath);
 
     if (updateFile.existsSync()) {
       final String lastUpdate = updateFile.readAsStringSync();
@@ -39,16 +39,14 @@ class DeviceInfo {
   /// complete with true if the flag was set successfully and false otherwise.
   static Future<bool> setFactoryResetFlag({@required bool shouldReset}) async {
     final resetFlagValue = shouldReset ? 1 : 0;
-    final completer = Completer<bool>();
     final deviceSettingsManagerProxy = DeviceSettingsManagerProxy();
 
-    connectToService(StartupContext.fromStartupInfo().environmentServices,
-        deviceSettingsManagerProxy.ctrl);
-    deviceSettingsManagerProxy.setInteger(_factoryResetKey, resetFlagValue,
-        (bool result) {
-      deviceSettingsManagerProxy.ctrl.close();
-      completer.complete(result);
-    });
-    return completer.future;
+    StartupContext.fromStartupInfo()
+        .incoming
+        .connectToService(deviceSettingsManagerProxy);
+    final success = await deviceSettingsManagerProxy.setInteger(
+        _factoryResetKey, resetFlagValue);
+    deviceSettingsManagerProxy.ctrl.close();
+    return success;
   }
 }

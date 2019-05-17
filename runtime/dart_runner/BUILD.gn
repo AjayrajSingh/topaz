@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/package.gni")
+import("//topaz/runtime/dart/dart_component.gni")
 import("dart_app.gni")
 
 template("runner") {
@@ -25,6 +26,7 @@ template("runner") {
       "dart_component_controller.h",
       "dart_runner.cc",
       "dart_runner.h",
+      "logging.h",
       "main.cc",
       "mapped_resource.cc",
       "mapped_resource.h",
@@ -36,22 +38,20 @@ template("runner") {
 
     dart_deps = [
       "//third_party/dart/runtime/bin:dart_io_api${product_suffix}",
-
-      # TODO(abarth): We shouldn't need to depend on libdart_builtin but we
-      # fail to link otherwise.
-      "//third_party/dart/runtime/bin:libdart_builtin${product_suffix}",
     ]
 
     deps = [
-             "//garnet/public/lib/component/cpp",
-             "//garnet/public/lib/fsl",
-             "//garnet/public/lib/fxl",
-             "//garnet/public/lib/svc/cpp",
-             "//topaz/lib/deprecated_loop",
              "//topaz/runtime/dart/utils",
+             "//topaz/runtime/dart/utils:files",
+             "//topaz/runtime/dart/utils:inlines",
+             "//topaz/runtime/dart/utils:vmo",
              "//third_party/tonic",
-             "//topaz/lib/deprecated_loop",
              "//topaz/public/dart-pkg/fuchsia",
+             "//zircon/public/lib/async",
+             "//zircon/public/lib/async-loop",
+             "//zircon/public/lib/async-loop-cpp",
+             "//zircon/public/lib/syslog",
+             "//zircon/public/lib/trace",
              "//zircon/public/lib/trace-provider",
            ] + dart_deps + extra_deps
   }
@@ -61,6 +61,9 @@ runner("dart_jit_runner_bin") {
   output_name = "dart_jit_runner"
   product = false
   extra_defines = []
+  if (flutter_profile) {
+    extra_defines += [ "FLUTTER_PROFILE" ]
+  }
   extra_deps = [
     "//third_party/dart/runtime:libdart_jit",
     "//third_party/dart/runtime/platform:libdart_platform_jit",
@@ -81,6 +84,9 @@ runner("dart_aot_runner_bin") {
   output_name = "dart_aot_runner"
   product = false
   extra_defines = [ "AOT_RUNTIME" ]
+  if (flutter_profile) {
+    extra_defines += [ "FLUTTER_PROFILE" ]
+  }
   extra_deps = [
     "//topaz/runtime/dart_runner/embedder:dart_aot_snapshot_cc",
     "//third_party/dart/runtime:libdart_precompiled_runtime",
@@ -123,6 +129,8 @@ template("aot_runner_package") {
       deps += [
         "vmservice:vmservice_snapshot",
         observatory_target,
+        "//topaz/runtime/dart/profiler_symbols:dart_aot_runner",
+        "//topaz/runtime/dart/profiler_symbols:libdart_precompiled_runtime",
       ]
 
       if (dart_aot_sharing_basis != "") {
@@ -172,6 +180,21 @@ template("aot_runner_package") {
           path = rebase_path(observatory_archive_file)
           dest = "observatory.tar"
         },
+        {
+          path = rebase_path(
+                  get_label_info(
+                      "//topaz/runtime/dart/profiler_symbols:libdart_precompiled_runtime",
+                      "target_gen_dir") + "/libdart_precompiled_runtime.dartprofilersymbols")
+          dest = "libdart_precompiled_runtime.dartprofilersymbols"
+        },
+        {
+          path = rebase_path(
+                  get_label_info(
+                      "//topaz/runtime/dart/profiler_symbols:dart_aot_runner",
+                      "target_gen_dir") +
+                  "/dart_aot_runner.dartprofilersymbols")
+          dest = "dart_aot_runner.dartprofilersymbols"
+        },
       ]
     }
   }
@@ -189,7 +212,11 @@ template("jit_runner_package") {
       "kernel:kernel_core_snapshot${product_suffix}",
     ]
     if (!invoker.product) {
-      deps += [ observatory_target ]
+      deps += [
+        observatory_target,
+        "//topaz/runtime/dart/profiler_symbols:dart_jit_runner",
+        "//topaz/runtime/dart/profiler_symbols:libdart_jit",
+      ]
     }
 
     binary = "dart_jit${product_suffix}_runner"
@@ -226,6 +253,21 @@ template("jit_runner_package") {
         {
           path = rebase_path(observatory_archive_file)
           dest = "observatory.tar"
+        },
+        {
+          path = rebase_path(
+                  get_label_info(
+                      "//topaz/runtime/dart/profiler_symbols:libdart_jit",
+                      "target_gen_dir") + "/libdart_jit.dartprofilersymbols")
+          dest = "libdart_jit.dartprofilersymbols"
+        },
+        {
+          path = rebase_path(
+                  get_label_info(
+                      "//topaz/runtime/dart/profiler_symbols:dart_jit_runner",
+                      "target_gen_dir") +
+                  "/dart_jit_runner.dartprofilersymbols")
+          dest = "dart_jit_runner.dartprofilersymbols"
         },
       ]
     }

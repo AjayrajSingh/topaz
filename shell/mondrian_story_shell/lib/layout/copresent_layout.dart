@@ -4,7 +4,7 @@
 
 import 'dart:math';
 
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
 import 'package:flutter/widgets.dart';
 
 import '../models/layout_model.dart';
@@ -54,7 +54,7 @@ List<PositionedSurface> layoutSurfaces(
         surfaces.firstWhere((PositionedSurface positioned) {
       return positioned.surface == focused.parent;
     });
-    PositionedSurface ontopSurface = new PositionedSurface(
+    PositionedSurface ontopSurface = PositionedSurface(
       surface: focused,
       position: parentSurface.position,
     );
@@ -145,9 +145,9 @@ List<PositionedSurface> layoutSurfaces(
     double fractionalWidth = surface.absoluteEmphasis(top) / totalEmphasis;
     double fractionalHeight = 1.0;
     layout.add(
-      new PositionedSurface(
+      PositionedSurface(
         surface: surface,
-        position: new Rect.fromLTWH(
+        position: Rect.fromLTWH(
           fractionalWidthOffset,
           0.0,
           fractionalWidth,

@@ -5,10 +5,8 @@
 #ifndef APPS_DART_RUNNER_MAPPED_RESOURCE_H_
 #define APPS_DART_RUNNER_MAPPED_RESOURCE_H_
 
+#include <fuchsia/mem/cpp/fidl.h>
 #include <lib/fdio/namespace.h>
-
-#include "lib/fsl/vmo/sized_vmo.h"
-#include "lib/fxl/macros.h"
 
 namespace dart_runner {
 
@@ -41,7 +39,8 @@ class MappedResource {
   // Maps a VMO into the current process's address space. The content is
   // unmapped when the MappedResource goes out of scope. Returns true on
   // success. The path is used only for error messages.
-  static bool LoadFromVmo(const std::string& path, fsl::SizedVmo resource_vmo,
+  static bool LoadFromVmo(const std::string& path,
+                          fuchsia::mem::Buffer resource_vmo,
                           MappedResource& resource, bool executable = false);
 
   const uint8_t* address() const {
@@ -53,7 +52,9 @@ class MappedResource {
   void* address_;
   size_t size_;
 
-  FXL_DISALLOW_COPY_AND_ASSIGN(MappedResource);
+  // Disallow copy and assignment.
+  MappedResource(const MappedResource&) = delete;
+  MappedResource& operator=(const MappedResource&) = delete;
 };
 
 }  // namespace dart_runner

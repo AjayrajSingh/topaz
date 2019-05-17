@@ -24,8 +24,10 @@ class KeyboardDisplay {
   bool _keyboardVisible;
 
   KeyboardDisplay() {
-    connectToEnvironmentService(_imeProxy);
-    connectToEnvironmentService(_imeVisibilityProxy);
+    StartupContext.fromStartupInfo().incoming.connectToService(_imeProxy);
+    StartupContext.fromStartupInfo()
+        .incoming
+        .connectToService(_imeVisibilityProxy);
 
     _imeVisibilityProxy.onKeyboardVisibilityChanged
         .listen(_onVisibilityChanged);

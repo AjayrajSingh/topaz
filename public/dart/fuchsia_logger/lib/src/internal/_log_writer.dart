@@ -20,9 +20,12 @@ final _lineNumberRegex = RegExp(r'\.dart:(\d+)');
 /// The base class for which log writers will inherit from. This class is
 /// used to pipe logs from the onRecord stream
 abstract class LogWriter {
-  List<String> _globalTags = const [];
+  List<String> _globalTags = [];
 
   StreamController<LogMessage> _controller;
+
+  /// A name which will prefix each log message and can be used for filtering.
+  String loggerBaseName;
 
   /// If set to true, this method will include the stack trace
   /// in each log record so we can later extract out the call site.
@@ -31,9 +34,9 @@ abstract class LogWriter {
 
   /// Constructor
   LogWriter({
-    @required Logger logger,
+    @required Stream<LogRecord> logStream,
     bool shouldBufferLogs = false,
-  }) : assert(logger != null) {
+  }) : assert(logStream != null) {
     void Function(LogMessage) onMessageFunc;
 
     if (shouldBufferLogs) {
@@ -46,8 +49,7 @@ abstract class LogWriter {
     } else {
       onMessageFunc = onMessage;
     }
-    logger.onRecord.listen(
-        (record) => onMessageFunc(_messageFromRecord(record)),
+    logStream.listen((record) => onMessageFunc(_messageFromRecord(record)),
         onDone: () => _controller?.close());
   }
 
@@ -79,7 +81,9 @@ abstract class LogWriter {
         record: record,
         processId: pid,
         threadId: Isolate.current.hashCode,
-        tags: _tagsForLogMessage(),
+        loggerBaseName: loggerBaseName,
+        codeLocation: _codeLocation(),
+        tags: _globalTags,
       );
 
   /// A method for subclasses to implement to handle messages as they are
@@ -95,9 +99,9 @@ abstract class LogWriter {
   List<String> _verifyGlobalTags(List<String> tags) {
     List<String> result = <String>[];
 
-    // make our own copy to allow us to remove null values an not change the
+    // make our own copy to allow us to remove null values and not change the
     // original values
-    final incomingTags = List.of(tags)
+    final incomingTags = List.of(tags ?? const [])
       ..removeWhere((t) => t == null || t.isEmpty);
 
     if (incomingTags != null) {
@@ -119,14 +123,11 @@ abstract class LogWriter {
     return result;
   }
 
-  List<String> _tagsForLogMessage() {
+  String _codeLocation() {
     if (forceShowCodeLocation) {
-      final codeLocation = _codeLocationFromStackTrace(StackTrace.current);
-      if (codeLocation != null && codeLocation.isNotEmpty) {
-        return List.of(_globalTags)..add(codeLocation);
-      }
+      return _codeLocationFromStackTrace(StackTrace.current);
     }
-    return _globalTags;
+    return null;
   }
 
   String _codeLocationFromStackTrace(StackTrace stackTrace) {

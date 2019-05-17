@@ -19,14 +19,14 @@ class SetValue<E> extends SetBase<E> implements LeafValue {
   final KeyValueStorage<E, E> _map;
   final MapToKVListConverter<E, bool> _converter;
   final StreamController<SetChange<E>> _changeController =
-      new StreamController<SetChange<E>>.broadcast();
+      StreamController<SetChange<E>>.broadcast();
 
   // TODO: consider Converter as a provider of [equals] and [hashCode] methods.
   /// Creates a SetValue with provided [equals] as equality.
   /// It should be coherent with encoding of [E] done by Converter.
   SetValue({bool equals(E entry1, E entry2), int hashCode(E entry)})
-      : _map = new KeyValueStorage<E, E>(equals: equals, hashCode: hashCode),
-        _converter = new MapToKVListConverter<E, bool>();
+      : _map = KeyValueStorage<E, E>(equals: equals, hashCode: hashCode),
+        _converter = MapToKVListConverter<E, bool>();
 
   @override
   Change getChange() => _converter.serialize(_removeValue(_map.getChange()));
@@ -40,7 +40,7 @@ class SetValue<E> extends SetBase<E> implements LeafValue {
   void applyChange(Change input) {
     final change = _copyKeyToValue(_converter.deserialize(input));
     _map.applyChange(change);
-    _changeController.add(new SetChange<E>(change));
+    _changeController.add(SetChange<E>(change));
   }
 
   @override
@@ -94,15 +94,15 @@ class SetValue<E> extends SetBase<E> implements LeafValue {
   Stream<SetChange<E>> get onChange => _changeController.stream;
 
   ConvertedChange<E, bool> _removeValue(ConvertedChange<E, E> change) {
-    return new ConvertedChange<E, bool>(
-        new Map<E, bool>.fromIterable(change.changedEntries.keys,
+    return ConvertedChange<E, bool>(
+        Map<E, bool>.fromIterable(change.changedEntries.keys,
             value: (item) => true),
         change.deletedKeys);
   }
 
   ConvertedChange<E, E> _copyKeyToValue(ConvertedChange<E, bool> change) {
-    return new ConvertedChange<E, E>(
-        new Map<E, E>.fromIterable(change.changedEntries.keys),
+    return ConvertedChange<E, E>(
+        Map<E, E>.fromIterable(change.changedEntries.keys),
         change.deletedKeys);
   }
 }

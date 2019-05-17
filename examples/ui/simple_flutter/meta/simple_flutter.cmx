@@ -7,10 +7,10 @@
             "fuchsia.accessibility.ToggleBroadcaster",
             "fuchsia.fonts.Provider",
             "fuchsia.modular.Clipboard",
-            "fuchsia.modular.ContextWriter" ,
+            "fuchsia.modular.ContextWriter",
             "fuchsia.sys.Environment",
-            "fuchsia.ui.scenic.Scenic",
-            "fuchsia.ui.viewsv1.ViewManager"
+            "fuchsia.sys.Launcher",
+            "fuchsia.ui.scenic.Scenic"
         ]
     }
 }

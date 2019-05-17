@@ -1,0 +1,66 @@
+#Copyright 2018 The Fuchsia Authors.All rights reserved.
+#Use of this source code is governed by a BSD - style license that can be
+#found in the LICENSE file.
+
+import("//build/package.gni")
+import("//build/test/test_package.gni")
+import("//build/testing/environments.gni")
+
+executable("test") {
+  testonly = true
+  output_name = "dart_inspect_vmo_test"
+
+  sources = [
+    "test.cc",
+  ]
+
+  deps = [
+    "//src/lib/fxl",
+    "//src/lib/fxl/test:gtest_main",
+    "//garnet/public/lib/inspect:reader",
+    "//garnet/public/lib/inspect/testing",
+    "//sdk/lib/sys/cpp",
+    "//sdk/lib/sys/cpp/testing:integration",
+    "//third_party/googletest:gmock",
+  ]
+}
+
+test_package("dart_inspect_vmo_test") {
+  deps = [
+    ":test",
+  ]
+
+  tests = [
+    {
+      name = "dart_inspect_vmo_test"
+      environments = basic_envs
+    },
+  ]
+}
+
+import("//topaz/runtime/dart_runner/dart_app.gni")
+
+dart_app("dart_inspect_vmo_test_writer") {
+  components = [
+    {
+      component_name = "dart_inspect_vmo_test_writer"
+      component_type = "dart"
+      package_root = "dart_inspect_vmo_test_writer"
+      main_dart = "writer.dart"
+      sources = []
+      deps = [
+        "//sdk/fidl/fuchsia.sys",
+        "//topaz/public/dart/fidl",
+        "//topaz/public/dart/fuchsia_inspect",
+        "//topaz/public/dart/fuchsia_services",
+      ]
+    },
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/dart_inspect_vmo_test_writer.cmx")
+      dest = "dart_inspect_vmo_test_writer.cmx"
+    },
+  ]
+}

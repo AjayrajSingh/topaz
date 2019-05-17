@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/src/document/values/map_value.dart';
 import 'package:test/test.dart';
 
@@ -15,12 +15,12 @@ class MapFleetFactory<K, V> {
   const MapFleetFactory();
 
   Fleet<MapValue<K, V>> newFleet(int count) {
-    return new Fleet<MapValue<K, V>>(count, (index) => new MapValue<K, V>());
+    return Fleet<MapValue<K, V>>(count, (index) => MapValue<K, V>());
   }
 }
 
 const MapFleetFactory<int, int> intMapFleetFactory =
-    const MapFleetFactory<int, int>();
+    MapFleetFactory<int, int>();
 
 class ValuesAreUniqueChecker<K, V> extends Checker<MapValue<K, V>> {
   @override
@@ -46,7 +46,7 @@ void main() async {
         m1[2] = 2;
       })
       ..synchronize([0, 1])
-      ..addChecker(() => new ValuesAreUniqueChecker<int, int>());
+      ..addChecker(() => ValuesAreUniqueChecker<int, int>());
     try {
       await fleet.testAllOrders();
       // If SingleOrderTestFailure wasn't thrown, fail. Note that fail will
@@ -56,7 +56,7 @@ void main() async {
       final nodeIds = failure.order.nodes.map((node) => node.nodeId);
       // Check that the EvaluationOrder is correctly reproduced with the list of
       // nodeIds.
-      expect(new EvaluationOrder.fromIds(nodeIds, fleet.graph.nodes),
+      expect(EvaluationOrder.fromIds(nodeIds, fleet.graph.nodes),
           equals(failure.order));
 
       try {
@@ -84,7 +84,7 @@ void main() async {
         m0[2] = 4;
       })
       ..setRandomSynchronizationsRate(1.0)
-      ..addChecker(() => new ValuesAreUniqueChecker<int, int>());
+      ..addChecker(() => ValuesAreUniqueChecker<int, int>());
     try {
       // 1/2 probability of the correct order.
       // 1/2 probability of synchronization after the last modification.
@@ -100,7 +100,7 @@ void main() async {
       // Check that the EvaluationOrder is correctly reproduced with the list of
       // nodeIds.
       expect(
-          new EvaluationOrder.fromIds(nodeIds, fleet.graph.nodes,
+          EvaluationOrder.fromIds(nodeIds, fleet.graph.nodes,
               allowGenerated: true),
           equals(failure.order));
 

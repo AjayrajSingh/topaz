@@ -7,7 +7,7 @@ import 'package:xi_fuchsia_client/client.dart';
 
 void main() {
   test('XiFuchsiaClient constructor', () {
-    XiFuchsiaClient client = new XiFuchsiaClient(null);
+    XiFuchsiaClient client = XiFuchsiaClient(null);
     expect(client.initialized, equals(false));
   });
 }

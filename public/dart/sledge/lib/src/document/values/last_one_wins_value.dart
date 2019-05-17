@@ -14,7 +14,7 @@ class _LastOneWinsValue<T> {
   T _value;
   T _valueToRollback;
   final StreamController<T> _changeController =
-      new StreamController<T>.broadcast();
+      StreamController<T>.broadcast();
 
   _LastOneWinsValue(this._value);
 
@@ -30,9 +30,9 @@ class _LastOneWinsValue<T> {
   ConvertedChange<int, T> getChange() {
     if (_valueToRollback == null) {
       // If there's nothing to rollback, no changes have been done.
-      return new ConvertedChange<int, T>();
+      return ConvertedChange<int, T>();
     }
-    return new ConvertedChange<int, T>(<int, T>{0: _value});
+    return ConvertedChange<int, T>(<int, T>{0: _value});
   }
 
   void applyChange(ConvertedChange<int, T> change) {
@@ -40,13 +40,13 @@ class _LastOneWinsValue<T> {
       return;
     }
     if (change.deletedKeys.isNotEmpty) {
-      throw new FormatException(
+      throw FormatException(
           'There should be no deleted keys. Found `${change.deletedKeys}`.',
           change);
     }
     if (change.changedEntries.length != 1 ||
         !change.changedEntries.containsKey(0)) {
-      throw new FormatException('Changes have unsupported format.', change);
+      throw FormatException('Changes have unsupported format.', change);
     }
     _value = change.changedEntries[0];
     _changeController.add(_value);
@@ -72,9 +72,9 @@ class LastOneWinsValue<T> implements LeafValue {
 
   /// Default constructor.
   LastOneWinsValue([Change init])
-      : _converter = new MapToKVListConverter<int, T>(),
-        _value = new _LastOneWinsValue<T>(new Converter<T>().defaultValue) {
-    applyChange(init ?? new Change());
+      : _converter = MapToKVListConverter<int, T>(),
+        _value = _LastOneWinsValue<T>(Converter<T>().defaultValue) {
+    applyChange(init ?? Change());
   }
 
   @override

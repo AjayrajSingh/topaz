@@ -6,17 +6,18 @@
 #define TOPAZ_EXAMPLES_UI_LIB_SKIA_VIEW_H_
 
 #include "examples/ui/lib/host_canvas_cycler.h"
-#include "lib/fxl/macros.h"
-#include "lib/ui/base_view/cpp/v1_base_view.h"
+#include "src/lib/fxl/logging.h"
+#include "src/lib/fxl/macros.h"
+#include "lib/ui/base_view/cpp/base_view.h"
 
 namespace scenic {
 
 // Abstract base class for views which use Skia software rendering to a
 // single full-size surface.
-class SkiaView : public scenic::V1BaseView {
+class SkiaView : public scenic::BaseView {
  public:
   SkiaView(scenic::ViewContext view_context, const std::string& label);
-  ~SkiaView() override;
+  ~SkiaView() override = default;
 
   // Acquires a canvas for rendering.
   // At most one canvas can be acquired at a time.
@@ -32,6 +33,12 @@ class SkiaView : public scenic::V1BaseView {
   // Releases the canvas most recently acquired using |AcquireCanvas()|.
   // Sets the view's content texture to be backed by the canvas.
   void ReleaseAndSwapCanvas();
+
+ protected:
+  // |scenic::SessionListener|
+  void OnScenicError(std::string error) override {
+    FXL_LOG(ERROR) << "Scenic Error " << error;
+  }
 
  private:
   scenic::skia::HostCanvasCycler canvas_cycler_;

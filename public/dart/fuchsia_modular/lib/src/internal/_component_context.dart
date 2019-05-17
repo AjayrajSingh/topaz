@@ -7,7 +7,7 @@ import 'package:fuchsia_services/services.dart';
 
 final fidl.ComponentContextProxy _componentContextProxy = () {
   final proxy = fidl.ComponentContextProxy();
-  connectToEnvironmentService(proxy);
+  StartupContext.fromStartupInfo().incoming.connectToService(proxy);
   return proxy;
 }();
 

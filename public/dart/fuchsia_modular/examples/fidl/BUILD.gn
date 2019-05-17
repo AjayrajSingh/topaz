@@ -6,7 +6,6 @@ import("//build/fidl/fidl.gni")
 
 fidl("fibonacci_service") {
   name = "fuchsia.fibonacci"
-  cpp_legacy_callbacks = true
 
   sources = [
     "fibonacci_service.fidl",

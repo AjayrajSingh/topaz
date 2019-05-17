@@ -13,7 +13,7 @@ import 'converter.dart';
 // Length of a bytelist, written on edge to value node.
 // Bytelist content is: {1}{timetamp}, {timestamp} is 8 bytes long.
 const _nodeValueSuffixLength = 9;
-const _listEquality = const ListEquality();
+const _listEquality = ListEquality();
 
 /// Type of child.
 enum ChildType {
@@ -40,7 +40,7 @@ class OrderedListTreePath implements Comparable<OrderedListTreePath> {
       : this(concatListOfUint8Lists([parent._data]..addAll(labels)));
 
   /// Creates OrderedListTreePath corresponding to tree root.
-  OrderedListTreePath.root() : this(new Uint8List(_nodeValueSuffixLength));
+  OrderedListTreePath.root() : this(Uint8List(_nodeValueSuffixLength));
 
   /// Checks if node is a child of a [parent].
   bool isDescendant(OrderedListTreePath parent) {
@@ -59,27 +59,27 @@ class OrderedListTreePath implements Comparable<OrderedListTreePath> {
   /// Returns path to parent implicit node, for value node.
   OrderedListTreePath parentPath() {
     // Remove appendix corresponding to value from path.
-    return new OrderedListTreePath(new Uint8List.fromList(
+    return OrderedListTreePath(Uint8List.fromList(
         _data.getRange(0, _data.length - _nodeValueSuffixLength).toList()));
   }
 
   /// Returns OrderedListTreePath representing child of this.
   OrderedListTreePath getChild(
       ChildType side, Uint8List instanceId, Uint8List timestamp) {
-    return new OrderedListTreePath.fromParent(
+    return OrderedListTreePath.fromParent(
         // ----------------
         // Path to implicit node:
         // 1. path to parent implicit node
         parentPath(),
         [
           // 2. direction ([left] or [right]).
-          new Uint8List.fromList([side.index]),
+          Uint8List.fromList([side.index]),
           // 3. id of current instance
           instanceId,
           // ----------------
           // Appendix for path to value:
           // 1. direction ([value])
-          new Uint8List.fromList([ChildType.value.index]),
+          Uint8List.fromList([ChildType.value.index]),
           // 2. timestamp
           timestamp
         ]);
@@ -109,11 +109,11 @@ class OrderedListTreePathConverter implements Converter<OrderedListTreePath> {
 
   @override
   OrderedListTreePath get defaultValue =>
-      new OrderedListTreePath(new Uint8List(0));
+      OrderedListTreePath(Uint8List(0));
 
   @override
   OrderedListTreePath deserialize(final Uint8List x) =>
-      new OrderedListTreePath(x);
+      OrderedListTreePath(x);
 
   @override
   Uint8List serialize(final OrderedListTreePath x) => x._data;
@@ -121,4 +121,4 @@ class OrderedListTreePathConverter implements Converter<OrderedListTreePath> {
 
 /// Public const instance of OrderedListTreePathConverter.
 const OrderedListTreePathConverter orderedListTreePathConverter =
-    const OrderedListTreePathConverter();
+    OrderedListTreePathConverter();

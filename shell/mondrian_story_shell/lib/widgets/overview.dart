@@ -4,11 +4,11 @@
 
 import 'dart:math' as math;
 
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuchsia_scenic_flutter/child_view.dart' show ChildView;
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../models/surface/surface.dart';
@@ -17,14 +17,14 @@ import 'isometric_widget.dart';
 
 /// Printable names for relation arrangement
 const Map<SurfaceArrangement, String> relName =
-    const <SurfaceArrangement, String>{
+    <SurfaceArrangement, String>{
   SurfaceArrangement.none: 'no opinion',
   SurfaceArrangement.copresent: 'co-present',
 };
 
 /// Printable names for relation dependency
 const Map<SurfaceDependency, String> depName =
-    const <SurfaceDependency, String>{
+    <SurfaceDependency, String>{
   SurfaceDependency.dependent: 'dependent',
   SurfaceDependency.none: 'independent',
 };
@@ -37,7 +37,7 @@ class Overview extends StatelessWidget {
 
   /// Build the ListView of Surface views in SurfaceGraph
   Widget buildGraphList(BoxConstraints constraints, SurfaceGraph graph) {
-    return new ListView.builder(
+    return ListView.builder(
       itemCount: graph.focusStack.toList().length,
       scrollDirection: Axis.vertical,
       itemExtent: constraints.maxHeight / 3.5,
@@ -45,24 +45,24 @@ class Overview extends StatelessWidget {
         Surface s = graph.focusStack.toList().reversed.elementAt(index);
         String arrangement = relName[s.relation.arrangement] ?? 'unknown';
         String dependency = depName[s.relation.dependency] ?? 'unknown';
-        return new Row(
+        return Row(
           children: <Widget>[
-            new Flexible(
+            Flexible(
               flex: 1,
-              child: new Center(
+              child: Center(
                 child: index < graph.focusStack.length - 1
-                    ? new Text('Presentation: $arrangement'
+                    ? Text('Presentation: $arrangement'
                         '\nDependency: $dependency'
                         '\nEmphasis: ${s.relation.emphasis}')
                     : null,
               ),
             ),
-            new Flexible(
+            Flexible(
               flex: 2,
-              child: new Container(
-                child: new Center(
-                  child: new IsoMetric(
-                    child: new ChildView(
+              child: Container(
+                child: Center(
+                  child: IsoMetric(
+                    child: ChildView(
                         connection: s.connection, hitTestable: false),
                   ),
                 ),
@@ -75,20 +75,20 @@ class Overview extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => new LayoutBuilder(
+  Widget build(BuildContext context) => LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          return new Container(
+          return Container(
             alignment: FractionalOffset.center,
             width: math.min(constraints.maxWidth, constraints.maxHeight),
             height: constraints.maxHeight,
-            padding: const EdgeInsets.symmetric(horizontal: 44.0),
-            child: new Scrollbar(
-              child: new ScopedModelDescendant<SurfaceGraph>(
+            padding: EdgeInsets.symmetric(horizontal: 44.0),
+            child: Scrollbar(
+              child: ScopedModelDescendant<SurfaceGraph>(
                 builder:
                     (BuildContext context, Widget child, SurfaceGraph graph) {
                   if (graph.focusStack.isEmpty) {
                     log.warning('focusedSurfaceHistory is empty');
-                    return new Container();
+                    return Container();
                   }
                   return buildGraphList(constraints, graph);
                 },

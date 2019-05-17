@@ -35,11 +35,11 @@ class Query {
       _checkComparisonWithField(fieldPath, comparison);
     });
     if (fieldsWithInequalities.length > 1) {
-      throw new ArgumentError(
+      throw ArgumentError(
           'Queries can have at most one inequality. Inequalities founds: $fieldsWithInequalities.');
     }
     _comparisons =
-        new SplayTreeMap<String, QueryFieldComparison>.from(comparisons);
+        SplayTreeMap<String, QueryFieldComparison>.from(comparisons);
   }
 
   /// The Schema of documents returned by this query.
@@ -67,7 +67,7 @@ class Query {
         utils.hash(utils.concatListOfUint8Lists(equalityValueHashes));
 
     // TODO: get the correct index hash.
-    Uint8List indexHash = new Uint8List(20);
+    Uint8List indexHash = Uint8List(20);
 
     // TODO: take into account the inequality to compute the prefix.
     Uint8List prefix = utils.concatListOfUint8Lists([
@@ -84,7 +84,7 @@ class Query {
   /// with.
   bool documentMatchesQuery(Document doc) {
     if (doc.documentId.schema != _schema) {
-      throw new ArgumentError(
+      throw ArgumentError(
           'The Document `doc` is of an incorrect Schema type.');
     }
     for (final fieldName in _comparisons.keys) {
@@ -100,7 +100,7 @@ class Query {
     final expectedType = _schema.fieldAtPath(fieldPath);
     if (!comparison.comparisonValue.comparableTo(expectedType)) {
       String runtimeType = expectedType.runtimeType.toString();
-      throw new ArgumentError(
+      throw ArgumentError(
           'Field `$fieldPath` of type `$runtimeType` is not comparable with `$comparison.comparisonValue`.');
     }
   }

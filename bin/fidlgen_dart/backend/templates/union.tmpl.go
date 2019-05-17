@@ -9,7 +9,7 @@ const Union = `
 {{- define "UnionDeclaration" -}}
 enum {{ .TagName }} {
 {{- range .Members }}
-  {{ .Name }},
+  {{ .Tag }},
 {{- end }}
 }
 
@@ -20,17 +20,17 @@ class {{ .Name }} extends $fidl.Union {
 {{- range .Members }}
 
   const {{ $.Name }}.with{{ .CtorName }}({{ .Type.Decl }} value)
-    : _data = value, tag = {{ $.TagName }}.{{ .Name }};
+    : _data = value, _tag = {{ $.TagName }}.{{ .Tag }};
 {{- end }}
 
-  {{ .Name }}._(this.tag, Object data) : _data = data;
+  {{ .Name }}._({{ .TagName }} tag, Object data) : _tag = tag, _data = data;
 
-  final {{ .TagName }} tag;
+  final {{ .TagName }} _tag;
   final _data;
 
 {{- range .Members }}
   {{ .Type.Decl }} get {{ .Name }} {
-    if (tag != {{ $.TagName }}.{{ .Name }}) {
+    if (_tag != {{ $.TagName }}.{{ .Tag }}) {
       return null;
     }
     return _data;
@@ -39,10 +39,10 @@ class {{ .Name }} extends $fidl.Union {
 
   @override
   String toString() {
-    switch (tag) {
+    switch (_tag) {
 {{- range .Members }}
-      case {{ $.TagName }}.{{ .Name }}:
-        return '{{ $.Name }}.{{ .Name }}(${{ .Name }})';
+      case {{ $.TagName }}.{{ .Tag }}:
+        return r'{{ $.Name }}.{{ .Name }}(${{ .Name }})';
 {{- end }}
       default:
         return null;
@@ -52,14 +52,19 @@ class {{ .Name }} extends $fidl.Union {
   {{- range .Doc }}
   ///{{ . -}}
   {{- end }}
+
+  {{ .TagName }} get $tag => _tag;
+  // TODO: remove, see: FIDL-587
+  {{ .TagName }} get tag => _tag;
+
   @override
-  int get $index => tag.index;
+  int get $index => _tag.index;
 
   @override
   Object get $data => _data;
 
   static {{ .Name }} _ctor(int index, Object data) {
-    return new {{ .Name }}._({{ .TagName }}.values[index], data);
+    return {{ .Name }}._({{ .TagName }}.values[index], data);
   }
 }
 

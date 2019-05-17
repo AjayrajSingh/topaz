@@ -19,7 +19,7 @@ void main() {
     const String action = 'start';
 
     // Create a parent node with two unique child actions.
-    final Step parent = new Step(name, action)
+    final Step parent = Step(name, action)
       ..addResult(result1, childKey1)
       ..addResult(result2, childKey2);
 
@@ -52,7 +52,7 @@ void main() {
     const String result1 = 'result1';
 
     // Create parent with a single child node.
-    final Step parent = new Step('parent', 'start')
+    final Step parent = Step('parent', 'start')
       ..addResult(result1, childKey)
       ..defaultTransition = defaultKey;
 

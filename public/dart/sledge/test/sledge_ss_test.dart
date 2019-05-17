@@ -10,17 +10,17 @@ import 'helpers.dart';
 
 class SledgeFleetFactory {
   Fleet<Sledge> newFleet(int count) {
-    return new Fleet<Sledge>(count, (index) => newSledgeForTesting());
+    return Fleet<Sledge>(count, (index) => newSledgeForTesting());
   }
 }
 
 void main() async {
-  final Schema nameSchema = new Schema(<String, BaseType>{
-    'name': new LastOneWinsString(),
+  final Schema nameSchema = Schema(<String, BaseType>{
+    'name': LastOneWinsString(),
   });
-  final documentId = new DocumentId(nameSchema);
+  final documentId = DocumentId(nameSchema);
 
-  final sledgeFleetFactory = new SledgeFleetFactory();
+  final sledgeFleetFactory = SledgeFleetFactory();
 
   test('Sledge test with framework. One instance.', () async {
     final fleet = sledgeFleetFactory.newFleet(1)

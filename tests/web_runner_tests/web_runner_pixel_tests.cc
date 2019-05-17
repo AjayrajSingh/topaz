@@ -2,29 +2,32 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include <fuchsia/sys/cpp/fidl.h>
+#include <fuchsia/ui/app/cpp/fidl.h>
+#include <fuchsia/ui/policy/cpp/fidl.h>
+#include <fuchsia/ui/scenic/cpp/fidl.h>
+#include <fuchsia/ui/views/cpp/fidl.h>
+#include <gtest/gtest.h>
+#include <lib/fdio/spawn.h>
+#include <lib/fit/function.h>
+#include <lib/fsl/vmo/vector.h>
+#include <lib/gtest/real_loop_fixture.h>
+#include <lib/sys/cpp/component_context.h>
+#include <lib/sys/cpp/service_directory.h>
+#include <lib/ui/scenic/cpp/view_token_pair.h>
+#include <lib/zx/time.h>
+#include <src/lib/files/file.h>
+#include <src/lib/fxl/logging.h>
+#include <src/lib/fxl/strings/string_printf.h>
+#include <zircon/status.h>
+
 #include <iomanip>
 #include <map>
 #include <string>
 #include <vector>
 
-#include <fuchsia/sys/cpp/fidl.h>
-#include <fuchsia/ui/app/cpp/fidl.h>
-#include <fuchsia/ui/policy/cpp/fidl.h>
-#include <fuchsia/ui/scenic/cpp/fidl.h>
-#include <gtest/gtest.h>
-#include <lib/component/cpp/startup_context.h>
-#include <lib/fdio/spawn.h>
-#include <lib/fit/function.h>
-#include <lib/fsl/vmo/vector.h>
-#include <src/lib/files/file.h>
-#include <lib/fxl/logging.h>
-#include <lib/fxl/strings/string_printf.h>
-#include <lib/gtest/real_loop_fixture.h>
-#include <lib/zx/time.h>
-#include <zircon/status.h>
-
-#include "topaz/tests/web_runner_tests/chromium_context.h"
 #include "topaz/tests/web_runner_tests/test_server.h"
+#include "topaz/tests/web_runner_tests/web_context.h"
 
 namespace {
 
@@ -102,9 +105,8 @@ void Input(std::vector<const char*> args) {
 // screenshot utilities.
 class PixelTest : public gtest::RealLoopFixture {
  protected:
-  PixelTest() : context_(component::StartupContext::CreateFromStartupInfo()) {
-    scenic_ =
-        context_->ConnectToEnvironmentService<fuchsia::ui::scenic::Scenic>();
+  PixelTest() : context_(sys::ComponentContext::Create()) {
+    scenic_ = context_->svc()->Connect<fuchsia::ui::scenic::Scenic>();
     scenic_.set_error_handler([](zx_status_t status) {
       FAIL() << "Lost connection to Scenic: " << zx_status_get_string(status);
     });
@@ -120,25 +122,20 @@ class PixelTest : public gtest::RealLoopFixture {
     FXL_CHECK(WaitForBlank());
   }
 
-  component::StartupContext* context() { return context_.get(); }
+  sys::ComponentContext* context() { return context_.get(); }
 
   // Gets a view token for presentation by |RootPresenter|. See also
   // garnet/examples/ui/hello_base_view
-  zx::eventpair CreatePresentationViewToken() {
-    zx::eventpair view_holder_token, view_token;
-    zx_status_t status =
-        zx::eventpair::create(0u, &view_holder_token, &view_token);
-    FXL_CHECK(status == ZX_OK)
-        << "zx::eventpair::create: " << zx_status_get_string(status);
+  fuchsia::ui::views::ViewToken CreatePresentationViewToken() {
+    auto [view_token, view_holder_token] = scenic::ViewTokenPair::New();
 
-    auto presenter =
-        context_->ConnectToEnvironmentService<fuchsia::ui::policy::Presenter>();
+    auto presenter = context_->svc()->Connect<fuchsia::ui::policy::Presenter>();
     presenter.set_error_handler([](zx_status_t status) {
       FAIL() << "presenter: " << zx_status_get_string(status);
     });
-    presenter->Present2(std::move(view_holder_token), nullptr);
+    presenter->PresentView(std::move(view_holder_token), nullptr);
 
-    return view_token;
+    return std::move(view_token);
   }
 
   bool ScreenshotUntil(
@@ -216,7 +213,7 @@ class PixelTest : public gtest::RealLoopFixture {
   }
 
  private:
-  std::unique_ptr<component::StartupContext> context_;
+  std::unique_ptr<sys::ComponentContext> context_;
   fuchsia::sys::ComponentControllerPtr runner_ctrl_;
   fuchsia::ui::scenic::ScenicPtr scenic_;
 };
@@ -240,40 +237,42 @@ TEST_F(WebRunnerPixelTest, Static) {
     }
   });
 
-  component::Services services;
   fuchsia::sys::ComponentControllerPtr controller;
+  fuchsia::sys::LauncherPtr launcher;
+  context()->svc()->Connect(launcher.NewRequest());
 
-  context()->launcher()->CreateComponent(
+  zx::channel request;
+  auto services = sys::ServiceDirectory::CreateWithRequest(&request);
+  launcher->CreateComponent(
       {.url =
            fxl::StringPrintf("http://localhost:%d/static.html", server.port()),
-       .directory_request = services.NewRequest()},
+       .directory_request = std::move(request)},
       controller.NewRequest());
 
   // Present the view.
-  services.ConnectToService<fuchsia::ui::app::ViewProvider>()->CreateView(
-      CreatePresentationViewToken(), nullptr, nullptr);
+  services->Connect<fuchsia::ui::app::ViewProvider>()->CreateView(
+      CreatePresentationViewToken().value, nullptr, nullptr);
 
   ExpectSolidColor(kTargetColor);
 }
 
-// This fixture uses chromium.web FIDL services to interact with Chromium.
-class ChromiumPixelTest : public PixelTest {
+// This fixture uses fuchsia.web FIDL services to interact with the WebEngine.
+class WebPixelTest : public PixelTest {
  protected:
-  ChromiumPixelTest() : chromium_(context()) {
+  WebPixelTest() : web_context_(context()) {
     // And create a view for the frame.
-    chromium_.frame()->CreateView2(CreatePresentationViewToken(), nullptr,
-                                   nullptr);
+    web_context_.web_frame()->CreateView(CreatePresentationViewToken());
   }
 
-  ChromiumContext* chromium() { return &chromium_; }
+  WebContext* web_context() { return &web_context_; }
 
  private:
-  ChromiumContext chromium_;
+  WebContext web_context_;
 };
 
-// Loads a static page with a solid color via chromium.web interfaces and
+// Loads a static page with a solid color via fuchsia.web interfaces and
 // verifies that the color is the only color onscreen.
-TEST_F(ChromiumPixelTest, Static) {
+TEST_F(WebPixelTest, Static) {
   static constexpr uint32_t kTargetColor = 0xffff00ff;
 
   web_runner_tests::TestServer server;
@@ -286,7 +285,7 @@ TEST_F(ChromiumPixelTest, Static) {
     MockHttpGetResponse(&server, "static.html");
   });
 
-  chromium()->Navigate(
+  web_context()->Navigate(
       fxl::StringPrintf("http://localhost:%d/static.html", server.port()));
   ExpectSolidColor(kTargetColor);
 }
@@ -295,7 +294,7 @@ TEST_F(ChromiumPixelTest, Static) {
 // text box, with Javascript to change the background to the color typed in the
 // text box. This test verifies the initial color, taps on the text box (top
 // quarter of the screen), types a new color, and verifies the changed color.
-TEST_F(ChromiumPixelTest, Dynamic) {
+TEST_F(WebPixelTest, Dynamic) {
   static constexpr char kInput[] = "#40e0d0";
   static constexpr uint32_t kBeforeColor = 0xffff00ff;
   static constexpr uint32_t kAfterColor = 0xff40e0d0;
@@ -308,7 +307,7 @@ TEST_F(ChromiumPixelTest, Dynamic) {
     MockHttpGetResponse(&server, "dynamic.html");
   });
 
-  chromium()->Navigate(
+  web_context()->Navigate(
       fxl::StringPrintf("http://localhost:%d/dynamic.html", server.port()));
 
   ExpectPrimaryColor(kBeforeColor);

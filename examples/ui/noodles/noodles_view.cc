@@ -9,7 +9,7 @@
 #include <cstdlib>
 #include <utility>
 
-#include "lib/fxl/logging.h"
+#include "src/lib/fxl/logging.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkImageInfo.h"
@@ -69,8 +69,8 @@ void NoodlesView::Draw(SkCanvas* canvas, float phase) {
 
   canvas->clear(SK_ColorBLACK);
 
-  double cx = logical_size().width * 0.5;
-  double cy = logical_size().height * 0.5;
+  double cx = logical_size().x * 0.5;
+  double cy = logical_size().y * 0.5;
   canvas->translate(cx, cy);
 
   for (int i = 0; i < count; i++, phase += 0.1) {

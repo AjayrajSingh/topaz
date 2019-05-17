@@ -2,15 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_sys/fidl_async.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fuchsia_logger/logger.dart';
 import 'package:meta/meta.dart';
 
 import 'child_view_connection.dart';
-import 'internal/_mozart.dart';
+import 'child_view_render_box.dart';
 
 /// A widget that is replaced by content from another process.
 ///
@@ -37,7 +33,7 @@ class ChildView extends LeafRenderObjectWidget {
 
   @override
   RenderBox createRenderObject(BuildContext context) {
-    return RenderChildView(
+    return ChildViewRenderBox(
       connection: connection,
       hitTestable: hitTestable,
       focusable: focusable,
@@ -46,27 +42,12 @@ class ChildView extends LeafRenderObjectWidget {
 
   @override
   void updateRenderObject(BuildContext context, RenderObject renderObject) {
-    if (renderObject is RenderChildView) {
+    assert(renderObject is ChildViewRenderBox);
+    if (renderObject is ChildViewRenderBox) {
       renderObject
         ..connection = connection
         ..hitTestable = hitTestable
         ..focusable = focusable;
-    } else {
-      log.warning('updateRenderObject was called with unknown renderObject: '
-          '[$renderObject]');
     }
-  }
-}
-
-/// TODO add documentation
-class View {
-  /// Provide services to Scenic through [provider].
-  ///
-  /// [services] should contain the list of service names offered by the
-  /// [provider].
-  static void offerServiceProvider(
-      InterfaceHandle<ServiceProvider> provider, List<String> services) {
-    // Analyzer doesn't know Handle must be dart:zircon's Handle
-    Scenic.offerServiceProvider(provider.passChannel().handle, services);
   }
 }

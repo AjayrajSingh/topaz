@@ -5,7 +5,7 @@
 // import 'dart:math';
 
 import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 
 import '../models/layout_model.dart';
 import '../models/surface/positioned_surface.dart';
@@ -36,9 +36,9 @@ List<PositionedSurface> layoutSurfaces(
     log.warning('unrecognized pattern $pattern');
 
     layout.add(
-      new PositionedSurface(
+      PositionedSurface(
         surface: focused,
-        position: new Rect.fromLTWH(0.0, 0.0, 1.0, 1.0),
+        position: Rect.fromLTWH(0.0, 0.0, 1.0, 1.0),
       ),
     );
     return layout;
@@ -96,18 +96,18 @@ bool _isSupportedPattern(String pattern) {
 List<PositionedSurface> _layoutTicker(Surface tickerSource, Surface ticker,
     double availableHeight, double availableWidth) {
   return <PositionedSurface>[
-    new PositionedSurface(
+    PositionedSurface(
       surface: tickerSource,
-      position: new Rect.fromLTWH(
+      position: Rect.fromLTWH(
         0.0,
         0.0,
         availableWidth,
         availableHeight * (1.0 - _tickerHeightRatio),
       ),
     ),
-    new PositionedSurface(
+    PositionedSurface(
       surface: ticker,
-      position: new Rect.fromLTWH(
+      position: Rect.fromLTWH(
         0.0,
         availableHeight * (1.0 - _tickerHeightRatio),
         availableWidth,
@@ -122,18 +122,18 @@ List<PositionedSurface> _layoutCommentsRight(
   Surface comments,
 ) {
   return <PositionedSurface>[
-    new PositionedSurface(
+    PositionedSurface(
       surface: commentsSource,
-      position: new Rect.fromLTWH(
+      position: Rect.fromLTWH(
         0.0,
         0.0,
         1.0 - _commentsWidthRatio,
         1.0,
       ),
     ),
-    new PositionedSurface(
+    PositionedSurface(
       surface: comments,
-      position: new Rect.fromLTWH(
+      position: Rect.fromLTWH(
         1.0 - _commentsWidthRatio,
         0.0,
         _commentsWidthRatio,

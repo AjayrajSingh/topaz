@@ -9,12 +9,12 @@
 #include "flutter/fml/memory/weak_ptr.h"
 #include "flutter/shell/common/surface.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 // The interface between the Flutter rasterizer and the underlying platform. May
 // be constructed on any thread but will be used by the engine only on the GPU
 // thread.
-class Surface final : public shell::Surface {
+class Surface final : public flutter::Surface {
  public:
   Surface(std::string debug_label);
 
@@ -24,17 +24,17 @@ class Surface final : public shell::Surface {
   const bool valid_ = CanConnectToDisplay();
   const std::string debug_label_;
 
-  // |shell::Surface|
+  // |flutter::Surface|
   bool IsValid() override;
 
-  // |shell::Surface|
-  std::unique_ptr<shell::SurfaceFrame> AcquireFrame(
+  // |flutter::Surface|
+  std::unique_ptr<flutter::SurfaceFrame> AcquireFrame(
       const SkISize& size) override;
 
-  // |shell::Surface|
+  // |flutter::Surface|
   GrContext* GetContext() override;
 
-  // |shell::Surface|
+  // |flutter::Surface|
   SkMatrix GetRootTransformation() const override;
 
   static bool CanConnectToDisplay();
@@ -42,4 +42,4 @@ class Surface final : public shell::Surface {
   FML_DISALLOW_COPY_AND_ASSIGN(Surface);
 };
 
-}  // namespace flutter
+}  // namespace flutter_runner

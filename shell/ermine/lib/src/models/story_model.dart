@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fidl_fuchsia_modular/fidl_async.dart'
     show StoryControllerProxy, StoryInfo;
-import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart';
+import 'package:fidl_fuchsia_ui_views/fidl_async.dart';
 import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
     show ChildViewConnection;
 
@@ -64,8 +64,8 @@ class StoryModel extends ChangeNotifier {
   }
 
   /// Called by [StoryManager] when story's view is available.
-  void attachView(ImportToken viewHolderToken) {
-    childViewConnection = ChildViewConnection.fromImportToken(viewHolderToken);
+  void attachView(ViewHolderToken viewHolderToken) {
+    childViewConnection = ChildViewConnection(viewHolderToken);
     notifyListeners();
   }
 

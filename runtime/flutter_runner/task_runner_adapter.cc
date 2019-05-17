@@ -4,40 +4,43 @@
 
 #include "topaz/runtime/flutter_runner/task_runner_adapter.h"
 
+#include <lib/async/default.h>
+#include <lib/async/cpp/task.h>
+#include <lib/zx/time.h>
+
 #include "flutter/fml/message_loop_impl.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 class CompatTaskRunner : public fml::TaskRunner {
  public:
-  CompatTaskRunner(fxl::RefPtr<fxl::TaskRunner> runner)
-      : fml::TaskRunner(nullptr), forwarding_target_(std::move(runner)) {
+  CompatTaskRunner(async_dispatcher_t* dispatcher)
+      : fml::TaskRunner(nullptr), forwarding_target_(dispatcher) {
     FML_DCHECK(forwarding_target_);
   }
 
   void PostTask(fml::closure task) override {
-    forwarding_target_->PostTask(std::move(task));
+    async::PostTask(forwarding_target_, std::move(task));
   }
 
   void PostTaskForTime(fml::closure task, fml::TimePoint target_time) override {
-    forwarding_target_->PostTaskForTime(
+    async::PostTaskForTime(forwarding_target_,
         std::move(task),
-        fxl::TimePoint::FromEpochDelta(fxl::TimeDelta::FromNanoseconds(
-            target_time.ToEpochDelta().ToNanoseconds())));
+        zx::time(target_time.ToEpochDelta().ToNanoseconds()));
   }
 
   void PostDelayedTask(fml::closure task, fml::TimeDelta delay) override {
-    forwarding_target_->PostDelayedTask(
+    async::PostDelayedTask(forwarding_target_,
         std::move(task),
-        fxl::TimeDelta::FromNanoseconds(delay.ToNanoseconds()));
+        zx::duration(delay.ToNanoseconds()));
   }
 
   bool RunsTasksOnCurrentThread() override {
-    return forwarding_target_->RunsTasksOnCurrentThread();
+    return forwarding_target_ == async_get_default_dispatcher();
   }
 
  private:
-  fxl::RefPtr<fxl::TaskRunner> forwarding_target_;
+  async_dispatcher_t* forwarding_target_;
 
   FML_DISALLOW_COPY_AND_ASSIGN(CompatTaskRunner);
   FML_FRIEND_MAKE_REF_COUNTED(CompatTaskRunner);
@@ -45,8 +48,8 @@ class CompatTaskRunner : public fml::TaskRunner {
 };
 
 fml::RefPtr<fml::TaskRunner> CreateFMLTaskRunner(
-    fxl::RefPtr<fxl::TaskRunner> runner) {
-  return fml::MakeRefCounted<CompatTaskRunner>(std::move(runner));
+    async_dispatcher_t* dispatcher) {
+  return fml::MakeRefCounted<CompatTaskRunner>(dispatcher);
 }
 
-}  // namespace flutter
+}  // namespace flutter_runner

@@ -17,10 +17,10 @@ class Node {
   /// already contains type prefix.
   Node._internal(this.nodeId) {
     if (nodeId.contains("'")) {
-      throw new ArgumentError("[nodeId] should not contain character <'>.");
+      throw ArgumentError("[nodeId] should not contain character <'>.");
     }
     if (nodeId.startsWith(r'[\w]+-')) {
-      throw new ArgumentError('[nodeId] should start with the type prefix.');
+      throw ArgumentError('[nodeId] should start with the type prefix.');
     }
   }
 

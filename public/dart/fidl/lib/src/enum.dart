@@ -7,7 +7,7 @@
 abstract class Enum {
   const Enum();
 
-  int get value;
+  int get $value;
 }
 
 typedef EnumFactory<T> = T Function(int value);

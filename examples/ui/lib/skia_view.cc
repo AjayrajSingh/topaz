@@ -7,24 +7,21 @@
 namespace scenic {
 
 SkiaView::SkiaView(scenic::ViewContext view_context, const std::string& label)
-    : V1BaseView(std::move(view_context), label), canvas_cycler_(session()) {
-  parent_node().AddChild(canvas_cycler_);
+    : BaseView(std::move(view_context), label), canvas_cycler_(session()) {
+  root_node().AddChild(canvas_cycler_);
 }
-
-SkiaView::~SkiaView() = default;
 
 SkCanvas* SkiaView::AcquireCanvas() {
   if (!has_logical_size() || !has_metrics())
     return nullptr;
 
-  SkCanvas* canvas =
-      canvas_cycler_.AcquireCanvas(logical_size().width, logical_size().height,
-                                   metrics().scale_x, metrics().scale_y);
+  SkCanvas* canvas = canvas_cycler_.AcquireCanvas(
+      logical_size().x, logical_size().y, metrics().scale_x, metrics().scale_y);
   if (!canvas)
     return canvas;
 
-  canvas_cycler_.SetTranslationRH(logical_size().width * .5f,
-                                  logical_size().height * .5f, 0.f);
+  canvas_cycler_.SetTranslation(logical_size().x * .5f, logical_size().y * .5f,
+                                0.f);
   return canvas;
 }
 

@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:keyboard/keys.dart';
 
-final AssetBundle _defaultBundle = new NetworkAssetBundle(Uri.base);
+final AssetBundle _defaultBundle = NetworkAssetBundle(Uri.base);
 
 void main() {
   testWidgets(
@@ -15,11 +15,11 @@ void main() {
       (WidgetTester tester) async {
     String onTextText;
 
-    GlobalKey textKeyKey = new GlobalKey();
-    TextKey textKey = new TextKey('A',
+    GlobalKey textKeyKey = GlobalKey();
+    TextKey textKey = TextKey('A',
         key: textKeyKey, onText: (String text) => onTextText = text);
 
-    await tester.pumpWidget(new Row(children: <Widget>[textKey]));
+    await tester.pumpWidget(Row(children: <Widget>[textKey]));
     expect(onTextText, isNull);
 
     await _tap(tester, _getMiddleOfLeftSide(tester, textKeyKey));
@@ -31,8 +31,8 @@ void main() {
       (WidgetTester tester) async {
     bool pressed = false;
 
-    GlobalKey imageKeyKey = new GlobalKey();
-    ImageKey imageKey = new ImageKey(
+    GlobalKey imageKeyKey = GlobalKey();
+    ImageKey imageKey = ImageKey(
       "doesn't matter",
       () => pressed = true,
       const Color(0xFFFFFFFF),
@@ -40,8 +40,8 @@ void main() {
       key: imageKeyKey,
     );
 
-    await tester.pumpWidget(new DefaultAssetBundle(
-        bundle: _defaultBundle, child: new Row(children: <Widget>[imageKey])));
+    await tester.pumpWidget(DefaultAssetBundle(
+        bundle: _defaultBundle, child: Row(children: <Widget>[imageKey])));
     expect(pressed, isFalse);
 
     await _tap(tester, _getMiddleOfLeftSide(tester, imageKeyKey));
@@ -53,7 +53,7 @@ Offset _getMiddleOfLeftSide(WidgetTester tester, Key key) {
   Finder element = find.byKey(key);
   Offset topLeft = tester.getTopLeft(element);
   Offset center = tester.getCenter(element);
-  return new Offset(topLeft.dx, center.dy);
+  return Offset(topLeft.dx, center.dy);
 }
 
 Future<Null> _tap(WidgetTester tester, Offset point) async {

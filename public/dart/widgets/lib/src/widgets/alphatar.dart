@@ -72,19 +72,19 @@ class Alphatar extends StatelessWidget {
   }) {
     assert(avatarUrl != null || letter != null);
     assert(retry != null);
-    return new Alphatar(
+    return Alphatar(
       key: key,
       avatarImage: avatarUrl != null && avatarUrl.isNotEmpty
           ? avatarUrl.startsWith('http')
-              ? new Image(
+              ? Image(
                   image: retry
-                      ? new NetworkImageWithRetry(avatarUrl)
-                      : new NetworkImage(avatarUrl),
+                      ? NetworkImageWithRetry(avatarUrl)
+                      : NetworkImage(avatarUrl),
                   width: size,
                   height: size,
                   fit: BoxFit.cover,
                 )
-              : new Image.asset(
+              : Image.asset(
                   avatarUrl,
                   width: size,
                   height: size,
@@ -106,7 +106,7 @@ class Alphatar extends StatelessWidget {
     Color backgroundColor,
   }) {
     assert(name != null);
-    return new Alphatar(
+    return Alphatar(
       key: key,
       avatarImage: avatarImage,
       letter: name.isNotEmpty ? name[0] : '',
@@ -125,7 +125,7 @@ class Alphatar extends StatelessWidget {
     bool retry = true,
   }) {
     assert(name != null);
-    return new Alphatar.withUrl(
+    return Alphatar.withUrl(
       key: key,
       avatarUrl: avatarUrl,
       letter: name.isNotEmpty ? name[0] : '',
@@ -146,7 +146,7 @@ class Alphatar extends StatelessWidget {
     // https://github.com/flutter/flutter/issues/6229
     Widget image;
     if (avatarImage != null) {
-      image = new Stack(
+      image = Stack(
         fit: StackFit.passthrough,
         children: <Widget>[
           _buildLetter(),
@@ -157,10 +157,10 @@ class Alphatar extends StatelessWidget {
       image = _buildLetter();
     }
 
-    return new Container(
+    return Container(
       width: size,
       height: size,
-      child: new ClipOval(
+      child: ClipOval(
         child: image,
       ),
     );
@@ -169,21 +169,21 @@ class Alphatar extends StatelessWidget {
   Widget _buildLetter() {
     String text = letter?.toUpperCase() ?? '';
 
-    return new Container(
+    return Container(
       alignment: FractionalOffset.center,
-      decoration: new BoxDecoration(
+      decoration: BoxDecoration(
         color: text.isNotEmpty ? backgroundColor : Colors.transparent,
         shape: BoxShape.circle,
       ),
       child: text.isNotEmpty
-          ? new Text(
+          ? Text(
               text,
-              style: new TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: size / 2.0,
               ),
             )
-          : new Icon(
+          : Icon(
               Icons.error,
               size: size,
               color: Colors.red,
@@ -192,7 +192,7 @@ class Alphatar extends StatelessWidget {
   }
 
   static Color _pickRandomColor() {
-    return _kAllowedColors[new Random().nextInt(_kAllowedColors.length)];
+    return _kAllowedColors[Random().nextInt(_kAllowedColors.length)];
   }
 
   static Color _pickColorForString(String str) {

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/sledge.dart';
 import 'package:test/test.dart';
 
@@ -10,10 +10,10 @@ import 'helpers.dart';
 
 Schema newSchema() {
   final schemaDescription = <String, BaseType>{
-    'a': new Integer(),
-    'b': new Integer()
+    'a': Integer(),
+    'b': Integer()
   };
-  return new Schema(schemaDescription);
+  return Schema(schemaDescription);
 }
 
 void main() async {
@@ -21,7 +21,7 @@ void main() async {
 
   test('Verify that document can be created.', () async {
     Schema schema = newSchema();
-    final id = new DocumentId(schema);
+    final id = DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
     // ignore: unused_local_variable
     Document doc;
@@ -34,7 +34,7 @@ void main() async {
       'Verify that by same DocumentId we get the same document object.'
       '(different transactions)', () async {
     Schema schema = newSchema();
-    final id = new DocumentId(schema);
+    final id = DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
     Document doc1, doc2;
     await sledge.runInTransaction(() async {
@@ -50,7 +50,7 @@ void main() async {
       'Verify that by same documentId we get the same document object.'
       '(same transaction)', () async {
     Schema schema = newSchema();
-    final id = new DocumentId(schema);
+    final id = DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
     Document doc1, doc2;
     await sledge.runInTransaction(() async {
@@ -66,7 +66,7 @@ void main() async {
       'Verify that by different documentId we get different document objects.'
       '(different transactions)', () async {
     Schema schema = newSchema();
-    final id1 = new DocumentId(schema), id2 = new DocumentId(schema);
+    final id1 = DocumentId(schema), id2 = DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
     Document doc1, doc2;
     await sledge.runInTransaction(() async {
@@ -82,7 +82,7 @@ void main() async {
       'Verify that by different documentId we get different document objects.'
       '(same transaction)', () async {
     Schema schema = newSchema();
-    final id1 = new DocumentId(schema), id2 = new DocumentId(schema);
+    final id1 = DocumentId(schema), id2 = DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
     Document doc1, doc2;
     await sledge.runInTransaction(() async {
@@ -96,7 +96,7 @@ void main() async {
       'Check that creating then rolling back a document does not prevent from'
       'creating it later', () async {
     Schema schema = newSchema();
-    final id = new DocumentId(schema);
+    final id = DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
     await sledge.runInTransaction(() async {
       await sledge.getDocument(id);
@@ -118,7 +118,7 @@ void main() async {
   test('Check that operations on non-existing documents throw exceptions',
       () async {
     Schema schema = newSchema();
-    final id = new DocumentId(schema);
+    final id = DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
     Document doc;
     await sledge.runInTransaction(() async {

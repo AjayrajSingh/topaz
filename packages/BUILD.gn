@@ -1,0 +1,48 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("all") {
+  testonly = true
+  public_deps = [
+    "//topaz/packages/benchmarks:all",
+    "//topaz/packages/examples:all",
+    "//topaz/packages/prod:all",
+    "//topaz/packages/sdk:all",
+    "//topaz/packages/tests:all",
+    "//topaz/packages/tools:all",
+  ]
+}
+
+group("buildbot") {
+  testonly = true
+  public_deps = [
+    "//peridot/packages:peridot",
+    "//topaz/packages:all",
+    "//topaz/packages/config:ermine_required",
+  ]
+}
+
+group("kitchen_sink") {
+  testonly = true
+  public_deps = [
+    "//peridot/packages:kitchen_sink",
+    "//topaz/packages:all",
+  ]
+}
+
+group("topaz") {
+  testonly = true
+  public_deps = [
+    "//peridot/packages:peridot",
+    "//topaz/packages/prod:all",
+  ]
+}
+
+group("default") {
+  testonly = true
+  public_deps = [
+    "//peridot/packages:peridot",
+    "//topaz/packages:all",
+  ]
+}

@@ -27,7 +27,7 @@ class OngoingActivityImpl implements OngoingActivity {
       throw Exception(
           'It is an error to call OngoingActivity.done more than once. '
           'An ongoing activity can only be used one time. If you need to start '
-          'a new activity use the methods on Module to do so.');
+          'a activity use the methods on Module to do so.');
     }
 
     _hasCalledDone = true;

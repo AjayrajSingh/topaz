@@ -8,8 +8,6 @@
 #
 # The copy happens when you run "make" from the command line.
 analyzer:
-  language:
-    enableSuperMixins: true
   exclude:
     - '**/generated/**'
 linter:
@@ -89,7 +87,6 @@ linter:
     - parameter_assignments
     - prefer_adjacent_string_concatenation
     - prefer_asserts_in_initializer_lists
-    - prefer_bool_in_asserts
     - prefer_collection_literals
     - prefer_conditional_assignment
     # Disabled until bug is fixed
@@ -126,15 +123,16 @@ linter:
     # Topaz codebase places fields before constructors
     # - sort_constructors_first
     - sort_unnamed_constructors_first
-    - super_goes_last
     - test_types_in_equals
     - throw_in_finally
     - type_annotate_public_apis
     - type_init_formals
     - unawaited_futures
     - unnecessary_brace_in_string_interps
+    - unnecessary_const
     - unnecessary_getters_setters
     - unnecessary_lambdas
+    - unnecessary_new
     - unnecessary_null_aware_assignments
     - unnecessary_null_in_if_null_operators
     - unnecessary_overrides

@@ -18,7 +18,7 @@ SettingsSection _buildBrightness(
   return SettingsSection(
       title: 'Brightness',
       scale: scale,
-      child: new Slider(
+      child: Slider(
         activeColor: Colors.grey[600],
         inactiveColor: Colors.grey[200],
         value: model.brightness,
@@ -35,13 +35,13 @@ class DisplaySettings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      new ScopedModelDescendant<DisplayPolicyBrightnessModel>(
+      ScopedModelDescendant<DisplayPolicyBrightnessModel>(
           builder: (
         BuildContext context,
         Widget child,
         DisplayPolicyBrightnessModel model,
       ) =>
-              new LayoutBuilder(
+              LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) =>
                       Material(
                           child: _buildDisplaySettings(

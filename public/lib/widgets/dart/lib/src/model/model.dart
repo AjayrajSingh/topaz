@@ -57,7 +57,7 @@ class ModelFinder<T extends Model> {
   /// whenever there's a change to the returned model.
   T of(BuildContext context, {bool rebuildOnChange = false}) {
     // ignore: prefer_const_constructors
-    final Type type = new _InheritedModel<T>.forRuntimeType().runtimeType;
+    final Type type = _InheritedModel<T>.forRuntimeType().runtimeType;
     Widget widget = rebuildOnChange
         ? context.inheritFromWidgetOfExactType(type)
         : context.ancestorWidgetOfExactType(type);
@@ -78,9 +78,9 @@ class ScopedModel<T extends Model> extends StatelessWidget {
   const ScopedModel({this.model, this.child});
 
   @override
-  Widget build(BuildContext context) => new _ModelListener(
+  Widget build(BuildContext context) => _ModelListener(
         model: model,
-        builder: (BuildContext context) => new _InheritedModel<T>(
+        builder: (BuildContext context) => _InheritedModel<T>(
               model: model,
               child: child,
             ),
@@ -95,7 +95,7 @@ class _ModelListener extends StatefulWidget {
   const _ModelListener({this.model, this.builder});
 
   @override
-  _ModelListenerState createState() => new _ModelListenerState();
+  _ModelListenerState createState() => _ModelListenerState();
 }
 
 class _ModelListenerState extends State<_ModelListener> {
@@ -171,6 +171,6 @@ class ScopedModelDescendant<T extends Model> extends StatelessWidget {
   Widget build(BuildContext context) => builder(
         context,
         child,
-        new ModelFinder<T>().of(context, rebuildOnChange: true),
+        ModelFinder<T>().of(context, rebuildOnChange: true),
       );
 }

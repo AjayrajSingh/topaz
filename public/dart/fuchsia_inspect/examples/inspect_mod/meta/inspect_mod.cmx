@@ -1,0 +1,26 @@
+{
+    "program": {
+        "data": "data/inspect_mod"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.fonts.Provider",
+            "fuchsia.logger.LogSink",
+            "fuchsia.modular.ComponentContext",
+            "fuchsia.modular.ModuleContext",
+            "fuchsia.netstack.Netstack",
+            "fuchsia.sys.Environment",
+            "fuchsia.ui.input.ImeService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic"
+        ]
+    },
+    "facets": {
+        "fuchsia.module": {
+            "@version": 2,
+            "suggestion_headline": "Inspect Hello World",
+            "intent_filters": [
+            ]
+        }
+    }
+}

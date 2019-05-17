@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_library.gni")
-import("//topaz/runtime/dart/dart_test.gni")
+import("//topaz/runtime/dart/flutter_test.gni")
 
 dart_library("fuchsia_scenic_flutter") {
   package_name = "fuchsia_scenic_flutter"
@@ -17,31 +17,19 @@ dart_library("fuchsia_scenic_flutter") {
     "child_view_connection.dart",
     "src/child_view.dart",
     "src/child_view_connection.dart",
-    "src/internal/_child_scene_layer.dart",
-    "src/internal/_mozart.dart",
-    "src/internal/fakes/mozart_fakes.dart",
-    "src/view_container.dart",
-    "src/view_container_listener_impl.dart",
-    "view_container.dart",
+    "src/child_view_render_box.dart",
   ]
 
   deps = [
-    "//sdk/fidl/fuchsia.math",
-    "//sdk/fidl/fuchsia.sys",
-    "//sdk/fidl/fuchsia.ui.gfx",
-    "//sdk/fidl/fuchsia.ui.viewsv1",
-    "//sdk/fidl/fuchsia.ui.viewsv1token",
+    "//sdk/fidl/fuchsia.ui.views",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",
-    "//topaz/public/dart/fidl",
-    "//topaz/public/dart/fuchsia_logger",
-    "//topaz/public/dart/zircon",
   ]
 }
 
 # Runs these tests using:
 #   fx run-host-tests fuchsia_scenic_flutter_unittests
-dart_test("fuchsia_scenic_flutter_unittests") {
+flutter_test("fuchsia_scenic_flutter_unittests") {
   sources = [
     "child_view_test.dart",
   ]

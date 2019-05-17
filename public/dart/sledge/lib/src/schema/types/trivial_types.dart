@@ -15,7 +15,7 @@ class Boolean implements BaseType {
   String toJson() => 'Boolean';
 
   @override
-  Value newValue(ConnectionId connectionId) => new LastOneWinsValue<bool>();
+  Value newValue(ConnectionId connectionId) => LastOneWinsValue<bool>();
 }
 
 /// The Sledge type to store integers.
@@ -24,7 +24,7 @@ class Integer implements BaseType {
   String toJson() => 'Integer';
 
   @override
-  Value newValue(ConnectionId connectionId) => new LastOneWinsValue<int>();
+  Value newValue(ConnectionId connectionId) => LastOneWinsValue<int>();
 }
 
 /// The Sledge type to store doubles.
@@ -33,7 +33,7 @@ class Double implements BaseType {
   String toJson() => 'Double';
 
   @override
-  Value newValue(ConnectionId connectionId) => new LastOneWinsValue<double>();
+  Value newValue(ConnectionId connectionId) => LastOneWinsValue<double>();
 }
 
 /// The Sledge type to store strings with LWW merging strategy.
@@ -42,7 +42,7 @@ class LastOneWinsString implements BaseType {
   String toJson() => 'LastOneWinsString';
 
   @override
-  Value newValue(ConnectionId connectionId) => new LastOneWinsValue<String>();
+  Value newValue(ConnectionId connectionId) => LastOneWinsValue<String>();
 }
 
 /// The Sledge type to store byte data with LWW merging strategy.
@@ -52,5 +52,5 @@ class LastOneWinsUint8List implements BaseType {
 
   @override
   Value newValue(ConnectionId connectionId) =>
-      new LastOneWinsValue<Uint8List>();
+      LastOneWinsValue<Uint8List>();
 }

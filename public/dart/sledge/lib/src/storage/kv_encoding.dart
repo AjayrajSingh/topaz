@@ -34,7 +34,7 @@ const int typePrefixLength = 1;
 /// Returns the prefix for the KV storing in Ledger items of type [type].
 Uint8List prefixForType(KeyValueType type) {
   assert(type.index >= 0 && type.index <= 255);
-  return new Uint8List.fromList([type.index]);
+  return Uint8List.fromList([type.index]);
 }
 
 /// Returns the document subId stored in `key`.

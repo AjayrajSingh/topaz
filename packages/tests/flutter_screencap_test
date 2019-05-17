@@ -1,9 +1,0 @@
-{
-    "imports": [
-        "peridot/packages/prod/integration_testing",
-        "topaz/packages/tests/flutter_screencap_test_app"
-    ],
-    "packages": [
-        "//topaz/bin/flutter_screencap_test"
-    ]
-}

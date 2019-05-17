@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/sledge.dart';
 import 'package:test/test.dart';
 
@@ -34,7 +34,7 @@ void main() {
     List<int> events = <int>[];
     // ignore: unawaited_futures
     sledge.runInTransaction(() async {
-      events.add(0);
+      await Future(() => events.add(0));
     });
     expect(events, equals(<int>[]));
     await sledge.runInTransaction(() async {
@@ -45,14 +45,14 @@ void main() {
 
   test('Check that abortAndRollback works', () async {
     Map<String, BaseType> schemaDescription = <String, BaseType>{
-      'written': new Boolean()
+      'written': Boolean()
     };
-    Schema schema = new Schema(schemaDescription);
+    Schema schema = Schema(schemaDescription);
 
     Sledge sledge = newSledgeForTesting();
     Document doc;
     await sledge.runInTransaction(() async {
-      doc = await sledge.getDocument(new DocumentId(schema));
+      doc = await sledge.getDocument(DocumentId(schema));
       doc['written'].value = false;
     });
     expect(doc['written'].value, equals(false));
@@ -67,14 +67,14 @@ void main() {
 
   test('Check that exceptions rollback transactions', () async {
     Map<String, BaseType> schemaDescription = <String, BaseType>{
-      'written': new Boolean()
+      'written': Boolean()
     };
-    Schema schema = new Schema(schemaDescription);
+    Schema schema = Schema(schemaDescription);
 
     Sledge sledge = newSledgeForTesting();
     Document doc;
     await sledge.runInTransaction(() async {
-      doc = await sledge.getDocument(new DocumentId(schema));
+      doc = await sledge.getDocument(DocumentId(schema));
       doc['written'].value = false;
     });
     expect(doc['written'].value, equals(false));

@@ -39,7 +39,7 @@ void main() {
 
     test('connect to service fails for bad flags and check status', () async {
       for (var unsupportedFlag in unsupportedFlags) {
-        _EchoImpl echo = new _EchoImpl();
+        _EchoImpl echo = _EchoImpl();
         Service<Echo> service = Service.withConnector(echo.bind);
         EchoProxy echoProxy = EchoProxy();
         var expectedStatus = ZX.ERR_NOT_SUPPORTED;
@@ -103,7 +103,6 @@ void main() {
 
     test('connect to service passes with valid flags', () async {
       var supportedFlags = [
-        0,
         io_fidl.openRightReadable,
         io_fidl.openRightWritable
       ];
@@ -130,7 +129,8 @@ void main() {
         // connect to service
         var echoProxy = EchoProxy();
 
-        await fs.dirProxy.open(0, supportedMode, Echo.$serviceName,
+        await fs.dirProxy.open(io_fidl.openRightReadable,
+            supportedMode, Echo.$serviceName,
             InterfaceRequest(echoProxy.ctrl.request().passChannel()));
         String str = 'my message';
         var got = await echoProxy.echoString(str);
@@ -143,19 +143,20 @@ void main() {
 class _FsWithEchoService {
   final io_fidl.DirectoryProxy dirProxy = io_fidl.DirectoryProxy();
   final PseudoDir _dir = PseudoDir();
-  _EchoImpl echo = new _EchoImpl();
+  _EchoImpl echo = _EchoImpl();
 
   _FsWithEchoService() {
     Service<Echo> service = Service.withConnector(echo.bind);
     var status = _dir.connect(
-        0, 0, InterfaceRequest(dirProxy.ctrl.request().passChannel()));
+        io_fidl.openRightReadable | io_fidl.openRightWritable,
+        0, InterfaceRequest(dirProxy.ctrl.request().passChannel()));
     expect(status, ZX.OK);
     _dir.addNode(Echo.$serviceName, service);
   }
 }
 
 class _EchoImpl extends Echo {
-  final EchoBinding _binding = new EchoBinding();
+  final EchoBinding _binding = EchoBinding();
 
   void bind(InterfaceRequest<Echo> request) {
     _binding.bind(this, request);

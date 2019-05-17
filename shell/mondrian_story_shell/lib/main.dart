@@ -3,18 +3,15 @@
 // found in the LICENSE file.
 
 import 'dart:convert' show ascii;
+import 'dart:developer' show Timeline;
 import 'dart:ui' show window;
 
-import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_ui_input/fidl.dart'
+import 'package:fidl_fuchsia_ui_input/fidl_async.dart'
     show KeyboardEvent, kModifierLeftAlt, KeyboardEventPhase;
 import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
-
 import 'package:lib.story_shell/common.dart';
 import 'models/inset_manager.dart';
 import 'models/layout_model.dart';
@@ -30,7 +27,7 @@ StoryShellImpl _storyShellImpl;
 /// Entry point.
 void main() {
   setupLogger(name: 'Mondrian');
-  trace('starting');
+  Timeline.instantSync('starting');
   log.info('Started');
 
   LayoutModel layoutModel = LayoutModel();
@@ -38,14 +35,15 @@ void main() {
   InsetManager insetManager = InsetManager();
   KeyListener keyListener = KeyListener()
     ..registerKeyboardEventCallback(
-        event: new KeyboardEvent(
-            deviceId: 0,
-            eventTime: 0,
-            hidUsage: 0,
-            codePoint: ascii.encode('o')[0],
-            modifiers: kModifierLeftAlt,
-            phase: KeyboardEventPhase.pressed),
-        callback: () => overviewNotifier.value = !overviewNotifier.value);
+      event: KeyboardEvent(
+          deviceId: 0,
+          eventTime: 0,
+          hidUsage: 0,
+          codePoint: ascii.encode('o')[0],
+          modifiers: kModifierLeftAlt,
+          phase: KeyboardEventPhase.pressed),
+      callback: () => overviewNotifier.value = !overviewNotifier.value,
+    );
 
   final surfaceGraph = SurfaceGraph();
   surfaceGraph.addListener(() {
@@ -53,10 +51,10 @@ void main() {
   });
 
   void onWindowMetricsChanged() {
-    trace(
+    Timeline.instantSync(
       'Mondrian: onWindowMetricsChanged '
-          '${new MediaQueryData.fromWindow(window).size.width},'
-          '${new MediaQueryData.fromWindow(window).size.height}',
+          '${MediaQueryData.fromWindow(window).size.width},'
+          '${MediaQueryData.fromWindow(window).size.height}',
     );
   }
 
@@ -88,24 +86,7 @@ void main() {
   );
 
   _storyShellImpl =
-      new StoryShellImpl(surfaceGraph: surfaceGraph, keyListener: keyListener);
-
-  StartupContext.fromStartupInfo().outgoingServices
-    ..addServiceForName(
-      (InterfaceRequest<StoryShell> request) {
-        trace('story shell request');
-        log.fine('Received binding request for StoryShell');
-        _storyShellImpl.bindStoryShell(request);
-      },
-      StoryShell.$serviceName,
-    )
-    ..addServiceForName(
-      (InterfaceRequest<Lifecycle> request) {
-        trace('lifecycle request');
-        log.fine('Received binding request for Lifecycle');
-        _storyShellImpl.bindLifecycle(request);
-      },
-      Lifecycle.$serviceName,
-    );
-  trace('started');
+      StoryShellImpl(surfaceGraph: surfaceGraph, keyListener: keyListener)
+        ..advertise();
+  Timeline.instantSync('started');
 }

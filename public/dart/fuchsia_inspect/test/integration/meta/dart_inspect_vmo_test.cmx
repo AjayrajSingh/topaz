@@ -1,0 +1,15 @@
+{
+    "program": {
+        "binary": "test/dart_inspect_vmo_test"
+    },
+    "sandbox": {
+        "features": [
+            "shell"
+        ],
+        "services": [
+            "fuchsia.sys.Environment",
+            "fuchsia.sys.Launcher",
+            "fuchsia.sys.Loader"
+        ]
+    }
+}

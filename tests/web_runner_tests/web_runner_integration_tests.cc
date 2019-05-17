@@ -4,15 +4,15 @@
 
 #include <fuchsia/sys/cpp/fidl.h>
 #include <gtest/gtest.h>
-#include <lib/component/cpp/environment_services_helper.h>
 #include <lib/fit/function.h>
-#include <lib/fxl/logging.h>
-#include <lib/fxl/strings/string_printf.h>
 #include <lib/gtest/real_loop_fixture.h>
+#include <src/lib/fxl/logging.h>
+#include <src/lib/fxl/strings/string_printf.h>
 #include <zircon/status.h>
 
-#include "topaz/tests/web_runner_tests/chromium_context.h"
+#include "lib/sys/cpp/service_directory.h"
 #include "topaz/tests/web_runner_tests/test_server.h"
+#include "topaz/tests/web_runner_tests/web_context.h"
 
 // This file contains a subset of adapted Chromium Fuchsia tests to make sure
 // nothing broke on the import boundary.
@@ -38,7 +38,7 @@ TEST(WebRunnerIntegrationTest, Smoke) {
       fxl::StringPrintf("http://localhost:%d/foo.html", server.port());
 
   fuchsia::sys::LauncherSyncPtr launcher;
-  component::GetEnvironmentServices()->ConnectToService(launcher.NewRequest());
+  sys::ServiceDirectory::CreateFromNamespace()->Connect(launcher.NewRequest());
 
   fuchsia::sys::ComponentControllerSyncPtr controller;
   launcher->CreateComponent(std::move(launch_info), controller.NewRequest());
@@ -62,12 +62,12 @@ TEST(WebRunnerIntegrationTest, Smoke) {
   EXPECT_EQ(expected_prefix, std::string(buf.data(), expected_prefix.size()));
 }
 
-class MockNavigationEventObserver
-    : public chromium::web::NavigationEventObserver {
+class MockNavigationEventListener
+    : public fuchsia::web::NavigationEventListener {
  public:
-  // |chromium::web::NavigationEventObserver|
+  // |fuchsia::web::NavigationEventListener|
   void OnNavigationStateChanged(
-      chromium::web::NavigationEvent change,
+      fuchsia::web::NavigationState change,
       OnNavigationStateChangedCallback callback) override {
     if (on_navigation_state_changed_) {
       on_navigation_state_changed_(std::move(change));
@@ -77,73 +77,69 @@ class MockNavigationEventObserver
   }
 
   void set_on_navigation_state_changed(
-      fit::function<void(chromium::web::NavigationEvent)> fn) {
+      fit::function<void(fuchsia::web::NavigationState)> fn) {
     on_navigation_state_changed_ = std::move(fn);
   }
 
  private:
-  fit::function<void(chromium::web::NavigationEvent)>
+  fit::function<void(fuchsia::web::NavigationState)>
       on_navigation_state_changed_;
 };
 
 class ChromiumAppTest : public gtest::RealLoopFixture {
  protected:
-  ChromiumAppTest()
-      : chromium_(component::StartupContext::CreateFromStartupInfo().get()) {}
+  ChromiumAppTest() : web_context_(sys::ComponentContext::Create().get()) {}
 
-  ChromiumContext* chromium() { return &chromium_; }
+  WebContext* web_context() { return &web_context_; }
 
  private:
-  ChromiumContext chromium_;
+  WebContext web_context_;
 };
 
-// This test ensures that we can interact with the chromium.web FIDL.
+// This test ensures that we can interact with the fuchsia.web FIDL.
 //
 // See also
 // https://chromium.googlesource.com/chromium/src/+/master/fuchsia/engine/browser/context_impl_browsertest.cc
 TEST_F(ChromiumAppTest, CreateAndNavigate) {
-  MockNavigationEventObserver navigation_event_observer;
-  fidl::Binding<chromium::web::NavigationEventObserver>
-      navigation_event_observer_binding(&navigation_event_observer);
-  chromium()->frame()->SetNavigationEventObserver(
-      navigation_event_observer_binding.NewBinding());
-  navigation_event_observer_binding.set_error_handler([](zx_status_t status) {
-    FAIL() << "navigation_event_observer_binding: "
+  MockNavigationEventListener navigation_event_listener;
+  fidl::Binding<fuchsia::web::NavigationEventListener>
+      navigation_event_listener_binding(&navigation_event_listener);
+  web_context()->web_frame()->SetNavigationEventListener(
+      navigation_event_listener_binding.NewBinding());
+  navigation_event_listener_binding.set_error_handler([](zx_status_t status) {
+    FAIL() << "navigation_event_listener_binding: "
            << zx_status_get_string(status);
   });
 
   std::string observed_url;
   std::string observed_title;
 
-  navigation_event_observer.set_on_navigation_state_changed(
-      [this, &navigation_event_observer, &observed_url,
-       &observed_title](chromium::web::NavigationEvent change) {
-        if (change.url) {
-          observed_url = *change.url;
+  navigation_event_listener.set_on_navigation_state_changed(
+      [this, &navigation_event_listener, &observed_url,
+       &observed_title](fuchsia::web::NavigationState change) {
+        if (change.has_url()) {
+          observed_url = change.url();
         }
-        if (change.title) {
-          observed_title = *change.title;
+        if (change.has_title()) {
+          observed_title = change.title();
         }
 
-        EXPECT_FALSE(change.is_error);
+        if (change.has_page_type()) {
+          EXPECT_EQ(change.page_type(), fuchsia::web::PageType::NORMAL);
+        }
 
         if (!(observed_url.empty() || observed_title.empty())) {
-          navigation_event_observer.set_on_navigation_state_changed(nullptr);
+          navigation_event_listener.set_on_navigation_state_changed(nullptr);
           QuitLoop();
         }
       });
-
-  // TODO(NET-2089): Without this (or even if this is moved down below
-  // |FindAndBindPort|), this test flakes about 10% of the time. Reordering the
-  // tests such that this test executes first also deflakes it.
-  sleep(1);
 
   web_runner_tests::TestServer server;
   FXL_CHECK(server.FindAndBindPort());
 
   const std::string url =
       fxl::StringPrintf("http://localhost:%d/foo.html", server.port());
-  chromium()->Navigate(url);
+  web_context()->Navigate(url);
 
   ASSERT_TRUE(server.Accept());
 

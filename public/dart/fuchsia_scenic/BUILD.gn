@@ -12,14 +12,12 @@ dart_library("fuchsia_scenic") {
   source_dir = "lib"
 
   sources = [
-    "scenic.dart",
-    "src/resources.dart",
-    "src/session.dart",
+    "src/view_token_pair.dart",
+    "views.dart",
   ]
 
   deps = [
-    "//sdk/fidl/fuchsia.ui.gfx",
-    "//sdk/fidl/fuchsia.ui.scenic",
+    "//sdk/fidl/fuchsia.ui.views",
     "//topaz/public/dart/zircon",
   ]
 }

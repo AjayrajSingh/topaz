@@ -3,18 +3,19 @@
         "data": "data/device_settings"
     },
     "sandbox": {
+        "features": ["build-info"],
         "services": [
-            "fuchsia.modular.Clipboard",
             "fuchsia.amber.Control",
+            "fuchsia.device.manager.Administrator",
             "fuchsia.devicesettings.DeviceSettingsManager",
             "fuchsia.fonts.Provider",
             "fuchsia.logger.LogSink",
-            "fuchsia.sys.Environment",
+            "fuchsia.modular.Clipboard",
             "fuchsia.modular.ContextWriter",
+            "fuchsia.sys.Environment",
             "fuchsia.ui.input.ImeService",
             "fuchsia.ui.policy.Presenter",
-            "fuchsia.ui.scenic.Scenic",
-            "fuchsia.ui.viewsv1.ViewManager"
+            "fuchsia.ui.scenic.Scenic"
             ],
         "dev": [ "misc" ],
         "system": [ "data" ]

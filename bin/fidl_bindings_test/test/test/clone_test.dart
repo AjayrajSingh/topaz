@@ -26,13 +26,13 @@ void main() {
     });
     test('set field', () {
       final s1 = ExampleStruct(foo: 'test', bar: 42);
-      final s2 = ExampleStruct.clone(s1, baz: new Uint8List(10));
+      final s2 = ExampleStruct.clone(s1, baz: Uint8List(10));
       expect(s2.foo, equals('test'));
       expect(s2.bar, equals(42));
       expect(s2.baz?.length, equals(10));
     });
     test('unset field', () {
-      final s1 = ExampleStruct(foo: 'test', bar: 42, baz: new Uint8List(10));
+      final s1 = ExampleStruct(foo: 'test', bar: 42, baz: Uint8List(10));
       final s2 = ExampleStruct.cloneWithout(s1, baz: true);
       expect(s2.foo, equals('test'));
       expect(s2.bar, equals(42));

@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:fuchsia_modular/module.dart';
 
-const List<Color> _colors = const <Color>[
+const List<Color> _colors = <Color>[
   Colors.red,
   Colors.orange,
   Colors.yellow,
@@ -29,7 +29,7 @@ class RootIntentHandler extends IntentHandler {
           backgroundColor: Colors.black54,
           body: Center(
             child: Stack(
-                alignment: const Alignment(0.0, 0.0),
+                alignment: Alignment(0.0, 0.0),
                 children: _createLayers(_numTotalLayers)),
           ),
         ),

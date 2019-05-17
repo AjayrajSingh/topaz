@@ -80,17 +80,29 @@ void Handle::ReleaseWaiter(HandleWaiter* waiter) {
   waiters_.erase(iter);
 }
 
+Dart_Handle Handle::Duplicate(uint32_t rights) {
+  if (!is_valid()) {
+    return ToDart(Create(ZX_HANDLE_INVALID));
+  }
 
-  // clang-format: off
+  zx_handle_t out_handle;
+  zx_status_t status = zx_handle_duplicate(handle_, rights, &out_handle);
+  if (status != ZX_OK) {
+    return ToDart(Create(ZX_HANDLE_INVALID));
+  }
+  return ToDart(Create(out_handle));
+}
 
-#define FOR_EACH_STATIC_BINDING(V) \
-  V(Handle, CreateInvalid)
+// clang-format: off
+
+#define FOR_EACH_STATIC_BINDING(V) V(Handle, CreateInvalid)
 
 #define FOR_EACH_BINDING(V) \
   V(Handle, handle)         \
   V(Handle, is_valid)       \
   V(Handle, Close)          \
-  V(Handle, AsyncWait)
+  V(Handle, AsyncWait)      \
+  V(Handle, Duplicate)
 
 // clang-format: on
 

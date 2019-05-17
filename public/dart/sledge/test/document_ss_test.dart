@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/sledge.dart';
 import 'package:test/test.dart';
 
@@ -16,7 +16,7 @@ class DocumentFleetFactory {
   const DocumentFleetFactory(this._sledge, this._documentId);
 
   Fleet<Document> newFleet(int count) {
-    return new Fleet<Document>(
+    return Fleet<Document>(
         count, (index) => _sledge.fakeGetDocument(_documentId));
   }
 }
@@ -31,13 +31,13 @@ class NameLengthChecker extends Checker<Document> {
 void main() async {
   setupLogger();
 
-  final Schema nameLengthSchema = new Schema(<String, BaseType>{
-    'name': new LastOneWinsString(),
-    'length': new Integer()
+  final Schema nameLengthSchema = Schema(<String, BaseType>{
+    'name': LastOneWinsString(),
+    'length': Integer()
   });
-  final documentId = new DocumentId(nameLengthSchema);
+  final documentId = DocumentId(nameLengthSchema);
   final fakeSledge = newSledgeForTesting()..startInfiniteTransaction();
-  final documentFleetFactory = new DocumentFleetFactory(fakeSledge, documentId);
+  final documentFleetFactory = DocumentFleetFactory(fakeSledge, documentId);
 
   test('Document test with framework', () async {
     final fleet = documentFleetFactory.newFleet(3)
@@ -54,7 +54,7 @@ void main() async {
         doc['length'].value = 6;
       })
       ..synchronize([0, 1, 2])
-      ..addChecker(() => new NameLengthChecker());
+      ..addChecker(() => NameLengthChecker());
     await fleet.testAllOrders();
   });
 

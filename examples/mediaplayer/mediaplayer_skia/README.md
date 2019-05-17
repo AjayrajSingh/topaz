@@ -8,12 +8,12 @@ create a media player.
 The media player uses a file reader or a network reader. To use the file
 reader, you'll need to have an accessible file. Here's an example command line:
 
-    set_root_view mediaplayer_skia /data/vid.ogv
+    present_view mediaplayer_skia /data/vid.ogv
 
 Paths must be absolute (start with a '/'). Here's an example using the network
 reader:
 
-    set_root_view mediaplayer_skia http://example.com/vid.ogv
+    present_view mediaplayer_skia http://example.com/vid.ogv
 
 The app responds to mouse clicks, touch and the keyboard. Scenic
 requires a touch to focus the keyboard. Touching anywhere but the progress bar

@@ -4,7 +4,7 @@
 
 #include "topaz/app/term/term_params.h"
 
-#include "lib/fxl/strings/string_number_conversions.h"
+#include "src/lib/fxl/strings/string_number_conversions.h"
 
 namespace term {
 

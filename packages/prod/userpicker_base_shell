@@ -1,8 +1,0 @@
-{
-    "imports": [
-        "topaz/packages/prod/flutter"
-    ],
-    "packages": [
-        "//topaz/bin/userpicker_base_shell"
-    ]
-}

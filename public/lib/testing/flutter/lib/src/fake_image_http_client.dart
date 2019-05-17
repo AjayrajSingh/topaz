@@ -35,7 +35,7 @@ class FakeHttpClient implements HttpClient {
 class FakeHttpClientRequest implements HttpClientRequest {
   @override
   HttpHeaders get headers {
-    return new FakeHttpHeaders();
+    return FakeHttpHeaders();
   }
 
   @override
@@ -65,7 +65,7 @@ class FakeHttpClientResponse implements HttpClientResponse {
   @override
   StreamSubscription<List<int>> listen(void onData(List<int> event),
       {Function onError, void onDone(), bool cancelOnError}) {
-    return new Stream<List<int>>.fromIterable(
+    return Stream<List<int>>.fromIterable(
             <List<int>>[_kTransparentImageBytes])
         .listen(onData,
             onDone: onDone, onError: onError, cancelOnError: cancelOnError);

@@ -1,0 +1,27 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+flutter_app("inspect_mod") {
+  main_dart = "lib/main.dart"
+  package_name = "inspect_mod"
+
+  fuchsia_package_name = "inspect_mod"
+
+  meta = [
+    {
+      path = rebase_path("meta/inspect_mod.cmx")
+      dest = "inspect_mod.cmx"
+    },
+  ]
+
+  sources = []
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/fuchsia_inspect",
+    "//topaz/public/dart/fuchsia_modular",
+  ]
+}

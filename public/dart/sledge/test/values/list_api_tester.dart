@@ -639,7 +639,7 @@ class ListApiTester<TestingList extends List, E> {
   void testObserver() {
     test('Observer calls.', () {
       final list = _newList();
-      final observer = new DummyValueObserver();
+      final observer = DummyValueObserver();
       expect(list, const TypeMatcher<LeafValue>());
       dynamic leafValue = list;
       leafValue.observer = observer; // ignore: cascade_invocations
@@ -676,7 +676,7 @@ class ListApiTester<TestingList extends List, E> {
         ..expectChanged()
         ..reset();
 
-      list.shuffle(new Random(1));
+      list.shuffle(Random(1));
       observer
         ..expectChanged()
         ..reset();

@@ -2,7 +2,7 @@
     "facets": {
         "fuchsia.test": {
             "injected-services": {
-                "chromium.web.ContextProvider": "fuchsia-pkg://fuchsia.com/chromium#meta/chromium.cmx"
+                "fuchsia.web.ContextProvider": "fuchsia-pkg://fuchsia.com/chromium#meta/chromium.cmx"
             },
             "system-services": [
                 "fuchsia.net.SocketProvider",
@@ -15,11 +15,11 @@
     },
     "sandbox": {
         "services": [
-            "chromium.web.ContextProvider",
             "fuchsia.net.SocketProvider",
             "fuchsia.netstack.Netstack",
             "fuchsia.process.Launcher",
-            "fuchsia.sys.Launcher"
+            "fuchsia.sys.Launcher",
+            "fuchsia.web.ContextProvider"
         ]
     }
 }

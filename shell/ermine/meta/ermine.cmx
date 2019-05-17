@@ -3,7 +3,9 @@
         "data": "data/ermine"
     },
     "sandbox": {
-        "pkgfs": [ "packages" ],
+        "pkgfs": [
+            "packages"
+        ],
         "services": [
             "fuchsia.cobalt.LoggerFactory",
             "fuchsia.fonts.Provider",
@@ -20,9 +22,7 @@
             "fuchsia.sys.Launcher",
             "fuchsia.ui.input.ImeService",
             "fuchsia.ui.policy.Presenter",
-            "fuchsia.ui.scenic.Scenic",
-            "fuchsia.ui.viewsv1.ViewManager"
-        ],
-        "system": [ "data/sysui" ]
+            "fuchsia.ui.scenic.Scenic"
+        ]
     }
 }

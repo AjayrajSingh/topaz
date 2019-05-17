@@ -9,7 +9,7 @@ export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
 const RK4SpringDescription _kSimulationDesc =
-    const RK4SpringDescription(tension: 450.0, friction: 50.0);
+    RK4SpringDescription(tension: 450.0, friction: 50.0);
 
 /// Frame for child views
 class InsetManager extends SpringModel {

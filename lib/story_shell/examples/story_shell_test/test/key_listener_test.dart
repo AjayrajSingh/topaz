@@ -5,9 +5,9 @@
 import 'dart:async';
 import 'dart:convert' show ascii;
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_ui_input/fidl.dart'
+import 'package:fidl_fuchsia_ui_input/fidl_async.dart'
     show KeyboardEvent, KeyboardEventPhase, kModifierLeftAlt;
-import 'package:fidl_fuchsia_ui_policy/fidl.dart'
+import 'package:fidl_fuchsia_ui_policy/fidl_async.dart'
     show
         KeyboardCaptureListenerHack,
         KeyboardCaptureListenerHackProxy,
@@ -24,8 +24,8 @@ class MockPresentation extends Mock implements Presentation {
   final KeyboardCaptureListenerHackProxy _proxy =
       KeyboardCaptureListenerHackProxy();
   @override
-  void captureKeyboardEventHack(KeyboardEvent eventToCapture,
-      InterfaceHandle<KeyboardCaptureListenerHack> listener) {
+  Future<void> captureKeyboardEventHack(KeyboardEvent eventToCapture,
+      InterfaceHandle<KeyboardCaptureListenerHack> listener) async {
     _eventToCapture = eventToCapture;
     _proxy.ctrl.bind(listener);
   }
@@ -96,7 +96,7 @@ void main() {
       mockPresentation.triggerEvent();
       // give the call time to propagate
       Future sleep1() {
-        return new Future.delayed(const Duration(seconds: 1), () {});
+        return Future.delayed(const Duration(seconds: 1), () {});
       }
 
       await sleep1();

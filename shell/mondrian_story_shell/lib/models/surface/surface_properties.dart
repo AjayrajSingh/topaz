@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
 
 /// Inherent properties of a surface
 class SurfaceProperties {
@@ -39,12 +39,12 @@ class SurfaceProperties {
   ModuleSource moduleSourceFromString(String str) {
     if (str == ModuleSource.internal.toString()) {
       return ModuleSource.internal;
-    } else if (str == ModuleSource.external$.toString()) {
-      return ModuleSource.external$;
+    } else if (str == ModuleSource.external.toString()) {
+      return ModuleSource.external;
     } else if (str == 'null') {
       return null;
     } else {
-      throw new ArgumentError.value(str);
+      throw ArgumentError.value(str);
     }
   }
 }

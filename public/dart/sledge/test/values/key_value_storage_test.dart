@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/src/document/values/key_value_storage.dart';
 import 'package:test/test.dart';
 
@@ -13,13 +13,13 @@ void main() {
   setupLogger();
 
   group('Map API coverage', () {
-    new MapApiTester<KeyValueStorage>(() => new KeyValueStorage<int, int>())
+    MapApiTester<KeyValueStorage>(() => KeyValueStorage<int, int>())
       ..testApi()
       ..testObserver();
   });
 
   test('getChange', () {
-    KeyValueStorage kv = new KeyValueStorage<int, int>();
+    KeyValueStorage kv = KeyValueStorage<int, int>();
     expect(kv.length, equals(0));
     kv[0] = 2;
     expect(kv[0], equals(2));
@@ -30,8 +30,8 @@ void main() {
   });
 
   test('getChange + applyChange', () {
-    KeyValueStorage kv1 = new KeyValueStorage<int, int>(),
-        kv2 = new KeyValueStorage<int, int>();
+    KeyValueStorage kv1 = KeyValueStorage<int, int>(),
+        kv2 = KeyValueStorage<int, int>();
     kv1[0] = 2;
     kv2.applyChange(kv1.getChange());
     expect(kv2[0], equals(2));

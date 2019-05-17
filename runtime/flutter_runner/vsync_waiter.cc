@@ -4,17 +4,17 @@
 
 #include "vsync_waiter.h"
 
+#include <lib/async/default.h>
 #include <trace/event.h>
 
-#include "topaz/lib/deprecated_loop/message_loop.h"
 #include "vsync_recorder.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 VsyncWaiter::VsyncWaiter(std::string debug_label,
                          zx_handle_t session_present_handle,
-                         blink::TaskRunners task_runners)
-    : shell::VsyncWaiter(task_runners),
+                         flutter::TaskRunners task_runners)
+    : flutter::VsyncWaiter(task_runners),
       debug_label_(std::move(debug_label)),
       session_wait_(session_present_handle, SessionPresentSignal),
       weak_factory_(this) {
@@ -66,8 +66,7 @@ void VsyncWaiter::AwaitVSync() {
 void VsyncWaiter::FireCallbackWhenSessionAvailable() {
   TRACE_DURATION("flutter", "VsyncWaiter::FireCallbackWhenSessionAvailable");
   FML_DCHECK(task_runners_.GetUITaskRunner()->RunsTasksOnCurrentThread());
-  if (session_wait_.Begin(
-          deprecated_loop::MessageLoop::GetCurrent()->dispatcher()) != ZX_OK) {
+  if (session_wait_.Begin(async_get_default_dispatcher()) != ZX_OK) {
     FML_LOG(ERROR) << "Could not begin wait for Vsync.";
   }
 }
@@ -85,4 +84,4 @@ void VsyncWaiter::FireCallbackNow() {
   FireCallback(previous_vsync, next_vsync);
 }
 
-}  // namespace flutter
+}  // namespace flutter_runner

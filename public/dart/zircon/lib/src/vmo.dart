@@ -34,6 +34,11 @@ class Vmo extends _HandleWrapper<Vmo> {
     return System.vmoWrite(handle, vmoOffset, data);
   }
 
+  /// Duplicate this [Vmo] with the given rights.
+  Vmo duplicate(int rights) {
+    return Vmo(handle.duplicate(rights));
+  }
+
   ReadResult read(int numBytes, [int vmoOffset = 0]) {
     if (handle == null) {
       return const ReadResult(ZX.ERR_INVALID_ARGS);
@@ -50,13 +55,13 @@ class Vmo extends _HandleWrapper<Vmo> {
   Uint8List map() {
     if (handle == null) {
       const int status = ZX.ERR_INVALID_ARGS;
-      throw new ZxStatusException(status, getStringForStatus(status));
+      throw ZxStatusException(status, getStringForStatus(status));
     }
     MapResult r = System.vmoMap(handle);
     if (r.status != ZX.OK) {
-      throw new ZxStatusException(r.status, getStringForStatus(r.status));
+      throw ZxStatusException(r.status, getStringForStatus(r.status));
     }
-    return new UnmodifiableUint8ListView(r.data);
+    return UnmodifiableUint8ListView(r.data);
   }
 }
 
@@ -73,18 +78,18 @@ class SizedVmo extends Vmo {
   factory SizedVmo.fromFile(String path) {
     FromFileResult r = System.vmoFromFile(path);
     if (r.status != ZX.OK) {
-      throw new ZxStatusException(r.status, getStringForStatus(r.status));
+      throw ZxStatusException(r.status, getStringForStatus(r.status));
     }
-    return new SizedVmo(r.handle, r.numBytes);
+    return SizedVmo(r.handle, r.numBytes);
   }
 
   /// Constructs a VMO using the given [bytes]. The returned Vmo is read-only.
   factory SizedVmo.fromUint8List(Uint8List bytes) {
     HandleResult r = System.vmoCreate(bytes.length);
     if (r.status != ZX.OK) {
-      throw new ZxStatusException(r.status, getStringForStatus(r.status));
+      throw ZxStatusException(r.status, getStringForStatus(r.status));
     }
-    return new SizedVmo(r.handle, bytes.length)
+    return SizedVmo(r.handle, bytes.length)
       ..write(bytes.buffer.asByteData());
   }
 

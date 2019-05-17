@@ -14,15 +14,24 @@ import 'package:doc_checker/link_verifier.dart';
 import 'package:doc_checker/projects.dart';
 
 const String _optionHelp = 'help';
-const String _optionRootDir = 'root-dir';
+const String _optionRootDir = 'root';
+const String _optionProject = 'project';
 const String _optionDotFile = 'dot-file';
-const String _optionGitProject = 'git-project';
+const String _optionLocalLinksOnly = 'local-links-only';
+
+// The fuchsia Gerrit host.
+const String _fuchsiaHost = 'fuchsia.googlesource.com';
+
+// Different ways of pointing to the master branch of a project in a Gerrit
+// link.
+const List<String> _masterSynonyms = ['master', 'refs/heads/master', 'HEAD'];
+
+// Documentation subdirectory to inspect.
+const String _docsDir = 'docs';
 
 void reportError(Error error) {
   String errorToString(ErrorType type) {
     switch (type) {
-      case ErrorType.convertPathToHttp:
-        return 'Convert path to http';
       case ErrorType.unknownLocalFile:
         return 'Linking to unknown file';
       case ErrorType.convertHttpToPath:
@@ -36,7 +45,7 @@ void reportError(Error error) {
       case ErrorType.invalidUri:
         return 'Invalid URI';
       default:
-        throw new UnsupportedError('Unknown error type $type');
+        throw UnsupportedError('Unknown error type $type');
     }
   }
 
@@ -45,7 +54,6 @@ void reportError(Error error) {
 }
 
 enum ErrorType {
-  convertPathToHttp,
   unknownLocalFile,
   convertHttpToPath,
   brokenLink,
@@ -66,8 +74,24 @@ class Error {
   bool get hasLocation => location != null;
 }
 
+// Checks whether the URI points to the master branch of a Gerrit (i.e.,
+// googlesource.com) project.
+bool onGerritMaster(Uri uri) {
+  final int index = uri.pathSegments.indexOf('+');
+  if (index == -1 || index == uri.pathSegments.length - 1) {
+    return false;
+  }
+  final String subPath = uri.pathSegments.sublist(index + 1).join('/');
+  for (String branch in _masterSynonyms) {
+    if (subPath.startsWith(branch)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 Future<Null> main(List<String> args) async {
-  final ArgParser parser = new ArgParser()
+  final ArgParser parser = ArgParser()
     ..addFlag(
       _optionHelp,
       help: 'Displays this help message.',
@@ -75,18 +99,23 @@ Future<Null> main(List<String> args) async {
     )
     ..addOption(
       _optionRootDir,
-      help: 'Path to the directory to inspect',
-      defaultsTo: 'docs',
+      help: 'Path to the root of the checkout',
+      defaultsTo: '.',
+    )
+    ..addOption(
+      _optionProject,
+      help: 'Name of the project being inspected',
+      defaultsTo: 'fuchsia',
     )
     ..addOption(
       _optionDotFile,
       help: 'Path to the dotfile to generate',
       defaultsTo: '',
     )
-    ..addOption(
-      _optionGitProject,
-      help: 'Name of the Git project hosting the documentation directory',
-      defaultsTo: 'fuchsia',
+    ..addFlag(
+      _optionLocalLinksOnly,
+      help: 'Don\'t attempt to resolve http(s) links',
+      negatable: false,
     );
   final ArgResults options = parser.parse(args);
 
@@ -95,9 +124,11 @@ Future<Null> main(List<String> args) async {
     return;
   }
 
-  final String docsDir = path.canonicalize(options[_optionRootDir]);
+  final String rootDir = path.canonicalize(options[_optionRootDir]);
+  final String docsProject = options[_optionProject];
+  final String docsDir = path.canonicalize(path.join(rootDir, _docsDir));
 
-  final List<String> docs = new Directory(docsDir)
+  final List<String> docs = Directory(docsDir)
       .listSync(recursive: true)
       .where((FileSystemEntity entity) =>
           path.extension(entity.path) == '.md' &&
@@ -108,83 +139,94 @@ Future<Null> main(List<String> args) async {
       .toList();
 
   final String readme = path.join(docsDir, 'README.md');
-  final Graph graph = new Graph();
+  final Graph graph = Graph();
   final List<Error> errors = <Error>[];
-  final List<Link<String>> linksToVerify = [];
+  final List<Link<String>> inTreeLinks = [];
+  final List<Link<String>> outOfTreeLinks = [];
 
   for (String doc in docs) {
-    final String label = path.relative(doc, from: docsDir);
+    final String label = '//${path.relative(doc, from: rootDir)}';
     final String baseDir = path.dirname(doc);
     final Node node = graph.getNode(label);
     if (doc == readme) {
       graph.root = node;
     }
-    for (String link in new LinkScraper().scrape(doc)) {
+    for (String link in LinkScraper().scrape(doc)) {
       Uri uri;
       try {
         uri = Uri.parse(link);
       } on FormatException {
-        errors.add(new Error(ErrorType.invalidUri, label, link));
+        errors.add(Error(ErrorType.invalidUri, label, link));
         continue;
       }
+
       if (uri.hasScheme) {
-        if (uri.scheme == 'http' || uri.scheme == 'https') {
-          bool shouldTestLink = true;
-          if (uri.authority == 'fuchsia.googlesource.com' &&
-              uri.pathSegments.isNotEmpty) {
-            if (uri.pathSegments[0] == options[_optionGitProject]) {
-              shouldTestLink = false;
-              errors.add(new Error(
-                  ErrorType.convertHttpToPath, label, uri.toString()));
-            } else if (!validProjects.contains(uri.pathSegments[0])) {
-              shouldTestLink = false;
-              errors.add(
-                  new Error(ErrorType.obsoleteProject, label, uri.toString()));
-            }
-          }
-          if (shouldTestLink) {
-            linksToVerify.add(new Link(uri, label));
-          }
+        if (uri.scheme != 'http' && uri.scheme != 'https') {
+          continue;
+        }
+        final bool onFuchsiaHost  = uri.authority == _fuchsiaHost;
+        final String project = uri.pathSegments.isEmpty? '' :
+            uri.pathSegments[0];
+        if (onFuchsiaHost && onGerritMaster(uri) && project == docsProject) {
+          errors.add(Error(
+              ErrorType.convertHttpToPath, label, uri.toString()));
+        } else if (onFuchsiaHost && !validProjects.contains(project)) {
+          errors.add(
+              Error(ErrorType.obsoleteProject, label, uri.toString()));
+        } else {
+            outOfTreeLinks.add(Link(uri, label));
         }
         continue;
       }
+
       final List<String> parts = link.split('#');
       final String location = parts[0];
       if (location.isEmpty) {
         continue;
       }
-      final String absoluteLocation = path.canonicalize(location.startsWith('/')
-          ? path.join(docsDir, location.substring(1))
-          : path.join(baseDir, location));
-      if (path.isWithin(docsDir, absoluteLocation)) {
-        final String relativeLocation =
-            path.relative(absoluteLocation, from: docsDir);
-        if (docs.contains(absoluteLocation)) {
-          graph.addEdge(from: node, to: graph.getNode(relativeLocation));
-        } else {
-          errors.add(
-              new Error(ErrorType.unknownLocalFile, label, relativeLocation));
-        }
-      } else {
-        errors.add(new Error(ErrorType.convertPathToHttp, label, location));
+
+      final String rootRelPath = location.startsWith('/') ?
+          location.substring(1):
+          path.relative(path.join(baseDir, location), from: rootDir);
+      final String absPath = path.join(rootDir, rootRelPath);
+      final String linkLabel = '//$rootRelPath';
+
+      if (docs.contains(absPath)) {
+        graph.addEdge(from: node, to: graph.getNode(linkLabel));
       }
+      final Uri localUri = Uri.parse('file://$absPath');
+      inTreeLinks.add(Link(localUri, label));
     }
   }
 
-  // Verify http links.
-  await verifyLinks(linksToVerify, (Link<String> link, bool isValid) {
-    if (!isValid) {
+  // Verify http links pointing inside the tree just by checking to see if the
+  // path exists, as HTTP calls would be unnecessarily expensive here.
+  await Future.wait(inTreeLinks.map((Link<String> link) async {
+    final File possibleFile = File.fromUri(link.uri);
+    final Directory possibleDir = Directory.fromUri(link.uri);
+    if (!possibleFile.existsSync() && !possibleDir.existsSync()) {
       errors.add(
-          new Error(ErrorType.brokenLink, link.payload, link.uri.toString()));
+          Error(ErrorType.brokenLink, link.payload, link.toString()));
     }
-  });
+    return null;
+  }));
+
+  // Verify http links pointing outside the tree.
+  if (!options[_optionLocalLinksOnly]) {
+    await verifyLinks(outOfTreeLinks, (Link<String> link, bool isValid) {
+      if (!isValid) {
+        errors.add(
+            Error(ErrorType.brokenLink, link.payload, link.uri.toString()));
+      }
+    });
+  }
 
   // Verify singletons and orphans.
   final List<Node> unreachable = graph.removeSingletons()
     ..addAll(
-        graph.orphans..removeWhere((Node node) => node.label == 'navbar.md'));
+        graph.orphans..removeWhere((Node node) => node.label == '//docs/navbar.md'));
   for (Node node in unreachable) {
-    errors.add(new Error.forProject(ErrorType.unreachablePage, node.label));
+    errors.add(Error.forProject(ErrorType.unreachablePage, node.label));
   }
 
   errors
@@ -192,7 +234,7 @@ Future<Null> main(List<String> args) async {
     ..forEach(reportError);
 
   if (options[_optionDotFile].isNotEmpty) {
-    graph.export('fuchsia_docs', new File(options[_optionDotFile]).openWrite());
+    graph.export('fuchsia_docs', File(options[_optionDotFile]).openWrite());
   }
 
   if (errors.isNotEmpty) {

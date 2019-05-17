@@ -1,6 +1,0 @@
-{
-    "packages": [
-        "//topaz/app/maxwell/agents/module_suggester_dart:module_suggester",
-        "//topaz/app/maxwell/agents/usage_log"
-    ]
-}

@@ -7,6 +7,8 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 
+import 'package:crypto/crypto.dart';
+
 import 'package:vm/kernel_front_end.dart'
     show createCompilerArgParser, runCompiler, successExitCode;
 
@@ -28,7 +30,7 @@ Future<void> main(List<String> args) async {
   try {
     options = _argParser.parse(args);
     if (!options.rest.isNotEmpty) {
-      throw new Exception('Must specify input.dart');
+      throw Exception('Must specify input.dart');
     }
   } on Exception catch (error) {
     print('ERROR: $error\n');
@@ -56,16 +58,16 @@ Future<void> main(List<String> args) async {
 
 Future createManifest(
     String packageManifestFilename, String dataDir, String output) async {
-  List<String> packages = await new File('$output-packages').readAsLines();
+  List<String> packages = await File('$output-packages').readAsLines();
 
   // Make sure the 'main' package is the last (convention with package loader).
   packages.remove('main');
   packages.add('main');
 
-  final IOSink packageManifest = new File(packageManifestFilename).openWrite();
-  final String kernelListFilename = '$packageManifestFilename.dilplist';
-  final IOSink kernelList = new File(kernelListFilename).openWrite();
+  final IOSink packageManifest = File(packageManifestFilename).openWrite();
 
+  final String kernelListFilename = '$packageManifestFilename.dilplist';
+  final IOSink kernelList = File(kernelListFilename).openWrite();
   for (String package in packages) {
     final String filenameInPackage = '$package.dilp';
     final String filenameInBuild = '$output-$package.dilp';
@@ -73,8 +75,22 @@ Future createManifest(
         .write('data/$dataDir/$filenameInPackage=$filenameInBuild\n');
     kernelList.write('$filenameInPackage\n');
   }
+  await kernelList.close();
+
+  final String frameworkVersionFilename = '$packageManifestFilename.frameworkversion';
+  final IOSink frameworkVersion = File(frameworkVersionFilename).openWrite();
+  for (String package in ['collection', 'flutter', 'meta', 'typed_data', 'vector_math']) {
+    Digest digest;
+    if (packages.contains(package)) {
+      final filenameInBuild = '$output-$package.dilp';
+      final bytes = await File(filenameInBuild).readAsBytes();
+      digest = sha256.convert(bytes);
+    }
+    frameworkVersion.write('$package=$digest\n');
+  }
+  await frameworkVersion.close();
 
   packageManifest.write('data/$dataDir/app.dilplist=$kernelListFilename\n');
+  packageManifest.write('data/$dataDir/app.frameworkversion=$frameworkVersionFilename\n');
   await packageManifest.close();
-  await kernelList.close();
 }

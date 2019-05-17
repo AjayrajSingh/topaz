@@ -13,13 +13,13 @@ import '../base_type.dart';
 
 /// The Sledge type for Ordered Set of [Uint8List].
 class OrderedList implements BaseType {
-  static const _listEquality = const ListEquality<int>();
+  static const _listEquality = ListEquality<int>();
 
   @override
   String toJson() => 'OrderedList';
 
   @override
   Value newValue(ConnectionId connectionId) =>
-      new OrderedListValue<Uint8List>(connectionId.id,
+      OrderedListValue<Uint8List>(connectionId.id,
           equals: _listEquality.equals);
 }

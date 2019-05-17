@@ -163,7 +163,7 @@ class MapApiTester<TestingMap extends Map> {
   void testObserver() {
     test('Observer calls.', () {
       final dynamic map = _mapCreator();
-      final observer = new DummyValueObserver();
+      final observer = DummyValueObserver();
       map.observer = observer;
       expect(map.containsKey(0), equals(false));
       observer.expectNotChanged();

@@ -2,16 +2,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/sledge.dart';
 import 'package:test/test.dart';
 
 Schema _newSchema() {
   final schemaDescription = <String, BaseType>{
-    'a': new Integer(),
-    'b': new Integer(),
+    'a': Integer(),
+    'b': Integer(),
   };
-  return new Schema(schemaDescription);
+  return Schema(schemaDescription);
 }
 
 void main() {
@@ -19,7 +19,7 @@ void main() {
 
   test('Verify exceptions', () async {
     Schema schema = _newSchema();
-    QueryBuilder qb = new QueryBuilder(schema)..addEqual('a', 1);
+    QueryBuilder qb = QueryBuilder(schema)..addEqual('a', 1);
     // Test adding multiple restrictions on the same field.
     expect(() => qb.addEqual('a', 2), throwsArgumentError);
     // Test passing an unsuported type.

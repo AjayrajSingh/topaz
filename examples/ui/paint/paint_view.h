@@ -5,13 +5,15 @@
 #ifndef TOPAZ_EXAMPLES_UI_PAINT_PAINT_VIEW_H_
 #define TOPAZ_EXAMPLES_UI_PAINT_PAINT_VIEW_H_
 
+#include <fuchsia/images/cpp/fidl.h>
+#include <fuchsia/ui/input/cpp/fidl.h>
 #include <map>
 #include <vector>
-
-#include "examples/ui/lib/skia_view.h"
-#include "lib/fxl/macros.h"
+#include "src/lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkPath.h"
+
+#include "examples/ui/lib/skia_view.h"
 
 namespace examples {
 
@@ -21,10 +23,10 @@ class PaintView : public scenic::SkiaView {
   ~PaintView() override = default;
 
  private:
-  // |scenic::V1BaseView|
+  // |scenic::BaseView|
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
-  bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
+  void OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 
   void DrawContent(SkCanvas* canvas);
   SkPath CurrentPath(uint32_t pointer_id);

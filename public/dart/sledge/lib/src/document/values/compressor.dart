@@ -16,7 +16,7 @@ import 'key_value.dart';
 /// ({hash(key)}, {|key|}{key}{value}).
 /// {|key|} is an Uint64 and takes 8 bytes to store.
 class Compressor {
-  static const _listEquality = const ListEquality();
+  static const _listEquality = ListEquality();
   final Map<Uint8List, Uint8List> _keyByHash = newUint8ListMap<Uint8List>();
 
   /// Compress Key
@@ -28,18 +28,18 @@ class Compressor {
   KeyValue compressKeyInEntry(KeyValue entry) {
     Uint8List newKey = compressKey(entry.key);
     Uint8List newValue = concatListOfUint8Lists([
-      new Uint8List(8)..buffer.asByteData().setUint64(0, entry.key.length),
+      Uint8List(8)..buffer.asByteData().setUint64(0, entry.key.length),
       entry.key,
       entry.value
     ]);
-    return new KeyValue(newKey, newValue);
+    return KeyValue(newKey, newValue);
   }
 
   /// Uncompress key.
   Uint8List uncompressKey(Uint8List keyHash) {
     final key = _keyByHash[keyHash];
     if (key == null) {
-      throw new InternalSledgeError('Unable to uncompress key `$keyHash`.');
+      throw InternalSledgeError('Unable to uncompress key `$keyHash`.');
     }
     return key;
   }
@@ -47,13 +47,13 @@ class Compressor {
   /// Uncompress KeyValue.
   KeyValue uncompressKeyInEntry(KeyValue entry) {
     if (entry.value.length < 8) {
-      throw new InternalSledgeError(
+      throw InternalSledgeError(
           'In a hashed key mode, the value size must be '
           '>= 8. Found ${entry.value.length} instead for entry `$entry`.');
     }
     final keyLength = entry.value.buffer.asByteData().getUint64(0);
     if (entry.value.length < 8 + keyLength) {
-      throw new InternalSledgeError(
+      throw InternalSledgeError(
           'Incorrect format for value of given entry: '
           'The parsed length ($keyLength) is larger than the value content\'s '
           'length (${entry.value.length - 8}). Entry: `$entry`');
@@ -65,10 +65,10 @@ class Compressor {
     // Important side effect: result.key is added to _keyByHash.
     final hash = _getAndSaveHashOfKey(key);
     if (!_listEquality.equals(hash, entry.key)) {
-      throw new InternalSledgeError(
+      throw InternalSledgeError(
           'Hash of parsed key is not equal to passed hash (expected `$hash`, got `${entry.key}`).');
     }
-    return new KeyValue(key, value);
+    return KeyValue(key, value);
   }
 
   /// Returns hash of key, and adds (hash, key) pair to caching map.

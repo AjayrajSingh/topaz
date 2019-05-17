@@ -184,34 +184,22 @@ void main() {
       });
     });
 
-    test('open fails with non empty path', () async {
+    test('open fails', () async {
       var file = _createReadWriteFileStub();
 
-      var proxy = FileProxy();
-      file.open(openRightReadable | openFlagDescribe, 0, '/',
-          _getNodeInterfaceRequest(proxy));
+      var paths = ['', '/', '.', './', './/', './//'];
+      for (var path in paths) {
+        var proxy = FileProxy();
+        file.open(openRightReadable | openFlagDescribe, 0, path,
+            _getNodeInterfaceRequest(proxy), openRightReadable);
 
-      await proxy.onOpen.first.then((response) {
-        expect(response.s, ZX.ERR_NOT_DIR);
-        expect(response.info, isNull);
-      }).catchError((err) async {
-        fail(err.toString());
-      });
-    });
-
-    test('open works with empty path', () async {
-      var file = _createReadWriteFileStub();
-
-      var proxy = FileProxy();
-      file.open(openRightReadable | openFlagDescribe, 0, '',
-          _getNodeInterfaceRequest(proxy));
-
-      await proxy.onOpen.first.then((response) {
-        expect(response.s, ZX.OK);
-        expect(response.info, isNotNull);
-      }).catchError((err) async {
-        fail(err.toString());
-      });
+        await proxy.onOpen.first.then((response) {
+          expect(response.s, ZX.ERR_NOT_DIR);
+          expect(response.info, isNull);
+        }).catchError((err) async {
+          fail(err.toString());
+        });
+      }
     });
   });
 
@@ -287,6 +275,22 @@ void main() {
       });
     });
 
+    test('clone works with POSIX compatibility', () async {
+      var file = _createReadOnlyFile('test_str', openRightReadable);
+
+      var clonedProxy = FileProxy();
+      await file.proxy.clone(
+          openRightReadable | openFlagDescribe | openFlagPosix,
+          _getNodeInterfaceRequest(clonedProxy));
+
+      await clonedProxy.onOpen.first.then((response) {
+        expect(response.s, ZX.OK);
+        expect(response.info, isNotNull);
+      }).catchError((err) async {
+        fail(err.toString());
+      });
+    });
+
     test('clone fails when trying to pass Readable flag to Node Reference',
         () async {
       var file = _createReadOnlyFile(
@@ -336,7 +340,8 @@ void main() {
       });
     });
 
-    test('clone should fail if parent\'s flag doesn\'t match up', () async {
+    test('clone should fail if requested rights exceed source rights',
+        () async {
       var file = _createReadWriteFile('test_str', createProxy: false);
       var flagsToTest = [openRightReadable, openRightWritable];
 

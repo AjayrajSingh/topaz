@@ -30,8 +30,14 @@ class Handle {
   int close() {
     return 0;
   }
+
   HandleWaiter asyncWait(int signals, AsyncWaitCallback callback) {
-    throw new UnimplementedError(
+    throw UnimplementedError(
         'Handle.asyncWait() is not implemented on this platform.');
+  }
+
+  Handle duplicate(int options) {
+    throw UnimplementedError(
+        'Handle.duplicate() is not implemented on this platform.');
   }
 }

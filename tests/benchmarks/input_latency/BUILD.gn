@@ -1,0 +1,31 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/package.gni")
+
+package("topaz_input_latency_benchmarks") {
+  testonly = true
+
+  deps = [
+    "//topaz/tests/benchmarks:topaz_benchmarks_bin",
+  ]
+
+  meta = [
+    {
+      dest = "run_button_flutter_benchmark.cmx"
+      path = rebase_path(dest)
+    },
+  ]
+
+  binaries = [
+    {
+      name = "topaz_benchmarks"
+    },
+    {
+      shell = true
+      name = "run_button_flutter_benchmark.sh"
+      source = rebase_path("run_button_flutter_benchmark.sh")
+    },
+  ]
+}

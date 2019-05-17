@@ -18,15 +18,15 @@ class CircularButton extends StatelessWidget {
       : assert(icon != null);
 
   @override
-  Widget build(BuildContext context) => new Material(
+  Widget build(BuildContext context) => Material(
         type: MaterialType.circle,
         elevation: 2.0,
         color: Colors.grey[200],
-        child: new InkWell(
+        child: InkWell(
           onTap: () => onTap?.call(),
-          child: new Container(
-            padding: const EdgeInsets.all(12.0),
-            child: new Icon(icon),
+          child: Container(
+            padding: EdgeInsets.all(12.0),
+            child: Icon(icon),
           ),
         ),
       );

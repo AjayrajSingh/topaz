@@ -17,7 +17,7 @@ void main(List<String> args) {
     fuchsia.exit(23);
   }
 
-  _timer = new Timer(const Duration(seconds: 1), () {
+  _timer = Timer(const Duration(seconds: 1), () {
     print('Goodbye, Dart!');
     fuchsia.exit(42);
   });

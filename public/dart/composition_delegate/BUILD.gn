@@ -1,0 +1,47 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/test.gni")
+import("//build/dart/dart_library.gni")
+
+dart_library("composition_delegate") {
+  package_name = "composition_delegate"
+
+  sdk_category = "partner"
+  sources = [
+    "composition_delegate.dart",
+    "src/layout/layout_types.dart",
+    "src/composition_delegate/composition_delegate.dart",
+    "src/internal/tree/_surface_node.dart",
+    "src/internal/tree/_surface_tree.dart",
+    "src/internal/layout_logic/_layout_strategy.dart",
+    "src/internal/layout_logic/_layout_logic.dart",
+    "src/internal/layout_logic/split_evenly_strategy/split_evenly_strategy.dart",
+    "src/internal/layout_logic/stack_strategy/stack_strategy.dart",
+    "src/surface/surface_relation.dart",
+    "src/surface/surface.dart",
+  ]
+
+  deps = [
+    "//third_party/dart-pkg/pub/logging",
+    "//third_party/dart-pkg/pub/meta",
+    "//third_party/dart-pkg/pub/quiver"
+  ]
+}
+
+dart_test("composition_delegate_tests") {
+  sources = [
+    "encode_decode_test.dart",
+    "internal/surface_node_test.dart",
+    "internal/surface_tree_test.dart",
+    "layout_logic/stack_layout_test.dart",
+    "layout_logic/split_layout_test.dart",
+  ]
+
+  deps = [
+    ":composition_delegate",
+    "//third_party/dart-pkg/pub/logging",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}

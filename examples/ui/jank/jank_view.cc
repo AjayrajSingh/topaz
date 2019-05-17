@@ -9,9 +9,9 @@
 #include <string>
 
 #include "lib/component/cpp/connect.h"
-#include "lib/fxl/logging.h"
-#include "lib/fxl/macros.h"
-#include "lib/fxl/time/time_delta.h"
+#include "src/lib/fxl/logging.h"
+#include "src/lib/fxl/macros.h"
+#include "src/lib/fxl/time/time_delta.h"
 
 namespace examples {
 
@@ -93,12 +93,12 @@ void JankView::DrawButton(SkCanvas* canvas, const char* label,
   textPaint.setColor(SK_ColorBLACK);
   textPaint.setAntiAlias(true);
   canvas->drawSimpleText(label, strlen(label), kUTF8_SkTextEncoding,
-                   bounds.centerX() - textBounds.centerX(),
-                   bounds.centerY() - textBounds.centerY(),
-                   textFont, textPaint);
+                         bounds.centerX() - textBounds.centerX(),
+                         bounds.centerY() - textBounds.centerY(), textFont,
+                         textPaint);
 }
 
-bool JankView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
+void JankView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   if (event.is_pointer()) {
     const fuchsia::ui::input::PointerEvent& pointer = event.pointer();
     if (pointer.phase == fuchsia::ui::input::PointerEventPhase::DOWN) {
@@ -110,11 +110,10 @@ bool JankView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
             size_t(index) < sizeof(kButtons) / sizeof(kButtons[0]) &&
             y < (kButtonHeight + kMargin) * (index + 1))
           OnClick(kButtons[index]);
-        return true;
+        return;
       }
     }
   }
-  return false;
 }
 
 void JankView::OnClick(const Button& button) {

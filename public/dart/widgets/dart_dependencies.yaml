@@ -4,7 +4,7 @@
 
 name: lib.widgets
 dependencies:
-  flutter_image: ^1.0.0
+  flutter_image: 2.0.0-dev.1
   flutter_svg: ^0.6.1
   palette_generator: ^0.1.0
 

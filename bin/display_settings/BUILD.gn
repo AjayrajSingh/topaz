@@ -25,10 +25,9 @@ flutter_app("display_settings") {
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/lib/settings:lib.settings",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_services",
     "//topaz/public/lib/display/dart",
     "//topaz/public/lib/display/flutter",
-    "//topaz/public/lib/schemas/dart",
   ]
 }

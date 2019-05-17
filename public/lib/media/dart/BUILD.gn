@@ -9,7 +9,6 @@ dart_library("dart") {
 
   sources = [
     "audio.dart",
-    "audio_legacy.dart",
   ]
 
   source_dir = "."
@@ -19,7 +18,6 @@ dart_library("dart") {
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_logger",
     "//topaz/public/dart/fuchsia_services",
-    "//topaz/public/lib/app/dart",
     "//topaz/public/lib/settings:settings_protos",
   ]
 }

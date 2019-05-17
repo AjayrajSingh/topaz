@@ -4,8 +4,8 @@
 
 import 'dart:convert';
 
-import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_ui_gfx/fidl.dart' show ImportToken;
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
+import 'package:fidl_fuchsia_ui_views/fidl_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mondrian/models/surface/surface.dart';
 import 'package:mondrian/models/surface/surface_graph.dart';
@@ -14,23 +14,23 @@ import 'package:zircon/zircon.dart';
 
 void main() {
   test('toJson and back again with a single surface', () {
-    SurfaceGraph graph = new SurfaceGraph();
+    SurfaceGraph graph = SurfaceGraph();
     SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
+        SurfaceProperties(containerLabel: 'containerLabel');
+    SurfaceRelation relation = SurfaceRelation(
       emphasis: 0.12,
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
     graph
       ..addSurface('value', properties, '', relation, null, '')
-      ..connectViewFromImportToken('value', ImportToken(value: EventPair(null)))
+      ..connectView('value', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('value');
     expect(graph.focusStack.length, 1);
     String encoded = json.encode(graph);
 
     Map<String, dynamic> decoded = json.decode(encoded);
-    SurfaceGraph decodedGraph = new SurfaceGraph.fromJson(decoded);
+    SurfaceGraph decodedGraph = SurfaceGraph.fromJson(decoded);
 
     expect(decodedGraph.focusStack.length, 1);
     Surface surface = decodedGraph.focusStack.first;
@@ -43,37 +43,36 @@ void main() {
   });
 
   test('toJson and back again with two surfaces', () {
-    SurfaceGraph graph = new SurfaceGraph();
+    SurfaceGraph graph = SurfaceGraph();
     SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
+        SurfaceProperties(containerLabel: 'containerLabel');
+    SurfaceRelation relation = SurfaceRelation(
       emphasis: 0.12,
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
     graph
       ..addSurface('parent', properties, '', relation, null, '')
-      ..connectViewFromImportToken(
-          'parent', ImportToken(value: EventPair(null)))
+      ..connectView('parent', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('parent');
     expect(graph.focusStack.length, 1);
 
-    properties = new SurfaceProperties(containerLabel: 'containerLabel');
-    relation = new SurfaceRelation(
+    properties = SurfaceProperties(containerLabel: 'containerLabel');
+    relation = SurfaceRelation(
       emphasis: 0.5,
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
     graph
       ..addSurface('child', properties, 'parent', relation, null, '')
-      ..connectViewFromImportToken('child', ImportToken(value: EventPair(null)))
+      ..connectView('child', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('child');
     expect(graph.focusStack.length, 2);
 
     String encoded = json.encode(graph);
 
     Map<String, dynamic> decoded = json.decode(encoded);
-    SurfaceGraph decodedGraph = new SurfaceGraph.fromJson(decoded);
+    SurfaceGraph decodedGraph = SurfaceGraph.fromJson(decoded);
 
     expect(decodedGraph.focusStack.length, 2);
     Surface surface = decodedGraph.focusStack.first;
@@ -98,50 +97,48 @@ void main() {
   });
 
   test('toJson and back again with one surface with two children', () {
-    SurfaceGraph graph = new SurfaceGraph();
+    SurfaceGraph graph = SurfaceGraph();
     SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
+        SurfaceProperties(containerLabel: 'containerLabel');
+    SurfaceRelation relation = SurfaceRelation(
       emphasis: 0.12,
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
     graph
       ..addSurface('parent', properties, '', relation, null, '')
-      ..connectViewFromImportToken(
-          'parent', ImportToken(value: EventPair(null)))
+      ..connectView('parent', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('parent');
     expect(graph.focusStack.length, 1);
 
-    properties = new SurfaceProperties(containerLabel: 'containerLabel');
-    relation = new SurfaceRelation(
+    properties = SurfaceProperties(containerLabel: 'containerLabel');
+    relation = SurfaceRelation(
       emphasis: 0.5,
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
     graph
       ..addSurface('child1', properties, 'parent', relation, null, '')
-      ..connectViewFromImportToken('child', ImportToken(value: EventPair(null)))
+      ..connectView('child', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('child1');
     expect(graph.focusStack.length, 2);
 
-    properties = new SurfaceProperties(containerLabel: 'containerLabel');
-    relation = new SurfaceRelation(
+    properties = SurfaceProperties(containerLabel: 'containerLabel');
+    relation = SurfaceRelation(
       emphasis: 0.0,
       arrangement: SurfaceArrangement.ontop,
       dependency: SurfaceDependency.dependent,
     );
     graph
       ..addSurface('child2', properties, 'parent', relation, null, '')
-      ..connectViewFromImportToken(
-          'child2', ImportToken(value: EventPair(null)))
+      ..connectView('child2', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('child2');
     expect(graph.focusStack.length, 3);
 
     String encoded = json.encode(graph);
 
     Map<String, dynamic> decoded = json.decode(encoded);
-    SurfaceGraph decodedGraph = new SurfaceGraph.fromJson(decoded);
+    SurfaceGraph decodedGraph = SurfaceGraph.fromJson(decoded);
 
     expect(decodedGraph.focusStack.length, 3);
     Surface surface = decodedGraph.focusStack.first;
@@ -177,20 +174,18 @@ void main() {
   });
 
   test('external surfaces are found by resummon dismissed checks', () {
-    SurfaceGraph graph = new SurfaceGraph();
+    SurfaceGraph graph = SurfaceGraph();
     SurfaceProperties externalProp =
-        new SurfaceProperties(source: ModuleSource.external$);
+        SurfaceProperties(source: ModuleSource.external);
     graph
-      ..addSurface('parent', new SurfaceProperties(), '', new SurfaceRelation(),
-          null, '')
-      ..connectViewFromImportToken(
-          'parent', ImportToken(value: EventPair(null)))
+      ..addSurface(
+          'parent', SurfaceProperties(), '', SurfaceRelation(), null, '')
+      ..connectView('parent', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('parent')
       // Now add external surface
       ..addSurface(
-          'external', externalProp, 'parent', new SurfaceRelation(), null, '')
-      ..connectViewFromImportToken(
-          'external', ImportToken(value: EventPair(null)))
+          'external', externalProp, 'parent', SurfaceRelation(), null, '')
+      ..connectView('external', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('external')
       // Now dismiss the external surface
       ..dismissSurface('external');
@@ -199,83 +194,79 @@ void main() {
   });
 
   test('duplicate surface add', () {
-    SurfaceGraph graph = new SurfaceGraph();
+    SurfaceGraph graph = SurfaceGraph();
     SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
+        SurfaceProperties(containerLabel: 'containerLabel');
+    SurfaceRelation relation = SurfaceRelation(
       emphasis: 0.12,
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
     graph
       ..addSurface('value', properties, '', relation, null, '')
-      ..connectViewFromImportToken('value', ImportToken(value: EventPair(null)))
+      ..connectView('value', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('value');
     expect(graph.treeSize, 2);
 
     graph
       ..addSurface('value', properties, '', relation, null, '')
-      ..connectViewFromImportToken('value', ImportToken(value: EventPair(null)))
+      ..connectView('value', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('value');
     expect(graph.treeSize, 2);
   });
 
   test('duplicate child surface add', () {
-    SurfaceGraph graph = new SurfaceGraph();
+    SurfaceGraph graph = SurfaceGraph();
     SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
+        SurfaceProperties(containerLabel: 'containerLabel');
+    SurfaceRelation relation = SurfaceRelation(
       emphasis: 0.12,
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
     graph
       ..addSurface('value', properties, '', relation, null, '')
-      ..connectViewFromImportToken('value', ImportToken(value: EventPair(null)))
+      ..connectView('value', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('value');
     expect(graph.treeSize, 2);
 
     graph
       ..addSurface('value.child', properties, '', relation, null, '')
-      ..connectViewFromImportToken(
-          'value.child', ImportToken(value: EventPair(null)))
+      ..connectView('value.child', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('value.child');
     expect(graph.treeSize, 3);
 
     graph
       ..addSurface('value.child', properties, '', relation, null, '')
-      ..connectViewFromImportToken(
-          'value.child', ImportToken(value: EventPair(null)))
+      ..connectView('value.child', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('value.child');
     expect(graph.treeSize, 3);
   });
 
   test('duplicate child surface add', () {
-    SurfaceGraph graph = new SurfaceGraph();
+    SurfaceGraph graph = SurfaceGraph();
     SurfaceProperties properties =
-        new SurfaceProperties(containerLabel: 'containerLabel');
-    SurfaceRelation relation = new SurfaceRelation(
+        SurfaceProperties(containerLabel: 'containerLabel');
+    SurfaceRelation relation = SurfaceRelation(
       emphasis: 0.12,
       arrangement: SurfaceArrangement.copresent,
       dependency: SurfaceDependency.dependent,
     );
     graph
       ..addSurface('value', properties, '', relation, null, '')
-      ..connectViewFromImportToken('value', ImportToken(value: EventPair(null)))
+      ..connectView('value', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('value');
     expect(graph.treeSize, 2);
 
     graph
       ..addSurface('value.child', properties, '', relation, null, '')
-      ..connectViewFromImportToken(
-          'value.child', ImportToken(value: EventPair(null)))
+      ..connectView('value.child', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('value.child');
     expect(graph.treeSize, 3);
 
     graph
       ..addSurface('value.child', properties, '', relation, null, '')
-      ..connectViewFromImportToken(
-          'value.child', ImportToken(value: EventPair(null)))
+      ..connectView('value.child', ViewHolderToken(value: EventPair(null)))
       ..focusSurface('value.child');
     expect(graph.treeSize, 3);
   });

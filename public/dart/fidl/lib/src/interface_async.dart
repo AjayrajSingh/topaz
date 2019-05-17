@@ -38,7 +38,7 @@ abstract class _Stateful {
 
   /// The controller for the stream of state changes.
   final StreamController<InterfaceState> _streamController =
-      new StreamController.broadcast();
+      StreamController.broadcast();
 
   /// Gets the current state.
   InterfaceState get state => _currentState;
@@ -51,7 +51,7 @@ abstract class _Stateful {
       return;
     }
     if (newState.index < _currentState.index) {
-      throw new FidlStateException(
+      throw FidlStateException(
           "Can't change InterfaceState from $_currentState to $newState.");
     }
     _currentState = newState;
@@ -73,10 +73,10 @@ abstract class _Stateful {
       return stateChanges.firstWhere((s) => s == InterfaceState.bound);
     }
     if (_currentState == InterfaceState.bound) {
-      return new Future.value();
+      return Future.value();
     }
-    return new Future.error(
-        new FidlStateException('Interface will never become bound'));
+    return Future.error(
+        FidlStateException('Interface will never become bound'));
   }
 
   /// Is this interface closed?
@@ -85,7 +85,7 @@ abstract class _Stateful {
   /// A future that completes when the interface is closed.
   Future<void> get whenClosed {
     if (_currentState == InterfaceState.closed) {
-      return new Future.value();
+      return Future.value();
     }
     return stateChanges.firstWhere((s) => s == InterfaceState.closed);
   }
@@ -118,12 +118,12 @@ abstract class AsyncBinding<T> extends _Stateful {
   /// The `impl` parameter must not be null.
   InterfaceHandle<T> wrap(T impl) {
     if (!isUnbound) {
-      throw new FidlStateException(
+      throw FidlStateException(
           "AsyncBinding<${$interfaceName}> isn't unbound");
     }
-    ChannelPair pair = new ChannelPair();
+    ChannelPair pair = ChannelPair();
     if (pair.status != ZX.OK) {
-      throw new Exception(
+      throw Exception(
           "AsyncBinding<${$interfaceName}> couldn't create channel: ${getStringForStatus(pair.status)}");
     }
     _impl = impl;
@@ -131,7 +131,7 @@ abstract class AsyncBinding<T> extends _Stateful {
 
     state = InterfaceState.bound;
 
-    return new InterfaceHandle<T>(pair.second);
+    return InterfaceHandle<T>(pair.second);
   }
 
   /// Binds the given implementation to the given interface request.
@@ -145,21 +145,21 @@ abstract class AsyncBinding<T> extends _Stateful {
   /// `channel` property of the given `interfaceRequest` must not be `null`.
   void bind(T impl, InterfaceRequest<T> interfaceRequest) {
     if (!isUnbound) {
-      throw new FidlStateException(
+      throw FidlStateException(
           "AsyncBinding<${$interfaceName}> isn't unbound");
     }
     if (impl == null) {
-      throw new FidlError(
+      throw FidlError(
           "AsyncBinding<${$interfaceName}> can't bind to a null impl");
     }
     if (interfaceRequest == null) {
-      throw new FidlError(
+      throw FidlError(
           "AsyncBinding<${$interfaceName}> can't bind to a null InterfaceRequest");
     }
 
     Channel channel = interfaceRequest.passChannel();
     if (channel == null) {
-      throw new FidlError(
+      throw FidlError(
           "AsyncBinding<${$interfaceName}> can't bind to a null InterfaceRequest channel");
     }
 
@@ -178,11 +178,11 @@ abstract class AsyncBinding<T> extends _Stateful {
   /// The object must have previously been bound (e.g., using [bind]).
   InterfaceRequest<T> unbind() {
     if (!isBound) {
-      throw new FidlStateException(
+      throw FidlStateException(
           "AsyncBinding<${$interfaceName}> isn't bound");
     }
     final InterfaceRequest<T> result =
-        new InterfaceRequest<T>(_reader.unbind());
+        InterfaceRequest<T>(_reader.unbind());
     _impl = null;
 
     state = InterfaceState.closed;
@@ -218,10 +218,10 @@ abstract class AsyncBinding<T> extends _Stateful {
   void _handleReadable() {
     final ReadResult result = _reader.channel.queryAndRead();
     if ((result.bytes == null) || (result.bytes.lengthInBytes == 0))
-      throw new FidlError(
+      throw FidlError(
           'AsyncBinding<${$interfaceName}> Unexpected empty message or error: $result');
 
-    final Message message = new Message.fromReadResult(result);
+    final Message message = Message.fromReadResult(result);
     handleMessage(message, sendMessage);
   }
 
@@ -243,7 +243,7 @@ abstract class AsyncBinding<T> extends _Stateful {
     _reader.channel.write(response.data, response.handles);
   }
 
-  final ChannelReader _reader = new ChannelReader();
+  final ChannelReader _reader = ChannelReader();
 }
 
 /// Representation of a service that all [T] implementations should extend from.
@@ -284,9 +284,9 @@ class AsyncProxy<T> {
 
 /// A controller for Future based proxies.
 class AsyncProxyController<T> extends _Stateful {
-  final ChannelReader _reader = new ChannelReader();
+  final ChannelReader _reader = ChannelReader();
 
-  final HashMap<int, Completer<dynamic>> _completerMap = new HashMap();
+  final HashMap<int, Completer<dynamic>> _completerMap = HashMap();
   int _nextTxid = 1;
 
   /// Creates proxy controller.
@@ -301,7 +301,7 @@ class AsyncProxyController<T> extends _Stateful {
     whenClosed.then((_) {
       for (final Completer completer in _completerMap.values) {
         if (!completer.isCompleted) {
-          completer.completeError(new FidlError(
+          completer.completeError(FidlError(
               'AsyncProxyController<${$interfaceName}> connection closed'));
         }
       }
@@ -335,19 +335,19 @@ class AsyncProxyController<T> extends _Stateful {
   /// The proxy must not already have been bound.
   InterfaceRequest<T> request() {
     if (!isUnbound) {
-      throw new FidlStateException(
+      throw FidlStateException(
           "AsyncProxyController<${$interfaceName}> isn't unbound");
     }
 
-    ChannelPair pair = new ChannelPair();
+    ChannelPair pair = ChannelPair();
     if (pair.status != ZX.OK) {
-      throw new FidlError(
+      throw FidlError(
           "AsyncProxyController<${$interfaceName}> couldn't create channel: ${getStringForStatus(pair.status)}");
     }
     _reader.bind(pair.first);
     state = InterfaceState.bound;
 
-    return new InterfaceRequest<T>(pair.second);
+    return InterfaceRequest<T>(pair.second);
   }
 
   /// Binds the proxy to the given interface handle.
@@ -361,15 +361,15 @@ class AsyncProxyController<T> extends _Stateful {
   /// of the given `interfaceHandle` must not be null.
   void bind(InterfaceHandle<T> interfaceHandle) {
     if (!isUnbound) {
-      throw new FidlStateException(
+      throw FidlStateException(
           "AsyncProxyController<${$interfaceName}> isn't unbound");
     }
     if (interfaceHandle == null) {
-      throw new FidlError(
+      throw FidlError(
           "AsyncProxyController<${$interfaceName}> can't bind to null InterfaceHandle");
     }
     if (interfaceHandle.channel == null) {
-      throw new FidlError(
+      throw FidlError(
           "AsyncProxyController<${$interfaceName}> can't bind to null InterfaceHandle channel");
     }
 
@@ -385,17 +385,17 @@ class AsyncProxyController<T> extends _Stateful {
   /// The proxy must have previously been bound (e.g., using [bind]).
   InterfaceHandle<T> unbind() {
     if (!isBound) {
-      throw new FidlStateException(
+      throw FidlStateException(
           "AsyncProxyController<${$interfaceName}> isn't bound");
     }
     if (!_reader.isBound) {
-      throw new FidlError(
+      throw FidlError(
           "AsyncProxyController<${$interfaceName}> reader isn't bound");
     }
 
     state = InterfaceState.closed;
 
-    return new InterfaceHandle<T>(_reader.unbind());
+    return InterfaceHandle<T>(_reader.unbind());
   }
 
   /// Close the channel bound to the proxy.
@@ -406,14 +406,14 @@ class AsyncProxyController<T> extends _Stateful {
       _reader.close();
       state = InterfaceState.closed;
       _completerMap.forEach((_, Completer<dynamic> completer) =>
-          completer.completeError(new FidlStateException(
+          completer.completeError(FidlStateException(
               'AsyncProxyController<${$interfaceName}> is closed.')));
     }
   }
 
   /// Log an [error] message and close the channel.
   void proxyError(FidlError error) {
-    print('Proxy error: ${error.message}');
+    print('AsyncProxyController<${$interfaceName}> error: ${error.message}');
     close();
   }
 
@@ -425,13 +425,13 @@ class AsyncProxyController<T> extends _Stateful {
   void _handleReadable() {
     final ReadResult result = _reader.channel.queryAndRead();
     if ((result.bytes == null) || (result.bytes.lengthInBytes == 0)) {
-      proxyError(new FidlError(
+      proxyError(FidlError(
           'AsyncProxyController<${$interfaceName}>: Read from channel failed'));
       return;
     }
     try {
       if (onResponse != null) {
-        onResponse(new Message.fromReadResult(result));
+        onResponse(Message.fromReadResult(result));
       }
     } on FidlError catch (e) {
       if (result.handles != null) {
@@ -445,7 +445,7 @@ class AsyncProxyController<T> extends _Stateful {
 
   /// Always called when the channel underneath closes.
   void _handleError(ChannelReaderError error) {
-    proxyError(new FidlError(error.toString()));
+    proxyError(FidlError(error.toString()));
   }
 
   /// Sends the given messages over the bound channel.
@@ -453,13 +453,13 @@ class AsyncProxyController<T> extends _Stateful {
   /// Used by subclasses of [Proxy<T>] to send encoded messages.
   void sendMessage(Message message) {
     if (!_reader.isBound) {
-      proxyError(new FidlStateException(
+      proxyError(FidlStateException(
           'AsyncProxyController<${$interfaceName}> is closed.'));
       return;
     }
     final int status = _reader.channel.write(message.data, message.handles);
     if (status != ZX.OK) {
-      proxyError(new FidlError(
+      proxyError(FidlError(
           'AsyncProxyController<${$interfaceName}> failed to write to channel: ${_reader.channel} (status: $status)'));
     }
   }
@@ -470,7 +470,7 @@ class AsyncProxyController<T> extends _Stateful {
   /// Used by subclasses of [AsyncProxy<T>] to send encoded messages.
   void sendMessageWithResponse(Message message, Completer<dynamic> completer) {
     if (!_reader.isBound) {
-      proxyError(new FidlStateException(
+      proxyError(FidlStateException(
           'AsyncProxyController<${$interfaceName}> is closed.'));
       return;
     }
@@ -485,7 +485,7 @@ class AsyncProxyController<T> extends _Stateful {
     final int status = _reader.channel.write(message.data, message.handles);
 
     if (status != ZX.OK) {
-      proxyError(new FidlError(
+      proxyError(FidlError(
           'AsyncProxyController<${$interfaceName}> failed to write to channel: ${_reader.channel} (status: $status)'));
       return;
     }
@@ -498,7 +498,7 @@ class AsyncProxyController<T> extends _Stateful {
   Completer getCompleter(int txid) {
     final Completer result = _completerMap.remove(txid);
     if (result == null) {
-      proxyError(new FidlError('Message had unknown request id: $txid'));
+      proxyError(FidlError('Message had unknown request id: $txid'));
     }
     return result;
   }

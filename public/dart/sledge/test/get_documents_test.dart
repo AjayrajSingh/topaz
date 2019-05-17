@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/sledge.dart';
 import 'package:sledge/src/query/field_value.dart'; // ignore: implementation_imports
 import 'package:test/test.dart';
@@ -10,22 +10,22 @@ import 'package:test/test.dart';
 import 'helpers.dart';
 
 Schema _newSchema1() {
-  final schemaDescription = <String, BaseType>{'s1': new LastOneWinsString()};
-  return new Schema(schemaDescription);
+  final schemaDescription = <String, BaseType>{'s1': LastOneWinsString()};
+  return Schema(schemaDescription);
 }
 
 Schema _newSchema2() {
-  final schemaDescription = <String, BaseType>{'s2': new LastOneWinsString()};
-  return new Schema(schemaDescription);
+  final schemaDescription = <String, BaseType>{'s2': LastOneWinsString()};
+  return Schema(schemaDescription);
 }
 
 Schema _newSchema3() {
   final schemaDescription = <String, BaseType>{
-    'i1': new Integer(),
-    'i2': new Integer(),
-    's3': new LastOneWinsString(),
+    'i1': Integer(),
+    'i2': Integer(),
+    's3': LastOneWinsString(),
   };
-  return new Schema(schemaDescription);
+  return Schema(schemaDescription);
 }
 
 void main() async {
@@ -36,7 +36,7 @@ void main() async {
       Schema schema = _newSchema1();
       Sledge sledge = newSledgeForTesting();
       await sledge.runInTransaction(() async {
-        final query = new Query(schema);
+        final query = Query(schema);
         final docs = await sledge.getDocuments(query);
         expect(docs.length, equals(0));
       });
@@ -51,21 +51,21 @@ void main() async {
       Document docB;
       // Save 3 documents in Sledge, two of which are instances of schema1.
       await sledge.runInTransaction(() async {
-        docA = await sledge.getDocument(new DocumentId(schema1));
+        docA = await sledge.getDocument(DocumentId(schema1));
         docA['s1'].value = 'foo';
-        docB = await sledge.getDocument(new DocumentId(schema1));
+        docB = await sledge.getDocument(DocumentId(schema1));
         docB['s1'].value = 'bar';
-        final otherDoc = await sledge.getDocument(new DocumentId(schema2));
+        final otherDoc = await sledge.getDocument(DocumentId(schema2));
         otherDoc['s2'].value = 'baz';
 
         // Verify that `getDocuments` does not return any documents.
-        final docs = await sledge.getDocuments(new Query(schema1));
+        final docs = await sledge.getDocuments(Query(schema1));
         expect(docs.length, equals(0));
       });
 
       // Verify that `getDocuments` returns all instances of schema1.
       await sledge.runInTransaction(() async {
-        final docs = await sledge.getDocuments(new Query(schema1));
+        final docs = await sledge.getDocuments(Query(schema1));
         expect(docs.length, equals(2));
         expect(docs, contains(docA));
         expect(docs, contains(docB));
@@ -79,10 +79,10 @@ void main() async {
       Sledge sledge = newSledgeForTesting();
       await sledge.runInTransaction(() async {
         final comparisons = <String, QueryFieldComparison>{
-          'i1': new QueryFieldComparison(
-              new NumFieldValue(42), ComparisonType.equal)
+          'i1': QueryFieldComparison(
+              NumFieldValue(42), ComparisonType.equal)
         };
-        final query = new Query(schema, comparisons: comparisons);
+        final query = Query(schema, comparisons: comparisons);
         final docs = await sledge.getDocuments(query);
         expect(docs.length, equals(0));
       });
@@ -98,38 +98,38 @@ void main() async {
       Document doc4;
       Document doc5;
       await sledge.runInTransaction(() async {
-        doc1 = await sledge.getDocument(new DocumentId(schema));
+        doc1 = await sledge.getDocument(DocumentId(schema));
         doc1['i1'].value = 1;
         doc1['i2'].value = 10;
-        doc2 = await sledge.getDocument(new DocumentId(schema));
+        doc2 = await sledge.getDocument(DocumentId(schema));
         doc2['i1'].value = 2;
         doc2['i2'].value = 20;
-        doc3 = await sledge.getDocument(new DocumentId(schema));
+        doc3 = await sledge.getDocument(DocumentId(schema));
         doc3['i1'].value = 1;
         doc3['i2'].value = 30;
-        doc4 = await sledge.getDocument(new DocumentId(schema));
+        doc4 = await sledge.getDocument(DocumentId(schema));
         doc4['i1'].value = 2;
         doc4['i2'].value = 30;
-        doc5 = await sledge.getDocument(new DocumentId(schema));
+        doc5 = await sledge.getDocument(DocumentId(schema));
         doc5['i1'].value = 2;
         doc5['i2'].value = 20;
       });
       // Verify the resuts of queries with equalities.
       await sledge.runInTransaction(() async {
         {
-          QueryBuilder qb = new QueryBuilder(schema)..addEqual('i1', 1);
+          QueryBuilder qb = QueryBuilder(schema)..addEqual('i1', 1);
           final docs = await sledge.getDocuments(qb.build());
           expect(docs.length, equals(2));
           expect(docs, containsAll([doc1, doc3]));
         }
         {
-          QueryBuilder qb = new QueryBuilder(schema)..addEqual('i2', 30);
+          QueryBuilder qb = QueryBuilder(schema)..addEqual('i2', 30);
           final docs = await sledge.getDocuments(qb.build());
           expect(docs.length, equals(2));
           expect(docs, containsAll([doc3, doc4]));
         }
         {
-          QueryBuilder qb = new QueryBuilder(schema)
+          QueryBuilder qb = QueryBuilder(schema)
             ..addEqual('i1', 2)
             ..addEqual('i2', 30);
           final docs = await sledge.getDocuments(qb.build());
@@ -139,12 +139,12 @@ void main() async {
       });
       // Verify the resuts of queries with inequalities.
       await sledge.runInTransaction(() async {
-        final lessQb = new QueryBuilder(schema)..addLess('i2', 20);
-        final lessOrEqualQb = new QueryBuilder(schema)
+        final lessQb = QueryBuilder(schema)..addLess('i2', 20);
+        final lessOrEqualQb = QueryBuilder(schema)
           ..addLessOrEqual('i2', 20);
-        final greaterOrEqualQb = new QueryBuilder(schema)
+        final greaterOrEqualQb = QueryBuilder(schema)
           ..addGreaterOrEqual('i2', 20);
-        final greaterQb = new QueryBuilder(schema)..addGreater('i2', 20);
+        final greaterQb = QueryBuilder(schema)..addGreater('i2', 20);
         {
           final docs = await sledge.getDocuments(lessQb.build());
           expect(docs.length, equals(1));

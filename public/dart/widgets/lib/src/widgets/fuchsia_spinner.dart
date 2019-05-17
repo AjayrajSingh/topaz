@@ -11,9 +11,9 @@ const Color _kDefaultColor = Colors.blue;
 const double _kInitialFractionalDiameter = 1.0 / 1.2;
 const double _kTargetFractionalDiameter = 1.0;
 const double _kRotationRadians = 6 * math.pi;
-const Curve _kDefaultCurve = const Cubic(0.3, 0.1, 0.3, 0.9);
+const Curve _kDefaultCurve = Cubic(0.3, 0.1, 0.3, 0.9);
 
-const Duration _kAnimationDuration = const Duration(seconds: 2);
+const Duration _kAnimationDuration = Duration(seconds: 2);
 
 /// The spinner used by fuchsia flutter apps.
 class FuchsiaSpinner extends StatefulWidget {
@@ -26,21 +26,21 @@ class FuchsiaSpinner extends StatefulWidget {
   });
 
   @override
-  _FuchsiaSpinnerState createState() => new _FuchsiaSpinnerState();
+  _FuchsiaSpinnerState createState() => _FuchsiaSpinnerState();
 }
 
 class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
     with SingleTickerProviderStateMixin {
-  final Tween<double> _fractionalWidthTween = new Tween<double>(
+  final Tween<double> _fractionalWidthTween = Tween<double>(
     begin: _kInitialFractionalDiameter,
     end: _kTargetFractionalDiameter,
   );
-  final Tween<double> _fractionalHeightTween = new Tween<double>(
+  final Tween<double> _fractionalHeightTween = Tween<double>(
     begin: _kInitialFractionalDiameter,
     end: _kInitialFractionalDiameter * 2 / 3,
   );
 
-  final Curve _firstHalfCurve = const Cubic(0.75, 0.25, 0.25, 1.0);
+  final Curve _firstHalfCurve = Cubic(0.75, 0.25, 0.25, 1.0);
   final Curve _secondHalfCurve = _kDefaultCurve;
 
   AnimationController _controller;
@@ -48,7 +48,7 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
   @override
   void initState() {
     super.initState();
-    _controller = new AnimationController(
+    _controller = AnimationController(
       vsync: this,
       duration: _kAnimationDuration,
     )..repeat(period: _kAnimationDuration);
@@ -61,13 +61,13 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
   }
 
   @override
-  Widget build(BuildContext context) => new LayoutBuilder(
+  Widget build(BuildContext context) => LayoutBuilder(
         builder: (_, BoxConstraints constraints) {
           double maxDiameter = math.min(
             constraints.maxWidth,
             constraints.maxHeight,
           );
-          return new AnimatedBuilder(
+          return AnimatedBuilder(
             animation: _controller,
             builder: (_, __) {
               double tweenProgress = _tweenValue;
@@ -79,24 +79,24 @@ class _FuchsiaSpinnerState extends State<FuchsiaSpinner>
                   _fractionalHeightTween.transform(
                     tweenProgress,
                   );
-              return new Transform(
+              return Transform(
                 alignment: FractionalOffset.center,
-                transform: new Matrix4.rotationZ(
+                transform: Matrix4.rotationZ(
                   _kDefaultCurve.transform(_controller.value) *
                       _kRotationRadians,
                 ),
-                child: new Center(
-                  child: new Container(
+                child: Center(
+                  child: Container(
                     width: width,
                     height: height,
-                    child: new Material(
+                    child: Material(
                       elevation: tweenProgress * 10.0,
                       color: Color.lerp(
                         widget.color.withOpacity(0.8),
                         widget.color,
                         tweenProgress,
                       ),
-                      borderRadius: new BorderRadius.circular(width / 2),
+                      borderRadius: BorderRadius.circular(width / 2),
                     ),
                   ),
                 ),

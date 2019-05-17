@@ -6,15 +6,15 @@
 
 #include "flutter/flow/layers/layer_tree.h"
 
-namespace flutter {
+namespace flutter_runner {
 
-class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
+class ScopedFrame final : public flutter::CompositorContext::ScopedFrame {
  public:
-  ScopedFrame(flow::CompositorContext& context,
+  ScopedFrame(flutter::CompositorContext& context,
               const SkMatrix& root_surface_transformation,
               bool instrumentation_enabled,
               SessionConnection& session_connection)
-      : flow::CompositorContext::ScopedFrame(context, nullptr, nullptr, nullptr,
+      : flutter::CompositorContext::ScopedFrame(context, nullptr, nullptr, nullptr,
                                              root_surface_transformation,
                                              instrumentation_enabled),
         session_connection_(session_connection) {}
@@ -22,7 +22,7 @@ class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
  private:
   SessionConnection& session_connection_;
 
-  bool Raster(flow::LayerTree& layer_tree, bool ignore_raster_cache) override {
+  bool Raster(flutter::LayerTree& layer_tree, bool ignore_raster_cache) override {
     if (!session_connection_.has_metrics()) {
       return true;
     }
@@ -55,24 +55,13 @@ class ScopedFrame final : public flow::CompositorContext::ScopedFrame {
 };
 
 CompositorContext::CompositorContext(
-    std::string debug_label,
-#ifndef SCENIC_VIEWS2
-    zx::eventpair import_token,
-#else
-    zx::eventpair view_token,
-#endif
+    std::string debug_label, fuchsia::ui::views::ViewToken view_token,
     fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session,
     fit::closure session_error_callback, zx_handle_t vsync_event_handle)
     : debug_label_(std::move(debug_label)),
-      session_connection_(debug_label_,
-#ifndef SCENIC_VIEWS2
-                          std::move(import_token),
-#else
-                          std::move(view_token),
-#endif
+      session_connection_(debug_label_, std::move(view_token),
                           std::move(session), std::move(session_error_callback),
-                          vsync_event_handle) {
-}
+                          vsync_event_handle) {}
 
 void CompositorContext::OnSessionMetricsDidChange(
     const fuchsia::ui::gfx::Metrics& metrics) {
@@ -87,19 +76,20 @@ void CompositorContext::OnSessionSizeChangeHint(float width_change_factor,
 
 CompositorContext::~CompositorContext() = default;
 
-std::unique_ptr<flow::CompositorContext::ScopedFrame>
+std::unique_ptr<flutter::CompositorContext::ScopedFrame>
 CompositorContext::AcquireFrame(GrContext* gr_context, SkCanvas* canvas,
-                                flow::ExternalViewEmbedder* view_embedder,
+                                flutter::ExternalViewEmbedder* view_embedder,
                                 const SkMatrix& root_surface_transformation,
                                 bool instrumentation_enabled) {
   // TODO: The AcquireFrame interface is too broad and must be refactored to get
   // rid of the context and canvas arguments as those seem to be only used for
   // colorspace correctness purposes on the mobile shells.
-  return std::make_unique<flutter::ScopedFrame>(*this,                        //
-                                                root_surface_transformation,  //
-                                                instrumentation_enabled,      //
-                                                session_connection_           //
+  return std::make_unique<flutter_runner::ScopedFrame>(
+      *this,                        //
+      root_surface_transformation,  //
+      instrumentation_enabled,      //
+      session_connection_           //
   );
 }
 
-}  // namespace flutter
+}  // namespace flutter_runner

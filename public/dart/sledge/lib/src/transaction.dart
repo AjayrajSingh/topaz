@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+import 'package:fidl_fuchsia_ledger/fidl_async.dart' as ledger;
 
 import 'document/change.dart';
 import 'document/document.dart';
@@ -32,7 +32,6 @@ class Transaction {
   final Sledge _sledge;
   final ledger.PageProxy _pageProxy;
   final ledger.PageSnapshotProxy _pageSnapshotProxy;
-  // TODO: close _pageSnapshotProxy
 
   /// Default constructor.
   Transaction(
@@ -42,82 +41,55 @@ class Transaction {
   /// Runs [modification].
   Future<bool> saveModification(Modification modification) async {
     // Start Ledger transaction.
-    final startTransactionCompleter = new Completer<ledger.Status>();
-    _pageProxy.startTransaction(startTransactionCompleter.complete);
-    bool startTransactionOk =
-        (await startTransactionCompleter.future) == ledger.Status.ok;
-    if (!startTransactionOk) {
-      return false;
-    }
+    await _pageProxy.startTransaction();
 
     // Obtain the snapshot.
     // All the read operations in |modification| will read from that snapshot.
-    final snapshotCompleter = new Completer<ledger.Status>();
-    _pageProxy.getSnapshot(
+    await _pageProxy.getSnapshot(
       _pageSnapshotProxy.ctrl.request(),
-      new Uint8List(0),
+      Uint8List(0),
       null,
-      snapshotCompleter.complete,
     );
-    bool getSnapshotOk = (await snapshotCompleter.future) == ledger.Status.ok;
-    if (!getSnapshotOk) {
-      return false;
-    }
 
-    // Execute the modifications.
-    // The modifications may:
-    // - obtain a handle to a document, which would trigger a call to |getDocument|.
-    // - modify a document. This would result in |documentWasModified| being called.
     try {
-      await modification();
-    } on _RollbackException {
-      await _rollbackModification();
-      return false;
-      // ignore: avoid_catches_without_on_clauses
-    } catch (e) {
-      await _rollbackModification();
-      rethrow;
-    }
-
-    // Iterate through all the documents modified by this transaction and
-    // forward the updates (puts and deletes) to Ledger.
-    final updateLedgerFutures = <Future<ledger.Status>>[];
-    for (final document in _documents) {
-      if (document.state == DocumentState.available) {
-        updateLedgerFutures
-          ..addAll(saveDocumentToPage(document, _pageProxy))
-          ..add(saveSchemaToPage(document.documentId.schema, _pageProxy));
-      } else {
-        final futures = await deleteDocumentFromPage(
-            document, _pageProxy, _pageSnapshotProxy);
-        updateLedgerFutures.addAll(futures);
-      }
-    }
-
-    // Await until all updates have been succesfully executed.
-    // If some updates have failed, rollback.
-    final List<ledger.Status> statuses = await Future.wait(updateLedgerFutures);
-    for (final status in statuses) {
-      if (status != ledger.Status.ok) {
-        await _rollbackModification();
+      // Execute the modifications.
+      // The modifications may:
+      // - obtain a handle to a document, which would trigger a call to |getDocument|.
+      // - modify a document. This would result in |documentWasModified| being called.
+      try {
+        await modification();
+      } on _RollbackException {
+        _rollbackModification();
         return false;
+        // ignore: avoid_catches_without_on_clauses
+      } catch (e) {
+        _rollbackModification();
+        rethrow;
       }
-    }
 
-    // Finish the transaction by commiting. If the commit fails, rollback.
-    final commitCompleter = new Completer<ledger.Status>();
-    _pageProxy.commit(commitCompleter.complete);
-    bool commitOk = (await commitCompleter.future) == ledger.Status.ok;
-    if (!commitOk) {
-      await _rollbackModification();
-      return false;
-    }
+      // Iterate through all the documents modified by this transaction and
+      // forward the updates (puts and deletes) to Ledger.
+      for (final document in _documents) {
+        if (document.state == DocumentState.available) {
+          saveDocumentToPage(document, _pageProxy);
+          await saveSchemaToPage(document.documentId.schema, _pageProxy);
+        } else {
+          await deleteDocumentFromPage(
+              document, _pageProxy, _pageSnapshotProxy);
+        }
+      }
 
-    // Notify the documents that the transaction has been completed.
-    _documents
-      ..forEach((Document document) => document.completeTransaction())
-      ..clear();
-    return true;
+      // Finish the transaction by commiting.
+      await _pageProxy.commit();
+
+      // Notify the documents that the transaction has been completed.
+      _documents
+        ..forEach((Document document) => document.completeTransaction())
+        ..clear();
+      return true;
+    } finally {
+      _pageSnapshotProxy.ctrl.close();
+    }
   }
 
   /// Abort and rollback the transaction
@@ -133,7 +105,7 @@ class Transaction {
   /// Returns the document identified with [documentId].
   /// If the document does not exist, a new document is returned.
   Future<Document> getDocument(DocumentId documentId) async {
-    final document = new Document(_sledge, documentId);
+    final document = Document(_sledge, documentId);
     Uint8List keyPrefix = concatUint8Lists(
         sledge_storage.prefixForType(sledge_storage.KeyValueType.document),
         documentId.prefix);
@@ -142,14 +114,14 @@ class Transaction {
 
     // Strip the document prefix from the KVs.
     for (int i = 0; i < kvs.length; i++) {
-      kvs[i] = new KeyValue(
+      kvs[i] = KeyValue(
           getSublistView(kvs[i].key,
               start: DocumentId.prefixLength + sledge_storage.typePrefixLength),
           kvs[i].value);
     }
 
     if (kvs.isNotEmpty) {
-      final change = new Change(kvs);
+      final change = Change(kvs);
       document.applyChange(change);
     }
 
@@ -169,12 +141,12 @@ class Transaction {
         List<KeyValue> keyValues = await getEntriesFromSnapshotWithPrefix(
             _pageSnapshotProxy, keyPrefix);
         for (KeyValue keyValue in keyValues) {
-          documentIds.add(new DocumentId(query.schema, keyValue.value));
+          documentIds.add(DocumentId(query.schema, keyValue.value));
         }
       } else {
         print('getDocumentIds called with missing index');
         List<DocumentId> documentIds =
-            await getDocumentIds(new Query(query.schema));
+            await getDocumentIds(Query(query.schema));
         final filteredDocumentIds = <DocumentId>[];
         for (final documentId in documentIds) {
           // TODO(LE-638): Avoid discarding the documents after reading them.
@@ -201,7 +173,7 @@ class Transaction {
         final newDocumentSubId =
             sledge_storage.documentSubIdFromKey(keyValue.key);
         if (!uint8ListsAreEqual(currentDocumentSubId, newDocumentSubId)) {
-          documentIds.add(new DocumentId(query.schema, newDocumentSubId));
+          documentIds.add(DocumentId(query.schema, newDocumentSubId));
           currentDocumentSubId = newDocumentSubId;
         }
       }
@@ -220,15 +192,10 @@ class Transaction {
   }
 
   /// Rollback the documents that were modified during the transaction.
-  Future _rollbackModification() async {
+  void _rollbackModification() {
     _documents
       ..forEach((Document document) => document.rollbackChange())
       ..clear();
-    final completer = new Completer<ledger.Status>();
-    _pageProxy.rollback(completer.complete);
-    bool commitOk = (await completer.future) == ledger.Status.ok;
-    if (!commitOk) {
-      throw new Exception('Transaction failed. Unable to rollback.');
-    }
+    _pageProxy.rollback();
   }
 }

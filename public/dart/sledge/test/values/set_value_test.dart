@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 // ignore_for_file: implementation_imports
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/src/document/values/set_value.dart';
 import 'package:test/test.dart';
 
@@ -13,20 +13,20 @@ void main() {
   setupLogger();
 
   group('Set API coverage', () {
-    new SetApiTester<SetValue>(() => new SetValue<int>())
+    SetApiTester<SetValue>(() => SetValue<int>())
       ..testApi()
       ..testObserver();
   });
 
   test('SetValue add and contains.', () {
-    var s = new SetValue<int>();
+    var s = SetValue<int>();
     expect(s.contains(0), equals(false));
     expect(s.add(0), equals(true));
     expect(s.contains(0), equals(true));
   });
 
   test('SetValue add twice and contains.', () {
-    var s = new SetValue<int>();
+    var s = SetValue<int>();
     expect(s.contains(0), equals(false));
     expect(s.add(0), equals(true));
     expect(s.add(0), equals(false));
@@ -34,7 +34,7 @@ void main() {
   });
 
   test('SetValue remove.', () {
-    var s = new SetValue<int>();
+    var s = SetValue<int>();
     expect(s.remove(2), equals(false));
     expect(s.add(2), equals(true));
     expect(s.remove(2), equals(true));
@@ -43,7 +43,7 @@ void main() {
   });
 
   test('SetValue add, put, contains, remove.', () {
-    var s = new SetValue<String>();
+    var s = SetValue<String>();
     expect(s.contains('-'), equals(false));
     expect(s.add('-'), equals(true));
     expect(s.add('-'), equals(false));

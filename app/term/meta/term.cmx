@@ -12,8 +12,7 @@
             "fuchsia.process.Launcher",
             "fuchsia.process.Resolver",
             "fuchsia.tracelink.Registry",
-            "fuchsia.ui.scenic.Scenic",
-            "fuchsia.ui.viewsv1.ViewManager"
+            "fuchsia.ui.scenic.Scenic"
         ]
     }
 }

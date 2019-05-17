@@ -1,0 +1,24 @@
+# Copyright 2018 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_library.gni")
+
+dart_library("webview") {
+  package_name = "webview"
+
+  sources = [
+    "webview.dart",
+    "src/webview.dart",
+  ]
+
+  deps = [
+    "//sdk/fidl/fuchsia.sys",
+    "//sdk/fidl/fuchsia.ui.views",
+    "//sdk/fidl/fuchsia.web",
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_scenic_flutter",
+    "//zircon/public/fidl/fuchsia-io",
+    "//zircon/public/fidl/fuchsia-mem",
+  ]
+}

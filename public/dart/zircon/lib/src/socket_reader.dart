@@ -32,7 +32,7 @@ class SocketReader {
 
   void bind(Socket socket) {
     if (isBound) {
-      throw new ZirconApiError('SocketReader is already bound.');
+      throw ZirconApiError('SocketReader is already bound.');
     }
     _socket = socket;
     _asyncWait();
@@ -40,7 +40,7 @@ class SocketReader {
 
   Socket unbind() {
     if (!isBound) {
-      throw new ZirconApiError('SocketReader is not bound');
+      throw ZirconApiError('SocketReader is not bound');
     }
     _waiter.cancel();
     final Socket result = _socket;
@@ -82,7 +82,7 @@ class SocketReader {
     assert(isBound);
     if (status != ZX.OK) {
       close();
-      _errorSoon(new SocketReaderError(
+      _errorSoon(SocketReaderError(
           'Wait completed with status ${getStringForStatus(status)} ($status)',
           null));
       return;
@@ -110,7 +110,7 @@ class SocketReader {
       // ignore: avoid_catches_without_on_clauses
     } catch (e, s) {
       close();
-      _errorSoon(new SocketReaderError(e, s));
+      _errorSoon(SocketReaderError(e, s));
     }
   }
 }

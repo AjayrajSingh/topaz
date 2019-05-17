@@ -5,9 +5,8 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
-import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular_async;
+import 'package:fidl_fuchsia_ledger/fidl_async.dart' as ledger;
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular;
 import 'package:fidl/fidl.dart' as fidl;
 import 'package:zircon/zircon.dart' show ChannelPair;
 
@@ -29,9 +28,9 @@ import 'uint8list_ops.dart';
 
 /// The interface to the Sledge library.
 class Sledge {
-  final ledger.LedgerProxy _ledgerProxy = new ledger.LedgerProxy();
+  final ledger.LedgerProxy _ledgerProxy = ledger.LedgerProxy();
   final ledger.PageProxy _pageProxy;
-  final ConnectionId _connectionId = new ConnectionId.random();
+  final ConnectionId _connectionId = ConnectionId.random();
 
   // Cache to get document by documentId.prefix.
   final Map<Uint8List, Future<Document>> _documentByPrefix =
@@ -40,79 +39,48 @@ class Sledge {
   // The factories used for fake object injection.
   final LedgerObjectsFactory _ledgerObjectsFactory;
 
-  // Contains the status of the initialization.
-  // ignore: unused_field
-  Future<bool> _initializationSucceeded;
-
   ModificationQueue _modificationQueue;
 
+  Subscription _subscribtion;
+
   /// Default constructor.
-  factory Sledge(ComponentContext componentContext, [SledgePageId pageId]) {
-    fidl.InterfacePair<ledger.Ledger> ledgerPair = new fidl.InterfacePair();
-    componentContext.getLedger(ledgerPair.passRequest());
-    return new Sledge._(ledgerPair.passHandle(), pageId);
+  factory Sledge(modular.ComponentContext componentContext,
+      [SledgePageId pageId]) {
+    final pair = ChannelPair();
+    componentContext.getLedger(fidl.InterfaceRequest(pair.first));
+    return Sledge._(fidl.InterfaceHandle(pair.second), pageId);
   }
 
   /// Internal constructor
   Sledge._(fidl.InterfaceHandle<ledger.Ledger> ledgerHandle,
       [SledgePageId pageId])
-      : _pageProxy = new ledger.PageProxy(),
-        _ledgerObjectsFactory = new LedgerObjectsFactoryImpl() {
-    pageId ??= new SledgePageId();
+      : _pageProxy = ledger.PageProxy(),
+        _ledgerObjectsFactory = LedgerObjectsFactoryImpl() {
+    pageId ??= SledgePageId();
 
     // The initialization sequence consists of:
     // 1/ Obtaining a LedgerProxy from the LedgerHandle.
     // 2/ Setting a conflict resolver on the LedgerProxy (not yet implemented).
     // 3/ Obtaining a LedgerPageProxy using the LedgerProxy.
     // 4/ Subscribing for change notifications on the LedgerPageProxy.
-    // Any of these steps can fail.
-    //
-    // The following Completer is completed with `false` if an error occurs at
-    // any step. It is completed with `true` if the 4th step finishes
-    // succesfully.
-    //
-    // Operations that require the succesfull initialization of the Sledge
-    // instance await the Future returned by this completer.
-    Completer<bool> initializationCompleter = new Completer<bool>();
 
-    _ledgerProxy.ctrl.onConnectionError = () {
-      if (!initializationCompleter.isCompleted) {
-        initializationCompleter.complete(false);
-      }
-    };
+    _ledgerProxy.ctrl.whenClosed.then((_) {
+      // TODO(jif): Handle disconnection from the Ledger.
+    });
 
     _ledgerProxy.ctrl.bind(ledgerHandle);
 
-    _ledgerProxy.getPageNew(pageId.id, _pageProxy.ctrl.request());
+    _ledgerProxy.getPage(pageId.id, _pageProxy.ctrl.request());
     _modificationQueue =
-        new ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
-    _subscribe(initializationCompleter);
-    _initializationSucceeded = initializationCompleter.future;
-  }
-
-  /// Constructor that takes a new-style binding of ComponentContext
-  factory Sledge.forAsync(modular_async.ComponentContext componentContext,
-      [SledgePageId pageId]) {
-    final pair = new ChannelPair();
-    componentContext.getLedger(new fidl.InterfaceRequest(pair.first));
-    return new Sledge._(new fidl.InterfaceHandle(pair.second), pageId);
-  }
-
-  /// Convenience factory for modules.
-  factory Sledge.fromModule(final ModuleContext moduleContext,
-      [SledgePageId pageId]) {
-    ComponentContextProxy componentContextProxy = new ComponentContextProxy();
-    moduleContext.getComponentContext(componentContextProxy.ctrl.request());
-    return new Sledge(componentContextProxy, pageId);
+        ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
+    _subscribtion = _subscribe();
   }
 
   /// Convenience constructor for tests.
   Sledge.testing(this._pageProxy, this._ledgerObjectsFactory) {
-    Completer<bool> initializationCompleter = new Completer<bool>();
     _modificationQueue =
-        new ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
-    _subscribe(initializationCompleter);
-    _initializationSucceeded = initializationCompleter.future;
+        ModificationQueue(this, _ledgerObjectsFactory, _pageProxy);
+    _subscribtion = _subscribe();
   }
 
   /// Convenience constructor for integration tests.
@@ -122,6 +90,7 @@ class Sledge {
 
   /// Closes connection to ledger.
   void close() {
+    _subscribtion.unsubscribe();
     _pageProxy.ctrl.close();
     _ledgerProxy.ctrl.close();
   }
@@ -130,11 +99,7 @@ class Sledge {
   /// Returns false if an error occurred and the modification couldn't be
   /// committed.
   /// Returns true otherwise.
-  Future<bool> runInTransaction(Modification modification) async {
-    bool initializationSucceeded = await _initializationSucceeded;
-    if (!initializationSucceeded) {
-      return false;
-    }
+  Future<bool> runInTransaction(Modification modification) {
     return _modificationQueue.queueModification(modification);
   }
 
@@ -142,7 +107,7 @@ class Sledge {
   /// Execution of the transaction does not continue past this point.
   void abortAndRollback() {
     if (currentTransaction == null) {
-      throw new StateError('No transaction started.');
+      throw StateError('No transaction started.');
     }
     currentTransaction.abortAndRollback();
   }
@@ -198,7 +163,7 @@ class Sledge {
     // Select the changes that concern documents.
     final documentChange = splittedChange[sledge_storage
             .prefixForType(sledge_storage.KeyValueType.document)] ??
-        new Change();
+        Change();
     // Split the changes according to the document they belong to.
     final splittedDocumentChange =
         documentChange.splitByPrefix(DocumentId.prefixLength);
@@ -211,16 +176,15 @@ class Sledge {
   }
 
   /// Subscribes for page.onChange to perform applyChange.
-  Subscription _subscribe(Completer<bool> subscriptionCompleter) {
+  Subscription _subscribe() {
     assert(_modificationQueue.currentTransaction == null,
         '`_subscribe` must be called before any transaction can start.');
-    return new Subscription(
-        _pageProxy, _ledgerObjectsFactory, _applyChange, subscriptionCompleter);
+    return Subscription(_pageProxy, _ledgerObjectsFactory, _applyChange);
   }
 
   void _verifyThatTransactionHasStarted() {
     if (currentTransaction == null) {
-      throw new StateError('No transaction started.');
+      throw StateError('No transaction started.');
     }
   }
 }

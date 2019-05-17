@@ -19,18 +19,18 @@ class EvaluationOrder {
   EvaluationOrder.fromIds(Iterable<String> ids, Iterable<Node> graphNodes,
       {bool allowPartial = false, allowGenerated = false})
       : nodes = <Node>[] {
-    final idToNode = new Map<String, Node>.fromIterable(graphNodes,
+    final idToNode = Map<String, Node>.fromIterable(graphNodes,
         key: (node) => node.nodeId);
 
     final setIds = ids.toSet();
     if (setIds.length != ids.length) {
-      throw new ArgumentError('Elements of ids ($ids) must be unique.');
+      throw ArgumentError('Elements of ids ($ids) must be unique.');
     }
 
     if (!allowPartial) {
       for (final node in graphNodes) {
         if (!setIds.contains(node.nodeId)) {
-          throw new ArgumentError(
+          throw ArgumentError(
               'ids ($ids) must contain all nodes from `$graphNodes`.');
         }
       }
@@ -40,7 +40,7 @@ class EvaluationOrder {
       Node node = idToNode[id];
       if (node == null) {
         if (!allowGenerated || !id.startsWith('g-')) {
-          throw new ArgumentError(
+          throw ArgumentError(
               '`$id` is not an id of a node from `$graphNodes`.');
         }
         // Can throw FormatException
@@ -49,7 +49,7 @@ class EvaluationOrder {
         int secondDash = id.indexOf('-', underscore + 1);
         int id1 = int.parse(id.substring(firstDash + 1, underscore));
         int id2 = int.parse(id.substring(underscore + 1, secondDash));
-        node = new SynchronizationNode.generated(
+        node = SynchronizationNode.generated(
             id.substring(secondDash + 1), id1, id2);
       }
       nodes.add(node);
@@ -58,7 +58,7 @@ class EvaluationOrder {
 
   @override
   String toString() {
-    StringBuffer nodesString = new StringBuffer()
+    StringBuffer nodesString = StringBuffer()
       ..writeAll(nodes.map((node) => "'$node'"), ', ');
     return '[$nodesString]';
   }

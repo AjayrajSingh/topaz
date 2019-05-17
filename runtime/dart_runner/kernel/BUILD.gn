@@ -3,6 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_tool.gni")
+import("//topaz/runtime/dart/dart_component.gni")
 import("//third_party/dart/utils/compile_platform.gni")
 
 compile_platform("kernel_platform_files") {
@@ -18,7 +19,9 @@ compile_platform("kernel_platform_files") {
   ]
 
   args = [
-    "--bytecode",
+    # TODO(dartbug.com/36342): enable bytecode for core libraries when performance of bytecode
+    # pipeline is on par with default pipeline and continuously tracked.
+    # "--bytecode",
     "--target=dart_runner",
     "dart:core",
   ]
@@ -63,8 +66,6 @@ template("create_kernel_core_snapshot") {
     }
 
     args = [
-      # TODO(zra): remove this when the interpreter supports field guards.
-      "--no_use_field_guards",
       # TODO(FL-117): Re-enable causal async stack traces when this issue is
       # addressed.
       "--no_causal_async_stacks",
@@ -84,7 +85,10 @@ template("create_kernel_core_snapshot") {
       "--write_v8_snapshot_profile_to=" +
           rebase_path(snapshot_profile, root_build_dir),
     ]
-    if (is_debug && !invoker.product) {
+    # No asserts in debug or release product.
+    # No asserts in release with flutter_profile=true (non-product)
+    # Yes asserts in non-product debug.
+    if (!invoker.product && (!flutter_profile || is_debug)) {
       args += [ "--enable_asserts" ]
     }
     args += [ rebase_path(platform_dill) ]

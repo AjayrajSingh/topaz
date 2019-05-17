@@ -8,15 +8,15 @@ import 'package:flutter/widgets.dart';
 import 'package:keyboard/keyboard.dart';
 
 final services.AssetBundle _defaultBundle =
-    new services.NetworkAssetBundle(Uri.base);
+    services.NetworkAssetBundle(Uri.base);
 
 void main() {
   testWidgets('tapping "uppercase" symbol swaps to upper case letters',
       (WidgetTester tester) async {
     String onTextText;
 
-    GlobalKey keyboardKey = new GlobalKey();
-    Keyboard keyboard = new Keyboard(
+    GlobalKey keyboardKey = GlobalKey();
+    Keyboard keyboard = Keyboard(
         key: keyboardKey,
         onText: (String text) {
           onTextText = text;
@@ -25,8 +25,8 @@ void main() {
         onDelete: () {},
         onGo: () {});
 
-    await tester.pumpWidget(new DefaultAssetBundle(
-        bundle: _defaultBundle, child: new Center(child: keyboard)));
+    await tester.pumpWidget(DefaultAssetBundle(
+        bundle: _defaultBundle, child: Center(child: keyboard)));
     expect(onTextText, isNull);
 
     // tap the center of the keyboard to get a lower case letter
@@ -49,7 +49,7 @@ Offset _getShiftPosition(WidgetTester tester, Key keyboardKey) {
   final Finder element = find.byKey(keyboardKey);
   Offset topLeft = tester.getTopLeft(element);
   Offset bottomLeft = tester.getBottomLeft(element);
-  return new Offset(
+  return Offset(
       topLeft.dx, topLeft.dy + ((bottomLeft.dy - topLeft.dy) * 0.6));
 }
 

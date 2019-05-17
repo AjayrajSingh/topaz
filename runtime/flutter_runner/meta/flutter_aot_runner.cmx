@@ -11,6 +11,7 @@
             "fuchsia.crash.Analyzer",
             "fuchsia.fonts.Provider",
             "fuchsia.net.SocketProvider",
+            "fuchsia.sysmem.Allocator",
             "fuchsia.timezone.Timezone",
             "fuchsia.tracelink.Registry",
             "fuchsia.vulkan.loader.Loader"

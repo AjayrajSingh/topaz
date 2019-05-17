@@ -11,8 +11,8 @@ const Enum = `
 ///{{ . -}}
 {{- end }}
 class {{ .Name }} extends $fidl.Enum {
-  factory {{ .Name }}(int v) {
-    switch (v) {
+  factory {{ .Name }}(int _v) {
+    switch (_v) {
 {{- range .Members }}
       case {{ .Value }}:
         return {{ .Name }};
@@ -26,31 +26,34 @@ class {{ .Name }} extends $fidl.Enum {
   {{- range .Doc }}
   ///{{ . -}}
   {{- end }}
-  static const {{ $.Name }} {{ .Name }} = const {{ $.Name }}._({{ .Value }});
+  static const {{ $.Name }} {{ .Name }} = {{ $.Name }}._({{ .Value }});
 {{- end }}
 
-  const {{ .Name }}._(this.value);
+  const {{ .Name }}._(this.$value);
 
   @override
-  final int value;
+  final int $value;
 
-  static const Map<String, {{ .Name }}> valuesMap = const {
+  static const Map<String, {{ .Name }}> $valuesMap = {
   {{- range .Members }}
     r'{{ .Name }}': {{ .Name }},
   {{- end }}
   };
 
-  static const List<{{ .Name }}> values = const [
+  static const List<{{ .Name }}> $values = [
     {{- range .Members }}
     {{ .Name }},
     {{- end }}
   ];
 
-  static {{ .Name }} valueOf(String name) => valuesMap[name];
+  // TODO: remove, see: FIDL-587
+  static const List<{{ .Name }}> values = {{ .Name }}.$values;
+
+  static {{ .Name }} $valueOf(String name) => $valuesMap[name];
 
   @override
   String toString() {
-    switch (value) {
+    switch ($value) {
   {{- range .Members }}
       case {{ .Value }}:
         return r'{{ $.Name }}.{{ .Name }}';
@@ -60,7 +63,7 @@ class {{ .Name }} extends $fidl.Enum {
     }
   }
 
-  static {{ .Name }} _ctor(int v) => new {{ .Name }}(v);
+  static {{ .Name }} _ctor(int v) => {{ .Name }}(v);
 }
 
 const $fidl.EnumType<{{ .Name }}> {{ .TypeSymbol }} = {{ .TypeExpr }};

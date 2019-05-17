@@ -5,10 +5,14 @@
 #ifndef TOPAZ_EXAMPLES_UI_JANK_JANK_VIEW_H_
 #define TOPAZ_EXAMPLES_UI_JANK_JANK_VIEW_H_
 
+#include <fuchsia/fonts/cpp/fidl.h>
+#include <fuchsia/images/cpp/fidl.h>
+#include <fuchsia/ui/input/cpp/fidl.h>
+#include <src/lib/fxl/macros.h>
+#include <src/lib/fxl/time/time_point.h>
+
 #include "examples/ui/lib/skia_font_loader.h"
 #include "examples/ui/lib/skia_view.h"
-#include "lib/fxl/macros.h"
-#include "lib/fxl/time/time_point.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkFont.h"
@@ -37,16 +41,16 @@ class JankView : public scenic::SkiaView {
 
   static const Button kButtons[];
 
-  // |scenic::V1BaseView|
+  // |scenic::BaseView|
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
-  bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
+  void OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 
   void DrawContent(SkCanvas* canvas);
   void DrawButton(SkCanvas* canvas, const char* label, const SkRect& bounds);
   void OnClick(const Button& button);
 
-  mozart::SkiaFontLoader font_loader_;
+  scenic::SkiaFontLoader font_loader_;
   sk_sp<SkTypeface> typeface_;
 
   fxl::TimePoint stutter_end_time_;

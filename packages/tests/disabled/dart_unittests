@@ -1,6 +1,0 @@
-{
-    "host_tests" : [
-      "//topaz/shell/keyboard:keyboard_tests",
-      "//topaz/bin/session_shell/capybara_session_shell:capybara_session_shell_tests"
-    ]
-}

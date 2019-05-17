@@ -31,10 +31,10 @@ class SurfaceFrame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
+    return Container(
       alignment: FractionalOffset.center,
-      child: new IgnorePointer(
-        child: new ScopedModelDescendant<DepthModel>(
+      child: IgnorePointer(
+        child: ScopedModelDescendant<DepthModel>(
           builder: (
             BuildContext context,
             Widget child,
@@ -51,9 +51,9 @@ class SurfaceFrame extends StatelessWidget {
               _surfaceDepth,
               (depthModel.maxDepth - depth) / 2.0,
             ).clamp(0.0, _surfaceDepth);
-            return new PhysicalModel(
+            return PhysicalModel(
               elevation: elevation,
-              color: const Color(0x00000000),
+              color: Color(0x00000000),
               child: child,
             );
           },

@@ -4,13 +4,13 @@
 
 import 'package:fidl_fuchsia_sys/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_app/fidl_async.dart' show ViewProviderProxy;
-import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart'
-    show ExportToken, ImportToken;
+import 'package:fidl_fuchsia_ui_views/fidl_async.dart'
+    show ViewToken, ViewHolderToken;
 import 'package:flutter/widgets.dart';
 import 'package:fuchsia_scenic_flutter/child_view.dart' show ChildView;
 import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
     show ChildViewConnection;
-import 'package:lib.app.dart/app_async.dart';
+import 'package:fuchsia_services/services.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
@@ -19,6 +19,7 @@ class ApplicationWidget extends StatefulWidget {
   /// The application to launch.
   final String url;
 
+  // TODO: This class should be responsible to close the launcher connection
   /// The [Launcher] used to launch the application.
   final Launcher launcher;
 
@@ -42,7 +43,7 @@ class ApplicationWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _ApplicationWidgetState createState() => new _ApplicationWidgetState();
+  _ApplicationWidgetState createState() => _ApplicationWidgetState();
 }
 
 class _ApplicationWidgetState extends State<ApplicationWidget> {
@@ -73,7 +74,7 @@ class _ApplicationWidgetState extends State<ApplicationWidget> {
   }
 
   @override
-  Widget build(BuildContext context) => new ChildView(
+  Widget build(BuildContext context) => ChildView(
         connection: _connection,
         hitTestable: widget.hitTestable,
         focusable: widget.focusable,
@@ -85,16 +86,17 @@ class _ApplicationWidgetState extends State<ApplicationWidget> {
   }
 
   void _launchApp() {
-    _applicationController = new ComponentControllerProxy();
+    _applicationController = ComponentControllerProxy();
 
-    Services incomingServices = new Services();
+    final incomingServices = Incoming();
     widget.launcher.createComponent(
-      new LaunchInfo(
-          url: widget.url, directoryRequest: incomingServices.request()),
+      LaunchInfo(
+          url: widget.url,
+          directoryRequest: incomingServices.request().passChannel()),
       _applicationController.ctrl.request(),
     );
 
-    _connection = ChildViewConnection.fromImportToken(
+    _connection = ChildViewConnection(
       _consumeViewProvider(
         _consumeServices(incomingServices),
       ),
@@ -105,23 +107,23 @@ class _ApplicationWidgetState extends State<ApplicationWidget> {
 
   /// Creates a [ViewProviderProxy] from a [Services], closing it in the
   /// process.
-  ViewProviderProxy _consumeServices(Services services) {
+  ViewProviderProxy _consumeServices(Incoming services) {
     ViewProviderProxy viewProvider = ViewProviderProxy();
     services
-      ..connectToService(viewProvider.ctrl)
+      ..connectToService(viewProvider)
       ..close();
     return viewProvider;
   }
 
-  /// Creates a handle to a [ImportToken] from a [ViewProviderProxy], closing it
-  /// in the process.
-  ImportToken _consumeViewProvider(
+  /// Creates a handle to a [ViewHolderToken] from a [ViewProviderProxy],
+  /// closing it in the process.
+  ViewHolderToken _consumeViewProvider(
     ViewProviderProxy viewProvider,
   ) {
     final viewTokens = EventPairPair();
     assert(viewTokens.status == ZX.OK);
-    final viewHolderToken = ImportToken(value: viewTokens.first);
-    final viewToken = ExportToken(value: viewTokens.second);
+    final viewHolderToken = ViewHolderToken(value: viewTokens.first);
+    final viewToken = ViewToken(value: viewTokens.second);
 
     viewProvider.createView(viewToken.value, null, null);
     viewProvider.ctrl.close();

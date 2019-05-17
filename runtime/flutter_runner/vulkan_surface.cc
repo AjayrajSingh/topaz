@@ -9,13 +9,13 @@
 
 #include <algorithm>
 
-#include "lib/fxl/logging.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/gpu/GrBackendSemaphore.h"
 #include "third_party/skia/include/gpu/GrBackendSurface.h"
 #include "third_party/skia/include/gpu/GrContext.h"
+#include "topaz/runtime/dart/utils/inlines.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 namespace {
 
@@ -30,6 +30,11 @@ bool CreateVulkanImage(vulkan::VulkanProvider& vulkan_provider,
   FML_DCHECK(!size.isEmpty());
   FML_DCHECK(out_vulkan_image != nullptr);
 
+  // The image creation parameters need to be the same as those in scenic
+  // (garnet/lib/ui/gfx/resources/gpu_image.cc and
+  // src/ui/lib/escher/util/image_utils.cc) or else the different vulkan
+  // devices may interpret the bytes differently.
+  // TODO(SCN-1369): Use API to coordinate this with scenic.
   out_vulkan_image->vk_image_create_info = {
       .sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
       .pNext = nullptr,
@@ -42,7 +47,9 @@ bool CreateVulkanImage(vulkan::VulkanProvider& vulkan_provider,
       .arrayLayers = 1,
       .samples = VK_SAMPLE_COUNT_1_BIT,
       .tiling = VK_IMAGE_TILING_OPTIMAL,
-      .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+      .usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |
+               VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+               VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
       .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
       .queueFamilyIndexCount = 0,
       .pQueueFamilyIndices = nullptr,
@@ -150,15 +157,17 @@ vulkan::VulkanHandle<VkSemaphore> VulkanSurface::SemaphoreFromEvent(
     return vulkan::VulkanHandle<VkSemaphore>();
   }
 
-  VkImportSemaphoreFuchsiaHandleInfoKHR import_info = {
-      .sType = VK_STRUCTURE_TYPE_IMPORT_SEMAPHORE_FUCHSIA_HANDLE_INFO_KHR,
+  VkImportSemaphoreZirconHandleInfoFUCHSIA import_info = {
+      .sType =
+          VK_STRUCTURE_TYPE_TEMP_IMPORT_SEMAPHORE_ZIRCON_HANDLE_INFO_FUCHSIA,
       .pNext = nullptr,
       .semaphore = semaphore,
-      .handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_FUCHSIA_FENCE_BIT_KHR,
+      .handleType =
+          VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_TEMP_ZIRCON_EVENT_BIT_FUCHSIA,
       .handle = static_cast<uint32_t>(semaphore_event.release())};
 
-  result =
-      VK_CALL_LOG_ERROR(vulkan_provider_.vk().ImportSemaphoreFuchsiaHandleKHR(
+  result = VK_CALL_LOG_ERROR(
+      vulkan_provider_.vk().ImportSemaphoreZirconHandleFUCHSIA(
           vulkan_provider_.vk_device(), &import_info));
   if (result != VK_SUCCESS) {
     return vulkan::VulkanHandle<VkSemaphore>();
@@ -217,10 +226,16 @@ bool VulkanSurface::AllocateDeviceMemory(sk_sp<GrContext> context,
     }
   }
 
+  VkMemoryDedicatedAllocateInfo dedicated_allocate_info = {
+      .sType = VK_STRUCTURE_TYPE_MEMORY_DEDICATED_ALLOCATE_INFO,
+      .pNext = nullptr,
+      .image = vulkan_image_.vk_image,
+      .buffer = VK_NULL_HANDLE};
   VkExportMemoryAllocateInfoKHR export_allocate_info = {
       .sType = VK_STRUCTURE_TYPE_EXPORT_MEMORY_ALLOCATE_INFO_KHR,
-      .pNext = nullptr,
-      .handleTypes = VK_EXTERNAL_MEMORY_HANDLE_TYPE_FUCHSIA_VMO_BIT_KHR};
+      .pNext = &dedicated_allocate_info,
+      .handleTypes =
+          VK_EXTERNAL_MEMORY_HANDLE_TYPE_TEMP_ZIRCON_VMO_BIT_FUCHSIA};
 
   const VkMemoryAllocateInfo alloc_info = {
       .sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO,
@@ -259,10 +274,10 @@ bool VulkanSurface::AllocateDeviceMemory(sk_sp<GrContext> context,
     // Acquire the VMO for the device memory.
     uint32_t vmo_handle = 0;
 
-    VkMemoryGetFuchsiaHandleInfoKHR get_handle_info = {
-        VK_STRUCTURE_TYPE_MEMORY_GET_FUCHSIA_HANDLE_INFO_KHR, nullptr,
-        vk_memory_, VK_EXTERNAL_MEMORY_HANDLE_TYPE_FUCHSIA_VMO_BIT_KHR};
-    if (VK_CALL_LOG_ERROR(vulkan_provider_.vk().GetMemoryFuchsiaHandleKHR(
+    VkMemoryGetZirconHandleInfoFUCHSIA get_handle_info = {
+        VK_STRUCTURE_TYPE_TEMP_MEMORY_GET_ZIRCON_HANDLE_INFO_FUCHSIA, nullptr,
+        vk_memory_, VK_EXTERNAL_MEMORY_HANDLE_TYPE_TEMP_ZIRCON_VMO_BIT_FUCHSIA};
+    if (VK_CALL_LOG_ERROR(vulkan_provider_.vk().GetMemoryZirconHandleFUCHSIA(
             vulkan_provider_.vk_device(), &get_handle_info, &vmo_handle)) !=
         VK_SUCCESS) {
       return false;
@@ -436,9 +451,10 @@ void VulkanSurface::SignalWritesFinished(
     return;
   }
 
-  FXL_CHECK(pending_on_writes_committed_ == nullptr)
-      << "Attempted to signal a write on the surface when the previous write "
-         "has not yet been acknowledged by the compositor.";
+  dart_utils::Check(pending_on_writes_committed_ == nullptr,
+                    "Attempted to signal a write on the surface when the "
+                    "previous write has not yet been acknowledged by the "
+                    "compositor.");
 
   pending_on_writes_committed_ = on_writes_committed;
 }
@@ -489,4 +505,4 @@ void VulkanSurface::OnHandleReady(async_dispatcher_t* dispatcher,
   Reset();
 }
 
-}  // namespace flutter
+}  // namespace flutter_runner

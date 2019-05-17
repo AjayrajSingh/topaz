@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "dart-pkg/zircon/sdk_ext/handle_waiter.h"
-#include "lib/fxl/memory/ref_counted.h"
+#include "src/lib/fxl/memory/ref_counted.h"
 #include "third_party/dart/runtime/include/dart_api.h"
 #include "third_party/tonic/dart_library_natives.h"
 #include "third_party/tonic/dart_wrappable.h"
@@ -57,6 +57,8 @@ class Handle : public fxl::RefCountedThreadSafe<Handle>,
                                       Dart_Handle callback);
 
   void ReleaseWaiter(HandleWaiter* waiter);
+
+  Dart_Handle Duplicate(uint32_t rights);
 
  private:
   explicit Handle(zx_handle_t handle);

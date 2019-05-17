@@ -5,4 +5,5 @@
 export 'src/pseudo_dir.dart';
 export 'src/pseudo_file.dart';
 export 'src/service.dart';
+export 'src/vmo_file.dart';
 export 'src/vnode.dart';

@@ -2,10 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
+import("//build/fidl/fidl.gni")
 import("//build/testing/environments.gni")
-import("//topaz/runtime/dart/dart_test.gni")
+import("//topaz/runtime/dart_runner/dart_app.gni")
+import("//topaz/runtime/dart/dart_fuchsia_test.gni")
+import("//topaz/runtime/dart/flutter_test.gni")
 
 dart_library("fuchsia_services") {
   package_name = "fuchsia_services"
@@ -14,11 +16,10 @@ dart_library("fuchsia_services") {
 
   sources = [
     "services.dart",
-    "src/environment_service_connection.dart",
+    "src/incoming.dart",
+    "src/internal/_startup_context_impl.dart",
     "src/outgoing.dart",
-    "src/service_connection.dart",
     "src/service_provider_impl.dart",
-    "src/services_connector.dart",
     "src/startup_context.dart",
   ]
 
@@ -33,9 +34,8 @@ dart_library("fuchsia_services") {
   ]
 }
 
-dart_test("fuchsia_services_package_unittests") {
+flutter_test("fuchsia_services_package_unittests") {
   sources = [
-    "environment_service_connection_test.dart",
     "service_provider_impl_test.dart",
     "startup_context_test.dart",
   ]
@@ -47,6 +47,15 @@ dart_test("fuchsia_services_package_unittests") {
   ]
 }
 
+fidl("test_foo_fidl") {
+  name = "test.fuchsia.service.foo"
+
+  sources = [
+    "test_support/fidl/foo.fidl",
+  ]
+}
+
+# fx run-test fuchsia_services_package_integration_tests
 dart_fuchsia_test("fuchsia_services_package_integration_tests") {
   meta = [
     {
@@ -55,18 +64,38 @@ dart_fuchsia_test("fuchsia_services_package_integration_tests") {
     },
   ]
 
-  # Note: existing tests were moved into another package during a refactor which
-  # is why this is empty. We are leaving this here so that it is easy to add
-  # integration tests when we get a chance. This comment can be removed when
-  # sources is no longer empty.
   sources = [
+    "launch_flow_test.dart",
+    "incoming_test.dart",
     "outgoing_test.dart",
   ]
 
   deps = [
     ":fuchsia_services",
+    ":test_foo_fidl",
     "//third_party/dart-pkg/pub/test",
     "//zircon/public/fidl/fuchsia-io",
   ]
   environments = basic_envs
 }
+
+# The foo test server used for integration testing
+dart_app("fuchsia_services_foo_test_server") {
+
+  main_dart = "test_support/foo_test_server/main.dart"
+
+  meta = [
+    {
+      path = rebase_path("meta/fuchsia_services_foo_test_server.cmx")
+      dest = "fuchsia_services_foo_test_server.cmx"
+    },
+  ]
+
+  sources = []
+  deps = [
+    ":test_foo_fidl",
+    "//topaz/public/dart/fidl",
+    "//topaz/public/dart/fuchsia_services",
+  ]
+}
+

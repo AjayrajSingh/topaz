@@ -5,51 +5,54 @@
 import 'dart:async';
 import 'dart:io' as io;
 
-import 'package:fidl_fuchsia_examples_hello/fidl.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:fidl_fuchsia_examples_hello/fidl_async.dart';
+import 'package:fidl_fuchsia_sys/fidl_async.dart';
+import 'package:fuchsia_services/services.dart';
 import 'package:test/test.dart';
 
 void main(List<String> args) {
-  final StartupContext context = new StartupContext.fromStartupInfo();
-  tearDownAll(context.close);
+  final StartupContext context = StartupContext.fromStartupInfo();
+  LauncherProxy launcher;
+
+  setUp(() {
+    launcher = LauncherProxy();
+    context.incoming.connectToService(launcher);
+  });
+
+  tearDown(() {
+    launcher.ctrl.close();
+    launcher = null;
+  });
 
   // TODO(rosswang): nested environments and determinism
 
   test('schedule delayed futures',
-      () => new Future<Null>.delayed(const Duration(seconds: 1)));
+      () => Future<Null>.delayed(const Duration(seconds: 1)));
 
-  test('start hello_dart', () {
-    const LaunchInfo info = const LaunchInfo(
+  test('start hello_dart', () async {
+    const LaunchInfo info = LaunchInfo(
         url:
             'fuchsia-pkg://fuchsia.com/hello_dart_jit#meta/hello_dart_jit.cmx');
-    context.launcher.createComponent(info, null);
+    await launcher.createComponent(
+        info, ComponentControllerProxy().ctrl.request());
   });
 
   test('communicate with a fidl service (hello_app_dart)', () async {
-    final Services services = new Services();
-    final HelloProxy service = new HelloProxy();
+    final HelloProxy service = HelloProxy();
+    final incoming = Incoming();
 
-    final ComponentControllerProxy actl = new ComponentControllerProxy();
+    final ComponentControllerProxy actl = ComponentControllerProxy();
 
-    final LaunchInfo info = new LaunchInfo(
+    final LaunchInfo info = LaunchInfo(
         url:
             'fuchsia-pkg://fuchsia.com/hello_app_dart_jit#meta/hello_app_dart_jit.cmx',
-        directoryRequest: services.request());
-    context.launcher.createComponent(info, actl.ctrl.request());
-    services
-      ..connectToService(service.ctrl)
-      ..close();
+        directoryRequest: incoming.request().passChannel());
+    await launcher.createComponent(info, actl.ctrl.request());
+    incoming.connectToService(service);
 
-    // TODO(rosswang): let's see if we can generate a future-based fidl dart
-    final Completer<String> hello = new Completer<String>();
-    service.say('hello', hello.complete);
-
-    expect(await hello.future, equals('hola from Dart!'));
+    expect(await service.say('hello'), equals('hola from Dart!'));
 
     actl.ctrl.close();
-    expect(service.ctrl.error.timeout(const Duration(seconds: 2)),
-        throwsA(anything));
   });
 
   test('dart:io exit() throws UnsupportedError', () {

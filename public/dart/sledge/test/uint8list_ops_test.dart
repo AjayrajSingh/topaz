@@ -6,13 +6,13 @@
 import 'dart:math' show Random;
 import 'dart:typed_data';
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/src/uint8list_ops.dart';
 import 'package:test/test.dart';
 
 bool _listsAreEqualHelper(a, b) {
-  final convertedA = new Uint8List.fromList(a);
-  final convertedB = new Uint8List.fromList(b);
+  final convertedA = Uint8List.fromList(a);
+  final convertedB = Uint8List.fromList(b);
   return uint8ListsAreEqual(convertedA, convertedB);
 }
 
@@ -21,9 +21,9 @@ void main() {
   test('Concatenation of Uint8Lists', () {
     final l1 = [1, 2], l2 = [3, 4, 5], l3 = [6];
     final uint8lConcat = concatListOfUint8Lists([
-      new Uint8List.fromList(l1),
-      new Uint8List.fromList(l2),
-      new Uint8List.fromList(l3)
+      Uint8List.fromList(l1),
+      Uint8List.fromList(l2),
+      Uint8List.fromList(l3)
     ]);
     expect(uint8lConcat.toList(), equals([1, 2, 3, 4, 5, 6]));
   });
@@ -31,10 +31,10 @@ void main() {
   test('Concatenation of Uint8Lists #2', () {
     final l1 = [1], l2 = [10], l3 = [3], l4 = [6];
     final uint8lConcat = concatListOfUint8Lists([
-      new Uint8List.fromList(l1),
-      new Uint8List.fromList(l2),
-      new Uint8List.fromList(l3),
-      new Uint8List.fromList(l4)
+      Uint8List.fromList(l1),
+      Uint8List.fromList(l2),
+      Uint8List.fromList(l3),
+      Uint8List.fromList(l4)
     ]);
     expect(uint8lConcat.toList(), equals([1, 10, 3, 6]));
   });
@@ -48,7 +48,7 @@ void main() {
 
   test('listsAreEqual', () {
     expect(uint8ListsAreEqual(null, null), equals(true));
-    expect(uint8ListsAreEqual(new Uint8List.fromList([]), null), equals(false));
+    expect(uint8ListsAreEqual(Uint8List.fromList([]), null), equals(false));
     expect(_listsAreEqualHelper(<int>[], <int>[]), equals(true));
     expect(_listsAreEqualHelper([1], <int>[]), equals(false));
     expect(_listsAreEqualHelper([1], [1]), equals(true));
@@ -58,10 +58,10 @@ void main() {
 
   test('Ordered map with Uint8List keys of same length', () {
     final orderedMap = newUint8ListOrderedMap<int>();
-    Random rand = new Random();
+    Random rand = Random();
     for (int i = 0; i < 100; i++) {
       int value = rand.nextInt(0xffffffff);
-      Uint8List key = new Uint8List(8)
+      Uint8List key = Uint8List(8)
         ..buffer.asByteData().setUint64(0, value, Endian.big);
       orderedMap[key] = value;
     }
@@ -91,56 +91,56 @@ void main() {
 
   group('hasPrefix', () {
     test('both empty', () {
-      expect(hasPrefix(new Uint8List(0), new Uint8List(0)), isTrue);
+      expect(hasPrefix(Uint8List(0), Uint8List(0)), isTrue);
     });
 
     test('prefix empty', () {
-      expect(hasPrefix(new Uint8List.fromList([1]), new Uint8List(0)), isTrue);
+      expect(hasPrefix(Uint8List.fromList([1]), Uint8List(0)), isTrue);
     });
 
     test('key empty', () {
-      expect(hasPrefix(new Uint8List(0), new Uint8List.fromList([1])), isFalse);
+      expect(hasPrefix(Uint8List(0), Uint8List.fromList([1])), isFalse);
     });
 
     test('prefix equals to key', () {
       expect(
           hasPrefix(
-              new Uint8List.fromList([1, 3]), new Uint8List.fromList([1, 3])),
+              Uint8List.fromList([1, 3]), Uint8List.fromList([1, 3])),
           isTrue);
     });
 
     test('prefix is a prefix of key', () {
       expect(
-          hasPrefix(new Uint8List.fromList([1, 3, 2, 5]),
-              new Uint8List.fromList([1, 3])),
+          hasPrefix(Uint8List.fromList([1, 3, 2, 5]),
+              Uint8List.fromList([1, 3])),
           isTrue);
     });
 
     test('key is a prefix of prefix', () {
       expect(
-          hasPrefix(new Uint8List.fromList([1, 3]),
-              new Uint8List.fromList([1, 3, 2, 5])),
+          hasPrefix(Uint8List.fromList([1, 3]),
+              Uint8List.fromList([1, 3, 2, 5])),
           isFalse);
     });
 
     test('same length, non equal', () {
       expect(
-          hasPrefix(new Uint8List.fromList([1, 3, 4, 5]),
-              new Uint8List.fromList([1, 3, 2, 5])),
+          hasPrefix(Uint8List.fromList([1, 3, 4, 5]),
+              Uint8List.fromList([1, 3, 2, 5])),
           isFalse);
     });
 
     test('key shorter, not prefix', () {
       expect(
-          hasPrefix(new Uint8List.fromList([1, 2]),
-              new Uint8List.fromList([1, 3, 2, 5])),
+          hasPrefix(Uint8List.fromList([1, 2]),
+              Uint8List.fromList([1, 3, 2, 5])),
           isFalse);
     });
 
     test('prefix shorter, not prefix', () {
       expect(
-          hasPrefix(new Uint8List.fromList([1, 2, 4, 2]),
-              new Uint8List.fromList([1, 3, 1])),
+          hasPrefix(Uint8List.fromList([1, 2, 4, 2]),
+              Uint8List.fromList([1, 3, 1])),
           isFalse);
     });
   });

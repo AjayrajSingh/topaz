@@ -4,18 +4,54 @@
 
 import("//build/package.gni")
 
+group("all") {
+  testonly = true
+  public_deps = [
+    "//topaz/tests/benchmarks:input_latency",
+    "//topaz/tests/benchmarks:topaz_benchmarks",
+  ]
+}
+
+group("input_latency") {
+  testonly = true
+  public_deps = [
+    "//garnet/tests/benchmarks/input_latency:garnet_input_latency_benchmarks",
+    "//topaz/tests/benchmarks/input_latency:topaz_input_latency_benchmarks",
+  ]
+}
+
+executable("topaz_benchmarks_bin") {
+  output_name = "topaz_benchmarks"
+
+  sources = [
+    "benchmarks.cc",
+    "gfx_benchmarks.cc",
+    "gfx_benchmarks.h",
+  ]
+
+  deps = [
+    "//garnet/testing/benchmarking:benchmarking",
+    "//garnet/testing/benchmarking:is_vulkan_supported",
+  ]
+}
+
 # Builds "benchmarks.sh" into a package that runs all Topaz benchmarks
 # on CI.
 package("topaz_benchmarks") {
   testonly = true
+
+  deps = [
+    ":topaz_benchmarks_bin",
+  ]
+
   binaries = [
     {
-      name = rebase_path("topaz_benchmarks.sh")
+      name = rebase_path("benchmarks.sh")
       dest = "benchmarks.sh"
     },
     {
-      name = rebase_path("topaz_gfx_benchmarks.sh")
-      dest = "gfx_benchmarks.sh"
+      shell = true
+      name = "topaz_benchmarks"
     },
   ]
 }

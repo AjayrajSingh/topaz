@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:lib_setui_common/step.dart';
 import 'package:lib_setui_common/syllabus.dart';
 import 'package:meta/meta.dart';
@@ -48,7 +48,7 @@ class SyllabusParser {
     // First pass: create steps.
     docs[1].contents.value.forEach((key, value) {
       final String action = value[_keyAction];
-      steps[key] = new Step(key, action);
+      steps[key] = Step(key, action);
     });
 
     // Second pass: link up nodes.
@@ -69,7 +69,7 @@ class SyllabusParser {
 
     final YamlMap metaData = docs[0].contents.value;
 
-    return new Syllabus(steps.values.toList(), steps[metaData[_keyEntry]],
+    return Syllabus(steps.values.toList(), steps[metaData[_keyEntry]],
         metaData[_keySingleUseId]);
   }
 

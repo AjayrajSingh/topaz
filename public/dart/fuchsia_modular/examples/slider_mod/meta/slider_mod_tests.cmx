@@ -1,15 +1,22 @@
 {
+    "facets": {
+        "fuchsia.test": {
+            "system-services": [
+                "fuchsia.net.SocketProvider"
+            ]
+        }
+    },
     "program": {
         "data": "data/slider_mod_tests"
     },
     "sandbox": {
         "features": [
-            "root-ssl-certificates",
-            "system-temp"
+            "shell"
         ],
         "services": [
-            "fuchsia.sys.Environment",
-            "fuchsia.testing.runner.TestRunner"
+            "fuchsia.net.SocketProvider",
+            "fuchsia.sys.Launcher",
+            "fuchsia.sys.Environment"
         ]
     }
 }

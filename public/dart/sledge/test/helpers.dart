@@ -19,10 +19,10 @@ class SledgeForTesting extends Sledge {
   SledgeForTesting(FakeLedgerPage fakeLedgerPage)
       : fakeLedgerPage = fakeLedgerPage,
         super.testing(
-            fakeLedgerPage, new FakeLedgerObjectsFactory(fakeLedgerPage));
+            fakeLedgerPage, FakeLedgerObjectsFactory(fakeLedgerPage));
 
   Document fakeGetDocument(DocumentId documentId) {
-    return new Document(this, documentId);
+    return Document(this, documentId);
   }
 
   @override
@@ -32,10 +32,10 @@ class SledgeForTesting extends Sledge {
 
   void startInfiniteTransaction() {
     _fakeTransaction =
-        new Transaction(null, null, new FakeLedgerObjectsFactory(null));
+        Transaction(null, null, FakeLedgerObjectsFactory(null));
   }
 }
 
 SledgeForTesting newSledgeForTesting() {
-  return new SledgeForTesting(new FakeLedgerPage());
+  return SledgeForTesting(FakeLedgerPage());
 }

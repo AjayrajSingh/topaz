@@ -3,9 +3,11 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app_driver.dart/module_driver.dart';
-import 'package:lib.app.dart/logging.dart';
-import 'package:lib.component.dart/component.dart';
+import 'package:fuchsia_logger/logger.dart';
+import 'package:fuchsia_modular/lifecycle.dart';
+import 'package:fuchsia_modular/module.dart';
+import 'package:fuchsia_services/services.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular;
 import 'package:lib.widgets.dart/model.dart';
 
 import 'src/models/todo_list_model.dart';
@@ -13,20 +15,18 @@ import 'src/widgets/todo_list_module_screen.dart';
 
 /// Main entry point to the todo list module.
 void main() {
-  setupLogger();
+  setupLogger(name: 'Todo List');
 
-  final model = new TodoListModel();
-  // TODO: Refactor this class to use the new SDK instead of deprecated API
-  // ignore: deprecated_member_use
-  final driver = ModuleDriver(onTerminate: model.onTerminate);
+  final model = TodoListModel()..connect(_getComponentContext());
 
-  driver.getComponentContext().then((ComponentContextClient client) {
-    model.connect(client.proxy);
-  }).catchError(log.severe);
+  // We don't support intents in this module so explicitly ignore them.
+  Module().registerIntentHandler(NoopIntentHandler());
+
+  Lifecycle().addTerminateListener(model.onTerminate);
 
   runApp(
     MaterialApp(
-      home: new ScopedModel<TodoListModel>(
+      home: ScopedModel<TodoListModel>(
         model: model,
         child: TodoListModuleScreen(
           onNewItem: model.addItem,
@@ -35,6 +35,10 @@ void main() {
       ),
     ),
   );
+}
 
-  driver.start().catchError(log.severe);
+modular.ComponentContext _getComponentContext() {
+  final proxy = modular.ComponentContextProxy();
+  StartupContext.fromStartupInfo().incoming.connectToService(proxy);
+  return proxy;
 }

@@ -3,4 +3,12 @@
 // found in the LICENSE file.
 
 /// The Inspect API for Dart.
-export 'src/inspect.dart';
+export 'src/inspect/inspect.dart'
+    show
+        Inspect,
+        InspectStateError,
+        Node,
+        IntProperty,
+        DoubleProperty,
+        StringProperty,
+        ByteDataProperty;

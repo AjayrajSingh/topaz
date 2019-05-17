@@ -3,7 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
+import 'package:fuchsia_modular/module.dart';
 import 'package:lib.widgets.dart/model.dart';
 
 import 'src/demo_model.dart';
@@ -16,9 +17,12 @@ import 'src/demo_widget.dart';
 void main() {
   setupLogger(name: 'session_demo');
 
+  // explicitly disable intents
+  Module().registerIntentHandler(NoopIntentHandler());
+
   DemoModel model = DemoModel();
 
-  runApp(new ScopedModel<DemoModel>(
+  runApp(ScopedModel<DemoModel>(
     model: model,
     child: MessagesDemo(),
   ));

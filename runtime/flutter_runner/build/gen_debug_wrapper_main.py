@@ -32,8 +32,6 @@ def main():
 // ignore_for_file: avoid_relative_lib_imports
 import 'dart:async';
 
-import 'package:fidl_fuchsia_testing_runner/fidl_async.dart';
-import 'package:fuchsia_services/services.dart';
 import 'package:flutter_driver/driver_extension.dart';
 ''')
   outfile.write("import '%s' as flutter_app_main;\n" % args.main_dart)
@@ -44,12 +42,7 @@ void main() async {
     print('Overriding app main method because flutter_driver_extendable '
         'is enabled in the build file');
 
-    // TODO(DX-634): don't reply on testRunner if possible
-    final TestRunnerProxy testRunner = TestRunnerProxy();
-    connectToEnvironmentService(testRunner);
     try {
-      await testRunner.done();
-
       // Enables Flutter Driver VM service extension
       //
       // This extension is required for tests that use package:flutter_driver

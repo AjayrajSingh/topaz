@@ -28,10 +28,10 @@ class Change {
 
   /// Returns a new Change with prefix attached to all entries.
   Change withPrefix(Uint8List prefix) {
-    Change result = new Change();
+    Change result = Change();
     for (final change in changedEntries) {
       result.changedEntries.add(
-          new KeyValue(concatUint8Lists(prefix, change.key), change.value));
+          KeyValue(concatUint8Lists(prefix, change.key), change.value));
     }
     for (final key in deletedKeys) {
       result.deletedKeys.add(concatUint8Lists(prefix, key));
@@ -44,13 +44,13 @@ class Change {
     final splittedChanges = newUint8ListMap<Change>();
     for (final change in changedEntries) {
       final prefix = getSublistView(change.key, end: prefixLen);
-      final newChange = splittedChanges.putIfAbsent(prefix, () => new Change());
-      newChange.changedEntries.add(new KeyValue(
+      final newChange = splittedChanges.putIfAbsent(prefix, () => Change());
+      newChange.changedEntries.add(KeyValue(
           getSublistView(change.key, start: prefixLen), change.value));
     }
     for (final deletion in deletedKeys) {
       final prefix = getSublistView(deletion, end: prefixLen);
-      final newChange = splittedChanges.putIfAbsent(prefix, () => new Change());
+      final newChange = splittedChanges.putIfAbsent(prefix, () => Change());
       newChange.deletedKeys.add(getSublistView(deletion, start: prefixLen));
     }
     return splittedChanges;

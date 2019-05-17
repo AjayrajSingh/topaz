@@ -16,8 +16,8 @@ class MapChange<K, V> {
 
   /// Constructor from ConvertedChange.
   MapChange(ConvertedChange<K, V> change)
-      : changedEntries = new Map<K, V>.from(change.changedEntries),
-        deletedKeys = new Set<K>.from(change.deletedKeys);
+      : changedEntries = Map<K, V>.from(change.changedEntries),
+        deletedKeys = Set<K>.from(change.deletedKeys);
 }
 
 /// Interface to get changes applied to SetValue.
@@ -31,7 +31,7 @@ class SetChange<E> {
   /// Constructor from MapChange.
   SetChange(ConvertedChange<E, E> change)
       : insertedElements = change.changedEntries.keys.toSet(),
-        deletedElements = new Set<E>.from(change.deletedKeys);
+        deletedElements = Set<E>.from(change.deletedKeys);
 }
 
 /// Interface to get changes applied to OrderedList.
@@ -64,8 +64,8 @@ class ConvertedChange<K, V> {
 
   /// Copy constructor.
   ConvertedChange.from(ConvertedChange<K, V> change)
-      : changedEntries = new Map.from(change.changedEntries),
-        deletedKeys = new Set.from(change.deletedKeys);
+      : changedEntries = Map.from(change.changedEntries),
+        deletedKeys = Set.from(change.deletedKeys);
 
   /// Clears all changes.
   void clear() {

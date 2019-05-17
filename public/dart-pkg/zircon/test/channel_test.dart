@@ -12,7 +12,7 @@ import 'package:zircon/zircon.dart';
 /// Helper method to turn a [String] into a [ByteData] containing the
 /// text of the string encoded as UTF-8.
 ByteData utf8Bytes(final String text) {
-  return new ByteData.view(new Uint8List.fromList(utf8.encode(text)).buffer);
+  return ByteData.view(Uint8List.fromList(utf8.encode(text)).buffer);
 }
 
 void main() {
@@ -28,9 +28,9 @@ void main() {
     expect(pair.first.close(), equals(0));
     expect(pair.first.isValid, isFalse);
     expect(pair.second.isValid, isTrue);
-    expect(System.channelWrite(pair.first, new ByteData(1), <Handle>[]),
+    expect(System.channelWrite(pair.first, ByteData(1), <Handle>[]),
         equals(ZX.ERR_BAD_HANDLE));
-    expect(System.channelWrite(pair.second, new ByteData(1), <Handle>[]),
+    expect(System.channelWrite(pair.second, ByteData(1), <Handle>[]),
         equals(ZX.ERR_PEER_CLOSED));
   });
 
@@ -75,7 +75,7 @@ void main() {
 
   test('async wait channel read', () async {
     final HandlePairResult pair = System.channelCreate();
-    final Completer<List<int>> completer = new Completer<List<int>>();
+    final Completer<List<int>> completer = Completer<List<int>>();
     pair.first.asyncWait(ZX.CHANNEL_READABLE, (int status, int pending) {
       completer.complete(<int>[status, pending]);
     });
@@ -92,7 +92,7 @@ void main() {
 
   test('async wait channel closed', () async {
     final HandlePairResult pair = System.channelCreate();
-    final Completer<int> completer = new Completer<int>();
+    final Completer<int> completer = Completer<int>();
     pair.first.asyncWait(ZX.CHANNEL_PEER_CLOSED, (int status, int pending) {
       completer.complete(status);
     });

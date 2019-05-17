@@ -4,6 +4,8 @@
 
 #include "vulkan_surface_producer.h"
 
+#include <lib/async/default.h>
+#include <lib/async/cpp/task.h>
 #include <trace/event.h>
 
 #include <memory>
@@ -16,13 +18,21 @@
 #include "third_party/skia/include/gpu/vk/GrVkBackendContext.h"
 #include "third_party/skia/include/gpu/vk/GrVkTypes.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 namespace {
 
-// TODO: Properly tune these values. See FL-153.
 constexpr int kGrCacheMaxCount = 8192;
-constexpr size_t kGrCacheMaxByteSize = 8 * (1 << 20);
+// Tuning advice:
+// If you see the following 3 things happening simultaneously in a trace:
+//   * Over budget ("flutter", "GPURasterizer::Draw") durations
+//   * Many ("skia", "GrGpu::createTexture") events within the
+//     "GPURasterizer::Draw"s
+//   * The Skia GPU resource cache is full, as indicated by the
+//     "SkiaCacheBytes" field in the ("flutter", "SurfacePool") trace counter
+//     (compare it to the bytes value here)
+// then you should consider increasing the size of the GPU resource cache.
+constexpr size_t kGrCacheMaxByteSize = 16 * (1 << 20);
 
 }  // namespace
 
@@ -40,9 +50,11 @@ VulkanSurfaceProducer::VulkanSurfaceProducer(scenic::Session* scenic_session) {
 
 VulkanSurfaceProducer::~VulkanSurfaceProducer() {
   // Make sure queue is idle before we start destroying surfaces
-  VkResult wait_result =
-      VK_CALL_LOG_ERROR(vk_->QueueWaitIdle(logical_device_->GetQueueHandle()));
-  FML_DCHECK(wait_result == VK_SUCCESS);
+  if (valid_) {
+    VkResult wait_result =
+        VK_CALL_LOG_ERROR(vk_->QueueWaitIdle(logical_device_->GetQueueHandle()));
+    FML_DCHECK(wait_result == VK_SUCCESS);
+  }
 };
 
 bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
@@ -123,7 +135,7 @@ bool VulkanSurfaceProducer::Initialize(scenic::Session* scenic_session) {
 
 void VulkanSurfaceProducer::OnSurfacesPresented(
     std::vector<
-        std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>>
+        std::unique_ptr<flutter::SceneUpdateContext::SurfaceProducerSurface>>
         surfaces) {
   TRACE_DURATION("flutter", "VulkanSurfaceProducer::OnSurfacesPresented");
 
@@ -146,15 +158,14 @@ void VulkanSurfaceProducer::OnSurfacesPresented(
 
   // If no further surface production has taken place for 10 frames (TODO:
   // Don't hardcode refresh rate here), then shrink our surface pool to fit.
-  constexpr auto kShouldShrinkThreshold =
-      fxl::TimeDelta::FromMilliseconds(10 * 16.67);
-  deprecated_loop::MessageLoop::GetCurrent()->task_runner()->PostDelayedTask(
+  constexpr auto kShouldShrinkThreshold = zx::msec(10 * 16.67);
+  async::PostDelayedTask(async_get_default_dispatcher(),
       [self = weak_factory_.GetWeakPtr(), kShouldShrinkThreshold] {
         if (!self) {
           return;
         }
         auto time_since_last_produce =
-            fxl::TimePoint::Now() - self->last_produce_time_;
+            async::Now(async_get_default_dispatcher()) - self->last_produce_time_;
         if (time_since_last_produce >= kShouldShrinkThreshold) {
           self->surface_pool_->ShrinkToFit();
         }
@@ -164,7 +175,7 @@ void VulkanSurfaceProducer::OnSurfacesPresented(
 
 bool VulkanSurfaceProducer::TransitionSurfacesToExternal(
     const std::vector<
-        std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>>&
+        std::unique_ptr<flutter::SceneUpdateContext::SurfaceProducerSurface>>&
         surfaces) {
   for (auto& surface : surfaces) {
     auto vk_surface = static_cast<VulkanSurface*>(surface.get());
@@ -219,22 +230,22 @@ bool VulkanSurfaceProducer::TransitionSurfacesToExternal(
   return true;
 }
 
-std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
+std::unique_ptr<flutter::SceneUpdateContext::SurfaceProducerSurface>
 VulkanSurfaceProducer::ProduceSurface(
     const SkISize& size,
-    const flow::LayerRasterCacheKey& layer_key,
+    const flutter::LayerRasterCacheKey& layer_key,
     std::unique_ptr<scenic::EntityNode> entity_node) {
   FML_DCHECK(valid_);
-  last_produce_time_ = fxl::TimePoint::Now();
+  last_produce_time_ = async::Now(async_get_default_dispatcher());
   auto surface = surface_pool_->AcquireSurface(size);
   surface->SetRetainedInfo(layer_key, std::move(entity_node));
   return surface;
 }
 
 void VulkanSurfaceProducer::SubmitSurface(
-    std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface> surface) {
+    std::unique_ptr<flutter::SceneUpdateContext::SurfaceProducerSurface> surface) {
   FML_DCHECK(valid_ && surface != nullptr);
   surface_pool_->SubmitSurface(std::move(surface));
 }
 
-}  // namespace flutter
+}  // namespace flutter_runner

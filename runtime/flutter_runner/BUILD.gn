@@ -4,10 +4,13 @@
 
 assert(is_fuchsia)
 
+import("//build/package.gni")
 import("//build/test/test_package.gni")
 import("//build/testing/environments.gni")
 import("//build/vulkan/config.gni")
 import("//garnet/bin/ui/scenic/config.gni")
+import("//topaz/runtime/dart/dart_component.gni")
+import("//topaz/runtime/flutter_runner/prebuilt_framework.gni")
 import("$flutter_root/shell/gpu/gpu.gni")
 
 shell_gpu_configuration("fuchsia_gpu_configuration") {
@@ -50,11 +53,6 @@ template("flutter_runner") {
     extra_defines += invoker.extra_defines
   }
 
-  product_suffix = ""
-  if (invoker.product) {
-    product_suffix = "_product"
-  }
-
   executable(target_name) {
     output_name = invoker_output_name
 
@@ -75,15 +73,14 @@ template("flutter_runner") {
       "fuchsia_font_manager.h",
       "isolate_configurator.cc",
       "isolate_configurator.h",
+      "logging.h",
+      "loop.cc",
+      "loop.h",
       "main.cc",
       "platform_view.cc",
       "platform_view.h",
       "runner.cc",
       "runner.h",
-      "semantics_bridge.cc",
-      "semantics_bridge.h",
-      "service_provider_dir.cc",
-      "service_provider_dir.h",
       "session_connection.cc",
       "session_connection.h",
       "surface.cc",
@@ -92,6 +89,8 @@ template("flutter_runner") {
       "task_observers.h",
       "task_runner_adapter.cc",
       "task_runner_adapter.h",
+      "thread.cc",
+      "thread.h",
       "unique_fdio_ns.h",
       "vsync_recorder.cc",
       "vsync_recorder.h",
@@ -125,36 +124,35 @@ template("flutter_runner") {
     ]
 
     deps = [
+             "//garnet/public/lib/vulkan",
              "//sdk/fidl/fuchsia.accessibility",
              "//sdk/fidl/fuchsia.fonts",
+             "//sdk/fidl/fuchsia.modular",
              "//sdk/fidl/fuchsia.ui.app",
              "//sdk/fidl/fuchsia.ui.input",
-             "//sdk/fidl/fuchsia.ui.viewsv1",
-             "//garnet/public/lib/component/cpp",
-             "//garnet/public/lib/fsl",
-             "//garnet/public/lib/fxl",
-             "//garnet/public/lib/icu_data/cpp",
-             "//garnet/public/lib/svc/cpp",
-             "//garnet/public/lib/vulkan",
-             "//sdk/fidl/fuchsia.modular",
+             "//sdk/fidl/fuchsia.ui.scenic",
+             "//sdk/fidl/fuchsia.ui.views",
+             "//sdk/lib/sys/cpp",
              "//sdk/lib/ui/scenic/cpp",
-             "//third_party/dart/runtime/bin:libdart_builtin${product_suffix}",
+             "//sdk/lib/vfs/cpp",
+             "//third_party/icu",
              "//third_party/rapidjson",
              "//third_party/skia",
              "//third_party/tonic",
              "//third_party/zlib:minizip",
-             "//topaz/lib/deprecated_loop",
              "//topaz/public/dart-pkg/fuchsia",
-             "//topaz/public/lib/ui/flutter/sdk_ext",
              "//topaz/runtime/dart/utils",
+             "//topaz/runtime/dart/utils:files",
+             "//topaz/runtime/dart/utils:inlines",
+             "//topaz/runtime/dart/utils:vmo",
+             "//zircon/public/fidl/fuchsia-io",
+             "//zircon/public/lib/async-cpp",
+             "//zircon/public/lib/async-loop-cpp",
+             "//zircon/public/lib/syslog",
              "//zircon/public/lib/trace",
              "//zircon/public/lib/trace-provider",
-             "//zircon/public/fidl/fuchsia-io",
+             "//zircon/public/lib/zx",
            ] + extra_deps + flutter_deps
-
-    if (scenic_use_views2) {
-      defines += [ "SCENIC_VIEWS2" ]
-    }
 
     # The flags below are needed so that Dart's CPU profiler can walk the
     # C++ stack.
@@ -163,15 +161,20 @@ template("flutter_runner") {
       "-fno-omit-frame-pointer",
     ]
 
-    # This flag is needed so that the call to dladdr() in Dart's native symbol
-    # resolver can report good symbol information for the CPU profiler.
-    ldflags = [ "-rdynamic" ]
+    if (!invoker.product) {
+      # This flag is needed so that the call to dladdr() in Dart's native symbol
+      # resolver can report good symbol information for the CPU profiler.
+      ldflags = [ "-rdynamic" ]
+    }
   }
 }
 
 flutter_runner("aot") {
   output_name = "flutter_aot_runner"
   product = false
+  if (flutter_profile) {
+    extra_defines = [ "FLUTTER_PROFILE" ]
+  }
   extra_deps = [
     "//third_party/dart/runtime:libdart_precompiled_runtime",
     "//third_party/dart/runtime/platform:libdart_platform_precompiled_runtime",
@@ -191,6 +194,9 @@ flutter_runner("aot_product") {
 flutter_runner("jit") {
   output_name = "flutter_jit_runner"
   product = false
+  if (flutter_profile) {
+    extra_defines = [ "FLUTTER_PROFILE" ]
+  }
   extra_deps = [
                  "//third_party/dart/runtime:libdart_jit",
                  "//third_party/dart/runtime/platform:libdart_platform_jit",
@@ -206,8 +212,6 @@ flutter_runner("jit_product") {
     "//third_party/dart/runtime/platform:libdart_platform_jit_product",
   ]
 }
-
-import("//build/package.gni")
 
 observatory_target =
     "//third_party/dart/runtime/observatory:observatory_archive"
@@ -229,7 +233,11 @@ template("aot_runner") {
     ]
 
     if (!product) {
-      deps += [ observatory_target ]
+      deps += [
+        "//topaz/runtime/dart/profiler_symbols:flutter_aot_runner",
+        "//topaz/runtime/dart/profiler_symbols:libdart_precompiled_runtime",
+        observatory_target,
+      ]
     }
 
     binary = "flutter_aot${product_suffix}_runner"
@@ -246,6 +254,22 @@ template("aot_runner") {
         {
           path = rebase_path(observatory_archive_file)
           dest = "observatory.tar"
+        },
+        {
+          path = rebase_path(
+                  get_label_info(
+                      "//topaz/runtime/dart/profiler_symbols:libdart_precompiled_runtime",
+                      "target_gen_dir") +
+                  "/libdart_precompiled_runtime.dartprofilersymbols")
+          dest = "libdart_precompiled_runtime.dartprofilersymbols"
+        },
+        {
+          path = rebase_path(
+                  get_label_info(
+                      "//topaz/runtime/dart/profiler_symbols:flutter_aot_runner",
+                      "target_gen_dir") +
+                  "/flutter_aot_runner.dartprofilersymbols")
+          dest = "flutter_aot_runner.dartprofilersymbols"
         },
       ]
     }
@@ -268,15 +292,21 @@ template("jit_runner") {
 
   package(target_name) {
     snapshot_label = "//topaz/runtime/flutter_runner/kernel:kernel_core_snapshot${product_suffix}"
+    snapshot_framework_label = "${snapshot_label}_framework"
     snapshot_gen_dir = get_label_info(snapshot_label, "target_gen_dir")
 
     deps = [
       ":jit${product_suffix}",
+      snapshot_framework_label,
       snapshot_label,
     ]
 
     if (!product) {
-      deps += [ observatory_target ]
+      deps += [
+        "//topaz/runtime/dart/profiler_symbols:flutter_jit_runner",
+        "//topaz/runtime/dart/profiler_symbols:libdart_jit",
+        observatory_target,
+      ]
     }
 
     binary = "flutter_jit${product_suffix}_runner"
@@ -303,16 +333,72 @@ template("jit_runner") {
         dest = "isolate_core_snapshot_instructions.bin"
       },
       {
+        path = rebase_path(
+                "$snapshot_gen_dir/vm_isolate_snapshot${product_suffix}_framework.bin")
+        dest = "framework_vm_snapshot_data.bin"
+      },
+      {
+        path = rebase_path(
+                "$snapshot_gen_dir/vm_snapshot_instructions${product_suffix}_framework.bin")
+        dest = "framework_vm_snapshot_instructions.bin"
+      },
+      {
+        path = rebase_path(
+                "$snapshot_gen_dir/isolate_snapshot${product_suffix}_framework.bin")
+        dest = "framework_isolate_core_snapshot_data.bin"
+      },
+      {
+        path = rebase_path(
+                "$snapshot_gen_dir/isolate_snapshot_instructions${product_suffix}_framework.bin")
+        dest = "framework_isolate_core_snapshot_instructions.bin"
+      },
+      {
         path = rebase_path("//third_party/icu/common/icudtl.dat")
         dest = "icudtl.dat"
       },
     ]
+
+    if (prebuilt_framework_path == "") {
+      deps += [ "//topaz/runtime/flutter_runner/kernel:framework_shim_kernel" ]
+      resources += [
+        {
+          path = rebase_path(
+                  "$snapshot_gen_dir/framework_shim.dilpmanifest.frameworkversion")
+          dest = "runner.frameworkversion"
+        },
+      ]
+    } else {
+      deps +=
+          [ "//topaz/runtime/flutter_runner/kernel:extract_prebuilt_framework" ]
+      resources += [
+        {
+          path = rebase_path(
+                  "$snapshot_gen_dir/data/$prebuilt_framework_name/app.frameworkversion")
+          dest = "runner.frameworkversion"
+        },
+      ]
+    }
 
     if (!product) {
       resources += [
         {
           path = rebase_path(observatory_archive_file)
           dest = "observatory.tar"
+        },
+        {
+          path = rebase_path(
+                  get_label_info(
+                      "//topaz/runtime/dart/profiler_symbols:libdart_jit",
+                      "target_gen_dir") + "/libdart_jit.dartprofilersymbols")
+          dest = "libdart_jit.dartprofilersymbols"
+        },
+        {
+          path = rebase_path(
+                  get_label_info(
+                      "//topaz/runtime/dart/profiler_symbols:flutter_jit_runner",
+                      "target_gen_dir") +
+                  "/flutter_jit_runner.dartprofilersymbols")
+          dest = "flutter_jit_runner.dartprofilersymbols"
         },
       ]
     }
@@ -351,16 +437,22 @@ executable("flutter_runner_unittests") {
     "fuchsia_font_manager.cc",
     "fuchsia_font_manager.h",
     "fuchsia_font_manager_unittest.cc",
+    "logging.h",
   ]
 
   deps = [
-    "//garnet/public/lib/component/cpp",
-    "//garnet/public/lib/component/cpp/testing",
-    "//garnet/public/lib/fsl",
+    "//garnet/public/lib/gtest",
     "//sdk/fidl/fuchsia.fonts",
+    "//sdk/fidl/fuchsia.sys",
+    "//sdk/lib/sys/cpp",
     "//third_party/googletest:gtest_main",
     "//third_party/icu",
     "//third_party/skia",
+    "//topaz/runtime/dart/utils:inlines",
+    "//topaz/runtime/dart/utils:vmo",
+    "//zircon/public/lib/fdio",
+    "//zircon/public/lib/trace",
+    "//zircon/public/lib/zx",
   ]
 }
 

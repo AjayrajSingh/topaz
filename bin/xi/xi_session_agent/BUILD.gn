@@ -27,7 +27,7 @@ dart_app("xi_session_agent") {
     "//sdk/fidl/fuchsia.auth",
     "//topaz/lib/xi/fuchsia_client:xi_fuchsia_client",
     "//topaz/public/dart/fidl",
-    "//topaz/public/lib/agent/dart",
-    "//topaz/public/lib/app/dart",
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_modular",
   ]
 }

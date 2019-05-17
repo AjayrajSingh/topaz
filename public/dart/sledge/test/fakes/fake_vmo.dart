@@ -16,7 +16,7 @@ class FakeVmo extends Vmo {
     if (_data == null) {
       return super.getSize();
     }
-    return new GetSizeResult(ZX.OK, _data.length);
+    return GetSizeResult(ZX.OK, _data.length);
   }
 
   @override
@@ -30,7 +30,7 @@ class FakeVmo extends Vmo {
     if (len < numBytes) {
       // TODO: decide on returning status
     }
-    return new ReadResult(
+    return ReadResult(
         ZX.OK, buffer.asByteData(offsetInBytes, len), len, null);
   }
 }

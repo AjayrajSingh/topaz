@@ -8,7 +8,7 @@ import 'package:test/test.dart';
 
 /// A matcher which matches on the ModuleStateException type.
 const Matcher isModuleStateException =
-    const TypeMatcher<ModuleStateException>();
+    TypeMatcher<ModuleStateException>();
 
 /// A matcher which matches on the module ModuleStateException type.
 Matcher throwsModuleStateException = throwsA(isModuleStateException);

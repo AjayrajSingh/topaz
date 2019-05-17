@@ -5,7 +5,7 @@
 #ifndef TOPAZ_APP_TERM_TERM_PARAMS_H_
 #define TOPAZ_APP_TERM_TERM_PARAMS_H_
 
-#include "lib/fxl/command_line.h"
+#include "src/lib/fxl/command_line.h"
 
 namespace term {
 

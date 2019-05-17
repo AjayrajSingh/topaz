@@ -37,16 +37,16 @@ Future<bool> initializeMessages(String localeName) async {
     onFailure: (_) => null);
   if (availableLocale == null) {
     // ignore: unnecessary_new
-    return new Future.value(false);
+    return Future.value(false);
   }
   var lib = _deferredLibraries[availableLocale];
   // ignore: unnecessary_new
-  await (lib == null ? new Future.value(false) : lib());
+  await (lib == null ? Future.value(false) : lib());
   // ignore: unnecessary_new
-  initializeInternalMessageLookup(() => new CompositeMessageLookup());
+  initializeInternalMessageLookup(() => CompositeMessageLookup());
   messageLookup.addLocale(availableLocale, _findGeneratedMessagesFor);
   // ignore: unnecessary_new
-  return new Future.value(true);
+  return Future.value(true);
 }
 
 bool _messagesExistFor(String locale) {

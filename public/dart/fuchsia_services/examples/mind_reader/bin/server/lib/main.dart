@@ -7,7 +7,7 @@ import 'package:fuchsia_services/services.dart';
 
 import 'src/_mind_reader_impl.dart';
 
-void main() {
+void main(List<String> args) {
   setupLogger(name: 'mind_reader_server');
 
   final mindReader = MindReaderImpl();

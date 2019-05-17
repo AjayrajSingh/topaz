@@ -30,13 +30,13 @@ void main() {
     group('structs', () {
       test('no handles', () {
         final s1 = NoHandleStruct(
-            foo: 'hello', bar: 42, baz: new Uint8List.fromList([2, 4, 6, 8]));
+            foo: 'hello', bar: 42, baz: Uint8List.fromList([2, 4, 6, 8]));
         final s2 = NoHandleStruct(
-            foo: 'hello', bar: 42, baz: new Uint8List.fromList([2, 4, 6, 8]));
+            foo: 'hello', bar: 42, baz: Uint8List.fromList([2, 4, 6, 8]));
         final s3 = NoHandleStruct(
-            foo: 'goodbye', bar: 42, baz: new Uint8List.fromList([2, 4, 6, 8]));
+            foo: 'goodbye', bar: 42, baz: Uint8List.fromList([2, 4, 6, 8]));
         final s4 = NoHandleStruct(
-            foo: 'hello', bar: 42, baz: new Uint8List.fromList([3, 6, 9, 12]));
+            foo: 'hello', bar: 42, baz: Uint8List.fromList([3, 6, 9, 12]));
         expect(s1 == s2, isTrue);
         expect(s1 == s3, isFalse);
         expect(s1 == s4, isFalse);

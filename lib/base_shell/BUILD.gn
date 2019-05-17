@@ -6,11 +6,15 @@ import("//build/dart/dart_library.gni")
 
 dart_library("lib.base_shell") {
   package_name = "lib.base_shell"
+  sources_required = false
 
   sources = [
     "base_model.dart",
     "netstack_model.dart",
     "user_manager.dart",
+    # Including these sources triggers analysis errors.
+    # "base_shell_model.dart",
+    # "base_shell_widget.dart",
   ]
 
   deps = [
@@ -19,12 +23,11 @@ dart_library("lib.base_shell") {
     "//sdk/fidl/fuchsia.netstack",
     "//sdk/fidl/fuchsia.timezone",
     "//sdk/fidl/fuchsia.ui.input",
-    "//sdk/fidl/fuchsia.ui.viewsv1",
+    "//sdk/fidl/fuchsia.ui.views",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/app/dart",
     "//zircon/public/fidl/fuchsia-net:fuchsia-net",
   ]
 }

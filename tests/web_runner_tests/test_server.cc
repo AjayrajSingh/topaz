@@ -22,11 +22,8 @@ bool TestServer::FindAndBindPort() {
     return false;
   }
 
-  int port_to_try = 9999;
-
   struct sockaddr_in6 addr = {};
   addr.sin6_family = AF_INET6;
-  addr.sin6_port = htons(port_to_try);
   addr.sin6_addr = in6addr_loopback;
 
   if (bind(socket_.get(), reinterpret_cast<struct sockaddr*>(&addr),
@@ -34,7 +31,20 @@ bool TestServer::FindAndBindPort() {
     fprintf(stderr, "bind() failed: %d %s\n", errno, strerror(errno));
     return false;
   }
-  port_ = port_to_try;
+
+  socklen_t addrlen = sizeof(addr);
+  if (getsockname(socket_.get(), reinterpret_cast<struct sockaddr*>(&addr),
+                  &addrlen) < 0) {
+    fprintf(stderr, "getsockname() failed: %d %s\n", errno, strerror(errno));
+    return false;
+  }
+  if (addrlen != sizeof(addr)) {
+    fprintf(stderr, "getsockname() returned unexpected length %d vs %lu\n",
+            addrlen, sizeof(addr));
+    return false;
+  }
+
+  port_ = ntohs(addr.sin6_port);
 
   if (listen(socket_.get(), 2) < 0) {
     fprintf(stderr, "listen() failed: %d %s\n", errno, strerror(errno));

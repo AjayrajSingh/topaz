@@ -6,12 +6,11 @@
 
 #include <unordered_set>
 
-#include "lib/component/cpp/startup_context.h"
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 ContextWriterBridge::ContextWriterBridge(
     fidl::InterfaceHandle<fuchsia::modular::ContextWriter> writer)
@@ -20,7 +19,7 @@ ContextWriterBridge::ContextWriterBridge(
 ContextWriterBridge::~ContextWriterBridge() = default;
 
 void ContextWriterBridge::UpdateSemantics(
-    const blink::SemanticsNodeUpdates& update) {
+    const flutter::SemanticsNodeUpdates& update) {
   for (const auto& update : update) {
     const auto& node = update.second;
     semantics_nodes_[node.id] = node;
@@ -52,7 +51,7 @@ void ContextWriterBridge::UpdateSemantics(
 
 void ContextWriterBridge::UpdateVisitedForNodeAndChildren(
     const int id, std::vector<int>* visited_nodes) {
-  std::map<int, blink::SemanticsNode>::const_iterator it =
+  std::map<int, flutter::SemanticsNode>::const_iterator it =
       semantics_nodes_.find(id);
   if (it == semantics_nodes_.end()) {
     return;
@@ -77,4 +76,4 @@ void ContextWriterBridge::EraseUnvisitedNodes(
   }
 }
 
-}  // namespace flutter
+}  // namespace flutter_runner

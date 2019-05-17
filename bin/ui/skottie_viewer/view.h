@@ -5,12 +5,14 @@
 #ifndef TOPAZ_BIN_UI_SKOTTIE_VIEWER_VIEW_H_
 #define TOPAZ_BIN_UI_SKOTTIE_VIEWER_VIEW_H_
 
+#include <fuchsia/images/cpp/fidl.h>
+#include <fuchsia/mem/cpp/fidl.h>
 #include <fuchsia/skia/skottie/cpp/fidl.h>
 
 #include "examples/ui/lib/skia_view.h"
 #include "lib/component/cpp/startup_context.h"
 #include "lib/fidl/cpp/binding_set.h"
-#include "lib/fxl/macros.h"
+#include "src/lib/fxl/macros.h"
 //#if defined(SK_ENABLE_SKOTTIE)
 #include "third_party/skia/modules/skottie/include/Skottie.h"
 //#endif
@@ -24,19 +26,19 @@ class View final : public scenic::SkiaView,
   View(scenic::ViewContext view_context);
   ~View() override = default;
 
-  // |fuchsia::skia::skottie::Loader|.
+  // |scenic::BaseView|
+  void OnSceneInvalidated(
+      fuchsia::images::PresentationInfo presentation_info) override;
+
+  // |fuchsia::skia::skottie::Loader|
   virtual void Load(fuchsia::mem::Buffer payload,
                     fuchsia::skia::skottie::Options options,
                     LoadCallback callback) override;
 
-  // |fuchsia::skia::skottie::Player|.
+  // |fuchsia::skia::skottie::Player|
   virtual void Seek(float t) override;
   virtual void Play() override;
   virtual void Pause() override;
-
-  // |scenic::V1BaseView|
-  void OnSceneInvalidated(
-      fuchsia::images::PresentationInfo presentation_info) override;
 
  private:
   fidl::BindingSet<fuchsia::skia::skottie::Loader> loader_bindings_;

@@ -7,6 +7,7 @@ import 'package:fidl_fuchsia_io/fidl_async.dart';
 import 'package:zircon/zircon.dart';
 
 import 'internal/_error_node.dart';
+import 'internal/_flags.dart';
 
 /// This interface declares a abstract Vnode class with
 /// common operations that may be overwritten.
@@ -20,17 +21,18 @@ abstract class Vnode {
 
   /// Connect to this vnode.
   /// All flags and modes are defined in
-  /// https://fuchsia.googlesource.com/zircon/+/master/system/fidl/fuchsia-io/io.fidl
+  /// https://fuchsia.googlesource.com/fuchsia/+/master/zircon/system/fidl/fuchsia-io/io.fidl
   ///
-  /// By default param [#parentFlags] is -1 so that open can validate all flags.
+  /// By default param [#parentFlags] is all rights, so that open will allow
+  /// all rights requested on the incoming [request].
   /// This param is used by clone to restrict cloning.
   int connect(int flags, int mode, InterfaceRequest<Node> request,
-      [int parentFlags = -1]);
+      [int parentFlags = Flags.fsRights]);
 
   /// Filter flags when [openFlagNodeReference] is passed.
   /// This will maintain compatibility with c++ layer.
   int filterForNodeReference(int flags) {
-    if (flags & openFlagNodeReference != 0) {
+    if (Flags.isNodeReference(flags)) {
       return flags &
           (openFlagNodeReference | openFlagDirectory | openFlagDescribe);
     }
@@ -45,17 +47,13 @@ abstract class Vnode {
   ///
   /// Vnode provides a simplified implementation for non-directory types.
   /// Behavior:
-  /// Bypasses to connect call for empty path and non-directory types.
   /// For directory types, it will throw UnimplementedError error.
   /// For non empty path it will fail with [ERR_NOT_DIR].
-  void open(int flags, int mode, String path, InterfaceRequest<Node> request) {
+  void open(int flags, int mode, String path, InterfaceRequest<Node> request,
+      [int parentFlags = Flags.fsRights]) {
     if (type() == direntTypeDirectory) {
       // dir types should implement this function
       throw UnimplementedError();
-    }
-    if (path == '') {
-      connect(flags, mode, request);
-      return;
     }
     sendErrorEvent(flags, ZX.ERR_NOT_DIR, request);
   }

@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
+import("//topaz/runtime/dart/dart_fuchsia_test.gni")
 
 dart_fuchsia_test("key_listener_device_tests") {
   meta = [

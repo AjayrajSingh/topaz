@@ -27,13 +27,13 @@ class Line {
 
   /// Constructor, from json data (xi-core update protocol format)
   Line.fromJson(Map<String, dynamic> json, TextStyle style)
-      : text = new TextSpan(text: json['text'], style: style),
+      : text = TextSpan(text: json['text'], style: style),
         cursor = _transformCursor(json['text'], json) ?? <int>[],
         styles = _transformStyles(json['text'], json) ?? <int>[];
 
   /// Update cursor and styles for a line, retaining text, using json
   /// from the xi-core "update" op
-  Line updateFromJson(Map<String, dynamic> json) => new Line(
+  Line updateFromJson(Map<String, dynamic> json) => Line(
         text,
         _transformCursor(text.text, json) ?? cursor,
         _transformStyles(text.text, json) ?? styles,
@@ -44,8 +44,8 @@ class Line {
   // responsibility?
   int getIndexForHorizontal(double horizontal) {
     TextPainter textPainter =
-        new TextPainter(text: text, textDirection: TextDirection.ltr)..layout();
-    Offset offset = new Offset(horizontal, 0.0);
+        TextPainter(text: text, textDirection: TextDirection.ltr)..layout();
+    Offset offset = Offset(horizontal, 0.0);
     TextPosition pos = textPainter.getPositionForOffset(offset);
     return pos.offset;
   }
@@ -77,7 +77,7 @@ class LineCache {
       switch (op['op']) {
         case 'ins':
           for (Map<String, dynamic> line in op['lines']) {
-            newLines.add(new Line.fromJson(line, style));
+            newLines.add(Line.fromJson(line, style));
           }
           break;
         case 'invalidate':

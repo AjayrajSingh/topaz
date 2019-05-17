@@ -127,17 +127,17 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   final KeyValueStorage<OrderedListTreePath, E> _storage;
   final Uint8List _instanceId;
   int _incrementalTime = 0;
-  final OrderedListTreePath _root = new OrderedListTreePath.root();
+  final OrderedListTreePath _root = OrderedListTreePath.root();
   final StreamController<OrderedListChange<E>> _changeController =
-      new StreamController<OrderedListChange<E>>.broadcast();
+      StreamController<OrderedListChange<E>>.broadcast();
   final MapToKVListConverter _converter;
   final bool Function(E, E) _equals;
 
   /// Default constructor.
   OrderedListValue(this._instanceId, {bool equals(E element1, E element2)})
-      : _converter = new MapToKVListConverter<OrderedListTreePath, E>(
+      : _converter = MapToKVListConverter<OrderedListTreePath, E>(
             keyConverter: orderedListTreePathConverter),
-        _storage = new KeyValueStorage<OrderedListTreePath, E>(),
+        _storage = KeyValueStorage<OrderedListTreePath, E>(),
         _equals = equals ?? ((E element1, E element2) => element1 == element2);
 
   @override
@@ -147,7 +147,7 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   void insert(int index, E element) {
     final sortedKeys = _sortedKeysList();
     if (index < 0 || index > sortedKeys.length) {
-      throw new RangeError.value(index, 'index', 'Index is out of range.');
+      throw RangeError.value(index, 'index', 'Index is out of range.');
     }
 
     OrderedListTreePath newKey;
@@ -172,7 +172,7 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   @override
   void insertAll(int index, Iterable<E> iterable) {
     if (index < 0 || index > length) {
-      throw new RangeError.value(index, 'index', 'Index is out of range.');
+      throw RangeError.value(index, 'index', 'Index is out of range.');
     }
     int insertIndex = index;
     for (final element in iterable) {
@@ -269,7 +269,7 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
   set length(int newLength) {
     // This list is not fixed length.
     // However, it does not support the length setter because [null] cannot be stored.
-    throw new UnsupportedError('Length setter is not supported.');
+    throw UnsupportedError('Length setter is not supported.');
   }
 
   @override
@@ -315,7 +315,7 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
     final keys = _sortedKeysList();
     // We are add deleted keys in case this change is done on our
     // connection. In other cases deletedKeys should be in keys.
-    final startKeys = (new SplayTreeSet<OrderedListTreePath>()
+    final startKeys = (SplayTreeSet<OrderedListTreePath>()
           ..addAll(keys)
           ..addAll(change.deletedKeys))
         .toList();
@@ -328,14 +328,14 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
     }
     _storage.applyChange(change);
     final keysFinal = _sortedKeysList();
-    final insertedElements = new SplayTreeMap<int, E>();
+    final insertedElements = SplayTreeMap<int, E>();
     for (int i = 0; i < keysFinal.length; i++) {
       if (change.changedEntries.containsKey(keysFinal[i])) {
         insertedElements[i] = change.changedEntries[keysFinal[i]];
       }
     }
     _changeController
-        .add(new OrderedListChange(deletedPositions, insertedElements));
+        .add(OrderedListChange(deletedPositions, insertedElements));
   }
 
   @override
@@ -350,6 +350,6 @@ class OrderedListValue<E> extends ListBase<E> implements LeafValue {
 
   Uint8List get _timestamp {
     _incrementalTime += 1;
-    return new Uint8List(8)..buffer.asByteData().setUint64(0, _incrementalTime);
+    return Uint8List(8)..buffer.asByteData().setUint64(0, _incrementalTime);
   }
 }

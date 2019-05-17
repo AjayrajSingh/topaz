@@ -7,8 +7,7 @@ import 'package:fuchsia_services/services.dart' show StartupContext;
 import 'package:fuchsia_logger/logger.dart';
 
 import 'ask_model.dart';
-import 'ask_suggestion_list.dart';
-import 'ask_text_field.dart';
+import 'ask_sheet.dart';
 
 void main() {
   setupLogger(name: 'ermine_ask_module');
@@ -28,49 +27,22 @@ class AskModule extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData.dark().copyWith(
+        textSelectionColor: Color(0xFFFF8BCB),
+      ),
       home: DefaultTextStyle(
         style: Theme.of(context).primaryTextTheme.body1.copyWith(
               fontFamily: 'RobotoMono',
               fontWeight: FontWeight.w400,
-              fontSize: 24.0,
+              fontSize: 18.0,
               color: Colors.white,
             ),
-        child: Builder(
-          builder: (context) => GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onLongPress: model.show,
-                onTap: model.hide,
-                child: AnimatedBuilder(
-                  animation: model.visibility,
-                  child: Column(
-                    children: <Widget>[
-                      Expanded(
-                        child: Offstage(),
-                      ),
-                      AskTextField(
-                        model: model,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 5),
-                      ),
-                      Expanded(
-                        child: AskSuggestionList(
-                          model: model,
-                        ),
-                      ),
-                    ],
-                  ),
-                  builder: (context, child) {
-                    if (model.isVisible) {
-                      model.focus(context);
-                      return child;
-                    } else {
-                      model.unfocus();
-                      return Offstage(child: child);
-                    }
-                  },
-                ),
-              ),
+        child: Align(
+          alignment: Alignment.bottomRight,
+          child: SizedBox(
+            width: 500.0,
+            child: AskSheet(model: model),
+          ),
         ),
       ),
     );

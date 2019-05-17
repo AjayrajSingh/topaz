@@ -6,16 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 /// Logo Yellow
-const Color yellow = const Color(0xFFFFFD3B);
+const Color yellow = Color(0xFFFFFD3B);
 
 /// Logo Red
-const Color red = const Color(0xFFFC5D60);
+const Color red = Color(0xFFFC5D60);
 
 /// Logo Blue
-const Color blue = const Color(0xFF4D8AE9);
+const Color blue = Color(0xFF4D8AE9);
 
 /// Logo Border
-const Color borderColor = const Color(0xFF353535);
+const Color borderColor = Color(0xFF353535);
 
 /// Programmatic implementation of Static Mondrian Logo
 class MondrianLogo extends StatelessWidget {
@@ -24,56 +24,56 @@ class MondrianLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new LayoutBuilder(
+    return LayoutBuilder(
       builder: (BuildContext layoutContext, BoxConstraints constraints) {
         double fontPoint = constraints.maxHeight / 2.3;
         double borderWidth = constraints.maxWidth / 37.5;
         double borderRadius = constraints.maxWidth * 0.0625;
-        return new Material(
-          child: new Container(
-            child: new Row(
+        return Material(
+          child: Container(
+            child: Row(
               children: <Widget>[
-                new Flexible(
+                Flexible(
                   flex: 1,
-                  child: new Container(
-                    decoration: new BoxDecoration(
+                  child: Container(
+                    decoration: BoxDecoration(
                       color: blue,
-                      border: new Border(
-                        right: new BorderSide(
+                      border: Border(
+                        right: BorderSide(
                             color: borderColor, width: borderWidth),
                       ),
                     ),
                   ),
                 ),
-                new Flexible(
+                Flexible(
                   flex: 1,
-                  child: new Column(
+                  child: Column(
                     children: <Widget>[
-                      new Flexible(
+                      Flexible(
                         flex: 1,
-                        child: new Container(
-                          decoration: new BoxDecoration(
+                        child: Container(
+                          decoration: BoxDecoration(
                             color: red,
-                            border: new Border(
-                              bottom: new BorderSide(
+                            border: Border(
+                              bottom: BorderSide(
                                   color: borderColor, width: borderWidth),
                             ),
                           ),
                         ),
                       ),
-                      new Flexible(
+                      Flexible(
                         flex: 1,
-                        child: new Container(
-                          child: new Center(
-                            child: new Text(
+                        child: Container(
+                          child: Center(
+                            child: Text(
                               'M',
-                              style: new TextStyle(
+                              style: TextStyle(
                                   fontFamily: 'Kanit', // ToDo - djmurphy
                                   fontStyle: FontStyle.normal,
                                   fontSize: fontPoint),
                             ),
                           ),
-                          decoration: const BoxDecoration(color: yellow),
+                          decoration: BoxDecoration(color: yellow),
                         ),
                       )
                     ],
@@ -81,15 +81,15 @@ class MondrianLogo extends StatelessWidget {
                 ),
               ],
             ),
-            foregroundDecoration: new BoxDecoration(
-              borderRadius: new BorderRadius.all(
-                new Radius.circular(borderRadius),
+            foregroundDecoration: BoxDecoration(
+              borderRadius: BorderRadius.all(
+                Radius.circular(borderRadius),
               ),
-              border: new Border.all(width: borderWidth, color: borderColor),
+              border: Border.all(width: borderWidth, color: borderColor),
             ),
           ),
-          borderRadius: new BorderRadius.all(
-            new Radius.circular(borderRadius),
+          borderRadius: BorderRadius.all(
+            Radius.circular(borderRadius),
           ),
         );
       },

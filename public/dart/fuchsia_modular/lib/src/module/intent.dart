@@ -93,7 +93,7 @@ class Intent extends fidl.Intent {
     fidl.IntentParameter parameter,
     String type,
   }) {
-    if (parameter.data.tag == fidl.IntentParameterDataTag.entityReference) {
+    if (parameter.data.$tag == fidl.IntentParameterDataTag.entityReference) {
       return Entity(
           type: type, entityReference: parameter.data.entityReference);
     }

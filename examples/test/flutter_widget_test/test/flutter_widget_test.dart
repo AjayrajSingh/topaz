@@ -4,17 +4,17 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   testWidgets('my first widget test', (WidgetTester tester) async {
     // You can use keys to locate the widget you need to test
-    var sliderKey = new UniqueKey();
+    var sliderKey = UniqueKey();
     var value = 0.0;
 
     // Tells the tester to build a UI based on the widget tree passed to it
     await tester.pumpWidget(
-      new StatefulBuilder(
+      StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
-          return new MaterialApp(
-            home: new Material(
-              child: new Center(
-                child: new Slider(
+          return MaterialApp(
+            home: Material(
+              child: Center(
+                child: Slider(
                   key: sliderKey,
                   value: value,
                   onChanged: (double newValue) {

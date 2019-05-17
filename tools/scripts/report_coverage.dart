@@ -19,7 +19,7 @@ Future<Null> main(List<String> args) async {
   }
 
   // Existence check.
-  File reportFile = new File(args[0]);
+  File reportFile = File(args[0]);
   if (!await reportFile.exists()) {
     stderr.writeln('The file ${args[0]} does not exist.');
     exit(1);
@@ -27,9 +27,9 @@ Future<Null> main(List<String> args) async {
 
   // Process line by line.
   String currentFile;
-  Set<String> files = new SplayTreeSet<String>();
-  Map<String, int> totalLines = new HashMap<String, int>();
-  Map<String, int> coveredLines = new HashMap<String, int>();
+  Set<String> files = SplayTreeSet<String>();
+  Map<String, int> totalLines = HashMap<String, int>();
+  Map<String, int> coveredLines = HashMap<String, int>();
 
   await reportFile
       .openRead()
@@ -58,7 +58,7 @@ Future<Null> main(List<String> args) async {
   }).asFuture();
 
   // Report to console.
-  TableWriter writer = new TableWriter(stdout)
+  TableWriter writer = TableWriter(stdout)
     ..setHeaders(<Object>['Filepath', 'Covered', 'Total', 'Percentage'])
     ..setRightAlignment(<bool>[false, true, true, true]);
   for (String file in files) {

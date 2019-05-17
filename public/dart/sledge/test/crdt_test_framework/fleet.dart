@@ -40,16 +40,16 @@ typedef CheckerGenerator<T> = Checker<T> Function();
 class Fleet<T extends dynamic> {
   int _fleetSize;
   List<Node> _lastModifications;
-  final Node _initialModification = new Node('init');
-  final ComputationalGraph graph = new ComputationalGraph();
+  final Node _initialModification = Node('init');
+  final ComputationalGraph graph = ComputationalGraph();
   final T Function(int) _instanceGenerator;
   final List<CheckerGenerator<T>> _checkerGenerators = <CheckerGenerator<T>>[];
   double _expectedSyncsPerAction = 0.0;
-  final Random random = new Random(1);
+  final Random random = Random(1);
 
   Fleet(this._fleetSize, this._instanceGenerator) {
     _lastModifications =
-        new List<Node>.filled(_fleetSize, _initialModification);
+        List<Node>.filled(_fleetSize, _initialModification);
     graph.addNode(_initialModification);
   }
 
@@ -73,7 +73,7 @@ class Fleet<T extends dynamic> {
     }
     final list = <int>[]..addAll(group)..addAll(group.reversed.skip(2));
     for (int i = 0; i < list.length - 1; i++) {
-      Node node = new SynchronizationNode(
+      Node node = SynchronizationNode(
           '${list[i]}_${list[i + 1]}-n${graph.nodes.length}',
           list[i],
           list[i + 1]);
@@ -84,7 +84,7 @@ class Fleet<T extends dynamic> {
 
   void runInTransaction(int id, Future Function(T) modification) {
     final node =
-        new ModificationNode<T>('$id-n${graph.nodes.length}', id, modification);
+        ModificationNode<T>('$id-n${graph.nodes.length}', id, modification);
     _addNode(node, id);
   }
 
@@ -99,7 +99,7 @@ class Fleet<T extends dynamic> {
   /// [expectedSyncsPerAction].
   void setRandomSynchronizationsRate(double expectedSyncsPerAction) {
     if (expectedSyncsPerAction < 0) {
-      throw new ArgumentError(
+      throw ArgumentError(
           'Number of synchronizations must be greater or equal to 0. Got $expectedSyncsPerAction.');
     }
     _expectedSyncsPerAction = expectedSyncsPerAction;
@@ -111,7 +111,7 @@ class Fleet<T extends dynamic> {
   Future testSingleOrder(
       {EvaluationOrder order, bool enableRandomSyncronization = true}) async {
     order ??= graph.orders.first;
-    final fleetState = new FleetState<T>(_fleetSize, _instanceGenerator);
+    final fleetState = FleetState<T>(_fleetSize, _instanceGenerator);
     for (final newChecker in _checkerGenerators) {
       fleetState.addChecker(newChecker());
     }
@@ -122,7 +122,7 @@ class Fleet<T extends dynamic> {
     if (enableRandomSyncronization &&
         _fleetSize > 1 &&
         _expectedSyncsPerAction > 0) {
-      completedOrder = new EvaluationOrder([]);
+      completedOrder = EvaluationOrder([]);
       for (final node in order.nodes) {
         completedOrder.nodes.add(node);
         // Geometric distribution (the probability distribution of the number Y
@@ -141,7 +141,7 @@ class Fleet<T extends dynamic> {
           if (instanceId2 >= instanceId1) {
             instanceId2++;
           }
-          completedOrder.nodes.add(new SynchronizationNode.generated(
+          completedOrder.nodes.add(SynchronizationNode.generated(
               '${completedOrder.nodes.length}', instanceId1, instanceId2));
         }
       }
@@ -152,7 +152,7 @@ class Fleet<T extends dynamic> {
         await fleetState.applyNode(completedOrder.nodes[i], i);
       } on TestFailure catch (failure) {
         // ignore: only_throw_errors
-        throw new SingleOrderTestFailure(
+        throw SingleOrderTestFailure(
             failure, completedOrder, completedOrder.nodes[i]);
       }
     }
@@ -169,7 +169,7 @@ class Fleet<T extends dynamic> {
   Future testFixedOrder(Iterable<String> nodeIds,
       {bool allowPartial = false, bool allowGenerated = true}) async {
     await testSingleOrder(
-        order: new EvaluationOrder.fromIds(nodeIds, graph.nodes,
+        order: EvaluationOrder.fromIds(nodeIds, graph.nodes,
             allowPartial: allowPartial, allowGenerated: allowGenerated),
         enableRandomSyncronization: false);
   }

@@ -11,7 +11,6 @@
 #include <lib/fdio/namespace.h>
 
 #include <fuchsia/sys/cpp/fidl.h>
-#include "lib/component/cpp/startup_context.h"
 
 namespace dart_runner {
 

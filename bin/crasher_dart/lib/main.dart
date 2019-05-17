@@ -29,9 +29,9 @@ void main(List<String> args) {
 
 Future<void> throwAsync() async {
   Future.delayed(Duration(seconds: 1),
-      () => throw new Exception('Dart exception from async function'));
+      () => throw Exception('Dart exception from async function'));
 }
 
 void throwSync() {
-  throw new Exception('Dart exception from sync function');
+  throw Exception('Dart exception from sync function');
 }

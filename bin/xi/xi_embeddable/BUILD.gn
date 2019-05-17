@@ -2,7 +2,6 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//topaz/runtime/dart/dart_test.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("xi_embeddable") {
@@ -21,7 +20,7 @@ flutter_app("xi_embeddable") {
     "//topaz/lib/xi/fuchsia_client:xi_fuchsia_client",
     "//topaz/lib/xi/widgets:xi_widgets",
     "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/app_driver/dart",
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_modular",
   ]
 }

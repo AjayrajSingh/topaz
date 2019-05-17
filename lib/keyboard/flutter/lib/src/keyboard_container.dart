@@ -5,12 +5,13 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:fuchsia_services/services.dart' show StartupContext;
+import 'package:fuchsia_services/services.dart';
 import 'package:keyboard/constants.dart'
     as keyboard; // Temporary solution for keyboard height.
 import 'package:lib.widgets/application.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:topaz.lib.shell/models/overlay_position_model.dart';
+import 'package:fidl_fuchsia_sys/fidl_async.dart';
 
 import 'keyboard_model.dart';
 
@@ -62,16 +63,23 @@ class KeyboardContainer extends StatelessWidget {
       child: SizedBox(
         height: _kKeyboardOverlayHeight,
         child: Material(
-          borderRadius: const BorderRadius.vertical(
-              top: const Radius.circular(_kKeyboardCornerRadius)),
+          borderRadius: BorderRadius.vertical(
+              top: Radius.circular(_kKeyboardCornerRadius)),
           elevation: elevation ?? model.keyboardElevation,
           child: ApplicationWidget(
             url: 'fuchsia-pkg://fuchsia.com/latin-ime#meta/latin-ime.cmx',
             focusable: false,
-            launcher: StartupContext.fromStartupInfo().launcher,
+            launcher: _getLauncher(),
           ),
         ),
       ),
     );
+  }
+
+  LauncherProxy _getLauncher() {
+    // Create and connect to a Launcher service
+    final launcherProxy = LauncherProxy();
+    StartupContext.fromStartupInfo().incoming.connectToService(launcherProxy);
+    return launcherProxy;
   }
 }

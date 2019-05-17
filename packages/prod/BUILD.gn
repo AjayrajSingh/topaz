@@ -1,0 +1,290 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("display_settings") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/display_settings",
+  ]
+}
+
+group("web_runner") {
+  testonly = true
+  public_deps = [
+    "//topaz/packages/prod:chromium",
+    "//topaz/runtime/chromium:web_runner",
+  ]
+}
+
+group("system_dashboard") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/system_dashboard",
+  ]
+}
+
+group("dart") {
+  testonly = true
+  public_deps = [
+    "//topaz/runtime/dart:dart",
+  ]
+}
+
+group("flutter") {
+  testonly = true
+  public_deps = [
+    "//topaz/packages/prod:flutter_aot",
+    "//topaz/packages/prod:flutter_aot_product",
+    "//topaz/packages/prod:flutter_jit",
+    "//topaz/packages/prod:flutter_jit_product",
+  ]
+}
+
+group("all") {
+  testonly = true
+  public_deps = [
+    "//topaz/packages/prod:accessibility_settings",
+    "//topaz/packages/prod:bluetooth_settings",
+    "//topaz/packages/prod:cast_runner",
+    "//topaz/packages/prod:chromium",
+    "//topaz/packages/prod:dart",
+    "//topaz/packages/prod:dart_aot_product_runner",
+    "//topaz/packages/prod:dart_aot_runner",
+    "//topaz/packages/prod:dart_jit_product_runner",
+    "//topaz/packages/prod:dart_jit_runner",
+    "//topaz/packages/prod:dart_runner",
+    "//topaz/packages/prod:datetime_settings",
+    "//topaz/packages/prod:device_settings",
+    "//topaz/packages/prod:display_settings",
+    "//topaz/packages/prod:ermine",
+    "//topaz/packages/prod:flutter",
+    "//topaz/packages/prod:flutter_aot",
+    "//topaz/packages/prod:flutter_aot_product",
+    "//topaz/packages/prod:flutter_jit",
+    "//topaz/packages/prod:flutter_jit_product",
+    "//topaz/packages/prod:latin-ime",
+    "//topaz/packages/prod:mondrian",
+    "//topaz/packages/prod:settings",
+    "//topaz/packages/prod:skottie_viewer",
+    "//topaz/packages/prod:story_shell_labs",
+    "//topaz/packages/prod:system_dashboard",
+    "//topaz/packages/prod:term",
+    "//topaz/packages/prod:userpicker_base_shell",
+    "//topaz/packages/prod:web_runner",
+    "//topaz/packages/prod:wifi_settings",
+    "//topaz/packages/prod:xi",
+  ]
+}
+
+group("flutter_aot") {
+  testonly = true
+  public_deps = [
+    "//garnet/packages/prod:scenic",
+    "//topaz/runtime/flutter_runner:flutter_aot_runner",
+  ]
+}
+
+group("datetime_settings") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/datetime_settings",
+  ]
+}
+
+group("settings") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/settings",
+  ]
+}
+
+group("wifi_settings") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/wifi_settings",
+  ]
+}
+
+group("flutter_aot_product") {
+  testonly = true
+  public_deps = [
+    "//garnet/packages/prod:scenic",
+    "//topaz/runtime/flutter_runner:flutter_aot_product_runner",
+  ]
+}
+
+group("accessibility_settings") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/accessibility_settings",
+  ]
+}
+
+group("dart_jit_runner") {
+  testonly = true
+  public_deps = [
+    "//topaz/runtime/dart_runner:dart_jit_runner",
+  ]
+}
+
+group("dart_aot_product_runner") {
+  testonly = true
+  public_deps = [
+    "//topaz/runtime/dart_runner:dart_aot_product_runner",
+  ]
+}
+
+group("skottie_viewer") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/ui/skottie_viewer:package",
+  ]
+}
+
+group("dart_jit_product_runner") {
+  testonly = true
+  public_deps = [
+    "//topaz/runtime/dart_runner:dart_jit_product_runner",
+  ]
+}
+
+group("userpicker_base_shell") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/userpicker_base_shell",
+    "//topaz/packages/prod:flutter",
+  ]
+}
+
+group("dart_aot_runner") {
+  testonly = true
+  public_deps = [
+    "//topaz/runtime/dart_runner:dart_aot_runner",
+  ]
+}
+
+group("dart_runner") {
+  testonly = true
+  public_deps = [
+    "//topaz/packages/prod:dart_aot_product_runner",
+    "//topaz/packages/prod:dart_aot_runner",
+    "//topaz/packages/prod:dart_jit_product_runner",
+    "//topaz/packages/prod:dart_jit_runner",
+  ]
+}
+
+group("flutter_jit_product") {
+  testonly = true
+  public_deps = [
+    "//garnet/packages/prod:scenic",
+    "//topaz/runtime/flutter_runner:flutter_jit_product_runner",
+  ]
+}
+
+group("latin-ime") {
+  testonly = true
+  public_deps = [
+    "//topaz/app/latin-ime",
+  ]
+}
+
+group("term") {
+  testonly = true
+  public_deps = [
+    "//garnet/bin/fonts:font_provider_tests",
+    "//garnet/packages/prod:fonts",
+    "//third_party/vulkan_loader_and_validation_layers/loader:vulkan_loader",
+    "//topaz/app/term",
+  ]
+}
+
+group("bluetooth_settings") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/bluetooth_settings",
+  ]
+}
+
+group("story_shell_labs") {
+  testonly = true
+  public_deps = [
+    "//topaz/shell/story_shell_labs:story_shell_labs",
+  ]
+}
+
+group("device_settings") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/device_settings",
+  ]
+}
+
+group("chromium") {
+  testonly = true
+  public_deps = [
+    "//topaz/runtime/chromium",
+    "//topaz/runtime/chromium:web_runner",
+  ]
+}
+
+group("mondrian") {
+  testonly = true
+  public_deps = [
+    "//topaz/shell/mondrian_story_shell:mondrian",
+  ]
+}
+
+group("flutter_jit") {
+  testonly = true
+  public_deps = [
+    "//garnet/packages/prod:scenic",
+    "//topaz/runtime/flutter_runner:flutter_jit_runner",
+  ]
+}
+
+group("xi") {
+  testonly = true
+  public_deps = [
+    "//garnet/bin/xi_core",
+    "//topaz/bin/xi",
+    "//topaz/bin/xi/xi_embeddable",
+    "//topaz/bin/xi/xi_mod",
+    "//topaz/bin/xi/xi_session_agent",
+    "//topaz/bin/xi/xi_session_demo",
+  ]
+}
+
+group("ermine") {
+  testonly = true
+  public_deps = [
+    "//topaz/packages/prod:bluetooth_settings",
+    "//topaz/packages/prod:chromium",
+    "//topaz/packages/prod:dart_jit_product_runner",
+    "//topaz/packages/prod:dart_jit_runner",
+    "//topaz/packages/prod:datetime_settings",
+    "//topaz/packages/prod:display_settings",
+    "//topaz/packages/prod:mondrian",
+    "//topaz/packages/prod:settings",
+    "//topaz/packages/prod:story_shell_labs",
+    "//topaz/packages/prod:userpicker_base_shell",
+    "//topaz/packages/prod:wifi_settings",
+    "//topaz/shell/ermine:ermine",
+    "//topaz/shell/ermine:ermine_ask_module",
+  ]
+}
+
+group("simple_browser") {
+  testonly = true
+  public_deps = [
+    "//topaz/bin/simple_browser:simple_browser",
+    "//topaz/public/lib/webview:webview",
+  ]
+}
+
+group("cast_runner") {
+  testonly = true
+  public_deps = [
+    "//topaz/runtime/cast_runner",
+  ]
+}

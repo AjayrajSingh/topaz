@@ -7,7 +7,7 @@ create a media player.
 
 Run the app as follows:
 
-    set_root_view mediaplayer_flutter
+    present_view mediaplayer_flutter
 
 The initial screen is a menu of content items that can be played, unless the
 config file contains only one asset, in which case the chooser screen is

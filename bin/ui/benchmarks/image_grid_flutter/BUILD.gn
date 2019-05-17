@@ -16,10 +16,14 @@ flutter_app("image_grid_flutter") {
     },
   ]
 
-  sources = []
+  sources = [
+    "image_grid.dart",
+    "image_grid_model.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/app/dart",
+    "//topaz/public/dart/fuchsia_logger",
   ]
 }

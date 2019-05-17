@@ -10,11 +10,11 @@ class Grouping extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      color: const Color(0xFFFFFFFF),
-      margin: const EdgeInsets.all(10.0),
-      padding: const EdgeInsets.all(10.0),
-      child: new Column(
+    return Container(
+      color: Color(0xFFFFFFFF),
+      margin: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(10.0),
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: children,
       ),

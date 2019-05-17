@@ -7,6 +7,7 @@
 /// classes implemented by generated FIDL code. It is often used directly in
 /// author code to retrieve type definitions (e.g. InterfaceHandle,
 /// InterfaceRequest, etc.) for interacting with certain FIDL services.
+export 'src/bits.dart';
 export 'src/codec.dart';
 export 'src/enum.dart';
 export 'src/error.dart';

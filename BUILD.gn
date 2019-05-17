@@ -2,27 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//peridot/build/module_manifest.gni")
-
 group("dart_unittests") {
   testonly = true
 
   deps = [
-    # "app/dashboard:tests",
     "examples/test/flutter_widget_test:flutter_widget_test",
     "public/dart/sledge:dart_sledge_tests",
-
-    # "public/dart/widgets:dart_widget_tests",
-    "public/lib/app/dart:dart_app_tests",
-    "public/lib/schemas/dart:dart_schema_tests",
     "shell:tests",
   ]
-}
-
-# This target, if included in the built image, will cause the listed module
-# components to have their module facets indexed by the on-device module resolver
-# when the user logs in. These indexed module facets will be used to resolve
-# implicit intents (i.e., intents without a 'handler' specified).
-initial_module_packages("topaz_modules_index") {
-  packages = []
 }

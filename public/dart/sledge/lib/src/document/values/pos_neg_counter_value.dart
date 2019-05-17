@@ -29,23 +29,23 @@ class PosNegCounterValue<T extends num> implements LeafValue {
   T _sum;
   final T _defaultValue;
   final StreamController<T> _changeController =
-      new StreamController<T>.broadcast();
-  static final _listEquality = new ListEquality();
+      StreamController<T>.broadcast();
+  static final _listEquality = ListEquality();
   final MapToKVListConverter<Uint8List, T> _converter;
 
   /// Default constructor.
   PosNegCounterValue(this._currentInstanceId)
-      : _defaultValue = new Converter<T>().defaultValue,
-        _converter = new MapToKVListConverter<Uint8List, T>(),
-        _storage = new KeyValueStorage<Uint8List, T>(
+      : _defaultValue = Converter<T>().defaultValue,
+        _converter = MapToKVListConverter<Uint8List, T>(),
+        _storage = KeyValueStorage<Uint8List, T>(
             equals: _listEquality.equals, hashCode: _listEquality.hash) {
     _sum = _defaultValue;
   }
 
   Uint8List get _positiveKey =>
-      concatUint8Lists(new Uint8List.fromList([0]), _currentInstanceId);
+      concatUint8Lists(Uint8List.fromList([0]), _currentInstanceId);
   Uint8List get _negativeKey =>
-      concatUint8Lists(new Uint8List.fromList([1]), _currentInstanceId);
+      concatUint8Lists(Uint8List.fromList([1]), _currentInstanceId);
   bool _isKeyPositive(Uint8List key) => key[0] == 0;
 
   @override

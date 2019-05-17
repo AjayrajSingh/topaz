@@ -2,13 +2,16 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
 import("//build/testing/environments.gni")
-import("//topaz/runtime/dart/dart_test.gni")
+import("//topaz/runtime/dart/dart_fuchsia_test.gni")
+import("//topaz/runtime/dart/flutter_test.gni")
 
 dart_library("sledge") {
   package_name = "sledge"
+
+  # Several source files have analysis errors
+  sources_required = false
 
   sources = [
     "sledge.dart",
@@ -49,17 +52,27 @@ dart_library("sledge") {
     "src/subscription/subscription.dart",
     "src/transaction.dart",
     "src/uint8list_ops.dart",
+
+    # analyzer errors triggered by including these files
+    # "src/version.dart",
+    # "src/conflict_resolver/schemas_obtainer.dart",
+    # "src/storage/kv_encoding.dart",
+    # "src/storage/schema_storage.dart",
+    # "src/storage/document_storage.dart",
+    # "src/query/query_builder.dart",
+    # "src/query/query_field_comparison.dart",
   ]
 
   deps = [
     "//sdk/fidl/fuchsia.ledger",
+    "//sdk/fidl/fuchsia.modular",
     "//third_party/dart-pkg/pub/collection",
     "//third_party/dart-pkg/pub/crypto",
-    "//topaz/public/lib/module/dart",
+    "//topaz/public/dart/fuchsia_logger",
   ]
 }
 
-dart_test("dart_sledge_tests") {
+flutter_test("dart_sledge_tests") {
   sources = [
     "crdt_test_framework/checker.dart",
     "crdt_test_framework/computational_graph.dart",
@@ -119,6 +132,8 @@ dart_test("dart_sledge_tests") {
     ":sledge",
     "//third_party/dart-pkg/git/flutter/packages/flutter_test",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/public/dart/fuchsia_services",
+    "//topaz/public/dart/zircon",
   ]
 }
 

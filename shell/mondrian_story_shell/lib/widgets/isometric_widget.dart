@@ -8,7 +8,7 @@ import 'package:flutter/widgets.dart';
 import 'package:meta/meta.dart';
 
 /// 60-30 isometric projection matrix
-final Matrix4 _iso = new Matrix4.identity()
+final Matrix4 _iso = Matrix4.identity()
   ..rotateX(60 * pi / 180.0)
   ..rotateZ(30 * pi / 180.0);
 
@@ -25,14 +25,14 @@ class IsoMetric extends StatelessWidget {
   const IsoMetric({@required this.child, this.scaleFactor = 4.0});
 
   @override
-  Widget build(BuildContext context) => new LayoutBuilder(
+  Widget build(BuildContext context) => LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           BoxConstraints _scaledConstraints = constraints * scaleFactor;
-          return new FittedBox(
+          return FittedBox(
             fit: BoxFit.scaleDown,
-            child: new Container(
+            child: Container(
               constraints: _scaledConstraints,
-              child: new Transform(
+              child: Transform(
                 child: child,
                 transform: _getTransformation(constraints: _scaledConstraints),
                 origin: _scaledConstraints.biggest.center(Offset.zero),
@@ -52,6 +52,6 @@ class IsoMetric extends StatelessWidget {
     );
     double isoScale = min(constraintsRect.height / transRect.height,
         constraintsRect.width / transRect.width);
-    return new Matrix4.copy(_iso)..scale(isoScale);
+    return Matrix4.copy(_iso)..scale(isoScale);
   }
 }

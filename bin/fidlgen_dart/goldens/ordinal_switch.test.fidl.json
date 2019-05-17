@@ -1,0 +1,90 @@
+{
+  "version": "0.0.1",
+  "name": "test.name",
+  "library_dependencies": [],
+  "bits_declarations": [],
+  "const_declarations": [],
+  "enum_declarations": [],
+  "interface_declarations": [
+    {
+      "name": "test.name/SwitchingOrdinals",
+      "location": {
+        "filename": "garnet/go/src/fidl/compiler/backend/typestest/ordinal_switch.test.fidl",
+        "line": 3,
+        "column": 10
+      },
+      "methods": [
+        {
+          "ordinal": 2005164903,
+          "generated_ordinal": 2005164903,
+          "name": "OrdinalFive",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/ordinal_switch.test.fidl",
+            "line": 4,
+            "column": 5
+          },
+          "has_request": true,
+          "maybe_request": [],
+          "maybe_request_size": 16,
+          "maybe_request_alignment": 8,
+          "has_response": false
+        },
+        {
+          "ordinal": 667506719,
+          "generated_ordinal": 667506719,
+          "name": "OnlyGeneratedOrdinal",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/ordinal_switch.test.fidl",
+            "line": 5,
+            "column": 5
+          },
+          "has_request": true,
+          "maybe_request": [],
+          "maybe_request_size": 16,
+          "maybe_request_alignment": 8,
+          "has_response": false
+        },
+        {
+          "ordinal": 1467258273,
+          "generated_ordinal": 1467258273,
+          "name": "EventOrdinalFifteen",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/ordinal_switch.test.fidl",
+            "line": 6,
+            "column": 8
+          },
+          "has_request": false,
+          "has_response": true,
+          "maybe_response": [],
+          "maybe_response_size": 16,
+          "maybe_response_alignment": 8
+        },
+        {
+          "ordinal": 2146190926,
+          "generated_ordinal": 2146190926,
+          "name": "EventOnlyGeneratedOrdinal",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/ordinal_switch.test.fidl",
+            "line": 7,
+            "column": 8
+          },
+          "has_request": false,
+          "has_response": true,
+          "maybe_response": [],
+          "maybe_response_size": 16,
+          "maybe_response_alignment": 8
+        }
+      ]
+    }
+  ],
+  "struct_declarations": [],
+  "table_declarations": [],
+  "union_declarations": [],
+  "xunion_declarations": [],
+  "declaration_order": [
+    "test.name/SwitchingOrdinals"
+  ],
+  "declarations": {
+    "test.name/SwitchingOrdinals": "interface"
+  }
+}

@@ -5,8 +5,8 @@
 #pragma once
 
 #include <lib/async/cpp/wait.h>
-#include <zx/event.h>
-#include <zx/vmo.h>
+#include <lib/zx/event.h>
+#include <lib/zx/vmo.h>
 
 #include <array>
 #include <memory>
@@ -21,7 +21,7 @@
 #include "lib/ui/scenic/cpp/resources.h"
 #include "third_party/skia/include/core/SkSurface.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 // A |VkImage| and its relevant metadata.
 struct VulkanImage {
@@ -43,7 +43,7 @@ bool CreateVulkanImage(vulkan::VulkanProvider& vulkan_provider,
                        const SkISize& size, VulkanImage* out_vulkan_image);
 
 class VulkanSurface final
-    : public flow::SceneUpdateContext::SurfaceProducerSurface {
+    : public flutter::SceneUpdateContext::SurfaceProducerSurface {
  public:
   VulkanSurface(vulkan::VulkanProvider& vulkan_provider,
                 sk_sp<GrContext> context, scenic::Session* session,
@@ -51,16 +51,16 @@ class VulkanSurface final
 
   ~VulkanSurface() override;
 
-  // |flow::SceneUpdateContext::SurfaceProducerSurface|
+  // |flutter::SceneUpdateContext::SurfaceProducerSurface|
   size_t AdvanceAndGetAge() override;
 
-  // |flow::SceneUpdateContext::SurfaceProducerSurface|
+  // |flutter::SceneUpdateContext::SurfaceProducerSurface|
   bool FlushSessionAcquireAndReleaseEvents() override;
 
-  // |flow::SceneUpdateContext::SurfaceProducerSurface|
+  // |flutter::SceneUpdateContext::SurfaceProducerSurface|
   bool IsValid() const override;
 
-  // |flow::SceneUpdateContext::SurfaceProducerSurface|
+  // |flutter::SceneUpdateContext::SurfaceProducerSurface|
   SkISize GetSize() const override;
 
   // Note: It is safe for the caller to collect the surface in the
@@ -68,10 +68,10 @@ class VulkanSurface final
   void SignalWritesFinished(
       std::function<void(void)> on_writes_committed) override;
 
-  // |flow::SceneUpdateContext::SurfaceProducerSurface|
+  // |flutter::SceneUpdateContext::SurfaceProducerSurface|
   scenic::Image* GetImage() override;
 
-  // |flow::SceneUpdateContext::SurfaceProducerSurface|
+  // |flutter::SceneUpdateContext::SurfaceProducerSurface|
   sk_sp<SkSurface> GetSkiaSurface() const override;
 
   const vulkan::VulkanHandle<VkImage>& GetVkImage() {
@@ -116,14 +116,14 @@ class VulkanSurface final
   // if the swap was not successful.
   bool BindToImage(sk_sp<GrContext> context, VulkanImage vulkan_image);
 
-  // Flutter may retain a |VulkanSurface| for a |flow::Layer| subtree to improve
+  // Flutter may retain a |VulkanSurface| for a |flutter::Layer| subtree to improve
   // the performance. The |retained_key_| identifies which layer subtree this
   // |VulkanSurface| is retained for. The key has two parts. One is the pointer
   // to the root of that layer subtree: |retained_key_.id()|. Another is the
   // transformation matrix: |retained_key_.matrix()|. We need the matrix part
   // because a different matrix would invalidate the pixels (raster cache) in
   // this |VulkanSurface|.
-  const flow::LayerRasterCacheKey& GetRetainedKey() const {
+  const flutter::LayerRasterCacheKey& GetRetainedKey() const {
     return retained_key_;
   }
 
@@ -144,7 +144,7 @@ class VulkanSurface final
 
   // Let this surface own the retained EntityNode associated with it (see
   // |GetRetainedNode|), and set the retained key (see |GetRetainedKey|).
-  void SetRetainedInfo(const flow::LayerRasterCacheKey& key,
+  void SetRetainedInfo(const flutter::LayerRasterCacheKey& key,
                        std::unique_ptr<scenic::EntityNode> node) {
     retained_key_ = key;
     retained_node_ = std::move(node);
@@ -194,8 +194,7 @@ class VulkanSurface final
   size_t age_ = 0;
   bool valid_ = false;
 
-  flow::LayerRasterCacheKey retained_key_ =
-      {nullptr, SkMatrix::MakeScale(1, 1)};
+  flutter::LayerRasterCacheKey retained_key_ = {0, SkMatrix::MakeScale(1, 1)};
   std::unique_ptr<scenic::EntityNode> retained_node_ = nullptr;
 
   std::atomic<bool> used_in_retained_rendering_ = false;
@@ -203,4 +202,4 @@ class VulkanSurface final
   FML_DISALLOW_COPY_AND_ASSIGN(VulkanSurface);
 };
 
-}  // namespace flutter
+}  // namespace flutter_runner

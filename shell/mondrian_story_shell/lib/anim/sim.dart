@@ -97,8 +97,8 @@ class Independent2DSim extends Sim<Offset> {
 
   /// Convenience constructor when the value is fixed.
   Independent2DSim.static({@required Offset value})
-      : xSim = new StaticSimulation(value: value.dx),
-        ySim = new StaticSimulation(value: value.dy);
+      : xSim = StaticSimulation(value: value.dx),
+        ySim = StaticSimulation(value: value.dy);
 
   /// The Simulation used for the x axis.
   final Simulation xSim;
@@ -107,10 +107,10 @@ class Independent2DSim extends Sim<Offset> {
   final Simulation ySim;
 
   @override
-  Offset value(double time) => new Offset(xSim.x(time), ySim.x(time));
+  Offset value(double time) => Offset(xSim.x(time), ySim.x(time));
 
   @override
-  Offset velocity(double time) => new Offset(xSim.dx(time), ySim.dx(time));
+  Offset velocity(double time) => Offset(xSim.dx(time), ySim.dx(time));
 
   @override
   bool isDone(double time) => xSim.isDone(time) && ySim.isDone(time);

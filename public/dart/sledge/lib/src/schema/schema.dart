@@ -42,18 +42,18 @@ class Schema implements BaseType {
   final SplayTreeMap<String, BaseType> _schemaDescription;
   static final Map<String, BaseType> _jsonToType =
       _buildJsonToTypeMap(<BaseType>[
-    new Boolean(),
-    new Integer(),
-    new Double(),
-    new LastOneWinsString(),
-    new LastOneWinsUint8List(),
-    new IntCounter(),
-    new DoubleCounter(),
-    new BytelistMap(),
-    new BytelistSet(),
-    new OrderedList()
+    Boolean(),
+    Integer(),
+    Double(),
+    LastOneWinsString(),
+    LastOneWinsUint8List(),
+    IntCounter(),
+    DoubleCounter(),
+    BytelistMap(),
+    BytelistSet(),
+    OrderedList()
   ]);
-  static const _listEquality = const ListEquality();
+  static const _listEquality = ListEquality();
 
   /// The length of the hash of Schema, as returned by the hash getter.
   static const int hashLength = 20;
@@ -62,10 +62,10 @@ class Schema implements BaseType {
   /// schemas.
   /// Throws an error if a field's name contains the '.' character.
   Schema(Map<String, BaseType> schemaDescription)
-      : _schemaDescription = new SplayTreeMap.from(schemaDescription) {
+      : _schemaDescription = SplayTreeMap.from(schemaDescription) {
     _schemaDescription.forEach((String name, dynamic value) {
       if (name.contains('.')) {
-        throw new ArgumentError(
+        throw ArgumentError(
             'The field `$name` must not contain the `.` character.');
       }
     });
@@ -73,15 +73,15 @@ class Schema implements BaseType {
 
   /// Builds a Schema from a JSON object.
   Schema.fromJson(Map<String, dynamic> map)
-      : _schemaDescription = new SplayTreeMap<String, BaseType>() {
+      : _schemaDescription = SplayTreeMap<String, BaseType>() {
     map.forEach((String name, dynamic value) {
       BaseType type;
       if (value is Map) {
-        type = new Schema.fromJson(value);
+        type = Schema.fromJson(value);
       } else if (value is String) {
         type = _baseTypeFromString(value);
       } else {
-        throw new ArgumentError('Invalid JSON.');
+        throw ArgumentError('Invalid JSON.');
       }
       _schemaDescription[name] = type;
     });
@@ -89,11 +89,11 @@ class Schema implements BaseType {
 
   @override
   Map<String, dynamic> toJson() =>
-      new SplayTreeMap<String, dynamic>.from(_schemaDescription);
+      SplayTreeMap<String, dynamic>.from(_schemaDescription);
 
   @override
   Value newValue(ConnectionId id) {
-    return new NodeValue(_schemaDescription, id);
+    return NodeValue(_schemaDescription, id);
   }
 
   /// Returns a description of the schema.
@@ -147,7 +147,7 @@ class Schema implements BaseType {
 
   static BaseType _baseTypeFromString(String typeName) {
     if (!_jsonToType.containsKey(typeName)) {
-      throw new ArgumentError('Unknown type.');
+      throw ArgumentError('Unknown type.');
     }
     return _jsonToType[typeName];
   }

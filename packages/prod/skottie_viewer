@@ -1,5 +1,0 @@
-{
-    "packages": [
-        "//topaz/bin/ui/skottie_viewer:package"
-    ]
-}

@@ -3,12 +3,13 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io';
 
-import 'package:fidl_fuchsia_amber/fidl.dart' as amber;
+import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_amber/fidl_async.dart' as amber;
+import 'package:fidl_fuchsia_device_manager/fidl_async.dart' as devmgr;
 import 'package:flutter/foundation.dart';
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
+import 'package:fuchsia_services/services.dart';
 import 'package:lib.settings/device_info.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:zircon/zircon.dart';
@@ -68,8 +69,9 @@ class DeviceSettingsModel extends Model {
       DateTime.now().isAfter(_lastUpdate.add(Duration(seconds: 60)));
 
   /// Checks for update from the update service
-  void checkForUpdates() {
-    _amberControl.checkForSystemUpdate((_) => _lastUpdate = DateTime.now());
+  Future<void> checkForUpdates() async {
+    await _amberControl.checkForSystemUpdate();
+    _lastUpdate = DateTime.now();
   }
 
   Future<void> selectChannel(amber.SourceConfig selectedConfig) async {
@@ -79,28 +81,19 @@ class DeviceSettingsModel extends Model {
     // more than one source well.
     for (amber.SourceConfig config in channels) {
       if (config.statusConfig.enabled) {
-        await setSrcEnabled(config.id, enabled: false);
+        await _amberControl.setSrcEnabled(config.id, false);
       }
     }
 
     if (selectedConfig != null) {
-      await setSrcEnabled(selectedConfig.id, enabled: true);
+      await _amberControl.setSrcEnabled(selectedConfig.id, true);
     }
-    _updateSources();
+    await _updateSources();
   }
 
-  /// Wraps amber.setSrcEnabled to be asynchronous.
-  Future<void> setSrcEnabled(String id, {@required bool enabled}) {
-    final completer = Completer();
-    _amberControl.setSrcEnabled(id, enabled, (_) => completer.complete());
-    return completer.future;
-  }
-
-  void _updateSources() {
-    _amberControl.listSrcs((srcs) {
-      _channels = srcs;
-      notifyListeners();
-    });
+  Future<void> _updateSources() async {
+    _channels = await _amberControl.listSrcs();
+    notifyListeners();
   }
 
   void dispose() {
@@ -115,10 +108,9 @@ class DeviceSettingsModel extends Model {
     _uptimeRefreshTimer =
         Timer.periodic(_uptimeRefreshInterval, (_) => updateUptime());
 
-    final startupContext = StartupContext.fromStartupInfo();
-    connectToService(startupContext.environmentServices, _amberControl.ctrl);
+    StartupContext.fromStartupInfo().incoming.connectToService(_amberControl);
 
-    _updateSources();
+    await _updateSources();
   }
 
   void updateUptime() {
@@ -130,15 +122,33 @@ class DeviceSettingsModel extends Model {
 
   void factoryReset() async {
     if (showResetConfirmation) {
-      // Reset has been confirmed, perform reset.
-      var dm = File('/dev/misc/dmctl');
-      if (dm.existsSync()) {
-        final flagSet = await DeviceInfo.setFactoryResetFlag(shouldReset: true);
-        log.severe('Factory Reset flag set successfully: $flagSet');
-        dm.writeAsStringSync('reboot', flush: true);
-      } else {
-        log.severe('dmctl unable to be found.');
+      final flagSet = await DeviceInfo.setFactoryResetFlag(shouldReset: true);
+      log.severe('Factory Reset flag set successfully: $flagSet');
+
+      final ChannelPair channels = ChannelPair();
+      if (channels.status != 0) {
+        log.severe('Unable to create channels: $channels.status');
+        return;
       }
+
+      int status = System.connectToService(
+        '/svc/${devmgr.Administrator.$serviceName}',
+        channels.second.passHandle());
+      if (status != 0 ) {
+        channels.first.close();
+        log.severe('Unable to connect to device administrator service: $status');
+        return;
+      }
+
+      final devmgr.AdministratorProxy admin = devmgr.AdministratorProxy();
+      admin.ctrl.bind(InterfaceHandle<devmgr.Administrator>(channels.first));
+
+      status = await admin.suspend(devmgr.suspendFlagReboot);
+      if (status != 0) {
+        log.severe('Reboot call failed with status: $status');
+      }
+
+      admin.ctrl.close();
     } else {
       _showResetConfirmation = true;
       notifyListeners();

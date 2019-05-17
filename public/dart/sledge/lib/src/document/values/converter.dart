@@ -16,7 +16,7 @@ abstract class Converter<T> {
   factory Converter() {
     final result = _converters[T];
     if (result == null) {
-      throw new InternalSledgeError('No converter found for type `$T`.');
+      throw InternalSledgeError('No converter found for type `$T`.');
     }
     return result;
   }
@@ -35,17 +35,17 @@ abstract class Converter<T> {
 class MapToKVListConverter<K, V> {
   final Converter<K> _keyConverter;
   final Converter<V> _valueConverter;
-  final Compressor _compressor = new Compressor();
+  final Compressor _compressor = Compressor();
 
   /// Constructor.
   MapToKVListConverter({Converter<K> keyConverter, Converter<V> valueConverter})
-      : _keyConverter = keyConverter ?? new Converter<K>(),
-        _valueConverter = valueConverter ?? new Converter<V>();
+      : _keyConverter = keyConverter ?? Converter<K>(),
+        _valueConverter = valueConverter ?? Converter<V>();
 
   /// Converts from List<KeyValue> to Map<K, V>.
   ConvertedChange<K, V> deserialize(final Change _input) {
     final input = _uncompressKeysInChange(_input);
-    final result = new ConvertedChange<K, V>();
+    final result = ConvertedChange<K, V>();
     for (var keyValue in input.changedEntries) {
       result.changedEntries[_keyConverter.deserialize(keyValue.key)] =
           _valueConverter.deserialize(keyValue.value);
@@ -58,9 +58,9 @@ class MapToKVListConverter<K, V> {
 
   /// Converts from Map<K, V> to List<KeyValue>.
   Change serialize(final ConvertedChange<K, V> input) {
-    final Change result = new Change();
+    final Change result = Change();
     for (final changedEntry in input.changedEntries.entries) {
-      result.changedEntries.add(new KeyValue(
+      result.changedEntries.add(KeyValue(
           _keyConverter.serialize(changedEntry.key),
           _valueConverter.serialize(changedEntry.value)));
     }
@@ -72,7 +72,7 @@ class MapToKVListConverter<K, V> {
 
   /// Restores (key, value)s from stored in Ledger state.
   Change _uncompressKeysInChange(final Change input) {
-    Change result = new Change();
+    Change result = Change();
     for (final entry in input.changedEntries) {
       result.changedEntries.add(_compressor.uncompressKeyInEntry(entry));
     }
@@ -84,7 +84,7 @@ class MapToKVListConverter<K, V> {
 
   /// Prepares (key, value)s to store in Ledger. (getting rid of long keys)
   Change _compressKeysInChange(final Change input) {
-    Change result = new Change();
+    Change result = Change();
     for (final entry in input.changedEntries) {
       result.changedEntries.add(_compressor.compressKeyInEntry(entry));
     }
@@ -106,16 +106,16 @@ class StringConverter implements Converter<String> {
   @override
   String deserialize(final Uint8List x) {
     if (x.length.isOdd) {
-      throw new InternalSledgeError(
+      throw InternalSledgeError(
           'Cannot parse String. Length should be even.');
     }
-    return new String.fromCharCodes(
+    return String.fromCharCodes(
         x.buffer.asUint16List(x.offsetInBytes, x.lengthInBytes ~/ 2));
   }
 
   @override
   Uint8List serialize(final String x) {
-    return new Uint16List.fromList(x.codeUnits).buffer.asUint8List();
+    return Uint16List.fromList(x.codeUnits).buffer.asUint8List();
   }
 }
 
@@ -132,7 +132,7 @@ class IntConverter implements Converter<int> {
   @override
   int deserialize(final Uint8List x) {
     if (x.length != _serializationLength) {
-      throw new InternalSledgeError(
+      throw InternalSledgeError(
           "Can't parse int: Length should be $_serializationLength, "
           'found ${x.length} instead for input: `$x`.');
     }
@@ -141,7 +141,7 @@ class IntConverter implements Converter<int> {
 
   @override
   Uint8List serialize(final int x) =>
-      new Uint8List(_serializationLength)..buffer.asByteData().setInt64(0, x);
+      Uint8List(_serializationLength)..buffer.asByteData().setInt64(0, x);
 }
 
 /// Converter for double.
@@ -157,7 +157,7 @@ class DoubleConverter implements Converter<double> {
   @override
   double deserialize(final Uint8List x) {
     if (x.length != _serializationLength) {
-      throw new InternalSledgeError(
+      throw InternalSledgeError(
           "Can't parse double: Length should be $_serializationLength, "
           'found ${x.length} instead for input: `$x`.');
     }
@@ -166,7 +166,7 @@ class DoubleConverter implements Converter<double> {
 
   @override
   Uint8List serialize(final double x) =>
-      new Uint8List(_serializationLength)..buffer.asByteData().setFloat64(0, x);
+      Uint8List(_serializationLength)..buffer.asByteData().setFloat64(0, x);
 }
 
 /// Converter for bool.
@@ -180,12 +180,12 @@ class BoolConverter implements Converter<bool> {
   @override
   bool deserialize(final Uint8List x) {
     if (x.lengthInBytes != 1) {
-      throw new InternalSledgeError(
+      throw InternalSledgeError(
           "Can't parse bool. Length should be 1,"
           'found ${x.lengthInBytes} bytes instead.');
     }
     if (x[0] != 0 && x[0] != 1) {
-      throw new InternalSledgeError(
+      throw InternalSledgeError(
           "Can't parse bool. Value should be 0 or 1, "
           'found ${x[0]} bytes instead.');
     }
@@ -195,7 +195,7 @@ class BoolConverter implements Converter<bool> {
   @override
   // ignore: avoid_positional_boolean_parameters
   Uint8List serialize(final bool x) {
-    return new Uint8List.fromList([x ? 1 : 0]);
+    return Uint8List.fromList([x ? 1 : 0]);
   }
 }
 
@@ -205,7 +205,7 @@ class Uint8ListConverter implements Converter<Uint8List> {
   const Uint8ListConverter();
 
   @override
-  Uint8List get defaultValue => new Uint8List(0);
+  Uint8List get defaultValue => Uint8List(0);
 
   @override
   Uint8List deserialize(final Uint8List x) => x;
@@ -233,13 +233,13 @@ class NumConverter implements Converter<num> {
   @override
   num deserialize(final Uint8List x) {
     if (x.length != _serializationLength) {
-      throw new InternalSledgeError(
+      throw InternalSledgeError(
           "Can't parse double: Length should be $_serializationLength, "
           'found ${x.length} instead for input: `$x`.');
     }
 
     if (x[0] >= _NumInternalType.values.length) {
-      throw new InternalSledgeError(
+      throw InternalSledgeError(
           "Can't parse double: First byte should be 0 or 1, "
           'found ${x[0]} instead.');
     }
@@ -259,7 +259,7 @@ class NumConverter implements Converter<num> {
 
   @override
   Uint8List serialize(final num x) {
-    final list = new Uint8List(_serializationLength);
+    final list = Uint8List(_serializationLength);
     final byteData = list.buffer.asByteData();
     if (x.runtimeType == int) {
       byteData
@@ -274,11 +274,11 @@ class NumConverter implements Converter<num> {
   }
 }
 
-const _converters = const <Type, Converter>{
-  int: const IntConverter(),
-  String: const StringConverter(),
-  double: const DoubleConverter(),
-  bool: const BoolConverter(),
-  Uint8List: const Uint8ListConverter(),
-  num: const NumConverter(),
+const _converters = <Type, Converter>{
+  int: IntConverter(),
+  String: StringConverter(),
+  double: DoubleConverter(),
+  bool: BoolConverter(),
+  Uint8List: Uint8ListConverter(),
+  num: NumConverter(),
 };

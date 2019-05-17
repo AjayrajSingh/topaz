@@ -11,26 +11,26 @@
 
 #include "flutter/fml/unique_fd.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 Surface::Surface(std::string debug_label)
     : debug_label_(std::move(debug_label)) {}
 
 Surface::~Surface() = default;
 
-// |shell::Surface|
+// |flutter::Surface|
 bool Surface::IsValid() { return valid_; }
 
-// |shell::Surface|
-std::unique_ptr<shell::SurfaceFrame> Surface::AcquireFrame(
+// |flutter::Surface|
+std::unique_ptr<flutter::SurfaceFrame> Surface::AcquireFrame(
     const SkISize& size) {
-  return std::make_unique<shell::SurfaceFrame>(
-      nullptr, [](const shell::SurfaceFrame& surface_frame, SkCanvas* canvas) {
+  return std::make_unique<flutter::SurfaceFrame>(
+      nullptr, [](const flutter::SurfaceFrame& surface_frame, SkCanvas* canvas) {
         return true;
       });
 }
 
-// |shell::Surface|
+// |flutter::Surface|
 GrContext* Surface::GetContext() { return nullptr; }
 
 static zx_status_t DriverWatcher(int dirfd, int event, const char* fn,
@@ -54,7 +54,7 @@ bool Surface::CanConnectToDisplay() {
   return status == ZX_ERR_STOP;
 }
 
-// |shell::Surface|
+// |flutter::Surface|
 SkMatrix Surface::GetRootTransformation() const {
   // This backend does not support delegating to the underlying platform to
   // query for root surface transformations. Just return identity.
@@ -63,4 +63,4 @@ SkMatrix Surface::GetRootTransformation() const {
   return matrix;
 }
 
-}  // namespace flutter
+}  // namespace flutter_runner

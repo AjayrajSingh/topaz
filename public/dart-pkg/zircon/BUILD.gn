@@ -2,9 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_fuchsia_test.gni")
 import("//build/dart/dart_library.gni")
 import("//build/testing/environments.gni")
+import("//topaz/runtime/dart/dart_fuchsia_test.gni")
 
 # NOTE: You must add any Dart files to sdk_ext.gni.
 
@@ -33,12 +33,15 @@ source_set("sdk_ext") {
   deps = [
     "//garnet/public/lib/fsl",
     "//third_party/dart/runtime:dart_api",
+    "//zircon/public/fidl/fuchsia-device-manager",
     "//zircon/public/lib/async-default",
+    "//zircon/public/lib/ddk",
+    "//zircon/public/lib/fs",
     "//zircon/public/lib/zx",
   ]
 
   public_deps = [
-    "//garnet/public/lib/fxl",
+    "//src/lib/fxl",
     "//third_party/tonic",
     "//zircon/public/lib/async-cpp",
     "//zircon/public/lib/fdio",
@@ -63,6 +66,7 @@ dart_fuchsia_test("dart_zircon_test") {
   sources = [
     "channel_test.dart",
     "eventpair_test.dart",
+    "handle_test.dart",
     "socket_test.dart",
     "vmo_test.dart",
   ]

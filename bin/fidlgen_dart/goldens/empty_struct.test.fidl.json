@@ -1,0 +1,34 @@
+{
+  "version": "0.0.1",
+  "name": "test.name",
+  "library_dependencies": [],
+  "bits_declarations": [],
+  "const_declarations": [],
+  "enum_declarations": [],
+  "interface_declarations": [],
+  "struct_declarations": [
+    {
+      "name": "test.name/Empty",
+      "location": {
+        "filename": "garnet/go/src/fidl/compiler/backend/typestest/empty_struct.test.fidl",
+        "line": 3,
+        "column": 8
+      },
+      "anonymous": false,
+      "members": [],
+      "size": 1,
+      "max_out_of_line": 0,
+      "alignment": 1,
+      "max_handles": 0
+    }
+  ],
+  "table_declarations": [],
+  "union_declarations": [],
+  "xunion_declarations": [],
+  "declaration_order": [
+    "test.name/Empty"
+  ],
+  "declarations": {
+    "test.name/Empty": "struct"
+  }
+}

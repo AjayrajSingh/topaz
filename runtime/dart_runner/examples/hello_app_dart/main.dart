@@ -4,25 +4,25 @@
 
 import 'package:fidl/fidl.dart';
 
-import 'package:lib.app.dart/app.dart';
-import 'package:fidl_fuchsia_examples_hello/fidl.dart';
+import 'package:fuchsia_services/services.dart';
+import 'package:fidl_fuchsia_examples_hello/fidl_async.dart';
 
 class _HelloImpl extends Hello {
-  final HelloBinding _binding = new HelloBinding();
+  final HelloBinding _binding = HelloBinding();
 
   void bind(InterfaceRequest<Hello> request) {
     _binding.bind(this, request);
   }
 
   @override
-  void say(String request, void callback(String response)) {
-    callback((request == 'hello') ? 'hola from Dart!' : 'adios from Dart!');
+  Future<String> say(String request) async {
+    return request == 'hello' ? 'hola from Dart!' : 'adios from Dart!';
   }
 }
 
 void main(List<String> args) {
-  StartupContext context = new StartupContext.fromStartupInfo();
+  StartupContext context = StartupContext.fromStartupInfo();
 
-  context.outgoingServices
-      .addServiceForName(new _HelloImpl().bind, Hello.$serviceName);
+  context.outgoing
+      .addPublicService(_HelloImpl().bind, Hello.$serviceName);
 }

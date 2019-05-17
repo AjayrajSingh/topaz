@@ -31,7 +31,7 @@ void main() {
         IntentHandlerImpl(startupContext: StartupContext.fromStartupInfo());
   });
 
-  test('addModuleToStory should return ModuleController upon success',
+  test('addModuleToStory should return ModuleControllerProxy upon success',
       () async {
     final context = MockModuleContext();
     when(context.addModuleToStory(any, any, any, any))
@@ -42,7 +42,7 @@ void main() {
 
     final ctrl = await moduleImpl.addModuleToStory(
         name: 'testMod', intent: _emptyIntent);
-    expect(ctrl, const TypeMatcher<fidl.ModuleController>());
+    expect(ctrl, const TypeMatcher<fidl.ModuleControllerProxy>());
   });
 
   test(

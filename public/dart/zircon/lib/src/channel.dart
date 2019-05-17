@@ -17,9 +17,9 @@ class Channel extends _HandleWrapper<Channel> {
   factory Channel.fromFile(String path) {
     HandleResult r = System.channelFromFile(path);
     if (r.status != ZX.OK) {
-      throw new ZxStatusException(r.status, getStringForStatus(r.status));
+      throw ZxStatusException(r.status, getStringForStatus(r.status));
     }
-    return new Channel(r.handle);
+    return Channel(r.handle);
   }
 
   // Signals
@@ -56,10 +56,10 @@ class ChannelPair extends _HandleWrapperPair<Channel> {
   factory ChannelPair() {
     final HandlePairResult result = System.channelCreate();
     if (result.status == ZX.OK) {
-      return new ChannelPair._(
-          result.status, new Channel(result.first), new Channel(result.second));
+      return ChannelPair._(
+          result.status, Channel(result.first), Channel(result.second));
     } else {
-      return new ChannelPair._(result.status, null, null);
+      return ChannelPair._(result.status, null, null);
     }
   }
 

@@ -1,5 +1,0 @@
-{
-    "labels": [
-        "//topaz/bin/fidlgen_dart:install(//build/toolchain:host_x64)"
-    ]
-}

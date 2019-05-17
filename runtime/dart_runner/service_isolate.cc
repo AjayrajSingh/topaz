@@ -4,15 +4,17 @@
 
 #include "topaz/runtime/dart_runner/service_isolate.h"
 
-#include "lib/fsl/vmo/file.h"
 #include "third_party/dart/runtime/include/bin/dart_io_api.h"
 #include "third_party/tonic/converter/dart_converter.h"
 #include "third_party/tonic/dart_library_natives.h"
 #include "third_party/tonic/dart_microtask_queue.h"
 #include "third_party/tonic/dart_state.h"
 #include "third_party/tonic/typed_data/uint8_list.h"
+#include "topaz/runtime/dart/utils/inlines.h"
+
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
+#include "topaz/runtime/dart_runner/logging.h"
 
 namespace dart_runner {
 namespace {
@@ -25,20 +27,20 @@ tonic::DartLibraryNatives* service_natives = nullptr;
 
 Dart_NativeFunction GetNativeFunction(Dart_Handle name, int argument_count,
                                       bool* auto_setup_scope) {
-  FXL_CHECK(service_natives);
+  dart_utils::Check(service_natives, LOG_TAG);
   return service_natives->GetNativeFunction(name, argument_count,
                                             auto_setup_scope);
 }
 
 const uint8_t* GetSymbol(Dart_NativeFunction native_function) {
-  FXL_CHECK(service_natives);
+  dart_utils::Check(service_natives, LOG_TAG);
   return service_natives->GetSymbol(native_function);
 }
 
 #define SHUTDOWN_ON_ERROR(handle)           \
   if (Dart_IsError(handle)) {               \
     *error = strdup(Dart_GetError(handle)); \
-    FXL_LOG(ERROR) << *error;               \
+    FX_LOG(ERROR, LOG_TAG, *error);         \
     Dart_ExitScope();                       \
     Dart_ShutdownIsolate();                 \
     return nullptr;                         \
@@ -90,14 +92,14 @@ Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
   if (!MappedResource::LoadFromNamespace(nullptr, snapshot_data_path,
                                          mapped_isolate_snapshot_data)) {
     *error = strdup("Failed to load snapshot for service isolate");
-    FXL_LOG(ERROR) << *error;
+    FX_LOG(ERROR, LOG_TAG, *error);
     return nullptr;
   }
   if (!MappedResource::LoadFromNamespace(nullptr, snapshot_instructions_path,
                                          mapped_isolate_snapshot_instructions,
                                          true /* executable */)) {
     *error = strdup("Failed to load snapshot for service isolate");
-    FXL_LOG(ERROR) << *error;
+    FX_LOG(ERROR, LOG_TAG, *error);
     return nullptr;
   }
 
@@ -106,27 +108,28 @@ Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
           nullptr, "pkg/data/vmservice_shared_snapshot_data.bin",
           mapped_shared_snapshot_data)) {
     *error = strdup("Failed to load snapshot for service isolate");
-    FXL_LOG(ERROR) << *error;
+    FX_LOG(ERROR, LOG_TAG, *error);
     return nullptr;
   }
   if (!MappedResource::LoadFromNamespace(
           nullptr, "pkg/data/vmservice_shared_snapshot_instructions.bin",
           mapped_shared_snapshot_instructions, true /* executable */)) {
     *error = strdup("Failed to load snapshot for service isolate");
-    FXL_LOG(ERROR) << *error;
+    FX_LOG(ERROR, LOG_TAG, *error);
     return nullptr;
   }
 #endif
 
   auto state = new std::shared_ptr<tonic::DartState>(new tonic::DartState());
   Dart_Isolate isolate =
-      Dart_CreateIsolate(uri, "main", mapped_isolate_snapshot_data.address(),
+      Dart_CreateIsolate(uri, DART_VM_SERVICE_ISOLATE_NAME,
+                         mapped_isolate_snapshot_data.address(),
                          mapped_isolate_snapshot_instructions.address(),
                          mapped_shared_snapshot_data.address(),
                          mapped_shared_snapshot_instructions.address(),
                          nullptr /* flags */, state, error);
   if (!isolate) {
-    FXL_LOG(ERROR) << "Dart_CreateIsolate failed: " << *error;
+    FX_LOGF(ERROR, LOG_TAG, "Dart_CreateIsolate failed: %s", *error);
     return nullptr;
   }
 
@@ -170,6 +173,12 @@ Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
                     Dart_NewBoolean(false));
   SHUTDOWN_ON_ERROR(result);
 
+  // _authCodesDisabled = false
+  result =
+      Dart_SetField(library, Dart_NewStringFromCString("_authCodesDisabled"),
+                    Dart_NewBoolean(false));
+  SHUTDOWN_ON_ERROR(result);
+
   InitBuiltinLibrariesForIsolate(std::string(uri), nullptr, fileno(stdout),
                                  fileno(stderr), nullptr, zx::channel(), true);
 
@@ -178,7 +187,7 @@ Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
   Dart_ExitIsolate();
   *error = Dart_IsolateMakeRunnable(isolate);
   if (*error != nullptr) {
-    FXL_LOG(ERROR) << *error;
+    FX_LOG(ERROR, LOG_TAG, *error);
     Dart_EnterIsolate(isolate);
     Dart_ShutdownIsolate();
     return nullptr;
@@ -190,7 +199,7 @@ Dart_Handle GetVMServiceAssetsArchiveCallback() {
   MappedResource observatory_tar;
   if (!MappedResource::LoadFromNamespace(nullptr, "pkg/data/observatory.tar",
                                          observatory_tar)) {
-    FXL_LOG(ERROR) << "Failed to load Observatory assets";
+    FX_LOG(ERROR, LOG_TAG, "Failed to load Observatory assets");
     return nullptr;
   }
   // TODO(rmacnak): Should we avoid copying the tar? Or does the service library

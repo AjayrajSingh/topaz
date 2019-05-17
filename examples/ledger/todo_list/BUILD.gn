@@ -24,9 +24,9 @@ flutter_app("todo_list") {
   deps = [
     "//sdk/fidl/fuchsia.ledger",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/app_driver/dart",
-    "//topaz/public/lib/component/dart",
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_modular",
+    "//topaz/public/dart/fuchsia_services",
     "//topaz/public/lib/widgets/dart",
   ]
 }

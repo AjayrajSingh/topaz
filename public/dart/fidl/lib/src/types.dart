@@ -7,6 +7,7 @@ import 'dart:typed_data';
 
 import 'package:zircon/zircon.dart';
 
+import 'bits.dart';
 import 'codec.dart';
 import 'enum.dart';
 import 'error.dart';
@@ -21,27 +22,27 @@ import 'xunion.dart';
 
 void _throwIfNotNullable(bool nullable) {
   if (!nullable) {
-    throw new FidlError('Found null for a non-nullable type');
+    throw FidlError('Found null for a non-nullable type');
   }
 }
 
 void _throwIfExceedsLimit(int count, int limit) {
   if (limit != null && count > limit) {
-    throw new FidlError(
+    throw FidlError(
         'Found an object wth $count elements. Limited to $limit.');
   }
 }
 
 void _throwIfCountMismatch(int count, int expectedCount) {
   if (count != expectedCount) {
-    throw new FidlError(
+    throw FidlError(
         'Found an array of count $count. Expected $expectedCount.');
   }
 }
 
 void _throwIfNotZero(int value) {
   if (value != 0) {
-    throw new FidlError('Expected zero, got: $value');
+    throw FidlError('Expected zero, got: $value');
   }
 }
 
@@ -123,18 +124,6 @@ void _copyFloat64(ByteData data, Float64List value, int offset) {
   }
 }
 
-String _convertFromUTF8(Uint8List bytes) {
-  try {
-    return const Utf8Decoder().convert(bytes);
-  } on FormatException {
-    throw FidlError('Received a string with invalid UTF8: $bytes');
-  }
-}
-
-Uint8List _convertToUTF8(String string) {
-  return new Uint8List.fromList(const Utf8Encoder().convert(string));
-}
-
 const int kAllocAbsent = 0;
 const int kAllocPresent = 0xFFFFFFFFFFFFFFFF;
 const int kHandleAbsent = 0;
@@ -157,7 +146,7 @@ abstract class FidlType<T> {
   }
 
   List<T> decodeArray(Decoder decoder, int count, int offset) {
-    final List<T> list = new List<T>(count);
+    final List<T> list = List<T>(count);
     for (int i = 0; i < count; ++i) {
       list[i] = decode(decoder, offset + i * encodedSize);
     }
@@ -413,7 +402,7 @@ void _validateEncodedHandle(int encoded, bool nullable) {
   } else if (encoded == kHandlePresent) {
     // Nothing to validate.
   } else {
-    throw new FidlError('Invalid handle encoding: $encoded.');
+    throw FidlError('Invalid handle encoding: $encoded.');
   }
 }
 
@@ -432,7 +421,7 @@ Handle _decodeHandle(Decoder decoder, int offset, bool nullable) {
   _validateEncodedHandle(encoded, nullable);
   return encoded == kHandlePresent
       ? decoder.claimHandle()
-      : new Handle.invalid();
+      : Handle.invalid();
 }
 
 // TODO(pascallouis): By having _HandleWrapper exported, we could DRY this code
@@ -471,7 +460,7 @@ class ChannelType extends NullableFidlType<Channel> {
 
   @override
   Channel decode(Decoder decoder, int offset) =>
-      new Channel(_decodeHandle(decoder, offset, nullable));
+      Channel(_decodeHandle(decoder, offset, nullable));
 }
 
 class EventPairType extends NullableFidlType<EventPair> {
@@ -486,7 +475,7 @@ class EventPairType extends NullableFidlType<EventPair> {
 
   @override
   EventPair decode(Decoder decoder, int offset) =>
-      new EventPair(_decodeHandle(decoder, offset, nullable));
+      EventPair(_decodeHandle(decoder, offset, nullable));
 }
 
 class SocketType extends NullableFidlType<Socket> {
@@ -501,7 +490,7 @@ class SocketType extends NullableFidlType<Socket> {
 
   @override
   Socket decode(Decoder decoder, int offset) =>
-      new Socket(_decodeHandle(decoder, offset, nullable));
+      Socket(_decodeHandle(decoder, offset, nullable));
 }
 
 class VmoType extends NullableFidlType<Vmo> {
@@ -516,7 +505,7 @@ class VmoType extends NullableFidlType<Vmo> {
 
   @override
   Vmo decode(Decoder decoder, int offset) =>
-      new Vmo(_decodeHandle(decoder, offset, nullable));
+      Vmo(_decodeHandle(decoder, offset, nullable));
 }
 
 class InterfaceHandleType<T> extends NullableFidlType<InterfaceHandle<T>> {
@@ -532,7 +521,7 @@ class InterfaceHandleType<T> extends NullableFidlType<InterfaceHandle<T>> {
   @override
   InterfaceHandle<T> decode(Decoder decoder, int offset) {
     final Handle handle = _decodeHandle(decoder, offset, nullable);
-    return new InterfaceHandle<T>(handle.isValid ? new Channel(handle) : null);
+    return InterfaceHandle<T>(handle.isValid ? Channel(handle) : null);
   }
 }
 
@@ -549,7 +538,7 @@ class InterfaceRequestType<T> extends NullableFidlType<InterfaceRequest<T>> {
   @override
   InterfaceRequest<T> decode(Decoder decoder, int offset) {
     final Handle handle = _decodeHandle(decoder, offset, nullable);
-    return new InterfaceRequest<T>(handle.isValid ? new Channel(handle) : null);
+    return InterfaceRequest<T>(handle.isValid ? Channel(handle) : null);
   }
 }
 
@@ -572,8 +561,8 @@ class StringType extends NullableFidlType<String> {
         ..encodeUint64(kAllocAbsent, offset + 8); // data
       return null;
     }
-    final Uint8List bytes = _convertToUTF8(value);
-    final int size = bytes.lengthInBytes;
+    final bytes = Utf8Encoder().convert(value);
+    final int size = bytes.length;
     encoder
       ..encodeUint64(size, offset) // size
       ..encodeUint64(kAllocPresent, offset + 8); // data
@@ -591,7 +580,11 @@ class StringType extends NullableFidlType<String> {
     }
     final Uint8List bytes =
         decoder.data.buffer.asUint8List(decoder.claimMemory(size), size);
-    return _convertFromUTF8(bytes);
+    try {
+      return const Utf8Decoder().convert(bytes, 0, size);
+    } on FormatException {
+      throw FidlError('Received a string with invalid UTF8: $bytes');
+    }
   }
 
   void validate(String value) {
@@ -609,7 +602,7 @@ class StringType extends NullableFidlType<String> {
     } else if (data == kAllocPresent) {
       _throwIfExceedsLimit(size, maybeElementCount);
     } else {
-      throw new FidlError('Invalid string encoding: $data.');
+      throw FidlError('Invalid string encoding: $data.');
     }
   }
 }
@@ -644,7 +637,7 @@ class PointerType<T> extends FidlType<T> {
 
   void validateEncoded(int encoded) {
     if (encoded != kAllocAbsent && encoded != kAllocPresent) {
-      throw new FidlError('Invalid pointer encoding: $encoded.');
+      throw FidlError('Invalid pointer encoding: $encoded.');
     }
   }
 }
@@ -682,7 +675,7 @@ class StructType<T extends Struct> extends FidlType<T> {
     final int count = members.length;
     final List<Object> values = value.$fields;
     if (values.length != count) {
-      throw new FidlError(
+      throw FidlError(
           'Unexpected number of members for $T. Expected $count. Got ${values.length}');
     }
     for (int i = 0; i < count; ++i) {
@@ -693,7 +686,7 @@ class StructType<T extends Struct> extends FidlType<T> {
   @override
   T decode(Decoder decoder, int offset) {
     final int argc = members.length;
-    final List<Object> argv = new List<Object>(argc);
+    final List<Object> argv = List<Object>(argc);
     for (int i = 0; i < argc; ++i) {
       argv[i] = members[i].decode(decoder, offset);
     }
@@ -735,7 +728,7 @@ T _decodeEnvelope<T>(Decoder decoder, int offset, _envelopeMode mode, FidlType<T
   switch (fieldPresent) {
     case kAllocPresent:
       if (mode == _envelopeMode.kMustBeAbsent)
-        throw new FidlError('expected empty envelope');
+        throw FidlError('expected empty envelope');
       final fieldKnown = fieldType != null;
       if (fieldKnown) {
         final fieldOffset = decoder.claimMemory(fieldType.encodedSize);
@@ -745,9 +738,9 @@ T _decodeEnvelope<T>(Decoder decoder, int offset, _envelopeMode mode, FidlType<T
         final numHandlesConsumed =
             decoder.countClaimedHandles() - claimedHandles;
         if (numBytes != numBytesConsumed)
-          throw new FidlError('field was mis-sized');
+          throw FidlError('field was mis-sized');
         if (numHandles != numHandlesConsumed)
-          throw new FidlError('handles were mis-sized');
+          throw FidlError('handles were mis-sized');
         return field;
       } else if (mode == _envelopeMode.kAllowUnknown) {
         decoder.claimMemory(numBytes);
@@ -762,17 +755,17 @@ T _decodeEnvelope<T>(Decoder decoder, int offset, _envelopeMode mode, FidlType<T
         }
         return null;
       } else {
-        throw new FidlError('unknown field');
+        throw FidlError('unknown field');
       }
       break;
     case kAllocAbsent:
       if (numBytes != 0)
-        throw new FidlError('absent envelope with non-zero bytes');
+        throw FidlError('absent envelope with non-zero bytes');
       if (numHandles != 0)
-        throw new FidlError('absent envelope with non-zero handles');
+        throw FidlError('absent envelope with non-zero handles');
       return null;
     default:
-      throw new FidlError('Bad reference encoding');
+      throw FidlError('Bad reference encoding');
   }
 }
 
@@ -792,7 +785,7 @@ class TableType<T extends Table> extends FidlType<T> {
     int maxOrdinal = 0;
     value.$fields.forEach((ordinal, field) {
       if (!members.containsKey(ordinal)) {
-        throw new FidlError(
+        throw FidlError(
             'Cannot encode unknown table member with ordinal: $ordinal');
       }
       if (field != null) {
@@ -838,9 +831,9 @@ class TableType<T extends Table> extends FidlType<T> {
       case kAllocPresent:
         break; // good
       case kAllocAbsent:
-        throw new FidlError('Unexpected null reference');
+        throw FidlError('Unexpected null reference');
       default:
-        throw new FidlError('Bad reference encoding');
+        throw FidlError('Bad reference encoding');
     }
 
     // Early exit on empty table.
@@ -880,7 +873,7 @@ class UnionType<T extends Union> extends FidlType<T> {
   void encode(Encoder encoder, T value, int offset) {
     final int index = value.$index;
     if (index < 0 || index >= members.length)
-      throw new FidlError('Bad union tag index: $index');
+      throw FidlError('Bad union tag index: $index');
     encoder.encodeUint32(index, offset);
     members[index].encode(encoder, value.$data, offset);
   }
@@ -889,7 +882,7 @@ class UnionType<T extends Union> extends FidlType<T> {
   T decode(Decoder decoder, int offset) {
     final int index = decoder.decodeUint32(offset);
     if (index < 0 || index >= members.length)
-      throw new FidlError('Bad union tag index: $index');
+      throw FidlError('Bad union tag index: $index');
     return ctor(index, members[index].decode(decoder, offset));
   }
 }
@@ -918,7 +911,7 @@ class XUnionType<T extends XUnion> extends NullableFidlType<T> {
       final int ordinal = value.$ordinal;
       final FidlType fieldType = members[ordinal];
       if (fieldType == null)
-        throw new FidlError('Bad xunion ordinal: $ordinal');
+        throw FidlError('Bad xunion ordinal: $ordinal');
       encoder.encodeUint32(ordinal, offset);
       _encodeEnvelopePresent(encoder, envelopeOffset, value.$data, fieldType);
     }
@@ -930,7 +923,7 @@ class XUnionType<T extends XUnion> extends NullableFidlType<T> {
     final int ordinal = decoder.decodeUint32(offset);
     if (ordinal == 0) {
       if (!nullable) {
-        throw new FidlError('Zero xunion ordinal on non-nullable');
+        throw FidlError('Zero xunion ordinal on non-nullable');
       }
       _decodeEnvelope(
         decoder, envelopeOffset, _envelopeMode.kMustBeAbsent, null);
@@ -938,11 +931,11 @@ class XUnionType<T extends XUnion> extends NullableFidlType<T> {
     } else {
       final fieldType = members[ordinal];
       if (fieldType == null)
-        throw new FidlError('Bad xunion ordinal: $ordinal');
+        throw FidlError('Bad xunion ordinal: $ordinal');
       final field = _decodeEnvelope(
         decoder, envelopeOffset, _envelopeMode.kDisallowUnknown, fieldType);
       if (field == null)
-        throw new FidlError('Bad xunion: missing content');
+        throw FidlError('Bad xunion: missing content');
       return ctor(ordinal, field);
     }
   }
@@ -962,7 +955,30 @@ class EnumType<T extends Enum> extends FidlType<T> {
 
   @override
   void encode(Encoder encoder, T value, int offset) {
-    type.encode(encoder, value.value, offset);
+    type.encode(encoder, value.$value, offset);
+  }
+
+  @override
+  T decode(Decoder decoder, int offset) {
+    return ctor(type.decode(decoder, offset));
+  }
+}
+
+class BitsType<T extends Bits> extends FidlType<T> {
+  const BitsType({
+    this.type,
+    this.ctor,
+  });
+
+  final FidlType<int> type;
+  final BitsFactory<T> ctor;
+
+  @override
+  int get encodedSize => type.encodedSize;
+
+  @override
+  void encode(Encoder encoder, T value, int offset) {
+    type.encode(encoder, value.$value, offset);
   }
 
   @override
@@ -984,12 +1000,12 @@ class MethodType extends FidlType<Null> {
 
   @override
   void encode(Encoder encoder, Null value, int offset) {
-    throw new FidlError('Cannot encode a method.');
+    throw FidlError('Cannot encode a method.');
   }
 
   @override
   Null decode(Decoder decoder, int offset) {
-    throw new FidlError('Cannot decode a method.');
+    throw FidlError('Cannot decode a method.');
   }
 }
 
@@ -1047,7 +1063,7 @@ class VectorType<T extends List> extends NullableFidlType<T> {
     } else if (data == kAllocPresent) {
       _throwIfExceedsLimit(count, maybeElementCount);
     } else {
-      throw new FidlError('Invalid vector encoding: $data.');
+      throw FidlError('Invalid vector encoding: $data.');
     }
   }
 }

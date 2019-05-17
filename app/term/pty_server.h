@@ -8,7 +8,7 @@
 #include <vector>
 
 #include <lib/fit/function.h>
-#include <zx/process.h>
+#include <lib/zx/process.h>
 
 #include "lib/fsl/tasks/fd_waiter.h"
 #include "src/lib/files/unique_fd.h"

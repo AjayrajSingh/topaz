@@ -5,8 +5,8 @@
 import 'dart:async';
 
 import 'package:fidl_fuchsia_devicesettings/fidl_async.dart';
-import 'package:lib.app.dart/logging.dart';
 import 'package:protobuf/protobuf.dart';
+import 'package:fuchsia_logger/logger.dart';
 
 /// A store for settings expressed as protobufs. The settings are persisted
 /// in the device setting service as JSON.

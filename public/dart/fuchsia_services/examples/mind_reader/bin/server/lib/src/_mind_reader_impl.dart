@@ -32,7 +32,9 @@ class MindReaderImpl extends MindReader {
     // succeed the service must have been explicity exposed to us by the parent
     // process and we must identify that we can connect to it in our component
     // manifest file.
-    connectToEnvironmentService<ThoughtLeaker>(proxy);
+    StartupContext.fromStartupInfo()
+        .incoming
+        .connectToService<ThoughtLeaker>(proxy);
 
     final response = await _attemptReadMind(proxy);
     proxy.ctrl.close();

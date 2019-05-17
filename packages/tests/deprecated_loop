@@ -1,5 +1,0 @@
-{
-    "packages": [
-        "//topaz/lib/deprecated_loop:deprecated_loop_tests"
-    ]
-}

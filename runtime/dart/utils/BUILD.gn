@@ -5,6 +5,16 @@
 import("//build/package.gni")
 import("//build/testing/environments.gni")
 
+source_set("logging") {
+  visibility = [
+    ":*",
+  ]
+
+  sources = [
+    "logging.h",
+  ]
+}
+
 source_set("utils") {
   sources = [
     "handle_exception.cc",
@@ -16,19 +26,59 @@ source_set("utils") {
   ]
 
   public_deps = [
-    "//garnet/public/lib/svc/cpp",
-    "//zircon/public/lib/fs",
+    "//sdk/lib/sys/cpp",
+    "//sdk/lib/vfs/cpp",
     "//zircon/public/lib/zx",
   ]
 
   deps = [
-    "//garnet/public/lib/fsl",
-    "//garnet/public/lib/fxl",
+    ":logging",
     "//third_party/tonic",
-    "//topaz/lib/deprecated_loop",
     "//zircon/public/fidl/fuchsia-crash",
+    "//zircon/public/fidl/fuchsia-io",
     "//zircon/public/fidl/fuchsia-mem",
+    "//zircon/public/lib/async-loop-cpp",
     "//zircon/public/lib/memfs",
+    "//zircon/public/lib/syslog",
+  ]
+}
+
+source_set("vmo") {
+  sources = [
+    "vmo.cc",
+    "vmo.h",
+  ]
+
+  public_deps = [
+    "//zircon/public/fidl/fuchsia-mem",
+    "//zircon/public/lib/fdio",
+  ]
+
+  deps = [
+    ":logging",
+    "//zircon/public/lib/syslog",
+  ]
+}
+
+source_set("inlines") {
+  sources = [
+    "inlines.h",
+  ]
+
+  public_deps = [
+    "//zircon/public/lib/syslog",
+  ]
+}
+
+source_set("files") {
+  sources = [
+    "files.cc",
+    "files.h",
+  ]
+
+  deps = [
+    ":inlines",
+    ":logging",
   ]
 }
 

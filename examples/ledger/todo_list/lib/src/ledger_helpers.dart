@@ -5,21 +5,17 @@
 import 'dart:convert';
 import 'dart:typed_data' show Uint8List;
 
-import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+import 'package:fidl_fuchsia_ledger/fidl_async.dart' as ledger;
+import 'package:fuchsia_logger/logger.dart';
 
-/// Callback type that takes a status of a completed Ledger operation.
-typedef OnLedgerResponse = bool Function(ledger.Status status);
-
-/// Creates a callback that takes a Ledger status and logs an error if the
+/// Takes a Ledger status and logs an error if the
 /// status is not OK.
-OnLedgerResponse handleLedgerResponse(String description) {
-  return (ledger.Status status) {
-    if (status != ledger.Status.ok) {
-      print('[Todo List] Ledger error in $description: $status');
-      return true;
-    }
+bool validateLedgerResponse(ledger.Status status, String description) {
+  if (status != ledger.Status.ok) {
+    log.info('Ledger error in $description: $status');
     return false;
-  };
+  }
+  return true;
 }
 
 /// Retrieves all entries from a snapshot.
@@ -28,28 +24,26 @@ OnLedgerResponse handleLedgerResponse(String description) {
 /// Ledger calls, assemble the complete response and call [callback] exactly
 /// once.
 void getEntriesFromSnapshot(ledger.PageSnapshotProxy snapshot,
-    void callback(ledger.Status status, Map<List<int>, String> items)) {
+    void callback(Map<List<int>, String> items)) {
   _getEntriesRecursive(snapshot, <List<int>, String>{}, null, callback);
 }
 
-void _getEntriesRecursive(
+Future<void> _getEntriesRecursive(
     ledger.PageSnapshotProxy snapshot,
     Map<List<int>, String> items,
     ledger.Token token,
-    void callback(ledger.Status status, Map<List<int>, String> items)) {
-  snapshot.getEntriesInline(new Uint8List(0), token, (ledger.Status status,
-      List<ledger.InlinedEntry> entries, ledger.Token nextToken) {
-    if (status != ledger.Status.ok && status != ledger.Status.partialResult) {
-      callback(status, <List<int>, String>{});
-      return;
-    }
-    for (final ledger.InlinedEntry entry in entries) {
-      items[entry.key] = utf8.decode(entry.inlinedValue.value);
-    }
-    if (status == ledger.Status.ok) {
-      callback(ledger.Status.ok, items);
-      return;
-    }
-    _getEntriesRecursive(snapshot, items, nextToken, callback);
-  });
+    void callback(Map<List<int>, String> items)) async {
+  final response = await snapshot.getEntriesInline(Uint8List(0), token);
+  final status = response.status;
+  final entries = response.entries;
+  final nextToken = response.nextToken;
+
+  for (final ledger.InlinedEntry entry in entries) {
+    items[entry.key] = utf8.decode(entry.inlinedValue.value);
+  }
+  if (status == ledger.IterationStatus.ok) {
+    callback(items);
+    return;
+  }
+  await _getEntriesRecursive(snapshot, items, nextToken, callback);
 }

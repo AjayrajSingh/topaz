@@ -1,11 +1,10 @@
 // Copyright 2017 The Fuchsia Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
-
-import 'package:fidl_fuchsia_auth/fidl.dart';
-import 'package:fidl_fuchsia_modular/fidl.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_ui_policy/fidl.dart';
+import 'package:fidl_fuchsia_auth/fidl_async.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
+import 'package:fidl_fuchsia_ui_policy/fidl_async.dart';
 
 /// Called when [BaseShell.initialize] occurs.
 typedef OnBaseShellReady = void Function(
@@ -19,11 +18,11 @@ typedef OnBaseShellStop = void Function();
 
 /// Implements a BaseShell for receiving the services a [BaseShell] needs to
 /// operate.
-class BaseShellImpl implements BaseShell, Lifecycle {
+class BaseShellImpl extends BaseShell implements Lifecycle {
   final BaseShellContextProxy _baseShellContextProxy =
-      new BaseShellContextProxy();
-  final UserProviderProxy _userProviderProxy = new UserProviderProxy();
-  final PresentationProxy _presentationProxy = new PresentationProxy();
+      BaseShellContextProxy();
+  final UserProviderProxy _userProviderProxy = UserProviderProxy();
+  final PresentationProxy _presentationProxy = PresentationProxy();
   final Set<AuthenticationUiContextBinding> _authUiContextBindingSet =
       <AuthenticationUiContextBinding>{};
 
@@ -44,24 +43,23 @@ class BaseShellImpl implements BaseShell, Lifecycle {
     this.onReady,
     this.onStop,
   });
-
   @override
-  void initialize(
+  Future<void> initialize(
     InterfaceHandle<BaseShellContext> baseShellContextHandle,
     BaseShellParams baseShellParams,
-  ) {
+  ) async {
     if (onReady != null) {
       _baseShellContextProxy.ctrl.bind(baseShellContextHandle);
-      _baseShellContextProxy.getUserProvider(_userProviderProxy.ctrl.request());
-      if (baseShellParams.presentation.channel != null) {
-        _presentationProxy.ctrl.bind(baseShellParams.presentation);
-      }
+      await _baseShellContextProxy
+          .getUserProvider(_userProviderProxy.ctrl.request());
+      await _baseShellContextProxy
+          .getPresentation(_presentationProxy.ctrl.request());
       onReady(_userProviderProxy, _baseShellContextProxy, _presentationProxy);
     }
   }
 
   @override
-  void terminate() {
+  Future<void> terminate() async {
     onStop?.call();
     _userProviderProxy.ctrl.close();
     _baseShellContextProxy.ctrl.close();
@@ -71,11 +69,11 @@ class BaseShellImpl implements BaseShell, Lifecycle {
   }
 
   @override
-  void getAuthenticationUiContext(
+  Future<void> getAuthenticationUiContext(
     InterfaceRequest<AuthenticationUiContext> request,
-  ) {
+  ) async {
     AuthenticationUiContextBinding binding =
-        new AuthenticationUiContextBinding()
+        AuthenticationUiContextBinding()
           ..bind(authenticationUiContext, request);
     _authUiContextBindingSet.add(binding);
   }

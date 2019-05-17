@@ -10,19 +10,19 @@ import 'time_stringer.dart';
 
 /// System Clock in the Base Shell
 class Clock extends StatelessWidget {
-  final TimeStringer _time = new TimeStringer();
+  final TimeStringer _time = TimeStringer();
 
   @override
   Widget build(BuildContext context) {
-    return new LayoutBuilder(
+    return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        return new AnimatedBuilder(
+        return AnimatedBuilder(
           animation: _time,
           builder: (BuildContext context, Widget child) {
-            return new Container(
-              child: new Text(
+            return Container(
+              child: Text(
                 _time.timeOnly,
-                style: new TextStyle(
+                style: TextStyle(
                   color: Colors.white,
                   fontSize: min(
                     constraints.maxWidth / 6.0,

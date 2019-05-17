@@ -12,13 +12,13 @@
 #include <memory>
 #include <vector>
 
-#include "third_party/dart/runtime/include/dart_api.h"
 #include "dart-pkg/zircon/sdk_ext/handle.h"
 #include "dart-pkg/zircon/sdk_ext/handle_waiter.h"
 #include "dart-pkg/zircon/sdk_ext/system.h"
-#include "lib/fxl/arraysize.h"
-#include "lib/fxl/logging.h"
-#include "lib/fxl/macros.h"
+#include "src/lib/fxl/arraysize.h"
+#include "src/lib/fxl/logging.h"
+#include "src/lib/fxl/macros.h"
+#include "third_party/dart/runtime/include/dart_api.h"
 #include "third_party/tonic/dart_binding_macros.h"
 #include "third_party/tonic/dart_class_library.h"
 #include "third_party/tonic/dart_class_provider.h"
@@ -44,14 +44,15 @@ tonic::DartLibraryNatives* InitNatives() {
   return natives;
 }
 
-Dart_NativeFunction NativeLookup(Dart_Handle name,
-                                 int argument_count,
+Dart_NativeFunction NativeLookup(Dart_Handle name, int argument_count,
                                  bool* auto_setup_scope) {
   const char* function_name = nullptr;
   Dart_Handle result = Dart_StringToCString(name, &function_name);
-  DART_CHECK_VALID(result);
-  assert(function_name != nullptr);
-  assert(auto_setup_scope != nullptr);
+  if (Dart_IsError(result)) {
+    Dart_PropagateError(result);
+  }
+  FXL_DCHECK(function_name != nullptr);
+  FXL_DCHECK(auto_setup_scope != nullptr);
   *auto_setup_scope = true;
   if (!g_natives)
     g_natives = InitNatives();
@@ -68,9 +69,10 @@ const uint8_t* NativeSymbol(Dart_NativeFunction native_function) {
 
 void Initialize() {
   Dart_Handle library = Dart_LookupLibrary(ToDart("dart:zircon"));
-  DART_CHECK_VALID(library);
-  DART_CHECK_VALID(Dart_SetNativeResolver(
-      library, zircon::dart::NativeLookup, zircon::dart::NativeSymbol));
+  FXL_CHECK(!tonic::LogIfError(library));
+  Dart_Handle result = Dart_SetNativeResolver(
+      library, zircon::dart::NativeLookup, zircon::dart::NativeSymbol);
+  FXL_CHECK(!tonic::LogIfError(result));
 
   auto dart_state = tonic::DartState::Current();
   std::unique_ptr<tonic::DartClassProvider> zircon_class_provider(

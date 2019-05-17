@@ -31,7 +31,7 @@ class FutureWidget extends StatefulWidget {
   }) : assert(child != null);
 
   @override
-  _FutureWidgetState createState() => new _FutureWidgetState();
+  _FutureWidgetState createState() => _FutureWidgetState();
 }
 
 class _FutureWidgetState extends State<FutureWidget> {

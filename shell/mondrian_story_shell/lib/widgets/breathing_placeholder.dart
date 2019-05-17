@@ -20,7 +20,7 @@ const double _kUpperBound = 0.8;
 
 class BreathingPlaceholder extends StatefulWidget {
   @override
-  BreathingState createState() => new BreathingState();
+  BreathingState createState() => BreathingState();
 }
 
 class BreathingState extends State<BreathingPlaceholder>
@@ -34,13 +34,13 @@ class BreathingState extends State<BreathingPlaceholder>
   void initState() {
     super.initState();
     pause();
-    _opacityController = new AnimationController(
+    _opacityController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: _kBreathPeriod),
+      duration: Duration(milliseconds: _kBreathPeriod),
       lowerBound: _kLowerBound,
       upperBound: _kUpperBound,
     );
-    _opacity = new CurvedAnimation(
+    _opacity = CurvedAnimation(
       parent: _opacityController,
       curve: Curves.easeIn,
     )..addStatusListener(
@@ -53,7 +53,7 @@ class BreathingState extends State<BreathingPlaceholder>
   }
 
   void pause() {
-    _timer = new Timer(Duration(milliseconds: _kPausePeriod), animate);
+    _timer = Timer(Duration(milliseconds: _kPausePeriod), animate);
   }
 
   void animate() {
@@ -82,13 +82,13 @@ class BreathingState extends State<BreathingPlaceholder>
 
   @override
   Widget build(BuildContext context) {
-    return new Stack(
+    return Stack(
       children: <Widget>[
-        new Container(
+        Container(
           color: _kBaseColor,
         ),
-        new FadeTransition(
-          child: new Container(
+        FadeTransition(
+          child: Container(
             color: _kTopColor,
           ),
           opacity: _opacity,

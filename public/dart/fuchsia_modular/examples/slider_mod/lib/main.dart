@@ -9,5 +9,6 @@ import 'src/handlers/root_intent_handler.dart';
 
 void main() {
   setupLogger(name: 'slider_mod');
+
   Module().registerIntentHandler(RootIntentHandler());
 }

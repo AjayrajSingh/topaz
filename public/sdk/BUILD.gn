@@ -7,38 +7,40 @@ import("//build/sdk/sdk.gni")
 import("//build/sdk/sdk_molecule.gni")
 import("//sdk/config.gni")
 
-# Tools and libraries required to generate and use FIDL bindings in Dart.
-sdk_molecule("fidl_dart") {
-  deps = [
-    "//topaz/bin/fidlgen_dart:fidlgen_dart_sdk($host_toolchain)",
-    "//topaz/public/dart/fidl:fidl_sdk($dart_toolchain)",
-    "//zircon/public/tool/fidlc:fidlc_sdk($host_toolchain)",
-  ]
+# This default target is empty because there are multiple flavors of SDKs and
+# there is no "default" one. The empty target is still needed so that all the
+# other targets in this file are attached to the build graph.
+group("sdk") {
 }
 
-sdk_molecule("dart_support") {
-  deps = [
-    "//topaz/public/dart/fuchsia:fuchsia_sdk($dart_toolchain)",
-    "//topaz/public/dart/fuchsia_logger:fuchsia_logger_sdk($dart_toolchain)",
-    "//topaz/public/dart/fuchsia_media:fuchsia_media_sdk($dart_toolchain)",
-    "//topaz/public/dart/fuchsia_modular:fuchsia_modular_sdk($dart_toolchain)",
-    "//topaz/public/dart/fuchsia_scenic_flutter:fuchsia_scenic_flutter_sdk($dart_toolchain)",
-    "//topaz/public/dart/fuchsia_services:fuchsia_services_sdk($dart_toolchain)",
-    "//topaz/public/dart/fuchsia_vfs:fuchsia_vfs_sdk($dart_toolchain)",
-    "//topaz/runtime/dart:kernel_compiler_sdk($host_toolchain)",
-  ]
-}
-
-sdk("topaz") {
+# Tools and libraries to develop for Fuchsia with Dart.
+sdk("fuchsia_dart") {
   category = "partner"
 
   id = sdk_id
 
-  testonly = true
+  api = "fuchsia_dart.api"
 
   deps = [
-    ":dart_support",
-    ":fidl_dart",
-    "//sdk:core_molecule",
+    "//sdk/docs:modular_config_schema",
+
+    # TODO(SCN-1343): Remove this temporary dependency.
+    # Temporarily added as a direct dependency so that it can be removed from
+    # //sdk/fidl/fuchsia.ui.views.
+    "//sdk/fidl/fuchsia.intl:fuchsia.intl_sdk",
+    "//topaz/bin/fidlgen_dart:fidlgen_dart_sdk($host_toolchain)",
+    "//topaz/public/dart/composition_delegate:composition_delegate_sdk($dart_toolchain)",
+    "//topaz/public/dart/fidl:fidl_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia:fuchsia_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_inspect:fuchsia_inspect_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_logger:fuchsia_logger_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_media:fuchsia_media_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_modular:fuchsia_modular_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_scenic:fuchsia_scenic_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_scenic_flutter:fuchsia_scenic_flutter_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_services:fuchsia_services_sdk($dart_toolchain)",
+    "//topaz/public/dart/fuchsia_vfs:fuchsia_vfs_sdk($dart_toolchain)",
+    "//topaz/runtime/dart:gen_snapshot_sdk($dart_toolchain)",
+    "//topaz/runtime/dart:kernel_compiler_sdk($host_toolchain)",
   ]
 }

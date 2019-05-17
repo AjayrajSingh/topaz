@@ -4,15 +4,11 @@
 
 import 'dart:developer' show Timeline;
 
-import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_ui_gfx/fidl.dart' show ImportToken;
-import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
-import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
-    show ChildViewConnection;
-import 'package:lib.app.dart/logging.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
+import 'package:fidl_fuchsia_ui_views/fidl_async.dart';
+import 'package:fuchsia_scenic_flutter/child_view_connection.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:lib.widgets/model.dart';
-import 'package:zircon/zircon.dart' show EventPair;
 
 import '../tree/spanning_tree.dart';
 import '../tree/tree.dart';
@@ -33,7 +29,7 @@ class SurfaceGraph extends Model {
   final Map<String, Surface> _surfaces = <String, Surface>{};
 
   /// Surface relationship tree
-  final Tree<String> _tree = new Tree<String>(value: null);
+  final Tree<String> _tree = Tree<String>(value: null);
 
   /// The stack of previous focusedSurfaces, most focused at end
   final List<String> _focusedSurfaces = <String>[];
@@ -76,17 +72,17 @@ class SurfaceGraph extends Model {
     String pattern,
     String placeholderColor,
   ) {
-    Tree<String> node = _tree.find(id) ?? new Tree<String>(value: id);
+    Tree<String> node = _tree.find(id) ?? Tree<String>(value: id);
     Tree<String> parent =
         (parentId == kNoParent) ? _tree : _tree.find(parentId);
     assert(parent != null);
     assert(relation != null);
     Surface oldSurface = _surfaces[id];
-    Surface updatedSurface = new Surface(
-        this, node, properties, relation, pattern, placeholderColor);
+    Surface updatedSurface =
+        Surface(this, node, properties, relation, pattern, placeholderColor);
     // if this is an external surface, create an association between this and
     // the most focused surface.
-    if (properties.source == ModuleSource.external$ &&
+    if (properties.source == ModuleSource.external &&
         _focusedSurfaces.isNotEmpty) {
       _visualAssociation[_focusedSurfaces.last] = id;
     }
@@ -161,7 +157,7 @@ class SurfaceGraph extends Model {
     // TODO (djurphy): collisions/pathing - partial fix if we
     // make the changes so container IDs are paths.
     log.info('addContainer: $id');
-    Tree<String> node = _tree.find(id) ?? new Tree<String>(value: id);
+    Tree<String> node = _tree.find(id) ?? Tree<String>(value: id);
     log.info('found or made node: $node');
     Tree<String> parent =
         (parentId == kNoParent) ? _tree : _tree.find(parentId);
@@ -169,7 +165,7 @@ class SurfaceGraph extends Model {
     assert(relation != null);
     parent.add(node);
     Surface oldSurface = _surfaces[id];
-    _surfaces[id] = new SurfaceContainer(
+    _surfaces[id] = SurfaceContainer(
         this, node, properties, relation, '' /*pattern*/, layouts);
     oldSurface?.notifyListeners();
     log.info('_surfaces[id]: ${_surfaces[id]}');
@@ -216,13 +212,8 @@ class SurfaceGraph extends Model {
   /// True if surface has been dismissed and not subsequently focused
   bool isDismissed(String id) => _dismissedSurfaces.contains(id);
 
-  void connectView(String id, InterfaceHandle<ViewOwner> viewOwner) {
-    connectViewFromImportToken(id,
-        ImportToken(value: EventPair(viewOwner.passChannel().passHandle())));
-  }
-
   /// Used to update a [Surface] with a live ChildViewConnection
-  void connectViewFromImportToken(String id, ImportToken viewHolderToken) {
+  void connectView(String id, ViewHolderToken viewHolderToken) {
     final Surface surface = _surfaces[id];
     if (surface != null) {
       if (surface.connection != null) {
@@ -232,8 +223,8 @@ class SurfaceGraph extends Model {
       }
       log.fine('connectView $surface');
       surface
-        ..connection = ChildViewConnection.fromViewHolderToken(
-          viewHolderToken.value,
+        ..connection = ChildViewConnection(
+          viewHolderToken,
           onAvailable: (ChildViewConnection connection) {
             Timeline.instantSync('surface available', arguments: {'id': '$id'});
 
@@ -244,7 +235,7 @@ class SurfaceGraph extends Model {
             surface.notifyListeners();
           },
           onUnavailable: (ChildViewConnection connection) {
-            trace('surface $id unavailable');
+            Timeline.instantSync('surface $id unavailable');
             surface.connection = null;
             if (_surfaces.containsValue(surface)) {
               removeSurface(id);
@@ -262,7 +253,7 @@ class SurfaceGraph extends Model {
     List<dynamic> decodedSurfaceList = json['surfaceList'];
     for (dynamic s in decodedSurfaceList) {
       Map<String, dynamic> item = s.cast<String, dynamic>();
-      Surface surface = new Surface.fromJson(item, this);
+      Surface surface = Surface.fromJson(item, this);
 
       _surfaces.putIfAbsent(surface.node.value, () {
         return surface;
@@ -293,7 +284,7 @@ class SurfaceGraph extends Model {
     Surface parent = getNode(surfaceId);
     List<Surface> externalSurfaces = parent.children.toList()
       ..retainWhere(
-          (Surface s) => s.properties.source == ModuleSource.external$);
+          (Surface s) => s.properties.source == ModuleSource.external);
     Set<String> externalIds =
         externalSurfaces.map((Surface s) => s.node.value).toSet();
     // Case2: The focused surface has a recorded visual association with an

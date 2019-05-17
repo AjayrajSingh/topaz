@@ -58,7 +58,7 @@ abstract class ZX {
   static const int ERR_CONNECTION_RESET = -75;
   static const int ERR_CONNECTION_ABORTED = -76;
   static const int HANDLE_INVALID = 0;
-  static const int TIME_INFINITE = 0xFFFFFFFFFFFFFFFF;
+  static const int HANDLE_FIXED_BITS_MASK = 0x3;
   static const int CLOCK_MONOTONIC = 0;
   static const int CLOCK_UTC = 1;
   static const int CLOCK_THREAD = 2;
@@ -72,67 +72,47 @@ abstract class ZX {
   static const int USER_SIGNAL_5 = 1 << 29;
   static const int USER_SIGNAL_6 = 1 << 30;
   static const int USER_SIGNAL_7 = 1 << 31;
-  static const int SIGNAL_HANDLE_CLOSED = 1 << 23;
-  static const int EVENT_SIGNALED = 1 << 3;
-  static const int EVENT_SIGNAL_MASK = (0xff000000) | (1 << 3);
-  static const int EVENTPAIR_SIGNALED = 1 << 3;
-  static const int EVENTPAIR_PEER_CLOSED = 1 << 2;
-  static const int EVENTPAIR_SIGNAL_MASK = (0xff000000) | (1 << 3) | (1 << 2);
-  static const int CHANNEL_READABLE = 1 << 0;
-  static const int CHANNEL_WRITABLE = 1 << 1;
-  static const int CHANNEL_PEER_CLOSED = 1 << 2;
-  static const int SOCKET_READABLE = 1 << 0;
-  static const int SOCKET_WRITABLE = 1 << 1;
-  static const int SOCKET_PEER_CLOSED = 1 << 2;
-  static const int SOCKET_READ_DISABLED = 1 << 4;
-  static const int SOCKET_WRITE_DISABLED = 1 << 5;
-  static const int SOCKET_CONTROL_READABLE = 1 << 6;
-  static const int SOCKET_CONTROL_WRITABLE = 1 << 7;
-  static const int SOCKET_ACCEPT = 1 << 8;
-  static const int SOCKET_SHARE = 1 << 9;
-  static const int FIFO_READABLE = 1 << 0;
-  static const int FIFO_WRITABLE = 1 << 1;
-  static const int FIFO_PEER_CLOSED = 1 << 2;
-  static const int TASK_TERMINATED = 1 << 3;
-  static const int JOB_NO_PROCESSES = 1 << 3;
-  static const int JOB_NO_JOBS = 1 << 4;
-  static const int PROCESS_TERMINATED = 1 << 3;
-  static const int THREAD_TERMINATED = 1 << 3;
-  static const int THREAD_RUNNING = 1 << 4;
-  static const int THREAD_SUSPENDED = 1 << 5;
-  static const int LOG_READABLE = 1 << 0;
-  static const int LOG_WRITABLE = 1 << 1;
-  static const int TIMER_SIGNALED = 1 << 3;
-  static const int VMO_ZERO_CHILDREN = 1 << 3;
+  static const int SIGNAL_HANDLE_CLOSED = __ZX_OBJECT_HANDLE_CLOSED;
+  static const int EVENT_SIGNALED = __ZX_OBJECT_SIGNALED;
+  static const int EVENT_SIGNAL_MASK = USER_SIGNAL_ALL | __ZX_OBJECT_SIGNALED;
+  static const int EVENTPAIR_SIGNALED = __ZX_OBJECT_SIGNALED;
+  static const int EVENTPAIR_PEER_CLOSED = __ZX_OBJECT_PEER_CLOSED;
+  static const int EVENTPAIR_SIGNAL_MASK =
+      USER_SIGNAL_ALL | __ZX_OBJECT_SIGNALED | __ZX_OBJECT_PEER_CLOSED;
+  static const int CHANNEL_READABLE = __ZX_OBJECT_READABLE;
+  static const int CHANNEL_WRITABLE = __ZX_OBJECT_WRITABLE;
+  static const int CHANNEL_PEER_CLOSED = __ZX_OBJECT_PEER_CLOSED;
+  static const int SOCKET_READABLE = __ZX_OBJECT_READABLE;
+  static const int SOCKET_WRITABLE = __ZX_OBJECT_WRITABLE;
+  static const int SOCKET_PEER_CLOSED = __ZX_OBJECT_PEER_CLOSED;
+  static const int SOCKET_PEER_WRITE_DISABLED = __ZX_OBJECT_SIGNAL_4;
+  static const int SOCKET_WRITE_DISABLED = __ZX_OBJECT_SIGNAL_5;
+  static const int SOCKET_CONTROL_READABLE = __ZX_OBJECT_SIGNAL_6;
+  static const int SOCKET_CONTROL_WRITABLE = __ZX_OBJECT_SIGNAL_7;
+  static const int SOCKET_ACCEPT = __ZX_OBJECT_SIGNAL_8;
+  static const int SOCKET_SHARE = __ZX_OBJECT_SIGNAL_9;
+  static const int SOCKET_READ_THRESHOLD = __ZX_OBJECT_SIGNAL_10;
+  static const int SOCKET_WRITE_THRESHOLD = __ZX_OBJECT_SIGNAL_11;
+  static const int SOCKET_READ_DISABLED = SOCKET_PEER_WRITE_DISABLED;
+  static const int FIFO_READABLE = __ZX_OBJECT_READABLE;
+  static const int FIFO_WRITABLE = __ZX_OBJECT_WRITABLE;
+  static const int FIFO_PEER_CLOSED = __ZX_OBJECT_PEER_CLOSED;
+  static const int TASK_TERMINATED = __ZX_OBJECT_SIGNALED;
+  static const int JOB_NO_JOBS = __ZX_OBJECT_SIGNAL_4;
+  static const int JOB_NO_PROCESSES = __ZX_OBJECT_SIGNAL_5;
+  static const int PROCESS_TERMINATED = __ZX_OBJECT_SIGNALED;
+  static const int THREAD_TERMINATED = __ZX_OBJECT_SIGNALED;
+  static const int THREAD_RUNNING = __ZX_OBJECT_SIGNAL_4;
+  static const int THREAD_SUSPENDED = __ZX_OBJECT_SIGNAL_5;
+  static const int LOG_READABLE = __ZX_OBJECT_READABLE;
+  static const int LOG_WRITABLE = __ZX_OBJECT_WRITABLE;
+  static const int TIMER_SIGNALED = __ZX_OBJECT_SIGNALED;
+  static const int VMO_ZERO_CHILDREN = __ZX_OBJECT_SIGNALED;
   static const int KOID_INVALID = 0;
   static const int KOID_KERNEL = 1;
+  static const int KOID_FIRST = 1024;
   static const int WAIT_MANY_MAX_ITEMS = 16;
-  static const int RIGHT_NONE = 0;
-  static const int RIGHT_DUPLICATE = 1 << 0;
-  static const int RIGHT_TRANSFER = 1 << 1;
-  static const int RIGHT_READ = 1 << 2;
-  static const int RIGHT_WRITE = 1 << 3;
-  static const int RIGHT_EXECUTE = 1 << 4;
-  static const int RIGHT_MAP = 1 << 5;
-  static const int RIGHT_GET_PROPERTY = 1 << 6;
-  static const int RIGHT_SET_PROPERTY = 1 << 7;
-  static const int RIGHT_ENUMERATE = 1 << 8;
-  static const int RIGHT_DESTROY = 1 << 9;
-  static const int RIGHT_SET_POLICY = 1 << 10;
-  static const int RIGHT_GET_POLICY = 1 << 11;
-  static const int RIGHT_SIGNAL = 1 << 12;
-  static const int RIGHT_SIGNAL_PEER = 1 << 13;
-  static const int RIGHT_WAIT = 1 << 14;
-  static const int RIGHT_INSPECT = 1 << 15;
-  static const int RIGHT_MANAGE_JOB = 1 << 16;
-  static const int RIGHT_MANAGE_PROCESS = 1 << 17;
-  static const int RIGHT_MANAGE_THREAD = 1 << 18;
-  static const int RIGHT_APPLY_PROFILE = 1 << 19;
-  static const int RIGHT_SAME_RIGHTS = 1 << 31;
-  static const int RIGHTS_BASIC = (1 << 1) | (1 << 0) | (1 << 14) | (1 << 15);
-  static const int RIGHTS_IO = (1 << 2) | (1 << 3);
-  static const int RIGHTS_PROPERTY = (1 << 6) | (1 << 7);
-  static const int RIGHTS_POLICY = (1 << 11) | (1 << 10);
+  static const int VMO_NON_RESIZABLE = 1;
   static const int VMO_OP_COMMIT = 1;
   static const int VMO_OP_DECOMMIT = 2;
   static const int VMO_OP_LOCK = 3;
@@ -141,18 +121,20 @@ abstract class ZX {
   static const int VMO_OP_CACHE_INVALIDATE = 7;
   static const int VMO_OP_CACHE_CLEAN = 8;
   static const int VMO_OP_CACHE_CLEAN_INVALIDATE = 9;
-  static const int VMO_CLONE_COPY_ON_WRITE = 1;
-  static const int VM_FLAG_PERM_READ = 1 << 0;
-  static const int VM_FLAG_PERM_WRITE = 1 << 1;
-  static const int VM_FLAG_PERM_EXECUTE = 1 << 2;
-  static const int VM_FLAG_COMPACT = 1 << 3;
-  static const int VM_FLAG_SPECIFIC = 1 << 4;
-  static const int VM_FLAG_SPECIFIC_OVERWRITE = 1 << 5;
-  static const int VM_FLAG_CAN_MAP_SPECIFIC = 1 << 6;
-  static const int VM_FLAG_CAN_MAP_READ = 1 << 7;
-  static const int VM_FLAG_CAN_MAP_WRITE = 1 << 8;
-  static const int VM_FLAG_CAN_MAP_EXECUTE = 1 << 9;
-  static const int VM_FLAG_MAP_RANGE = 1 << 10;
+  static const int VMO_CLONE_COPY_ON_WRITE = 1 << 0;
+  static const int VMO_CLONE_NON_RESIZEABLE = 1 << 1;
+  static const int VM_PERM_READ = (1 << 0);
+  static const int VM_PERM_WRITE = (1 << 1);
+  static const int VM_PERM_EXECUTE = (1 << 2);
+  static const int VM_COMPACT = (1 << 3);
+  static const int VM_SPECIFIC = (1 << 4);
+  static const int VM_SPECIFIC_OVERWRITE = (1 << 5);
+  static const int VM_CAN_MAP_SPECIFIC = (1 << 6);
+  static const int VM_CAN_MAP_READ = (1 << 7);
+  static const int VM_CAN_MAP_WRITE = (1 << 8);
+  static const int VM_CAN_MAP_EXECUTE = (1 << 9);
+  static const int VM_MAP_RANGE = (1 << 10);
+  static const int VM_REQUIRE_NON_RESIZABLE = (1 << 11);
   static const int MAX_NAME_LEN = 32;
   static const int CPRNG_DRAW_MAX_LEN = 256;
   static const int CPRNG_ADD_ENTROPY_MAX_LEN = 256;
@@ -173,13 +155,16 @@ abstract class ZX {
   static const int CHANNEL_MAX_MSG_HANDLES = 64;
   static const int SOCKET_SHUTDOWN_WRITE = 1 << 0;
   static const int SOCKET_SHUTDOWN_READ = 1 << 1;
-  static const int SOCKET_SHUTDOWN_MASK = (1 << 0) | (1 << 1);
-  static const int SOCKET_STREAM = 0 << 0;
+  static const int SOCKET_SHUTDOWN_MASK =
+      SOCKET_SHUTDOWN_WRITE | SOCKET_SHUTDOWN_READ;
+  static const int SOCKET_STREAM = 0;
   static const int SOCKET_DATAGRAM = 1 << 0;
   static const int SOCKET_HAS_CONTROL = 1 << 1;
   static const int SOCKET_HAS_ACCEPT = 1 << 2;
-  static const int SOCKET_CREATE_MASK = (1 << 0) | (1 << 1) | (1 << 2);
+  static const int SOCKET_CREATE_MASK =
+      SOCKET_DATAGRAM | SOCKET_HAS_CONTROL | SOCKET_HAS_ACCEPT;
   static const int SOCKET_CONTROL = 1 << 2;
+  static const int SOCKET_PEEK = 1 << 3;
   static const int CACHE_POLICY_CACHED = 0;
   static const int CACHE_POLICY_UNCACHED = 1;
   static const int CACHE_POLICY_UNCACHED_DEVICE = 2;
@@ -195,6 +180,7 @@ abstract class ZX {
   static const int BTI_PERM_WRITE = 1 << 1;
   static const int BTI_PERM_EXECUTE = 1 << 2;
   static const int BTI_COMPRESS = 1 << 3;
+  static const int BTI_CONTIGUOUS = 1 << 4;
   static const int OBJ_TYPE_NONE = 0;
   static const int OBJ_TYPE_PROCESS = 1;
   static const int OBJ_TYPE_THREAD = 2;
@@ -219,7 +205,181 @@ abstract class ZX {
   static const int OBJ_TYPE_PROFILE = 25;
   static const int OBJ_TYPE_PMT = 26;
   static const int OBJ_TYPE_SUSPEND_TOKEN = 27;
-  static const int OBJ_TYPE_LAST = 28;
+  static const int OBJ_TYPE_PAGER = 28;
+  static const int OBJ_TYPE_EXCEPTION = 29;
+  static const int OBJ_TYPE_UPPER_BOUND = 64;
+  static const int HANDLE_OP_MOVE = 0;
+  static const int HANDLE_OP_DUPLICATE = 1;
+  static const int VM_FLAG_PERM_READ = 1 << 0;
+  static const int VM_FLAG_PERM_WRITE = 1 << 1;
+  static const int VM_FLAG_PERM_EXECUTE = 1 << 2;
+  static const int VM_FLAG_COMPACT = 1 << 3;
+  static const int VM_FLAG_SPECIFIC = 1 << 4;
+  static const int VM_FLAG_SPECIFIC_OVERWRITE = 1 << 5;
+  static const int VM_FLAG_CAN_MAP_SPECIFIC = 1 << 6;
+  static const int VM_FLAG_CAN_MAP_READ = 1 << 7;
+  static const int VM_FLAG_CAN_MAP_WRITE = 1 << 8;
+  static const int VM_FLAG_CAN_MAP_EXECUTE = 1 << 9;
+  static const int VM_FLAG_MAP_RANGE = 1 << 10;
+  static const int VM_FLAG_REQUIRE_NON_RESIZABLE = 1 << 11;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_ALL = 0x00ffffff;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_READABLE = 1 << 0;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_WRITABLE = 1 << 1;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_PEER_CLOSED = 1 << 2;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNALED = 1 << 3;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_4 = 1 << 4;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_5 = 1 << 5;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_6 = 1 << 6;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_7 = 1 << 7;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_8 = 1 << 8;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_9 = 1 << 9;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_10 = 1 << 10;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_11 = 1 << 11;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_12 = 1 << 12;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_13 = 1 << 13;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_14 = 1 << 14;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_15 = 1 << 15;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_16 = 1 << 16;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_17 = 1 << 17;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_18 = 1 << 18;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_19 = 1 << 19;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_20 = 1 << 20;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_21 = 1 << 21;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_SIGNAL_22 = 1 << 22;
+  // ignore: unused_field
+  static const int __ZX_OBJECT_HANDLE_CLOSED = 1 << 23;
+  // ignore: unused_field
+  static const int __ZX_JOB_NO_PROCESSES_OLD = __ZX_OBJECT_SIGNALED;
+  static const int RIGHT_NONE = 0;
+  static const int RIGHT_DUPLICATE = 1 << 0;
+  static const int RIGHT_TRANSFER = 1 << 1;
+  static const int RIGHT_READ = 1 << 2;
+  static const int RIGHT_WRITE = 1 << 3;
+  static const int RIGHT_EXECUTE = 1 << 4;
+  static const int RIGHT_MAP = 1 << 5;
+  static const int RIGHT_GET_PROPERTY = 1 << 6;
+  static const int RIGHT_SET_PROPERTY = 1 << 7;
+  static const int RIGHT_ENUMERATE = 1 << 8;
+  static const int RIGHT_DESTROY = 1 << 9;
+  static const int RIGHT_SET_POLICY = 1 << 10;
+  static const int RIGHT_GET_POLICY = 1 << 11;
+  static const int RIGHT_SIGNAL = 1 << 12;
+  static const int RIGHT_SIGNAL_PEER = 1 << 13;
+  static const int RIGHT_WAIT = 1 << 14;
+  static const int RIGHT_INSPECT = 1 << 15;
+  static const int RIGHT_MANAGE_JOB = 1 << 16;
+  static const int RIGHT_MANAGE_PROCESS = 1 << 17;
+  static const int RIGHT_MANAGE_THREAD = 1 << 18;
+  static const int RIGHT_APPLY_PROFILE = 1 << 19;
+  static const int RIGHT_SAME_RIGHTS = 1 << 31;
+  static const int RIGHTS_BASIC =
+      RIGHT_TRANSFER | RIGHT_DUPLICATE | RIGHT_WAIT | RIGHT_INSPECT;
+  static const int RIGHTS_IO = RIGHT_READ | RIGHT_WRITE;
+  static const int RIGHTS_PROPERTY = RIGHT_GET_PROPERTY | RIGHT_SET_PROPERTY;
+  static const int RIGHTS_POLICY = RIGHT_GET_POLICY | RIGHT_SET_POLICY;
+  static const int DEFAULT_CHANNEL_RIGHTS =
+      (RIGHTS_BASIC & (~RIGHT_DUPLICATE)) |
+          RIGHTS_IO |
+          RIGHT_SIGNAL |
+          RIGHT_SIGNAL_PEER;
+  static const int DEFAULT_EVENT_RIGHTS = RIGHTS_BASIC | RIGHT_SIGNAL;
+  static const int DEFAULT_EVENTPAIR_RIGHTS =
+      RIGHTS_BASIC | RIGHT_SIGNAL | RIGHT_SIGNAL_PEER;
+  static const int DEFAULT_FIFO_RIGHTS =
+      RIGHTS_BASIC | RIGHTS_IO | RIGHT_SIGNAL | RIGHT_SIGNAL_PEER;
+  static const int DEFAULT_GUEST_RIGHTS = RIGHT_TRANSFER |
+      RIGHT_DUPLICATE |
+      RIGHT_WRITE |
+      RIGHT_INSPECT |
+      RIGHT_MANAGE_PROCESS;
+  static const int DEFAULT_INTERRUPT_RIGHTS =
+      RIGHTS_BASIC | RIGHTS_IO | RIGHT_SIGNAL;
+  static const int DEFAULT_IO_MAPPING_RIGHTS = RIGHT_READ | RIGHT_INSPECT;
+  static const int DEFAULT_JOB_RIGHTS = RIGHTS_BASIC |
+      RIGHTS_IO |
+      RIGHTS_PROPERTY |
+      RIGHTS_POLICY |
+      RIGHT_ENUMERATE |
+      RIGHT_DESTROY |
+      RIGHT_SIGNAL |
+      RIGHT_MANAGE_JOB |
+      RIGHT_MANAGE_PROCESS |
+      RIGHT_MANAGE_THREAD;
+  static const int DEFAULT_LOG_RIGHTS =
+      RIGHTS_BASIC | RIGHT_WRITE | RIGHT_SIGNAL;
+  static const int DEFAULT_PCI_DEVICE_RIGHTS = RIGHTS_BASIC | RIGHTS_IO;
+  static const int DEFAULT_PCI_INTERRUPT_RIGHTS =
+      RIGHTS_BASIC | RIGHTS_IO | RIGHT_SIGNAL;
+  static const int DEFAULT_PORT_RIGHTS =
+      (RIGHTS_BASIC & (~RIGHT_WAIT)) | RIGHTS_IO;
+  static const int DEFAULT_PROCESS_RIGHTS = RIGHTS_BASIC |
+      RIGHTS_IO |
+      RIGHTS_PROPERTY |
+      RIGHT_ENUMERATE |
+      RIGHT_DESTROY |
+      RIGHT_SIGNAL |
+      RIGHT_MANAGE_PROCESS |
+      RIGHT_MANAGE_THREAD;
+  static const int DEFAULT_RESOURCE_RIGHTS =
+      RIGHT_TRANSFER | RIGHT_DUPLICATE | RIGHT_WRITE | RIGHT_INSPECT;
+  static const int DEFAULT_SOCKET_RIGHTS = RIGHTS_BASIC |
+      RIGHTS_IO |
+      RIGHT_GET_PROPERTY |
+      RIGHT_SET_PROPERTY |
+      RIGHT_SIGNAL |
+      RIGHT_SIGNAL_PEER;
+  static const int DEFAULT_THREAD_RIGHTS = RIGHTS_BASIC |
+      RIGHTS_IO |
+      RIGHTS_PROPERTY |
+      RIGHT_DESTROY |
+      RIGHT_SIGNAL |
+      RIGHT_MANAGE_THREAD;
+  static const int DEFAULT_TIMER_RIGHTS =
+      RIGHTS_BASIC | RIGHT_WRITE | RIGHT_SIGNAL;
+  static const int DEFAULT_VCPU_RIGHTS =
+      RIGHTS_BASIC | RIGHTS_IO | RIGHT_EXECUTE | RIGHT_SIGNAL;
+  static const int DEFAULT_VMAR_RIGHTS = RIGHTS_BASIC & (~RIGHT_WAIT);
+  static const int DEFAULT_VMO_RIGHTS =
+      RIGHTS_BASIC | RIGHTS_IO | RIGHTS_PROPERTY | RIGHT_MAP | RIGHT_SIGNAL;
+  static const int DEFAULT_IOMMU_RIGHTS = RIGHTS_BASIC & (~RIGHT_WAIT);
+  static const int DEFAULT_BTI_RIGHTS =
+      (RIGHTS_BASIC & (~RIGHT_WAIT)) | RIGHTS_IO | RIGHT_MAP;
+  static const int DEFAULT_PROFILE_RIGHTS =
+      (RIGHTS_BASIC & (~RIGHT_WAIT)) | RIGHT_APPLY_PROFILE;
+  static const int DEFAULT_PMT_RIGHTS = RIGHT_INSPECT;
+  static const int DEFAULT_SUSPEND_TOKEN_RIGHTS =
+      RIGHT_TRANSFER | RIGHT_INSPECT;
+  static const int DEFAULT_PAGER_RIGHTS = RIGHT_INSPECT |
+      RIGHT_ENUMERATE |
+      RIGHT_GET_PROPERTY |
+      RIGHT_SET_PROPERTY |
+      RIGHT_TRANSFER;
+  static const int DEFAULT_EXCEPTION_RIGHTS =
+      RIGHT_TRANSFER | RIGHTS_PROPERTY | RIGHT_INSPECT;
 }
 
 String getStringForStatus(int status) {

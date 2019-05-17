@@ -8,12 +8,13 @@ import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
-import 'package:lib.app.dart/logging.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:lib.widgets/utils.dart';
 import 'package:lib.widgets/widgets.dart';
 
+
 const RK4SpringDescription _kSimulationDesc =
-    const RK4SpringDescription(tension: 10.0, friction: 50.0);
+    RK4SpringDescription(tension: 10.0, friction: 50.0);
 const double _kMinScrollOffset = 0.0;
 const double _kMaxScrollOffset = 4000.0;
 const int _kNumImages = 100;
@@ -21,7 +22,7 @@ const int _kNumImages = 100;
 /// [Model] that manages the state of the Image Grid Module
 class ImageGridModel extends Model {
   final _TracedSpringModel _scrollModel =
-      new _TracedSpringModel(springDescription: _kSimulationDesc);
+      _TracedSpringModel(springDescription: _kSimulationDesc);
 
   ImageGridModel() {
     scheduleMicrotask(() {
@@ -30,7 +31,7 @@ class ImageGridModel extends Model {
         _scrollModel.jump(0.0);
 
         // Set up auto-scroller behavior.
-        _scrollController = new ScrollController();
+        _scrollController = ScrollController();
         _scrollModel
           ..addListener(() {
             if (!_scrollController.hasClients) {
@@ -53,21 +54,21 @@ class ImageGridModel extends Model {
   Future<List<RawImage>> generateImages() async {
     List<RawImage> images = [];
     for (int i = 0; i < _kNumImages; i++) {
-      var recorder = new ui.PictureRecorder();
-      var canvas = new Canvas(recorder);
-      var color = const Color(0xFF673AB7); // Deep Purple 500
+      var recorder = ui.PictureRecorder();
+      var canvas = Canvas(recorder);
+      var color = Color(0xFF673AB7); // Deep Purple 500
       canvas.drawColor(color, BlendMode.srcOver);
 
-      final paint = new Paint()
-        ..color = const Color(0xFFF50057) // Pink A400
+      final paint = Paint()
+        ..color = Color(0xFFF50057) // Pink A400
         ..style = PaintingStyle.fill;
 
-      canvas.drawCircle(new Offset(250.0, 250.0), 200.0, paint);
+      canvas.drawCircle(Offset(250.0, 250.0), 200.0, paint);
 
       var image = await recorder.endRecording().toImage(500, 500);
 
-      images.add(
-          new RawImage(image: image, width: 500.0, height: 500.0, scale: 1.0));
+      images
+          .add(RawImage(image: image, width: 500.0, height: 500.0, scale: 1.0));
     }
     return images;
   }
@@ -82,8 +83,7 @@ class ImageGridModel extends Model {
 }
 
 class _TracedSpringModel extends SpringModel {
-  final FrameRateTracer _frameRateTracer =
-      new FrameRateTracer(name: 'auto scroll');
+  final FrameRateTracer _frameRateTracer = FrameRateTracer(name: 'auto scroll');
   _TracedSpringModel({RK4SpringDescription springDescription})
       : super(springDescription: springDescription);
 

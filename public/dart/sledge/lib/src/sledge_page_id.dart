@@ -6,7 +6,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+import 'package:fidl_fuchsia_ledger/fidl_async.dart' as ledger;
 
 import 'uint8list_ops.dart';
 import 'version.dart';
@@ -24,14 +24,14 @@ class SledgePageId {
   SledgePageId([String pageName = '']) {
     pageName ??= '';
 
-    final Uint8List hashedPageName = hash(new Utf8Encoder().convert(pageName));
+    final Uint8List hashedPageName = hash(Utf8Encoder().convert(pageName));
 
     final encodedPageName = concatUint8Lists(prefix, hashedPageName);
 
     final trimmedEncodedPageName = encodedPageName.sublist(0, 16);
     assert(trimmedEncodedPageName.length == 16);
 
-    _id = new ledger.PageId(id: trimmedEncodedPageName);
+    _id = ledger.PageId(id: trimmedEncodedPageName);
   }
 
   /// The Ledger's PageId.
@@ -48,6 +48,6 @@ class SledgePageId {
   /// version of Sledge.
   static bool pageIsManagedBySledge(ledger.PageId pageId) {
     final pageIdPrefix = getSublistView(pageId.id, end: prefix.length);
-    return new ListEquality<int>().equals(pageIdPrefix, prefix);
+    return ListEquality<int>().equals(pageIdPrefix, prefix);
   }
 }

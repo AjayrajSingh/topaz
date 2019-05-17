@@ -2,23 +2,12 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.schemas.dart/com/fuchsia/media/media.dart';
 import 'package:lib.widgets/model.dart';
 
 /// Tracks progress of Media playback
 class MediaProgress extends Model {
   /// Constructor
   MediaProgress(this._durationMsec, this._normalizedProgress);
-
-  /// Named constructor for converting an Entity into this model
-  MediaProgress.fromEntity(MediaProgressEntityData entity) {
-    _durationMsec = entity.durationMsec;
-    _normalizedProgress = entity.normalizedProgress;
-  }
-
-  /// Generate and Entity object capable of being sent over a Link
-  MediaProgressEntityData toEntity() =>
-      new MediaProgressEntityData(_durationMsec, _normalizedProgress);
 
   /// Progress through media in the range [0..1]
   double _normalizedProgress;
@@ -27,7 +16,7 @@ class MediaProgress extends Model {
   int _durationMsec;
 
   /// Progress through media as an absolute Duration.
-  Duration get position => new Duration(milliseconds: positionMsec);
+  Duration get position => Duration(milliseconds: positionMsec);
 
   /// Progress through media as absolute milliseconds.
   int get positionMsec => (_durationMsec * _normalizedProgress).floor();

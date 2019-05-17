@@ -5,15 +5,15 @@
 #ifndef TOPAZ_EXAMPLES_UI_LIB_SKIA_FONT_LOADER_H_
 #define TOPAZ_EXAMPLES_UI_LIB_SKIA_FONT_LOADER_H_
 
-#include <functional>
-
 #include <fuchsia/fonts/cpp/fidl.h>
 #include <lib/fit/function.h>
 
-#include "lib/fxl/macros.h"
+#include <functional>
+
+#include "src/lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkTypeface.h"
 
-namespace mozart {
+namespace scenic {
 
 // Loads fonts from a font provider.
 class SkiaFontLoader {
@@ -37,6 +37,6 @@ class SkiaFontLoader {
   FXL_DISALLOW_COPY_AND_ASSIGN(SkiaFontLoader);
 };
 
-}  // namespace mozart
+}  // namespace scenic
 
 #endif  // TOPAZ_EXAMPLES_UI_LIB_SKIA_FONT_LOADER_H_

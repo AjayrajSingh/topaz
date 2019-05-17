@@ -16,7 +16,7 @@ export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
 const RK4SpringDescription _kSimulationDesc =
-    const RK4SpringDescription(tension: 450.0, friction: 50.0);
+    RK4SpringDescription(tension: 450.0, friction: 50.0);
 
 /// Model controlling an overlay.
 class OverlayPositionModel extends TracingSpringModel {
@@ -44,7 +44,7 @@ class OverlayPositionModel extends TracingSpringModel {
             0.0: hideMetricId
           },
         ) {
-    _overlayDragModel = new OverlayDragModel(overlayPositionModel: this)
+    _overlayDragModel = OverlayDragModel(overlayPositionModel: this)
       ..addListener(notifyListeners);
   }
 
@@ -75,7 +75,7 @@ class OverlayPositionModel extends TracingSpringModel {
   void restartNoInteractionTimer() {
     _stopNoInteractionTimer();
     if (noInteractionTimeout != null) {
-      _noInteractionTimer = new Timer(noInteractionTimeout, () {
+      _noInteractionTimer = Timer(noInteractionTimeout, () {
         onNoInteraction?.call();
         hide();
       });

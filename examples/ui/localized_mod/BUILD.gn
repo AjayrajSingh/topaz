@@ -11,14 +11,10 @@ flutter_app("localized_mod") {
   sources = []
 
   deps = [
-    "//sdk/fidl/fuchsia.ui.gfx",
-    "//sdk/fidl/fuchsia.ui.scenic",
-    "//sdk/fidl/fuchsia.ui.viewsv1",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/git/flutter/packages/flutter_localizations",
     "//third_party/dart/third_party/pkg/intl",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//topaz/public/lib/app_driver/dart",
   ]
 
   meta = [

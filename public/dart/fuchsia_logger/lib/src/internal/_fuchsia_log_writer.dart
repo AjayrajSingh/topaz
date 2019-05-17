@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 import 'package:fidl_fuchsia_logger/fidl_async.dart' as fidl_logger;
@@ -19,10 +21,10 @@ class FuchsiaLogWriter extends LogWriter {
   zircon.Socket _socket;
 
   /// Constructor
-  FuchsiaLogWriter({@required Logger logger})
-      : assert(logger != null),
+  FuchsiaLogWriter({@required Stream<LogRecord> logStream})
+      : assert(logStream != null),
         super(
-          logger: logger,
+          logStream: logStream,
           shouldBufferLogs: true,
         ) {
     _connectToSysLogger();
@@ -30,7 +32,7 @@ class FuchsiaLogWriter extends LogWriter {
 
   void _connectToSysLogger() {
     final proxy = fidl_logger.LogSinkProxy();
-    connectToEnvironmentService(proxy);
+    StartupContext.fromStartupInfo().incoming.connectToService(proxy);
 
     final socketPair = zircon.SocketPair(zircon.Socket.DATAGRAM);
     proxy.connect(socketPair.second).then((_) {

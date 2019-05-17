@@ -55,10 +55,10 @@ class SocketPair extends _HandleWrapperPair<Socket> {
   factory SocketPair([int options = Socket.STREAM]) {
     final HandlePairResult result = System.socketCreate(options);
     if (result.status == ZX.OK) {
-      return new SocketPair._(
-          result.status, new Socket(result.first), new Socket(result.second));
+      return SocketPair._(
+          result.status, Socket(result.first), Socket(result.second));
     } else {
-      return new SocketPair._(result.status, null, null);
+      return SocketPair._(result.status, null, null);
     }
   }
 

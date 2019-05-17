@@ -28,18 +28,15 @@ executable("skottie_viewer") {
 
   deps = [
     ":skottie_loader",
-    "//sdk/fidl/fuchsia.ui.app",
-    "//sdk/fidl/fuchsia.ui.viewsv1",
     "//garnet/public/lib/component/cpp",
-    "//sdk/lib/fidl/cpp",
-
-    # TODO(SCN-1193): Remove fostr dependency.
-    "//garnet/public/lib/fostr/fidl/fuchsia.ui.scenic",
     "//garnet/public/lib/fsl",
     "//garnet/public/lib/ui/base_view/cpp",
-    "//garnet/public/lib/ui/scenic/cpp",
+    "//sdk/fidl/fuchsia.images",
+    "//sdk/lib/fidl/cpp",
+    "//sdk/lib/ui/scenic/cpp",
     "//third_party/skia/modules/skottie",
     "//topaz/examples/ui/lib:skia_view",
+    "//zircon/public/fidl/fuchsia-mem",
     "//zircon/public/lib/async-loop-cpp",
     "//zircon/public/lib/trace-provider",
   ]

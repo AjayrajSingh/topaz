@@ -3,55 +3,36 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert' show utf8;
 
-import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart';
-import 'package:fidl_fuchsia_ui_viewsv1token/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular;
 import 'package:fidl_fuchsia_xi_session/fidl_async.dart';
 import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
     show ChildViewConnection;
-import 'package:lib.app_driver.dart/module_driver.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
+import 'package:fuchsia_modular/module.dart';
+import 'package:fuchsia_modular/service_connection.dart';
 import 'package:lib.widgets.dart/model.dart';
-import 'package:zircon/zircon.dart';
 
 const String kSessionManagerURL =
     'fuchsia-pkg://fuchsia.com/xi_session_agent#meta/xi_session_agent.cmx';
 
 class DemoModel extends Model {
-  /// TODO: Refactor this class to use the new SDK instead of deprecated API
-  /// ignore: deprecated_member_use
-  final ModuleDriver driver = ModuleDriver();
   final List<String> messages = [
     'Hello!',
     'This is pretending to be a messaging app.',
     'Press "+" to open a compose view',
-    'Then press "send" to add a new message.',
+    'Then press "send" to add a message.',
   ];
 
-  XiSessionManager _sessionManager;
-  Future<XiSessionManager> _pendingManager;
+  final _sessionManagerProxy = XiSessionManagerProxy();
+  XiSessionManager get sessionManager => _sessionManagerProxy;
 
   DemoModel() {
-    driver.start().then((driver) => trace('ModuleDriver started')).catchError(
-        (error, trace) => log.severe('ModuleDriver errored:', error, trace));
-
-    XiSessionManagerProxy sessionManagerProxy = new XiSessionManagerProxy();
-    _pendingManager = driver
-        .connectToAgentServiceWithAsyncProxy(
-            kSessionManagerURL, sessionManagerProxy)
-        .then((_) => _sessionManager = sessionManagerProxy)
-        .catchError((err, stackTrace) => log.severe(
-            'error connecting to xi_session_manager', err, stackTrace));
+    connectToAgentService(kSessionManagerURL, _sessionManagerProxy);
   }
 
-  Future<XiSessionManager> get sessionManager => (_sessionManager == null)
-      ? _pendingManager
-      : Future.value(_sessionManager);
-
-  InterfacePair<ViewOwner> viewOwner;
-  ModuleControllerClient editorController;
+  modular.ModuleController editorController;
   ChildViewConnection _editorConn;
   ChildViewConnection get editorConn => _editorConn;
 
@@ -71,7 +52,7 @@ class DemoModel extends Model {
   /// in a new modal view.
   void composeButtonAction() async {
     _activeSession = await requestSessionId();
-    connectXiModule(_activeSession);
+    await connectXiModule(_activeSession);
     log.info('connecting session $_activeSession');
     showingModal = true;
     notifyListeners();
@@ -81,39 +62,37 @@ class DemoModel extends Model {
   /// as a new message to the messages list, and dismisses the modal.
   void sendButtonAction() async {
     log.info('requesting contents for $_activeSession');
-    final newMessage = await sessionManager
-        .then((manager) => manager.getContents(_activeSession))
-        .then((vmo) => vmo.read(vmo.getSize().size).bytesAsUTF8String());
+
+    final vmo = await sessionManager.getContents(_activeSession);
+    final newMessage = vmo.read(vmo.getSize().size).bytesAsUTF8String();
+
     messages.add(newMessage);
-    //TODO: close the active session
-    await editorController.stop();
+    if (editorController != null) {
+      await editorController.stop();
+    }
     _editorConn = null;
     showingModal = false;
     notifyListeners();
   }
 
   /// Requests a new session id from the xi session agent service.
-  Future<String> requestSessionId() async {
-    var manager = await sessionManager;
-    String result = await manager.newSession();
-    return result;
-  }
+  Future<String> requestSessionId() => sessionManager.newSession();
 
-  void connectXiModule(String sessionId) async {
-    viewOwner = InterfacePair();
-    editorController = new ModuleControllerClient();
-    IntentBuilder intentBuilder = new IntentBuilder.handler(
-        'fuchsia-pkg://fuchsia.com/xi_embeddable#meta/xi_embeddable.cmx')
-      ..addParameter('session-id', sessionId);
-    driver.moduleContext.proxy.embedModule(
-        'xi_embeddable',
-        intentBuilder.intent,
-        editorController.proxy.ctrl.request(),
-        viewOwner.passRequest(), (StartModuleStatus status) {
-      editorConn = ChildViewConnection.fromImportToken(ImportToken(
-        value: EventPair(viewOwner.passHandle().passChannel().passHandle()),
-      ));
-      log.info('Start embeddable intent status = $status');
-    });
+  Future<void> connectXiModule(String sessionId) async {
+    final entity = await Module()
+        .createEntity(type: 'string', initialData: utf8.encode(sessionId));
+
+    final intent = Intent(
+        action: '',
+        handler:
+            'fuchsia-pkg://fuchsia.com/xi_embeddable#meta/xi_embeddable.cmx')
+      ..addParameterFromEntityReference(
+          'session-id', await entity.getEntityReference());
+
+    final embeddedModule =
+        await Module().embedModule(name: 'xi_embeddable', intent: intent);
+
+    _editorConn = ChildViewConnection(embeddedModule.viewHolderToken);
+    editorController = embeddedModule.moduleController;
   }
 }

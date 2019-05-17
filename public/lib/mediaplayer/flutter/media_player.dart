@@ -18,7 +18,7 @@ class MediaPlayer extends StatefulWidget {
   const MediaPlayer(this.controller, {Key key}) : super(key: key);
 
   @override
-  _MediaPlayerState createState() => new _MediaPlayerState();
+  _MediaPlayerState createState() => _MediaPlayerState();
 }
 
 /// The state of a MediaPlayer widget.
@@ -51,8 +51,8 @@ class _MediaPlayerState extends State<MediaPlayer> {
   /// Adds notification hooks to |controller|.
   void _hookController(MediaPlayerController controller) {
     controller.addListener(_handleControllerChanged);
-    _secondsNotifier = new ProgressNotifier(controller);
-    _sliderNotifier = new ProgressNotifier(controller);
+    _secondsNotifier = ProgressNotifier(controller);
+    _sliderNotifier = ProgressNotifier(controller);
   }
 
   /// Removes notification hooks from |controller|.
@@ -91,7 +91,7 @@ class _MediaPlayerState extends State<MediaPlayer> {
     Size size = widget.controller.videoPhysicalSize;
 
     if (size.width == 0) {
-      size = const Size(320.0, 45.0);
+      size = Size(320.0, 45.0);
     } else {
       size = size / MediaQuery.of(context).devicePixelRatio;
     }
@@ -103,21 +103,21 @@ class _MediaPlayerState extends State<MediaPlayer> {
   Widget _buildControlOverlay() {
     assert(debugCheckHasMaterial(context));
 
-    return new Stack(
+    return Stack(
       children: <Widget>[
-        new Center(
-          child: new PhysicalModel(
+        Center(
+          child: PhysicalModel(
             elevation: 2.0,
             color: Colors.transparent,
-            borderRadius: new BorderRadius.circular(60.0),
-            child: new IconButton(
+            borderRadius: BorderRadius.circular(60.0),
+            child: IconButton(
               icon: widget.controller.problem != null
                   ? const Icon(Icons.error_outline)
                   : widget.controller.loading
                       ? const Icon(Icons.hourglass_empty)
                       : widget.controller.playing
                           ? const Icon(Icons.pause)
-                          : const Icon(Icons.play_arrow),
+                          : Icon(Icons.play_arrow),
               iconSize: 60.0,
               onPressed: () {
                 if (widget.controller.playing) {
@@ -130,40 +130,40 @@ class _MediaPlayerState extends State<MediaPlayer> {
             ),
           ),
         ),
-        new Positioned(
+        Positioned(
           left: 2.0,
           bottom: 8.0,
-          child: new PhysicalModel(
+          child: PhysicalModel(
             elevation: 2.0,
             color: Colors.transparent,
-            borderRadius: new BorderRadius.circular(10.0),
-            child: new AnimatedBuilder(
+            borderRadius: BorderRadius.circular(10.0),
+            child: AnimatedBuilder(
               animation:
                   _secondsNotifier.withResolution(const Duration(seconds: 1)),
-              builder: (BuildContext context, Widget child) => new Container(
+              builder: (BuildContext context, Widget child) => Container(
                     width: 65.0,
-                    child: new Text(
+                    child: Text(
                       _durationToString(widget.controller.progress),
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white),
                       textAlign: TextAlign.center,
                     ),
                   ),
             ),
           ),
         ),
-        new Positioned(
+        Positioned(
           left: 48.0,
           right: 48.0,
           bottom: 0.0,
-          child: new PhysicalModel(
+          child: PhysicalModel(
             elevation: 3.0,
             color: Colors.transparent,
-            child: new LayoutBuilder(
+            child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) =>
-                  new AnimatedBuilder(
+                  AnimatedBuilder(
                     animation: _sliderNotifier.withExcursion(
                         constraints.maxWidth, context),
-                    builder: (BuildContext context, Widget child) => new Slider(
+                    builder: (BuildContext context, Widget child) => Slider(
                         min: 0.0,
                         max: 1.0,
                         activeColor: Colors.red[900],
@@ -174,18 +174,18 @@ class _MediaPlayerState extends State<MediaPlayer> {
             ),
           ),
         ),
-        new Positioned(
+        Positioned(
           right: 2.0,
           bottom: 8.0,
-          child: new PhysicalModel(
+          child: PhysicalModel(
             elevation: 2.0,
             color: Colors.transparent,
-            borderRadius: new BorderRadius.circular(10.0),
-            child: new Container(
+            borderRadius: BorderRadius.circular(10.0),
+            child: Container(
               width: 65.0,
-              child: new Text(
+              child: Text(
                 _durationToString(widget.controller.duration),
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -197,16 +197,16 @@ class _MediaPlayerState extends State<MediaPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return new AspectRatio(
+    return AspectRatio(
       aspectRatio: _layoutSize.width / _layoutSize.height,
-      child: new Stack(
+      child: Stack(
         children: <Widget>[
-          new GestureDetector(
+          GestureDetector(
             onTap: widget.controller.brieflyShowControlOverlay,
-            child: new ChildView(
+            child: ChildView(
                 connection: widget.controller.videoViewConnection),
           ),
-          new Offstage(
+          Offstage(
             offstage: !widget.controller.shouldShowControlOverlay,
             child: _buildControlOverlay(),
           ),

@@ -11,7 +11,7 @@ import 'spring_model.dart';
 export 'spring_model.dart' show ScopedModel, Model, ScopedModelDescendant;
 
 const RK4SpringDescription _kSimulationDesc =
-    const RK4SpringDescription(tension: 450.0, friction: 50.0);
+    RK4SpringDescription(tension: 450.0, friction: 50.0);
 
 /// Models the progress of a spring simulation.
 class TracingSpringModel extends SpringModel {
@@ -24,7 +24,7 @@ class TracingSpringModel extends SpringModel {
     String traceName = 'TracingSpringModel',
     Logger cobaltLogger,
     Map<double, int> targetToCobaltMetricIdMap = const <double, int>{},
-  })  : _frameRateTracer = new FrameRateTracer(
+  })  : _frameRateTracer = FrameRateTracer(
           name: traceName,
           cobaltLogger: cobaltLogger,
         ),

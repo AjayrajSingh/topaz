@@ -4,6 +4,7 @@
 
 #include "engine.h"
 
+#include <lib/async/cpp/task.h>
 #include <sstream>
 
 #include "flutter/common/task_runners.h"
@@ -12,16 +13,18 @@
 #include "flutter/fml/task_runner.h"
 #include "flutter/shell/common/rasterizer.h"
 #include "flutter/shell/common/run_configuration.h"
+#include "third_party/flutter/runtime/dart_vm_lifecycle.h"
+#include "topaz/runtime/dart/utils/files.h"
+
 #include "fuchsia_font_manager.h"
-#include "src/lib/files/file.h"
 #include "platform_view.h"
 #include "task_runner_adapter.h"
-#include "topaz/lib/deprecated_loop/message_loop.h"
+#include "thread.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 static void UpdateNativeThreadLabelNames(const std::string& label,
-                                         const blink::TaskRunners& runners) {
+                                         const flutter::TaskRunners& runners) {
   auto set_thread_name = [](fml::RefPtr<fml::TaskRunner> runner,
                             std::string prefix, std::string suffix) {
     if (!runner) {
@@ -38,11 +41,11 @@ static void UpdateNativeThreadLabelNames(const std::string& label,
 }
 
 Engine::Engine(Delegate& delegate, std::string thread_label,
-               component::StartupContext& startup_context,
-               blink::Settings settings,
-               fml::RefPtr<blink::DartSnapshot> isolate_snapshot,
-               fml::RefPtr<blink::DartSnapshot> shared_snapshot,
-               zx::eventpair view_token, UniqueFDIONS fdio_ns,
+               std::shared_ptr<sys::ServiceDirectory> svc,
+               flutter::Settings settings,
+               fml::RefPtr<const flutter::DartSnapshot> isolate_snapshot,
+               fml::RefPtr<const flutter::DartSnapshot> shared_snapshot,
+               fuchsia::ui::views::ViewToken view_token, UniqueFDIONS fdio_ns,
                fidl::InterfaceRequest<fuchsia::io::Directory> directory_request)
     : delegate_(delegate),
       thread_label_(std::move(thread_label)),
@@ -55,42 +58,31 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 
   // Launch the threads that will be used to run the shell. These threads will
   // be joined in the destructor.
-  for (auto& thread : host_threads_) {
-    thread.Run();
+  for (auto& thread : threads_) {
+    thread.reset(new Thread());
   }
 
   // Set up the session connection.
-  auto scenic = startup_context
-                    .ConnectToEnvironmentService<fuchsia::ui::scenic::Scenic>();
+  auto scenic = svc->Connect<fuchsia::ui::scenic::Scenic>();
   fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session;
   fidl::InterfaceHandle<fuchsia::ui::scenic::SessionListener> session_listener;
   auto session_listener_request = session_listener.NewRequest();
   scenic->CreateSession(session.NewRequest(), session_listener.Bind());
 
-#ifndef SCENIC_VIEWS2
-  fuchsia::ui::viewsv1::ViewManagerPtr view_manager;
-  startup_context.ConnectToEnvironmentService(view_manager.NewRequest());
-
-  zx::eventpair import_token, export_token;
-  if (zx::eventpair::create(0u, &import_token, &export_token) != ZX_OK) {
-    FML_DLOG(ERROR) << "Could not create event pair.";
-    return;
-  }
-#endif
-
-  // Grab the parent environent services. The platform view may want to access
+  // Grab the parent environment services. The platform view may want to access
   // some of these services.
+  fuchsia::sys::EnvironmentPtr environment;
+  svc->Connect(environment.NewRequest());
   fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
       parent_environment_service_provider;
-  startup_context.environment()->GetServices(
-      parent_environment_service_provider.NewRequest());
+  environment->GetServices(parent_environment_service_provider.NewRequest());
+  environment.Unbind();
 
   // Grab the accessibilty context writer that can understand the semantics tree
   // on the platform view.
   fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
       accessibility_context_writer;
-  startup_context.ConnectToEnvironmentService(
-      accessibility_context_writer.NewRequest());
+  svc->Connect(accessibility_context_writer.NewRequest());
 
   // We need to manually schedule a frame when the session metrics change.
   OnMetricsUpdate on_session_metrics_change_callback = std::bind(
@@ -104,9 +96,9 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   // platform thread when that happens. The Session itself should also be
   // disconnected when this happens, and it will also attempt to terminate.
   fit::closure on_session_listener_error_callback =
-      [runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner(),
+      [dispatcher = async_get_default_dispatcher(),
        weak = weak_factory_.GetWeakPtr()]() {
-        runner->PostTask([weak]() {
+        async::PostTask(dispatcher, [weak]() {
           if (weak) {
             weak->Terminate();
           }
@@ -114,7 +106,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
       };
 
   // Setup the callback that will instantiate the platform view.
-  shell::Shell::CreateCallback<shell::PlatformView> on_create_platform_view =
+  flutter::Shell::CreateCallback<flutter::PlatformView> on_create_platform_view =
       fml::MakeCopyable([debug_label = thread_label_,
                          parent_environment_service_provider =
                              std::move(parent_environment_service_provider),
@@ -126,16 +118,11 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
                              std::move(on_session_metrics_change_callback),
                          on_session_size_change_hint_callback =
                              std::move(on_session_size_change_hint_callback),
-#ifndef SCENIC_VIEWS2
-                         view_manager = view_manager.Unbind(),
-                         view_token = std::move(view_token),
-                         export_token = std::move(export_token),
-#endif
                          accessibility_context_writer =
                              std::move(accessibility_context_writer),
                          vsync_handle =
-                             vsync_event_.get()](shell::Shell& shell) mutable {
-        return std::make_unique<flutter::PlatformView>(
+                             vsync_event_.get()](flutter::Shell& shell) mutable {
+        return std::make_unique<flutter_runner::PlatformView>(
             shell,                                           // delegate
             debug_label,                                     // debug label
             shell.GetTaskRunners(),                          // task runners
@@ -144,11 +131,6 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
             std::move(on_session_listener_error_callback),
             std::move(on_session_metrics_change_callback),
             std::move(on_session_size_change_hint_callback),
-#ifndef SCENIC_VIEWS2
-            std::move(view_manager),  // view manager
-            std::move(view_token),    // view token
-            std::move(export_token),  // export token
-#endif
             std::move(
                 accessibility_context_writer),  // accessibility context writer
             vsync_handle                        // vsync handle
@@ -162,9 +144,9 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   // broken. The SessionListener interface also has an OnError method, which is
   // invoked on the platform thread (in PlatformView).
   fit::closure on_session_error_callback =
-      [runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner(),
+      [dispatcher = async_get_default_dispatcher(),
        weak = weak_factory_.GetWeakPtr()]() {
-        runner->PostTask([weak]() {
+        async::PostTask(dispatcher, [weak]() {
           if (weak) {
             weak->Terminate();
           }
@@ -173,28 +155,23 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 
   // Create the compositor context from the scenic pointer to create the
   // rasterizer.
-  std::unique_ptr<flow::CompositorContext> compositor_context;
+  std::unique_ptr<flutter::CompositorContext> compositor_context;
   {
     TRACE_DURATION("flutter", "CreateCompositorContext");
-    compositor_context = std::make_unique<flutter::CompositorContext>(
-        thread_label_,  // debug label
-#ifndef SCENIC_VIEWS2
-        std::move(import_token),  // import token (scenic node we attach our
-                                  // tree to)
-#else
-        std::move(view_token),    // scenic view we attach our tree to
-#endif
-        std::move(session),                    // scenic session
+    compositor_context = std::make_unique<flutter_runner::CompositorContext>(
+        thread_label_,          // debug label
+        std::move(view_token),  // scenic view we attach our tree to
+        std::move(session),     // scenic session
         std::move(on_session_error_callback),  // session did encounter error
         vsync_event_.get()                     // vsync event handle
     );
   }
 
   // Setup the callback that will instantiate the rasterizer.
-  shell::Shell::CreateCallback<shell::Rasterizer> on_create_rasterizer =
+  flutter::Shell::CreateCallback<flutter::Rasterizer> on_create_rasterizer =
       fml::MakeCopyable([compositor_context = std::move(compositor_context)](
-                            shell::Shell& shell) mutable {
-        return std::make_unique<shell::Rasterizer>(
+                            flutter::Shell& shell) mutable {
+        return std::make_unique<flutter::Rasterizer>(
             shell.GetTaskRunners(),        // task runners
             std::move(compositor_context)  // compositor context
         );
@@ -202,13 +179,12 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 
   // Get the task runners from the managed threads. The current thread will be
   // used as the "platform" thread.
-  const blink::TaskRunners task_runners(
+  const flutter::TaskRunners task_runners(
       thread_label_,  // Dart thread labels
-      CreateFMLTaskRunner(deprecated_loop::MessageLoop::GetCurrent()
-                              ->task_runner()),            // platform
-      CreateFMLTaskRunner(host_threads_[0].TaskRunner()),  // gpu
-      CreateFMLTaskRunner(host_threads_[1].TaskRunner()),  // ui
-      CreateFMLTaskRunner(host_threads_[2].TaskRunner())   // io
+      CreateFMLTaskRunner(async_get_default_dispatcher()),  // platform
+      CreateFMLTaskRunner(threads_[0]->dispatcher()),    // gpu
+      CreateFMLTaskRunner(threads_[1]->dispatcher()),    // ui
+      CreateFMLTaskRunner(threads_[2]->dispatcher())     // io
   );
 
   UpdateNativeThreadLabelNames(thread_label_, task_runners);
@@ -216,6 +192,8 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   settings_.verbose_logging = true;
 
   settings_.advisory_script_uri = thread_label_;
+
+  settings_.advisory_script_entrypoint = thread_label_;
 
   settings_.root_isolate_create_callback =
       std::bind(&Engine::OnMainIsolateStart, this);
@@ -230,49 +208,42 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
         });
       });
 
+  auto vm = flutter::DartVMRef::Create(settings_);
+
   if (!isolate_snapshot) {
-    isolate_snapshot =
-        blink::DartVM::ForProcess(settings_)->GetIsolateSnapshot();
+    isolate_snapshot = vm->GetVMData()->GetIsolateSnapshot();
   }
+
   if (!shared_snapshot) {
-    shared_snapshot = blink::DartSnapshot::Empty();
+    shared_snapshot = flutter::DartSnapshot::Empty();
   }
 
   {
     TRACE_DURATION("flutter", "CreateShell");
-    shell_ = shell::Shell::Create(
+    shell_ = flutter::Shell::Create(
         task_runners,                 // host task runners
         settings_,                    // shell launch settings
         std::move(isolate_snapshot),  // isolate snapshot
         std::move(shared_snapshot),   // shared snapshot
         on_create_platform_view,      // platform view create callback
-        on_create_rasterizer          // rasterizer create callback
+        on_create_rasterizer,         // rasterizer create callback
+        std::move(vm)                 // vm reference
     );
   }
 
   if (!shell_) {
-    FML_LOG(ERROR) << "Could not launch the shell with settings: "
-                   << settings_.ToString();
+    FML_LOG(ERROR) << "Could not launch the shell.";
     return;
   }
 
   // Shell has been created. Before we run the engine, setup the isolate
   // configurator.
   {
-#ifndef SCENIC_VIEWS2
-    auto view_container =
-        static_cast<PlatformView*>(shell_->GetPlatformView().get())
-            ->TakeViewContainer();
-#endif
-
     fuchsia::sys::EnvironmentPtr environment;
-    startup_context.ConnectToEnvironmentService(environment.NewRequest());
+    svc->Connect(environment.NewRequest());
 
     isolate_configurator_ = std::make_unique<IsolateConfigurator>(
-        std::move(fdio_ns),  //
-#ifndef SCENIC_VIEWS2
-        std::move(view_container),  //
-#endif
+        std::move(fdio_ns),              //
         std::move(environment),          //
         directory_request.TakeChannel()  //
     );
@@ -283,23 +254,20 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
   shell_->GetPlatformView()->NotifyCreated();
 
   // Launch the engine in the appropriate configuration.
-  auto run_configuration = shell::RunConfiguration::InferFromSettings(
+  auto run_configuration = flutter::RunConfiguration::InferFromSettings(
       settings_, task_runners.GetIOTaskRunner());
 
-  auto on_run_failure =
-      [weak = weak_factory_.GetWeakPtr(),                                  //
-       runner = deprecated_loop::MessageLoop::GetCurrent()->task_runner()  //
-  ]() {
-        // The engine could have been killed by the caller right after the
-        // constructor was called but before it could run on the UI thread.
-        if (weak) {
-          weak->Terminate();
-        }
-      };
+  auto on_run_failure = [weak = weak_factory_.GetWeakPtr()]() {
+    // The engine could have been killed by the caller right after the
+    // constructor was called but before it could run on the UI thread.
+    if (weak) {
+      weak->Terminate();
+    }
+  };
 
   // Connect to the system font provider.
   fuchsia::fonts::ProviderSyncPtr sync_font_provider;
-  startup_context.ConnectToEnvironmentService(sync_font_provider.NewRequest());
+  svc->Connect(sync_font_provider.NewRequest());
 
   shell_->GetTaskRunners().GetUITaskRunner()->PostTask(
       fml::MakeCopyable([engine = shell_->GetEngine(),                        //
@@ -316,7 +284,7 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
             sk_make_sp<txt::FuchsiaFontManager>(std::move(sync_font_provider)));
 
         if (engine->Run(std::move(run_configuration)) ==
-            shell::Engine::RunStatus::Failure) {
+            flutter::Engine::RunStatus::Failure) {
           on_run_failure();
         }
       }));
@@ -324,9 +292,11 @@ Engine::Engine(Delegate& delegate, std::string thread_label,
 
 Engine::~Engine() {
   shell_.reset();
-  for (const auto& thread : host_threads_) {
-    thread.TaskRunner()->PostTask(
-        []() { deprecated_loop::MessageLoop::GetCurrent()->PostQuitTask(); });
+  for (const auto& thread : threads_) {
+    thread->Quit();
+  }
+  for (const auto& thread : threads_) {
+    thread->Join();
   }
 }
 
@@ -357,16 +327,18 @@ static void CreateCompilationTrace(Dart_Isolate isolate) {
     intptr_t trace_length = 0;
     Dart_Handle result = Dart_SaveCompilationTrace(&trace, &trace_length);
     tonic::LogIfError(result);
-    const std::string kCompilationTraceFile = "/data/dart_compilation_trace.txt";
-    if (files::WriteFile(kCompilationTraceFile,
-                         reinterpret_cast<const char*>(trace),
-                         trace_length)) {
-      FML_LOG(INFO) << "Dart compilation trace written to "
-                     << kCompilationTraceFile;
-    } else {
-      FML_LOG(ERROR) << "Could not write Dart compilation trace to "
-                     << kCompilationTraceFile;
+
+    for (intptr_t start = 0; start < trace_length;) {
+      intptr_t end = start;
+      while ((end < trace_length) && trace[end] != '\n')
+        end++;
+
+      std::string line(reinterpret_cast<char*>(&trace[start]), end - start);
+      FML_LOG(INFO) << "compilation-trace: " << line;
+
+      start = end + 1;
     }
+
     Dart_ExitScope();
   }
 
@@ -379,11 +351,10 @@ static void CreateCompilationTrace(Dart_Isolate isolate) {
     Dart_Handle result = Dart_SaveTypeFeedback(&feedback, &feedback_length);
     tonic::LogIfError(result);
     const std::string kTypeFeedbackFile = "/data/dart_type_feedback.bin";
-    if (files::WriteFile(kTypeFeedbackFile,
-                         reinterpret_cast<const char*>(feedback),
-                         feedback_length)) {
-      FML_LOG(INFO) << "Dart type feedback written to "
-                     << kTypeFeedbackFile;
+    if (dart_utils::WriteFile(kTypeFeedbackFile,
+                              reinterpret_cast<const char*>(feedback),
+                              feedback_length)) {
+      FML_LOG(INFO) << "Dart type feedback written to " << kTypeFeedbackFile;
     } else {
       FML_LOG(ERROR) << "Could not write Dart type feedback to "
                      << kTypeFeedbackFile;
@@ -396,7 +367,7 @@ static void CreateCompilationTrace(Dart_Isolate isolate) {
 
 void Engine::OnMainIsolateStart() {
   if (!isolate_configurator_ ||
-      !isolate_configurator_->ConfigureCurrentIsolate(this)) {
+      !isolate_configurator_->ConfigureCurrentIsolate()) {
     FML_LOG(ERROR) << "Could not configure some native embedder bindings for a "
                       "new root isolate.";
   }
@@ -440,7 +411,7 @@ void Engine::OnSessionMetricsDidChange(
       [rasterizer = shell_->GetRasterizer(), metrics]() {
         if (rasterizer) {
           auto compositor_context =
-              reinterpret_cast<flutter::CompositorContext*>(
+              reinterpret_cast<flutter_runner::CompositorContext*>(
                   rasterizer->compositor_context());
 
           compositor_context->OnSessionMetricsDidChange(metrics);
@@ -459,7 +430,7 @@ void Engine::OnSessionSizeChangeHint(float width_change_factor,
        height_change_factor]() {
         if (rasterizer) {
           auto compositor_context =
-              reinterpret_cast<flutter::CompositorContext*>(
+              reinterpret_cast<CompositorContext*>(
                   rasterizer->compositor_context());
 
           compositor_context->OnSessionSizeChangeHint(width_change_factor,
@@ -468,29 +439,16 @@ void Engine::OnSessionSizeChangeHint(float width_change_factor,
       });
 }
 
-// |mozart::NativesDelegate|
-void Engine::OfferServiceProvider(
-    fidl::InterfaceHandle<fuchsia::sys::ServiceProvider> service_provider,
-    std::vector<std::string> services) {
-#ifndef SCENIC_VIEWS2
-  if (!shell_) {
-    return;
+#if !defined(DART_PRODUCT)
+void Engine::WriteProfileToTrace() const {
+  Dart_Port main_port = shell_->GetEngine()->GetUIIsolateMainPort();
+  char* error = NULL;
+  bool success = Dart_WriteProfileToTimeline(main_port, &error);
+  if (!success) {
+    FML_LOG(ERROR) << "Failed to write Dart profile to trace: " << error;
+    free(error);
   }
-
-  shell_->GetTaskRunners().GetPlatformTaskRunner()->PostTask(
-      fml::MakeCopyable([platform_view = shell_->GetPlatformView(),       //
-                         service_provider = std::move(service_provider),  //
-                         services = std::move(services)                   //
-  ]() mutable {
-        if (platform_view) {
-          reinterpret_cast<flutter::PlatformView*>(platform_view.get())
-              ->OfferServiceProvider(std::move(service_provider),
-                                     std::move(services));
-        }
-      }));
-#else
-                                  // TODO(SCN-840): Remove OfferServiceProvider.
-#endif
 }
+#endif  // !defined(DART_PRODUCT)
 
-}  // namespace flutter
+}  // namespace flutter_runner

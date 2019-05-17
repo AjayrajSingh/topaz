@@ -2,10 +2,12 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/package.gni")
+import("//topaz/runtime/dart/dart_fuchsia_test.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 flutter_app("flutter_screencap_test_app") {
+  testonly = true
+
   main_dart = "lib/main.dart"
 
   meta = [
@@ -15,37 +17,35 @@ flutter_app("flutter_screencap_test_app") {
     },
   ]
 
-  sources = []
-
   deps = [
-    "//sdk/fidl/fuchsia.sys",
-    "//sdk/fidl/fuchsia.testing.runner",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
-    "//topaz/public/lib/app/dart",
+    "//topaz/public/dart/fuchsia_logger",
   ]
 }
 
-package("flutter_screencap_test") {
-  testonly = true
-
-  tests = [
+dart_fuchsia_test("flutter_screencap_test") {
+  meta = [
     {
-      name = rebase_path("run_flutter_screencap_test.sh")
-      dest = "run_flutter_screencap_test.sh"
-      environments = [
-        {
-          dimensions = {
-            device_type = "Intel NUC Kit NUC7i5DNHE"
-          }
-        },
-      ]
+      path = rebase_path("meta/flutter_screencap_test.cmx")
+      dest = "flutter_screencap_test.cmx"
     },
   ]
 
-  resources = [
+  deps = [
+    "//sdk/fidl/fuchsia.sys",
+    "//sdk/fidl/fuchsia.ui.app",
+    "//sdk/fidl/fuchsia.ui.policy",
+    "//sdk/fidl/fuchsia.ui.scenic",
+    "//topaz/public/dart/fuchsia_scenic",
+    "//topaz/public/dart/fuchsia_services",
+    "//topaz/public/dart/zircon",
+  ]
+
+  environments = [
     {
-      path = rebase_path("flutter_screencap_test.json")
-      dest = "flutter_screencap_test.json"
+      dimensions = {
+        device_type = "Intel NUC Kit NUC7i5DNHE"
+      }
     },
   ]
 }

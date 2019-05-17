@@ -5,20 +5,24 @@
 #include "topaz/runtime/dart_runner/dart_runner.h"
 
 #include <errno.h>
+#include <lib/async-loop/loop.h>
+#include <lib/async/default.h>
+#include <lib/syslog/global.h>
 #include <sys/stat.h>
 #include <trace/event.h>
 #include <zircon/status.h>
 #include <zircon/syscalls.h>
+#include <memory>
 #include <thread>
 #include <utility>
 
-#include "lib/fxl/arraysize.h"
 #include "third_party/dart/runtime/include/bin/dart_io_api.h"
 #include "third_party/tonic/dart_microtask_queue.h"
 #include "third_party/tonic/dart_state.h"
-#include "topaz/lib/deprecated_loop/message_loop.h"
+#include "topaz/runtime/dart/utils/inlines.h"
 #include "topaz/runtime/dart/utils/vmservice_object.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
+#include "topaz/runtime/dart_runner/logging.h"
 #include "topaz/runtime/dart_runner/service_isolate.h"
 
 #if defined(AOT_RUNTIME)
@@ -48,13 +52,16 @@ const char* kDartVMArgs[] = {
     "--enable_interpreter",
 #endif
 
-#if !defined(NDEBUG) && !defined(DART_PRODUCT)
+    // No asserts in debug or release product.
+    // No asserts in release with flutter_profile=true (non-product)
+    // Yes asserts in non-product debug.
+#if !defined(DART_PRODUCT) && (!defined(FLUTTER_PROFILE) || !defined(NDEBUG))
     "--enable_asserts",
-#endif  // !defined(NDEBUG)
+#endif
     // clang-format on
 };
 
-Dart_Isolate IsolateCreateCallback(const char* uri, const char* main,
+Dart_Isolate IsolateCreateCallback(const char* uri, const char* name,
                                    const char* package_root,
                                    const char* package_config,
                                    Dart_IsolateFlags* flags,
@@ -74,13 +81,12 @@ Dart_Isolate IsolateCreateCallback(const char* uri, const char* main,
 
 void IsolateShutdownCallback(void* callback_data) {
   // The service isolate (and maybe later the kernel isolate) doesn't have an
-  // deprecated_loop::MessageLoop.
-  deprecated_loop::MessageLoop* loop =
-      deprecated_loop::MessageLoop::GetCurrent();
+  // async loop.
+  auto dispatcher = async_get_default_dispatcher();
+  auto loop = async_loop_from_dispatcher(dispatcher);
   if (loop) {
-    loop->SetAfterTaskCallback(nullptr);
     tonic::DartMicrotaskQueue::GetForCurrentThread()->Destroy();
-    loop->QuitNow();
+    async_loop_quit(loop);
   }
 }
 
@@ -91,25 +97,17 @@ void IsolateCleanupCallback(void* callback_data) {
 void RunApplication(
     DartRunner* runner, fuchsia::sys::Package package,
     fuchsia::sys::StartupInfo startup_info,
-    std::shared_ptr<component::Services> runner_incoming_services,
+    std::shared_ptr<sys::ServiceDirectory> runner_incoming_services,
     ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   int64_t start = Dart_TimelineGetMicros();
-  deprecated_loop::MessageLoop loop;
-  DartComponentController app(std::move(package),
-                              std::move(startup_info), runner_incoming_services,
-                              std::move(controller));
+  DartComponentController app(std::move(package), std::move(startup_info),
+                              runner_incoming_services, std::move(controller));
   bool success = app.Setup();
   int64_t end = Dart_TimelineGetMicros();
   Dart_TimelineEvent("DartComponentController::Setup", start, end,
                      Dart_Timeline_Event_Duration, 0, NULL, NULL);
   if (success) {
-    loop.task_runner()->PostTask([&loop, &app] {
-      if (!app.Main())
-        loop.PostQuitTask();
-    });
-
-    loop.Run();
-    app.SendReturnCode();
+    app.Run();
   }
 
   if (Dart_CurrentIsolate()) {
@@ -124,10 +122,8 @@ bool EntropySource(uint8_t* buffer, intptr_t count) {
 
 }  // namespace
 
-DartRunner::DartRunner()
-    : context_(component::StartupContext::CreateFromStartupInfo()),
-      loop_(deprecated_loop::MessageLoop::GetCurrent()) {
-  context_->outgoing().AddPublicService<fuchsia::sys::Runner>(
+DartRunner::DartRunner() : context_(sys::ComponentContext::Create()) {
+  context_->outgoing()->AddPublicService<fuchsia::sys::Runner>(
       [this](fidl::InterfaceRequest<fuchsia::sys::Runner> request) {
         bindings_.AddBinding(this, std::move(request));
       });
@@ -136,17 +132,18 @@ DartRunner::DartRunner()
   // The VM service isolate uses the process-wide namespace. It writes the
   // vm service protocol port under /tmp. The VMServiceObject exposes that
   // port number to The Hub.
-  context_->outgoing().debug_dir()->AddEntry(
-      fuchsia::dart::VMServiceObject::kPortDirName,
-      fbl::AdoptRef(new fuchsia::dart::VMServiceObject()));
+  context_->outgoing()->debug_dir()->AddEntry(
+      dart_utils::VMServiceObject::kPortDirName,
+      std::make_unique<dart_utils::VMServiceObject>());
 
 #endif  // !defined(DART_PRODUCT)
 
   dart::bin::BootstrapDartIo();
 
-  char* error = Dart_SetVMFlags(arraysize(kDartVMArgs), kDartVMArgs);
+  char* error = Dart_SetVMFlags(dart_utils::ArraySize(kDartVMArgs),
+                                kDartVMArgs);
   if (error) {
-    FXL_LOG(FATAL) << "Dart_SetVMFlags failed: " << error;
+    FX_LOGF(FATAL, LOG_TAG, "Dart_SetVMFlags failed: %s", error);
   }
 
   Dart_InitializeParams params = {};
@@ -157,12 +154,12 @@ DartRunner::DartRunner()
 #else
   if (!MappedResource::LoadFromNamespace(
           nullptr, "pkg/data/vm_snapshot_data.bin", vm_snapshot_data_)) {
-    FXL_LOG(FATAL) << "Failed to load vm snapshot data";
+    FX_LOG(FATAL, LOG_TAG, "Failed to load vm snapshot data");
   }
   if (!MappedResource::LoadFromNamespace(
           nullptr, "pkg/data/vm_snapshot_instructions.bin",
           vm_snapshot_instructions_, true /* executable */)) {
-    FXL_LOG(FATAL) << "Failed to load vm snapshot instructions";
+    FX_LOG(FATAL, LOG_TAG, "Failed to load vm snapshot instructions");
   }
   params.vm_snapshot_data = vm_snapshot_data_.address();
   params.vm_snapshot_instructions = vm_snapshot_instructions_.address();
@@ -176,22 +173,22 @@ DartRunner::DartRunner()
 #endif
   error = Dart_Initialize(&params);
   if (error)
-    FXL_LOG(FATAL) << "Dart_Initialize failed: " << error;
+    FX_LOGF(FATAL, LOG_TAG, "Dart_Initialize failed: %s", error);
 }
 
 DartRunner::~DartRunner() {
   char* error = Dart_Cleanup();
   if (error)
-    FXL_LOG(FATAL) << "Dart_Cleanup failed: " << error;
+    FX_LOGF(FATAL, LOG_TAG, "Dart_Cleanup failed: %s", error);
 }
 
 void DartRunner::StartComponent(
     fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
     ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
   TRACE_DURATION("dart", "StartComponent", "url", package.resolved_url);
-  std::thread thread(RunApplication, this, 
-                     std::move(package), std::move(startup_info),
-                     context_->incoming_services(), std::move(controller));
+  std::thread thread(RunApplication, this, std::move(package),
+                     std::move(startup_info), context_->svc(),
+                     std::move(controller));
   thread.detach();
 }
 

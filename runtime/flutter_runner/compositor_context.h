@@ -6,6 +6,7 @@
 #define TOPAZ_RUNTIME_FLUTTER_RUNNER_COMPOSITOR_CONTEXT_H_
 
 #include <fuchsia/ui/scenic/cpp/fidl.h>
+#include <fuchsia/ui/views/cpp/fidl.h>
 #include <lib/fit/function.h>
 
 #include "flutter/flow/compositor_context.h"
@@ -13,18 +14,14 @@
 #include "flutter/fml/macros.h"
 #include "session_connection.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 // Holds composition specific state and bindings specific to composition on
 // Fuchsia.
-class CompositorContext final : public flow::CompositorContext {
+class CompositorContext final : public flutter::CompositorContext {
  public:
   CompositorContext(std::string debug_label,
-#ifndef SCENIC_VIEWS2
-                    zx::eventpair import_token,
-#else
-                    zx::eventpair view_token,
-#endif
+                    fuchsia::ui::views::ViewToken view_token,
                     fidl::InterfaceHandle<fuchsia::ui::scenic::Session> session,
                     fit::closure session_error_callback,
                     zx_handle_t vsync_event_handle);
@@ -39,17 +36,16 @@ class CompositorContext final : public flow::CompositorContext {
   const std::string debug_label_;
   SessionConnection session_connection_;
 
-  // |flow::CompositorContext|
+  // |flutter::CompositorContext|
   std::unique_ptr<ScopedFrame> AcquireFrame(
-      GrContext* gr_context,
-      SkCanvas* canvas,
-      flow::ExternalViewEmbedder* view_embedder,
+      GrContext* gr_context, SkCanvas* canvas,
+      flutter::ExternalViewEmbedder* view_embedder,
       const SkMatrix& root_surface_transformation,
       bool instrumentation_enabled) override;
 
   FML_DISALLOW_COPY_AND_ASSIGN(CompositorContext);
 };
 
-}  // namespace flutter
+}  // namespace flutter_runner
 
 #endif  // TOPAZ_RUNTIME_FLUTTER_RUNNER_COMPOSITOR_CONTEXT_H_

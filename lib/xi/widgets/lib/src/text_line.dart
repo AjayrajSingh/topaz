@@ -52,7 +52,7 @@ class TextLine extends LeafRenderObjectWidget {
 
   @override
   _RenderTextLine createRenderObject(BuildContext context) {
-    return new _RenderTextLine(text, cursor, styles, height);
+    return _RenderTextLine(text, cursor, styles, height);
   }
 
   @override
@@ -71,7 +71,7 @@ class _RenderTextLine extends RenderBox {
     List<int> styles,
     double height,
   )   : _textPainter =
-            new TextPainter(text: text, textDirection: TextDirection.ltr),
+            TextPainter(text: text, textDirection: TextDirection.ltr),
         _cursor = cursor,
         _styles = styles,
         _height = height;
@@ -154,8 +154,8 @@ class _RenderTextLine extends RenderBox {
       // TODO: if we stop building TextLine objects for cache misses, can't be null
       if (_cursor != null) {
         for (int ix in _cursor) {
-          Rect caretPrototype = new Rect.fromLTWH(0.0, 0.0, 1.0, _height);
-          TextPosition position = new TextPosition(offset: ix);
+          Rect caretPrototype = Rect.fromLTWH(0.0, 0.0, 1.0, _height);
+          TextPosition position = TextPosition(offset: ix);
           Offset caretOffset =
               _textPainter.getOffsetForCaret(position, caretPrototype);
           _cursorRects.add(caretPrototype.shift(caretOffset));
@@ -173,7 +173,7 @@ class _RenderTextLine extends RenderBox {
           int styleId = _styles[i + 2];
           if (styleId == 0) {
             TextSelection selection =
-                new TextSelection(baseOffset: start, extentOffset: end);
+                TextSelection(baseOffset: start, extentOffset: end);
             for (TextBox box in _textPainter.getBoxesForSelection(selection)) {
               _selectionRects.add(box.toRect());
             }
@@ -186,7 +186,7 @@ class _RenderTextLine extends RenderBox {
 
   @override
   void performLayout() {
-    size = constraints.constrain(new Size(_nominalWidth, _height));
+    size = constraints.constrain(Size(_nominalWidth, _height));
     // TODO: necessary?
     _textPainter.layout();
   }
@@ -194,11 +194,11 @@ class _RenderTextLine extends RenderBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     //print('painting, offset = $offset');
-    Paint paint = new Paint();
+    Paint paint = Paint();
 
     _layoutIfNeeded();
-    Color cursorColor = const Color(0xFF000040);
-    Color selectionColor = const Color(0xFFB2D8FC);
+    Color cursorColor = Color(0xFF000040);
+    Color selectionColor = Color(0xFFB2D8FC);
     for (Rect selectionRect in _selectionRects) {
       paint.color = selectionColor;
       context.canvas.drawRect(selectionRect.shift(offset), paint);

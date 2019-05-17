@@ -21,7 +21,7 @@ int _align(int size) =>
 
 void _throwIfNegative(int value) {
   if (value < 0) {
-    throw new FidlError(
+    throw FidlError(
         'Cannot encode a negative value for an unsigned type: $value');
   }
 }
@@ -30,16 +30,16 @@ const int _kInitialBufferSize = 1024;
 
 class Encoder {
   Message get message {
-    final ByteData trimmed = new ByteData.view(data.buffer, 0, _extent);
-    return new Message(trimmed, _handles, _extent, _handles.length);
+    final ByteData trimmed = ByteData.view(data.buffer, 0, _extent);
+    return Message(trimmed, _handles, _extent, _handles.length);
   }
 
-  ByteData data = new ByteData(_kInitialBufferSize);
+  ByteData data = ByteData(_kInitialBufferSize);
   final List<Handle> _handles = <Handle>[];
   int _extent = 0;
 
   void _grow(int newSize) {
-    final Uint8List newList = new Uint8List(newSize)
+    final Uint8List newList = Uint8List(newSize)
       ..setRange(0, data.lengthInBytes, data.buffer.asUint8List());
     data = newList.buffer.asByteData();
   }
@@ -144,7 +144,7 @@ class Decoder {
     final int result = _nextOffset;
     _nextOffset += _align(size);
     if (_nextOffset > _message.dataLength) {
-      throw new FidlError('Cannot access out of range memory');
+      throw FidlError('Cannot access out of range memory');
     }
     return result;
   }
@@ -155,7 +155,7 @@ class Decoder {
 
   Handle claimHandle() {
     if (_nextHandle >= _message.handlesLength) {
-      throw new FidlError('Cannot access out of range handle');
+      throw FidlError('Cannot access out of range handle');
     }
     return _message.handles[_nextHandle++];
   }

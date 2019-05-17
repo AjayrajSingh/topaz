@@ -6,22 +6,19 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:lib.app.dart/app.dart';
-import 'package:fidl_fuchsia_ledger/fidl.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:fidl_fuchsia_ledger/fidl_async.dart';
+import 'package:fidl_fuchsia_sys/fidl_async.dart';
 import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_xi/fidl.dart' as service;
+import 'package:fidl_fuchsia_xi/fidl_async.dart' as service;
+import 'package:fuchsia_services/services.dart';
 import 'package:xi_client/client.dart';
 import 'package:zircon/zircon.dart';
-
-/// [StartupContext] exported here so it can be used in `main.dart`.
-final StartupContext kContext = new StartupContext.fromStartupInfo();
 
 /// A partial implementation of XiClient to handle socket reading and writing.
 /// This should not be used on its own, but subclassed by some another type
 /// that will handle setting up the socket.
 class FuchsiaSocketClient extends XiClient {
-  final SocketReader _reader = new SocketReader();
+  final SocketReader _reader = SocketReader();
 
   @override
   Future<Null> init() async {}
@@ -29,13 +26,13 @@ class FuchsiaSocketClient extends XiClient {
   @override
   void send(String data) {
     final List<int> ints = utf8.encode('$data\n');
-    final Uint8List bytes = new Uint8List.fromList(ints);
+    final Uint8List bytes = Uint8List.fromList(ints);
     final ByteData buffer = bytes.buffer.asByteData();
 
     final WriteResult result = _reader.socket.write(buffer);
 
     if (result.status != ZX.OK) {
-      StateError error = new StateError('ERROR WRITING: $result');
+      StateError error = StateError('ERROR WRITING: $result');
       streamController
         ..addError(error)
         ..close();
@@ -50,7 +47,7 @@ class FuchsiaSocketClient extends XiClient {
     final ReadResult result = _reader.socket.read(1000);
 
     if (result.status != ZX.OK) {
-      StateError error = new StateError('Socket read error: ${result.status}');
+      StateError error = StateError('Socket read error: ${result.status}');
       streamController
         ..addError(error)
         ..close();
@@ -71,8 +68,8 @@ class XiFuchsiaClient extends FuchsiaSocketClient {
   XiFuchsiaClient(InterfaceHandle<Ledger> _ledgerHandle) {
     // Note: _ledgerHandle is currently unused, but we're hoping to bring it back.
   }
-  final Services _services = new Services();
-  final service.JsonProxy _jsonProxy = new service.JsonProxy();
+  final _incoming = Incoming();
+  final service.JsonProxy _jsonProxy = service.JsonProxy();
 
   @override
   Future<Null> init() async {
@@ -80,18 +77,27 @@ class XiFuchsiaClient extends FuchsiaSocketClient {
       return;
     }
 
-    final LaunchInfo launchInfo =
-        new LaunchInfo(url: 'fuchsia-pkg://fuchsia.com/xi_core#meta/xi_core.cmx', directoryRequest: _services.request());
-    kContext.launcher.createComponent(launchInfo, null);
-    // TODO(jasoncampbell): File a bug for how to get rid of the Dart warning
-    // "Unsafe implicit cast from InterfaceHandle<dynamic>"?
-    // ignore: STRONG_MODE_DOWN_CAST_COMPOSITE
-    InterfaceHandle<service.Json> handle = _services.connectToServiceByName(
-      service.Json.$serviceName,
-    );
-    _jsonProxy.ctrl.bind(handle);
-    final SocketPair pair = new SocketPair();
-    _jsonProxy.connectSocket(pair.first);
+    // Creates a new instance of the component described by launchInfo.
+    final componentController = ComponentControllerProxy();
+
+    // Create and connect to a Launcher service
+    final launcherProxy = LauncherProxy();
+    StartupContext.fromStartupInfo().incoming.connectToService(launcherProxy);
+
+    // Use the launcher services launch echo server via launchInfo
+    final LaunchInfo launchInfo = LaunchInfo(
+        url: 'fuchsia-pkg://fuchsia.com/xi_core#meta/xi_core.cmx',
+        directoryRequest: _incoming.request().passChannel());
+    await launcherProxy.createComponent(
+        launchInfo, componentController.ctrl.request());
+
+    // Close launcher connection since we no longer need the launcher service.
+    launcherProxy.ctrl.close();
+
+    _incoming.connectToService(_jsonProxy);
+
+    final SocketPair pair = SocketPair();
+    await _jsonProxy.connectSocket(pair.first);
     _reader
       ..bind(pair.second)
       ..onReadable = handleRead;
@@ -102,7 +108,7 @@ class XiFuchsiaClient extends FuchsiaSocketClient {
   @override
   void send(String data) {
     if (initialized == false) {
-      throw new StateError('Must call .init() first.');
+      throw StateError('Must call .init() first.');
     }
     super.send(data);
   }

@@ -5,6 +5,8 @@
 #ifndef TOPAZ_APP_TERM_VIEW_CONTROLLER_H_
 #define TOPAZ_APP_TERM_VIEW_CONTROLLER_H_
 
+#include <fuchsia/images/cpp/fidl.h>
+#include <fuchsia/ui/gfx/cpp/fidl.h>
 #include <lib/async/cpp/task.h>
 #include <lib/fit/function.h>
 
@@ -31,14 +33,14 @@ class ViewController : public scenic::SkiaView, public TermModel::Delegate {
   ViewController& operator=(const ViewController&) = delete;
 
  private:
-  // |scenic::V1BaseView|
+  // |scenic::BaseView|
   void OnPropertiesChanged(
-      fuchsia::ui::viewsv1::ViewProperties old_properties) override;
+      fuchsia::ui::gfx::ViewProperties old_properties) override;
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
-  bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
+  void OnInputEvent(fuchsia::ui::input::InputEvent event) override;
 
-  // |TermModel::Delegate|:
+  // |TermModel::Delegate|
   void OnResponse(const void* buf, size_t size) override;
   void OnSetKeypadMode(bool application_mode) override;
 
@@ -65,7 +67,7 @@ class ViewController : public scenic::SkiaView, public TermModel::Delegate {
   // If we skip drawing despite being forced to, we should force the next draw.
   bool force_next_draw_;
 
-  mozart::SkiaFontLoader font_loader_;
+  scenic::SkiaFontLoader font_loader_;
   sk_sp<SkTypeface> regular_typeface_;
 
   int ascent_;

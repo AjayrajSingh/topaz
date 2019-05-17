@@ -41,12 +41,12 @@ class Document implements ValueObserver {
   final ConnectionId _connectionId;
   static const int _identifierLength = 21;
   final StreamController<void> _changeController =
-      new StreamController<void>.broadcast();
+      StreamController<void>.broadcast();
 
   /// A value that is set to true for all documents that exist.
   /// If the Document object was created in a rollbacked transaction, then this
   /// field is false and all operations on this object are invalid.
-  final LastOneWinsValue<bool> _documentExists = new LastOneWinsValue<bool>();
+  final LastOneWinsValue<bool> _documentExists = LastOneWinsValue<bool>();
 
   DocumentState _state = DocumentState.available;
 
@@ -82,7 +82,7 @@ class Document implements ValueObserver {
 
   Uint8List _createIdentifierForField(String key, _DocumentFieldType type) {
     Uint8List hashOfKey = hash(getUint8ListFromString(key));
-    Uint8List prefix = new Uint8List.fromList([type.index]);
+    Uint8List prefix = Uint8List.fromList([type.index]);
     return concatUint8Lists(prefix, hashOfKey);
   }
 
@@ -94,7 +94,7 @@ class Document implements ValueObserver {
 
   /// Gets the change for all fields of this document.
   Change getChange() {
-    Change result = new Change();
+    Change result = Change();
     for (final field in _fields.entries) {
       result.addAll(field.value.getChange().withPrefix(field.key));
     }
@@ -117,10 +117,12 @@ class Document implements ValueObserver {
 
   /// Applies [change] to fields of this document.
   void applyChange(final Change change) {
-    Map<Uint8List, Change> splittedChanges =
-        change.splitByPrefix(_identifierLength);
-    for (final splittedChange in splittedChanges.entries) {
-      _fields[splittedChange.key].applyChange(splittedChange.value);
+    if (_state == DocumentState.available) {
+      Map<Uint8List, Change> splittedChanges =
+          change.splitByPrefix(_identifierLength);
+      for (final splittedChange in splittedChanges.entries) {
+        _fields[splittedChange.key].applyChange(splittedChange.value);
+      }
     }
     _changeController.add(null);
   }
@@ -142,10 +144,10 @@ class Document implements ValueObserver {
   /// Throws an exception if the document is in an invalid state.
   void _checkExistsState() {
     if (!_documentExists.value) {
-      throw new StateError('Value access to a non-existing document.');
+      throw StateError('Value access to a non-existing document.');
     }
     if (_state != DocumentState.available) {
-      throw new StateError("Can't access a document that is deleted.");
+      throw StateError("Can't access a document that is deleted.");
     }
   }
 
@@ -153,7 +155,7 @@ class Document implements ValueObserver {
     _checkExistsState();
     Transaction currentTransaction = _sledge.currentTransaction;
     if (currentTransaction == null) {
-      throw new StateError('Document was changed outside of a transaction.');
+      throw StateError('Document was changed outside of a transaction.');
     }
     currentTransaction.documentWasModified(this);
   }

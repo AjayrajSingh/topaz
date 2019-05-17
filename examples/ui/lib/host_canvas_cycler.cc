@@ -4,7 +4,7 @@
 
 #include "examples/ui/lib/host_canvas_cycler.h"
 
-#include "lib/fxl/logging.h"
+#include "src/lib/fxl/logging.h"
 
 namespace scenic {
 namespace skia {
@@ -21,8 +21,7 @@ HostCanvasCycler::HostCanvasCycler(scenic::Session* session)
 HostCanvasCycler::~HostCanvasCycler() = default;
 
 SkCanvas* HostCanvasCycler::AcquireCanvas(float logical_width,
-                                          float logical_height,
-                                          float scale_x,
+                                          float logical_height, float scale_x,
                                           float scale_y) {
   FXL_DCHECK(!acquired_surface_);
 
@@ -61,12 +60,12 @@ void HostCanvasCycler::ReleaseAndSwapCanvas() {
 
   if (reconfigured_) {
     scenic::Rectangle content_rect(content_node_.session(), logical_width_,
-                                       logical_height_);
+                                   logical_height_);
     content_node_.SetShape(content_rect);
     reconfigured_ = false;
   }
 
-  // TODO(MZ-145): Define an |InvalidateOp| on |Image| instead.
+  // TODO(SCN-145): Define an |InvalidateOp| on |Image| instead.
   surface_pool_.DiscardImage(surface_index_);
   surface_index_ = (surface_index_ + 1) % kNumBuffers;
 }

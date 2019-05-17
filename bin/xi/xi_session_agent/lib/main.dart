@@ -6,15 +6,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_auth/fidl.dart';
-import 'package:fidl_fuchsia_xi_session/fidl.dart' as fidl_xi_session;
-
-import 'package:lib.app.dart/app.dart';
-import 'package:lib.agent.dart/agent.dart';
-import 'package:lib.app.dart/logging.dart';
-
-import 'package:meta/meta.dart';
+import 'package:fidl_fuchsia_xi_session/fidl_async.dart' as fidl_xi_session;
+import 'package:fuchsia_modular/agent.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:zircon/zircon.dart';
 
 import 'package:xi_fuchsia_client/client.dart';
@@ -26,45 +20,6 @@ class PendingNotification {
   final String method;
   final dynamic params;
   PendingNotification(this.method, this.params);
-}
-
-
-/// TODO: Refactor this class to use the new SDK instead of deprecated API
-/// ignore: deprecated_member_use
-class XiSessionAgent extends AgentImpl {
-  final _xiSessionManager = XiSessionManagerImpl();
-
-  final List<fidl_xi_session.XiSessionManagerBinding> _bindings =
-      <fidl_xi_session.XiSessionManagerBinding>[];
-
-  XiSessionAgent({@required StartupContext startupContext})
-      : super(startupContext: startupContext);
-
-  @override
-  Future<Null> onReady(
-    StartupContext startupContext,
-    AgentContext agentContext,
-    ComponentContext componentContext,
-    TokenManager tokenManager,
-    ServiceProviderImpl outgoingServices,
-  ) async {
-    outgoingServices.addServiceForName(
-      (InterfaceRequest<fidl_xi_session.XiSessionManager> request) {
-        log.info('got request $request');
-        _bindings.add(
-          fidl_xi_session.XiSessionManagerBinding()
-            ..bind(_xiSessionManager, request),
-        );
-      },
-      fidl_xi_session.XiSessionManager.$serviceName,
-    );
-  }
-
-  @override
-  void advertise() {
-    super.advertise();
-    log.info('advertising xi_session_agent');
-  }
 }
 
 class XiSessionManagerImpl extends fidl_xi_session.XiSessionManager
@@ -89,32 +44,34 @@ class XiSessionManagerImpl extends fidl_xi_session.XiSessionManager
   }
 
   @override
-  void newSession(void Function(String sessionId) callback) {
+  Future<String> newSession() async {
     int id = _sessionId++;
     String idString = 'session-$id';
+    //ignore: unawaited_futures
     xiCore.sendRpc('new_view', {}).then((viewId) {
       _availableSessions[idString] = viewId;
       log.info('associated session $idString with view $viewId');
     });
-    callback(idString);
+    return idString;
   }
 
   @override
-  void closeSession(String sessionId) {
+  Future<void> closeSession(String sessionId) async {
     final viewId = _activeSessions.remove(sessionId);
     if (viewId == null) {
       log.warning('attempted to close unknown session $sessionId');
     }
     _activeConnections.remove(viewId);
-    xiCore.sendRpc('close_view', {'view_id': viewId});
+    await xiCore.sendRpc('close_view', {'view_id': viewId});
   }
 
   @override
-  void connectSession(String sessionId, Socket socket) {
+  Future<void> connectSession(String sessionId, Socket socket) async {
     final viewId = _availableSessions.remove(sessionId);
     if (viewId == null) {
       log.warning('attempted to connect to unknown session $sessionId');
     }
+    //ignore: unawaited_futures
     final forwarder = ViewForwarder(socket, viewId, xiCore)..init();
     _activeConnections[viewId] = forwarder;
     _activeSessions[sessionId] = viewId;
@@ -128,27 +85,20 @@ class XiSessionManagerImpl extends fidl_xi_session.XiSessionManager
   }
 
   @override
-  void getContents(String sessionId, void Function(Vmo buffer) callback) {
+  Future<Vmo> getContents(String sessionId) async {
     final viewId = _activeSessions[sessionId];
     if (viewId == null) {
       log.warning('getContents called for unknown session $sessionId');
-      callback(SizedVmo.fromUint8List(utf8.encode('unknown session id?? o_O')));
-      return;
+      return SizedVmo.fromUint8List(utf8.encode('unknown session id?? o_O'));
     }
-
-    xiCore.sendRpc('debug_get_contents', {'view_id': viewId}).then((result) {
-      String contents = result;
-      final vmo = SizedVmo.fromUint8List(utf8.encode(contents));
-      callback(vmo);
-    }).catchError((err) {
-      log.warning('get_contents failed for view $viewId', err);
-      callback(SizedVmo.fromUint8List(utf8.encode('getContents err $err')));
-    });
+    final contents =
+        await xiCore.sendRpc('debug_get_contents', {'view_id': viewId});
+    return SizedVmo.fromUint8List(utf8.encode(contents));
   }
 
   // handle a notification from xi-core, forwarding it to some session
   @override
-  void handleNotification(String method, dynamic params) {
+  Future<void> handleNotification(String method, dynamic params) async {
     String viewId = params.remove('view_id');
     if (viewId == null) {
       // we ignore things that aren't for a view
@@ -177,15 +127,12 @@ class XiSessionManagerImpl extends fidl_xi_session.XiSessionManager
 void main(List<String> args) {
   setupLogger(name: '[xi_session_agent]');
   log.info('agent started');
-
-  new XiSessionAgent(
-    startupContext: StartupContext.fromStartupInfo(),
-  ).advertise();
+  Agent().exposeService(XiSessionManagerImpl());
 }
 
 class ViewForwarder extends XiClient implements XiRpcHandler {
   final Socket _socket;
-  final SocketReader _reader = new SocketReader();
+  final SocketReader _reader = SocketReader();
   final String viewId;
   final XiClient core;
 
@@ -206,13 +153,13 @@ class ViewForwarder extends XiClient implements XiRpcHandler {
   @override
   void send(String data) {
     final List<int> ints = utf8.encode('$data\n');
-    final Uint8List bytes = new Uint8List.fromList(ints);
+    final Uint8List bytes = Uint8List.fromList(ints);
     final ByteData buffer = bytes.buffer.asByteData();
 
     final WriteResult result = _reader.socket.write(buffer);
 
     if (result.status != ZX.OK) {
-      StateError error = new StateError('ERROR WRITING: $result');
+      StateError error = StateError('ERROR WRITING: $result');
       streamController
         ..addError(error)
         ..close();
@@ -224,7 +171,7 @@ class ViewForwarder extends XiClient implements XiRpcHandler {
     final ReadResult result = _reader.socket.read(1000);
 
     if (result.status != ZX.OK) {
-      StateError error = new StateError('Socket read error: ${result.status}');
+      StateError error = StateError('Socket read error: ${result.status}');
       streamController
         ..addError(error)
         ..close();

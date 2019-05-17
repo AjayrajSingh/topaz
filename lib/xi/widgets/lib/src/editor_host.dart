@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:meta/meta.dart';
-import 'package:lib.app.dart/logging.dart';
 import 'package:xi_client/client.dart';
 
 import 'document.dart';
@@ -26,12 +26,12 @@ class EditorHost extends StatefulWidget {
         super(key: key);
 
   @override
-  State<EditorHost> createState() => new EditorHostState();
+  State<EditorHost> createState() => EditorHostState();
 }
 
 /// State for XiApp.
 class EditorHostState extends State<EditorHost> implements XiHandler {
-  final Document _document = new Document();
+  final Document _document = Document();
 
   EditorHostState();
 
@@ -61,15 +61,15 @@ class EditorHostState extends State<EditorHost> implements XiHandler {
   /// Uses a [MaterialApp] as the root of the Xi UI hierarchy.
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    return MaterialApp(
       title: 'Xi',
-      home: new Material(
+      home: Material(
         // required for the debug background to render correctly
         type: MaterialType.transparency,
         child: Container(
-          constraints: new BoxConstraints.expand(),
+          constraints: BoxConstraints.expand(),
           color: Colors.white,
-          child: new Editor(
+          child: Editor(
               document: _document, debugBackground: widget.debugBackground),
         ),
       ),

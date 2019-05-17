@@ -5,7 +5,7 @@
 // ignore_for_file: implementation_imports
 import 'dart:typed_data';
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/converter.dart';
 import 'package:test/test.dart';
@@ -13,7 +13,7 @@ import 'package:test/test.dart';
 import 'matchers.dart';
 
 void _testSerializationAndDeserialization<T>(T value) {
-  Converter<T> converter = new Converter<T>();
+  Converter<T> converter = Converter<T>();
   expect(converter.deserialize(converter.serialize(value)), equals(value));
 }
 
@@ -24,10 +24,10 @@ void _testValues<T>(List<T> values) {
 void main() {
   setupLogger();
 
-  final boolConverter = new Converter<bool>();
-  final doubleConverter = new Converter<double>();
-  final numConverter = new Converter<num>();
-  final stringConverter = new Converter<String>();
+  final boolConverter = Converter<bool>();
+  final doubleConverter = Converter<double>();
+  final numConverter = Converter<num>();
+  final stringConverter = Converter<String>();
 
   group('Correct convertions', () {
     test('int converter', () {
@@ -75,19 +75,19 @@ void main() {
     });
 
     test('data converter', () {
-      final conv = new MapToKVListConverter<String, int>();
-      final longBuffer = new StringBuffer();
+      final conv = MapToKVListConverter<String, int>();
+      final longBuffer = StringBuffer();
       for (int i = 0; i < 100; i++) {
         longBuffer.write('$i');
       }
       final long = longBuffer.toString(), short = 'aba';
-      final change = new ConvertedChange<String, int>({long: 10, short: 1});
+      final change = ConvertedChange<String, int>({long: 10, short: 1});
       final serializedChange = conv.serialize(change);
       expect(serializedChange.changedEntries[0].key.length <= 128 + 1, isTrue);
       final deserializedChange = conv.deserialize(serializedChange);
       expect(deserializedChange.changedEntries[short], equals(1));
       expect(deserializedChange.changedEntries[long], equals(10));
-      final change2 = new ConvertedChange<String, int>(
+      final change2 = ConvertedChange<String, int>(
           <String, int>{}, <String>{short, long});
       final deserializedChange2 = conv.deserialize(conv.serialize(change2));
       expect(deserializedChange2.deletedKeys.length, equals(2));
@@ -98,13 +98,13 @@ void main() {
 
   group('Exceptions', () {
     test('odd lengthInBytes', () {
-      expect(() => stringConverter.deserialize(new Uint8List(1)),
+      expect(() => stringConverter.deserialize(Uint8List(1)),
           throwsInternalError);
     });
     test("double's length", () {
       for (int i = 0; i < 10; i++) {
         if (i != 8) {
-          expect(() => doubleConverter.deserialize(new Uint8List(i)),
+          expect(() => doubleConverter.deserialize(Uint8List(i)),
               throwsInternalError);
         }
       }
@@ -112,18 +112,18 @@ void main() {
     test('bool', () {
       for (int i = 0; i < 10; i++) {
         if (i != 1) {
-          expect(() => boolConverter.deserialize(new Uint8List(i)),
+          expect(() => boolConverter.deserialize(Uint8List(i)),
               throwsInternalError);
         }
       }
-      expect(() => boolConverter.deserialize(new Uint8List.fromList([2])),
+      expect(() => boolConverter.deserialize(Uint8List.fromList([2])),
           throwsInternalError);
-      expect(() => boolConverter.deserialize(new Uint8List.fromList([-1])),
+      expect(() => boolConverter.deserialize(Uint8List.fromList([-1])),
           throwsInternalError);
-      expect(boolConverter.deserialize(new Uint8List.fromList([0])),
+      expect(boolConverter.deserialize(Uint8List.fromList([0])),
           equals(false));
       expect(
-          boolConverter.deserialize(new Uint8List.fromList([1])), equals(true));
+          boolConverter.deserialize(Uint8List.fromList([1])), equals(true));
     });
   });
 }

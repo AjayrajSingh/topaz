@@ -17,8 +17,8 @@ source_set("scenic_skia") {
   ]
 
   public_deps = [
-    "//garnet/public/lib/fxl",
-    "//garnet/public/lib/ui/scenic/cpp",
+    "//sdk/lib/ui/scenic/cpp",
+    "//src/lib/fxl",
     "//third_party/skia",
   ]
 
@@ -40,14 +40,14 @@ source_set("skia_fonts") {
   ]
 
   public_deps = [
+    "//sdk/fidl/fuchsia.fonts",
     "//zircon/public/lib/fit",
   ]
 
   deps = [
     ":skia_type_converters",
     ":skia_vmo",
-    "//sdk/fidl/fuchsia.fonts",
-    "//garnet/public/lib/fxl",
+    "//src/lib/fxl",
     "//third_party/skia",
   ]
 
@@ -61,8 +61,8 @@ source_set("skia_type_converters") {
   ]
 
   public_deps = [
-    "//sdk/fidl/fuchsia.math",
     "//garnet/public/lib/fsl",
+    "//sdk/fidl/fuchsia.math",
     "//third_party/skia",
   ]
 
@@ -77,7 +77,7 @@ source_set("skia_vmo") {
 
   public_deps = [
     "//garnet/public/lib/fsl",
-    "//garnet/public/lib/fxl",
+    "//src/lib/fxl",
     "//third_party/skia",
     "//zircon/public/lib/zx",
   ]

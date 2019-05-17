@@ -1,0 +1,18 @@
+{
+  "basemgr": {
+    "base_shell": {
+      "url": "fuchsia-pkg://fuchsia.com/userpicker_base_shell#meta/userpicker_base_shell.cmx"
+    },
+    "session_shells": [
+      {
+        "url": "fuchsia-pkg://fuchsia.com/ermine#meta/ermine.cmx",
+        "display_usage": "near"
+      }
+    ]
+  },
+  "sessionmgr": {
+    "startup_agents": [
+      "fuchsia-pkg://fuchsia.com/experiment_agent#meta/experiment_agent.cmx"
+    ]
+  }
+}

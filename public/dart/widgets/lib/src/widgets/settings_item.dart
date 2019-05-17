@@ -33,23 +33,23 @@ class SettingsItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new InkWell(
+    return InkWell(
         onTap: onTap,
-        child: new Container(
+        child: Container(
             height: 64.0 * scale,
             width: 480.0 * scale,
-            child: new Row(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[_buildLogo(), _buildText()],
             )));
   }
 
   Widget _buildLogo() {
-    return new Container(
-        padding: new EdgeInsets.only(
+    return Container(
+        padding: EdgeInsets.only(
           right: 16.0 * scale,
         ),
-        child: new Image.asset(
+        child: Image.asset(
           iconUrl,
           height: 48.0 * scale,
           width: 48.0 * scale,
@@ -57,25 +57,25 @@ class SettingsItem extends StatelessWidget {
   }
 
   Widget _buildText() {
-    final Text text = new Text(label, style: _textStyle(scale));
+    final Text text = Text(label, style: _textStyle(scale));
 
     if (details == null) {
       return text;
     }
 
-    return new Column(
+    return Column(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         text,
-        new Text(details, style: _textStyle(scale, isError: isError))
+        Text(details, style: _textStyle(scale, isError: isError))
       ],
     );
   }
 }
 
-TextStyle _textStyle(double scale, {bool isError = false}) => new TextStyle(
+TextStyle _textStyle(double scale, {bool isError = false}) => TextStyle(
       color: isError ? Colors.grey[900] : Colors.redAccent,
       fontSize: 24.0 * scale,
       fontWeight: FontWeight.w200,

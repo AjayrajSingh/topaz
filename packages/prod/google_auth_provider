@@ -1,5 +1,0 @@
-{
-    "packages": [
-        "//topaz/auth_providers/google:google_auth_provider"
-    ]
-}

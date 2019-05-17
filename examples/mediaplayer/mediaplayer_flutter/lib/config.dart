@@ -10,10 +10,10 @@ import 'asset.dart';
 
 /// Reads the configuration from [fileName].
 Future<List<Asset>> readConfig(String fileName) async {
-  File file = new File(fileName);
+  File file = File(fileName);
 
   if (!file.existsSync()) {
-    throw new ArgumentError.value(fileName, 'fileName', 'File does not exist');
+    throw ArgumentError.value(fileName, 'fileName', 'File does not exist');
   }
 
   return _convertAssetList(json.decode(await file.readAsString()));
@@ -58,7 +58,7 @@ Asset _convertAsset(Object json) {
         try {
           uri = Uri.parse(_convertString(value));
         } on FormatException {
-          throw new FormatException('Config file is malformed: bad URI $value');
+          throw FormatException('Config file is malformed: bad URI $value');
         }
         break;
       case 'type':
@@ -73,7 +73,7 @@ Asset _convertAsset(Object json) {
             type = AssetType.playlist;
             break;
           default:
-            throw new FormatException(
+            throw FormatException(
                 'Config file is malformed: $value is not a valid type');
         }
         break;
@@ -118,7 +118,7 @@ Asset _convertAsset(Object json) {
     case AssetType.movie:
       _checkNotNull(type, uri, 'a URI');
       _checkNull(type, children, 'children');
-      return new Asset.movie(
+      return Asset.movie(
         uri: uri,
         title: title,
         artist: artist,
@@ -129,7 +129,7 @@ Asset _convertAsset(Object json) {
     case AssetType.song:
       _checkNotNull(type, uri, 'a URI');
       _checkNull(type, children, 'children');
-      return new Asset.song(
+      return Asset.song(
         uri: uri,
         title: title,
         artist: artist,
@@ -151,27 +151,27 @@ Asset _convertAsset(Object json) {
         throw const FormatException(
             'Config file is malformed: playlist children must be songs or movies');
       }
-      return new Asset.playlist(
+      return Asset.playlist(
         title: title,
         children: children,
         loop: loop,
       );
 
     default:
-      throw new FormatException('Unknown asset type: $type');
+      throw FormatException('Unknown asset type: $type');
   }
 }
 
 void _checkNotNull(AssetType type, Object value, String name) {
   if (value == null) {
-    throw new FormatException(
+    throw FormatException(
         'Config file is malformed: a $type must have $name');
   }
 }
 
 void _checkNull(AssetType type, Object value, String name) {
   if (value != null) {
-    throw new FormatException(
+    throw FormatException(
         'Config file is malformed: a $type must not have $name');
   }
 }

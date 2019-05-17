@@ -16,7 +16,7 @@ import 'node.dart';
 class ComputationalGraph {
   final List<Node> nodes = <Node>[];
   final List<List<int>> _allChoices = <List<int>>[];
-  final Random random = new Random(0);
+  final Random random = Random(0);
 
   void addNode(Node v) {
     // TODO: remove O(n) part.
@@ -64,7 +64,7 @@ class ComputationalGraph {
     _allChoices.clear();
     List<int> choices = <int>[];
     while (_moveNextChoiceList(choices)) {
-      _allChoices.add(new List<int>.from(choices));
+      _allChoices.add(List<int>.from(choices));
     }
     return _allChoices.length;
   }
@@ -98,7 +98,7 @@ class ComputationalGraph {
     Map<Node, int> known = <Node, int>{};
     for (int i = 0; i < nodes.length; i++) {
       if (ready.isEmpty) {
-        throw new StateError('Computational graph should be acyclic.');
+        throw StateError('Computational graph should be acyclic.');
       }
       int curChoice = 0;
       if (i < choices.length) {
@@ -124,12 +124,12 @@ class ComputationalGraph {
         }
       }
     }
-    return new EvaluationOrder(order);
+    return EvaluationOrder(order);
   }
 
   EvaluationOrder _getNthOrder(int index) {
     if (index < 0 || index >= _allChoices.length) {
-      throw new ArgumentError.value(index, 'index', 'Index is out of range.');
+      throw ArgumentError.value(index, 'index', 'Index is out of range.');
     }
     return _getOrder(_allChoices[index]);
   }
@@ -139,5 +139,5 @@ class ComputationalGraph {
 
   // Returns all correct topological orders of this graph.
   Iterable<EvaluationOrder> get orders =>
-      new Iterable<EvaluationOrder>.generate(_countOrders(), _getNthOrder);
+      Iterable<EvaluationOrder>.generate(_countOrders(), _getNthOrder);
 }

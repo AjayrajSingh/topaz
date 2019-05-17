@@ -17,5 +17,5 @@ class BytelistMap implements BaseType {
 
   @override
   Value newValue(ConnectionId connectionId) =>
-      new MapValue<String, Uint8List>();
+      MapValue<String, Uint8List>();
 }

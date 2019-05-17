@@ -18,13 +18,13 @@ class MapValue<K, V> extends MapBase<K, V>
     implements LeafValue {
   final KeyValueStorage<K, V> _map;
   final StreamController<MapChange<K, V>> _changeController =
-      new StreamController<MapChange<K, V>>.broadcast();
+      StreamController<MapChange<K, V>>.broadcast();
   final MapToKVListConverter _converter;
 
   /// Creates a MapValue with provided [equals] as equality.
   MapValue({bool equals(K key1, K key2), int hashCode(K key)})
-      : _converter = new MapToKVListConverter<K, V>(),
-        _map = new KeyValueStorage<K, V>(equals: equals, hashCode: hashCode);
+      : _converter = MapToKVListConverter<K, V>(),
+        _map = KeyValueStorage<K, V>(equals: equals, hashCode: hashCode);
 
   @override
   Change getChange() => _converter.serialize(_map.getChange());
@@ -38,7 +38,7 @@ class MapValue<K, V> extends MapBase<K, V>
   void applyChange(Change input) {
     final change = _converter.deserialize(input);
     _map.applyChange(change);
-    _changeController.add(new MapChange<K, V>(change));
+    _changeController.add(MapChange<K, V>(change));
   }
 
   @override

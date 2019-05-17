@@ -11,6 +11,7 @@ import 'package:fidl_fuchsia_io/fidl_async.dart';
 import 'package:meta/meta.dart';
 import 'package:zircon/zircon.dart';
 
+import 'internal/_flags.dart';
 import 'vnode.dart';
 
 typedef WriteFn = int Function(Uint8List);
@@ -93,7 +94,7 @@ class PseudoFile extends Vnode {
   /// Connects to this instance of [PseudoFile] and serves [fushsia.io.File] over fidl.
   @override
   int connect(int flags, int mode, fidl.InterfaceRequest<Node> request,
-      [int parentFlags = -1]) {
+      [int parentFlags = Flags.fsRights]) {
     if (_isClosed) {
       sendErrorEvent(flags, ZX.ERR_NOT_SUPPORTED, request);
       return ZX.ERR_NOT_SUPPORTED;
@@ -134,6 +135,12 @@ class PseudoFile extends Vnode {
     return direntTypeFile;
   }
 
+  /// Return the description of this file.
+  /// This function may return null if describing the node fails. In that case, the connection should be closed.
+  NodeInfo describe() {
+    return NodeInfo.withFile(FileObject(event: null));
+  }
+
   ReadFn _getReadFn(ReadFnStr fn) {
     return () => Uint8List.fromList(fn().codeUnits);
   }
@@ -150,7 +157,10 @@ class PseudoFile extends Vnode {
     if (flags & openFlagDirectory != 0) {
       return ZX.ERR_NOT_DIR;
     }
-    var allowedFlags = openFlagDescribe | openFlagNodeReference;
+    var allowedFlags = openFlagDescribe |
+        openFlagNodeReference |
+        openFlagPosix |
+        cloneFlagSameRights;
     if (_readFn != null) {
       allowedFlags |= openRightReadable;
     }
@@ -196,7 +206,7 @@ class PseudoFile extends Vnode {
 ///
 /// This class should not be used directly, but by [fuchsia_vfs.PseudoFile].
 class _FileConnection extends File {
-  final FileBinding _binding = new FileBinding();
+  final FileBinding _binding = FileBinding();
 
   /// open file connection flags
   final int flags;
@@ -270,7 +280,32 @@ class _FileConnection extends File {
 
   @override
   Future<void> clone(int flags, fidl.InterfaceRequest<Node> object) async {
-    file.connect(flags, mode, object, this.flags);
+    if (!Flags.inputPrecondition(flags)) {
+      file.sendErrorEvent(flags, ZX.ERR_INVALID_ARGS, object);
+      return;
+    }
+    if (Flags.shouldCloneWithSameRights(flags)) {
+      if ((flags & Flags.fsRightsSpace) != 0) {
+        file.sendErrorEvent(flags, ZX.ERR_INVALID_ARGS, object);
+        return;
+      }
+    }
+
+    // If SAME_RIGHTS is requested, cloned connection will inherit the same
+    // rights as those from the originating connection.
+    var newFlags = flags;
+    if (Flags.shouldCloneWithSameRights(flags)) {
+      newFlags &= (~Flags.fsRights);
+      newFlags |= (this.flags & Flags.fsRights);
+      newFlags &= ~cloneFlagSameRights;
+    }
+
+    if (!Flags.stricterOrSameRights(newFlags, this.flags)) {
+      file.sendErrorEvent(flags, ZX.ERR_ACCESS_DENIED, object);
+      return;
+    }
+
+    file.connect(newFlags, mode, object, this.flags);
   }
 
   @override
@@ -410,7 +445,11 @@ class _FileConnection extends File {
   }
 
   NodeInfo _describe() {
-    return NodeInfo.withFile(FileObject(event: null));
+    NodeInfo ret = file.describe();
+    if (ret == null) {
+      close();
+    }
+    return ret;
   }
 
   File$Read$Response _handleRead(int count, int offset) {

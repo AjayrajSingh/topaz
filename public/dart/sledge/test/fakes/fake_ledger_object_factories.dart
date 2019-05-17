@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+import 'package:fidl_fuchsia_ledger/fidl_async.dart' as ledger;
 // ignore: implementation_imports
 import 'package:sledge/src/ledger_helpers.dart';
 
@@ -17,10 +17,9 @@ class FakeLedgerObjectsFactory implements LedgerObjectsFactory {
   FakeLedgerObjectsFactory(this._fakeLedgerPage);
 
   @override
-  ledger.PageWatcherBinding newPageWatcherBinding() =>
-      new FakePageWatcherBinding();
+  ledger.PageWatcherBinding newPageWatcherBinding() => FakePageWatcherBinding();
 
   @override
   ledger.PageSnapshotProxy newPageSnapshotProxy() =>
-      new FakeLedgerPageSnapshot(_fakeLedgerPage);
+      FakeLedgerPageSnapshot(_fakeLedgerPage);
 }

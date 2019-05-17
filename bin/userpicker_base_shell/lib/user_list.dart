@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_modular_auth/fidl.dart';
+import 'package:fidl_fuchsia_modular_auth/fidl_async.dart';
 import 'package:flutter/material.dart';
 import 'package:lib.widgets/model.dart';
 import 'package:lib.widgets/widgets.dart';
@@ -16,7 +16,7 @@ const double _kButtonWidthSmall = 116.0;
 const double _kButtonFontSizeLarge = 16.0;
 const double _kButtonFontSizeSmall = 14.0;
 
-const TextStyle _kTextStyle = const TextStyle(
+const TextStyle _kTextStyle = TextStyle(
   color: Colors.white,
   fontSize: 10.0,
   letterSpacing: 1.0,
@@ -24,9 +24,9 @@ const TextStyle _kTextStyle = const TextStyle(
 );
 
 final BorderRadius _kButtonBorderRadiusPhone =
-    new BorderRadius.circular(_kUserAvatarSizeSmall / 2.0);
+    BorderRadius.circular(_kUserAvatarSizeSmall / 2.0);
 final BorderRadius _kButtonBorderRadiusLarge =
-    new BorderRadius.circular(_kUserAvatarSizeLarge / 2.0);
+    BorderRadius.circular(_kUserAvatarSizeLarge / 2.0);
 
 /// Shows the list of users and allows the user to add new users
 class UserList extends StatelessWidget {
@@ -42,12 +42,12 @@ class UserList extends StatelessWidget {
     bool isSmall,
   }) {
     double size = isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge;
-    return new GestureDetector(
+    return GestureDetector(
       onTap: () => onTap?.call(),
-      child: new Container(
+      child: Container(
         height: size,
         width: size,
-        child: new Alphatar.fromNameAndUrl(
+        child: Alphatar.fromNameAndUrl(
           name: account.displayName,
           avatarUrl: _getImageUrl(account),
           size: size,
@@ -66,8 +66,8 @@ class UserList extends StatelessWidget {
       onTap: () => onTap?.call(),
       width: size,
       isSmall: isSmall,
-      child: new Center(
-        child: new Icon(
+      child: Center(
+        child: Icon(
           icon,
           color: Colors.white,
           size: size / 2.0,
@@ -83,17 +83,17 @@ class UserList extends StatelessWidget {
     double width,
     bool isDisabled = false,
   }) {
-    return new GestureDetector(
+    return GestureDetector(
       onTap: isDisabled ? null : () => onTap?.call(),
-      child: new Container(
+      child: Container(
         height: isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge,
         width: width ?? (isSmall ? _kButtonWidthSmall : _kButtonWidthLarge),
         alignment: FractionalOffset.center,
-        margin: const EdgeInsets.only(left: 16.0),
-        decoration: new BoxDecoration(
+        margin: EdgeInsets.only(left: 16.0),
+        decoration: BoxDecoration(
           borderRadius:
               isSmall ? _kButtonBorderRadiusPhone : _kButtonBorderRadiusLarge,
-          border: new Border.all(
+          border: Border.all(
             color: isDisabled ? Colors.grey : Colors.white,
             width: 1.0,
           ),
@@ -110,12 +110,12 @@ class UserList extends StatelessWidget {
     double fontSize = isSmall ? _kButtonFontSizeSmall : _kButtonFontSizeLarge;
 
     if (loginDisabled) {
-      return new Row(
+      return Row(
         children: <Widget>[
           _buildUserActionButton(
-            child: new Text(
+            child: Text(
               'RESET',
-              style: new TextStyle(
+              style: TextStyle(
                 fontSize: fontSize,
                 color: Colors.white,
               ),
@@ -124,9 +124,9 @@ class UserList extends StatelessWidget {
             isSmall: isSmall,
           ),
           _buildUserActionButton(
-            child: new Text(
+            child: Text(
               'WIFI',
-              style: new TextStyle(
+              style: TextStyle(
                 fontSize: fontSize,
                 color: Colors.white,
               ),
@@ -135,9 +135,9 @@ class UserList extends StatelessWidget {
             isSmall: isSmall,
           ),
           _buildUserActionButton(
-            child: new Text(
+            child: Text(
               'LOGIN DISABLED => No SessionShell configured',
-              style: new TextStyle(
+              style: TextStyle(
                 fontSize: fontSize,
                 color: Colors.white,
               ),
@@ -149,7 +149,7 @@ class UserList extends StatelessWidget {
         ],
       );
     }
-    return new Row(
+    return Row(
       children: <Widget>[
         _buildIconButton(
           onTap: () => model.hideUserActions(),
@@ -157,9 +157,9 @@ class UserList extends StatelessWidget {
           icon: Icons.close,
         ),
         _buildUserActionButton(
-          child: new Text(
+          child: Text(
             'RESET',
-            style: new TextStyle(
+            style: TextStyle(
               fontSize: fontSize,
               color: Colors.white,
             ),
@@ -168,9 +168,9 @@ class UserList extends StatelessWidget {
           isSmall: isSmall,
         ),
         _buildUserActionButton(
-          child: new Text(
+          child: Text(
             'WIFI',
-            style: new TextStyle(
+            style: TextStyle(
               fontSize: fontSize,
               color: Colors.white,
             ),
@@ -179,9 +179,9 @@ class UserList extends StatelessWidget {
           isSmall: isSmall,
         ),
         _buildUserActionButton(
-          child: new Text(
+          child: Text(
             'LOGIN',
-            style: new TextStyle(
+            style: TextStyle(
               fontSize: fontSize,
               color: Colors.white,
             ),
@@ -194,9 +194,9 @@ class UserList extends StatelessWidget {
           isSmall: isSmall,
         ),
         _buildUserActionButton(
-          child: new Text(
+          child: Text(
             'GUEST',
-            style: new TextStyle(
+            style: TextStyle(
               fontSize: fontSize,
               color: Colors.white,
             ),
@@ -218,7 +218,7 @@ class UserList extends StatelessWidget {
     }
     Uri uri = Uri.parse(account.imageUrl);
     if (uri.queryParameters['sz'] != null) {
-      Map<String, dynamic> queryParameters = new Map<String, dynamic>.from(
+      Map<String, dynamic> queryParameters = Map<String, dynamic>.from(
         uri.queryParameters,
       );
       queryParameters['sz'] = '160';
@@ -244,11 +244,11 @@ class UserList extends StatelessWidget {
       return userCard;
     }
 
-    Widget userImage = new LongPressDraggable<Account>(
+    Widget userImage = LongPressDraggable<Account>(
       child: userCard,
       feedback: userCard,
       data: account,
-      childWhenDragging: new Opacity(opacity: 0.0, child: userCard),
+      childWhenDragging: Opacity(opacity: 0.0, child: userCard),
       feedbackOffset: Offset.zero,
       dragAnchor: DragAnchor.child,
       maxSimultaneousDrags: 1,
@@ -257,14 +257,14 @@ class UserList extends StatelessWidget {
     );
 
     if (model.showingUserActions) {
-      return new Padding(
-        padding: const EdgeInsets.only(left: 16.0),
-        child: new Column(
+      return Padding(
+        padding: EdgeInsets.only(left: 16.0),
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
-            new Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: new Text(
+            Padding(
+              padding: EdgeInsets.only(bottom: 8.0),
+              child: Text(
                 account.displayName,
                 textAlign: TextAlign.center,
                 maxLines: 1,
@@ -276,15 +276,15 @@ class UserList extends StatelessWidget {
         ),
       );
     } else {
-      return new Padding(
-        padding: const EdgeInsets.only(left: 16.0),
+      return Padding(
+        padding: EdgeInsets.only(left: 16.0),
         child: userImage,
       );
     }
   }
 
   Widget _buildUserList(UserPickerBaseShellModel model) {
-    return new LayoutBuilder(
+    return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         List<Widget> children = <Widget>[];
 
@@ -293,7 +293,7 @@ class UserList extends StatelessWidget {
 
         if (model.showingUserActions) {
           children.add(
-            new Align(
+            Align(
               alignment: FractionalOffset.bottomCenter,
               child: _buildExpandedUserActions(
                 model: model,
@@ -303,7 +303,7 @@ class UserList extends StatelessWidget {
           );
         } else {
           children.add(
-            new Align(
+            Align(
               alignment: FractionalOffset.bottomCenter,
               child: _buildIconButton(
                 onTap: model.showUserActions,
@@ -316,7 +316,7 @@ class UserList extends StatelessWidget {
 
         children.addAll(
           model.accounts.map(
-            (Account account) => new Align(
+            (Account account) => Align(
                   alignment: FractionalOffset.bottomCenter,
                   child: _buildUserEntry(
                     account: account,
@@ -332,21 +332,21 @@ class UserList extends StatelessWidget {
           ),
         );
 
-        return new Container(
+        return Container(
           height: (isSmall ? _kUserAvatarSizeSmall : _kUserAvatarSizeLarge) +
               24.0 +
               (model.showingUserActions ? 24.0 : 0.0),
-          child: new AnimatedOpacity(
-            duration: const Duration(milliseconds: 250),
+          child: AnimatedOpacity(
+            duration: Duration(milliseconds: 250),
             opacity: model.showingRemoveUserTarget ? 0.0 : 1.0,
-            child: new ListView(
-              padding: const EdgeInsets.only(
+            child: ListView(
+              padding: EdgeInsets.only(
                 bottom: 24.0,
                 right: 24.0,
               ),
               scrollDirection: Axis.horizontal,
               reverse: true,
-              physics: const BouncingScrollPhysics(),
+              physics: BouncingScrollPhysics(),
               shrinkWrap: true,
               children: children,
             ),
@@ -358,26 +358,26 @@ class UserList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      new ScopedModelDescendant<UserPickerBaseShellModel>(builder: (
+      ScopedModelDescendant<UserPickerBaseShellModel>(builder: (
         BuildContext context,
         Widget child,
         UserPickerBaseShellModel model,
       ) {
         if (model.showingLoadingSpinner) {
-          return new Stack(
+          return Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
-              new Center(
-                child: new Container(
+              Center(
+                child: Container(
                   width: 64.0,
                   height: 64.0,
-                  child: const FuchsiaSpinner(),
+                  child: FuchsiaSpinner(),
                 ),
               ),
             ],
           );
         } else {
-          return new Stack(
+          return Stack(
             fit: StackFit.passthrough,
             children: <Widget>[
               _buildUserList(model),

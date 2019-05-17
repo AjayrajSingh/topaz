@@ -17,13 +17,12 @@ dart_app("mind_reader_dart") {
       ]
       deps = [
         "//sdk/fidl/fuchsia.sys",
+        "//topaz/public/dart/fuchsia",
         "//topaz/public/dart/fuchsia_logger",
         "//topaz/public/dart/fuchsia_services",
         "//topaz/public/dart/fuchsia_services/examples/mind_reader/fidl",
         "//topaz/public/dart/fuchsia_vfs",
-        "//topaz/public/dart/fuchsia",
         "//topaz/public/dart/zircon",
-        "//zircon/public/fidl/fuchsia-io",
       ]
     },
     {
@@ -37,12 +36,12 @@ dart_app("mind_reader_dart") {
       ]
       deps = [
         "//topaz/public/dart/fidl",
+        "//topaz/public/dart/fuchsia",
         "//topaz/public/dart/fuchsia_logger",
         "//topaz/public/dart/fuchsia_services",
         "//topaz/public/dart/fuchsia_services/examples/mind_reader/fidl",
-        "//topaz/public/dart/fuchsia",
       ]
-    }
+    },
   ]
 
   meta = [
@@ -53,6 +52,6 @@ dart_app("mind_reader_dart") {
     {
       path = rebase_path("server/meta/mind_reader_server.cmx")
       dest = "mind_reader_server.cmx"
-    }
+    },
   ]
 }

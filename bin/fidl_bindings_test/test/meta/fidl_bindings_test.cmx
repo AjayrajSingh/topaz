@@ -4,6 +4,7 @@
     },
     "sandbox": {
         "services": [
+            "fidl.examples.bindingstest.TestServer",
             "fuchsia.cobalt.LoggerFactory",
             "fuchsia.fonts.Provider",
             "fuchsia.logger.LogSink",
@@ -12,11 +13,11 @@
             "fuchsia.modular.ModuleContext",
             "fuchsia.netstack.Netstack",
             "fuchsia.sys.Environment",
+            "fuchsia.sys.Launcher",
             "fuchsia.testing.runner.TestRunner",
             "fuchsia.ui.input.ImeService",
             "fuchsia.ui.policy.Presenter",
             "fuchsia.ui.scenic.Scenic",
-            "fuchsia.ui.viewsv1.ViewManager",
             "fuchsia.wlan.service.Wlan"
         ]
     }

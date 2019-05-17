@@ -97,7 +97,7 @@ class QrCode {
   QrCode.withList(List<int> initData, this.mask, this.version, this.errCorLvl) {
     _checkMask();
     if (version < 1 || version > 40) {
-      throw new ArgumentError('Version value out of range');
+      throw ArgumentError('Version value out of range');
     }
 
     _createGrid();
@@ -135,7 +135,7 @@ class QrCode {
   /// code points (not UTF-16 code units). The smallest possible QR Code version is automatically chosen for the output.
   /// The ECC level of the result may be higher than the ecl argument if it can be done without increasing the version.
   factory QrCode.encodeText(String text, EccEnum ecl) =>
-      new QrCode._encodeSegments(
+      QrCode._encodeSegments(
         segs: _QrSegment.makeSegments(text),
         initialEcl: _kEcc[ecl],
       );
@@ -145,7 +145,7 @@ class QrCode {
   /// bytes allowed is 2953. The smallest possible QR Code version is automatically chosen for the output.
   /// The ECC level of the result may be higher than the ecl argument if it can be done without increasing the version.
   factory QrCode.encodeBinary(List<int> data, EccEnum ecl) =>
-      new QrCode._encodeSegments(
+      QrCode._encodeSegments(
         segs: <_QrSegment>[new _QrSegment.makeBytes(data)],
         initialEcl: _kEcc[ecl],
       );
@@ -165,7 +165,7 @@ class QrCode {
     if (!(1 <= minVersion && minVersion <= maxVersion && maxVersion <= 40) ||
         mask < -1 ||
         mask > 7) {
-      throw new ArgumentError('Invalid value');
+      throw ArgumentError('Invalid value');
     }
 
     _Ecc ecl = initialEcl;
@@ -182,7 +182,7 @@ class QrCode {
       }
       if (version >= maxVersion) {
         // All versions in the range could not fit the given data
-        throw new ArgumentError('Data too long');
+        throw ArgumentError('Data too long');
       }
     }
 
@@ -200,7 +200,7 @@ class QrCode {
 
     // Create the data bit string by concatenating all segments
     int dataCapacityBits = _getNumDataCodewords(version, ecl) * 8;
-    _BitBuffer bb = new _BitBuffer();
+    _BitBuffer bb = _BitBuffer();
     for (_QrSegment seg in segs) {
       bb
         ..appendBits(seg.mode.modeBits, 4)
@@ -222,13 +222,13 @@ class QrCode {
     assert(bb.bitLength % 8 == 0);
 
     // Create the QR Code symbol
-    return new QrCode.withList(bb.bytes, mask, version, ecl);
+    return QrCode.withList(bb.bytes, mask, version, ecl);
   }
 
   void _checkMask() {
     // Check arguments and handle simple scalar fields
     if (mask < -1 || mask > 7) {
-      throw new ArgumentError('Mask value out of range');
+      throw ArgumentError('Mask value out of range');
     }
   }
 
@@ -236,13 +236,13 @@ class QrCode {
     size = version * 4 + 17;
 
     // Initialize both grids to be size*size arrays of Boolean false
-    _modules = new List<List<bool>>.generate(
+    _modules = List<List<bool>>.generate(
       size,
-      (_) => new List<bool>.filled(size, false),
+      (_) => List<bool>.filled(size, false),
     );
-    _isFunction = new List<List<bool>>.generate(
+    _isFunction = List<List<bool>>.generate(
       size,
-      (_) => new List<bool>.filled(size, false),
+      (_) => List<bool>.filled(size, false),
     );
   }
 
@@ -426,7 +426,7 @@ class QrCode {
 
     // Split data into blocks and append ECC to each block
     List<List<int>> blocks = <List<int>>[];
-    _ReedSolomonGenerator rs = new _ReedSolomonGenerator(blockEccLen);
+    _ReedSolomonGenerator rs = _ReedSolomonGenerator(blockEccLen);
     for (int i = 0, k = 0; i < numBlocks; i++) {
       List<int> dat = data.sublist(
           k, k + shortBlockLen - blockEccLen + (i < numShortBlocks ? 0 : 1));
@@ -456,7 +456,7 @@ class QrCode {
   // data area of this QR Code symbol. Function modules need to be marked off before this is called.
   void _drawCodewords(List<int> data) {
     if (data.length != (_getNumRawDataModules(version) / 8).floor()) {
-      throw new ArgumentError('Invalid argument');
+      throw ArgumentError('Invalid argument');
     }
     int i = 0; // Bit index into the data
     // Do the funny zigzag scan
@@ -489,7 +489,7 @@ class QrCode {
   // well-formed QR Code symbol needs exactly one mask applied (not zero, not two, etc.).
   void _applyMask(int mask) {
     if (mask < 0 || mask > 7) {
-      throw new ArgumentError('Mask value out of range');
+      throw ArgumentError('Mask value out of range');
     }
     for (int y = 0; y < size; y++) {
       for (int x = 0; x < size; x++) {
@@ -627,7 +627,7 @@ class QrCode {
   // This stateless pure function could be implemented as table of 40 variable-length lists of integers.
   static List<int> _getAlignmentPatternPositions(int ver) {
     if (ver != null && (ver < 1 || ver > 40))
-      throw new ArgumentError('Version number out of range');
+      throw ArgumentError('Version number out of range');
     else if (ver == 1)
       return <int>[];
     else {
@@ -652,7 +652,7 @@ class QrCode {
   // The result is in the range [208, 29648]. This could be implemented as a 40-entry lookup table.
   static int _getNumRawDataModules(int ver) {
     if (ver < 1 || ver > 40)
-      throw new ArgumentError('Version number out of range');
+      throw ArgumentError('Version number out of range');
     int result = (16 * ver + 128) * ver + 64;
     if (ver >= 2) {
       int numAlign = (ver / 7).floor() + 2;
@@ -669,7 +669,7 @@ class QrCode {
   // This stateless pure function could be implemented as a (40*4)-cell lookup table.
   static int _getNumDataCodewords(int ver, _Ecc ecl) {
     if (ver < 1 || ver > 40)
-      throw new ArgumentError('Version number out of range');
+      throw ArgumentError('Version number out of range');
     return (_getNumRawDataModules(ver) / 8).floor() -
         _kEccCodewordsPerBlock[ecl.ordinal][ver] *
             QrCode._kNumErrorCorrectionBlocks[ecl.ordinal][ver];
@@ -1044,10 +1044,10 @@ class QrCode {
 	 */
   static final Map<EccEnum, _Ecc> _kEcc = <EccEnum, _Ecc>{
     // Constants declared in ascending order of error protection
-    EccEnum.low: new _Ecc(0, 1),
-    EccEnum.medium: new _Ecc(1, 0),
-    EccEnum.quartile: new _Ecc(2, 3),
-    EccEnum.high: new _Ecc(3, 2),
+    EccEnum.low: _Ecc(0, 1),
+    EccEnum.medium: _Ecc(1, 0),
+    EccEnum.quartile: _Ecc(2, 3),
+    EccEnum.high: _Ecc(3, 2),
   };
 }
 
@@ -1092,7 +1092,7 @@ class _QrSegment {
 
   _QrSegment(this.mode, this.numChars, this.bitData) {
     if (numChars < 0) {
-      throw new ArgumentError('Invalid argument');
+      throw ArgumentError('Invalid argument');
     }
   }
 
@@ -1100,34 +1100,34 @@ class _QrSegment {
 
   /// Returns a segment representing the given binary data encoded in byte mode.
   factory _QrSegment.makeBytes(List<int> data) {
-    _BitBuffer bb = new _BitBuffer();
+    _BitBuffer bb = _BitBuffer();
     for (int b in data) {
       bb.appendBits(b, 8);
     }
-    return new _QrSegment(kMode[_ModeEnum.byte], data.length, bb.bits);
+    return _QrSegment(kMode[_ModeEnum.byte], data.length, bb.bits);
   }
 
   /// Returns a segment representing the given string of decimal digits encoded in numeric mode.
   factory _QrSegment.makeNumeric(String digits) {
     if (!digits.contains(kNumericRegEx))
-      throw new ArgumentError('String contains non-numeric characters');
-    _BitBuffer bb = new _BitBuffer();
+      throw ArgumentError('String contains non-numeric characters');
+    _BitBuffer bb = _BitBuffer();
     int i;
     for (i = 0; i + 3 <= digits.length; i += 3) // Process groups of 3
       bb.appendBits(int.parse(digits.substring(i, 3), radix: 10), 10);
     int rem = digits.length - i;
     if (rem > 0) // 1 or 2 digits remaining
       bb.appendBits(int.parse(digits.substring(i), radix: 10), rem * 3 + 1);
-    return new _QrSegment(kMode[_ModeEnum.numeric], digits.length, bb.bits);
+    return _QrSegment(kMode[_ModeEnum.numeric], digits.length, bb.bits);
   }
 
   /// Returns a segment representing the given text string encoded in alphanumeric mode. The characters allowed are:
   /// 0 to 9, A to Z (uppercase only), space, dollar, percent, asterisk, plus, hyphen, period, slash, colon.
   factory _QrSegment.makeAlphanumeric(String text) {
     if (!text.contains(kAlphanumericRegex))
-      throw new ArgumentError(
+      throw ArgumentError(
           'String contains unencodable characters in alphanumeric mode');
-    _BitBuffer bb = new _BitBuffer();
+    _BitBuffer bb = _BitBuffer();
     int i;
     for (i = 0; i + 2 <= text.length; i += 2) {
       // Process groups of 2
@@ -1137,12 +1137,12 @@ class _QrSegment {
     }
     if (i < text.length) // 1 character remaining
       bb.appendBits(kAlphanumericCharset.indexOf(text[i]), 6);
-    return new _QrSegment(kMode[_ModeEnum.alphanumeric], text.length, bb.bits);
+    return _QrSegment(kMode[_ModeEnum.alphanumeric], text.length, bb.bits);
   }
 
   /// Returns a segment representing an Extended Channel Interpretation (ECI) designator with the given assignment value.
   factory _QrSegment.makeEci(int assignVal) {
-    _BitBuffer bb = new _BitBuffer();
+    _BitBuffer bb = _BitBuffer();
     if (0 <= assignVal && assignVal < (1 << 7))
       bb.appendBits(assignVal, 8);
     else if ((1 << 7) <= assignVal && assignVal < (1 << 14)) {
@@ -1150,15 +1150,15 @@ class _QrSegment {
     } else if ((1 << 14) <= assignVal && assignVal < 999999) {
       bb..appendBits(6, 3)..appendBits(assignVal, 21);
     } else
-      throw new ArgumentError('ECI assignment value out of range');
-    return new _QrSegment(kMode[_ModeEnum.eci], 0, bb.bits);
+      throw ArgumentError('ECI assignment value out of range');
+    return _QrSegment(kMode[_ModeEnum.eci], 0, bb.bits);
   }
 
   // Returns a copy of all bits, which is an array of 0s and 1s.
-  List<int> get bits => new List<int>.from(bitData);
+  List<int> get bits => List<int>.from(bitData);
 
   /*
-		 * Returns a new mutable list of zero or more segments to represent the given Unicode text string.
+		 * Returns a mutable list of zero or more segments to represent the given Unicode text string.
 		 * The result may use various segment modes and switch modes to optimize the length of the bit stream.
 		 */
   static List<_QrSegment> makeSegments(String text) {
@@ -1176,7 +1176,7 @@ class _QrSegment {
   // Package-private helper function.
   static int getTotalBits(List<_QrSegment> segs, int version) {
     if (version < 1 || version > 40)
-      throw new ArgumentError('Version number out of range');
+      throw ArgumentError('Version number out of range');
     int result = 0;
     for (int i = 0; i < segs.length; i++) {
       _QrSegment seg = segs[i];
@@ -1193,11 +1193,11 @@ class _QrSegment {
 /*---- Constants for QrSegment ----*/
 
 // (Public) Can test whether a string is encodable in numeric mode (such as by using QrSegment.makeNumeric()).
-  static final RegExp kNumericRegEx = new RegExp(r'/^[0-9]*\$/');
+  static final RegExp kNumericRegEx = RegExp(r'/^[0-9]*\$/');
 
 // (Public) Can test whether a string is encodable in alphanumeric mode (such as by using QrSegment.makeAlphanumeric()).
   static final RegExp kAlphanumericRegex =
-      new RegExp('r/^[A-Z0-9 \$%*+.\/:-]*\$/');
+      RegExp('r/^[A-Z0-9 \$%*+.\/:-]*\$/');
 
 // (Private) The set of all legal characters in alphanumeric mode, where each character value maps to the index in the string.
   static const String kAlphanumericCharset =
@@ -1210,11 +1210,11 @@ class _QrSegment {
  */
   static final Map<_ModeEnum, _Mode> kMode = <_ModeEnum, _Mode>{
     // Constants
-    _ModeEnum.numeric: new _Mode(0x1, <int>[10, 12, 14]),
-    _ModeEnum.alphanumeric: new _Mode(0x2, <int>[9, 11, 13]),
-    _ModeEnum.byte: new _Mode(0x4, <int>[8, 16, 16]),
-    _ModeEnum.kanji: new _Mode(0x8, <int>[8, 10, 12]),
-    _ModeEnum.eci: new _Mode(0x7, <int>[0, 0, 0]),
+    _ModeEnum.numeric: _Mode(0x1, <int>[10, 12, 14]),
+    _ModeEnum.alphanumeric: _Mode(0x2, <int>[9, 11, 13]),
+    _ModeEnum.byte: _Mode(0x4, <int>[8, 16, 16]),
+    _ModeEnum.kanji: _Mode(0x8, <int>[8, 10, 12]),
+    _ModeEnum.eci: _Mode(0x7, <int>[0, 0, 0]),
   };
 }
 
@@ -1243,7 +1243,7 @@ class _Mode {
       else if (27 <= ver && ver <= 40)
         return ccbits[2];
       else
-        throw new ArgumentError('Version number out of range');
+        throw ArgumentError('Version number out of range');
     };
   }
 }
@@ -1286,7 +1286,7 @@ class _ReedSolomonGenerator {
 
   _ReedSolomonGenerator(this.degree) {
     if (degree < 1 || degree > 255)
-      throw new ArgumentError('Degree out of range');
+      throw ArgumentError('Degree out of range');
 
     // Start with the monomial x^0
     for (int i = 0; i < degree - 1; i++) {
@@ -1329,7 +1329,7 @@ class _ReedSolomonGenerator {
 // result are unsigned 8-bit integers. This could be implemented as a lookup table of 256*256 entries of uint8.
   static int multiply(int x, int y) {
     if (x >> 8 != 0 || y >> 8 != 0)
-      throw new ArgumentError('Byte out of range');
+      throw ArgumentError('Byte out of range');
     // Russian peasant multiplication
     int z = 0;
     for (int i = 7; i >= 0; i--) {
@@ -1351,7 +1351,7 @@ class _BitBuffer {
   int get bitLength => bitData.length;
 
   // Returns a copy of all bits.
-  List<int> get bits => new List<int>.from(bitData);
+  List<int> get bits => List<int>.from(bitData);
 
   // Returns a copy of all bytes, padding up to the nearest byte.
   List<int> get bytes {
@@ -1372,7 +1372,7 @@ class _BitBuffer {
   // If 0 <= len <= 31, then this requires 0 <= val < 2^len.
   void appendBits(int val, int len) {
     if (len < 0 || len > 32 || len < 32 && (val >> len) != 0)
-      throw new ArgumentError('Value out of range');
+      throw ArgumentError('Value out of range');
     for (int i = len - 1; i >= 0; i--) // Append bit by bit
       bitData.add((val >> i) & 1);
   }

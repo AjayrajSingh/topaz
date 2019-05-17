@@ -6,14 +6,37 @@
 
 #include <fcntl.h>
 #include <fuchsia/fonts/cpp/fidl.h>
-#include <lib/async-loop/cpp/loop.h>
-#include <lib/component/cpp/startup_context.h>
-#include <lib/component/cpp/testing/test_with_environment.h>
+#include <fuchsia/sys/cpp/fidl.h>
+#include <lib/fdio/fd.h>
+#include <lib/gtest/real_loop_fixture.h>
+#include <lib/sys/cpp/service_directory.h>
+#include <lib/zx/channel.h>
+#include <lib/zx/handle.h>
+#include <memory>
 
 #include "gtest/gtest.h"
-#include "lib/fsl/io/fd.h"
 #include "third_party/skia/include/core/SkFontMgr.h"
 #include "third_party/skia/include/core/SkTypeface.h"
+
+namespace {
+
+zx::channel CloneChannelFromFileDescriptor(int fd) {
+  zx::handle handle;
+  zx_status_t status = fdio_fd_clone(fd, handle.reset_and_get_address());
+  if (status != ZX_OK)
+    return zx::channel();
+
+  zx_info_handle_basic_t info = {};
+  status =
+      handle.get_info(ZX_INFO_HANDLE_BASIC, &info, sizeof(info), NULL, NULL);
+
+  if (status != ZX_OK || info.type != ZX_OBJ_TYPE_CHANNEL)
+    return zx::channel();
+
+  return zx::channel(handle.release());
+}
+
+}  // namespace
 
 namespace txt {
 
@@ -29,67 +52,49 @@ constexpr char kTestFontFamily[] = "Roboto";
 constexpr char kFontsServiceUrl[] =
     "fuchsia-pkg://fuchsia.com/fonts#meta/fonts.cmx";
 
-class FuchsiaFontManagerTest : public component::testing::TestWithEnvironment {
+class FuchsiaFontManagerTest : public gtest::RealLoopFixture {
  public:
-  FuchsiaFontManagerTest() : loop_(&kAsyncLoopConfigNoAttachToThread) {
-    // Grab the current Environment. We'll need it to create a new set of
-    // services on a background thread.
-    auto context = component::StartupContext::CreateFromStartupInfo();
-    fuchsia::sys::EnvironmentPtr parent_env;
-    context->ConnectToEnvironmentService(parent_env.NewRequest());
+  FuchsiaFontManagerTest() {
+    auto services = sys::ServiceDirectory::CreateFromNamespace();
+    // Grab launcher and launch font provider.
+    fuchsia::sys::LauncherPtr launcher;
+    services->Connect(launcher.NewRequest());
 
-    // Create a new set of services running on a newly started (background)
-    // thread.
-    loop_.StartThread();
-    auto services = component::testing::EnvironmentServices::Create(
-        parent_env, loop_.dispatcher());
+    zx::channel out_services_request;
+    auto font_services =
+        sys::ServiceDirectory::CreateWithRequest(&out_services_request);
+    auto launch_info_font_service = GetLaunchInfoForFontService();
+    launch_info_font_service.directory_request =
+        std::move(out_services_request);
 
-    // Add the fonts provider service to services. We need to use the version of
-    // AddServiceWithLaunchInfo that takes a callback to produce LaunchInfo
-    // because the version that takes LaunchInfo directly only uses 'url' and
-    // 'aguments', but we need 'flat_namespace' as well in order to have the
-    // font provider use the test fonts in our package.
-    zx_status_t status = services->AddServiceWithLaunchInfo(
-        kFontsServiceUrl,
-        []() {
-          fuchsia::sys::LaunchInfo launch_info;
-          launch_info.url = kFontsServiceUrl;
-          launch_info.arguments.reset(
-              {"--no-default-fonts",
-               "--font-manifest=/test_fonts/manifest.json"});
-          fxl::UniqueFD tmp_dir_fd(
-              open("/pkg/data/testdata/test_fonts", O_DIRECTORY | O_RDONLY));
-          launch_info.flat_namespace = fuchsia::sys::FlatNamespace::New();
-          launch_info.flat_namespace->paths.push_back("/test_fonts");
-          launch_info.flat_namespace->directories.push_back(
-              fsl::CloneChannelFromFileDescriptor(tmp_dir_fd.get()));
-          return launch_info;
-        },
-        fuchsia::fonts::Provider::Name_);
-    EXPECT_EQ(ZX_OK, status);
+    launcher->CreateComponent(std::move(launch_info_font_service),
+                              font_service_controller_.NewRequest());
 
-    // Create an enclosing environment wrapping the new set of services.
-    environment_ = CreateNewEnclosingEnvironment("font_manager_tests",
-                                                 std::move(services));
-    EXPECT_TRUE(WaitForEnclosingEnvToStart(environment_.get()));
-
-    // Connect to the font provider service through the enclosing environment
-    // (so that it runs on the background thread), and then wrap it inside the
-    // font manager we will be testing.
+    // Connect to the font provider service and then wrap it inside the font
+    // manager we will be testing.
     fuchsia::fonts::ProviderSyncPtr provider_ptr;
-    environment_->ConnectToService(provider_ptr.NewRequest());
+    font_services->Connect(provider_ptr.NewRequest());
+
     font_manager_ = sk_make_sp<FuchsiaFontManager>(std::move(provider_ptr));
   }
 
-  void TearDown() override {
-    // Make sure the background thread terminates before tearing down the
-    // enclosing environment (otherwise we get a crash).
-    loop_.Quit();
+  fuchsia::sys::LaunchInfo GetLaunchInfoForFontService() {
+    fuchsia::sys::LaunchInfo launch_info;
+    launch_info.url = kFontsServiceUrl;
+    launch_info.arguments.reset(
+        {"--no-default-fonts", "--font-manifest=/test_fonts/manifest.json"});
+    auto tmp_dir_fd = open("/pkg/data/testdata/test_fonts",
+                           O_DIRECTORY | O_RDONLY);
+    launch_info.flat_namespace = fuchsia::sys::FlatNamespace::New();
+    launch_info.flat_namespace->paths.push_back("/test_fonts");
+    launch_info.flat_namespace->directories.push_back(
+        CloneChannelFromFileDescriptor(tmp_dir_fd));
+    close(tmp_dir_fd);
+    return launch_info;
   }
 
  protected:
-  async::Loop loop_;
-  std::unique_ptr<component::testing::EnclosingEnvironment> environment_;
+  fuchsia::sys::ComponentControllerPtr font_service_controller_;
   sk_sp<SkFontMgr> font_manager_;
 };
 

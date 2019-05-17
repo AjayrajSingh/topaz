@@ -8,7 +8,7 @@ import 'ticking_model.dart';
 export 'ticking_model.dart' show ScopedModel, Model, ScopedModelDescendant;
 
 const RK4SpringDescription _kSimulationDesc =
-    const RK4SpringDescription(tension: 450.0, friction: 50.0);
+    RK4SpringDescription(tension: 450.0, friction: 50.0);
 
 /// Models the progress of a spring simulation.
 class SpringModel extends TickingModel {
@@ -19,7 +19,7 @@ class SpringModel extends TickingModel {
 
   /// Constructor.
   SpringModel({this.springDescription = _kSimulationDesc}) {
-    _simulation = new RK4SpringSimulation(
+    _simulation = RK4SpringSimulation(
       initValue: 0.0,
       desc: springDescription,
     );
@@ -27,7 +27,7 @@ class SpringModel extends TickingModel {
 
   /// Jumps the simulation to [value].
   void jump(double value) {
-    _simulation = new RK4SpringSimulation(
+    _simulation = RK4SpringSimulation(
       initValue: value,
       desc: springDescription,
     );

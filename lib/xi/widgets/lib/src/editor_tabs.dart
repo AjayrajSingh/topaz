@@ -3,9 +3,11 @@
 // found in the LICENSE file.
 
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:xi_client/client.dart';
+
 import 'document.dart';
 import 'editor.dart';
 import 'editor_host.dart';
@@ -20,7 +22,7 @@ class EditorTabs extends EditorHost {
         super(key: key, coreProxy: coreProxy, debugBackground: debugBackground);
 
   @override
-  State<EditorTabs> createState() => new EditorTabsState();
+  State<EditorTabs> createState() => EditorTabsState();
 }
 
 class EditorTabsState extends State<EditorTabs>
@@ -43,7 +45,7 @@ class EditorTabsState extends State<EditorTabs>
     super.initState();
     widget.coreProxy.handler = this;
     widget.coreProxy.clientStarted().then((_) => newView());
-    _tabController = new TabController(vsync: this, length: 0);
+    _tabController = TabController(vsync: this, length: 0);
   }
 
   void newView() {
@@ -52,10 +54,10 @@ class EditorTabsState extends State<EditorTabs>
         _viewIds.add(viewId);
         _fakeDocumentTitles[viewId] = 'Untitled $_nextDocumentTitleNumber';
         _nextDocumentTitleNumber += 1;
-        _documents.putIfAbsent(viewId, () => new Document());
+        _documents.putIfAbsent(viewId, () => Document());
         _documents[viewId].finalizeViewProxy(widget.coreProxy.view(viewId));
         int prevIndex = _tabController.index;
-        _tabController = new TabController(
+        _tabController = TabController(
             vsync: this, length: _viewIds.length, initialIndex: prevIndex)
           ..animateTo(_viewIds.length - 1);
       });
@@ -69,7 +71,7 @@ class EditorTabsState extends State<EditorTabs>
       _viewIds.remove(viewId);
       _documents.remove(viewId);
       int prevIndex = _tabController.index;
-      _tabController = new TabController(
+      _tabController = TabController(
           vsync: this,
           length: _viewIds.length,
           initialIndex: math.max(0, math.min(prevIndex, _viewIds.length - 1)));
@@ -82,7 +84,7 @@ class EditorTabsState extends State<EditorTabs>
     // can get called before `newView`'s future resolves. However this does mean
     // races are possible if this is called with a `viewId` of a closed view, in which case
     // we could have some zombie documents sitting around.
-    _documents.putIfAbsent(viewId, () => new Document());
+    _documents.putIfAbsent(viewId, () => Document());
     return _documents[viewId];
   }
 
@@ -104,16 +106,16 @@ class EditorTabsState extends State<EditorTabs>
   @override
   Widget build(BuildContext context) {
     List<Widget> actions = [
-      new IconButton(icon: Icon(Icons.add), onPressed: newView)
+      IconButton(icon: Icon(Icons.add), onPressed: newView)
     ];
     if (_viewIds.length > 1) {
-      actions.add(new IconButton(
+      actions.add(IconButton(
           icon: Icon(Icons.remove),
           onPressed: () => closeView(_viewIds[_tabController.index])));
     }
 
     return MaterialApp(
-      theme: new ThemeData(
+      theme: ThemeData(
         primaryColor: Colors.pink[300],
       ),
       home: Scaffold(
@@ -123,11 +125,11 @@ class EditorTabsState extends State<EditorTabs>
               ? TabBar(
                   indicatorColor: Colors.white,
                   indicatorWeight: 4.0,
-                  labelStyle: const TextStyle(fontSize: 16.0),
+                  labelStyle: TextStyle(fontSize: 16.0),
                   isScrollable: true,
                   controller: _tabController,
                   tabs: _viewIds
-                      .map((id) => new Tab(text: _fakeDocumentTitles[id]))
+                      .map((id) => Tab(text: _fakeDocumentTitles[id]))
                       .toList(),
                 )
               : null,
@@ -150,10 +152,10 @@ class EditorTabsState extends State<EditorTabs>
     }
 
     return TabBarView(
-      physics: const NeverScrollableScrollPhysics(),
+      physics: NeverScrollableScrollPhysics(),
       controller: _tabController,
       children: _viewIds.map((id) {
-        return new Editor(
+        return Editor(
           document: _documents[id],
           key: Key(id),
           debugBackground: widget.debugBackground,

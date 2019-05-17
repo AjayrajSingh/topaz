@@ -21,9 +21,7 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart'
         UserInput;
 import 'package:fidl_fuchsia_shell_ermine/fidl_async.dart'
     show AskBar, AskBarBinding;
-import 'package:fuchsia_services/services.dart'
-    show connectToEnvironmentService, StartupContext;
-import 'package:lib.widgets/model.dart' show SpringModel;
+import 'package:fuchsia_services/services.dart' show StartupContext;
 import 'package:zircon/zircon.dart' show Vmo;
 
 const int _kMaxSuggestions = 20;
@@ -44,12 +42,12 @@ class AskModel extends ChangeNotifier {
   final ValueNotifier<List<Suggestion>> suggestions =
       ValueNotifier(<Suggestion>[]);
   final ValueNotifier<int> selection = ValueNotifier(-1);
-  final SpringModel animation = SpringModel();
 
   double autoCompleteTop = 0;
   double elevation = 200.0;
 
   _AskImpl _ask;
+  String _currentQuery;
 
   final _askBinding = AskBarBinding();
   final _suggestionProvider = SuggestionProviderProxy();
@@ -59,7 +57,9 @@ class AskModel extends ChangeNotifier {
 
   AskModel({this.startupContext}) {
     _ask = _AskImpl(this);
-    connectToEnvironmentService(_suggestionProvider);
+    StartupContext.fromStartupInfo()
+        .incoming
+        .connectToService(_suggestionProvider);
   }
 
   void focus(BuildContext context) =>
@@ -95,20 +95,21 @@ class AskModel extends ChangeNotifier {
   void show() {
     visibility.value = true;
     _ask.fireVisible();
-    animation
-      ..jump(0.8)
-      ..target = 1.0;
     controller.clear();
+    onQuery('');
   }
 
   void hide() {
+    visibility.value = false;
+  }
+
+  /// Called from ui when hiding animation has completed.
+  void hideAnimationCompleted() {
     _suggestions = <Suggestion>[];
     suggestions.value = _suggestions;
     selection.value = -1;
-    _ask.fireHidden();
-    visibility.value = false;
-    animation.jump(0.8);
     controller.clear();
+    _ask.fireHidden();
   }
 
   void onAsk(String query) {
@@ -153,19 +154,22 @@ class AskModel extends ChangeNotifier {
           return;
       }
       selection.value = newSelection.clamp(0, suggestions.value.length - 1);
-      controller
-        ..text = suggestions.value[selection.value].display.details
-        ..selection = TextSelection.fromPosition(TextPosition(
-          offset: controller.text.length,
-        ));
+      controller.value = controller.value.copyWith(
+        text: suggestions.value[selection.value].display.details,
+        selection: TextSelection(
+          baseOffset: 0,
+          extentOffset:
+              suggestions.value[selection.value].display.details.length,
+        ),
+      );
     }
   }
 
   void onQuery(String query) {
-    if (query?.isEmpty ?? true) {
+    if (query == _currentQuery || !controller.selection.isCollapsed) {
       return;
     }
-
+    _currentQuery = query;
     _suggestions = <Suggestion>[];
 
     final queryListenerBinding = QueryListenerBinding();
@@ -185,7 +189,7 @@ class AskModel extends ChangeNotifier {
   }
 
   void advertise() {
-    startupContext.outgoing.addServiceForName(
+    startupContext.outgoing.addPublicService(
       (InterfaceRequest<AskBar> request) => _askBinding.bind(_ask, request),
       AskBar.$serviceName,
     );

@@ -50,8 +50,8 @@ Widget mainWidget(DemoModel model) {
             floatingActionButton: FloatingActionButton(
                 child: Text('Send'), onPressed: () => model.sendButtonAction()),
             body: model.editorConn != null
-                ? new ChildView(connection: model.editorConn)
-                : new Placeholder(),
+                ? ChildView(connection: model.editorConn)
+                : Placeholder(),
           ),
         ),
       ),

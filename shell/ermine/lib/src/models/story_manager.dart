@@ -4,9 +4,8 @@
 
 import 'package:flutter/material.dart';
 
-import 'package:fidl/fidl.dart' show InterfaceHandle, InterfaceRequest;
-import 'package:fidl_fuchsia_ui_gfx/fidl_async.dart';
-import 'package:fidl_fuchsia_ui_viewsv1token/fidl_async.dart' show ViewOwner;
+import 'package:fidl/fidl.dart' show InterfaceRequest;
+import 'package:fidl_fuchsia_ui_views/fidl_async.dart' show ViewHolderToken;
 import 'package:fidl_fuchsia_modular/fidl_async.dart'
     show
         FocusControllerProxy,
@@ -24,7 +23,6 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart'
         StoryVisibilityState,
         ViewIdentifier;
 import 'package:fuchsia_services/services.dart' show StartupContext;
-import 'package:zircon/zircon.dart';
 
 import 'story_model.dart';
 
@@ -51,6 +49,9 @@ class StoryManager extends ChangeNotifier {
   /// Holds the id of the story that has focus.
   String focusedStoryId;
 
+  bool _isFullscreen = false;
+  bool get isFullscreen => _isFullscreen;
+
   final _focusProvider = FocusProviderProxy();
   final _focusController = FocusControllerProxy();
   final _storyProvider = StoryProviderProxy();
@@ -64,6 +65,14 @@ class StoryManager extends ChangeNotifier {
       ..getFocusProvider(_focusProvider.ctrl.request())
       ..getFocusController(_focusController.ctrl.request())
       ..getStoryProvider(_storyProvider.ctrl.request());
+  }
+
+  /// Disconnects from all service proxies.
+  void stop() {
+    _sessionShellBinding.close();
+    _focusController.ctrl.close();
+    _focusProvider.ctrl.close();
+    _storyProvider.ctrl.close();
   }
 
   /// Advertises this instance as [SessionShell].
@@ -88,7 +97,7 @@ class StoryManager extends ChangeNotifier {
         _storyMap[storyInfo.id].fullscreen =
             storyVisibilityState == StoryVisibilityState.immersive;
       }
-    } else {
+    } else if (storyState != StoryState.stopping) {
       final storyController = StoryControllerProxy();
       await _storyProvider.getController(
         storyInfo.id,
@@ -142,10 +151,15 @@ class StoryManager extends ChangeNotifier {
   /// Called when the user swipes to another story.
   void onChangeFocus(int index) {
     // Stories are displayed from second screen onwards, first is empty.
-    if (index > 0) {
-      focusedStoryId = _storyIds[index - 1];
-      _focusController.set(focusedStoryId);
-    }
+    focusedStoryId = index > 0 ? _storyIds[index - 1] : null;
+    _focusController.set(focusedStoryId);
+    notifyListeners();
+  }
+
+  /// toggles fullscreen mode
+  void toggleFullscreen() {
+    _isFullscreen = !_isFullscreen;
+    notifyListeners();
   }
 
   /// Requests focus to be set on the story.
@@ -165,7 +179,7 @@ class StoryManager extends ChangeNotifier {
   }
 
   Future<void> attachView(
-      ViewIdentifier viewId, ImportToken viewHolderToken) async {
+      ViewIdentifier viewId, ViewHolderToken viewHolderToken) async {
     if (_storyMap.containsKey(viewId.storyId)) {
       _storyMap[viewId.storyId].attachView(viewHolderToken);
     }
@@ -213,16 +227,14 @@ class _SessionShellImpl extends SessionShell {
 
   @override
   Future<void> attachView(
-      ViewIdentifier viewId, InterfaceHandle<ViewOwner> viewOwner) async {
-    return attachView2(viewId,
-        ImportToken(value: EventPair(viewOwner.passChannel().passHandle())));
+      ViewIdentifier viewId, ViewHolderToken viewHolderToken) async {
+    return _storyManager.attachView(viewId, viewHolderToken);
   }
 
   @override
-  // ignore: override_on_non_overriding_method
   Future<void> attachView2(
-      ViewIdentifier viewId, ImportToken viewHolderToken) async {
-    return _storyManager.attachView(viewId, viewHolderToken);
+      ViewIdentifier viewId, ViewHolderToken viewHolderToken) async {
+    return attachView(viewId, viewHolderToken);
   }
 
   @override

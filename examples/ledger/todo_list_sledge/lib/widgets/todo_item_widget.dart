@@ -24,17 +24,17 @@ class TodoItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextField title = new TextField(
-        decoration: new InputDecoration(
+    TextField title = TextField(
+        decoration: InputDecoration(
       hintText: _todoItem._title,
     ));
 
-    RaisedButton deleteButton = new RaisedButton(
-        child: const Text('Delete'),
+    RaisedButton deleteButton = RaisedButton(
+        child: Text('Delete'),
         onPressed: _handleDeleteButtonBeingPressed);
 
-    List<Widget> children = <Widget>[new Flexible(child: title), deleteButton];
+    List<Widget> children = <Widget>[Flexible(child: title), deleteButton];
 
-    return new Row(children: children);
+    return Row(children: children);
   }
 }

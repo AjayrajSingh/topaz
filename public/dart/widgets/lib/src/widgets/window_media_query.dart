@@ -18,7 +18,7 @@ class WindowMediaQuery extends StatefulWidget {
   const WindowMediaQuery({this.onWindowMetricsChanged, this.child});
 
   @override
-  _WindowMediaQueryState createState() => new _WindowMediaQueryState();
+  _WindowMediaQueryState createState() => _WindowMediaQueryState();
 }
 
 class _WindowMediaQueryState extends State<WindowMediaQuery>
@@ -36,8 +36,8 @@ class _WindowMediaQueryState extends State<WindowMediaQuery>
   }
 
   @override
-  Widget build(BuildContext context) => new MediaQuery(
-        data: new MediaQueryData.fromWindow(ui.window),
+  Widget build(BuildContext context) => MediaQuery(
+        data: MediaQueryData.fromWindow(ui.window),
         child: widget.child,
       );
 

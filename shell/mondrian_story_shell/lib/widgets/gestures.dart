@@ -46,7 +46,7 @@ class UnidirectionalHorizontalDragGestureRecognizer
   }
 
   @override
-  Offset _getDeltaForDetails(Offset delta) => new Offset(delta.dx, delta.dy);
+  Offset _getDeltaForDetails(Offset delta) => Offset(delta.dx, delta.dy);
 
   @override
   double _getPrimaryValueFromOffset(Offset value) => value.dx;
@@ -115,7 +115,7 @@ abstract class DragGestureRecognizer
   @override
   void addPointer(PointerEvent event) {
     startTrackingPointer(event.pointer);
-    _velocityTrackers[event.pointer] = new gestures.VelocityTracker();
+    _velocityTrackers[event.pointer] = gestures.VelocityTracker();
     if (_state == _DragState.ready) {
       _state = _DragState.possible;
       _initialPosition = event.position;
@@ -143,7 +143,7 @@ abstract class DragGestureRecognizer
           invokeCallback<void>(
             'onUpdate',
             () => onUpdate(
-                  new DragUpdateDetails(
+                  DragUpdateDetails(
                     sourceTimeStamp: event.timeStamp,
                     delta: _getDeltaForDetails(delta),
                     primaryDelta: null,
@@ -174,7 +174,7 @@ abstract class DragGestureRecognizer
         invokeCallback<void>(
           'onStart',
           () => onStart(
-                new DragStartDetails(
+                DragStartDetails(
                   sourceTimeStamp: timestamp,
                   globalPosition: _initialPosition,
                 ),
@@ -205,12 +205,12 @@ abstract class DragGestureRecognizer
       final gestures.VelocityEstimate estimate = tracker.getVelocityEstimate();
       if (estimate != null && _isFlingGesture(estimate)) {
         final Velocity velocity =
-            new Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
+            Velocity(pixelsPerSecond: estimate.pixelsPerSecond)
                 .clampMagnitude(minFlingVelocity ?? gestures.kMinFlingVelocity,
                     maxFlingVelocity ?? gestures.kMaxFlingVelocity);
         invokeCallback<void>(
             'onEnd',
-            () => onEnd(new DragEndDetails(
+            () => onEnd(DragEndDetails(
                   velocity: velocity,
                   primaryVelocity:
                       _getPrimaryValueFromOffset(velocity.pixelsPerSecond),
@@ -220,7 +220,7 @@ abstract class DragGestureRecognizer
       } else {
         invokeCallback<void>(
             'onEnd',
-            () => onEnd(new DragEndDetails(
+            () => onEnd(DragEndDetails(
                   velocity: Velocity.zero,
                   primaryVelocity: 0.0,
                 )), debugReport: () {
@@ -295,9 +295,9 @@ class UnidirectionalHorizontalGestureDetector extends StatelessWidget {
         onHorizontalDragUpdate != null ||
         onHorizontalDragEnd != null) {
       gestures[UnidirectionalHorizontalDragGestureRecognizer] =
-          new GestureRecognizerFactoryWithHandlers<
+          GestureRecognizerFactoryWithHandlers<
               UnidirectionalHorizontalDragGestureRecognizer>(
-        () => new UnidirectionalHorizontalDragGestureRecognizer(
+        () => UnidirectionalHorizontalDragGestureRecognizer(
               direction: direction,
               debugOwner: this,
             ),
@@ -311,7 +311,7 @@ class UnidirectionalHorizontalGestureDetector extends StatelessWidget {
       );
     }
 
-    return new RawGestureDetector(
+    return RawGestureDetector(
       gestures: gestures,
       behavior: behavior,
       excludeFromSemantics: excludeFromSemantics,

@@ -5,4 +5,4 @@
 name: sledge
 description: An experimental wrapper around Ledger
 environment:
-  sdk: '>=2.0.0 <3.0.0'
+  sdk: '>=2.2.0 <3.0.0'

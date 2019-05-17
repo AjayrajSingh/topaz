@@ -20,9 +20,9 @@ void main() {
     await HttpOverrides.runZoned(() async {
       // First, try without providing a letter.
       await tester.pumpWidget(
-        new MaterialApp(
-          home: new Material(
-            child: new Alphatar.withUrl(
+        MaterialApp(
+          home: Material(
+            child: Alphatar.withUrl(
               avatarUrl: profileUrl,
               retry: false,
             ),
@@ -35,9 +35,9 @@ void main() {
 
       // Try again with a letter provided.
       await tester.pumpWidget(
-        new MaterialApp(
-          home: new Material(
-            child: new Alphatar.withUrl(
+        MaterialApp(
+          home: Material(
+            child: Alphatar.withUrl(
               avatarUrl: profileUrl,
               letter: 'L',
               retry: false,
@@ -55,9 +55,9 @@ void main() {
       'Alphatar should display the fall-back letter, '
       'when the image is not provided', (WidgetTester tester) async {
     await tester.pumpWidget(
-      new MaterialApp(
-        home: new Material(
-          child: new Alphatar(letter: 'L'),
+      MaterialApp(
+        home: Material(
+          child: Alphatar(letter: 'L'),
         ),
       ),
     );
@@ -69,8 +69,8 @@ void main() {
   test('Alphtars for the same name should have the same background color.', () {
     String name = 'John Doe';
 
-    Alphatar a1 = new Alphatar.fromName(name: name);
-    Alphatar a2 = new Alphatar.fromName(name: name);
+    Alphatar a1 = Alphatar.fromName(name: name);
+    Alphatar a2 = Alphatar.fromName(name: name);
     expect(a1.backgroundColor, equals(a2.backgroundColor));
   });
 }

@@ -6,5 +6,5 @@ collection of cards. Used for benchmarking purposes.
 ## USAGE
 
 ```shell
-$ set_root_view fuchsia-pkg://fuchsia.com/image_grid_flutter#meta/image_grid_flutter.cmx
+$ present_view fuchsia-pkg://fuchsia.com/image_grid_flutter#meta/image_grid_flutter.cmx
 ```

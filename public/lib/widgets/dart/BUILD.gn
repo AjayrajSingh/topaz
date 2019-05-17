@@ -3,7 +3,6 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_library.gni")
-import("//topaz/runtime/dart/dart_test.gni")
 
 dart_library("dart") {
   infer_package_name = true

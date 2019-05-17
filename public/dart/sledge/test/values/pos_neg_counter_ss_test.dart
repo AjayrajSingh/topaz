@@ -5,7 +5,7 @@
 // ignore_for_file: implementation_imports
 import 'dart:typed_data';
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/src/document/values/pos_neg_counter_value.dart';
 import 'package:test/test.dart';
 
@@ -16,24 +16,24 @@ class PosNegCounterFleetFactory<T extends num> {
   const PosNegCounterFleetFactory();
 
   Fleet<PosNegCounterValue<T>> newFleet(int count) {
-    return new Fleet<PosNegCounterValue<T>>(count,
-        (index) => new PosNegCounterValue<T>(new Uint8List.fromList([index])));
+    return Fleet<PosNegCounterValue<T>>(count,
+        (index) => PosNegCounterValue<T>(Uint8List.fromList([index])));
   }
 }
 
 const PosNegCounterFleetFactory<int> integerCounterFleetFactory =
-    const PosNegCounterFleetFactory<int>();
+    PosNegCounterFleetFactory<int>();
 
 void main() async {
   setupLogger();
 
   test('PosNegCounterValue with StorageState', () {
-    var cnt1 = new PosNegCounterValue<int>(new Uint8List.fromList([1])),
-        cnt2 = new PosNegCounterValue<int>(new Uint8List.fromList([2])),
-        cnt3 = new PosNegCounterValue<int>(new Uint8List.fromList([3]));
-    var ss1 = new StorageState(),
-        ss2 = new StorageState(),
-        ss3 = new StorageState();
+    var cnt1 = PosNegCounterValue<int>(Uint8List.fromList([1])),
+        cnt2 = PosNegCounterValue<int>(Uint8List.fromList([2])),
+        cnt3 = PosNegCounterValue<int>(Uint8List.fromList([3]));
+    var ss1 = StorageState(),
+        ss2 = StorageState(),
+        ss3 = StorageState();
     cnt1.add(4);
     cnt2.add(2);
     ss1.applyChange(cnt1.getChange(), 1);

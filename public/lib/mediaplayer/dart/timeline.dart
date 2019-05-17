@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_mediaplayer/fidl.dart' as mp;
+import 'package:fidl_fuchsia_media/fidl_async.dart' as media;
 
 /// Immutable rate of a subject timeline with respect to a reference timeline
 /// (subject / reference) expressed as the ratio of two ints.
@@ -25,18 +25,18 @@ class TimelineRate {
   }) {
     assert(referenceDelta != 0);
     int gcd = subjectDelta.gcd(referenceDelta);
-    return new TimelineRate._(subjectDelta ~/ gcd, referenceDelta ~/ gcd);
+    return TimelineRate._(subjectDelta ~/ gcd, referenceDelta ~/ gcd);
   }
 
   /// Constructs a TimelineRate from a double.
   factory TimelineRate.fromDouble(double asDouble) {
     if (asDouble > 1.0) {
-      return new TimelineRate(
+      return TimelineRate(
         subjectDelta: _floatFactor,
         referenceDelta: (_floatFactor * asDouble).toInt(),
       );
     } else {
-      return new TimelineRate(
+      return TimelineRate(
         subjectDelta: _floatFactor ~/ asDouble,
         referenceDelta: _floatFactor,
       );
@@ -47,20 +47,20 @@ class TimelineRate {
   const TimelineRate._(this.subjectDelta, this.referenceDelta);
 
   /// A rate of 0 / 1.
-  static const TimelineRate zero = const TimelineRate._(0, 1);
+  static const TimelineRate zero = TimelineRate._(0, 1);
 
   /// The number of nanoseconds in a second.
   static const TimelineRate nanosecondsPerSecond =
-      const TimelineRate._(1000000000, 1);
+      TimelineRate._(1000000000, 1);
 
   /// The inverse of this rate. Asserts if this.subjectDelta is zero.
-  TimelineRate get inverse => new TimelineRate(
+  TimelineRate get inverse => TimelineRate(
         subjectDelta: referenceDelta,
         referenceDelta: subjectDelta,
       );
 
   /// Returns the product of this TimelineRate with another TimelineRate.
-  TimelineRate product(TimelineRate other) => new TimelineRate(
+  TimelineRate product(TimelineRate other) => TimelineRate(
         subjectDelta: subjectDelta * other.subjectDelta,
         referenceDelta: referenceDelta * other.referenceDelta,
       );
@@ -102,10 +102,10 @@ class TimelineFunction {
   });
 
   /// Constructs a TimelineFunction from a FIDL TimelineFunction struct.
-  TimelineFunction.fromFidl(mp.TimelineFunction timelineFunction)
+  TimelineFunction.fromFidl(media.TimelineFunction timelineFunction)
       : subjectTime = timelineFunction.subjectTime,
         referenceTime = timelineFunction.referenceTime,
-        rate = new TimelineRate(
+        rate = TimelineRate(
           subjectDelta: timelineFunction.subjectDelta,
           referenceDelta: timelineFunction.referenceDelta,
         );
@@ -133,7 +133,7 @@ class TimelineFunction {
   /// Gets the inverse of this function. sserts if subjectDelta is zero.
   TimelineFunction get inverse {
     assert(rate.subjectDelta != 0);
-    return new TimelineFunction(
+    return TimelineFunction(
       subjectTime: referenceTime,
       referenceTime: subjectTime,
       rate: rate.inverse,
@@ -141,7 +141,7 @@ class TimelineFunction {
   }
 
   /// Composes this TimelineFunction with another TimelineFunction.
-  TimelineFunction operator *(TimelineFunction other) => new TimelineFunction(
+  TimelineFunction operator *(TimelineFunction other) => TimelineFunction(
         subjectTime: apply(other.subjectTime),
         referenceTime: other.referenceTime,
         rate: rate.product(other.rate),

@@ -11,11 +11,14 @@ dart_library("lib.settings") {
     "device_info.dart",
     "timezone_picker.dart",
     "widgets.dart",
+    "debug.dart",
   ]
 
   deps = [
     "//sdk/fidl/fuchsia.devicesettings",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_services",
     "//topaz/public/dart/widgets:lib.widgets",
   ]
 }

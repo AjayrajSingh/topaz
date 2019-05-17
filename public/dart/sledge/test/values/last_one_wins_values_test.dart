@@ -6,7 +6,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/converter.dart';
 import 'package:sledge/src/document/values/last_one_wins_value.dart';
@@ -18,7 +18,7 @@ void main() {
   setupLogger();
 
   test('Integer', () {
-    final cnt = new LastOneWinsValue<int>();
+    final cnt = LastOneWinsValue<int>();
     expect(cnt.value, equals(0));
     cnt.value = 3;
     expect(cnt.value, equals(3));
@@ -27,7 +27,7 @@ void main() {
   });
 
   test('Double', () {
-    final cnt = new LastOneWinsValue<double>();
+    final cnt = LastOneWinsValue<double>();
     expect(cnt.value, equals(0.0));
     cnt.value = 3.5;
     expect(cnt.value, equals(3.5));
@@ -36,7 +36,7 @@ void main() {
   });
 
   test('Boolean', () {
-    final cnt = new LastOneWinsValue<bool>();
+    final cnt = LastOneWinsValue<bool>();
     expect(cnt.value, equals(false));
     cnt.value = true;
     expect(cnt.value, equals(true));
@@ -45,7 +45,7 @@ void main() {
   });
 
   test('String', () {
-    final cnt = new LastOneWinsValue<String>();
+    final cnt = LastOneWinsValue<String>();
     expect(cnt.value, equals(''));
     cnt.value = 'aba';
     expect(cnt.value, equals('aba'));
@@ -54,20 +54,20 @@ void main() {
   });
 
   test('Uint8List', () {
-    final cnt = new LastOneWinsValue<Uint8List>();
-    expect(cnt.value, equals(new Uint8List(0)));
-    cnt.value = new Uint8List.fromList([1, 2, 3]);
-    expect(cnt.value, equals(new Uint8List.fromList([1, 2, 3])));
-    cnt.value = new Uint8List.fromList([2, 5, 3]);
-    expect(cnt.value, equals(new Uint8List.fromList([2, 5, 3])));
+    final cnt = LastOneWinsValue<Uint8List>();
+    expect(cnt.value, equals(Uint8List(0)));
+    cnt.value = Uint8List.fromList([1, 2, 3]);
+    expect(cnt.value, equals(Uint8List.fromList([1, 2, 3])));
+    cnt.value = Uint8List.fromList([2, 5, 3]);
+    expect(cnt.value, equals(Uint8List.fromList([2, 5, 3])));
   });
 
   test('Integer oprations', () {
-    final conv = new MapToKVListConverter<int, int>();
-    final x = new LastOneWinsValue<int>(
-        conv.serialize(new ConvertedChange<int, int>({0: -3})));
+    final conv = MapToKVListConverter<int, int>();
+    final x = LastOneWinsValue<int>(
+        conv.serialize(ConvertedChange<int, int>({0: -3})));
     expect(x.value, equals(-3));
-    x.applyChange(conv.serialize(new ConvertedChange<int, int>({0: 5})));
+    x.applyChange(conv.serialize(ConvertedChange<int, int>({0: 5})));
     expect(x.value, equals(5));
     x.value = 2;
     expect(x.value, equals(2));
@@ -75,16 +75,16 @@ void main() {
     expect(x.value, equals(-1));
     x.getChange();
     expect(x.value, equals(-1));
-    x.applyChange(conv.serialize(new ConvertedChange<int, int>({0: 4})));
+    x.applyChange(conv.serialize(ConvertedChange<int, int>({0: 4})));
     expect(x.value, equals(4));
   });
 
   test('Double operations', () {
-    final conv = new MapToKVListConverter<int, double>();
-    final x = new LastOneWinsValue<double>(
-        conv.serialize(new ConvertedChange<int, double>({0: -3.5})));
+    final conv = MapToKVListConverter<int, double>();
+    final x = LastOneWinsValue<double>(
+        conv.serialize(ConvertedChange<int, double>({0: -3.5})));
     expect(x.value, equals(-3.5));
-    x.applyChange(conv.serialize(new ConvertedChange<int, double>({0: 4.2})));
+    x.applyChange(conv.serialize(ConvertedChange<int, double>({0: 4.2})));
     expect(x.value, equals(4.2));
     x.value = 0.5;
     expect(x.value, equals(0.5));
@@ -92,16 +92,16 @@ void main() {
     expect(x.value, equals(-1.0));
     x.getChange();
     expect(x.value, equals(-1.0));
-    x.applyChange(conv.serialize(new ConvertedChange<int, double>({0: 4.25})));
+    x.applyChange(conv.serialize(ConvertedChange<int, double>({0: 4.25})));
     expect(x.value, equals(4.25));
   });
 
   test('String operations', () {
-    final conv = new MapToKVListConverter<int, String>();
-    final x = new LastOneWinsValue<String>(
-        conv.serialize(new ConvertedChange<int, String>({0: 'bar'})));
+    final conv = MapToKVListConverter<int, String>();
+    final x = LastOneWinsValue<String>(
+        conv.serialize(ConvertedChange<int, String>({0: 'bar'})));
     expect(x.value, equals('bar'));
-    x.applyChange(conv.serialize(new ConvertedChange<int, String>({0: 'foo'})));
+    x.applyChange(conv.serialize(ConvertedChange<int, String>({0: 'foo'})));
     expect(x.value, equals('foo'));
     x.value = 'bar';
     expect(x.value, equals('bar'));
@@ -109,42 +109,42 @@ void main() {
     expect(x.value, equals('tor'));
     x.getChange();
     expect(x.value, equals('tor'));
-    x.applyChange(conv.serialize(new ConvertedChange<int, String>({0: 'cir'})));
+    x.applyChange(conv.serialize(ConvertedChange<int, String>({0: 'cir'})));
     expect(x.value, equals('cir'));
   });
 
   test('Boolean operations', () {
-    final conv = new MapToKVListConverter<int, bool>();
-    final x = new LastOneWinsValue<bool>(
-        conv.serialize(new ConvertedChange<int, bool>({0: true})));
+    final conv = MapToKVListConverter<int, bool>();
+    final x = LastOneWinsValue<bool>(
+        conv.serialize(ConvertedChange<int, bool>({0: true})));
     expect(x.value, equals(true));
-    x.applyChange(conv.serialize(new ConvertedChange<int, bool>({0: false})));
+    x.applyChange(conv.serialize(ConvertedChange<int, bool>({0: false})));
     expect(x.value, equals(false));
     x.value = true;
     expect(x.value, equals(true));
     x.getChange();
     expect(x.value, equals(true));
-    x.applyChange(conv.serialize(new ConvertedChange<int, bool>({0: false})));
+    x.applyChange(conv.serialize(ConvertedChange<int, bool>({0: false})));
     expect(x.value, equals(false));
   });
 
   test('onChange stream', () {
-    final conv = new MapToKVListConverter<int, String>();
-    final x = new LastOneWinsValue<String>(
-        conv.serialize(new ConvertedChange<int, String>({0: 'aba'})));
+    final conv = MapToKVListConverter<int, String>();
+    final x = LastOneWinsValue<String>(
+        conv.serialize(ConvertedChange<int, String>({0: 'aba'})));
     Stream<String> changeStream = x.onChange;
     expect(changeStream, emitsInOrder(['bar', 'foo', 'a']));
     x
       ..applyChange(
-          conv.serialize(new ConvertedChange<int, String>({0: 'bar'})))
+          conv.serialize(ConvertedChange<int, String>({0: 'bar'})))
       ..applyChange(
-          conv.serialize(new ConvertedChange<int, String>({0: 'foo'})))
-      ..applyChange(conv.serialize(new ConvertedChange<int, String>({0: 'a'})));
+          conv.serialize(ConvertedChange<int, String>({0: 'foo'})))
+      ..applyChange(conv.serialize(ConvertedChange<int, String>({0: 'a'})));
   });
 
   test('Observer calls', () {
-    final x = new LastOneWinsValue<String>();
-    final observer = new DummyValueObserver();
+    final x = LastOneWinsValue<String>();
+    final observer = DummyValueObserver();
     x.observer = observer;
     expect(x.value, equals(''));
     observer.expectNotChanged();

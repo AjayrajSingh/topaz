@@ -13,7 +13,7 @@ fidl("chromium.web") {
   deps = [
     "//sdk/fidl/fuchsia.sys",
     "//sdk/fidl/fuchsia.ui.gfx",
-    "//sdk/fidl/fuchsia.ui.viewsv1token",
+    "//sdk/fidl/fuchsia.ui.views",
     "//zircon/public/fidl/fuchsia-io",
   ]
 }

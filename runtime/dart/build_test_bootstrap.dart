@@ -13,7 +13,7 @@ const String _outputKey = 'output';
 
 /// Builds the Flutter test wrapper that gets executed by the test harness.
 Future<Null> main(List<String> args) async {
-  ArgParser parser = new ArgParser();
+  ArgParser parser = ArgParser();
   parser.addOption(
     _testNameKey,
     valueHelp: 'filename',
@@ -36,6 +36,6 @@ Future<Null> main(List<String> args) async {
     host: InternetAddress.loopbackIPv4,
   );
 
-  File outputFile = new File(results[_outputKey]);
+  File outputFile = File(results[_outputKey]);
   await outputFile.writeAsString(content);
 }

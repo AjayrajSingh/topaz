@@ -1,0 +1,47 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_library.gni")
+import("//topaz/runtime/dart/flutter_test.gni")
+
+dart_library("fuchsia_modular_flutter") {
+  package_name = "fuchsia_modular_flutter"
+
+  sdk_category = "partner"
+
+  sources = [
+    "session_shell.dart",
+    "src/session_shell.dart",
+    "src/story.dart",
+    "src/session_shell/internal/_focus_request_watcher_impl.dart",
+    "src/session_shell/internal/_focus_watcher_impl.dart",
+    "src/session_shell/internal/_modular_session_shell_impl.dart",
+    "src/session_shell/internal/_session_shell_impl.dart",
+    "src/session_shell/internal/_session_shell_presentation_provider_impl.dart",
+    "src/session_shell/internal/_story_provider_watcher_impl.dart",
+  ]
+
+  deps = [
+    "//sdk/fidl/fuchsia.modular",
+    "//sdk/fidl/fuchsia.ui.views",
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//third_party/dart-pkg/pub/meta",
+    "//topaz/public/dart/fuchsia_scenic_flutter",
+    "//topaz/public/dart/fuchsia_services",
+  ]
+}
+
+# Runs these tests using:
+#   fx run-host-tests fuchsia_modular_flutter_unittests
+flutter_test("fuchsia_modular_flutter_unittests") {
+  sources = [
+    "session_shell_test.dart",
+  ]
+
+  deps = [
+    ":fuchsia_modular_flutter",
+    "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}

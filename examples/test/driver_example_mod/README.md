@@ -11,11 +11,11 @@ To add the example (with the Flutter Driver Extensions enabled for driving the
 mod), run the following:
 
 ```
-$ fx set x64 --packages topaz/packages/all \
-    --packages topaz/packages/examples/tests
+$ fx set [x64|arm64] --available topaz/bundles/buildbot
 ```
 
-This will include the package with the topaz build when you run
+This will include the package and its dependencies with the topaz build when
+you run
 
 ```
 $ fx full-build
@@ -23,15 +23,9 @@ $ fx full-build
 
 ## Testing
 
-This mod is referenced in
-`//topaz/tests/modular_integration_tests/topaz_modular_integration_tests.json`,
-using the `driver_example_mod` as the mod under test, and the test code built
-from this `BUILD.gn` file as the integration testing code to be run against
-`driver_example_mod`.
-
-You can run these tests using the following command (so long as you've added
-`//topaz/packages/tests/all` as one of the packages for your build):
+You can run these tests using the following command (so long as you've included
+`//topaz/packages/examples/tests` as one of the packages for your build):
 
 ```
-$ fx shell /pkgfs/packages/topaz_modular_integration_tests/0/bin/run_topaz_modular_integration_tests.sh
+$ fx run-test driver_example_mod_tests
 ```

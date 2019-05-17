@@ -14,7 +14,7 @@ class IntCounter implements BaseType {
 
   @override
   Value newValue(ConnectionId connectionId) =>
-      new PosNegCounterValue<int>(connectionId.id);
+      PosNegCounterValue<int>(connectionId.id);
 }
 
 /// The Sledge type for positive-negative counter
@@ -24,5 +24,5 @@ class DoubleCounter implements BaseType {
 
   @override
   Value newValue(ConnectionId connectionId) =>
-      new PosNegCounterValue<double>(connectionId.id);
+      PosNegCounterValue<double>(connectionId.id);
 }

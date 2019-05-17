@@ -47,7 +47,7 @@ class Dashboard extends StatelessWidget {
 
   Widget _utilization(SystemInfoModel model) {
     return Padding(
-        padding: const EdgeInsets.all(1.0),
+        padding: EdgeInsets.all(1.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,7 +64,7 @@ class Dashboard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: model.cpuUtilization / 100,
                       backgroundColor: Colors.greenAccent,
-                      valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
                     ),
                   ),
                 ),
@@ -76,7 +76,7 @@ class Dashboard extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: model.memoryUtilization / 100,
                       backgroundColor: Colors.greenAccent,
-                      valueColor: new AlwaysStoppedAnimation<Color>(Colors.red),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
                     ),
                   ),
                 ),
@@ -104,7 +104,7 @@ class Dashboard extends StatelessWidget {
 
   Widget _fanSpeedAndTemperature(SystemInfoModel model) {
     return Padding(
-        padding: const EdgeInsets.all(1.0),
+        padding: EdgeInsets.all(1.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +117,7 @@ class Dashboard extends StatelessWidget {
                     color: Colors.lightBlue,
                     shape: CircleBorder(),
                     child: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: EdgeInsets.all(10.0),
                       child: Icon(Icons.settings_applications,
                           color: Colors.white, size: 30.0),
                     )),
@@ -125,7 +125,7 @@ class Dashboard extends StatelessWidget {
                     color: Colors.green[400],
                     shape: CircleBorder(),
                     child: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: EdgeInsets.all(10.0),
                       child: Icon(Icons.ac_unit, color: Colors.white, size: 30.0),
                     )),
               ],
@@ -152,7 +152,7 @@ class Dashboard extends StatelessWidget {
   
   Widget _bigCluster(SystemInfoModel model) {
     return Padding(
-        padding: const EdgeInsets.all(5.0),
+        padding: EdgeInsets.all(5.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,7 +168,7 @@ class Dashboard extends StatelessWidget {
                     color: Colors.indigo[500],
                     shape: CircleBorder(),
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(16.0),
                       child: Icon(Icons.broken_image,
                           color: Colors.white, size: 30.0),
                     )),
@@ -176,7 +176,7 @@ class Dashboard extends StatelessWidget {
                     color: Colors.amber,
                     shape: CircleBorder(),
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(16.0),
                       child:
                       Icon(Icons.flash_on, color: Colors.white, size: 30.0),
                     )),
@@ -204,7 +204,7 @@ class Dashboard extends StatelessWidget {
 
   Widget _littleCluster(SystemInfoModel model) {
     return Padding(
-        padding: const EdgeInsets.all(5.0),
+        padding: EdgeInsets.all(5.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,7 +220,7 @@ class Dashboard extends StatelessWidget {
                     color: Colors.indigo[500],
                     shape: CircleBorder(),
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(16.0),
                       child: Icon(Icons.broken_image,
                           color: Colors.white, size: 30.0),
                     )),
@@ -228,7 +228,7 @@ class Dashboard extends StatelessWidget {
                     color: Colors.amber,
                     shape: CircleBorder(),
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(16.0),
                       child:
                       Icon(Icons.flash_on, color: Colors.white, size: 30.0),
                     )),

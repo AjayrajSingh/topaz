@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fuchsia_scenic_flutter/child_view.dart' show ChildView;
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:lib.widgets/model.dart';
 
 import '../models/surface/surface.dart';
@@ -33,11 +33,11 @@ const double _relationshipTreeFontSize = 10.0;
 const FontWeight _relationshipTreeFontWeight = FontWeight.w200;
 const double _iconSize = 12.0;
 
-const Color _storytellerPrimaryColor = const Color(0xFF6315F6);
+const Color _storytellerPrimaryColor = Color(0xFF6315F6);
 
 /// Printable names for relation arrangement
 const Map<SurfaceArrangement, String> relName =
-    const <SurfaceArrangement, String>{
+    <SurfaceArrangement, String>{
   SurfaceArrangement.none: 'None',
   SurfaceArrangement.copresent: 'Co-present',
   SurfaceArrangement.sequential: 'Sequential',
@@ -46,7 +46,7 @@ const Map<SurfaceArrangement, String> relName =
 
 /// Printable names for relation dependency
 const Map<SurfaceDependency, String> depName =
-    const <SurfaceDependency, String>{
+    <SurfaceDependency, String>{
   SurfaceDependency.dependent: 'Dependent',
   SurfaceDependency.none: 'Independent',
 };
@@ -61,18 +61,18 @@ class SurfaceRelationships extends StatelessWidget {
   const SurfaceRelationships({Key key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => new LayoutBuilder(
+  Widget build(BuildContext context) => LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          return new Container(
+          return Container(
             width: constraints.maxWidth,
             height: constraints.maxHeight,
             color: Colors.grey[100],
-            child: new ScopedModelDescendant<SurfaceGraph>(
+            child: ScopedModelDescendant<SurfaceGraph>(
               builder:
                   (BuildContext context, Widget child, SurfaceGraph graph) {
                 if (graph.focusStack.isEmpty) {
                   log.warning('focusedSurfaceHistory is empty');
-                  return new Container();
+                  return Container();
                 }
                 return _buildRelationshipsPage(context, constraints, graph);
               },
@@ -84,7 +84,7 @@ class SurfaceRelationships extends StatelessWidget {
   Widget _buildRelationshipsPage(
       BuildContext context, BoxConstraints constraints, SurfaceGraph graph) {
     Map<String, GlobalKey> surfaceKeys = <String, GlobalKey>{};
-    GlobalKey stackKey = new GlobalKey();
+    GlobalKey stackKey = GlobalKey();
     Set<Surface> firstDepthSurfaces = <Surface>{};
 
     for (Surface s in graph.focusStack.toList()) {
@@ -110,9 +110,9 @@ class SurfaceRelationships extends StatelessWidget {
       totalLabelWidth = MediaQuery.of(context).size.width;
     }
 
-    return new SingleChildScrollView(
+    return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: new Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _buildLabel(totalLabelWidth, maxHeight),
@@ -123,11 +123,11 @@ class SurfaceRelationships extends StatelessWidget {
   }
 
   Widget _buildLabel(double labelWidth, int maxHeight) {
-    return new Material(
+    return Material(
       elevation: 4.0,
-      child: new Container(
+      child: Container(
         width: labelWidth,
-        child: new Row(
+        child: Row(
           children: _buildLabelWidgetList(maxHeight),
         ),
       ),
@@ -136,10 +136,10 @@ class SurfaceRelationships extends StatelessWidget {
 
   Widget _buildContent(SurfaceGraph graph, GlobalKey stackKey,
       Map<String, GlobalKey> surfaceKeys, Set<Surface> firstSurfaces) {
-    return new Expanded(
-      child: new SingleChildScrollView(
+    return Expanded(
+      child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
-        child: new Stack(
+        child: Stack(
           key: stackKey,
           children: <Widget>[
             _buildEdges(stackKey, surfaceKeys, firstSurfaces),
@@ -152,8 +152,8 @@ class SurfaceRelationships extends StatelessWidget {
 
   Widget _buildEdges(GlobalKey stackKey, Map<String, GlobalKey> surfaceKeys,
       Set<Surface> firstSurfaces) {
-    return new CustomPaint(
-      painter: new _RelationshipTreeEdges(
+    return CustomPaint(
+      painter: _RelationshipTreeEdges(
         firstSurfaces: firstSurfaces,
         surfaceKeys: surfaceKeys,
         backgroundKey: stackKey,
@@ -163,13 +163,13 @@ class SurfaceRelationships extends StatelessWidget {
 
   Widget _buildNodes(SurfaceGraph graph, Map<String, GlobalKey> surfaceKeys,
       Set<Surface> firstSurfaces) {
-    return new Container(
-      padding: new EdgeInsets.only(
+    return Container(
+      padding: EdgeInsets.only(
         left: _pageHorizontalPadding,
         right: _pageHorizontalPadding,
         top: _pageTopPadding,
       ),
-      child: new Column(
+      child: Column(
         children: firstSurfaces
             .map((surface) => _buildTree(surfaceKeys, graph, surface,
                 (graph.focusStack.last == surface)))
@@ -182,16 +182,16 @@ class SurfaceRelationships extends StatelessWidget {
   List<Widget> _buildLabelWidgetList(int maxHeight) {
     List<Widget> labelWidgets = <Widget>[];
     double totalLength = _pageHorizontalPadding + _surfaceWidgetWidth;
-    labelWidgets.add(new Container(
+    labelWidgets.add(Container(
       /// Depth 1
-      padding: new EdgeInsets.only(right: _labelHorizontalPadding),
+      padding: EdgeInsets.only(right: _labelHorizontalPadding),
       width: totalLength,
       height: _labelWidgetHeight,
       decoration: _labelBoxDecoration(true, true),
       alignment: Alignment.centerRight,
-      child: new Text(
+      child: Text(
         'Depth 1',
-        style: new TextStyle(
+        style: TextStyle(
           color: Colors.black,
           fontSize: 10.0,
         ),
@@ -204,15 +204,15 @@ class SurfaceRelationships extends StatelessWidget {
     for (int i = 0; i < maxHeight; i++) {
       totalLength += labelWidgetWidth;
 
-      labelWidgets.add(new Container(
-        padding: new EdgeInsets.only(right: _labelHorizontalPadding),
+      labelWidgets.add(Container(
+        padding: EdgeInsets.only(right: _labelHorizontalPadding),
         width: labelWidgetWidth,
         height: _labelWidgetHeight,
         decoration: _labelBoxDecoration(true, true),
         alignment: Alignment.centerRight,
-        child: new Text(
+        child: Text(
           'Depth ${i + 2}',
-          style: new TextStyle(
+          style: TextStyle(
             color: Colors.black,
             fontSize: 10.0,
           ),
@@ -220,8 +220,8 @@ class SurfaceRelationships extends StatelessWidget {
       ));
     }
 
-    labelWidgets.add(new Expanded(
-      child: new Container(
+    labelWidgets.add(Expanded(
+      child: Container(
         height: _labelWidgetHeight,
         decoration: _labelBoxDecoration(false, true),
       ),
@@ -231,14 +231,14 @@ class SurfaceRelationships extends StatelessWidget {
   }
 
   BoxDecoration _labelBoxDecoration(bool rightBorder, bool bottomBorder) {
-    return new BoxDecoration(
+    return BoxDecoration(
       color: Colors.white,
-      border: new Border(
-        right: new BorderSide(
+      border: Border(
+        right: BorderSide(
           color: rightBorder ? Colors.grey[400] : Colors.transparent,
           width: 0.5,
         ),
-        bottom: new BorderSide(
+        bottom: BorderSide(
           color: bottomBorder ? Colors.grey[400] : Colors.transparent,
           width: 0.5,
         ),
@@ -273,11 +273,11 @@ class SurfaceRelationships extends StatelessWidget {
     }
 
     String id = surface.node.value;
-    globalKeys[id] = new GlobalKey();
+    globalKeys[id] = GlobalKey();
 
     Widget thisWidget = _buildChildNode(globalKeys[id], surface, isFocused);
 
-    List<Surface> children = new List<Surface>.from(surface.children.toList())
+    List<Surface> children = List<Surface>.from(surface.children.toList())
       ..removeWhere((child) => child == null);
 
     if (_storytellerDebug) {
@@ -295,14 +295,14 @@ class SurfaceRelationships extends StatelessWidget {
       if (_storytellerDebug) {
         log.info('*** The first child: ${children[0]}');
       }
-      return new Row(
+      return Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           thisWidget,
           (children.length == 1)
               ? _buildTree(globalKeys, graph, children[0],
                   (graph.focusStack.toList().last == children[0]))
-              : new Column(
+              : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: children.map((child) {
                     return _buildTree(globalKeys, graph, child,
@@ -318,13 +318,13 @@ class SurfaceRelationships extends StatelessWidget {
   Widget _buildChildNode(GlobalKey key, Surface surface, bool isFocused) {
     bool isFirstDepthNode = (surface.parentId == null);
 
-    return new Container(
-      padding: new EdgeInsets.only(bottom: _branchPadding),
-      child: new Row(
+    return Container(
+      padding: EdgeInsets.only(bottom: _branchPadding),
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           (isFirstDepthNode)
-              ? new Container()
+              ? Container()
               : _buildRelationshipWidget(surface),
           _buildSurfaceWidget(key, surface, isFocused),
         ],
@@ -341,16 +341,16 @@ class SurfaceRelationships extends StatelessWidget {
     String dependency = depName[surface.relation.dependency] ?? 'Unknown';
     String emphasis = surface.relation.emphasis.toStringAsPrecision(2);
 
-    return new Container(
+    return Container(
       width: _branchWidth,
       height: _surfaceWidgetHeight,
-      child: new Center(
-        child: new Container(
-          padding: new EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+      child: Center(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
           width: _relationshipWidgetWidth,
           height: _relationshipWidgetHeight,
           decoration: _relationshipBoxDeco(dependency),
-          child: new Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -365,12 +365,12 @@ class SurfaceRelationships extends StatelessWidget {
   }
 
   Widget _buildRelationshipRow(IconData icon, String text, String dependency) {
-    return new Row(
+    return Row(
       children: <Widget>[
         _relationshipIcon(icon, dependency),
-        new Container(
-          padding: new EdgeInsets.only(left: 10.0),
-          child: new Text(
+        Container(
+          padding: EdgeInsets.only(left: 10.0),
+          child: Text(
             text,
             style: _relationshipTextStyle(dependency),
           ),
@@ -380,12 +380,12 @@ class SurfaceRelationships extends StatelessWidget {
   }
 
   BoxDecoration _relationshipBoxDeco(String dependency) {
-    return new BoxDecoration(
+    return BoxDecoration(
       color: (dependency == 'Independent')
           ? Colors.white
           : _storytellerPrimaryColor,
       borderRadius: BorderRadius.circular(10.0),
-      border: new Border.all(
+      border: Border.all(
         color: _storytellerPrimaryColor,
         width: 2.0,
       ),
@@ -393,7 +393,7 @@ class SurfaceRelationships extends StatelessWidget {
   }
 
   TextStyle _relationshipTextStyle(String dependency) {
-    return new TextStyle(
+    return TextStyle(
       color: (dependency == 'Independent')
           ? _storytellerPrimaryColor
           : Colors.white,
@@ -403,7 +403,7 @@ class SurfaceRelationships extends StatelessWidget {
   }
 
   Icon _relationshipIcon(IconData icon, String dependency) {
-    return new Icon(
+    return Icon(
       icon,
       color: (dependency == 'Independent')
           ? _storytellerPrimaryColor
@@ -414,9 +414,9 @@ class SurfaceRelationships extends StatelessWidget {
 
   /// Builds a node of the tree that shows a surface, the surface's id and state.
   Widget _buildSurfaceWidget(GlobalKey key, Surface surface, bool isFocused) {
-    return new Container(
+    return Container(
       height: _surfaceWidgetHeight + _surfaceWidgetTextHeight + 8.0,
-      child: new Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -428,17 +428,17 @@ class SurfaceRelationships extends StatelessWidget {
   }
 
   Widget _buildSurfaceImage(GlobalKey key, Surface surface) {
-    return new Material(
+    return Material(
       key: key,
       color: Colors.white,
       elevation: 2.0,
-      borderRadius: new BorderRadius.circular(8.0),
-      child: new Container(
+      borderRadius: BorderRadius.circular(8.0),
+      child: Container(
         width: _surfaceWidgetWidth,
         height: _surfaceWidgetHeight,
-        child: new Center(
-          child: new SurfaceResize(
-            child: new ChildView(
+        child: Center(
+          child: SurfaceResize(
+            child: ChildView(
               connection: surface.connection,
               hitTestable: false,
             ),
@@ -449,15 +449,15 @@ class SurfaceRelationships extends StatelessWidget {
   }
 
   Widget _buildSurfaceInfoText(Surface surface, bool isFocused) {
-    return new Container(
+    return Container(
       width: _surfaceWidgetWidth,
       height: _surfaceWidgetTextHeight,
-      child: new Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           _buildStateIndicator(surface.dismissed, isFocused),
-          new Expanded(
-            child: new Text(
+          Expanded(
+            child: Text(
               '${surface.node.value}',
               style: TextStyle(
                 color: (surface.dismissed) ? Colors.grey[400] : Colors.black,
@@ -493,15 +493,15 @@ class SurfaceRelationships extends StatelessWidget {
       stateBorderColor = _storytellerPrimaryColor;
     }
 
-    return new Padding(
-      padding: const EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
-      child: new Container(
+    return Padding(
+      padding: EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
+      child: Container(
         width: 6.0,
         height: 6.0,
-        decoration: new BoxDecoration(
+        decoration: BoxDecoration(
           color: stateFillColor,
           borderRadius: BorderRadius.circular(3.0),
-          border: new Border.all(
+          border: Border.all(
             width: 1.0,
             color: stateBorderColor,
           ),
@@ -526,7 +526,7 @@ class _RelationshipTreeEdges extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    Paint paint = new Paint()
+    Paint paint = Paint()
       ..color = _storytellerPrimaryColor
       ..strokeWidth = 1.5
       ..strokeCap = StrokeCap.round
@@ -535,7 +535,7 @@ class _RelationshipTreeEdges extends CustomPainter {
     final bgContext = backgroundKey.currentContext;
     final RenderBox bgBox = bgContext.findRenderObject();
 
-    Set<Surface> currentSurfaces = new Set<Surface>.from(firstSurfaces);
+    Set<Surface> currentSurfaces = Set<Surface>.from(firstSurfaces);
 
     while (currentSurfaces.isNotEmpty) {
       for (Surface surface in currentSurfaces) {

@@ -9,7 +9,7 @@
 #include "examples/ui/lib/skia_vmo_data.h"
 #include "third_party/skia/include/core/SkFontMgr.h"
 
-namespace mozart {
+namespace scenic {
 
 SkiaFontLoader::SkiaFontLoader(fuchsia::fonts::ProviderPtr font_provider)
     : font_provider_(std::move(font_provider)) {}
@@ -46,4 +46,4 @@ void SkiaFontLoader::LoadDefaultFont(FontCallback callback) {
   LoadFont(std::move(request), std::move(callback));
 }
 
-}  // namespace mozart
+}  // namespace scenic

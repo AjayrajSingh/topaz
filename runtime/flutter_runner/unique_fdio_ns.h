@@ -8,7 +8,7 @@
 #include "flutter/fml/unique_object.h"
 #include "lib/fdio/namespace.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 struct UniqueFDIONSTraits {
   static fdio_ns_t* InvalidValue() { return nullptr; }
@@ -31,4 +31,4 @@ inline UniqueFDIONS UniqueFDIONSCreate() {
   return UniqueFDIONS{nullptr};
 }
 
-}  // namespace flutter
+}  // namespace flutter_runner

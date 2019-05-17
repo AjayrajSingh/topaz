@@ -34,15 +34,15 @@ void main() {
   List<Tree<String>> expectedForest;
 
   setUp(() {
-    grandparent = new Tree<String>(value: 'grandparent');
-    parent = new Tree<String>(value: 'parent');
-    uncle = new Tree<String>(value: 'uncle');
-    aunt = new Tree<String>(value: 'aunt');
-    cousin = new Tree<String>(value: 'cousin');
-    sibling = new Tree<String>(value: 'sibling');
-    sibling2 = new Tree<String>(value: 'sibling2');
-    niece = new Tree<String>(value: 'niece');
-    child = new Tree<String>(value: 'child');
+    grandparent = Tree<String>(value: 'grandparent');
+    parent = Tree<String>(value: 'parent');
+    uncle = Tree<String>(value: 'uncle');
+    aunt = Tree<String>(value: 'aunt');
+    cousin = Tree<String>(value: 'cousin');
+    sibling = Tree<String>(value: 'sibling');
+    sibling2 = Tree<String>(value: 'sibling2');
+    niece = Tree<String>(value: 'niece');
+    child = Tree<String>(value: 'child');
 
     grandparent = t(
       // the root
@@ -68,15 +68,15 @@ void main() {
     );
 
     trimmedTree = t(
-      new Tree<String>(value: grandparent.value),
+      Tree<String>(value: grandparent.value),
       children: <Tree<String>>[uncle, aunt],
     );
 
-    forest = new Forest<String>()..add(grandparent);
+    forest = Forest<String>()..add(grandparent);
 
-    secondRoot = new Tree<String>(value: 'parent of friend');
-    friend = new Tree<String>(value: 'friend');
-    childFriend = new Tree<String>(value: 'child of friend');
+    secondRoot = Tree<String>(value: 'parent of friend');
+    friend = Tree<String>(value: 'friend');
+    childFriend = Tree<String>(value: 'child of friend');
 
     secondRoot = t(
       secondRoot, // the root

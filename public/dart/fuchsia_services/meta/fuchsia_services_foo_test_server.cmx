@@ -1,0 +1,14 @@
+{
+    "program": {
+        "data": "data/fuchsia_services_foo_test_server"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.logger.LogSink",
+            "fuchsia.netstack.Netstack",
+            "fuchsia.sys.Environment",
+            "fuchsia.sys.Launcher",
+            "fuchsia.wlan.service.Wlan"
+        ]
+    }
+}

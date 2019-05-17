@@ -15,7 +15,7 @@ import 'package:flutter/scheduler.dart';
 class PointerEventsListener extends PointerCaptureListenerHack {
   // Holds the fidl binding to receive pointer events.
   final PointerCaptureListenerHackBinding _pointerCaptureListenerBinding =
-      new PointerCaptureListenerHackBinding();
+      PointerCaptureListenerHackBinding();
 
   // Holds the last [PointerEvent] mapped to its pointer id. This is used to
   // determine the correct [PointerDataPacket] to generate at boundary condition
@@ -69,7 +69,7 @@ class PointerEventsListener extends PointerCaptureListenerHack {
   }
 
   PointerEvent _clone(PointerEvent event, [PointerEventPhase phase]) {
-    return new PointerEvent(
+    return PointerEvent(
         buttons: event.buttons,
         deviceId: event.deviceId,
         eventTime: event.eventTime,
@@ -184,10 +184,10 @@ class PointerEventsListener extends PointerCaptureListenerHack {
     }
 
     // Convert from PointerEvent to PointerData.
-    final data = new ui.PointerData(
+    final data = ui.PointerData(
       buttons: event.buttons,
       device: event.pointerId,
-      timeStamp: new Duration(microseconds: event.eventTime ~/ 1000),
+      timeStamp: Duration(microseconds: event.eventTime ~/ 1000),
       change: _changeFromPointerEvent(event),
       kind: _kindFromPointerEvent(event),
       physicalX: event.x * ui.window.devicePixelRatio,

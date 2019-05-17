@@ -3,17 +3,16 @@
         "data": "data/mediaplayer_flutter"
     },
     "sandbox": {
-        "features": [ "deprecated-global-persistent-storage" ],
+        "features": [ "isolated-persistent-storage" ],
         "services": [
             "fuchsia.fonts.Provider",
-            "fuchsia.mediaplayer.Player",
+            "fuchsia.media.playback.Player",
             "fuchsia.modular.ContextWriter",
             "fuchsia.modular.Clipboard",
             "fuchsia.sys.Environment",
             "fuchsia.ui.input.ImeService",
             "fuchsia.ui.policy.Presenter",
-            "fuchsia.ui.scenic.Scenic",
-            "fuchsia.ui.viewsv1.ViewManager"
+            "fuchsia.ui.scenic.Scenic"
         ]
     }
 }

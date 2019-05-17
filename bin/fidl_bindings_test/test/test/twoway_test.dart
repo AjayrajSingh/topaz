@@ -12,7 +12,7 @@ void main() async {
   TestServerInstance server;
   group('two way', () {
     setUpAll(() async {
-      server = new TestServerInstance();
+      server = TestServerInstance();
       await server.start();
     });
 
@@ -32,10 +32,10 @@ void main() async {
 
     test('three args', () async {
       final primes =
-          new Uint8List.fromList([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]);
+          Uint8List.fromList([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37]);
 
       final threeReply = await server.proxy.twoWayThreeArgs(
-          23, 42, new NoHandleStruct(foo: 'hello', bar: 1729, baz: primes));
+          23, 42, NoHandleStruct(foo: 'hello', bar: 1729, baz: primes));
 
       expect(threeReply.x, equals(23));
       expect(threeReply.y, equals(42));

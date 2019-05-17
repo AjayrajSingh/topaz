@@ -30,11 +30,11 @@ class MockAction extends Mock implements Action {}
 void main() {
   // Make sure first action is launched.
   test('test_start', () async {
-    final MockFile syllabusFile = new MockFile();
-    final MockBlueprint blueprint = new MockBlueprint();
-    final MockAction action = new MockAction();
+    final MockFile syllabusFile = MockFile();
+    final MockBlueprint blueprint = MockBlueprint();
+    final MockAction action = MockAction();
 
-    final Completer<String> completer = new Completer<String>()
+    final Completer<String> completer = Completer<String>()
       ..complete(_syllabus);
 
     // Load predefined syllabus when
@@ -42,7 +42,7 @@ void main() {
     when(blueprint.key).thenReturn('begin');
     when(blueprint.assemble(any, any)).thenReturn(action);
 
-    final ConductorBuilder builder = new ConductorBuilder(syllabusFile)
+    final ConductorBuilder builder = ConductorBuilder(syllabusFile)
       ..addBlueprint(blueprint);
 
     (await builder.build()).start();

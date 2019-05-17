@@ -28,7 +28,7 @@ Future<Null> verifyLinks<P>(
     urisByDomain.putIfAbsent(link.uri.authority, () => []).add(link);
   }
   await Future.wait(urisByDomain.keys.map((String domain) =>
-      new _LinkVerifier(urisByDomain[domain]).verify(callback)));
+      _LinkVerifier(urisByDomain[domain]).verify(callback)));
   return null;
 }
 
@@ -47,14 +47,27 @@ class _LinkVerifier<P> {
   Future<bool> _verifyLink(Link<P> link) async {
     try {
       for (int i = 0; i < 3; i++) {
-        final http.Response response = await http.get(link.uri);
+        final http.Response response = await http.get(link.uri, headers: {
+            HttpHeaders.acceptHeader:
+                'text/html,application/xhtml+xml,application/xml,',
+        });
         final int code = response.statusCode;
         if (code == HttpStatus.tooManyRequests) {
           final int delay =
               int.tryParse(response.headers['retry-after'] ?? '') ?? 50;
-          sleep(new Duration(milliseconds: delay));
+          sleep(Duration(milliseconds: delay));
           continue;
         }
+
+        // Http client doesn't automatically follow 308 (Permanent Redirect).
+        if (code == HttpStatus.permanentRedirect) {
+          if (response.headers.containsKey('location')) {
+            Uri redirectUri = Uri.parse(link.uri.origin + response.headers['location']);
+            return _verifyLink(Link<P>(redirectUri, link.payload));
+          }
+          return false;
+        }
+
         return code == HttpStatus.ok;
       }
     } on IOException {

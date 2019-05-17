@@ -2,9 +2,9 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//topaz/runtime/dart/dart_test.gni")
+import("//topaz/runtime/dart/flutter_test.gni")
 
-dart_test("flutter_widget_test") {
+flutter_test("flutter_widget_test") {
   sources = [
     "../test/flutter_widget_test.dart",
   ]

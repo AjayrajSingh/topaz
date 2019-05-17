@@ -47,10 +47,11 @@ LogWriter _logWriter;
 /// [Level.ALL].
 ///
 /// If [globalTags] is provided, these tags will be added to each message logged
-/// via this logger. The logger can accept 5 global tags, however, one of those
-/// tags is reserved for the logger name and one is reserved for the code
-/// location if it is requested. The logger will drop any tags that are over
-/// this limit.
+/// via this logger. The system logger can only accept 5 tags with each log
+/// record. Each record will include the name provided in the [setupLogger]
+/// method, the name of the dart logger if it is not the root logger and the
+/// code location if it is requested. Any tags that are over the maximum limit
+/// that the system is allowed to receive will be dropped.
 ///
 /// By default, the caller code location is automatically added in checked mode
 /// and not in production mode, because it is relatively expensive to calculate
@@ -71,16 +72,13 @@ void setupLogger({
   // method will be a noop. At this point, _logWriter will not be null
   _connectToLogWriterIfNeeded();
 
-  // We need to provide a name for the logger in the form of a tag because
-  // we are not using hierarchical logging.
+  final loggerBaseName = name ??
+      Platform.script?.pathSegments?.lastWhere((_) => true, orElse: () => null);
+
   // Tags get appended to each log statement. We put the name, if present
   // as the first tag so it makes it easier to identify.
   // We remove any null values before sending them to the logger
-  final List<String> tags = [
-    name ??
-        Platform.script?.pathSegments
-            ?.lastWhere((_) => true, orElse: () => null)
-  ]
+  final List<String> tags = []
     ..addAll(globalTags ?? const [])
     ..removeWhere((t) => t == null || t.isEmpty);
 
@@ -91,6 +89,7 @@ void setupLogger({
   }());
 
   _logWriter
+    ..loggerBaseName = loggerBaseName
     ..globalTags = tags
     ..forceShowCodeLocation = forceShowCodeLocation ?? inCheckedMode;
 }
@@ -104,9 +103,11 @@ void _connectToLogWriterIfNeeded({
     return;
   }
 
+  // we do not use a named logger here because we want to make sure that
+  // the provided name is included as a separate tag.
   if (Platform.isFuchsia) {
-    _logWriter = FuchsiaLogWriter(logger: Logger.root);
+    _logWriter = FuchsiaLogWriter(logStream: Logger.root.onRecord);
   } else {
-    _logWriter = StdoutLogWriter(logger: Logger.root);
+    _logWriter = StdoutLogWriter(logStream: Logger.root.onRecord);
   }
 }

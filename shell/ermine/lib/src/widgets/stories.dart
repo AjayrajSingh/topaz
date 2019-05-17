@@ -43,13 +43,15 @@ class Stories extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           itemCount: stories.length + 1,
           onPageChanged: (index) {
-            onChangeStory(index);
             storyManager.onChangeFocus(index);
+            onChangeStory(index);
           },
           itemBuilder: (context, index) {
             final story = index == 0 ? null : stories.elementAt(index - 1);
-            return Container(
-              padding: EdgeInsets.all(32),
+            return AnimatedPadding(
+              duration: Duration(milliseconds: 200),
+              curve: Curves.ease,
+              padding: EdgeInsets.all(storyManager.isFullscreen ? 0 : 32),
               child: index == 0
                   ? null
                   : Material(
@@ -89,12 +91,18 @@ class Stories extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Positioned(
-                            top: 18,
-                            left: 2,
-                            right: 2,
-                            bottom: 2,
+                          AnimatedPositioned(
+                            duration: Duration(milliseconds: 200),
+                            curve: Curves.ease,
+                            top: storyManager.isFullscreen ? 0 : 18,
+                            left: storyManager.isFullscreen ? 0 : 2,
+                            right: storyManager.isFullscreen ? 0 : 2,
+                            bottom: storyManager.isFullscreen ? 0 : 2,
                             child: GestureDetector(
+                              // Pass gestures down to page.
+                              behavior: HitTestBehavior.translucent,
+                              // Disable long press on top of story.
+                              onLongPress: () {},
                               // Disable listview scrolling on top of story.
                               onHorizontalDragStart: (_) {},
                               child: ChildView(

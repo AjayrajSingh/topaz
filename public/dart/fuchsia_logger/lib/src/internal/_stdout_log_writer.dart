@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:async';
+
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
 
@@ -11,10 +13,10 @@ import '_log_writer.dart';
 /// A concrete implementation of [LogWriter] which prints the logs to stdout.
 class StdoutLogWriter extends LogWriter {
   /// Constructor
-  StdoutLogWriter({@required Logger logger})
-      : assert(logger != null),
+  StdoutLogWriter({@required Stream<LogRecord> logStream})
+      : assert(logStream != null),
         super(
-          logger: logger,
+          logStream: logStream,
           shouldBufferLogs: false,
         );
 
@@ -23,6 +25,16 @@ class StdoutLogWriter extends LogWriter {
     final scopes = [
       getLevelString(message.record.level),
     ];
+
+    void addToScopes(String scope) {
+      if (scope != null && scope.isNotEmpty) {
+        scopes.add(scope);
+      }
+    }
+
+    addToScopes(message.loggerBaseName);
+    addToScopes(message.record.loggerName);
+    addToScopes(message.codeLocation);
 
     message.tags.forEach(scopes.add);
     String scopesString = scopes.join(':');

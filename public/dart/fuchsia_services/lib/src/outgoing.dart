@@ -33,13 +33,8 @@ class Outgoing {
     }
   }
 
-  /// deprecated method, until we change all reference to use [addPublicService].
-  void addServiceForName<T>(vfs.Connector<T> connector, String serviceName) {
-    addPublicService(connector, serviceName);
-  }
-
   /// Serves root dir to request channel and serve [fuchsia.io.Directory]
-  ///  over it.
+  /// over it.
   void serve(InterfaceRequest<Node> request) {
     _ensureNotClosed();
     _root.serve(request);

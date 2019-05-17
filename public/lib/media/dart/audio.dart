@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:fidl_fuchsia_media/fidl_async.dart';
+import 'package:fidl_fuchsia_media_audio/fidl_async.dart';
 import 'package:fuchsia_services/services.dart';
 import 'package:fuchsia_logger/logger.dart';
 
@@ -21,7 +22,7 @@ class Audio {
   static const double _minDbDiff = 0.006;
   static const double _minPerceivedDiff = 0.0001;
 
-  final AudioProxy _audioService = new AudioProxy();
+  final AudioProxy _audioService = AudioProxy();
 
   double _systemAudioGainDb = _initialGainDb;
   bool _systemAudioMuted = false;
@@ -30,7 +31,7 @@ class Audio {
   /// Constructs an Audio object.
   Audio() {
     try {
-      connectToEnvironmentService(_audioService);
+      StartupContext.fromStartupInfo().incoming.connectToService(_audioService);
     } on Exception catch (error) {
       log.severe('Unable to connect to audio service', error);
     }

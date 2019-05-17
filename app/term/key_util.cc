@@ -7,7 +7,7 @@
 #include <fuchsia/ui/input/cpp/fidl.h>
 #include <hid/usages.h>
 
-#include "lib/fxl/logging.h"
+#include "src/lib/fxl/logging.h"
 
 namespace term {
 

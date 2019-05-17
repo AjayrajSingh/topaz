@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/sledge.dart';
 import 'package:test/test.dart';
 
@@ -10,9 +10,9 @@ import 'helpers.dart';
 
 Schema newSchema() {
   final schemaDescription = <String, BaseType>{
-    'a': new Integer(),
+    'a': Integer(),
   };
-  return new Schema(schemaDescription);
+  return Schema(schemaDescription);
 }
 
 void main() async {
@@ -20,7 +20,7 @@ void main() async {
 
   test('Test immediate deletions.', () async {
     Schema schema = newSchema();
-    final id = new DocumentId(schema);
+    final id = DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
     Document doc;
     await sledge.runInTransaction(() async {
@@ -34,7 +34,7 @@ void main() async {
 
   test('Test deletions.', () async {
     Schema schema = newSchema();
-    final id = new DocumentId(schema);
+    final id = DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
 
     // Create document.
@@ -44,14 +44,14 @@ void main() async {
     });
     // Verify that the document exists and delete it.
     await sledge.runInTransaction(() async {
-      final query = new Query(schema);
+      final query = Query(schema);
       final docs = await sledge.getDocuments(query);
       expect(docs.length, equals(1));
       docs[0].delete();
     });
     // Verify that document deos not exist anymore.
     await sledge.runInTransaction(() async {
-      final query = new Query(schema);
+      final query = Query(schema);
       final docs = await sledge.getDocuments(query);
       expect(docs.length, equals(0));
     });
@@ -59,7 +59,7 @@ void main() async {
 
   test('Test rollbacked deletions.', () async {
     Schema schema = newSchema();
-    final id = new DocumentId(schema);
+    final id = DocumentId(schema);
     Sledge sledge = newSledgeForTesting();
     Document doc;
     // Create document.

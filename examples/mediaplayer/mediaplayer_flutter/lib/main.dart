@@ -5,49 +5,24 @@
 import 'dart:async';
 import 'dart:io' as io;
 
-import 'package:fidl/fidl.dart';
-import 'package:fidl_fuchsia_mediaplayer/fidl.dart' as mediaplayer;
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_media/fidl_async.dart' as media;
+import 'package:fidl_fuchsia_media_playback/fidl_async.dart' as playback;
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fuchsia/fuchsia.dart';
-import 'package:lib.app.dart/app.dart';
+import 'package:fuchsia_logger/logger.dart';
+import 'package:fuchsia_modular/module.dart';
+import 'package:fuchsia_services/services.dart';
 import 'package:lib.mediaplayer.flutter/media_player.dart';
 import 'package:lib.mediaplayer.flutter/media_player_controller.dart';
 
 import 'asset.dart';
 import 'config.dart';
 
-final StartupContext _context = new StartupContext.fromStartupInfo();
+final _context = StartupContext.fromStartupInfo();
 final MediaPlayerController _controller =
-    new MediaPlayerController(_context.environmentServices);
+    MediaPlayerController(_context.incoming);
 
-ModuleImpl _module = new ModuleImpl();
-
-void _log(String msg) {
-  print('[mediaplayer_flutter Module] $msg');
-}
-
-/// An implementation of the [Lifecycle] interface, which controls the lifetime
-/// of the module.
-class ModuleImpl implements Lifecycle {
-  final LifecycleBinding _lifecycleBinding = new LifecycleBinding();
-
-  /// Binds an [InterfaceRequest] for a [Lifecycle] interface to this object.
-  void bindLifecycle(InterfaceRequest<Lifecycle> request) {
-    _lifecycleBinding.bind(this, request);
-  }
-
-  /// Implementation of Lifecycle.Terminate method.
-  @override
-  void terminate() {
-    _log('ModuleImpl::Terminate call');
-    _lifecycleBinding.close();
-    exit(0);
-  }
-}
-
-const List<String> _configFileNames = const <String>[
+const List<String> _configFileNames = <String>[
   '/data/mediaplayer_flutter.config',
   '/pkg/data/mediaplayer_flutter.config',
 ];
@@ -125,7 +100,7 @@ void _playLeafAsset(Asset asset) {
 
   _leafAssetToPlay = asset;
 
-  if (_controller.problem?.type == mediaplayer.kProblemConnectionFailed) {
+  if (_controller.problem?.type == playback.problemConnectionFailed) {
     _controller.close();
   }
 
@@ -139,7 +114,7 @@ class _PlaybackScreen extends StatefulWidget {
   const _PlaybackScreen({Key key}) : super(key: key);
 
   @override
-  _PlaybackScreenState createState() => new _PlaybackScreenState();
+  _PlaybackScreenState createState() => _PlaybackScreenState();
 }
 
 class _PlaybackScreenState extends State<_PlaybackScreen> {
@@ -170,18 +145,18 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
       return;
     }
 
-    to.add(new Container(
-      margin: const EdgeInsets.only(left: 10.0),
-      child: new Text(
+    to.add(Container(
+      margin: EdgeInsets.only(left: 10.0),
+      child: Text(
         label,
-        style: new TextStyle(color: color, fontSize: fontSize),
+        style: TextStyle(color: color, fontSize: fontSize),
       ),
     ));
   }
 
   /// Adds a problem description to list [to] if there is a problem.
   void _addProblem(List<Widget> to) {
-    mediaplayer.Problem problem = _controller.problem;
+    playback.Problem problem = _controller.problem;
     if (problem != null) {
       String text;
 
@@ -189,22 +164,22 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
         text = problem.details;
       } else {
         switch (problem.type) {
-          case mediaplayer.kProblemInternal:
+          case playback.problemInternal:
             text = 'Internal error';
             break;
-          case mediaplayer.kProblemAssetNotFound:
+          case playback.problemAssetNotFound:
             text = 'The requested content was not found';
             break;
-          case mediaplayer.kProblemContainerNotSupported:
+          case playback.problemContainerNotSupported:
             text = 'The requested content uses an unsupported container format';
             break;
-          case mediaplayer.kProblemAudioEncodingNotSupported:
+          case playback.problemAudioEncodingNotSupported:
             text = 'The requested content uses an unsupported audio encoding';
             break;
-          case mediaplayer.kProblemVideoEncodingNotSupported:
+          case playback.problemVideoEncodingNotSupported:
             text = 'The requested content uses an unsupported video encoding';
             break;
-          case mediaplayer.kProblemConnectionFailed:
+          case playback.problemConnectionFailed:
             text = 'Connection to player failed';
             break;
           default:
@@ -224,56 +199,50 @@ class _PlaybackScreenState extends State<_PlaybackScreen> {
   @override
   Widget build(BuildContext context) {
     List<Widget> columnChildren = <Widget>[
-      new MediaPlayer(_controller),
+      MediaPlayer(_controller),
     ];
 
     Map<String, String> metadata = _controller.metadata;
     if (metadata != null) {
       _addLabel(
-          metadata[mediaplayer.metadataLabelTitle] ??
+          metadata[media.metadataLabelTitle] ??
               _leafAssetToPlay.title ??
               '(untitled)',
           Colors.white,
           20.0,
           columnChildren);
-      _addLabel(
-          metadata[mediaplayer.metadataLabelArtist] ?? _leafAssetToPlay.artist,
-          Colors.grey[600],
-          15.0,
-          columnChildren);
-      _addLabel(
-          metadata[mediaplayer.metadataLabelAlbum] ?? _leafAssetToPlay.album,
-          Colors.grey[800],
-          15.0,
-          columnChildren);
+      _addLabel(metadata[media.metadataLabelArtist] ?? _leafAssetToPlay.artist,
+          Colors.grey[600], 15.0, columnChildren);
+      _addLabel(metadata[media.metadataLabelAlbum] ?? _leafAssetToPlay.album,
+          Colors.grey[800], 15.0, columnChildren);
     }
 
     _addProblem(columnChildren);
 
-    return new Material(
+    return Material(
       color: Colors.black,
-      child: new Stack(
+      child: Stack(
         children: <Widget>[
-          new Positioned(
+          Positioned(
             left: 0.0,
             right: 0.0,
             top: 0.0,
-            child: new Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: columnChildren,
             ),
           ),
-          new Positioned(
+          Positioned(
             right: 0.0,
             top: 0.0,
-            child: new Offstage(
+            child: Offstage(
               offstage: !_controller.shouldShowControlOverlay,
-              child: new PhysicalModel(
+              child: PhysicalModel(
                 elevation: 2.0,
                 color: Colors.transparent,
-                borderRadius: new BorderRadius.circular(60.0),
-                child: new IconButton(
-                  icon: new Icon(
+                borderRadius: BorderRadius.circular(60.0),
+                child: IconButton(
+                  icon: Icon(
                       _assets.length == 1 ? Icons.close : Icons.arrow_back),
                   iconSize: 60.0,
                   onPressed: () {
@@ -301,7 +270,7 @@ class _ChooserScreen extends StatefulWidget {
   const _ChooserScreen({Key key}) : super(key: key);
 
   @override
-  _ChooserScreenState createState() => new _ChooserScreenState();
+  _ChooserScreenState createState() => _ChooserScreenState();
 }
 
 class _ChooserScreenState extends State<_ChooserScreen> {
@@ -320,34 +289,34 @@ class _ChooserScreenState extends State<_ChooserScreen> {
         break;
     }
 
-    return new RaisedButton(
+    return RaisedButton(
       onPressed: () {
         _play(asset);
         Navigator.of(context).pushNamed('/play');
       },
       color: Colors.black,
-      child: new Row(
+      child: Row(
         children: <Widget>[
-          new Icon(
+          Icon(
             iconData,
             size: 60.0,
             color: Colors.grey[200],
           ),
-          new Column(
+          Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              new Text(
+              Text(
                 asset.title ?? '(no title)',
-                style: new TextStyle(color: Colors.grey[200], fontSize: 18.0),
+                style: TextStyle(color: Colors.grey[200], fontSize: 18.0),
               ),
-              new Text(
+              Text(
                 asset.artist ?? '',
-                style: new TextStyle(color: Colors.grey[600], fontSize: 13.0),
+                style: TextStyle(color: Colors.grey[600], fontSize: 13.0),
               ),
-              new Text(
+              Text(
                 asset.album ?? '',
-                style: new TextStyle(color: Colors.grey[800], fontSize: 13.0),
+                style: TextStyle(color: Colors.grey[800], fontSize: 13.0),
               ),
             ],
           ),
@@ -358,22 +327,22 @@ class _ChooserScreenState extends State<_ChooserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return new Material(
+    return Material(
       color: Colors.black,
-      child: new Stack(
+      child: Stack(
         children: <Widget>[
-          new ListView(
+          ListView(
             itemExtent: 75.0,
             children: _assets.map(_buildChooseButton).toList(),
           ),
-          new Positioned(
+          Positioned(
             right: 0.0,
             top: 0.0,
-            child: new PhysicalModel(
+            child: PhysicalModel(
               elevation: 2.0,
               color: Colors.transparent,
-              child: new IconButton(
-                icon: const Icon(Icons.close),
+              child: IconButton(
+                icon: Icon(Icons.close),
                 iconSize: 60.0,
                 onPressed: () {
                   io.exit(0);
@@ -389,15 +358,11 @@ class _ChooserScreenState extends State<_ChooserScreen> {
 }
 
 Future<Null> main() async {
-  _log('Module started');
+  setupLogger(name: 'mediaplayer_flutter Module');
+  log.fine('Module started');
 
-  /// Add [ModuleImpl] to this application's outgoing ServiceProvider.
-  _context.outgoingServices.addServiceForName(
-    (InterfaceRequest<Lifecycle> request) {
-      _module.bindLifecycle(request);
-    },
-    Lifecycle.$serviceName,
-  );
+  // explicitly opt out of intents
+  Module().registerIntentHandler(NoopIntentHandler());
 
   await _readConfig();
 
@@ -410,14 +375,13 @@ Future<Null> main() async {
     _play(_assets[0]);
   }
 
-  runApp(new MaterialApp(
+  runApp(MaterialApp(
     title: 'Media Player',
-    home:
-        _assets.length == 1 ? const _PlaybackScreen() : const _ChooserScreen(),
+    home: _assets.length == 1 ? const _PlaybackScreen() : _ChooserScreen(),
     routes: <String, WidgetBuilder>{
       '/play': (BuildContext context) => const _PlaybackScreen()
     },
-    theme: new ThemeData(primarySwatch: Colors.blue),
+    theme: ThemeData(primarySwatch: Colors.blue),
     debugShowCheckedModeBanner: false,
   ));
 }

@@ -48,7 +48,7 @@ class ProgressNotifier extends ChangeNotifier {
     int delayMicroseconds = resolutionMicroseconds -
         (_controller.progress.inMicroseconds % resolutionMicroseconds);
 
-    _timer = new Timer(new Duration(microseconds: delayMicroseconds), () {
+    _timer = Timer(Duration(microseconds: delayMicroseconds), () {
       _timer = null;
 
       if (_disposed || !_controller.playing) {
@@ -86,7 +86,7 @@ class ProgressNotifier extends ChangeNotifier {
   ProgressNotifier withExcursion(double excursion, BuildContext context) {
     double effectiveExcursion =
         excursion * MediaQuery.of(context).devicePixelRatio;
-    return withResolution(new Duration(
+    return withResolution(Duration(
         microseconds:
             (_controller.duration.inMicroseconds / effectiveExcursion).ceil()));
   }

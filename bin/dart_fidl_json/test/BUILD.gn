@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 import("//topaz/bin/dart_fidl_json/dart_fidl_json.gni")
-import("//topaz/runtime/dart/dart_test.gni")
+import("//build/dart/test.gni")
 
 json_fidl("dart_fidl_json_test_fidl_json") {
   fidl_target = "//topaz//bin/dart_fidl_json/test/fidl/dart.fidl.json.test"

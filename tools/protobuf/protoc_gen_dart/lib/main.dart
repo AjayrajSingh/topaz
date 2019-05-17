@@ -83,11 +83,11 @@ class DartImportMappingOutputConfiguration extends DefaultOutputConfiguration {
 
 void main() {
   var packageMapping = <String, String>{};
-  new CodeGenerator(stdin, stdout).generate(
+  CodeGenerator(stdin, stdout).generate(
     optionParsers: {
       DartImportMappingOptionParser.kImportOptionKey:
           DartImportMappingOptionParser(packageMapping),
     },
-    config: new DartImportMappingOutputConfiguration(packageMapping),
+    config: DartImportMappingOutputConfiguration(packageMapping),
   );
 }

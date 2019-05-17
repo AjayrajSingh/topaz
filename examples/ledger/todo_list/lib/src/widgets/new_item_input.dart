@@ -16,31 +16,31 @@ class NewItemInput extends StatefulWidget {
   const NewItemInput({Key key, this.onNewItem}) : super(key: key);
 
   @override
-  _NewItemInputState createState() => new _NewItemInputState(onNewItem);
+  _NewItemInputState createState() => _NewItemInputState(onNewItem);
 }
 
 class _NewItemInputState extends State<NewItemInput> {
   _NewItemInputState(this.onNewItem);
 
-  final TextEditingController _controller = new TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   final NewItemCallback onNewItem;
 
   @override
   Widget build(BuildContext context) {
-    return new Row(children: <Widget>[
-      new Expanded(
-          child: new TextField(
+    return Row(children: <Widget>[
+      Expanded(
+          child: TextField(
               controller: _controller,
               onSubmitted: (String value) {
                 onNewItem(_controller.text);
                 _controller.text = '';
               },
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                   hintText: 'What would you like to achieve today?'))),
-      new SizedBox(
+      SizedBox(
           width: 72.0,
-          child: new IconButton(
-              icon: const Icon(Icons.add),
+          child: IconButton(
+              icon: Icon(Icons.add),
               onPressed: () {
                 onNewItem(_controller.text);
                 _controller.text = '';

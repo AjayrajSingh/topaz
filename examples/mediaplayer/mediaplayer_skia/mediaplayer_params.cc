@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "lib/fxl/strings/split_string.h"
+#include "src/lib/fxl/strings/split_string.h"
 
 namespace examples {
 
@@ -49,7 +49,7 @@ MediaPlayerParams::MediaPlayerParams(const fxl::CommandLine& command_line) {
 
 void MediaPlayerParams::Usage() {
   std::cerr << "mediaplayer_skia usage:\n";
-  std::cerr << "    set_root_view mediaplayer_skia url-or-path\n";
+  std::cerr << "    present_view mediaplayer_skia url-or-path\n";
 }
 
 }  // namespace examples

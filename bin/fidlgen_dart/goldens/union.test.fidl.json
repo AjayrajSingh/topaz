@@ -1,0 +1,86 @@
+{
+  "version": "0.0.1",
+  "name": "test.name",
+  "library_dependencies": [],
+  "bits_declarations": [],
+  "const_declarations": [],
+  "enum_declarations": [],
+  "interface_declarations": [],
+  "struct_declarations": [],
+  "table_declarations": [],
+  "union_declarations": [
+    {
+      "name": "test.name/Union",
+      "location": {
+        "filename": "garnet/go/src/fidl/compiler/backend/typestest/union.test.fidl",
+        "line": 3,
+        "column": 7
+      },
+      "members": [
+        {
+          "type": {
+            "kind": "primitive",
+            "subtype": "int32"
+          },
+          "name": "Primitive",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/union.test.fidl",
+            "line": 4,
+            "column": 11
+          },
+          "size": 4,
+          "max_out_of_line": 0,
+          "alignment": 4,
+          "offset": 8
+        },
+        {
+          "type": {
+            "kind": "string",
+            "nullable": false
+          },
+          "name": "StringNeedsConstructor",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/union.test.fidl",
+            "line": 5,
+            "column": 12
+          },
+          "size": 16,
+          "max_out_of_line": 4294967295,
+          "alignment": 8,
+          "offset": 8
+        },
+        {
+          "type": {
+            "kind": "vector",
+            "element_type": {
+              "kind": "string",
+              "nullable": false
+            },
+            "nullable": false
+          },
+          "name": "VectorStringAlsoNeedsConstructor",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/union.test.fidl",
+            "line": 6,
+            "column": 20
+          },
+          "size": 16,
+          "max_out_of_line": 4294967295,
+          "alignment": 8,
+          "offset": 8
+        }
+      ],
+      "size": 24,
+      "max_out_of_line": 4294967295,
+      "alignment": 8,
+      "max_handles": 0
+    }
+  ],
+  "xunion_declarations": [],
+  "declaration_order": [
+    "test.name/Union"
+  ],
+  "declarations": {
+    "test.name/Union": "union"
+  }
+}

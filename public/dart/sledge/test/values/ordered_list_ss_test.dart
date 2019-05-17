@@ -9,7 +9,7 @@ import 'dart:collection';
 import 'dart:math' show Random;
 import 'dart:typed_data';
 
-import 'package:lib.app.dart/logging.dart';
+import 'package:fuchsia_logger/logger.dart';
 import 'package:sledge/src/document/values/converted_change.dart';
 import 'package:sledge/src/document/values/ordered_list_value.dart';
 import 'package:test/test.dart';
@@ -24,13 +24,13 @@ class OrderedListFleetFactory<T> {
   // Returns Fleet of [count] OrderedListValues with pairwise different
   // instanceIds.
   Fleet<OrderedListValue<T>> newFleet(int count) {
-    return new Fleet<OrderedListValue<T>>(count,
-        (index) => new OrderedListValue<T>(new Uint8List.fromList([index])));
+    return Fleet<OrderedListValue<T>>(count,
+        (index) => OrderedListValue<T>(Uint8List.fromList([index])));
   }
 }
 
 const OrderedListFleetFactory<int> integerOrderedListFleetFactory =
-    const OrderedListFleetFactory<int>();
+    OrderedListFleetFactory<int>();
 
 // Checks that relative orders of elements do not change.
 // Throws an error if some pair of elements [a] and [b] appear in both orders,
@@ -83,11 +83,11 @@ Future randomRelativeOrderTest(
       'Check relative order '
       '(i: $countInstances, e: $countEpochs, ins: $countInsertions, seed: $seed).',
       () async {
-    final random = new Random(seed);
+    final random = Random(seed);
     int incValue = 0;
     final fleet = integerOrderedListFleetFactory.newFleet(countInstances);
     final instanceIdList =
-        new List<int>.generate(countInstances, (index) => index);
+        List<int>.generate(countInstances, (index) => index);
 
     for (int epoch = 0; epoch < countEpochs; epoch++) {
       for (int instance = 0; instance < countInstances; instance++) {
@@ -100,7 +100,7 @@ Future randomRelativeOrderTest(
       }
       fleet.synchronize(instanceIdList);
     }
-    fleet.addChecker(() => new RelativeOrderChecker<int>());
+    fleet.addChecker(() => RelativeOrderChecker<int>());
     await fleet.testAllOrders();
   });
 }
@@ -135,7 +135,7 @@ void main() async {
         l2..insert(0, 5)..insert(1, 6);
       })
       ..synchronize([0, 1, 2])
-      ..addChecker(() => new RelativeOrderChecker<int>());
+      ..addChecker(() => RelativeOrderChecker<int>());
     await fleet.testAllOrders();
   });
 
@@ -161,14 +161,14 @@ void main() async {
         expect(
             cnt.onChange,
             emitsInOrder([
-              new OrderedListChangeMatcher(new OrderedListChange<int>(
-                  [], new SplayTreeMap<int, int>.fromIterables([0], [1]))),
-              new OrderedListChangeMatcher(new OrderedListChange<int>([],
-                  new SplayTreeMap<int, int>.fromIterables([0, 2], [2, 3]))),
-              new OrderedListChangeMatcher(new OrderedListChange<int>(
-                  [1, 2], new SplayTreeMap<int, int>.fromIterables([], []))),
-              new OrderedListChangeMatcher(new OrderedListChange<int>(
-                  [], new SplayTreeMap<int, int>.fromIterables([0], [5]))),
+              OrderedListChangeMatcher(OrderedListChange<int>(
+                  [], SplayTreeMap<int, int>.fromIterables([0], [1]))),
+              OrderedListChangeMatcher(OrderedListChange<int>([],
+                  SplayTreeMap<int, int>.fromIterables([0, 2], [2, 3]))),
+              OrderedListChangeMatcher(OrderedListChange<int>(
+                  [1, 2], SplayTreeMap<int, int>.fromIterables([], []))),
+              OrderedListChangeMatcher(OrderedListChange<int>(
+                  [], SplayTreeMap<int, int>.fromIterables([0], [5]))),
             ]));
       });
     }

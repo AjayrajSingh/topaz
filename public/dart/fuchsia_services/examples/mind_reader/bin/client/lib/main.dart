@@ -12,7 +12,7 @@ import 'package:fuchsia_services/services.dart';
 
 import 'src/_thought_leaker_impl.dart';
 
-/// The URL which will be used to launch the mind reader server componet.
+/// The URL which will be used to launch the mind reader server component.
 const _mindReaderServerUrl =
     'fuchsia-pkg://fuchsia.com/mind_reader_dart#meta/mind_reader_server.cmx';
 
@@ -45,9 +45,12 @@ Future<void> _run(String thoughtToExpose) async {
     log.info('Exposing ThoughtLeakerImpl with the thought "$thoughtToExpose"');
   }
 
-  /// A [ServicesConnector] object is used to connect to a service which is
-  /// exposed in the launched components out/public directory.
-  final connector = ServicesConnector();
+  /// An [Incoming] is a helper class which will allow for connecting to
+  /// services exposed by the launched component.
+  /// This client component is looking for service under /in/svc/
+  /// directory to connect to while the server exposes services others can
+  /// connect to under /out/public directory.
+  final incoming = Incoming();
 
   /// The [LaunchInfo] struct is used to construct the component we want to
   /// launch.
@@ -55,26 +58,30 @@ Future<void> _run(String thoughtToExpose) async {
     url: _mindReaderServerUrl,
     // The directoryRequest is the handle to the /out directory of the launched
     // component.
-    directoryRequest: connector.request(),
+    directoryRequest: incoming.request().passChannel(),
 
     // The service list is a list of services which are exposed to the child.
     // If a service is not included in this list the child will fail to connect.
     additionalServices: serviceList,
   );
 
+  final launcherProxy = LauncherProxy();
+  context.incoming.connectToService(launcherProxy);
+
   // Launch the component and wait for it to start. We pass a
   // [ComponentControllerProxy] here to tie the lifecycle of our component to
   // the one we are launching. If we were to pass null the launched process
   // would live on after this process dies. Note: you can keep a reference to
   // the proxy and close it when you want if your process was longer lived.
-  await context.launcher
-      .createComponent(launchInfo, ComponentControllerProxy().ctrl.request());
+  await launcherProxy.createComponent(
+      launchInfo, ComponentControllerProxy().ctrl.request());
 
   // Now that the component has launched we attempt to connect to the mind
   // reader service which is exposed to us by the child.
   final mindReader = MindReaderProxy();
-  mindReader.ctrl.bind(await connector
-      .connectToServiceByName<MindReader>(MindReader.$serviceName));
+  incoming.connectToService(mindReader);
+
+  await incoming.close();
 
   // We ask the service to read our mind and wait for the response.
   final response = await mindReader.readMind();

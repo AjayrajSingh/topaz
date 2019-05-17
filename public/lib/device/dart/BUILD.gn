@@ -18,6 +18,5 @@ dart_library("dart") {
     "//sdk/fidl/fuchsia.auth",
     "//sdk/fidl/fuchsia.modular",
     "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
   ]
 }

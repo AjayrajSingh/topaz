@@ -12,6 +12,7 @@ import 'package:fidl_fuchsia_io/fidl_async.dart';
 import 'package:quiver/collection.dart';
 import 'package:zircon/zircon.dart';
 
+import 'internal/_flags.dart';
 import 'vnode.dart';
 
 /// A [PseudoDir] is a directory-like object whose entries are constructed
@@ -74,7 +75,7 @@ class PseudoDir extends Vnode {
   /// [fushsia.io.Directory] over fidl.
   @override
   int connect(int flags, int mode, fidl.InterfaceRequest<Node> request,
-      [int parentFlags = -1]) {
+      [int parentFlags = Flags.fsRights]) {
     if (_isClosed) {
       sendErrorEvent(flags, ZX.ERR_NOT_SUPPORTED, request);
       return ZX.ERR_NOT_SUPPORTED;
@@ -88,7 +89,15 @@ class PseudoDir extends Vnode {
 
     var connectFlags = filterForNodeReference(flags);
 
-    // ignore parentFlags as every directory is readable even if flag is not passed.
+    if (Flags.isPosix(connectFlags)) {
+      // grant POSIX clients additional rights
+      var parentRights = parentFlags & Flags.fsRights;
+      connectFlags |= parentRights;
+      connectFlags &= ~openFlagPosix;
+      // Mounting is not supported
+      connectFlags &= ~openRightAdmin;
+    }
+
     var status = _validateFlags(connectFlags);
     if (status != ZX.OK) {
       sendErrorEvent(connectFlags, status, request);
@@ -128,14 +137,24 @@ class PseudoDir extends Vnode {
 
   @override
   void open(
-      int flags, int mode, String path, fidl.InterfaceRequest<Node> request) {
-    var p = path.trim();
-    if (p.startsWith('/')) {
+      int flags, int mode, String path, fidl.InterfaceRequest<Node> request,
+      [int parentFlags = Flags.fsRights]) {
+    if (path.startsWith('/') || path == '') {
       sendErrorEvent(flags, ZX.ERR_BAD_PATH, request);
       return;
     }
-    if (p == '' || p == '.') {
-      connect(flags, mode, request);
+    var p = path;
+    // remove all ./, .//, etc
+    while (p.startsWith('./')) {
+      var index = 2;
+      while (index < p.length && p[index] == '/') {
+        index++;
+      }
+      p = p.substring(index);
+    }
+
+    if (p == '.' || p == '') {
+      connect(flags, mode, request, parentFlags);
       return;
     }
     var index = p.indexOf('/');
@@ -149,15 +168,16 @@ class PseudoDir extends Vnode {
       var e = _entries[key];
       // final element, open it
       if (index == -1) {
-        e.node.connect(flags, mode, request);
+        e.node.connect(flags, mode, request, parentFlags);
         return;
       } else if (index == p.length - 1) {
         // '/' is at end, should be a directory, add flag
-        e.node.connect(flags | openFlagDirectory, mode, request);
+        e.node.connect(flags | openFlagDirectory, mode, request, parentFlags);
         return;
       } else {
         // forward request to child Vnode and let it handle rest of path.
-        return e.node.open(flags, mode, p.substring(index + 1), request);
+        return e.node
+            .open(flags, mode, p.substring(index + 1), request, parentFlags);
       }
     } else {
       sendErrorEvent(flags, ZX.ERR_NOT_FOUND, request);
@@ -185,8 +205,12 @@ class PseudoDir extends Vnode {
   }
 
   /// Serves this [request] directory over request channel.
-  int serve(fidl.InterfaceRequest<Node> request) {
-    return connect(openFlagDirectory, 0, request);
+  /// Caller may specify the rights granted to the [request] connection.
+  /// If `rights` is omitted, it defaults to readable and writable.
+  int serve(fidl.InterfaceRequest<Node> request,
+      {int rights = openRightReadable | openRightWritable}) {
+    assert((rights & ~Flags.fsRights) == 0);
+    return connect(openFlagDirectory | rights, 0, request);
   }
 
   @override
@@ -203,7 +227,9 @@ class PseudoDir extends Vnode {
         openRightWritable |
         openFlagDirectory |
         openFlagNodeReference |
-        openFlagDescribe;
+        openFlagDescribe |
+        openFlagPosix |
+        cloneFlagSameRights;
     var prohibitedFlags = openFlagCreate |
         openFlagCreateIfAbsent |
         openFlagTruncate |
@@ -227,7 +253,7 @@ class PseudoDir extends Vnode {
 
 /// Implementation of fuchsia.io.Directory for pseudo directory.
 ///
-/// This class should not be used directly, but by [fuchsia_vfs.PseudoDirectory].
+/// This class should not be used directly, but by [fuchsia_vfs.PseudoDir].
 class _DirConnection extends Directory {
   final DirectoryBinding _binding = DirectoryBinding();
   bool isNodeRef = false;
@@ -272,7 +298,32 @@ class _DirConnection extends Directory {
 
   @override
   Future<void> clone(int flags, fidl.InterfaceRequest<Node> object) async {
-    _dir.connect(flags, _mode, object);
+    if (!Flags.inputPrecondition(flags)) {
+      _dir.sendErrorEvent(flags, ZX.ERR_INVALID_ARGS, object);
+      return;
+    }
+    if (Flags.shouldCloneWithSameRights(flags)) {
+      if ((flags & Flags.fsRightsSpace) != 0) {
+        _dir.sendErrorEvent(flags, ZX.ERR_INVALID_ARGS, object);
+        return;
+      }
+    }
+
+    // If SAME_RIGHTS is requested, cloned connection will inherit the same
+    // rights as those from the originating connection.
+    var newFlags = flags;
+    if (Flags.shouldCloneWithSameRights(flags)) {
+      newFlags &= (~Flags.fsRights);
+      newFlags |= (_flags & Flags.fsRights);
+      newFlags &= ~cloneFlagSameRights;
+    }
+
+    if (!Flags.stricterOrSameRights(newFlags, _flags)) {
+      _dir.sendErrorEvent(flags, ZX.ERR_ACCESS_DENIED, object);
+      return;
+    }
+
+    _dir.connect(newFlags, _mode, object);
   }
 
   @override
@@ -329,7 +380,23 @@ class _DirConnection extends Directory {
   @override
   Future<void> open(int flags, int mode, String path,
       fidl.InterfaceRequest<Node> object) async {
-    _dir.open(flags, mode, path, object);
+    if (!Flags.inputPrecondition(flags)) {
+      _dir.sendErrorEvent(flags, ZX.ERR_INVALID_ARGS, object);
+      return;
+    }
+    if (Flags.shouldCloneWithSameRights(flags)) {
+      _dir.sendErrorEvent(flags, ZX.ERR_INVALID_ARGS, object);
+      return;
+    }
+    if (Flags.isNodeReference(flags) && ((flags & Flags.fsRights) == 0)) {
+      _dir.sendErrorEvent(flags, ZX.ERR_INVALID_ARGS, object);
+      return;
+    }
+    if (!Flags.stricterOrSameRights(flags, _flags)) {
+      _dir.sendErrorEvent(flags, ZX.ERR_ACCESS_DENIED, object);
+      return;
+    }
+    _dir.open(flags, mode, path, object, _flags);
   }
 
   @override

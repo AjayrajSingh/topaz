@@ -9,6 +9,9 @@ dart_library("flutter") {
 
   source_dir = "."
 
+  # Unclear non-standard directory structure
+  sources_required = false
+
   sources = [
     "media_player.dart",
     "media_player_controller.dart",
@@ -17,10 +20,9 @@ dart_library("flutter") {
 
   deps = [
     "//sdk/fidl/fuchsia.media",
-    "//sdk/fidl/fuchsia.ui.viewsv1",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/fuchsia_scenic",
     "//topaz/public/dart/fuchsia_scenic_flutter",
-    "//topaz/public/lib/app/dart",
     "//topaz/public/lib/mediaplayer/dart",
   ]
 }

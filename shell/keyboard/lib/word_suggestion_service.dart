@@ -4,7 +4,7 @@
 
 import 'dart:math';
 
-const List<String> _kWords = const <String>[
+const List<String> _kWords = <String>[
   'the',
   'be',
   'to',
@@ -214,7 +214,7 @@ const List<String> _kWords = const <String>[
 class WordSuggestionService {
   /// Returns a list of words that are similar to [input].
   List<String> suggestWords(String input) {
-    final List<String> suggestedWords = new List<String>.from(_kWords)
+    final List<String> suggestedWords = List<String>.from(_kWords)
       ..removeWhere((String a) => levenshteinDistance(input, a) > 3)
       ..sort((String a, String b) =>
           levenshteinDistance(input, a) - levenshteinDistance(input, b));
@@ -235,8 +235,8 @@ class WordSuggestionService {
     }
 
     // Create two work vectors of integer distances.
-    final List<int> v0 = new List<int>.filled(t.length + 1, 0);
-    final List<int> v1 = new List<int>.filled(t.length + 1, 0);
+    final List<int> v0 = List<int>.filled(t.length + 1, 0);
+    final List<int> v1 = List<int>.filled(t.length + 1, 0);
 
     // Initialize v0 (the previous row of distances).
     // This row is A[0][i]: edit distance for an empty s.

@@ -15,6 +15,6 @@ dart_library("dart") {
     "//sdk/fidl/fuchsia.device.display",
     "//sdk/fidl/fuchsia.devicesettings",
     "//topaz/public/dart/fidl",
-    "//topaz/public/lib/app/dart",
-  ]
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_services",  ]
 }

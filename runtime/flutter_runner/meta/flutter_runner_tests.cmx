@@ -4,9 +4,7 @@
     },
     "sandbox": {
         "services": [
-            "fuchsia.fonts.Provider",
-            "fuchsia.sys.Environment",
-            "fuchsia.sys.Loader"
+            "fuchsia.sys.Launcher"
         ]
     }
 }

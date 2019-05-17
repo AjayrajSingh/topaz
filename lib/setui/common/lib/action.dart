@@ -46,7 +46,7 @@ abstract class Action<T extends Blueprint> {
 
   /// Called by client to return result
   void onResult(String result) {
-    callback.onResult(new ActionResult(step, result));
+    callback.onResult(ActionResult(step, result));
   }
 
   /// Called by owner to start the action

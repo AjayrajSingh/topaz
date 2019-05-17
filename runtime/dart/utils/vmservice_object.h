@@ -5,23 +5,21 @@
 #ifndef TOPAZ_RUNTIME_DART_UTILS_VMSERVICE_OBJECT_H_
 #define TOPAZ_RUNTIME_DART_UTILS_VMSERVICE_OBJECT_H_
 
-#include <fs/lazy-dir.h>
+#include <lib/vfs/cpp/lazy_dir.h>
 
-namespace fuchsia {
-namespace dart {
+namespace dart_utils {
 
-class VMServiceObject : public fs::LazyDir {
+class VMServiceObject : public vfs::LazyDir {
  public:
   static constexpr const char* kDirName = "DartVM";
   static constexpr const char* kPortDirName = "vmservice-port";
   static constexpr const char* kPortDir = "/tmp/dart.services";
 
-  void GetContents(LazyEntryVector* out_vector) override;
-  zx_status_t GetFile(fbl::RefPtr<Vnode>* out, uint64_t id,
-                      fbl::String name) override;
+  void GetContents(LazyEntryVector* out_vector) const override;
+  zx_status_t GetFile(Node** out_node,
+                      uint64_t id, std::string name) const override;
 };
 
-}  // namespace dart
-}  // namespace fuchsia
+}  // namespace dart_utils
 
 #endif  // TOPAZ_RUNTIME_DART_UTILS_VMSERVICE_OBJECT_H_

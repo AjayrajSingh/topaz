@@ -9,10 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:meta/meta.dart';
 
-const EdgeInsets _kPadding = const EdgeInsets.only(top: 32.0, bottom: 12.0);
+const EdgeInsets _kPadding = EdgeInsets.only(top: 32.0, bottom: 12.0);
 
 const ListEquality<RawImage> _kImageListEquality =
-    const ListEquality<RawImage>();
+    ListEquality<RawImage>();
 
 // Shows a grid of horizontally scrolling images. Their scroll behavior is
 // driven automatically using a ScrollController (see ImageGridModel).
@@ -34,34 +34,34 @@ class ImageGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new DefaultTextStyle(
-      style: const TextStyle(
+    return DefaultTextStyle(
+      style: TextStyle(
         color: Colors.black,
         fontSize: 8.0,
         height: 1.2,
       ),
-      child: new Container(
+      child: Container(
         padding: _kPadding,
-        child: new Column(
+        child: Column(
           mainAxisSize: MainAxisSize.max,
           children: <Widget>[
-            new Text('Image Grid Test (Flutter)'),
-            new Container(
+            Text('Image Grid Test (Flutter)'),
+            Container(
               height: 8.0,
             ),
-            new Expanded(
-              child: new CustomScrollView(
+            Expanded(
+              child: CustomScrollView(
                 scrollDirection: Axis.horizontal,
                 controller: scrollController,
                 slivers: <Widget>[
-                  new SliverPadding(
-                    padding: const EdgeInsets.only(left: 32.0),
-                    sliver: new SliverGrid(
-                      gridDelegate: new _ImageGridDelegate(
+                  SliverPadding(
+                    padding: EdgeInsets.only(left: 32.0),
+                    sliver: SliverGrid(
+                      gridDelegate: _ImageGridDelegate(
                         images: images,
                         rowCount: 3,
                       ),
-                      delegate: new SliverChildBuilderDelegate(
+                      delegate: SliverChildBuilderDelegate(
                           (BuildContext context, int index) =>
                               _buildItem(images[index]),
                           childCount: images.length),
@@ -77,18 +77,18 @@ class ImageGrid extends StatelessWidget {
   }
 
   Widget _buildItem(RawImage image) {
-    return new Container(
-      padding: const EdgeInsets.only(
+    return Container(
+      padding: EdgeInsets.only(
         right: 16.0,
         bottom: 16.0,
       ),
-      child: new PhysicalModel(
+      child: PhysicalModel(
         color: Colors.grey[200],
-        borderRadius: new BorderRadius.circular(4.0),
+        borderRadius: BorderRadius.circular(4.0),
         elevation: 2.0,
         child: drawImages
             ? image
-            : new Container(
+            : Container(
                 width: 500.0,
                 height: 500.0,
               ),
@@ -112,7 +112,7 @@ class _ImageGridDelegate extends SliverGridDelegate {
   SliverGridLayout getLayout(SliverConstraints constraints) {
     if (_newConstraints(constraints)) {
       _lastConstraints = constraints;
-      _lastLayout = new _ImageGridLayout(
+      _lastLayout = _ImageGridLayout(
         sliverGridGeometryList: _getSliverGeometryList(
           constraints.crossAxisExtent,
         ),
@@ -173,7 +173,7 @@ class _ImageGridDelegate extends SliverGridDelegate {
       double crossAxisOffset = rowHeight * rowIndex;
       double mainAxisExtent = _getScaledImageWidth(image, rowHeight);
       double crossAxisExtent = rowHeight;
-      SliverGridGeometry gridGeometry = new SliverGridGeometry(
+      SliverGridGeometry gridGeometry = SliverGridGeometry(
         scrollOffset: scrollOffset,
         crossAxisOffset: crossAxisOffset,
         mainAxisExtent: mainAxisExtent,

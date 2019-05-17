@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fidl_fuchsia_modular/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
 import '../surface/surface.dart';
 import '../surface/surface_graph.dart';
 import 'tree.dart';
@@ -13,7 +13,7 @@ import 'tree.dart';
 Tree<Surface> _spanningTree(
     Surface previous, Surface current, bool condition(Surface s)) {
   assert(current != null);
-  Tree<Surface> tree = new Tree<Surface>(value: current);
+  Tree<Surface> tree = Tree<Surface>(value: current);
   if (current.parent != previous &&
       current.parent != null &&
       condition(current)) {
@@ -31,7 +31,7 @@ Tree<Surface> _spanningTree(
 
 /// Gets the dependent spanning tree the current widget is part of
 Tree<Surface> getDependentSpanningTree(Surface surface) {
-  Tree<Surface> root = new Tree<Surface>(value: surface);
+  Tree<Surface> root = Tree<Surface>(value: surface);
   while (root.ancestors.isNotEmpty &&
       root.value.relation.dependency == SurfaceDependency.dependent) {
     root = root.ancestors.first;
@@ -43,7 +43,7 @@ Tree<Surface> getDependentSpanningTree(Surface surface) {
 /// Returns the List (forest) of DependentSpanningTrees in the current graph
 List<Tree<Surface>> getDependentSpanningTrees(Surface surface) {
   List<Tree<Surface>> queue = <Tree<Surface>>[];
-  Forest<Surface> forest = new Forest<Surface>();
+  Forest<Surface> forest = Forest<Surface>();
 
   Tree<Surface> tree = _spanningTree(null, surface, (Surface s) => true);
 
@@ -85,7 +85,7 @@ Tree<Surface> getCopresentSpanningTree(Surface surface) {
 /// Gets the pattern spanning tree the current widget is part of
 Tree<Surface> patternSpanningTree(
     SurfaceGraph graph, Tree<String> node, String pattern) {
-  Tree<Surface> root = new Tree<Surface>(value: graph.getNode(node.value));
+  Tree<Surface> root = Tree<Surface>(value: graph.getNode(node.value));
   while (
       root.ancestors.isNotEmpty && root.value.compositionPattern == pattern) {
     root = root.ancestors.first;
@@ -101,7 +101,7 @@ Tree<Surface> getContainerSpanningTree(
   Tree<String> containerNode = surface.node.root.find(containerId);
   // log.info('found: $node');
   Tree<Surface> root =
-      new Tree<Surface>(value: graph.getNode(containerNode.value));
+      Tree<Surface>(value: graph.getNode(containerNode.value));
   if (root.value is SurfaceContainer) {
     return _spanningTree(
       null,

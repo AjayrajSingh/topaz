@@ -5,6 +5,6 @@
 group("dart_unittests") {
   testonly = true
   deps = [
-    "//topaz/lib/xi/fuchsia_client:xi_fuchsia_client_tests",
+    "//topaz/lib/xi/fuchsia_client:xi_fuchsia_client_tests($host_toolchain)",
   ]
 }

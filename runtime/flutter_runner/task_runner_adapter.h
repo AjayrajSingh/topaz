@@ -4,12 +4,13 @@
 
 #pragma once
 
-#include "flutter/fml/task_runner.h"
-#include "lib/fxl/tasks/task_runner.h"
+#include <lib/async/dispatcher.h>
 
-namespace flutter {
+#include "flutter/fml/task_runner.h"
+
+namespace flutter_runner {
 
 fml::RefPtr<fml::TaskRunner> CreateFMLTaskRunner(
-    fxl::RefPtr<fxl::TaskRunner> runner);
+    async_dispatcher_t* dispatcher);
 
-}  // namespace flutter
+}  // namespace flutter_runner

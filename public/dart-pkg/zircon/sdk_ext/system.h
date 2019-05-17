@@ -56,6 +56,8 @@ class System : public fxl::RefCountedThreadSafe<System>,
 
   static void RegisterNatives(tonic::DartLibraryNatives* natives);
 
+  static zx_status_t ConnectToService(std::string path, fxl::RefPtr<Handle> channel);
+
  private:
   static void VmoMapFinalizer(void* isolate_callback_data,
                               Dart_WeakPersistentHandle handle,

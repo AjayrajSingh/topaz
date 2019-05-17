@@ -10,12 +10,12 @@ import 'package:fidl_fidl_examples_bindingstest/fidl_async.dart';
 void main() async {
   group('proxy state', () {
     test('initial', () {
-      final proxy = new TestServerProxy();
+      final proxy = TestServerProxy();
       expect(proxy.ctrl.state, equals(InterfaceState.unbound));
     });
 
     test('request', () {
-      final proxy = new TestServerProxy();
+      final proxy = TestServerProxy();
       expect(proxy.ctrl.whenBound, completes);
       final request = proxy.ctrl.request();
       expect(proxy.ctrl.state, equals(InterfaceState.bound));
@@ -23,8 +23,8 @@ void main() async {
     });
 
     test('bind', () {
-      final pair = new InterfacePair<TestServer>();
-      final proxy = new TestServerProxy();
+      final pair = InterfacePair<TestServer>();
+      final proxy = TestServerProxy();
       expect(proxy.ctrl.whenBound, completes);
       proxy.ctrl.bind(pair.handle);
       expect(proxy.ctrl.state, equals(InterfaceState.bound));
@@ -33,12 +33,12 @@ void main() async {
 
     test('after bind', () {
       // Set up a bound proxy...
-      var pair = new InterfacePair<TestServer>();
-      final proxy = new TestServerProxy();
+      var pair = InterfacePair<TestServer>();
+      final proxy = TestServerProxy();
       proxy.ctrl.bind(pair.handle);
 
       // The bound proxy cannot be bound to a handle.
-      pair = new InterfacePair<TestServer>();
+      pair = InterfacePair<TestServer>();
       expect(() => proxy.ctrl.bind(pair.handle), throwsA(anything));
       // The bound proxy cannot vend an interface request.
       expect(proxy.ctrl.request, throwsA(anything));
@@ -47,8 +47,8 @@ void main() async {
     test('unbind', () {
       // Set up a bound proxy...
 
-      final pair = new InterfacePair<TestServer>();
-      final proxy = new TestServerProxy();
+      final pair = InterfacePair<TestServer>();
+      final proxy = TestServerProxy();
       proxy.ctrl.bind(pair.handle);
 
       expect(proxy.ctrl.whenClosed, completes);
@@ -60,8 +60,8 @@ void main() async {
 
     test('close', () {
       // Set up a bound proxy...
-      final pair = new InterfacePair<TestServer>();
-      final proxy = new TestServerProxy();
+      final pair = InterfacePair<TestServer>();
+      final proxy = TestServerProxy();
       proxy.ctrl.bind(pair.handle);
 
       expect(proxy.ctrl.whenClosed, completes);
@@ -73,15 +73,15 @@ void main() async {
 
     test('after close', () {
       // Set up a closed proxy...
-      var pair = new InterfacePair<TestServer>();
-      final proxy = new TestServerProxy();
+      var pair = InterfacePair<TestServer>();
+      final proxy = TestServerProxy();
       proxy.ctrl.bind(pair.handle);
       proxy.ctrl.close();
 
       // The closed proxy will never reach bound state.
       expect(proxy.ctrl.whenBound, throwsA(anything));
       // The closed proxy cannot be bound to a handle.
-      pair = new InterfacePair<TestServer>();
+      pair = InterfacePair<TestServer>();
       expect(() => proxy.ctrl.bind(pair.handle), throwsA(anything));
       // The closed proxy cannot vend an interface request.
       expect(proxy.ctrl.request, throwsA(anything));

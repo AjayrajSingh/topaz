@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <lib/async/default.h>
+#include <lib/async/cpp/time.h>
+#include <lib/syslog/global.h>
+
 #include "flutter/flow/scene_update_context.h"
 #include "flutter/fml/macros.h"
 #include "flutter/vulkan/vulkan_application.h"
@@ -12,14 +16,15 @@
 #include "flutter/vulkan/vulkan_provider.h"
 #include "lib/ui/scenic/cpp/resources.h"
 #include "lib/ui/scenic/cpp/session.h"
-#include "topaz/lib/deprecated_loop/message_loop.h"
-#include "vulkan_surface.h"
-#include "vulkan_surface_pool.h"
 
-namespace flutter {
+#include "topaz/runtime/flutter_runner/logging.h"
+#include "topaz/runtime/flutter_runner/vulkan_surface.h"
+#include "topaz/runtime/flutter_runner/vulkan_surface_pool.h"
+
+namespace flutter_runner {
 
 class VulkanSurfaceProducer final
-    : public flow::SceneUpdateContext::SurfaceProducer,
+    : public flutter::SceneUpdateContext::SurfaceProducer,
       public vulkan::VulkanProvider {
  public:
   VulkanSurfaceProducer(scenic::Session* scenic_session);
@@ -28,37 +33,38 @@ class VulkanSurfaceProducer final
 
   bool IsValid() const { return valid_; }
 
-  // |flow::SceneUpdateContext::SurfaceProducer|
-  std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>
+  // |flutter::SceneUpdateContext::SurfaceProducer|
+  std::unique_ptr<flutter::SceneUpdateContext::SurfaceProducerSurface>
   ProduceSurface(const SkISize& size,
-                 const flow::LayerRasterCacheKey& layer_key,
+                 const flutter::LayerRasterCacheKey& layer_key,
                  std::unique_ptr<scenic::EntityNode> entity_node) override;
 
-  // |flow::SceneUpdateContext::SurfaceProducer|
+  // |flutter::SceneUpdateContext::SurfaceProducer|
   void SubmitSurface(
-      std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface> surface)
+      std::unique_ptr<flutter::SceneUpdateContext::SurfaceProducerSurface> surface)
       override;
 
-  // |flow::SceneUpdateContext::HasRetainedNode|
-  bool HasRetainedNode(const flow::LayerRasterCacheKey& key) const override {
+  // |flutter::SceneUpdateContext::HasRetainedNode|
+  bool HasRetainedNode(const flutter::LayerRasterCacheKey& key) const override {
     return surface_pool_->HasRetainedNode(key);
   }
 
-  // |flow::SceneUpdateContext::GetRetainedNode|
+  // |flutter::SceneUpdateContext::GetRetainedNode|
   const scenic::EntityNode& GetRetainedNode(
-      const flow::LayerRasterCacheKey& key) override {
+      const flutter::LayerRasterCacheKey& key) override {
     return surface_pool_->GetRetainedNode(key);
   }
 
   void OnSurfacesPresented(
       std::vector<
-          std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>>
+          std::unique_ptr<flutter::SceneUpdateContext::SurfaceProducerSurface>>
           surfaces);
 
   void OnSessionSizeChangeHint(float width_change_factor,
                                float height_change_factor) {
-    FXL_LOG(INFO) << "VulkanSurfaceProducer:OnSessionSizeChangeHint "
-                  << width_change_factor << ", " << height_change_factor;
+    FX_LOGF(INFO, LOG_TAG,
+            "VulkanSurfaceProducer:OnSessionSizeChangeHint %f, %f",
+            width_change_factor, height_change_factor);
   }
 
  private:
@@ -70,7 +76,7 @@ class VulkanSurfaceProducer final
 
   bool TransitionSurfacesToExternal(
       const std::vector<
-          std::unique_ptr<flow::SceneUpdateContext::SurfaceProducerSurface>>&
+          std::unique_ptr<flutter::SceneUpdateContext::SurfaceProducerSurface>>&
           surfaces);
 
   // Note: the order here is very important. The proctable must be destroyed
@@ -85,12 +91,14 @@ class VulkanSurfaceProducer final
 
   // Keep track of the last time we produced a surface.  This is used to
   // determine whether it is safe to shrink |surface_pool_| or not.
-  fxl::TimePoint last_produce_time_ = fxl::TimePoint::Now();
+  zx::time last_produce_time_ = async::Now(async_get_default_dispatcher());
   fml::WeakPtrFactory<VulkanSurfaceProducer> weak_factory_{this};
 
   bool Initialize(scenic::Session* scenic_session);
 
-  FML_DISALLOW_COPY_AND_ASSIGN(VulkanSurfaceProducer);
+  // Disallow copy and assignment.
+  VulkanSurfaceProducer(const VulkanSurfaceProducer&) = delete;
+  VulkanSurfaceProducer& operator=(const VulkanSurfaceProducer&) = delete;
 };
 
-}  // namespace flutter
+}  // namespace flutter_runner

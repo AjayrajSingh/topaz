@@ -33,30 +33,38 @@ class App extends StatelessWidget {
                   children: <Widget>[
                     // Stories.
                     Positioned.fill(
-                      child: Stories(
-                        elevation: 10.0,
-                        storyManager: model.storyManager,
-                        onChangeStory: (i) {
-                          if (i == 0) {
-                            model.onMeta();
-                          }
-                        },
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        child: Stories(
+                          elevation: 10.0,
+                          storyManager: model.storyManager,
+                          onChangeStory: (i) {
+                            if (i == 0) {
+                              model.onMeta();
+                            }
+                          },
+                        ),
+                        onLongPress: model.onMeta,
                       ),
                     ),
                     // Ask.
                     Positioned.fill(
-                      child: AnimatedBuilder(
-                        animation: Listenable.merge([
-                          model.askVisibility,
-                          model.askChildViewConnection
-                        ]),
-                        builder: (context, child) => Offstage(
-                              offstage: !model.askVisibility.value ||
-                                  model.askChildViewConnection.value == null,
-                              child: ChildView(
-                                connection: model.askChildViewConnection.value,
-                              ),
-                            ),
+                      child: GestureDetector(
+                        onTap: model.onCancel,
+                        child: AnimatedBuilder(
+                          animation: Listenable.merge([
+                            model.askVisibility,
+                            model.askChildViewConnection
+                          ]),
+                          builder: (context, child) =>
+                              !model.askVisibility.value ||
+                                      model.askChildViewConnection.value == null
+                                  ? Offstage()
+                                  : ChildView(
+                                      connection:
+                                          model.askChildViewConnection.value,
+                                    ),
+                        ),
                       ),
                     ),
                   ],

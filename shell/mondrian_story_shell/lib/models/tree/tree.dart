@@ -31,7 +31,7 @@ class Tree<T> extends Iterable<Tree<T>> {
 
   /// Direct descendents of parent, except this
   Iterable<Tree<T>> get siblings => (_parent == null)
-      ? new Iterable<Tree<T>>.empty() // ignore: prefer_const_constructors
+      ? Iterable<Tree<T>>.empty() // ignore: prefer_const_constructors
       : _parent.children.where((Tree<T> node) => node != this);
 
   /// Direct ancestors of this, starting at parent to root
@@ -101,7 +101,7 @@ class Tree<T> extends Iterable<Tree<T>> {
       firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
 
   /// Generate a new tree with the same structure with transformed values
-  Tree<V> mapTree<V>(V f(T value)) => new Tree<V>(
+  Tree<V> mapTree<V>(V f(T value)) => Tree<V>(
         value: f(value),
         children: _children.map((Tree<T> n) => n.mapTree(f)),
       );
@@ -184,7 +184,7 @@ class Forest<T> extends Iterable<Tree<T>> {
       firstWhere((Tree<T> node) => node.value == value, orElse: () => null);
 
   /// Generate a new forest with the same structure with transformed values
-  Forest<V> mapForest<V>(V f(T value)) => new Forest<V>(
+  Forest<V> mapForest<V>(V f(T value)) => Forest<V>(
         roots: _roots.map((Tree<T> n) => n.mapTree(f)),
       );
 

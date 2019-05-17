@@ -6,7 +6,7 @@ import 'package:fuchsia_services/src/startup_context.dart'; // ignore: implement
 import 'package:test/test.dart';
 
 void main() {
-  group('StartupContext', () {
+  group('StartupContext: ', () {
     test('fromStartupInfo does not return null instance', () {
       expect(StartupContext.fromStartupInfo(), isNotNull);
     });

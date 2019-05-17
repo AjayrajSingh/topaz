@@ -8,8 +8,8 @@
   implementation. 
 */
 
-import 'package:fidl_fuchsia_ui_input/fidl.dart' show KeyboardEvent;
-import 'package:fidl_fuchsia_ui_policy/fidl.dart'
+import 'package:fidl_fuchsia_ui_input/fidl_async.dart' show KeyboardEvent;
+import 'package:fidl_fuchsia_ui_policy/fidl_async.dart'
     show
         Presentation,
         KeyboardCaptureListenerHack,
@@ -20,7 +20,7 @@ typedef VoidCallback = void Function();
 
 /// Listens for registered keyboard events and calls the associated callback
 /// when triggered.
-class KeyListener implements KeyboardCaptureListenerHack {
+class KeyListener extends KeyboardCaptureListenerHack {
   /// Callback for when the overview toggle key event has happened
   Map<KeyboardEvent, List<VoidCallback>> registeredEvents =
       <KeyboardEvent, List<VoidCallback>>{};
@@ -30,7 +30,7 @@ class KeyListener implements KeyboardCaptureListenerHack {
 
   /// Key event listener
   final KeyboardCaptureListenerHackBinding _keyEventListener =
-      new KeyboardCaptureListenerHackBinding();
+      KeyboardCaptureListenerHackBinding();
 
   /// Call to register a key event - callback pair. The pair will be added
   /// to a Map, multiple callbacks can be associated with the same key event.
@@ -63,7 +63,7 @@ class KeyListener implements KeyboardCaptureListenerHack {
 
   /// |KeyboardCaptureListenerHack|
   @override
-  void onEvent(KeyboardEvent ev) {
+  Future<void> onEvent(KeyboardEvent ev) async {
     for (KeyboardEvent event in registeredEvents.keys) {
       if (ev.codePoint == event.codePoint &&
           ev.modifiers == event.modifiers &&

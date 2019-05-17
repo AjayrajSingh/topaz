@@ -5,11 +5,18 @@
 library fuchsia_builtin;
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:_internal' show VMLibraryHooks;
 
 // Corelib 'print' implementation.
 void _print(arg) {
   _Logger._printString(arg.toString());
+  try {
+    // If stdout is connected, print to it as well.
+    stdout.writeln(arg);
+  } on FileSystemException catch (_) {
+    // Some Fuchsia applications will not have stdout connected.
+  }
 }
 
 class _Logger {
@@ -25,7 +32,7 @@ Uri _scriptUri() {
       _rawScript.startsWith('file:')) {
     return Uri.parse(_rawScript);
   } else {
-    return Uri.base.resolveUri(new Uri.file(_rawScript));
+    return Uri.base.resolveUri(Uri.file(_rawScript));
   }
 }
 

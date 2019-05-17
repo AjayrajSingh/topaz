@@ -11,8 +11,8 @@ class LinkScraper {
   /// Extracts links from the given [file].
   Iterable<String> scrape(String file) {
     final List<Node> nodes =
-        new Document().parseLines(new File(file).readAsLinesSync());
-    final _Visitor visitor = new _Visitor();
+        Document().parseLines(File(file).readAsLinesSync());
+    final _Visitor visitor = _Visitor();
     for (Node node in nodes) {
       node.accept(visitor);
     }

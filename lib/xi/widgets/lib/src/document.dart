@@ -3,8 +3,10 @@
 // found in the LICENSE file.
 
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:xi_client/client.dart';
+
 import 'editor.dart';
 import 'line_cache.dart';
 
@@ -14,16 +16,16 @@ typedef DocumentChangeNotification = void Function(Document event);
 /// Stores and manages updates to the state for a Xi document, and provides
 /// access to the editing API to the [Editor], via the [XiViewProxy].
 class Document extends Stream<Document> implements XiViewHandler {
-  final LineCache lines = new LineCache(TextStyle(color: Colors.black));
+  final LineCache lines = LineCache(TextStyle(color: Colors.black));
 
-  final TextStyle _defaultStyle = const TextStyle(color: Colors.white);
+  final TextStyle _defaultStyle = TextStyle(color: Colors.white);
 
   /// A connection to xi-core.
   XiViewProxy _viewProxy;
 
   final StreamController<Document> _controller;
 
-  Document() : _controller = new StreamController.broadcast();
+  Document() : _controller = StreamController.broadcast();
 
   List<Completer<XiViewProxy>> _pending = [];
 
@@ -37,7 +39,7 @@ class Document extends Stream<Document> implements XiViewHandler {
     if (_viewProxy != null) {
       return Future.value(_viewProxy);
     }
-    final completer = new Completer();
+    final completer = Completer();
     _pending.add(completer);
     return completer.future;
   }
@@ -54,13 +56,13 @@ class Document extends Stream<Document> implements XiViewHandler {
     _notifyListeners();
   }
 
-  LineCol _scrollPos = new LineCol(line: 0, col: 0);
+  LineCol _scrollPos = LineCol(line: 0, col: 0);
   LineCol get scrollPos => _scrollPos;
 
   double _measureWidth(String s) {
-    TextSpan span = new TextSpan(text: s, style: _defaultStyle);
+    TextSpan span = TextSpan(text: s, style: _defaultStyle);
     TextPainter painter =
-        new TextPainter(text: span, textDirection: TextDirection.ltr)..layout();
+        TextPainter(text: span, textDirection: TextDirection.ltr)..layout();
     return painter.width;
   }
 
@@ -87,7 +89,7 @@ class Document extends Stream<Document> implements XiViewHandler {
 
   @override
   void scrollTo(int line, int col) {
-    _scrollPos = new LineCol(line: line, col: col);
+    _scrollPos = LineCol(line: line, col: col);
     _notifyListeners();
   }
 

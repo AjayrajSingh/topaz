@@ -11,7 +11,7 @@
 #include "flutter/fml/macros.h"
 #include "flutter/lib/ui/semantics/semantics_node.h"
 
-namespace flutter {
+namespace flutter_runner {
 
 // Maintain an up-to-date list of SemanticsNodes on screen, and communicate
 // with the Context Service.
@@ -24,11 +24,11 @@ class ContextWriterBridge final {
 
   // Update the internal representation of the semantics nodes, and write the
   // semantics to Context Service.
-  void UpdateSemantics(const blink::SemanticsNodeUpdates& update);
+  void UpdateSemantics(const flutter::SemanticsNodeUpdates& update);
 
  private:
   fuchsia::modular::ContextWriterPtr writer_;
-  std::map<int, blink::SemanticsNode> semantics_nodes_;
+  std::map<int, flutter::SemanticsNode> semantics_nodes_;
 
   // Walk the semantics node tree starting at |id|, and store the id of each
   // visited child in |visited_nodes|.
@@ -42,4 +42,4 @@ class ContextWriterBridge final {
   FML_DISALLOW_COPY_AND_ASSIGN(ContextWriterBridge);
 };
 
-}  // namespace flutter
+}  // namespace flutter_runner

@@ -15,7 +15,7 @@ class _TickerProviderImpl implements TickerProvider {
   Ticker createTicker(TickerCallback onTick) => Ticker(onTick);
 }
 
-const Duration _kCubeRotationAnimationPeriod = const Duration(
+const Duration _kCubeRotationAnimationPeriod = Duration(
   milliseconds: 12000,
 );
 

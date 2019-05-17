@@ -8,7 +8,6 @@ group("tests") {
   testonly = true
 
   deps = [
-    # "../bin/session_shell/capybara_session_shell:capybara_session_shell_tests",
     # "keyboard:keyboard_tests",
     "mondrian_story_shell:mondrian_story_shell_tests",
   ]

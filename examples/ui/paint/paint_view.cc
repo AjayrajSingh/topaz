@@ -7,8 +7,8 @@
 #include <hid/usages.h>
 
 #include "lib/component/cpp/connect.h"
-#include "lib/fxl/logging.h"
-#include "lib/fxl/macros.h"
+#include "src/lib/fxl/logging.h"
+#include "src/lib/fxl/macros.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkRect.h"
 
@@ -63,8 +63,7 @@ SkPath PaintView::CurrentPath(uint32_t pointer_id) {
   return path;
 }
 
-bool PaintView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
-  bool handled = false;
+void PaintView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
   if (event.is_pointer()) {
     const fuchsia::ui::input::PointerEvent& pointer = event.pointer();
     uint32_t pointer_id = pointer.device_id * 32 + pointer.pointer_id;
@@ -82,14 +81,12 @@ bool PaintView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
           }
           points_.at(pointer_id).push_back(SkPoint::Make(pointer.x, pointer.y));
         }
-        handled = true;
         break;
       case fuchsia::ui::input::PointerEventPhase::UP:
         // Path is done, add it to the list of paths and reset the list of
         // points
         paths_.push_back(CurrentPath(pointer_id));
         points_.erase(pointer_id);
-        handled = true;
         break;
       default:
         break;
@@ -99,12 +96,10 @@ bool PaintView::OnInputEvent(fuchsia::ui::input::InputEvent event) {
     if (keyboard.hid_usage == HID_USAGE_KEY_ESC) {
       // clear
       paths_.clear();
-      handled = true;
     }
   }
 
   InvalidateScene();
-  return handled;
 }
 
 }  // namespace examples

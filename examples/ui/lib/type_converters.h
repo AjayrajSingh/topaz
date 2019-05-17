@@ -15,7 +15,7 @@
 #include "third_party/skia/include/core/SkRect.h"
 
 // The TypeConverter template is defined in the fxl namespace.
-namespace fxl {
+namespace fidl {
 
 template <>
 struct TypeConverter<SkIPoint, fuchsia::math::Point> {
@@ -83,6 +83,6 @@ struct TypeConverter<fuchsia::math::Transform, SkMatrix44> {
   static fuchsia::math::Transform Convert(const SkMatrix44& input);
 };
 
-}  // namespace fxl
+}  // namespace fidl
 
 #endif  // LIB_UI_SKIA_TYPE_CONVERTERS_H_

@@ -4,7 +4,7 @@
 
 #include "examples/ui/lib/image_info.h"
 
-#include "lib/fxl/logging.h"
+#include "src/lib/fxl/logging.h"
 
 namespace scenic {
 namespace skia {

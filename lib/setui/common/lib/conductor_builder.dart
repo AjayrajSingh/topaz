@@ -15,7 +15,7 @@ import 'syllabus_parser.dart';
 /// A builder for assembling a [Conductor]. Abstracts away details surrounding
 /// the [Roster] and [Syllabus].
 class ConductorBuilder {
-  final Roster _roster = new Roster();
+  final Roster _roster = Roster();
   final File _syllabusFile;
 
   /// Constructs a builder with a [Syllabus] at the specified [File].
@@ -26,11 +26,11 @@ class ConductorBuilder {
 
   /// Builds the [Conductor].
   Future<Conductor> build() {
-    Completer<Conductor> completer = new Completer<Conductor>();
+    Completer<Conductor> completer = Completer<Conductor>();
 
     _syllabusFile.readAsString().then((String config) {
       final Syllabus syllabus = SyllabusParser.parse(loadYamlDocuments(config));
-      completer.complete(new Conductor(syllabus, _roster));
+      completer.complete(Conductor(syllabus, _roster));
     });
 
     return completer.future;

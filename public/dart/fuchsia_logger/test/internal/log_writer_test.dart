@@ -18,7 +18,7 @@ void main() {
     Logger logger;
 
     setUp(() {
-      logger = Logger('foo');
+      logger = Logger.root;
     });
 
     tearDown(() {
@@ -128,18 +128,18 @@ void main() {
     });
 
     test('setting forceShowCodeLocation includes code location in tags', () {
-      List<String> tags;
+      String codeLocation;
 
       StubLogWriter(
           logger: logger,
           onMessageFunc: (m) {
-            tags = m.tags;
+            codeLocation = m.codeLocation;
           }).forceShowCodeLocation = true;
 
       logger.info('foo');
-      expect(tags[0], matches(r'log_writer_test.dart\(\d+\)'));
+      expect(codeLocation, matches(r'log_writer_test.dart\(\d+\)'));
     });
-  }, timeout: Timeout(Duration(milliseconds: 100)));
+  });
 }
 
 class StubLogWriter extends LogWriter {
@@ -149,7 +149,7 @@ class StubLogWriter extends LogWriter {
     this.onMessageFunc,
     Logger logger,
     shouldBufferLogs = false,
-  }) : super(logger: logger, shouldBufferLogs: shouldBufferLogs);
+  }) : super(logStream: logger.onRecord, shouldBufferLogs: shouldBufferLogs);
 
   @override
   void onMessage(LogMessage message) => this.onMessageFunc(message);

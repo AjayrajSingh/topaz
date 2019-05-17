@@ -1,0 +1,52 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_library.gni")
+import("//topaz/runtime/dart/flutter_test.gni")
+
+dart_library("story_shell_labs_lib") {
+  package_name = "story_shell_labs_lib"
+
+  sources = [
+    "layout/deja_layout.dart",
+    "layout/tile_model.dart",
+    "layout/tile_presenter.dart",
+    "src/layout/deja_layout/deja_layout.dart",
+    "src/layout/deja_layout/layout_policy.dart",
+    "src/layout/deja_layout/layout_store.dart",
+    "src/layout/deja_layout/layout_utils.dart",
+    "src/layout/layout.dart",
+    "src/layout/presenter.dart",
+    "src/layout/tile_model/module_info.dart",
+    "src/layout/tile_model/module_info.g.dart",
+    "src/layout/tile_model/tile_layout_model.dart",
+    "src/layout/tile_model/tile_model_serializer.dart",
+    "src/layout/tile_presenter/layout_suggestions_update.dart",
+    "src/layout/tile_presenter/tile_presenter.dart",
+    "src/layout/tile_presenter/tile_presenter_suggestions_widget.dart",
+    "src/layout/tile_presenter/tile_presenter_widget.dart",
+    "src/layout/tile_presenter/widgets/drop_target_widget.dart",
+    "src/layout/tile_presenter/widgets/editing_tile_chrome.dart",
+  ]
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//third_party/dart-pkg/pub/built_collection",
+    "//third_party/dart-pkg/pub/json_annotation",
+    "//topaz/lib/tiler:tiler",
+    "//topaz/public/dart/fuchsia_scenic_flutter",
+  ]
+}
+
+flutter_test("layout_unittests") {
+  sources = [
+    "deja_layout_test.dart",
+  ]
+
+  deps = [
+    ":story_shell_labs_lib",
+    "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
+  ]
+}

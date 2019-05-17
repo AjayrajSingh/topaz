@@ -5,15 +5,14 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:fidl_fuchsia_math/fidl.dart' as geom;
-import 'package:fidl_fuchsia_mediaplayer/fidl.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
+import 'package:fidl_fuchsia_math/fidl_async.dart' as geom;
+import 'package:fidl_fuchsia_media_playback/fidl_async.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
-    show ChildViewConnection;
+import 'package:fuchsia_services/services.dart';
+import 'package:fuchsia_scenic/views.dart';
+import 'package:fuchsia_scenic_flutter/child_view_connection.dart';
 import 'package:lib.mediaplayer.dart/audio_player_controller.dart';
-import 'package:zircon/zircon.dart';
 
 /// Controller for MediaPlayer widgets.
 class MediaPlayerController extends AudioPlayerController
@@ -30,12 +29,10 @@ class MediaPlayerController extends AudioPlayerController
   bool _wasActive;
 
   /// Constructs a MediaPlayerController.
-  MediaPlayerController(ServiceProvider services) : super(services) {
+  MediaPlayerController(Incoming services) : super(services) {
     updateCallback = _notifyListeners;
     _close(); // Initialize stuff.
   }
-
-  set shouldCreateNewChildView(bool should) {}
 
   @override
   void open(Uri uri, {HttpHeaders headers}) {
@@ -47,12 +44,10 @@ class MediaPlayerController extends AudioPlayerController
   @override
   void onMediaPlayerCreated(PlayerProxy player) {
     if (!_wasActive) {
-      final EventPairPair viewTokens = new EventPairPair();
-      assert(viewTokens.status == ZX.OK);
-      player.createView2(viewTokens.first);
+      final ViewTokenPair viewTokens = ViewTokenPair();
 
-      _videoViewConnection =
-          ChildViewConnection.fromViewHolderToken(viewTokens.second);
+      player.createView(viewTokens.viewToken);
+      _videoViewConnection = ChildViewConnection(viewTokens.viewHolderToken);
     }
   }
 
@@ -70,7 +65,7 @@ class MediaPlayerController extends AudioPlayerController
   @override
   void addListener(VoidCallback listener) {
     if (_disposed) {
-      throw new StateError('Object disposed');
+      throw StateError('Object disposed');
     }
 
     _listeners.add(listener);
@@ -79,7 +74,7 @@ class MediaPlayerController extends AudioPlayerController
   @override
   void removeListener(VoidCallback listener) {
     if (_disposed) {
-      throw new StateError('Object disposed');
+      throw StateError('Object disposed');
     }
 
     _listeners.remove(listener);
@@ -113,7 +108,7 @@ class MediaPlayerController extends AudioPlayerController
 
     _hideTimer?.cancel();
 
-    _hideTimer = new Timer(overlayAutoHideDuration, () {
+    _hideTimer = Timer(overlayAutoHideDuration, () {
       _hideTimer = null;
       if (!shouldShowControlOverlay) {
         _notifyListeners();
@@ -127,14 +122,13 @@ class MediaPlayerController extends AudioPlayerController
 
   /// The duration to show the control overlay when [brieflyShowControlOverlay]
   /// is called. The default is 3 seconds.
-  Duration overlayAutoHideDuration = const Duration(seconds: 3);
+  Duration overlayAutoHideDuration = Duration(seconds: 3);
 
   /// Gets the physical size of the video.
   Size get videoPhysicalSize => hasVideo ? _videoSize : Size.zero;
 
   /// Gets the video view connection.
   ChildViewConnection get videoViewConnection => _videoViewConnection;
-  ChildViewConnection get videoViewConnectionNew => _videoViewConnection;
 
   @override
   void onVideoGeometryUpdated(geom.Size videoSize, geom.Size pixelAspectRatio) {
@@ -145,8 +139,8 @@ class MediaPlayerController extends AudioPlayerController
     double ratio =
         pixelAspectRatio.width.toDouble() / pixelAspectRatio.height.toDouble();
 
-    _videoSize = new Size(
-        videoSize.width.toDouble() * ratio, videoSize.height.toDouble());
+    _videoSize =
+        Size(videoSize.width.toDouble() * ratio, videoSize.height.toDouble());
 
     scheduleMicrotask(_notifyListeners);
   }

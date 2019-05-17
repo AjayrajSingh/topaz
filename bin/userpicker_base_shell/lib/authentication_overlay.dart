@@ -25,31 +25,31 @@ class AuthenticationOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      new ScopedModelDescendant<AuthenticationOverlayModel>(
+      ScopedModelDescendant<AuthenticationOverlayModel>(
         builder: (
           BuildContext context,
           Widget child,
           AuthenticationOverlayModel model,
         ) =>
-            new AnimatedBuilder(
+            AnimatedBuilder(
               animation: model.animation,
-              builder: (BuildContext context, Widget child) => new Offstage(
+              builder: (BuildContext context, Widget child) => Offstage(
                     offstage: model.animation.isDismissed,
-                    child: new Opacity(
+                    child: Opacity(
                       opacity: model.animation.value,
                       child: child,
                     ),
                   ),
-              child: new Stack(
+              child: Stack(
                 fit: StackFit.passthrough,
                 children: <Widget>[
-                  new GestureDetector(
+                  GestureDetector(
                     onTap: _onCancel,
                   ),
-                  new FractionallySizedBox(
+                  FractionallySizedBox(
                     widthFactor: 0.75,
                     heightFactor: 0.75,
-                    child: new ChildView(
+                    child: ChildView(
                       connection: model.childViewConnection,
                     ),
                   ),

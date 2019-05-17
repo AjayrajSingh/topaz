@@ -3,8 +3,8 @@
 // found in the LICENSE file.
 
 import 'package:flutter/widgets.dart';
-import 'package:fidl_fuchsia_modular/fidl.dart';
-import 'package:lib.app.dart/logging.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart';
+import 'package:fuchsia_logger/logger.dart';
 
 import '../models/layout_model.dart';
 import '../models/surface/positioned_surface.dart';
@@ -38,7 +38,7 @@ List<PositionedSurface> layoutSurfaces(
   ContainerLayout layoutSpec = layouts.first;
 
   for (LayoutEntry entry in layoutSpec.surfaces) {
-    Rect rect = new Rect.fromLTWH(
+    Rect rect = Rect.fromLTWH(
       entry.rectangle[0],
       entry.rectangle[1],
       entry.rectangle[2],
@@ -46,7 +46,7 @@ List<PositionedSurface> layoutSurfaces(
     );
     String label = entry.nodeName;
     layout.add(
-      new PositionedSurface(
+      PositionedSurface(
         surface: nodeMap[label],
         position: rect,
       ),
@@ -56,9 +56,9 @@ List<PositionedSurface> layoutSurfaces(
     log.warning('''Container $containerId with surfaces $containerSurfaces
     could not be laid out. Falling back on focused surface.''');
     layout.add(
-      new PositionedSurface(
+      PositionedSurface(
         surface: focusedSurface,
-        position: new Rect.fromLTWH(0.0, 0.0, 1.0, 1.0),
+        position: Rect.fromLTWH(0.0, 0.0, 1.0, 1.0),
       ),
     );
   }

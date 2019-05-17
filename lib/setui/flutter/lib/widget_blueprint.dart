@@ -24,6 +24,6 @@ class WidgetBlueprint extends Blueprint {
 
   @override
   Action assemble(Step step, ActionResultReceiver receiver) {
-    return new WidgetAction(step, receiver, this);
+    return WidgetAction(step, receiver, this);
   }
 }

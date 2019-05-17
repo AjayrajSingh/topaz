@@ -1,5 +1,0 @@
-{
-    "packages": [
-        "//topaz/runtime/dart_runner:dart_jit_product_runner"
-    ]
-}

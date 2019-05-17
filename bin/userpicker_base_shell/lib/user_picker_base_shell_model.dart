@@ -3,17 +3,20 @@
 // found in the LICENSE file.
 
 import 'dart:async';
-import 'dart:io';
 
-import 'package:fidl_fuchsia_cobalt/fidl.dart' as cobalt;
-import 'package:fidl_fuchsia_modular_auth/fidl.dart';
-import 'package:fidl_fuchsia_sys/fidl.dart';
-import 'package:fidl_fuchsia_ui_policy/fidl.dart';
+import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_cobalt/fidl_async.dart' as cobalt;
+import 'package:fidl_fuchsia_device_manager/fidl_async.dart' as devmgr;
+import 'package:fidl_fuchsia_modular_auth/fidl_async.dart';
+import 'package:fidl_fuchsia_sys/fidl_async.dart';
+import 'package:fidl_fuchsia_ui_policy/fidl_async.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:lib.base_shell/base_model.dart';
 import 'package:lib.widgets/model.dart';
+import 'package:zircon/zircon.dart';
+import 'package:fuchsia_logger/logger.dart';
 
 export 'package:lib.widgets/model.dart'
     show ScopedModel, ScopedModelDescendant, ModelFinder;
@@ -21,17 +24,15 @@ export 'package:lib.widgets/model.dart'
 /// Function signature for GetPresentationMode callback
 typedef GetPresentationModeCallback = void Function(PresentationMode mode);
 
-const Duration _kShowLoadingSpinnerDelay = const Duration(milliseconds: 500);
+const Duration _kShowLoadingSpinnerDelay = Duration(milliseconds: 500);
 
 /// Model that provides common state
 class UserPickerBaseShellModel extends CommonBaseShellModel
     with TickerProviderModelMixin
     implements
-        Presentation,
         ServiceProvider,
         KeyboardCaptureListenerHack,
-        PointerCaptureListenerHack,
-        PresentationModeListener {
+        PointerCaptureListenerHack {
   /// Called when the base shell stops.
   final VoidCallback onBaseShellStopped;
 
@@ -77,12 +78,31 @@ class UserPickerBaseShellModel extends CommonBaseShellModel
   }
 
   /// Call when reset is tapped.
-  void resetTapped() {
-    File dm = new File('/dev/misc/dmctl');
-    print('dmctl exists? ${dm.existsSync()}');
-    if (dm.existsSync()) {
-      dm.writeAsStringSync('reboot', flush: true);
-    }
+  void resetTapped() async {
+      final ChannelPair channels = ChannelPair();
+      if (channels.status != 0) {
+        log.severe('Unable to create channels: $channels.status');
+        return;
+      }
+
+      int status = System.connectToService(
+        '/svc/${devmgr.Administrator.$serviceName}',
+        channels.second.passHandle());
+      if (status != 0 ) {
+        channels.first.close();
+        log.severe('Unable to connect to device administrator service: $status');
+        return;
+      }
+
+      final devmgr.AdministratorProxy admin = devmgr.AdministratorProxy();
+      admin.ctrl.bind(InterfaceHandle<devmgr.Administrator>(channels.first));
+
+      status = await admin.suspend(devmgr.suspendFlagReboot);
+      if (status != 0) {
+        log.severe('Reboot call failed with status: $status');
+      }
+
+      admin.ctrl.close();
   }
 
   /// Create a new user and login with that user
@@ -142,10 +162,7 @@ class UserPickerBaseShellModel extends CommonBaseShellModel
   bool get showingLoadingSpinner => _showingLoadingSpinner;
 
   /// Show the system clock if true
-  bool get showingClock =>
-      !showingLoadingSpinner &&
-      _draggedUsers.isEmpty &&
-      childViewConnection == null;
+  bool get showingClock => !showingLoadingSpinner && _draggedUsers.isEmpty;
 
   /// If true, show advanced user actions
   bool get showingUserActions => _showingUserActions;
@@ -165,7 +182,7 @@ class UserPickerBaseShellModel extends CommonBaseShellModel
   void _updateShowLoadingSpinner() {
     if (accounts == null || _addingUser || _loadingChildView) {
       if (_showingLoadingSpinner == null) {
-        _showLoadingSpinnerTimer = new Timer(
+        _showLoadingSpinnerTimer = Timer(
           _kShowLoadingSpinnerDelay,
           () {
             _showingLoadingSpinner = true;

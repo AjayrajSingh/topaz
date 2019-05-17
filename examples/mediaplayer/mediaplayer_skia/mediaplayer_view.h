@@ -5,41 +5,46 @@
 #ifndef TOPAZ_EXAMPLES_MEDIAPLAYER_MEDIAPLAYER_SKIA_MEDIAPLAYER_VIEW_H_
 #define TOPAZ_EXAMPLES_MEDIAPLAYER_MEDIAPLAYER_SKIA_MEDIAPLAYER_VIEW_H_
 
+#include <fuchsia/images/cpp/fidl.h>
+#include <fuchsia/math/cpp/fidl.h>
+#include <fuchsia/media/cpp/fidl.h>
+#include <fuchsia/media/playback/cpp/fidl.h>
+#include <fuchsia/ui/gfx/cpp/fidl.h>
+#include <fuchsia/ui/input/cpp/fidl.h>
+#include <fuchsia/ui/scenic/cpp/fidl.h>
+#include <lib/async-loop/cpp/loop.h>
 #include <memory>
 #include <queue>
-
-#include <fuchsia/media/cpp/fidl.h>
-#include <fuchsia/mediaplayer/cpp/fidl.h>
-#include <lib/async-loop/cpp/loop.h>
-
 #include "examples/ui/lib/host_canvas_cycler.h"
 #include "lib/component/cpp/startup_context.h"
-#include "lib/fxl/macros.h"
+#include "src/lib/fxl/macros.h"
 #include "lib/media/timeline/timeline_function.h"
-#include "lib/ui/base_view/cpp/v1_base_view.h"
-
+#include "lib/ui/base_view/cpp/base_view.h"
 #include "mediaplayer_params.h"
 
 namespace examples {
 
-class MediaPlayerView : public scenic::V1BaseView {
+class MediaPlayerView : public scenic::BaseView {
  public:
   MediaPlayerView(scenic::ViewContext view_context, async::Loop* loop,
                   const MediaPlayerParams& params);
-  ~MediaPlayerView() override;
+  ~MediaPlayerView() override = default;
 
  private:
   enum class State { kPaused, kPlaying, kEnded };
 
-  // |scenic::V1BaseView|
+  // |scenic::SessionListener|
+  void OnScenicError(std::string error) override {
+    FXL_LOG(ERROR) << "Scenic Error " << error;
+  }
+
+  // |scenic::BaseView|
   void OnPropertiesChanged(
-      fuchsia::ui::viewsv1::ViewProperties old_properties) override;
+      fuchsia::ui::gfx::ViewProperties old_properties) override;
   void OnSceneInvalidated(
       fuchsia::images::PresentationInfo presentation_info) override;
-  void OnChildAttached(uint32_t child_key,
-                       fuchsia::ui::viewsv1::ViewInfo child_view_info) override;
-  void OnChildUnavailable(uint32_t child_key) override;
-  bool OnInputEvent(fuchsia::ui::input::InputEvent event) override;
+  void OnInputEvent(fuchsia::ui::input::InputEvent event) override;
+  void OnScenicEvent(fuchsia::ui::scenic::Event) override;
 
   // Perform a layout of the UI elements.
   void Layout();
@@ -49,7 +54,7 @@ class MediaPlayerView : public scenic::V1BaseView {
 
   // Handles a status update from the player. When called with the default
   // argument values, initiates status updates.
-  void HandleStatusChanged(const fuchsia::mediaplayer::PlayerStatus& status);
+  void HandleStatusChanged(const fuchsia::media::playback::PlayerStatus& status);
 
   // Toggles between play and pause.
   void TogglePlayPause();
@@ -71,8 +76,9 @@ class MediaPlayerView : public scenic::V1BaseView {
   scenic::ShapeNode background_node_;
   scenic::skia::HostCanvasCycler controls_widget_;
   std::unique_ptr<scenic::EntityNode> video_host_node_;
+  std::unique_ptr<scenic::ViewHolder> video_host_view_holder_;
 
-  fuchsia::mediaplayer::PlayerPtr player_;
+  fuchsia::media::playback::PlayerPtr player_;
   fuchsia::math::Size video_size_;
   fuchsia::math::Size pixel_aspect_ratio_;
   State previous_state_ = State::kPaused;

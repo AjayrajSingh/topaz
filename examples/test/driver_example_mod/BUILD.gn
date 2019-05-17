@@ -2,8 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/dart/dart_fuchsia_test.gni")
-import("//build/dart/dart_remote_test.gni")
+import("//build/testing/environments.gni")
+import("//topaz/runtime/dart/dart_fuchsia_test.gni")
 import("//topaz/runtime/flutter_runner/flutter_app.gni")
 
 # The main app.
@@ -23,35 +23,45 @@ flutter_app("driver_example_mod") {
   # testing when run in an environment along with TestRunner.
   flutter_driver_extendable = true
 
+  sources = [
+    "src/driver_example_model.dart",
+    "src/handlers/root_intent_handler.dart",
+  ]
+
   deps = [
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//topaz/public/dart/fuchsia_modular",
     "//topaz/public/dart/fuchsia_services",
-    "//topaz/public/lib/app/dart",
-    "//topaz/public/lib/app_driver/dart",
     "//topaz/public/lib/widgets/dart",
   ]
 }
 
-# Example of a target test. This can be run on the Fuchsia device using the
-# dart_runner command packaged in //garnet/packages/products/devtools
-#
-# The target application must be runnning on the machine.
-dart_fuchsia_test("driver_example_mod_target_tests") {
-  # TODO(IN-991): Use environments rather than this hack.
-  package_only = true
-
-  sources = []
+# Example of a flutter driver target test. This can be run on the Fuchsia
+# device using fx run-test. The target application must be available on the
+# machine.
+dart_fuchsia_test("driver_example_mod_tests") {
   deps = [
-    ":driver_example_mod_dart_library",
+    "//sdk/fidl/fuchsia.sys",
     "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
     "//third_party/dart-pkg/pub/test",
+    "//topaz/public/dart/fuchsia_services",
   ]
 
   meta = [
     {
-      path = rebase_path("meta/driver_example_mod_target_tests.cmx")
-      dest = "driver_example_mod_target_tests.cmx"
+      path = rebase_path("meta/driver_example_mod_tests.cmx")
+      dest = "driver_example_mod_tests.cmx"
     },
   ]
+
+  environments = []
+
+  # Flutter driver is only available in debug builds, so don't try to run in
+  # release CI/CQ.
+  if (is_debug) {
+    environments += [
+      nuc_env,
+      vim2_env,
+    ]
+  }
 }

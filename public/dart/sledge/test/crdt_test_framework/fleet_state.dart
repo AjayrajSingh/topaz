@@ -24,19 +24,19 @@ class FleetState<T extends dynamic> {
 
   FleetState(int size, T instanceGenerator(int index))
       : _fleetSize = size,
-        _storageStates = new List<StorageState>.generate(
-            size, (index) => new StorageState(),
+        _storageStates = List<StorageState>.generate(
+            size, (index) => StorageState(),
             growable: false),
         _instances =
-            new List<T>.generate(size, instanceGenerator, growable: false) {
+            List<T>.generate(size, instanceGenerator, growable: false) {
     for (int i = 0; i < size; i++) {
       if (T == Sledge) {
         _storageStates[i] = _instances[i].fakeLedgerPage.storageState;
       } else if (T == Document) {
-        _storageStates[i] = new StorageState(
+        _storageStates[i] = StorageState(
             (change) => _instances.cast<Document>()[i].applyChange(change));
       } else {
-        _storageStates[i] = new StorageState(_instances[i].applyChange);
+        _storageStates[i] = StorageState(_instances[i].applyChange);
       }
     }
   }

@@ -1,5 +1,0 @@
-{
-  "packages": [
-      "//topaz/public/dart/fuchsia_services/examples/mind_reader/bin:mind_reader_dart"
-  ]
-}

@@ -3,7 +3,7 @@
 # found in the LICENSE file.
 
 import("//build/dart/dart_library.gni")
-import("//topaz/runtime/dart/dart_test.gni")
+import("//build/dart/test.gni")
 
 dart_library("fuchsia_inspect") {
   package_name = "fuchsia_inspect"
@@ -14,14 +14,23 @@ dart_library("fuchsia_inspect") {
 
   sources = [
     "inspect.dart",
-    "src/vmo_writer.dart",
-    "src/vmo_heap.dart",
-    "src/inspect.dart",
+    "src/inspect/inspect.dart",
+    "src/inspect/internal/_inspect_impl.dart",
+    "src/inspect/node.dart",
+    "src/inspect/property.dart",
+    "src/vmo/bitfield64.dart",
+    "src/vmo/block.dart",
+    "src/vmo/heap.dart",
+    "src/vmo/util.dart",
+    "src/vmo/vmo_fields.dart",
+    "src/vmo/vmo_holder.dart",
+    "src/vmo/vmo_writer.dart",
   ]
 
   deps = [
     "//third_party/dart-pkg/pub/meta",
     "//topaz/public/dart/fuchsia_services",
+    "//topaz/public/dart/fuchsia_vfs",
     "//topaz/public/dart/zircon",
   ]
 }
@@ -31,7 +40,17 @@ dart_library("fuchsia_inspect") {
 
 dart_test("fuchsia_inspect_package_unittests") {
   sources = [
-    "internal/vmo_state_test.dart",
+    "inspect/inspect_test.dart",
+    "inspect/internal/inspect_impl_test.dart",
+    "inspect/node_test.dart",
+    "inspect/property_test.dart",
+    "integration/writer.dart",
+    "util.dart",
+    "vmo/bitfield64_test.dart",
+    "vmo/block_test.dart",
+    "vmo/heap_test.dart",
+    "vmo/vmo_fields_test.dart",
+    "vmo/vmo_writer_test.dart",
   ]
 
   deps = [
@@ -40,4 +59,3 @@ dart_test("fuchsia_inspect_package_unittests") {
     "//third_party/dart-pkg/pub/test",
   ]
 }
-

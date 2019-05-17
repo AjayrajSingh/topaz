@@ -3,10 +3,8 @@ snapshot. It is derived by unioning the output of Dart_SaveCompilationTrace
 after startup from a few apps.
 
 To update this trace.
-  - Replace the existing trace with an empty file.
   - In //topaz/runtime/flutter_runner/engine.cc, change kCompilationTraceDelayInSeconds to a non-zero value.
-  - In //topaz/runtime/flutter_runner/meta/flutter_jit_runner.cmx, add "persistent-storage" to "features" section.
-  - Build; run a few apps, collecting compilation trace from each app.
-    - Look for "Dart compilation trace" in 'fx log' to make sure the trace is written.
-    - Copy the compilation trace to the host: "fx cp --to-host /data/dart_compilation_trace.txt trace"
-  - Remove lines that aren't for dart: libraries.
+  - Re-build.
+  - Run `fx syslog | dart topaz/runtime/flutter_runner/collect_traces.dart topaz/runtime/flutter_runner/compilation_trace.txt`
+  - Boot and run a few apps, making sure to exercise the interesting paths before the timer set above expires.
+  - Send SIGINT (Ctrl-C) to collect_traces.dart.

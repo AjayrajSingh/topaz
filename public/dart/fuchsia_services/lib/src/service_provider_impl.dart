@@ -10,6 +10,7 @@ import 'package:zircon/zircon.dart';
 
 /// The [ServiceProviderImpl] is a concrete implementation of the
 /// [fidl.ServiceProvider] interface.
+//  TODO(MF-167, MS-2334): Move to fuchsia_modular and make private
 class ServiceProviderImpl extends fidl.ServiceProvider {
   final _binding = fidl.ServiceProviderBinding();
 

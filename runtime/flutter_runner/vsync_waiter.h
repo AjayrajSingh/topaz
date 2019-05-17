@@ -12,14 +12,14 @@
 #include "flutter/fml/time/time_point.h"
 #include "flutter/shell/common/vsync_waiter.h"
 
-namespace flutter {
+namespace flutter_runner {
 
-class VsyncWaiter final : public shell::VsyncWaiter {
+class VsyncWaiter final : public flutter::VsyncWaiter {
  public:
   static constexpr zx_signals_t SessionPresentSignal = ZX_EVENT_SIGNALED;
 
   VsyncWaiter(std::string debug_label, zx_handle_t session_present_handle,
-              blink::TaskRunners task_runners);
+              flutter::TaskRunners task_runners);
 
   ~VsyncWaiter() override;
 
@@ -28,7 +28,7 @@ class VsyncWaiter final : public shell::VsyncWaiter {
   async::Wait session_wait_;
   fml::WeakPtrFactory<VsyncWaiter> weak_factory_;
 
-  // |shell::VsyncWaiter|
+  // |flutter::VsyncWaiter|
   void AwaitVSync() override;
 
   void FireCallbackWhenSessionAvailable();
@@ -38,6 +38,6 @@ class VsyncWaiter final : public shell::VsyncWaiter {
   FML_DISALLOW_COPY_AND_ASSIGN(VsyncWaiter);
 };
 
-}  // namespace flutter
+}  // namespace flutter_runner
 
 #endif  // TOPAZ_RUNTIME_FLUTTER_RUNNER_VSYNC_WAITER_H_

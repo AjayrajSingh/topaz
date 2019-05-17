@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:fidl_fuchsia_ledger/fidl.dart' as ledger;
+import 'package:fidl_fuchsia_ledger/fidl_async.dart' as ledger;
 
 import 'ledger_helpers.dart';
 import 'sledge.dart';
@@ -14,7 +14,7 @@ import 'transaction.dart';
 /// Holds a Modification and a Completer. The [completer] completes
 /// when [modification] has been ran.
 class _Task {
-  final Completer<bool> completer = new Completer<bool>();
+  final Completer<bool> completer = Completer<bool>();
   final Modification modification;
   _Task(this.modification);
 }
@@ -22,7 +22,7 @@ class _Task {
 /// A queue of modifications that gets ran in transactions.
 class ModificationQueue {
   Transaction _currentTransaction;
-  final Queue<_Task> _tasks = new ListQueue<_Task>();
+  final Queue<_Task> _tasks = ListQueue<_Task>();
   final Sledge _sledge;
   final LedgerObjectsFactory _ledgerObjectsFactory;
   final ledger.PageProxy _pageProxy;
@@ -42,7 +42,7 @@ class ModificationQueue {
       taskToAwait = _tasks.last;
     }
 
-    final task = new _Task(modification);
+    final task = _Task(modification);
     _tasks.add(task);
 
     // If some task was in the queue, await its completion.
@@ -54,7 +54,7 @@ class ModificationQueue {
 
     // Create a transaction from [modifications], run it, and await its end.
     _currentTransaction =
-        new Transaction(_sledge, _pageProxy, _ledgerObjectsFactory);
+        Transaction(_sledge, _pageProxy, _ledgerObjectsFactory);
 
     try {
       return await _currentTransaction.saveModification(modification);
