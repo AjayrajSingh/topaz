@@ -8,10 +8,10 @@
 #include <fuchsia/images/cpp/fidl.h>
 #include <fuchsia/mem/cpp/fidl.h>
 #include <fuchsia/skia/skottie/cpp/fidl.h>
+#include <lib/fidl/cpp/binding_set.h>
+#include <lib/sys/cpp/component_context.h>
 
 #include "examples/ui/lib/skia_view.h"
-#include "lib/component/cpp/startup_context.h"
-#include "lib/fidl/cpp/binding_set.h"
 #include "src/lib/fxl/macros.h"
 //#if defined(SK_ENABLE_SKOTTIE)
 #include "third_party/skia/modules/skottie/include/Skottie.h"

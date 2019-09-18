@@ -7,8 +7,16 @@ import 'package:composition_delegate/src/surface/surface.dart';
 import 'package:composition_delegate/src/surface/surface_relation.dart';
 import 'package:composition_delegate/src/internal/tree/_surface_node.dart';
 
+// Clients need to be able to use SurfaceNode in condition setting
+export 'package:composition_delegate/src/internal/tree/_surface_node.dart';
+// Clients need to be able to specify a SurfaceRelation
+export 'package:composition_delegate/src/surface/surface_relation.dart';
+
 /// A logger for Surface Tree warnings
 Logger log = Logger.root;
+
+/// The ID of the tree's root node
+const String kRootID = '_kRoot_';
 
 /// A SurfaceTree of SurfaceNodes
 class SurfaceTree extends Iterable<Surface> {
@@ -16,7 +24,7 @@ class SurfaceTree extends Iterable<Surface> {
 
   /// The root of the SurfaceTree. SurfaceNodes added to the Tree without
   /// specifying parents are added to the root.
-  final SurfaceNode kRoot = SurfaceNode(surface: Surface(surfaceId: '_kRoot_'));
+  final SurfaceNode kRoot = SurfaceNode(surface: Surface(surfaceId: kRootID));
 
   /// Map from SurfaceIds to SurfaceNodes, for all the SurfaceNodes in the Forest
   final Map<String, SurfaceNode> _nodeMap = {};
@@ -141,9 +149,12 @@ class SurfaceTree extends Iterable<Surface> {
   @override
   String toString() => 'SurfaceTree($kRoot)';
 
-  /// Creates a spanning tree with a given condition
-  SurfaceTree spanningTree(
-      {@required String startNodeId, @required bool condition(SurfaceNode s)}) {
+  /// Creates a spanning tree with a given condition. If no [startNodeId] is
+  /// given, starts from the root of the tree
+  SurfaceTree spanningTree({
+    @required bool condition(SurfaceNode s),
+    String startNodeId = kRootID,
+  }) {
     SurfaceNode startNode;
     if (_nodeMap.containsKey(startNodeId)) {
       startNode = _nodeMap[startNodeId];

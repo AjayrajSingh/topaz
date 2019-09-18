@@ -5,79 +5,83 @@
 package backend
 
 import (
+	"io"
+	"os"
+	"path/filepath"
+	"text/template"
+
 	"fidl/compiler/backend/types"
 	"fidlgen_dart/backend/ir"
 	"fidlgen_dart/backend/templates"
-	"io/ioutil"
-	"os"
-	"os/exec"
-	"path/filepath"
-	"text/template"
 )
 
-func writeFile(outputFilename string,
-	templateName string,
-	tmpls *template.Template,
-	tree ir.Root, dartfmt string) error {
-	// Set up the output directory
-	outputDirectory := filepath.Dir(outputFilename)
-	if err := os.MkdirAll(outputDirectory, os.ModePerm); err != nil {
-		return err
-	}
-
-	// Generate to a temporary file
-	temporaryFile, err := ioutil.TempFile(outputDirectory, "fidlgen_tmp")
-	if err != nil {
-		return err
-	}
-	defer os.Remove(temporaryFile.Name())
-	err = tmpls.ExecuteTemplate(temporaryFile, templateName, tree)
-	if err != nil {
-		return err
-	}
-	err = temporaryFile.Close()
-	if err != nil {
-		return err
-	}
-
-	// Run dartfmt over the file
-	if dartfmt != "" {
-		cmd := exec.Command(dartfmt, "--overwrite", temporaryFile.Name())
-		cmd.Stderr = os.Stderr
-		err = cmd.Run()
-		if err != nil {
-			return err
-		}
-	}
-
-	// Rename the temporary file to the destination name
-	return os.Rename(temporaryFile.Name(), outputFilename)
+type FidlGenerator struct {
+	tmpls *template.Template
 }
 
-// GenerateFidl generates Dart bindings from FIDL types structures.
-func GenerateFidl(fidl types.Root, config *types.Config, dartfmt string) error {
-	tree := ir.Compile(fidl)
-
+func NewFidlGenerator() *FidlGenerator {
 	tmpls := template.New("DartTemplates")
+	template.Must(tmpls.Parse(templates.Bits))
 	template.Must(tmpls.Parse(templates.Const))
 	template.Must(tmpls.Parse(templates.Enum))
-	template.Must(tmpls.Parse(templates.Bits))
 	template.Must(tmpls.Parse(templates.Interface))
 	template.Must(tmpls.Parse(templates.Library))
 	template.Must(tmpls.Parse(templates.Struct))
 	template.Must(tmpls.Parse(templates.Table))
 	template.Must(tmpls.Parse(templates.Union))
 	template.Must(tmpls.Parse(templates.XUnion))
+	return &FidlGenerator{
+		tmpls: tmpls,
+	}
+}
 
-	err := writeFile(config.OutputBase+"/fidl.dart", "GenerateLibraryFile", tmpls, tree, dartfmt)
+func (gen FidlGenerator) generateSyncLibrary(wr io.Writer, tree ir.Root) error {
+	return gen.tmpls.ExecuteTemplate(wr, "GenerateLibraryFile", tree)
+}
+
+func (gen FidlGenerator) generateAsyncLibrary(wr io.Writer, tree ir.Root) error {
+	return gen.tmpls.ExecuteTemplate(wr, "GenerateAsyncFile", tree)
+}
+
+func (gen FidlGenerator) generateTestFile(wr io.Writer, tree ir.Root) error {
+	return gen.tmpls.ExecuteTemplate(wr, "GenerateTestFile", tree)
+}
+
+func writeFile(
+	generate func(io.Writer, ir.Root) error, tree ir.Root,
+	outputFilename string, dartfmt string) error {
+
+	if err := os.MkdirAll(filepath.Dir(outputFilename), os.ModePerm); err != nil {
+		return err
+	}
+	generated, err := os.Create(outputFilename)
 	if err != nil {
 		return err
 	}
+	defer generated.Close()
 
-	err = writeFile(config.OutputBase+"/fidl_async.dart", "GenerateAsyncFile", tmpls, tree, dartfmt)
+	generatedPipe, err := formatter{dartfmt}.FormatPipe(generated)
 	if err != nil {
+		return nil
+	}
+
+	if err := generate(generatedPipe, tree); err != nil {
+		return err
+	}
+	return generatedPipe.Close()
+}
+
+// GenerateBindings generates Dart bindings from FIDL types structures.
+func (gen FidlGenerator) GenerateBindings(fidl types.Root, config *types.Config, dartfmt string) error {
+	tree := ir.Compile(fidl)
+
+	if err := writeFile(gen.generateAsyncLibrary, tree, filepath.Join(config.OutputBase, "fidl_async.dart"), dartfmt); err != nil {
 		return err
 	}
 
-	return writeFile(config.OutputBase+"/fidl_test.dart", "GenerateTestFile", tmpls, tree, dartfmt)
+	if err := writeFile(gen.generateTestFile, tree, filepath.Join(config.OutputBase, "fidl_test.dart"), dartfmt); err != nil {
+		return err
+	}
+
+	return nil
 }

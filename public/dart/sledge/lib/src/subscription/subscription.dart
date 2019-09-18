@@ -33,7 +33,7 @@ class Subscription extends ledger.PageWatcher {
 
   @override
   Future<InterfaceRequest<ledger.PageSnapshot>> onChange(
-      ledger.PageChange pageChange, ledger.ResultState resultState) {
+      ledger.PageChange pageChange, ledger.ResultState resultState) async {
     _currentChange.addAll(getChangeFromPageChange(pageChange));
 
     // For a given change, [onChange] can be called multiple times.

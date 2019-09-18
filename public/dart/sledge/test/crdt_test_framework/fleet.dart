@@ -38,7 +38,7 @@ typedef CheckerGenerator<T> = Checker<T> Function();
 
 /// Fleet of instances.
 class Fleet<T extends dynamic> {
-  int _fleetSize;
+  final int _fleetSize;
   List<Node> _lastModifications;
   final Node _initialModification = Node('init');
   final ComputationalGraph graph = ComputationalGraph();

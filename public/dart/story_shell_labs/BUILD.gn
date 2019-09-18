@@ -9,6 +9,7 @@ dart_library("story_shell_labs_lib") {
   package_name = "story_shell_labs_lib"
 
   sources = [
+    "layout/layout.dart",
     "layout/deja_layout.dart",
     "layout/tile_model.dart",
     "layout/tile_presenter.dart",

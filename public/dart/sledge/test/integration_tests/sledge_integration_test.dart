@@ -73,5 +73,5 @@ void main() {
         someInteger = doc['someInteger'].value;
       });
     }
-  });
+  }, skip: 'Flaky (see FLK-347)');
 }

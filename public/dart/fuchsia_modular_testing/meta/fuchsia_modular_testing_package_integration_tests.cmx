@@ -1,0 +1,24 @@
+{
+    "program": {
+        "data": "data/fuchsia_modular_testing_package_integration_tests"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.cobalt.LoggerFactory",
+            "fuchsia.fonts.Provider",
+            "fuchsia.logger.LogSink",
+            "fuchsia.modular.Clipboard",
+            "fuchsia.modular.ComponentContext",
+            "fuchsia.modular.Lifecycle",
+            "fuchsia.modular.ModuleContext",
+            "fuchsia.netstack.Netstack",
+            "fuchsia.sys.Environment",
+            "fuchsia.sys.Launcher",
+            "fuchsia.testing.runner.TestRunner",
+            "fuchsia.ui.input.ImeService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.wlan.service.Wlan"
+        ]
+    }
+}

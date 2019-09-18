@@ -14,7 +14,6 @@ import 'embedded_module.dart';
 import 'intent_handler.dart';
 import 'internal/_intent_handler_impl.dart';
 import 'internal/_module_impl.dart';
-import 'ongoing_activity.dart';
 
 /// The [Module] class provides a mechanism for module authors
 /// to interact with the underlying framework. The main responsibilities
@@ -130,24 +129,4 @@ abstract class Module {
   /// module and remove it from the story. If there are no more running modules
   /// in the story the story will be stopped.
   void removeSelfFromStory();
-
-  /// Requests that the current story and module gain focus. It's up to the
-  /// story shell and session shell to honor that request.
-  void requestFocus();
-
-  /// Declares that activity of the given [type] is ongoing in this module.
-  ///
-  /// Modules should call [OngoingActivity.done] when the ongoing activity has
-  /// stopped. Pausing media should count as a stopped ongoing activity, and
-  /// when it is resumed it should be started as a new ongoing activity.
-  /// Conversely, media playing in a continuous playlist (i.e playing the next
-  /// video or song) should be treated as the same ongoing activity. Modules
-  /// must request a connection per ongoing activity; a single connection may
-  /// not be re-used for multiple ongoing activities.
-  ///
-  /// When an module indicates that it is performing an ongoing activity the
-  /// system can make informed decisions about power/memory management. For
-  /// example, if the module indicates that it is playing a video the system
-  /// can prevent the display from dimming when not in use.
-  OngoingActivity startOngoingActivity(modular.OngoingActivityType type);
 }

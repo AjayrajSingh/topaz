@@ -4,7 +4,8 @@
 
 #include "topaz/bin/ui/skottie_viewer/view.h"
 
-#include "lib/fsl/vmo/vector.h"
+#include <lib/fsl/vmo/vector.h>
+
 #include "src/lib/fxl/logging.h"
 #include "third_party/skia/include/core/SkColor.h"
 

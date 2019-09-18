@@ -180,45 +180,6 @@ void main() {
   });
 
   group('Agent Tasks:', () {
-    final fakeTask = fidl.TaskInfo(
-        taskId: '1',
-        triggerCondition: fidl.TriggerCondition.withMessageOnQueue('dunno'),
-        persistent: false);
-
-    test('verify calling scheduleTask with null task throws', () {
-      expect(() {
-        AgentImpl().scheduleTask(null);
-      }, throwsArgumentError);
-    });
-
-    test('verify calling scheduleTask without handler throws', () {
-      expect(() {
-        AgentImpl().scheduleTask(fakeTask);
-      }, throwsException);
-    });
-
-    test('verify scheduleTask should call context.scheduleTask', () {
-      final mockAgentContext = MockAgentContext();
-
-      AgentImpl(agentContext: mockAgentContext)
-        ..registerTaskHandler(MyAgentTaskHandler())
-        ..scheduleTask(fakeTask);
-      verify(mockAgentContext.scheduleTask(fakeTask));
-    });
-
-    test('verify calling deleteTask with null task throws', () {
-      expect(() {
-        AgentImpl().deleteTask(null);
-      }, throwsArgumentError);
-    });
-
-    test('verify deleteTask should call context.deleteTask', () {
-      final mockAgentContext = MockAgentContext();
-
-      AgentImpl(agentContext: mockAgentContext).deleteTask('1');
-      verify(mockAgentContext.deleteTask('1'));
-    });
-
     test('verify calling registerTaskHandler with null task throws', () {
       expect(() {
         AgentImpl().registerTaskHandler(null);

@@ -14,10 +14,12 @@ dart_library("fuchsia_vfs") {
   source_dir = "lib"
 
   sources = [
+    "src/composed_pseudo_dir.dart",
     "src/internal/_error_node.dart",
     "src/internal/_flags.dart",
     "src/pseudo_dir.dart",
     "src/pseudo_file.dart",
+    "src/pseudo_vmo_file.dart",
     "src/service.dart",
     "src/vmo_file.dart",
     "src/vnode.dart",
@@ -29,7 +31,7 @@ dart_library("fuchsia_vfs") {
     "//third_party/dart-pkg/pub/quiver",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/zircon",
-    "//zircon/public/fidl/fuchsia-io",
+    "//zircon/system/fidl/fuchsia-io",
   ]
 }
 
@@ -42,8 +44,10 @@ dart_fuchsia_test("fuchsia_vfs_package_unittests") {
   ]
 
   sources = [
+    "composed_pseudo_dir_test.dart",
     "pseudo_dir_test.dart",
     "pseudo_file_test.dart",
+    "pseudo_vmo_file_test.dart",
     "service_test.dart",
     "vmo_file_test.dart",
   ]

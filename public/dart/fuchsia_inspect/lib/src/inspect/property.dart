@@ -13,13 +13,16 @@ abstract class Property<T> {
 
   /// The writer for the underlying VMO.
   ///
-  /// Will be set to null if the [Property] has been deleted or could not be
-  /// created in the VMO.
+  /// Will be set to null if the [Property] has been deleted, could not be
+  /// created in the VMO, or was created on a deleted (or never-created) Node.
   /// If so, all actions on this [Property] should be no-ops and not throw.
   VmoWriter _writer;
 
+  final Node _parent;
+  final String _name;
+
   /// Creates a modifiable [Property].
-  Property._(this.index, this._writer) {
+  Property._(this._parent, this._name, this.index, this._writer) {
     if (index == invalidIndex) {
       _writer = null;
     }
@@ -27,13 +30,15 @@ abstract class Property<T> {
 
   /// Creates a property that never does anything.
   ///
-  /// These are returned when calling methods on a deleted Node,
-  /// or if there is no space for a newly created property in underlying storage.
+  /// These are returned when calling create-property methods on a deleted Node.
   Property.deleted()
       : _writer = null,
+        _name = null,
+        _parent = null,
         index = invalidIndex;
 
-  bool get _isDeleted => _writer == null;
+  /// Returns true only if this property is present in underlying storage.
+  bool get valid => _writer != null;
 
   /// Sets the value of this property.
   void setValue(T value);
@@ -41,8 +46,15 @@ abstract class Property<T> {
   /// Deletes this property from underlying storage.
   /// Calls on a deleted property have no effect and do not result in an error.
   void delete() {
+    _delete();
+  }
+
+  void _delete({bool deletedByParent = false}) {
     _writer?.deleteEntity(index);
     _writer = null;
+    if (!deletedByParent) {
+      _parent._forgetProperty(_name);
+    }
   }
 }
 
@@ -76,8 +88,9 @@ mixin Arithmetic<T extends num> on Property<T> {
 ///
 /// Only [Node.intProperty()] can create this object.
 class IntProperty extends Property<int> with Arithmetic<int> {
-  IntProperty._(String name, int parentIndex, VmoWriter writer)
-      : super._(writer.createMetric(parentIndex, name, 0), writer);
+  IntProperty._(String name, Node parent, VmoWriter writer)
+      : super._(
+            parent, name, writer.createMetric(parent.index, name, 0), writer);
 
   IntProperty._deleted() : super.deleted();
 }
@@ -86,8 +99,9 @@ class IntProperty extends Property<int> with Arithmetic<int> {
 ///
 /// Only [Node.doubleProperty()] can create this object.
 class DoubleProperty extends Property<double> with Arithmetic<double> {
-  DoubleProperty._(String name, int parentIndex, VmoWriter writer)
-      : super._(writer.createMetric(parentIndex, name, 0.0), writer);
+  DoubleProperty._(String name, Node parent, VmoWriter writer)
+      : super._(
+            parent, name, writer.createMetric(parent.index, name, 0.0), writer);
 
   DoubleProperty._deleted() : super.deleted();
 }
@@ -96,8 +110,9 @@ class DoubleProperty extends Property<double> with Arithmetic<double> {
 ///
 /// Only [Node.stringProperty()] can create this object.
 class StringProperty extends Property<String> with BytesProperty<String> {
-  StringProperty._(String name, int parentIndex, VmoWriter writer)
-      : super._(writer.createProperty(parentIndex, name), writer);
+  StringProperty._(String name, Node parent, VmoWriter writer)
+      : super._(
+            parent, name, writer.createProperty(parent.index, name), writer);
 
   StringProperty._deleted() : super.deleted();
 }
@@ -106,8 +121,9 @@ class StringProperty extends Property<String> with BytesProperty<String> {
 ///
 /// Only [Node.byteDataProperty()] can create this object.
 class ByteDataProperty extends Property<ByteData> with BytesProperty<ByteData> {
-  ByteDataProperty._(String name, int parentIndex, VmoWriter writer)
-      : super._(writer.createProperty(parentIndex, name), writer);
+  ByteDataProperty._(String name, Node parent, VmoWriter writer)
+      : super._(
+            parent, name, writer.createProperty(parent.index, name), writer);
 
   ByteDataProperty._deleted() : super.deleted();
 }

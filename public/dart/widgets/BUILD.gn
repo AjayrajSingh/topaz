@@ -50,7 +50,7 @@ dart_library("lib.widgets") {
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_logger",
     "//topaz/public/dart/fuchsia_scenic_flutter",
-    "//zircon/public/fidl/fuchsia-cobalt",
+    "//zircon/system/fidl/fuchsia-cobalt",
   ]
 }
 

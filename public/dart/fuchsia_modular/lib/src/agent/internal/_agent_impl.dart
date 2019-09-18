@@ -159,27 +159,6 @@ class AgentImpl extends fidl.Agent implements Agent {
     _outstandingTasks.add(taskId);
   }
 
-  @override
-  void scheduleTask(fidl.TaskInfo taskInfo) {
-    if (taskInfo == null) {
-      throw ArgumentError.notNull('taskInfo');
-    }
-    if (_taskHandler == null) {
-      throw Exception(
-          'Attempting to schedule a task without registering a task handler to '
-          'receive it');
-    }
-    _getContext().scheduleTask(taskInfo);
-  }
-
-  @override
-  void deleteTask(String taskId) {
-    if (taskId == null) {
-      throw ArgumentError.notNull('taskId');
-    }
-    _getContext().deleteTask(taskId);
-  }
-
   /// Exposes this [fidl.Agent] instance to the
   /// [StartupContext#addPublicService]. In other words, advertises this as an
   /// [fidl.Agent] to the rest of the system via the [StartupContext].

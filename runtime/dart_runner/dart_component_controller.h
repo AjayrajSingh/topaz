@@ -8,11 +8,11 @@
 #include <memory>
 
 #include <fuchsia/sys/cpp/fidl.h>
-#include <lib/async/cpp/wait.h>
 #include <lib/async-loop/cpp/loop.h>
+#include <lib/async/cpp/wait.h>
 #include <lib/fdio/namespace.h>
-#include <lib/sys/cpp/service_directory.h>
 #include <lib/sys/cpp/component_context.h>
+#include <lib/sys/cpp/service_directory.h>
 #include <lib/zx/timer.h>
 
 #include "lib/fidl/cpp/binding.h"
@@ -24,8 +24,7 @@ namespace dart_runner {
 class DartComponentController : public fuchsia::sys::ComponentController {
  public:
   DartComponentController(
-      fuchsia::sys::Package package,
-      fuchsia::sys::StartupInfo startup_info,
+      fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
       std::shared_ptr<sys::ServiceDirectory> runner_incoming_services,
       fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller);
   ~DartComponentController() override;
@@ -42,9 +41,7 @@ class DartComponentController : public fuchsia::sys::ComponentController {
   bool SetupFromAppSnapshot();
 
   bool CreateIsolate(const uint8_t* isolate_snapshot_data,
-                     const uint8_t* isolate_snapshot_instructions,
-                     const uint8_t* shared_snapshot_data,
-                     const uint8_t* shared_snapshot_instructions);
+                     const uint8_t* isolate_snapshot_instructions);
 
   int SetupFileDescriptor(fuchsia::sys::FileDescriptorPtr fd);
 
@@ -74,8 +71,6 @@ class DartComponentController : public fuchsia::sys::ComponentController {
   int stderrfd_ = -1;
   MappedResource isolate_snapshot_data_;
   MappedResource isolate_snapshot_instructions_;
-  MappedResource shared_snapshot_data_;
-  MappedResource shared_snapshot_instructions_;
   std::vector<MappedResource> kernel_peices_;
 
   Dart_Isolate isolate_;

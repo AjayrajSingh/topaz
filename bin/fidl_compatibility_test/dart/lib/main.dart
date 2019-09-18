@@ -24,27 +24,24 @@ class EchoImpl extends Echo {
     _binding.bind(this, request);
   }
 
-  Future<Struct> proxyEcho(Struct value, String forwardToServer) async {
-    assert(forwardToServer.isNotEmpty);
-
+  Future<Echo> proxy(String url) async {
+    assert(url.isNotEmpty);
     final incoming = Incoming();
     final launchInfo = LaunchInfo(
-        url: forwardToServer,
-        directoryRequest: incoming.request().passChannel());
+        url: url, directoryRequest: incoming.request().passChannel());
     final controller = ComponentControllerProxy();
     final launcher = LauncherProxy();
     _context.incoming.connectToService(launcher);
     await launcher.createComponent(launchInfo, controller.ctrl.request());
     final echo = EchoProxy();
     incoming.connectToService(echo);
-
-    return echo.echoStruct(value, '');
+    return echo;
   }
 
   @override
   Future<Struct> echoStruct(Struct value, String forwardToServer) async {
     if (forwardToServer != null && forwardToServer.isNotEmpty) {
-      return proxyEcho(value, forwardToServer);
+      return (await proxy(forwardToServer)).echoStruct(value, '');
     }
     return value;
   }
@@ -59,16 +56,7 @@ class EchoImpl extends Echo {
   @override
   Future<void> echoStructNoRetVal(Struct value, String forwardToServer) async {
     if (forwardToServer != null && forwardToServer.isNotEmpty) {
-      final incoming = Incoming();
-      final launchInfo = LaunchInfo(
-          url: forwardToServer,
-          directoryRequest: incoming.request().passChannel());
-      final controller = ComponentControllerProxy();
-      final launcher = LauncherProxy();
-      _context.incoming.connectToService(launcher);
-      await launcher.createComponent(launchInfo, controller.ctrl.request());
-      final echo = EchoProxy();
-      incoming.connectToService(echo);
+      final echo = await proxy(forwardToServer);
       // Keep echo around until we process the expected event.
       proxies[forwardToServer] = echo;
       echo.echoEvent.listen((Struct val) {
@@ -81,6 +69,42 @@ class EchoImpl extends Echo {
 
   @override
   Stream<Struct> get echoEvent => _echoEventStreamController.stream;
+
+  @override
+  Future<ArraysStruct> echoArrays(
+      ArraysStruct value, String forwardToServer) async {
+    if (forwardToServer != null && forwardToServer.isNotEmpty) {
+      return (await proxy(forwardToServer)).echoArrays(value, '');
+    }
+    return value;
+  }
+
+  @override
+  Future<VectorsStruct> echoVectors(
+      VectorsStruct value, String forwardToServer) async {
+    if (forwardToServer != null && forwardToServer.isNotEmpty) {
+      return (await proxy(forwardToServer)).echoVectors(value, '');
+    }
+    return value;
+  }
+
+  @override
+  Future<AllTypesTable> echoTable(
+      AllTypesTable value, String forwardToServer) async {
+    if (forwardToServer != null && forwardToServer.isNotEmpty) {
+      return (await proxy(forwardToServer)).echoTable(value, '');
+    }
+    return value;
+  }
+
+  @override
+  Future<List<AllTypesXunion>> echoXunions(
+      List<AllTypesXunion> value, String forwardToServer) async {
+    if (forwardToServer != null && forwardToServer.isNotEmpty) {
+      return (await proxy(forwardToServer)).echoXunions(value, '');
+    }
+    return value;
+  }
 }
 
 void main(List<String> args) {

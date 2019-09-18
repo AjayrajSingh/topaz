@@ -6,6 +6,7 @@
 
 import 'dart:typed_data';
 
+import 'package:fuchsia_inspect/testing.dart';
 import 'package:fuchsia_inspect/src/vmo/block.dart';
 import 'package:fuchsia_inspect/src/vmo/util.dart';
 import 'package:fuchsia_inspect/src/vmo/vmo_fields.dart';
@@ -20,8 +21,6 @@ void main() {
         block.lock();
         block.unlock();
       });
-      _accepts(
-          'becomeRoot', [BlockType.reserved], (block) => block.becomeRoot());
       _accepts(
           'becomeNode', [BlockType.anyValue], (block) => block.becomeNode());
       _accepts('becomeProperty', [BlockType.anyValue],
@@ -91,7 +90,7 @@ void main() {
     });
 
     test('can read, including payload bits', () {
-      final vmo = FakeVmo(32);
+      final vmo = FakeVmoHolder(32);
       vmo.bytes
         ..setUint8(0, 0x01 | (BlockType.propertyValue.value << 4))
         ..setUint8(1, 0x14) // Parent index should be 0x14
@@ -116,7 +115,7 @@ void main() {
     });
 
     test('can read, including payload bytes', () {
-      final vmo = FakeVmo(32);
+      final vmo = FakeVmoHolder(32);
       vmo.bytes
         ..setUint8(0, 0x01 | (BlockType.nameUtf8.value << 4))
         ..setUint8(1, 0x02) // Set length to 2
@@ -137,7 +136,7 @@ void main() {
 
   group('Block operations write to VMO correctly:', () {
     test('Creating, locking, and unlocking the VMO header', () {
-      final vmo = FakeVmo(32);
+      final vmo = FakeVmoHolder(32);
       final block = Block.create(vmo, 0)..becomeHeader();
       compare(
           vmo,
@@ -158,15 +157,8 @@ void main() {
           '00 0000 49 4E 53 50  0200 0000 0000 0000');
     });
 
-    test('Becoming the special root node', () {
-      final vmo = FakeVmo(64);
-      Block.create(vmo, 1).becomeRoot();
-      compare(vmo, 16,
-          '${hexChar(BlockType.nodeValue.value)} 0 00 0000 2000 0000 0000');
-    });
-
     test('Becoming and modifying an intValue via free, reserved, anyValue', () {
-      final vmo = FakeVmo(64);
+      final vmo = FakeVmoHolder(64);
       final block = Block.create(vmo, 2)..becomeFree(5);
       compare(vmo, 32, '${hexChar(BlockType.free.value)} 1 05 00 00 0000 0000');
       expect(block.nextFree, 5);
@@ -184,7 +176,7 @@ void main() {
     });
 
     test('Becoming a nodeValue and then a tombstone', () {
-      final vmo = FakeVmo(64);
+      final vmo = FakeVmoHolder(64);
       final block = Block.create(vmo, 2)
         ..becomeFree(5)
         ..becomeReserved()
@@ -201,7 +193,7 @@ void main() {
     });
 
     test('Becoming and modifying doubleValue', () {
-      final vmo = FakeVmo(64);
+      final vmo = FakeVmoHolder(64);
       final block = Block.create(vmo, 2)
         ..becomeFree(5)
         ..becomeReserved()
@@ -215,7 +207,7 @@ void main() {
     });
 
     test('Becoming and modifying a propertyValue', () {
-      final vmo = FakeVmo(64);
+      final vmo = FakeVmoHolder(64);
       final block = Block.create(vmo, 2)
         ..becomeFree(5)
         ..becomeReserved()
@@ -241,7 +233,7 @@ void main() {
     });
 
     test('Becoming a name', () {
-      final vmo = FakeVmo(64);
+      final vmo = FakeVmoHolder(64);
       final block = Block.create(vmo, 2)..becomeName('abc');
       compare(vmo, 32,
           '${hexChar(BlockType.nameUtf8.value)} 1 03 0000 0000 0000 61 62 63');
@@ -252,7 +244,7 @@ void main() {
     });
 
     test('Becoming and setting an extent', () {
-      final vmo = FakeVmo(64);
+      final vmo = FakeVmoHolder(64);
       final block = Block.create(vmo, 2)
         ..becomeFree(4)
         ..becomeReserved()
@@ -273,7 +265,7 @@ void main() {
 /// [previousStates] contains the types that should not throw
 /// an error. All others should throw.
 void _accepts(String testName, List<BlockType> previousStates, testFunction) {
-  final vmo = FakeVmo(4096);
+  final vmo = FakeVmoHolder(4096);
   for (BlockType type in BlockType.values) {
     final block = Block.createWithType(vmo, 0, type);
     if (previousStates.contains(type)) {

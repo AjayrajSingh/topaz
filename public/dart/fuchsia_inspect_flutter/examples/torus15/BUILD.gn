@@ -1,0 +1,90 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//build/dart/dart_library.gni")
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+import("//build/testing/environments.gni")
+import("//topaz/runtime/dart/dart_fuchsia_test.gni")
+import("//topaz/runtime/dart/flutter_test.gni")
+
+dart_library("torus15") {
+  package_name = "torus15"
+
+  sdk_category = "partner"
+
+  sources = [
+    "main.dart",
+    "src/handlers/root_intent_handler.dart",
+    "src/logic/torus_logic.dart",
+    "src/ui/torus_grid.dart",
+    "src/ui/torus_tile.dart",
+  ]
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/fuchsia_inspect",
+    "//topaz/public/dart/fuchsia_inspect_flutter",
+    "//topaz/public/dart/fuchsia_logger",
+    "//topaz/public/dart/fuchsia_modular",
+  ]
+}
+
+flutter_app("torus15_flutter") {
+  main_dart = "lib/main.dart"
+  package_name = "torus15_flutter"
+  fuchsia_package_name = "torus15_flutter"
+
+  sources = [
+    "main.dart",
+  ]
+
+  deps = [
+    ":torus15",
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/torus15_flutter.cmx")
+      dest = "torus15_flutter.cmx"
+    },
+  ]
+}
+
+# Run these tests using:
+#  fx run-host-tests torus15_flutter_test
+flutter_test("torus15_flutter_test") {
+  source_dir = "flutter_test"
+  sources = [
+    "torus15_flutter_test.dart",
+  ]
+
+  deps = [
+    ":torus15",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/pub/mockito",
+  ]
+}
+
+dart_fuchsia_test("torus15_dart_test") {
+  source_dir = "dart_test"
+  sources = [
+    "torus15_dart_test.dart",
+  ]
+
+  deps = [
+    ":torus15",
+    "//third_party/dart-pkg/pub/mockito",
+    "//third_party/dart-pkg/pub/test",
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/torus15_dart_test.cmx")
+      dest = "torus15_dart_test.cmx"
+    },
+  ]
+
+  environments = basic_envs
+}

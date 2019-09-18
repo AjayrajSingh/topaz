@@ -73,7 +73,7 @@ class Encoder {
 
   void encodeMessageHeader(int ordinal, int txid) {
     alloc(kMessageHeaderSize);
-    encodeUint32(ordinal, kMessageOrdinalOffset);
+    encodeUint64(ordinal, kMessageOrdinalOffset);
     encodeUint32(txid, kMessageTxidOffset);
   }
 
@@ -130,7 +130,7 @@ class Decoder {
       : _message = message,
         data = message.data;
 
-  Message _message;
+  final Message _message;
   ByteData data;
 
   int _nextOffset = 0;

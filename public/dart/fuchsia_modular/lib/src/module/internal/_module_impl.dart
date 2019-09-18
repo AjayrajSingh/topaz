@@ -19,10 +19,8 @@ import '../intent.dart';
 import '../intent_handler.dart';
 import '../module.dart';
 import '../module_state_exception.dart';
-import '../ongoing_activity.dart';
 import '_intent_handler_impl.dart';
 import '_module_context.dart';
-import '_ongoing_activity_impl.dart';
 
 /// A concrete implementation of the [Module] interface. This class
 /// is not intended to be used directly by authors but instead should
@@ -154,19 +152,6 @@ class ModuleImpl implements Module {
   @override
   void removeSelfFromStory() {
     _getContext().removeSelfFromStory();
-  }
-
-  @override
-  void requestFocus() {
-    _getContext().requestFocus();
-  }
-
-  @override
-  OngoingActivity startOngoingActivity(modular.OngoingActivityType type) {
-    final proxy = modular.OngoingActivityProxy();
-    _getContext().startOngoingActivity(type, proxy.ctrl.request());
-
-    return OngoingActivityImpl(proxy);
   }
 
   modular.ModuleContext _getContext() => _moduleContext ??= getModuleContext();

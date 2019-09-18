@@ -2,6 +2,7 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
+import("//build/dart/dart_library.gni")
 import("//build/go/go_binary.gni")
 import("//build/go/go_library.gni")
 import("//build/go/go_test.gni")
@@ -14,6 +15,9 @@ go_library("fidlgen_dart_lib") {
   deps = [
     "//garnet/go/src/fidl:fidl_lib",
   ]
+  if (is_linux || is_mac) {
+    non_go_deps = [ "goldens" ]
+  }
 }
 
 go_binary("fidlgen_dart") {
@@ -27,10 +31,64 @@ go_binary("fidlgen_dart") {
 }
 
 go_test("fidlgen_dart_backend_ir_test") {
-  gopackage = "fidlgen_dart/backend/ir"
+  gopackages = ["fidlgen_dart/backend/ir"]
 
   deps = [
     ":fidlgen_dart_lib",
+  ]
+}
+
+go_test("fidlgen_dart_backend_test") {
+  gopackages = ["fidlgen_dart/backend"]
+
+  deps = [
+    ":fidlgen_dart_lib",
+  ]
+  non_go_deps = [ ":copies" ]
+}
+
+group("copies") {
+  deps = [
+    ":copy_dart",
+    ":copy_dartfmt",
+    ":copy_dartsnapshot",
+  ]
+  metadata = {
+    test_runtime_deps = [
+      "$root_out_dir/test_data/fidlgen_dart/snapshots/dartfmt.dart.snapshot",
+      "$root_out_dir/test_data/fidlgen_dart/dart",
+      "$root_out_dir/test_data/fidlgen_dart/dartfmt",
+    ]
+  }
+}
+
+copy("copy_dartsnapshot") {
+  deps = dart_sdk_deps
+  sources = [
+    "$dart_sdk/bin/snapshots/dartfmt.dart.snapshot",
+  ]
+  outputs = [
+    "$root_out_dir/test_data/fidlgen_dart/snapshots/dartfmt.dart.snapshot",
+  ]
+}
+
+copy("copy_dart") {
+  deps = dart_sdk_deps
+  sources = [
+    "$dart_sdk/bin/dart",
+  ]
+  outputs = [
+    "$root_out_dir/test_data/fidlgen_dart/dart",
+  ]
+}
+
+copy("copy_dartfmt") {
+  deps = dart_sdk_deps
+  sources = [
+    "$dart_sdk/bin/dartfmt",
+  ]
+  outputs = [
+    "$root_out_dir/test_data/fidlgen_dart/dartfmt",
   ]
 }
 

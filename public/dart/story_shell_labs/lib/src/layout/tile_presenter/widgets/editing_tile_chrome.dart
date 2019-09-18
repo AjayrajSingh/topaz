@@ -6,34 +6,25 @@ import 'package:flutter/material.dart';
 import 'package:tiler/tiler.dart';
 import 'drop_target_widget.dart';
 
-const _kHighlightedBorderWidth = 3.0;
-const _kBorderWidth = 1.0;
-const _kBorderWidthDiff = _kHighlightedBorderWidth - _kBorderWidth;
-
-const _kTilePlaceholderWhenDragging = DecoratedBox(
-  decoration: BoxDecoration(color: Color(0xFFFAFAFA)),
-);
+const _kBorderWidth = 2.0;
 
 /// Chrome for a tiling layout presenter.
 class EditingTileChrome extends StatefulWidget {
   /// Constructor for a tiling layout presenter.
   const EditingTileChrome({
     @required this.focusedMod,
-    @required this.borderColor,
     @required this.parameterColors,
     @required this.tilerModel,
     @required this.tile,
     @required this.childView,
     @required this.modName,
-    @required this.originalSize,
     @required this.editingSize,
+    @required this.willStartDrag,
+    @required this.didCancelDrag,
   });
 
   /// Currently focused mod.
-  final ValueNotifier focusedMod;
-
-  /// Chrome border color.
-  final Color borderColor;
+  final ValueNotifier<String> focusedMod;
 
   /// Intent parameter circle colors.
   final Iterable<Color> parameterColors;
@@ -50,157 +41,145 @@ class EditingTileChrome extends StatefulWidget {
   /// Surface id of the view displayed here.
   final String modName;
 
-  /// Original size
-  final Size originalSize;
-
-  /// Eiditing size
+  /// Editing size
   final Size editingSize;
+
+  /// Called before user starts dragging this tile.
+  final VoidCallback willStartDrag;
+
+  /// Called after drag was cancelled, either by dropping outside of an accepting target, or because the action was interrupted.
+  final VoidCallback didCancelDrag;
 
   @override
   _EditingTileChromeState createState() => _EditingTileChromeState();
 }
 
 class _EditingTileChromeState extends State<EditingTileChrome> {
+  // whether this tile is currently being dragged
   final _isDragging = ValueNotifier(false);
+
+  // equal to isDragging, but with 1 frame delay, useful for starting the feedback animation
+  final _isDraggingDelayed = ValueNotifier(false);
+
+  // the direction that the tile is being hovered over by another tile, null if nothing is hovering
+  final _hoverDirection = ValueNotifier<AxisDirection>(null);
+
+  @override
+  void initState() {
+    _isDragging.addListener(_isDraggingListener);
+    super.initState();
+  }
+
+  void _isDraggingListener() async {
+    await Future.delayed(Duration(milliseconds: 100));
+    _isDraggingDelayed.value = _isDragging.value;
+  }
+
+  @override
+  void dispose() {
+    _isDragging.removeListener(_isDraggingListener);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: AspectRatio(
-        aspectRatio:
-            (widget.originalSize + Offset(_kBorderWidth, _kBorderWidth) * 2.0)
-                .aspectRatio,
-        child: Stack(
-          children: <Widget>[
-            Positioned.fill(
-              child: Draggable(
-                onDragStarted: () {
-                  widget.focusedMod.value = widget.modName;
-                  _isDragging.value = true;
-                },
-                onDragEnd: (_) {
-                  _isDragging.value = false;
-                },
-                key: Key(widget.modName),
-                data: widget.tile,
-                feedback: _buildFeedback(),
-                childWhenDragging: _kTilePlaceholderWhenDragging,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: widget.borderColor,
-                      width: _kBorderWidth,
-                    ),
-                  ),
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: FittedBox(
-                          fit: BoxFit.contain,
-                          child: SizedBox.fromSize(
-                            size: widget.originalSize,
-                            child: widget.childView,
-                          ),
-                        ),
-                      )
-                    ]..addAll(_buildSplitTargets(widget.editingSize)),
-                  ),
+    return Draggable(
+      onDragStarted: () {
+        widget.willStartDrag();
+        widget.focusedMod.value = widget.modName;
+        _isDragging.value = true;
+        widget.tilerModel.remove(widget.tile);
+      },
+      onDragEnd: (_) {
+        _isDragging.value = false;
+      },
+      onDraggableCanceled: (_, __) {
+        widget.didCancelDrag();
+      },
+      key: Key(widget.modName),
+      data: widget.tile,
+      feedback: _buildFeedback(),
+      dragAnchor: DragAnchor.pointer,
+      childWhenDragging: const Offstage(),
+      child: Stack(
+        children: [
+          AnimatedBuilder(
+            animation: _hoverDirection,
+            builder: (_, child) => AnimatedPositioned(
+                  duration: Duration(milliseconds: 400),
+                  curve: Curves.easeOutExpo,
+                  top: _hoverDirection.value == AxisDirection.up
+                      ? widget.editingSize.height * 0.5 + 12
+                      : 0,
+                  bottom: _hoverDirection.value == AxisDirection.down
+                      ? widget.editingSize.height * 0.5 + 12
+                      : 0,
+                  left: _hoverDirection.value == AxisDirection.left
+                      ? widget.editingSize.width * 0.5 + 12
+                      : 0,
+                  right: _hoverDirection.value == AxisDirection.right
+                      ? widget.editingSize.width * 0.5 + 12
+                      : 0,
+                  child: child,
                 ),
-              ),
+            child: AnimatedBuilder(
+              animation: widget.focusedMod,
+              builder: (_, child) => Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: widget.focusedMod.value == widget.modName
+                            ? Color(0xFFFF8BCB)
+                            : Colors.black,
+                        width: _kBorderWidth,
+                      ),
+                    ),
+                    child: widget.childView,
+                  ),
             ),
-            _buildCornerItems(),
-          ],
-        ),
+          ),
+        ]..addAll(_buildSplitTargets(widget.editingSize)),
       ),
     );
   }
 
   Widget _buildFeedback() {
-    // to get the offset between the draggable object and the feeback
+    final contentSize = widget.editingSize;
+    return AnimatedBuilder(
+      animation: _isDraggingDelayed,
+      builder: (_, child) {
+        final size = _isDraggingDelayed.value ? contentSize * .5 : contentSize;
+        return AnimatedContainer(
+          // ease in Quad -> ease out Expo:
+          curve: Cubic(0.455, 0.03, 0.0, 1.0),
 
-    // we need the difference between the border width of the original widget and the feedback
-    final borderWidthDifference =
-        Offset(-_kBorderWidthDiff, -_kBorderWidthDiff);
-    // and half the space lost to containing the original size within the editing size (the tile after reducing sizers)
-    final boxFitDifference = (widget.editingSize * .5 -
-        applyBoxFit(BoxFit.contain, widget.originalSize, widget.editingSize)
-                .destination *
-            0.5);
+          // can have a long duration because  it's interactive the whole time
+          // and has a strong out easing curve so it spends most of the time at the end
+          duration: Duration(milliseconds: 500),
 
-    return Transform.translate(
-      offset: borderWidthDifference - boxFitDifference,
-      child: SizedBox.fromSize(
-        size: widget.editingSize +
-            Offset(_kBorderWidthDiff, _kBorderWidthDiff) * 2,
-        child: Center(
-          child: AspectRatio(
-            // aspect ratio of original box plus highlighted border
-            aspectRatio: (widget.originalSize +
-                    Offset(_kHighlightedBorderWidth, _kHighlightedBorderWidth) *
-                        2.0)
-                .aspectRatio,
-            child: Material(
-              elevation: 16.0,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: widget.borderColor,
-                    width: _kHighlightedBorderWidth,
-                  ),
-                ),
-                child: FittedBox(
-                  fit: BoxFit.contain,
-                  child: SizedBox.fromSize(
-                    size: widget.originalSize,
-                    child: widget.childView,
-                  ),
-                ),
-              ),
-            ),
+          width: size.width,
+          height: size.height,
+          transform: Matrix4.translationValues(
+            size.width * -.5,
+            size.height * -.5,
+            0,
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCornerItems() {
-    final parameterIndicators = Row(
-      children: widget.parameterColors
-          .expand((color) => [
-                Material(
-                  elevation: 4.0,
-                  clipBehavior: Clip.antiAlias,
-                  shape: CircleBorder(),
-                  color: color,
-                  child: SizedBox(width: 24, height: 24),
-                ),
-                SizedBox(width: 8.0),
-              ])
-          .toList(),
-    );
-
-    return Positioned(
-      top: 8,
-      right: 8,
-      child: AnimatedBuilder(
-        animation: _isDragging,
-        builder: (_, child) =>
-            Offstage(offstage: _isDragging.value, child: child),
-        child: Row(
-          children: <Widget>[
-            parameterIndicators,
-            Material(
-              elevation: 4.0,
-              clipBehavior: Clip.antiAlias,
-              shape: CircleBorder(),
-              child: InkWell(
-                onTap: () {
-                  widget.tilerModel.remove(widget.tile);
-                },
-                child: Icon(Icons.close),
-              ),
-            )
-          ],
+          child: Material(
+            color: Color(0xFFFF8BCB),
+            elevation: _isDraggingDelayed.value ? 16.0 : 8.5,
+            animationDuration: Duration(milliseconds: 500),
+            child: child,
+          ),
+        );
+      },
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: SizedBox(
+          width: contentSize.width,
+          height: contentSize.height,
+          child: Padding(
+            padding: const EdgeInsets.all(_kBorderWidth),
+            child: widget.childView,
+          ),
         ),
       ),
     );
@@ -241,6 +220,7 @@ class _EditingTileChromeState extends State<EditingTileChrome> {
         right: direction == AxisDirection.left ? null : 0,
         child: DropTargetWidget(
           onAccept: (tile) {
+            _hoverDirection.value = null;
             widget.tilerModel.remove(tile);
             widget.tilerModel.split(
               content: tile.content,
@@ -248,7 +228,16 @@ class _EditingTileChromeState extends State<EditingTileChrome> {
               tile: nearTile,
             );
           },
-          onWillAccept: (_) => true,
+          onWillAccept: (tile) {
+            if (tile == nearTile) {
+              return false;
+            }
+            _hoverDirection.value = direction;
+            return true;
+          },
+          onLeave: (_) {
+            _hoverDirection.value = null;
+          },
           axis: axisDirectionToAxis(direction),
           baseSize: 50.0,
           hoverSize: parentSizeOnAxis * .33,

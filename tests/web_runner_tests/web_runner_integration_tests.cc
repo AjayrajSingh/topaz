@@ -114,9 +114,15 @@ TEST_F(ChromiumAppTest, CreateAndNavigate) {
   std::string observed_url;
   std::string observed_title;
 
+  // If set, the URL and title events are used to determine if a page has
+  // loaded. Otherwise, |is_main_document_loaded| is used instead.
+  // TODO(WEB-42): Remove this workaround once Chromium has rolled with the new
+  // behavior.
+  bool use_legacy_observer_behavior = true;
+
   navigation_event_listener.set_on_navigation_state_changed(
-      [this, &navigation_event_listener, &observed_url,
-       &observed_title](fuchsia::web::NavigationState change) {
+      [this, &navigation_event_listener, &observed_url, &observed_title,
+       &use_legacy_observer_behavior](fuchsia::web::NavigationState change) {
         if (change.has_url()) {
           observed_url = change.url();
         }
@@ -128,7 +134,14 @@ TEST_F(ChromiumAppTest, CreateAndNavigate) {
           EXPECT_EQ(change.page_type(), fuchsia::web::PageType::NORMAL);
         }
 
-        if (!(observed_url.empty() || observed_title.empty())) {
+        if (change.has_is_main_document_loaded())
+          use_legacy_observer_behavior = false;
+
+        if ((use_legacy_observer_behavior &&
+             !(observed_url.empty() || observed_title.empty())) ||
+            (!use_legacy_observer_behavior &&
+             (change.has_is_main_document_loaded() &&
+              change.is_main_document_loaded()))) {
           navigation_event_listener.set_on_navigation_state_changed(nullptr);
           QuitLoop();
         }

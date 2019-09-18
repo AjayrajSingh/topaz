@@ -53,7 +53,14 @@ class StartupContextImpl implements StartupContext {
   /// of instantiating one on their own as it will bind and connect to all the
   /// underlying services for them.
   factory StartupContextImpl.fromStartupInfo() {
-    if (Directory(_serviceRootPath).existsSync()) {
+    if (Platform.isFuchsia) {
+      if (!Directory(_serviceRootPath).existsSync()) {
+        final componentName = Platform.script?.pathSegments
+            ?.lastWhere((_) => true, orElse: () => '???');
+        throw Exception(
+            'Attempting to launch component [$componentName] without a valid /svc directory. '
+            'This is an indication that the system is not in a valid state.');
+      }
       final channel = Channel.fromFile(_serviceRootPath);
       final directory = fidl_io.DirectoryProxy()
         ..ctrl.bind(InterfaceHandle<fidl_io.Directory>(channel));

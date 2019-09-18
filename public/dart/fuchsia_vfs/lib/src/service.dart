@@ -15,7 +15,7 @@ typedef Connector<T> = void Function(fidl.InterfaceRequest<T> request);
 
 /// A node which binds a channel to a service implementation when opened.
 class Service<T> extends Vnode {
-  Connector<T> _connector;
+  final Connector<T> _connector;
   bool _closed = false;
 
   /// Constructor with [Connector]

@@ -3,11 +3,12 @@
 // found in the LICENSE file.
 
 #include <lib/async-loop/cpp/loop.h>
+#include <lib/async-loop/default.h>
+#include <lib/ui/base_view/cpp/view_provider_component.h>
 #include <trace-provider/provider.h>
 
 #include "src/lib/fxl/command_line.h"
 #include "src/lib/fxl/log_settings_command_line.h"
-#include "lib/ui/base_view/cpp/view_provider_component.h"
 #include "topaz/bin/ui/skottie_viewer/view.h"
 
 int main(int argc, const char** argv) {
@@ -15,11 +16,11 @@ int main(int argc, const char** argv) {
   if (!fxl::SetLogSettingsFromCommandLine(command_line))
     return 1;
 
-  async::Loop loop(&kAsyncLoopConfigAttachToThread);
-  trace::TraceProvider trace_provider(loop.dispatcher());
+  async::Loop loop(&kAsyncLoopConfigAttachToCurrentThread);
+  trace::TraceProviderWithFdio trace_provider(loop.dispatcher());
 
   scenic::ViewProviderComponent component(
-      [&loop](scenic::ViewContext view_context) {
+      [](scenic::ViewContext view_context) {
         return std::make_unique<skottie::View>(std::move(view_context));
       },
       &loop);

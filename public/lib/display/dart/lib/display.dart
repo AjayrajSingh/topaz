@@ -5,16 +5,10 @@
 import 'dart:async';
 
 import 'package:fidl_fuchsia_device_display/fidl_async.dart';
-import 'package:fidl_fuchsia_devicesettings/fidl_async.dart';
-import 'package:fuchsia_logger/logger.dart';
 import 'package:fuchsia_services/services.dart';
 
 /// This class abstracts away the fuchsia.device.display.Manager fidl interface,
-class Display extends DeviceSettingsWatcher {
-  final DeviceSettingsWatcherBinding _deviceSettingsWatcherBinding =
-      DeviceSettingsWatcherBinding();
-  final String _brightnessSettingsKey = 'Display.Brightness';
-
+class Display {
   // Used to publish brightness events.
   final StreamController<double> _brightnessStreamController =
       StreamController.broadcast();
@@ -22,9 +16,6 @@ class Display extends DeviceSettingsWatcher {
   // Used to modify the physical display.
   final ManagerProxy _displayManagerService = ManagerProxy();
 
-  // Used to store and retrieve user settings.
-  final DeviceSettingsManagerProxy _deviceSettingsManagerService =
-      DeviceSettingsManagerProxy();
   double _brightness;
 
   // ignore: public_member_api_docs
@@ -33,12 +24,6 @@ class Display extends DeviceSettingsWatcher {
         .incoming
         .connectToService(_displayManagerService);
 
-    StartupContext.fromStartupInfo()
-        .incoming
-        .connectToService(_deviceSettingsManagerService);
-
-    _deviceSettingsManagerService.watch(
-        _brightnessSettingsKey, _deviceSettingsWatcherBinding.wrap(this));
     // Immediately get brightness on construction.
     _refreshBrightness();
   }
@@ -49,24 +34,11 @@ class Display extends DeviceSettingsWatcher {
       return;
     }
 
-    final result =
-        await _deviceSettingsManagerService.getString(_brightnessSettingsKey);
-
-    if (result.s == Status.ok) {
-      if (result.val == null || result.val.isEmpty) {
-        return;
-      }
-
-      // If previous value exists, restore brightness.
-      await setBrightness(double.parse(result.val));
-    } else {
-      // If no previous value is found, fetch display brightness and set.
-      // Setting is a noop from the device side, but makes sure our locale
-      // cache is updated.
-      final brightnessResult = await _displayManagerService.getBrightness();
-      if (brightnessResult.success) {
-        await setBrightness(brightnessResult.brightness);
-      }
+    // TODO(4774): Search Stash storage to see if a persisted brightness value
+    // already exists.
+    final brightnessResult = await _displayManagerService.getBrightness();
+    if (brightnessResult.success) {
+      await setBrightness(brightnessResult.brightness);
     }
   }
 
@@ -95,13 +67,7 @@ class Display extends DeviceSettingsWatcher {
 
     if (wasSuccessful) {
       _brightness = brightness;
-      final deviceSettingWasSuccessful = await _deviceSettingsManagerService
-          .setString(_brightnessSettingsKey, brightness.toString());
-      if (!deviceSettingWasSuccessful) {
-        // This is a silent failure. While we couldn't store the brightness,
-        // it still took effect on the physical display.
-        log.warning('Could not persist display brightness');
-      }
+      // TODO(4774): Persist brightness update to Stash store.
       _notifyBrightnessChange();
       return true;
     } else {
@@ -119,10 +85,5 @@ class Display extends DeviceSettingsWatcher {
   /// change in brightness.
   void _notifyBrightnessChange() {
     _brightnessStreamController.add(brightness);
-  }
-
-  @override
-  Future<void> onChangeSettings(ValueType type) async {
-    await _refreshBrightness(true);
   }
 }

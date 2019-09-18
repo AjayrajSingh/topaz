@@ -9,16 +9,6 @@ import 'package:test/test.dart';
 
 void main() {
   group('connectToAgentService:=', () {
-    test('throws for null or empty agent url', () {
-      FakeAsyncProxy fakeServiceProxy =
-          FakeAsyncProxy('fuchsia.modular.FakeService', r'FakeService');
-      expect(() => connectToAgentService('', fakeServiceProxy), throwsException,
-          reason: 'AgentUrl cannot be empty');
-      expect(
-          () => connectToAgentService(null, fakeServiceProxy), throwsException,
-          reason: 'AgentUrl cannot be null');
-    });
-
     test('throws if serviceProxy is null', () {
       expect(() => connectToAgentService('agentUrl', null), throwsException);
     });

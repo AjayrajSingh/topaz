@@ -8,3 +8,4 @@ third_party/cast_runner/
 third_party/chromium/
 **/Cargo.lock
 **/Cargo.toml
+*.swp

@@ -19,11 +19,11 @@ namespace {
 // us avoid the heap allocation.
 class SurfaceContext {
  public:
-  explicit SurfaceContext(std::shared_ptr<HostData> data)
+  explicit SurfaceContext(std::shared_ptr<scenic_util::HostData> data)
       : data_(std::move(data)) {}
 
  private:
-  std::shared_ptr<HostData> data_;
+  std::shared_ptr<scenic_util::HostData> data_;
 };
 
 void DestroySurfaceContext(void* pixels, void* context) {
@@ -32,19 +32,19 @@ void DestroySurfaceContext(void* pixels, void* context) {
 
 }  // namespace
 
-sk_sp<SkSurface> MakeSkSurface(const HostImage& image) {
+sk_sp<SkSurface> MakeSkSurface(const scenic_util::HostImage& image) {
   return MakeSkSurface(image.info(), image.data(), image.memory_offset());
 }
 
 sk_sp<SkSurface> MakeSkSurface(const fuchsia::images::ImageInfo& image_info,
-                               std::shared_ptr<HostData> data,
+                               std::shared_ptr<scenic_util::HostData> data,
                                off_t memory_offset) {
   return MakeSkSurface(MakeSkImageInfo(image_info), image_info.stride,
                        std::move(data), memory_offset);
 }
 
 sk_sp<SkSurface> MakeSkSurface(SkImageInfo image_info, size_t row_bytes,
-                               std::shared_ptr<HostData> data,
+                               std::shared_ptr<scenic_util::HostData> data,
                                off_t memory_offset) {
   return SkSurface::MakeRasterDirectReleaseProc(
       image_info, static_cast<uint8_t*>(data->ptr()) + memory_offset, row_bytes,
@@ -72,7 +72,7 @@ sk_sp<SkSurface> HostSkSurfacePool::GetSkSurface(uint32_t index) {
   if (surface_ptrs_[index])
     return surface_ptrs_[index];
 
-  const HostImage* image = image_pool_.GetImage(index);
+  const scenic_util::HostImage* image = image_pool_.GetImage(index);
   if (!image)
     return nullptr;
 

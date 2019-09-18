@@ -25,6 +25,8 @@ import 'vnode.dart';
 ///
 /// This version doesn't support watchers, should support watchers if needed.
 class PseudoDir extends Vnode {
+  static const _maxObjectNameLength = 256;
+
   final HashMap<String, _Entry> _entries = HashMap();
   final AvlTreeSet<_Entry> _treeEntries =
       AvlTreeSet(comparator: (v1, v2) => v1.nodeId.compareTo(v2.nodeId));
@@ -32,15 +34,25 @@ class PseudoDir extends Vnode {
   final List<_DirConnection> _connections = [];
   bool _isClosed = false;
 
+  static bool _isLegalObjectName(String objectName) {
+    const forwardSlashUtf16 = 47;
+    return objectName.isNotEmpty &&
+        objectName.length < _maxObjectNameLength &&
+        objectName != '.' &&
+        objectName != '..' &&
+        objectName.codeUnits
+            .every((unit) => (unit != 0 && unit != forwardSlashUtf16));
+  }
+
   /// Adds a directory entry associating the given [name] with [node].
   /// It is ok to add the same Vnode multiple times with different names.
   ///
   /// Returns `ZX.OK` on success.
-  /// Returns `ZX.ERR_INVALID_ARGS` if name length is more than `maxFilename`.
+  /// Returns `ZX.ERR_INVALID_ARGS` if name is illegal object name.
   /// Returns `ZX.ERR_ALREADY_EXISTS` if there is already a node with the
   /// given name.
   int addNode(String name, Vnode node) {
-    if (name.length > maxFilename) {
+    if (!_isLegalObjectName(name)) {
       return ZX.ERR_INVALID_ARGS;
     }
     if (_entries.containsKey(name)) {
@@ -164,7 +176,9 @@ class PseudoDir extends Vnode {
     } else {
       key = p.substring(0, index);
     }
-    if (_entries.containsKey(key)) {
+    if (!_isLegalObjectName(key)) {
+      sendErrorEvent(flags, ZX.ERR_BAD_PATH, request);
+    } else if (_entries.containsKey(key)) {
       var e = _entries[key];
       // final element, open it
       if (index == -1) {
@@ -181,7 +195,6 @@ class PseudoDir extends Vnode {
       }
     } else {
       sendErrorEvent(flags, ZX.ERR_NOT_FOUND, request);
-      return;
     }
   }
 
@@ -219,7 +232,11 @@ class PseudoDir extends Vnode {
   }
 
   void _onClose(_DirConnection obj) {
-    assert(_connections.remove(obj));
+    final result = _connections.remove(obj);
+    scheduleMicrotask(() {
+      obj.closeBinding();
+    });
+    assert(result);
   }
 
   int _validateFlags(int flags) {
@@ -259,9 +276,9 @@ class _DirConnection extends Directory {
   bool isNodeRef = false;
 
   // reference to current Directory object;
-  PseudoDir _dir;
-  int _mode;
-  int _flags;
+  final PseudoDir _dir;
+  final int _mode;
+  final int _flags;
 
   /// Position in directory where [#readDirents] should start searching. If less
   /// than 0, means first entry should be dot('.').
@@ -331,7 +348,9 @@ class _DirConnection extends Directory {
     if (_isClosed) {
       return ZX.OK;
     }
-    _dir._onClose(this);
+    scheduleMicrotask(() {
+      _dir._onClose(this);
+    });
     _isClosed = true;
 
     return ZX.OK;

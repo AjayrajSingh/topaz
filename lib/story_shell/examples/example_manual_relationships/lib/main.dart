@@ -4,8 +4,8 @@
 
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart' hide Intent;
+import 'package:flutter/widgets.dart' hide Intent;
 import 'package:fidl_fuchsia_modular/fidl_async.dart';
 import 'package:fuchsia_logger/logger.dart';
 import 'package:fuchsia_modular/module.dart' as mod;

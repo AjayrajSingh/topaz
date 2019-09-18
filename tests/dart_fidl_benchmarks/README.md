@@ -7,8 +7,8 @@ So far it contains benchmarks for:
  - string encoding and decoding, both ASCII and Unicode
 
 You can include this in your build by including the target:
-`//topaz/packages/tests:dart_fidl_benchmarks`.  If you use `fx` that means
-passing `--with //topaz/packages/tests:dart_fidl_benchmarks` to `fx set`.
+`//topaz/tests/dart_fidl_benchmarks`.  If you use `fx` that means
+passing `--with //topaz/tests/dart_fidl_benchmarks` to `fx set`.
 
 You can run the benchmarks by invoking:
 ```

@@ -6,18 +6,17 @@ import 'dart:math' show min;
 import 'dart:typed_data';
 
 import 'package:fuchsia_vfs/vfs.dart';
+import 'package:zircon/zircon.dart';
 
 import 'block.dart';
 import 'heap.dart';
+import 'little_big_slab.dart';
 import 'util.dart';
 import 'vmo_fields.dart';
 import 'vmo_holder.dart';
 
 /// Index 0 will never be allocated, so it's the designated 'invalid' value.
 const int invalidIndex = 0;
-
-/// Name of the root node.
-const String rootName = 'root';
 
 /// An Inspect-format VMO with accessors.
 ///
@@ -41,20 +40,27 @@ class VmoWriter {
   Block _headerBlock;
 
   /// Constructor.
-  VmoWriter(this._vmo) {
+  VmoWriter(this._vmo, Function heapFactory) {
     _vmo.beginWork();
     _headerBlock = Block.create(_vmo, headerIndex)..becomeHeader();
-    Block.create(_vmo, rootNodeIndex).becomeRoot();
-    Block.create(_vmo, rootNameIndex).becomeName(rootName);
-    _heap = Heap(_vmo);
+    _heap = heapFactory(_vmo);
     _vmo.commit();
   }
 
   /// Creates a [VmoWriter] with a VMO of size [size].
-  factory VmoWriter.withSize(int size) => VmoWriter(VmoHolder(size));
+  factory VmoWriter.withSize(int size) => VmoWriter.withVmo(VmoHolder(size));
 
-  /// Gets the top Node of the Inspect tree (always at index 1).
-  int get rootNode => rootNodeIndex;
+  /// Function used for creating the heap by default.
+  static const Function _heapCreate = LittleBigSlab.create;
+
+  /// Creates a [VmoWriter] with a given VMO.
+  factory VmoWriter.withVmo(VmoHolder vmo) => VmoWriter(vmo, _heapCreate);
+
+  /// Gets the top Node of the Inspect tree (always set to index 0, which is the header).
+  int get rootNode => 0;
+
+  /// The underlying VMO
+  Vmo get vmo => _vmo.vmo;
 
   /// The read-only node of the VMO.
   VmoFile get vmoNode =>
@@ -198,18 +204,21 @@ class VmoWriter {
 
   // Creates a new *_VALUE node inside the tree.
   Block _createValue(int parent, String name) {
-    var block = _heap.allocateBlock();
+    var block = _heap.allocateBlock(32);
     if (block == null) {
       return null;
     }
-    var nameBlock = _heap.allocateBlock();
+    var nameBlock = _heap.allocateBlock(name.length, required: true);
     if (nameBlock == null) {
       _heap.freeBlock(block);
       return null;
     }
     nameBlock.becomeName(name);
     block.becomeValue(parentIndex: parent, nameIndex: nameBlock.index);
-    Block.read(_vmo, parent).childCount += 1;
+    if (parent != 0) {
+      // Only increment child count if the parent is not the special header block.
+      Block.read(_vmo, parent).childCount += 1;
+    }
     return block;
   }
 
@@ -266,7 +275,7 @@ class VmoWriter {
     int nextIndex = invalidIndex;
     int sizeRemaining = size;
     while (sizeRemaining > 0) {
-      var extent = _heap.allocateBlock();
+      var extent = _heap.allocateBlock(sizeRemaining);
       if (extent == null) {
         _freeExtents(nextIndex);
         return 0;
@@ -303,6 +312,11 @@ class VmoWriter {
   // If the parent is a TOMBSTONE and has no children then free it.
   // TOMBSTONES have no parent, so there's no recursion.
   void _unparent(Block value) {
+    if (value.parentIndex == 0) {
+      // Never delete the header node.
+      return;
+    }
+
     var parent = Block.read(_vmo, value.parentIndex);
     if (--parent.childCount == 0 && parent.type == BlockType.tombstone) {
       _heap.freeBlock(parent);

@@ -11,20 +11,20 @@ To add the example (with the Flutter Driver Extensions enabled for driving the
 mod), run the following:
 
 ```
-$ fx set [x64|arm64] --available topaz/bundles/buildbot
+$ fx set core.[chromebook-][x64|arm64] --with //topaz/examples/test/driver_example_mod:driver_example_mod_tests --with //topaz/bundles:buildbot
 ```
 
 This will include the package and its dependencies with the topaz build when
 you run
 
 ```
-$ fx full-build
+$ fx build
+$ fx serve
 ```
 
 ## Testing
 
-You can run these tests using the following command (so long as you've included
-`//topaz/packages/examples/tests` as one of the packages for your build):
+You can then run these tests using the following command:
 
 ```
 $ fx run-test driver_example_mod_tests

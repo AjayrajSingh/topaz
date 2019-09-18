@@ -46,9 +46,9 @@ class _OnWaitCompleteClosure {  // ignore: unused_element
   @pragma('vm:entry-point')
   _OnWaitCompleteClosure(this._callback, this._arg1, this._arg2);
 
-  Function _callback;
-  Object _arg1;
-  Object _arg2;
+  final Function _callback;
+  final Object _arg1;
+  final Object _arg2;
 
   @pragma('vm:entry-point')
   Function get _closure => () => _callback(_arg1, _arg2); // ignore: unused_element

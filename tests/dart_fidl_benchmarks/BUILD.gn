@@ -22,16 +22,22 @@ dart_app("dart_fidl_benchmarks") {
   ]
 
   deps = [
+    ":benchmark_fidl",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia",
-    ":benchmark_fidl",
   ]
 }
 
 fidl("benchmark_fidl") {
+  # TODO(fxb/35879): Remove lint exclusions by fixing known FIDL lint violations in this target
+  excluded_checks = [
+    "string-bounds-not-specified",
+    "too-many-nested-libraries",
+  ]
+
   name = "fidl.test.dart.benchmark"
 
   sources = [
-    "fidl/benchmark.test.fidl"
+    "fidl/benchmark.test.fidl",
   ]
 }

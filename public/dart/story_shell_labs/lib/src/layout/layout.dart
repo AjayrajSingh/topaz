@@ -15,7 +15,7 @@ typedef FocusChangeCallback = void Function(String, bool);
 
 /// The layout strategy manages a model of the layout that is shared with the
 /// Presenter through the LayoutModel.
-abstract class Layout<T> {
+abstract class Layout {
   /// Called when a surface is removed
   RemoveSurfaceCallback removeSurface;
 

@@ -6,6 +6,7 @@
 #define TOPAZ_EXAMPLES_UI_NOODLES_NOODLES_VIEW_H_
 
 #include <fuchsia/images/cpp/fidl.h>
+
 #include "examples/ui/lib/skia_view.h"
 #include "src/lib/fxl/macros.h"
 

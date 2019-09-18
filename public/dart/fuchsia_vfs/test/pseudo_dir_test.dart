@@ -41,6 +41,61 @@ void main() {
       expect(dir.lookup(key1), node1);
     });
 
+    test('legal name', () {
+      PseudoDir dir = PseudoDir();
+      const maxObjectNameLength = 255;
+      StringBuffer specialsNonPrintablesBuilder = StringBuffer();
+      // null character is illegal, start at one
+      for (var char = 1; char < maxObjectNameLength; char++) {
+        if (char != 47 /* key seperator */) {
+          specialsNonPrintablesBuilder.writeCharCode(char);
+        }
+      }
+      var legalKeys = <String>[
+        'k',
+        'key',
+        'longer_key',
+        // dart linter prefers interpolation over cat
+        'just_shy_of_max_key${'_' * 236}',
+        '.prefix_is_independently_illegal',
+        '..prefix_is_independently_illegal',
+        'suffix_is_independetly_illegal.',
+        'suffix_is_independetly_illegal..',
+        'infix_is_._independetly_illegal',
+        'infix_is_.._independetly_illegal',
+        '...',
+        '....',
+        'space is legal',
+        'which\tmakes\tme\tuncomfortable',
+        'very\nuncomfortable',
+        'numbers_0123456789',
+        specialsNonPrintablesBuilder.toString(),
+      ];
+      for (var key in legalKeys) {
+        var node = _TestVnode();
+        expect(dir.addNode(key, node), ZX.OK);
+        expect(dir.lookup(key), node);
+      }
+    });
+
+    test('illegal name', () {
+      PseudoDir dir = PseudoDir();
+      var illegalKeys = <String>[
+        '',
+        'illegal_length_key${'_' * 238}',
+        '.',
+        '..',
+        '\u{00}',
+        'null_\u{00}_character',
+        '/',
+        'key_/_seperator',
+      ];
+      var node = _TestVnode();
+      for (var key in illegalKeys) {
+        expect(dir.addNode(key, node), ZX.ERR_INVALID_ARGS);
+      }
+    });
+
     test('duplicate key', () {
       PseudoDir dir = PseudoDir();
       var key = 'key';
@@ -747,20 +802,32 @@ void main() {
         }
       });
 
-      test('open fails for empty path', () async {
+      test('open fails for illegal path', () async {
         PseudoDir dir = _setUpDir();
 
         var proxy = _getProxyForDir(dir);
-        var newProxy = DirectoryProxy();
-        await proxy.open(openRightReadable | openFlagDescribe, 0, '',
-            InterfaceRequest(newProxy.ctrl.request().passChannel()));
+        var paths = <String>[
+          '',
+          'too_long_path${'_' * 242}',
+          'subDir/too_long_path${'_' * 242}',
+          '..',
+          'subDir/..',
+          'invalid_\u{00}_name',
+          'subDir/invalid_\u{00}_name',
+          'invalid_\u{00}_name/legal_name',
+        ];
+        for (var path in paths) {
+          DirectoryProxy newProxy = DirectoryProxy();
+          await proxy.open(openRightReadable | openFlagDescribe, 0, path,
+              InterfaceRequest(newProxy.ctrl.request().passChannel()));
 
-        await newProxy.onOpen.first.then((response) {
-          expect(response.s, isNot(ZX.OK));
-          expect(response.info, isNull);
-        }).catchError((err) async {
-          fail(err.toString());
-        });
+          await newProxy.onOpen.first.then((response) {
+            expect(response.s, isNot(ZX.OK));
+            expect(response.info, isNull);
+          }).catchError((err) async {
+            fail(err.toString());
+          });
+        }
       });
 
       test('open file fails for path ending with "/"', () async {
@@ -1073,7 +1140,7 @@ class _Dirent {
 }
 
 class _TestVnode extends Vnode {
-  String _val;
+  final String _val;
   _TestVnode([this._val = '']);
 
   @override

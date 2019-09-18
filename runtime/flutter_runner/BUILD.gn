@@ -7,8 +7,6 @@ assert(is_fuchsia)
 import("//build/package.gni")
 import("//build/test/test_package.gni")
 import("//build/testing/environments.gni")
-import("//build/vulkan/config.gni")
-import("//garnet/bin/ui/scenic/config.gni")
 import("//topaz/runtime/dart/dart_component.gni")
 import("//topaz/runtime/flutter_runner/prebuilt_framework.gni")
 import("$flutter_root/shell/gpu/gpu.gni")
@@ -17,6 +15,7 @@ shell_gpu_configuration("fuchsia_gpu_configuration") {
   enable_software = false
   enable_gl = false
   enable_vulkan = true
+  enable_metal = false
 }
 
 # Dependencies for flutter tooling
@@ -61,12 +60,12 @@ template("flutter_runner") {
     libs = []
 
     sources = [
+      "accessibility_bridge.cc",
+      "accessibility_bridge.h",
       "component.cc",
       "component.h",
       "compositor_context.cc",
       "compositor_context.h",
-      "context_writer_bridge.cc",
-      "context_writer_bridge.h",
       "engine.cc",
       "engine.h",
       "fuchsia_font_manager.cc",
@@ -124,8 +123,8 @@ template("flutter_runner") {
     ]
 
     deps = [
-             "//garnet/public/lib/vulkan",
              "//sdk/fidl/fuchsia.accessibility",
+             "//sdk/fidl/fuchsia.accessibility.semantics",
              "//sdk/fidl/fuchsia.fonts",
              "//sdk/fidl/fuchsia.modular",
              "//sdk/fidl/fuchsia.ui.app",
@@ -145,21 +144,19 @@ template("flutter_runner") {
              "//topaz/runtime/dart/utils:files",
              "//topaz/runtime/dart/utils:inlines",
              "//topaz/runtime/dart/utils:vmo",
-             "//zircon/public/fidl/fuchsia-io",
+             "//zircon/system/fidl/fuchsia-io",
              "//zircon/public/lib/async-cpp",
+             "//zircon/public/lib/async-default",
              "//zircon/public/lib/async-loop-cpp",
              "//zircon/public/lib/syslog",
              "//zircon/public/lib/trace",
-             "//zircon/public/lib/trace-provider",
+             "//zircon/public/lib/trace-provider-with-fdio",
              "//zircon/public/lib/zx",
            ] + extra_deps + flutter_deps
 
     # The flags below are needed so that Dart's CPU profiler can walk the
     # C++ stack.
-    cflags = [
-      "-mno-omit-leaf-frame-pointer",
-      "-fno-omit-frame-pointer",
-    ]
+    cflags = [ "-fno-omit-frame-pointer" ]
 
     if (!invoker.product) {
       # This flag is needed so that the call to dladdr() in Dart's native symbol
@@ -434,22 +431,47 @@ executable("flutter_runner_unittests") {
   output_name = "flutter_runner_tests"
 
   sources = [
+    "accessibility_bridge.cc",
+    "accessibility_bridge.h",
+    "accessibility_bridge_unittest.cc",
+    "flutter_runner_fakes.h",
     "fuchsia_font_manager.cc",
     "fuchsia_font_manager.h",
     "fuchsia_font_manager_unittest.cc",
     "logging.h",
+    "platform_view.cc",
+    "platform_view.h",
+    "platform_view_unittest.cc",
+    "surface.cc",
+    "surface.h",
+    "vsync_recorder.cc",
+    "vsync_recorder.h",
+    "vsync_waiter.cc",
+    "vsync_waiter.h",
   ]
 
   deps = [
+    "$flutter_root/lib/ui",
+    "$flutter_root/shell/common",
     "//garnet/public/lib/gtest",
+    "//sdk/fidl/fuchsia.accessibility",
+    "//sdk/fidl/fuchsia.accessibility.semantics",
     "//sdk/fidl/fuchsia.fonts",
+    "//sdk/fidl/fuchsia.modular",
     "//sdk/fidl/fuchsia.sys",
+    "//sdk/fidl/fuchsia.ui.scenic",
     "//sdk/lib/sys/cpp",
+    "//sdk/lib/sys/cpp/testing:unit",
+    "//sdk/lib/ui/scenic/cpp",
+    "//third_party/dart/runtime:libdart_jit",
+    "//third_party/dart/runtime/platform:libdart_platform_jit",
     "//third_party/googletest:gtest_main",
     "//third_party/icu",
+    "//third_party/rapidjson",
     "//third_party/skia",
     "//topaz/runtime/dart/utils:inlines",
     "//topaz/runtime/dart/utils:vmo",
+    "//topaz/runtime/flutter_runner:jit",
     "//zircon/public/lib/fdio",
     "//zircon/public/lib/trace",
     "//zircon/public/lib/zx",
@@ -483,7 +505,7 @@ test_package("flutter_runner_tests") {
   foreach(font, fonts) {
     resources += [
       {
-        path = rebase_path("//garnet/bin/fonts/third_party/${font}")
+        path = rebase_path("//prebuilt/third_party/fonts/${font}")
         file_name = get_path_info(font, "file")
         dest = "testdata/test_fonts/${file_name}"
       },

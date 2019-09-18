@@ -118,8 +118,7 @@ abstract class AsyncBinding<T> extends _Stateful {
   /// The `impl` parameter must not be null.
   InterfaceHandle<T> wrap(T impl) {
     if (!isUnbound) {
-      throw FidlStateException(
-          "AsyncBinding<${$interfaceName}> isn't unbound");
+      throw FidlStateException("AsyncBinding<${$interfaceName}> isn't unbound");
     }
     ChannelPair pair = ChannelPair();
     if (pair.status != ZX.OK) {
@@ -143,10 +142,16 @@ abstract class AsyncBinding<T> extends _Stateful {
   ///
   /// The `impl` and `interfaceRequest` parameters must not be `null`. The
   /// `channel` property of the given `interfaceRequest` must not be `null`.
-  void bind(T impl, InterfaceRequest<T> interfaceRequest) {
+  ///
+  /// Implementation note: in a generic context, the inferred type when creating
+  /// the `interfaceRequest` may be a super-class of `T`, possibly `Service`.
+  /// Since concrete classes of `AsyncBinding` are code generated, the type
+  /// parameter `T` will always be precise, even when used in a generic context.
+  /// As a result, we cannot type-bound `interfaceRequest` statically, and
+  /// should instead rely on dynamic behavior.
+  void bind(T impl, InterfaceRequest<dynamic> interfaceRequest) {
     if (!isUnbound) {
-      throw FidlStateException(
-          "AsyncBinding<${$interfaceName}> isn't unbound");
+      throw FidlStateException("AsyncBinding<${$interfaceName}> isn't unbound");
     }
     if (impl == null) {
       throw FidlError(
@@ -178,11 +183,9 @@ abstract class AsyncBinding<T> extends _Stateful {
   /// The object must have previously been bound (e.g., using [bind]).
   InterfaceRequest<T> unbind() {
     if (!isBound) {
-      throw FidlStateException(
-          "AsyncBinding<${$interfaceName}> isn't bound");
+      throw FidlStateException("AsyncBinding<${$interfaceName}> isn't bound");
     }
-    final InterfaceRequest<T> result =
-        InterfaceRequest<T>(_reader.unbind());
+    final InterfaceRequest<T> result = InterfaceRequest<T>(_reader.unbind());
     _impl = null;
 
     state = InterfaceState.closed;
@@ -402,19 +405,23 @@ class AsyncProxyController<T> extends _Stateful {
   ///
   /// The proxy must have previously been bound (e.g., using [bind]).
   void close() {
+    _close(null);
+  }
+
+  void _close(FidlError error) {
     if (isBound) {
       _reader.close();
       state = InterfaceState.closed;
       _completerMap.forEach((_, Completer<dynamic> completer) =>
-          completer.completeError(FidlStateException(
-              'AsyncProxyController<${$interfaceName}> is closed.')));
+          completer.completeError(FidlStateException(error != null
+              ? 'AsyncProxyController<${$interfaceName}> is closed with error: ${error.message}'
+              : 'AsyncProxyController<${$interfaceName}> is closed.')));
     }
   }
 
-  /// Log an [error] message and close the channel.
+  ///  close the channel and forwards error to any open completers.
   void proxyError(FidlError error) {
-    print('AsyncProxyController<${$interfaceName}> error: ${error.message}');
-    close();
+    _close(error);
   }
 
   /// Called whenever this object receives a response on a bound channel.

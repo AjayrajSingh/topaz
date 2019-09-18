@@ -109,13 +109,4 @@ void main() {
     expect(moduleImpl.embedModule(name: 'testMod', intent: _emptyIntent),
         throwsA(const TypeMatcher<ModuleStateException>()));
   });
-
-  test('startOngoingActivity should return a valid OngoingActivity', () {
-    final moduleImpl = ModuleImpl(
-        intentHandlerImpl: handlerImpl, moduleContext: MockModuleContext());
-
-    expect(
-        moduleImpl.startOngoingActivity(fidl.OngoingActivityType.unspecified),
-        isNotNull);
-  });
 }

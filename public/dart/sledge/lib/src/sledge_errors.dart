@@ -4,7 +4,7 @@
 
 /// Error thrown due to a bug in Sledge's implementation.
 class InternalSledgeError extends Error {
-  String _message;
+  final String _message;
 
   /// Default constructor.
   InternalSledgeError(this._message);

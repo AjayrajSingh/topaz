@@ -29,6 +29,8 @@ import "package:path/path.dart" as path;
 
 Future<void> main(List<String> args) async {
   final parser = new ArgParser();
+  parser.addOption("build-id-dir", help: "Path to .build-id directory");
+  parser.addOption("build-id-script", help: "Path to get_build_id.py script");
   parser.addOption("nm", help: "Path to `nm` tool");
   parser.addOption("binary",
       help: "Path to the ELF file to extract symbols from");
@@ -40,19 +42,41 @@ Options:
 ${parser.usage};
 """;
 
+  String buildIdDir;
+  String buildIdScript;
   String nm;
   String binary;
   String output;
 
   try {
     final options = parser.parse(args);
+    buildIdDir = options["build-id-dir"];
+    if (buildIdDir == null) {
+      throw "Must specify --build-id-dir";
+    }
+    if (!FileSystemEntity.isDirectorySync(buildIdDir)) {
+      throw "Cannot find $buildIdDir";
+    }
+    buildIdScript = options["build-id-script"];
+    if (buildIdScript == null) {
+      throw "Must specify --build-id-script";
+    }
+    if (!FileSystemEntity.isFileSync(buildIdScript)) {
+      throw "Cannot find $buildIdScript";
+    }
     nm = options["nm"];
     if (nm == null) {
       throw "Must specify --nm";
     }
+    if (!FileSystemEntity.isFileSync(nm)) {
+      throw "Cannot find $nm";
+    }
     binary = options["binary"];
     if (binary == null) {
       throw "Must specify --binary";
+    }
+    if (!FileSystemEntity.isFileSync(binary)) {
+      throw "Cannot find $binary";
     }
     output = options["output"];
     if (output == null) {
@@ -65,7 +89,7 @@ ${parser.usage};
     return;
   }
 
-  await run(nm, binary, output);
+  await run(buildIdDir, buildIdScript, nm, binary, output);
 }
 
 class Symbol {
@@ -74,12 +98,18 @@ class Symbol {
   String name;
 }
 
-Future<void> run(String nm, String binary, String output) async {
-  var unstrippedFile = findUnstrippedFile(binary);
-  if (unstrippedFile == null) {
+Future<void> run(String buildIdDir, String buildIdScript, String nm,
+    String binary, String output) async {
+  final buildIdResult =
+      await Process.run(buildIdScript, ["--build-id", binary]);
+  final buildId = buildIdResult.stdout.trim();
+
+  var unstrippedFile = path.join(
+      buildIdDir, buildId.substring(0, 2), buildId.substring(2) + ".debug");
+  if (!FileSystemEntity.isFileSync(unstrippedFile)) {
     throw "Cannot find unstripped file for: $binary";
   }
-  final args = ["--demangle", "--numeric-sort", "--print-size", binary];
+  final args = ["--demangle", "--numeric-sort", "--print-size", unstrippedFile];
   final result = await Process.run(nm, args);
   if (result.exitCode != 0) {
     print(result.stdout);
@@ -110,6 +140,10 @@ Future<void> run(String nm, String binary, String output) async {
     symbols.add(symbol);
   }
 
+  if (symbols.isEmpty) {
+    throw "$unstrippedFile has no symbols";
+  }
+
   var nameTable = new BytesBuilder();
   var binarySearchTable = new Uint32List(symbols.length * 3 + 1);
   var binarySearchTableIndex = 0;
@@ -130,44 +164,4 @@ Future<void> run(String nm, String binary, String output) async {
   sink.add(binarySearchTable.buffer.asUint8List());
   sink.add(nameTable.takeBytes());
   await sink.close();
-}
-
-String findUnstrippedFile(String filename) {
-  var file = new File(filename);
-  var dirname = path.dirname(filename);
-  var basename = path.basename(filename);
-  var subdir = basename.endsWith(".so") || basename.contains(".so.")
-      ? "lib.unstripped"
-      : "exe.unstripped";
-
-  // Check the subdirectory with unstripped files.
-  var debugfile = path.join(dirname, subdir, basename);
-  if (new File(debugfile).existsSync()) {
-    return debugfile;
-  }
-
-  // Next look through variant subdirectories.
-  var contents = new Directory(dirname).listSync();
-  for (var fileOrDir in contents) {
-    if (fileOrDir is Directory) {
-      var contents = fileOrDir.listSync();
-      for (var fileOrDir in contents) {
-        if (fileOrDir is File) {
-          // Check if it's the same file (variant linked to out directory).
-          if (FileSystemEntity.identicalSync(file.path, fileOrDir.path)) {
-            var basename = path.basename(fileOrDir.path);
-            var dirname = path.dirname(fileOrDir.path);
-
-            // Check the subdirectory with unstripped files.
-            var debugfile = path.join(dirname, subdir, basename);
-            if (new File(debugfile).existsSync()) {
-              return debugfile;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  return null;
 }

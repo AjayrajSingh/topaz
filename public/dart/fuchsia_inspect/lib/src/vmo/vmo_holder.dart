@@ -12,6 +12,11 @@ class VmoHolder {
   final int size;
   Vmo _vmo;
 
+  /// Dart currently requires a syscall to write to a VMO, but provides a way
+  /// to map it read-only. [_shadow] will hold that map to avoid syscall
+  /// overhead on reads.
+  Uint8List _shadow;
+
   /// Creates and holds a VMO of desired size.
   VmoHolder(this.size) {
     HandleResult result = System.vmoCreate(size);
@@ -19,6 +24,7 @@ class VmoHolder {
       throw ZxStatusException(result.status, getStringForStatus(result.status));
     }
     _vmo = Vmo(result.handle);
+    _shadow = _vmo.map();
   }
 
   /// The raw VMO
@@ -41,13 +47,8 @@ class VmoHolder {
   }
 
   /// Reads data from VMO at byte offset (not index).
-  ByteData read(int offset, int size) {
-    ReadResult result = _vmo.read(size, offset);
-    if (result.status != ZX.OK) {
-      throw ZxStatusException(result.status, getStringForStatus(result.status));
-    }
-    return result.bytes;
-  }
+  ByteData read(int offset, int size) =>
+      ByteData.view(_shadow.buffer, offset, size);
 
   /// Writes int64 to VMO.
   ///

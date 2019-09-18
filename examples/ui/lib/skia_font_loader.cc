@@ -16,16 +16,17 @@ SkiaFontLoader::SkiaFontLoader(fuchsia::fonts::ProviderPtr font_provider)
 
 SkiaFontLoader::~SkiaFontLoader() {}
 
-void SkiaFontLoader::LoadFont(fuchsia::fonts::Request request,
+void SkiaFontLoader::LoadFont(fuchsia::fonts::TypefaceRequest request,
                               FontCallback callback) {
   // TODO(jeffbrown): Handle errors in case the font provider itself dies.
-  font_provider_->GetFont(
-      std::move(request), [this, callback = std::move(callback)](
-                              fuchsia::fonts::ResponsePtr response) {
-        if (response) {
+  font_provider_->GetTypeface(
+      std::move(request), [callback = std::move(callback)](
+                              fuchsia::fonts::TypefaceResponse response) {
+        if (!response.IsEmpty()) {
+          fuchsia::mem::Buffer buffer{};
+          response.buffer().Clone(&buffer);
           fsl::SizedVmo vmo;
-          if (!fsl::SizedVmo::FromTransport(std::move(response->buffer),
-                                            &vmo)) {
+          if (!fsl::SizedVmo::FromTransport(std::move(buffer), &vmo)) {
             callback(nullptr);
             return;
           }
@@ -41,8 +42,9 @@ void SkiaFontLoader::LoadFont(fuchsia::fonts::Request request,
 }
 
 void SkiaFontLoader::LoadDefaultFont(FontCallback callback) {
-  fuchsia::fonts::Request request;
-  request.family = "Roboto";
+  fuchsia::fonts::TypefaceRequest request{};
+  request.set_query(std::move(fuchsia::fonts::TypefaceQuery{}.set_family(
+      fuchsia::fonts::FamilyName{.name = "Roboto"})));
   LoadFont(std::move(request), std::move(callback));
 }
 

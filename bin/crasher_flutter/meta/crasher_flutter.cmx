@@ -5,7 +5,6 @@
     "sandbox": {
         "services": [
             "fuchsia.modular.Clipboard",
-            "fuchsia.modular.ContextWriter",
             "fuchsia.sys.Environment",
             "fuchsia.fonts.Provider",
             "fuchsia.ui.input.ImeService",

@@ -7,6 +7,7 @@ library topaz.public.dart.fuchsia_inspect.inspect.inspect;
 import 'dart:typed_data';
 
 import 'package:fuchsia_services/services.dart';
+import 'package:fuchsia_vfs/vfs.dart';
 import 'package:meta/meta.dart';
 
 import '../vmo/vmo_writer.dart';
@@ -14,6 +15,8 @@ import 'internal/_inspect_impl.dart';
 
 part 'node.dart';
 part 'property.dart';
+
+typedef OnDemandRootFn = Function(Node);
 
 /// Unless reconfigured, the VMO will be this size.
 /// @nodoc
@@ -25,10 +28,6 @@ class InspectStateError extends StateError {
   /// Constructor
   InspectStateError(String message) : super(message);
 }
-
-// TODO(cphoenix): In the integration test (when one is written)
-// verify that Inspect() returns the same object on each call.
-// (It can't be tested in host unit tests.)
 
 /// [Inspect] exposes a structured tree of internal component state.
 ///
@@ -42,14 +41,65 @@ abstract class Inspect {
   static int vmoSize = defaultVmoSizeBytes;
   static InspectImpl _singleton;
 
-  /// Returns a singleton [Inspect] instance for this program.
+  /// Maps an inspect instance name to the number of instantiations
+  /// of that inspector. Used to deduplicate requests for
+  /// similarly named inspectors.
+  static Map<String, int> nameToInstanceCount;
+
+  /// Returns a singleton [Inspect] instance at root.inspect
   factory Inspect() {
     if (_singleton == null) {
       var context = StartupContext.fromStartupInfo();
       var writer = VmoWriter.withSize(vmoSize);
-      _singleton = InspectImpl(context, writer);
+      _singleton =
+          InspectImpl(context.outgoing.debugDir(), 'root.inspect', writer);
     }
     return _singleton;
+  }
+
+  /// Returns a new [Inspect] object at <name>.inspect
+  /// If called multiple times with the same name within a process, a unique
+  /// number will be appended, though any existing file will be overwritten.
+  ///
+  /// Example:
+  /// Inspect.named('test');
+  /// Inspect.named('test');
+  /// Results in "test.inspect" and "test_2.inspect"
+  factory Inspect.named(String name) {
+    var context = StartupContext.fromStartupInfo();
+    var writer = VmoWriter.withSize(vmoSize);
+    var fileName = _nextInstanceWithName(name);
+    return InspectImpl(context.outgoing.debugDir(), fileName, writer);
+  }
+
+  /// Mounts an [Inspect] file at <name>.inspect whose contents are
+  /// dynamically created by rootNodeCallback on each read.
+  ///
+  /// If methods on this class are called multiple times with the same
+  /// name, a unique number will be appended to the name.
+  static void onDemand(String name, OnDemandRootFn rootNodeCallback) {
+    var context = StartupContext.fromStartupInfo();
+    var directory = context.outgoing.debugDir();
+    var fileName = _nextInstanceWithName(name);
+    var pseudoVmoNode = PseudoVmoFile.readOnly(() {
+      var writer = VmoWriter.withSize(vmoSize);
+      rootNodeCallback(RootNode(writer));
+      return writer.vmo;
+    });
+
+    directory.addNode(fileName, pseudoVmoNode);
+  }
+
+  static String _nextInstanceWithName(String name) {
+    nameToInstanceCount ??= <String, int>{};
+    if (nameToInstanceCount.containsKey(name)) {
+      int val = nameToInstanceCount[name] + 1;
+      nameToInstanceCount[name] = val;
+      return '${name}_$val.inspect';
+    } else {
+      nameToInstanceCount[name] = 1;
+      return '$name.inspect';
+    }
   }
 
   /// Optionally configure global settings for inspection.
@@ -63,13 +113,10 @@ abstract class Inspect {
   /// Throws [InspectStateError] if called after Inspect(), or [ArgumentError]
   /// if called with an invalid vmoSizeBytes.
   static void configure({int vmoSizeBytes}) {
-// TODO(cphoenix): In integration, test that we throw if called after
-// the factory is run.
     if (_singleton != null) {
       throw InspectStateError(
           'configureInspect cannot be called after factory runs');
     }
-// TODO(cphoenix): In integration, test that the VMO is the specified size.
     if (vmoSizeBytes != null) {
       if (vmoSizeBytes < 64) {
         throw ArgumentError('VMO size must be at least 64 bytes.');

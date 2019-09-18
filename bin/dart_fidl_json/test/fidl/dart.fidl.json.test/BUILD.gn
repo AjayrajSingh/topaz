@@ -5,6 +5,15 @@
 import("//build/fidl/fidl.gni")
 
 fidl("dart.fidl.json.test") {
+  # TODO(fxb/35879): Remove lint exclusions by fixing known FIDL lint violations in this target
+  excluded_checks = [
+    "invalid-case-for-constant",
+    "invalid-copyright-for-platform-source-library",
+    "string-bounds-not-specified",
+    "too-many-nested-libraries",
+    "vector-bounds-not-specified",
+  ]
+
   name = "test.dart.fidl.json"
   sources = [
     "types.test.fidl",

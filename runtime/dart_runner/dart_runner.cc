@@ -12,6 +12,7 @@
 #include <trace/event.h>
 #include <zircon/status.h>
 #include <zircon/syscalls.h>
+
 #include <memory>
 #include <thread>
 #include <utility>
@@ -61,11 +62,11 @@ const char* kDartVMArgs[] = {
     // clang-format on
 };
 
-Dart_Isolate IsolateCreateCallback(const char* uri, const char* name,
-                                   const char* package_root,
-                                   const char* package_config,
-                                   Dart_IsolateFlags* flags,
-                                   void* callback_data, char** error) {
+Dart_Isolate IsolateGroupCreateCallback(const char* uri, const char* name,
+                                        const char* package_root,
+                                        const char* package_config,
+                                        Dart_IsolateFlags* flags,
+                                        void* callback_data, char** error) {
   if (std::string(uri) == DART_VM_SERVICE_ISOLATE_NAME) {
 #if defined(DART_PRODUCT)
     *error = strdup("The service isolate is not implemented in product mode");
@@ -79,7 +80,7 @@ Dart_Isolate IsolateCreateCallback(const char* uri, const char* name,
   return NULL;
 }
 
-void IsolateShutdownCallback(void* callback_data) {
+void IsolateShutdownCallback(void* isolate_group_data, void* isolate_data) {
   // The service isolate (and maybe later the kernel isolate) doesn't have an
   // async loop.
   auto dispatcher = async_get_default_dispatcher();
@@ -90,8 +91,8 @@ void IsolateShutdownCallback(void* callback_data) {
   }
 }
 
-void IsolateCleanupCallback(void* callback_data) {
-  delete static_cast<std::shared_ptr<tonic::DartState>*>(callback_data);
+void IsolateGroupCleanupCallback(void* isolate_group_data) {
+  delete static_cast<std::shared_ptr<tonic::DartState>*>(isolate_group_data);
 }
 
 void RunApplication(
@@ -140,8 +141,8 @@ DartRunner::DartRunner() : context_(sys::ComponentContext::Create()) {
 
   dart::bin::BootstrapDartIo();
 
-  char* error = Dart_SetVMFlags(dart_utils::ArraySize(kDartVMArgs),
-                                kDartVMArgs);
+  char* error =
+      Dart_SetVMFlags(dart_utils::ArraySize(kDartVMArgs), kDartVMArgs);
   if (error) {
     FX_LOGF(FATAL, LOG_TAG, "Dart_SetVMFlags failed: %s", error);
   }
@@ -164,9 +165,9 @@ DartRunner::DartRunner() : context_(sys::ComponentContext::Create()) {
   params.vm_snapshot_data = vm_snapshot_data_.address();
   params.vm_snapshot_instructions = vm_snapshot_instructions_.address();
 #endif
-  params.create = IsolateCreateCallback;
-  params.shutdown = IsolateShutdownCallback;
-  params.cleanup = IsolateCleanupCallback;
+  params.create_group = IsolateGroupCreateCallback;
+  params.shutdown_isolate = IsolateShutdownCallback;
+  params.cleanup_group = IsolateGroupCleanupCallback;
   params.entropy_source = EntropySource;
 #if !defined(DART_PRODUCT)
   params.get_service_assets = GetVMServiceAssetsArchiveCallback;
@@ -185,7 +186,14 @@ DartRunner::~DartRunner() {
 void DartRunner::StartComponent(
     fuchsia::sys::Package package, fuchsia::sys::StartupInfo startup_info,
     ::fidl::InterfaceRequest<fuchsia::sys::ComponentController> controller) {
-  TRACE_DURATION("dart", "StartComponent", "url", package.resolved_url);
+  // TRACE_DURATION currently requires that the string data does not change
+  // in the traced scope. Since |package| gets moved in the construction of
+  // |thread| below, we cannot ensure that |package.resolved_url| does not
+  // move or change, so we make a copy to pass to TRACE_DURATION.
+  // TODO(PT-169): Remove this copy when TRACE_DURATION reads string arguments
+  // eagerly.
+  std::string url_copy = package.resolved_url;
+  TRACE_DURATION("dart", "StartComponent", "url", url_copy);
   std::thread thread(RunApplication, this, std::move(package),
                      std::move(startup_info), context_->svc(),
                      std::move(controller));

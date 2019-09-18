@@ -21,8 +21,10 @@ class Outgoing {
   /// This class will throw an Exception if its methods are called
   /// after it is closed. Calling close twice doesn't cause exception.
   Outgoing() {
+    // TODO(CF-540): remove 'public' after transition is complete
     _root
       ..addNode('public', _public)
+      ..addNode('svc', _public)
       ..addNode('debug', _debug)
       ..addNode('ctrl', _ctrl);
   }

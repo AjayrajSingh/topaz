@@ -14,7 +14,7 @@ typedef MapCreator = Map<int, int> Function();
 
 /// Generic class, to test if [TestingMap] correctly implements Map API.
 class MapApiTester<TestingMap extends Map> {
-  MapCreator _mapCreator;
+  final MapCreator _mapCreator;
 
   MapApiTester(this._mapCreator);
 

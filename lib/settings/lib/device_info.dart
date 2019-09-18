@@ -5,6 +5,8 @@ import 'package:fuchsia_logger/logger.dart';
 import 'package:fuchsia_services/services.dart';
 import 'package:meta/meta.dart';
 
+// If a release build, will show the build tag. Otherwise defaults to last built date.
+const String _buildTagFilePath = '/config/build-info/version';
 const String _lastUpdateFilePath = '/config/build-info/latest-commit-date';
 const String _factoryResetKey = 'FactoryReset';
 
@@ -13,22 +15,25 @@ class DeviceInfo {
   DateTime _sourceTimeStamp;
   DateTime get sourceTimeStamp => _sourceTimeStamp;
 
+  /// Returns the build tag if available, or the date the source code was last updated.
+  static String get buildTag {
+    final File updateFile = File(_buildTagFilePath);
+
+    if (updateFile.existsSync()) {
+      return updateFile.readAsStringSync();
+    }
+    log.warning('Update file not present');
+    return null;
+  }
+
   /// Returns the date the source code was last updated.
-  static DateTime getSourceDate() {
+  static String get sourceDate {
     final File updateFile = File(_lastUpdateFilePath);
 
     if (updateFile.existsSync()) {
-      final String lastUpdate = updateFile.readAsStringSync();
-
-      try {
-        return DateTime.parse(lastUpdate.trim());
-      } on FormatException {
-        log.warning('Could not parse build timestamp!');
-      }
-    } else {
-      log.warning('Update file not present');
+      return updateFile.readAsStringSync();
     }
-
+    log.warning('Update file not present');
     return null;
   }
 

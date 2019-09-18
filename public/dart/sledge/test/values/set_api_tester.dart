@@ -15,7 +15,7 @@ typedef SetCreator = Set<int> Function();
 
 /// Generic class, to test if [TestingSet] correctly implements Set API.
 class SetApiTester<TestingSet extends Set> {
-  SetCreator _setCreator;
+  final SetCreator _setCreator;
 
   SetApiTester(this._setCreator);
 

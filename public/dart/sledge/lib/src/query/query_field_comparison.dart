@@ -26,8 +26,8 @@ enum ComparisonType {
 /// Holds the information necessary to compare to a Value:
 /// It holds a comparison type (<, <=, ==, >, >=), and a value (e.g. 42).
 class QueryFieldComparison {
-  FieldValue _comparisonValue;
-  ComparisonType _comparisonType;
+  final FieldValue _comparisonValue;
+  final ComparisonType _comparisonType;
 
   /// Default constructor.
   QueryFieldComparison(this._comparisonValue, this._comparisonType);

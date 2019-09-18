@@ -9,6 +9,7 @@ group("all") {
   public_deps = [
     "//topaz/tests/benchmarks:input_latency",
     "//topaz/tests/benchmarks:topaz_benchmarks",
+    "//topaz/tests/benchmarks/dart_inspect:dart_inspect_benchmarks",
   ]
 }
 

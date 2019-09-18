@@ -38,6 +38,9 @@ class FuchsiaLogWriter extends LogWriter {
     proxy.connect(socketPair.second).then((_) {
       _socket = socketPair.first;
       startListening(onMessage);
+    }).catchError((e) {
+      print('[WARN] Unable to get socket from system logger');
+      throw e;
     });
   }
 

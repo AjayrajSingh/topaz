@@ -24,7 +24,7 @@ class ChildViewConnection {
       ChildViewConnectionStateCallback onStateChanged})
       : assert(viewHolderToken?.value != null) {
     if (viewHolderToken.value.isValid) {
-      _sceneHost = SceneHost.fromViewHolderToken(
+      _sceneHost = SceneHost(
           viewHolderToken.value.passHandle(),
           (onAvailable == null)
               ? null

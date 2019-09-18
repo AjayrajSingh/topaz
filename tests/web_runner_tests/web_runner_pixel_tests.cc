@@ -15,6 +15,7 @@
 #include <lib/sys/cpp/component_context.h>
 #include <lib/sys/cpp/service_directory.h>
 #include <lib/ui/scenic/cpp/view_token_pair.h>
+#include <lib/zx/clock.h>
 #include <lib/zx/time.h>
 #include <src/lib/files/file.h>
 #include <src/lib/fxl/logging.h>

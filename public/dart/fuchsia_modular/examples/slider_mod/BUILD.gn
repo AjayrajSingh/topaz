@@ -21,7 +21,7 @@ flutter_app("slider_mod") {
     "src/blocs/bloc_provider.dart",
     "src/blocs/fibonacci_bloc.dart",
     "src/blocs/slider_bloc.dart",
-    "src/handlers/root_intent_handler.dart",
+    "src/widgets/app.dart",
     "src/widgets/launch_bar.dart",
     "src/widgets/slider_scaffold.dart",
     "src/widgets/value_slider.dart",
@@ -48,6 +48,8 @@ flutter_app("slider_mod") {
 # This can be run on the Fuchsia device using fx run-test. The slider mod must
 # be available on the machine.
 dart_fuchsia_test("slider_mod_tests") {
+  deprecated_shell = "//topaz"
+
   sources = [
     "slider_mod_widget_test.dart",
   ]
@@ -57,7 +59,8 @@ dart_fuchsia_test("slider_mod_tests") {
     "//sdk/fidl/fuchsia.sys",
     "//third_party/dart-pkg/git/flutter/packages/flutter_driver",
     "//third_party/dart-pkg/pub/test",
-    "//topaz/public/dart/fuchsia_services",
+    "//topaz/public/dart/fuchsia_modular_testing",
+    "//topaz/public/dart/zircon",
   ]
 
   meta = [

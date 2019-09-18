@@ -11,6 +11,10 @@ checks that HTTP links are valid and do not point to the same project (for which
 relative links should be preferred). Lastly, it identifies documents which are
 not connected to the rest of the documentation tree.
 
+The menu structure encoding in the _toc.yaml files is validated to make
+sure all files referenced exist as well as the general structure of the
+yaml.
+
 
 ## Usage
 

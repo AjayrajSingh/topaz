@@ -19,13 +19,6 @@ void AddGraphicsBenchmarks(benchmarking::BenchmarksRunner* benchmarks_runner) {
   constexpr char kImageGridFlutterX3Command[] =
       "present_view fuchsia-pkg://fuchsia.com/tile_view#meta/tile_view.cmx "
       "image_grid_flutter image_grid_flutter image_grid_flutter";
-  constexpr char kChoreographyCommand[] =
-      "basemgr --test --enable_presenter "
-      "--account_provider=dev_token_manager --base_shell=dev_base_shell "
-      "--base_shell_args=--test_timeout_ms=60000 "
-      "--session_shell=dev_session_shell "
-      "--session_shell_args=--root_module=choreography "
-      "--story_shell=mondrian";
 
   // clang-format off
   std::vector<Param> params = {
@@ -44,18 +37,11 @@ void AddGraphicsBenchmarks(benchmarking::BenchmarksRunner* benchmarks_runner) {
     {"fuchsia.scenic.image_grid_flutter_x3_noclipping_noshadows", kImageGridFlutterX3Command, {}, "--unshadowed --clipping_disabled",},
     {"fuchsia.scenic.image_grid_flutter_x3_noshadows", kImageGridFlutterX3Command, {}, "--unshadowed --clipping_enabled",},
     {"fuchsia.scenic.image_grid_flutter_x3_stencil_shadow_volume", kImageGridFlutterX3Command, {}, "--stencil_shadow_volume --clipping_enabled",},
-
-    //
-    // choreography
-    //
-    {"fuchsia.scenic.choreography_noclipping_noshadows", kChoreographyCommand, "dashboard", "--unshadowed --clipping_disabled",},
-    {"fuchsia.scenic.choreography_noshadows", kChoreographyCommand, "dashboard", "--unshadowed --clipping_enabled",},
-    {"fuchsia.scenic.choreography_stencil_shadow_volume", kChoreographyCommand, "dashboard", "--stencil_shadow_volume --clipping_enabled",},
   };
   // clang-format on
 
   for (const auto& param : params) {
-    std::string out_file = benchmarks_runner->MakeTempFile();
+    std::string out_file = benchmarks_runner->MakePerfResultsOutputFilename("scenic");
 
     // clang-format off
     std::vector<std::string> full_command = {

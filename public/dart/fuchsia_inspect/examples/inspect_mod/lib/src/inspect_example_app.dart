@@ -2,11 +2,21 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:developer' show Timeline;
+import 'dart:typed_data';
+
+import 'package:async/async.dart';
+import 'package:flutter/material.dart' hide Intent;
 import 'package:fuchsia_inspect/inspect.dart' as inspect;
+import 'package:fuchsia_logger/logger.dart';
 
 /// A Flutter app that demonstrates usage of the [Inspect] API.
 class InspectExampleApp extends StatelessWidget {
+  /// Call InspectExampleApp.stateBloc.updateValue('new state') to display and
+  /// key-publish 'new state'.
+  static final StateBloc stateBloc = StateBloc();
+
   static const _appColor = Colors.blue;
 
   final inspect.Node _inspectNode;
@@ -30,7 +40,48 @@ class InspectExampleApp extends StatelessWidget {
 
   /// Initializes the [Inspect] properties for this widget.
   void _initProperties() {
-    _inspectNode.stringProperty('app-color').setValue('$_appColor');
+    _inspectNode.stringProperty('greeting').setValue('Hello World');
+    _inspectNode.doubleProperty('double down')
+      ..setValue(1.23)
+      ..add(2);
+    _inspectNode.intProperty('interesting')
+      ..setValue(123)
+      ..subtract(5);
+    _inspectNode
+        .byteDataProperty('bytes')
+        .setValue(ByteData(4)..setUint32(0, 0x01020304));
+  }
+}
+
+/// The [StateBloc] provides actions and streams associated with
+/// the agent that displays state on-screen and exports state keys for test.
+class StateBloc {
+  final _valueController = StreamController<String>.broadcast();
+  String _lastKnownValue = 'Program has started';
+
+  Stream<String> get valueStream => _valueController.stream;
+  String get currentValue => _lastKnownValue;
+
+  void updateValue(String newState) {
+    _lastKnownValue = newState;
+    _valueController.add(newState);
+  }
+
+  void dispose() {
+    _valueController.close();
+  }
+}
+
+class _AnswerFinder {
+  static final _funnel = StreamController<int>();
+  static final _faucet = StreamQueue<int>(_funnel.stream);
+
+  Future<int> getTheAnswer() async {
+    return await _faucet.next;
+  }
+
+  void takeAHint(int n) async {
+    _funnel.add(n);
   }
 }
 
@@ -54,7 +105,15 @@ class _InspectHomePageState extends State<_InspectHomePage> {
     Colors.orange,
   ];
 
+  // Helpers to demo tree building and deletion
   final inspect.Node _inspectNode;
+  inspect.Node _subtree;
+  int _id = 0;
+
+  // Helpers to demo auto-deletion lifecycle
+  final _answerFinder = _AnswerFinder();
+  int _nextHint = 40;
+  String _answer = 'No answer requested yet';
 
   /// A property that tracks [_counter].
   final inspect.IntProperty _counterProperty;
@@ -80,8 +139,11 @@ class _InspectHomePageState extends State<_InspectHomePage> {
       // to the new value:
       //
       //     _counterProperty.setValue(_counter);
-      _counterProperty.add(1);
+      Timeline.timeSync('Inc counter', () {
+        _counterProperty.add(1);
+      });
     });
+    InspectExampleApp.stateBloc.updateValue('Counter was incremented');
   }
 
   void _decrementCounter() {
@@ -89,6 +151,7 @@ class _InspectHomePageState extends State<_InspectHomePage> {
       _counter--;
       _counterProperty.subtract(1);
     });
+    InspectExampleApp.stateBloc.updateValue('Counter was decremented');
   }
 
   /// Increments through the possible [_colors].
@@ -98,22 +161,77 @@ class _InspectHomePageState extends State<_InspectHomePage> {
     setState(() {
       _colorIndex++;
 
-      if (_colorIndex >= _colors.length) {
-        _colorIndex = 0;
-
-        // Contrived example of removing an Inspect property:
-        // Once we've looped through the colors once, delete the  to.
-        //
-        // A more realistic example would be if something were being removed
-        // from the UI, but this is intended to be super simple.
-        _backgroundProperty.delete();
-        // Setting _backgroundProperty to null is optional; it's fine to
-        // call setValue() on a deleted property - it will just have no effect.
-        _backgroundProperty = null;
-      }
+      _colorIndex %= _colors.length;
 
       _backgroundProperty?.setValue('$_backgroundColor');
     });
+    InspectExampleApp.stateBloc.updateValue('Color was changed');
+  }
+
+  void _makeTree() {
+    // Make a long tree name on purpose, to see how far we can push the naming.
+    _subtree = _inspectNode.child(
+        'I think that I shall never see01234567890123456789012345678901234567890')
+      ..intProperty('int$_id').setValue(_id++);
+    InspectExampleApp.stateBloc.updateValue('Tree was made');
+  }
+
+  void _addToTree() {
+    _subtree?.intProperty('int$_id')?.setValue(_id++);
+    InspectExampleApp.stateBloc.updateValue('Tree was grown');
+  }
+
+  void _deleteTree() {
+    _subtree?.delete();
+    InspectExampleApp.stateBloc.updateValue('Tree was deleted');
+  }
+
+  void _giveHint() {
+    _answerFinder.takeAHint(_nextHint++);
+    InspectExampleApp.stateBloc.updateValue('Gave a hint');
+  }
+
+  void _showAnswer() {
+    var answerFuture = _answerFinder.getTheAnswer();
+    var wait = _inspectNode.stringProperty('waiting')..setValue('for a hint');
+    answerFuture.whenComplete(wait.delete);
+    setState(() {
+      _answer = 'Waiting for answer';
+    });
+    InspectExampleApp.stateBloc.updateValue('Waiting for answer');
+    answerFuture.then((answer) {
+      setState(() {
+        _answer = 'Answer is: $answer';
+      });
+      InspectExampleApp.stateBloc.updateValue('Displayed answer');
+    }).catchError(
+      (e, s) {
+        log.info(' * * Hi2 from inspect_mod');
+        setState(() {
+          _answer = 'Something went wrong getting answer:\n$e\n$s';
+        });
+      },
+    );
+  }
+
+  StreamBuilder<String> buildProgramStateWidget() {
+    var stateBloc = InspectExampleApp.stateBloc;
+    return StreamBuilder<String>(
+        stream: stateBloc.valueStream,
+        initialData: stateBloc.currentValue,
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.data == '') {
+            // don't display anything
+            return Offstage();
+          } else {
+            return Container(
+              alignment: Alignment.center,
+              child: Text('State: ${snapshot.data}',
+                  style: Theme.of(context).textTheme.display1),
+              key: Key(snapshot.data),
+            );
+          }
+        });
   }
 
   @override
@@ -126,14 +244,35 @@ class _InspectHomePageState extends State<_InspectHomePage> {
       ),
       backgroundColor: _backgroundColor,
       body: Center(
-        child: Text(
-          'Counter: $_counter.',
-        ),
-      ),
+          child: Column(children: [
+        buildProgramStateWidget(),
+        Text('Counter: $_counter', style: Theme.of(context).textTheme.display2),
+        Text('$_answer', style: Theme.of(context).textTheme.display2),
+      ])),
       persistentFooterButtons: <Widget>[
         FlatButton(
+          onPressed: _giveHint,
+          child: Text('Give hint'),
+        ),
+        FlatButton(
+          onPressed: _showAnswer,
+          child: Text('Get answer'),
+        ),
+        FlatButton(
           onPressed: _changeBackground,
-          child: Text('Change background color'),
+          child: Text('Change color'),
+        ),
+        FlatButton(
+          onPressed: _makeTree,
+          child: Text('Make tree'),
+        ),
+        FlatButton(
+          onPressed: _addToTree,
+          child: Text('Grow tree'),
+        ),
+        FlatButton(
+          onPressed: _deleteTree,
+          child: Text('Delete tree'),
         ),
         FlatButton(
           onPressed: _incrementCounter,

@@ -42,6 +42,11 @@ template("generate_dart_profiler_symbols") {
     script = get_label_info(":dart_profiler_symbols", "root_out_dir") +
              "/dart-tools/dart_profiler_symbols"
     args = [
+      "--build-id-dir",
+      rebase_path("$root_build_dir/.build-id"),
+      # TODO: use llvm-readelf once it supports files without section headers.
+      "--build-id-script",
+      rebase_path("//build/images/elfinfo.py"),
       "--nm",
       "$default_clang_prefix/llvm-nm",
       "--binary",

@@ -22,7 +22,7 @@ class LedgerTestInstanceProvider {
   // Prevents the controller from being GCed, which would result in the service
   // being closed.
   // ignore: unused_field
-  ComponentControllerProxy _controller;
+  final ComponentControllerProxy _controller;
 }
 
 /// Returns a new LedgerTestInstanceProvider that creates connections to a
@@ -51,7 +51,7 @@ class _SledgeForTesting extends Sledge {
       : super.fromLedgerHandle(ledgerHandle, pageId);
   // Prevents the connection to Ledger from being closed.
   // ignore: unused_field
-  ComponentControllerProxy _controller;
+  final ComponentControllerProxy _controller;
 }
 
 /// Creates a new test Sledge instance backed by an in-memory Ledger provided

@@ -17,7 +17,7 @@ import 'storage_state.dart';
 // TODO: consider removing dynamic
 class FleetState<T extends dynamic> {
   // ignore: unused_field
-  int _fleetSize;
+  final int _fleetSize;
   final List<StorageState> _storageStates;
   final List<T> _instances;
   final List<Checker<T>> _checkers = <Checker<T>>[];

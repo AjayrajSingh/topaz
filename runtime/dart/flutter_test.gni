@@ -81,17 +81,11 @@ if (current_toolchain == dart_toolchain) {
 
     foreach(_source_file, invoker.sources) {
       _source_path = "$_source_dir/$_source_file"
-
-      _test_target =
-          exec_script("//topaz/runtime/dart/gen_flutter_test_target_name.py",
-                      [
-                        "--file",
-                        _source_file,
-                      ],
-                      "trim string")
-
-      if (_test_target != "") {
-        _test_target_name = "${_main_target_name}_${_test_target}"
+      _trimmed_source = string_replace(_source_file, "_test.dart", "")
+      if (_source_file != _trimmed_source) {
+        _trimmed_source = string_replace(_trimmed_source, ".", "_")
+        _trimmed_source = string_replace(_trimmed_source, "/", "_")
+        _test_target_name = "${_main_target_name}_${_trimmed_source}"
         _kernel_target_name = "${_test_target_name}_dill"
         _bootstrap_target_name = "${_test_target_name}_bootstrap"
 
@@ -189,8 +183,7 @@ if (current_toolchain == dart_toolchain) {
     _dart_flutter_tools_gen_dir =
         get_label_info("$_flutter_tools_label($dart_toolchain)",
                        "target_gen_dir")
-    _packages_path =
-        "$_dart_flutter_tools_gen_dir/flutter_tools.packages"
+    _packages_path = "$_dart_flutter_tools_gen_dir/flutter_tools.packages"
     _main_file = "//third_party/dart-pkg/git/flutter/packages/flutter_tools/bin/fuchsia_tester.dart"
 
     action(_snapshot_target_name) {
@@ -324,14 +317,11 @@ if (current_toolchain == dart_toolchain) {
     _invocation_file = "$target_gen_dir/$target_name"
 
     if (is_linux || is_mac) {
-      # TODO(IN-819): Delete renaming when dart tests are no longer run out of
-      # $root_build_dir/host_tests/.
-      _invocation_file = "$root_out_dir/$target_name"
-
       test_spec(_spec_target_name) {
         testonly = true
         name = _main_target_name
-        location = _invocation_file
+        install_path = _invocation_file
+
         deps = [
           ":$_main_target_name($dart_toolchain)",
         ]
@@ -369,24 +359,6 @@ if (current_toolchain == dart_toolchain) {
       deps = [
         ":$_main_target_name($dart_toolchain)",
       ]
-      if (is_linux || is_mac) {
-        # TODO(IN-819): Temporary measure to support the fx workflow, which is to
-        # take a dependency on tests.json, to which this metadata will be
-        # supplementary. Once flutter tests are contributing test spec metadata,
-        # all relevant information will be in the former and this is to be
-        # deleted.
-        metadata = {
-          pseudo_test_spec = [
-            {
-              test = {
-                location = rebase_path(_invocation_file, root_build_dir)
-                os = current_os
-              }
-            },
-          ]
-        }
-        deps += [ ":$_spec_target_name" ]
-      }
     }
   }
 }

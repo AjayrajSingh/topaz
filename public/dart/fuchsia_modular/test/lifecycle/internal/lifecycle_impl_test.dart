@@ -22,38 +22,46 @@ Future<void> throwingTerminateListener() async {
 }
 
 void main() {
+  LifecycleImpl lifecycleImpl;
+
+  setUp(() {
+    lifecycleImpl = LifecycleImpl();
+  });
+
   test('addTerminateListener throws for null listener', () {
-    expect(() => LifecycleImpl()..addTerminateListener(null),
+    expect(() => lifecycleImpl..addTerminateListener(null),
         throwsA((const TypeMatcher<Exception>())));
   });
 
   test('addTerminateListener should return false when adding same handler', () {
-    final host = LifecycleImpl()..addTerminateListener(terminateListener1);
+    final host = lifecycleImpl..addTerminateListener(terminateListener1);
     expect(host.addTerminateListener(terminateListener1), false);
   });
 
   test('addTerminateListener successful add', () {
-    final host = LifecycleImpl()..addTerminateListener(terminateListener1);
+    final host = lifecycleImpl..addTerminateListener(terminateListener1);
     expect(host.addTerminateListener(terminateListener2), true);
   });
 
   test('failing terminate handler should error', () {
     print('testing 1');
-    final host = LifecycleImpl()
+    final host = lifecycleImpl
       ..addTerminateListener(expectAsync0(terminateListener1))
       ..addTerminateListener(expectAsync0(throwingTerminateListener));
 
     expect(host.terminate(), throwsException);
   });
 
-  // This test must always be ran last since it's calling fuchsia.exit(0)
-  // which will terminate the process.
   test('terminate should trigger all added listeners to execute', () {
-    LifecycleImpl()
+    lifecycleImpl
       ..addTerminateListener(expectAsync0(terminateListener1))
       ..addTerminateListener(expectAsync0(terminateListener2))
       ..terminate();
-  },
-      skip:
-          'this test will cause other tests to not run after it is invoked since it calls exit()');
+  });
+
+  test('terminate invokes the exitHandler', () async {
+    int exitCode = -1;
+    await LifecycleImpl(exitHandler: (c) => exitCode = c).terminate();
+    expect(exitCode, 0);
+  });
 }

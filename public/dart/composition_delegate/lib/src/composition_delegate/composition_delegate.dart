@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:collection';
+import 'package:composition_delegate/src/internal/layout_logic/copresent_strategy/copresent_strategy.dart';
 import 'package:meta/meta.dart';
 
 import 'package:composition_delegate/src/internal/layout_logic/_layout_logic.dart';
@@ -33,9 +34,10 @@ class CompositionDelegate {
   /// no current relationships and Surfaces that are currently hidden.
   final SurfaceTree _surfaceTree;
 
-  /// The default LayoutContext
+  /// The default LayoutContext: resolution of 1280 x 800 units and 320 minimum
+  /// width for Surfaces.
   static const LayoutContext defaultContext =
-      LayoutContext(size: Size(1280, 800));
+      LayoutContext(size: Size(1280, 800), minSurfaceWidth: 320);
 
   /// Keep instances of layout strategies around to avoid re-instantiating
   final Map<layoutStrategyType, LayoutStrategy> _strategyEngines = {};
@@ -54,9 +56,18 @@ class CompositionDelegate {
   /// Add a Surface to the tree. [parentId] is an optional paramater used when
   /// this surface has a parent-child relationship with a [Surface] that is
   /// already in the experience - for example if this Surface was launched by
-  /// that Surface.
-  void addSurface({@required Surface surface, String parentId}) {
-    _surfaceTree.add(surface: surface, parentId: parentId);
+  /// that Surface. The default relation is [SurfaceArragement.none] and
+  /// [SurfaceDependency.none]
+  void addSurface({
+    @required Surface surface,
+    String parentId,
+    SurfaceRelation relation,
+  }) {
+    _surfaceTree.add(
+      surface: surface,
+      parentId: parentId,
+      relationToParent: relation,
+    );
   }
 
   /// Destructively remove a Surface from the tree and the focused and hidden
@@ -107,6 +118,9 @@ class CompositionDelegate {
           break;
         case layoutStrategyType.stackStrategy:
           _strategyEngines[layoutStrategy] = StackStrategy();
+          break;
+        case layoutStrategyType.copresentStrategy:
+          _strategyEngines[layoutStrategy] = CopresentStrategy();
           break;
       }
     }

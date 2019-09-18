@@ -10,16 +10,13 @@ import 'package:fuchsia_scenic_flutter/child_view_connection.dart'
 import 'package:tiler/tiler.dart';
 
 import '../tile_model/module_info.dart';
+import '../tile_model/tile_model_serializer.dart';
 import 'widgets/drop_target_widget.dart';
 import 'widgets/editing_tile_chrome.dart';
 
-const _kSizerThickness = 24.0;
-const _kSizerHandleThickness = 4.0;
-
-final _kSizerHandleDecoration = BoxDecoration(
-  border: Border.all(color: Color(0xFFBDBDBD)),
-  borderRadius: BorderRadius.circular(2),
-);
+const _kSizerThickness = 48.0;
+const _kSizerHandleThickness = 8.0;
+const _kSizerHandleLength = 32.0;
 
 /// Tiling layout Layout presenter widget.
 @immutable
@@ -33,23 +30,25 @@ class LayoutPresenter extends StatelessWidget {
   /// Maps a surface id to the view.
   final BuiltMap<String, ChildViewConnection> connections;
 
-  /// Border color for the mod.
-  final Color Function(String modName) colorForMod;
-
   /// Maps a parameter id to a color.
   final Map<String, Color> parametersToColors;
 
   /// Currently focused mod.
-  final ValueNotifier focusedMod;
+  final ValueNotifier<String> focusedMod;
+
+  /// Called when tiler model should be set to model.
+  ///
+  /// This should be implemented by the story_widget.
+  final void Function(TilerModel model) setTilerModel;
 
   /// Constructor for a tiling layout presenter.
   const LayoutPresenter({
     @required this.tilerModel,
     @required this.isEditing,
     @required this.connections,
-    @required this.colorForMod,
     @required this.parametersToColors,
     @required this.focusedMod,
+    @required this.setTilerModel,
   });
 
   @override
@@ -109,12 +108,12 @@ class LayoutPresenter extends StatelessWidget {
               child: Center(
                 child: Container(
                   width: axis == Axis.horizontal
-                      ? _kSizerThickness
+                      ? _kSizerHandleLength
                       : _kSizerHandleThickness,
                   height: axis == Axis.vertical
-                      ? _kSizerThickness
+                      ? _kSizerHandleLength
                       : _kSizerHandleThickness,
-                  decoration: _kSizerHandleDecoration,
+                  decoration: const BoxDecoration(color: Colors.black),
                 ),
               ),
             ),
@@ -138,10 +137,11 @@ class LayoutPresenter extends StatelessWidget {
       return ChildView(connection: connection);
     }
 
+    TilerModel tilerModelForCancel;
+
     return LayoutBuilder(
         builder: (context, constraints) => EditingTileChrome(
               focusedMod: focusedMod,
-              borderColor: colorForMod(modName),
               parameterColors:
                   content.parameters.map((p) => parametersToColors[p]),
               tilerModel: tilerModel,
@@ -153,8 +153,12 @@ class LayoutPresenter extends StatelessWidget {
                 connection: connection,
               ),
               editingSize: constraints.biggest,
-              originalSize: constraints.biggest +
-                  Offset(_kSizerThickness, _kSizerThickness),
+              willStartDrag: () {
+                tilerModelForCancel = cloneTiler(tilerModel);
+              },
+              didCancelDrag: () {
+                setTilerModel(tilerModelForCancel);
+              },
             ));
   }
 

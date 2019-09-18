@@ -5,6 +5,7 @@
 // ignore_for_file: implementation_imports
 
 import 'package:fuchsia_inspect/inspect.dart';
+import 'package:fuchsia_inspect/testing.dart';
 import 'package:fuchsia_inspect/src/inspect/internal/_inspect_impl.dart';
 import 'package:fuchsia_inspect/src/vmo/util.dart';
 import 'package:fuchsia_inspect/src/vmo/vmo_holder.dart';
@@ -12,59 +13,54 @@ import 'package:fuchsia_inspect/src/vmo/vmo_writer.dart';
 import 'package:fuchsia_services/services.dart';
 import 'package:test/test.dart';
 
-import '../util.dart';
-
 void main() {
   VmoHolder vmo;
   Node node;
 
   setUp(() {
     var context = StartupContext.fromStartupInfo();
-    vmo = FakeVmo(512);
-    var writer = VmoWriter(vmo);
-    Inspect inspect = InspectImpl(context, writer);
+    vmo = FakeVmoHolder(512);
+    var writer = VmoWriter.withVmo(vmo);
+    Inspect inspect =
+        InspectImpl(context.outgoing.debugDir(), 'root.inspect', writer);
     node = inspect.root;
   });
 
   group('String properties', () {
     test('are written to the VMO when the value is set', () {
-      var property = node.stringProperty('color')..setValue('fuchsia');
+      var _ = node.stringProperty('color')..setValue('fuchsia');
 
-      expect(readProperty(vmo, property.index),
-          equalsByteData(toByteData('fuchsia')));
+      expect(VmoMatcher(vmo).node()..propertyEquals('color', 'fuchsia'),
+          hasNoErrors);
     });
 
     test('can be mutated', () {
       var property = node.stringProperty('breakfast')..setValue('pancakes');
 
-      expect(readProperty(vmo, property.index),
-          equalsByteData(toByteData('pancakes')));
+      expect(VmoMatcher(vmo).node()..propertyEquals('breakfast', 'pancakes'),
+          hasNoErrors);
 
       property.setValue('waffles');
-      expect(readProperty(vmo, property.index),
-          equalsByteData(toByteData('waffles')));
+      expect(VmoMatcher(vmo).node()..propertyEquals('breakfast', 'waffles'),
+          hasNoErrors);
     });
 
     test('can be deleted', () {
       var property = node.stringProperty('scallops');
-      var index = property.index;
+      expect(VmoMatcher(vmo).node().property('scallops'), hasNoErrors);
 
       property.delete();
 
-      expect(() => readProperty(vmo, index),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(vmo).node()..missingChild('scallops'), hasNoErrors);
     });
 
     test('setting a value on an already deleted property is a no-op', () {
       var property = node.stringProperty('paella');
-      var index = property.index;
+      expect(VmoMatcher(vmo).node().property('paella'), hasNoErrors);
       property.delete();
 
       expect(() => property.setValue('this will not set'), returnsNormally);
-      expect(() => readProperty(vmo, index),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(vmo).node()..missingChild('paella'), hasNoErrors);
     });
 
     test('removing an already deleted property is a no-op', () {
@@ -77,43 +73,48 @@ void main() {
   group('ByteData properties', () {
     test('are written to the VMO when the property is set', () {
       var bytes = toByteData('fuchsia');
-      var property = node.byteDataProperty('color')..setValue(bytes);
+      var _ = node.byteDataProperty('color')..setValue(bytes);
 
-      expect(readProperty(vmo, property.index), equalsByteData(bytes));
+      expect(
+          VmoMatcher(vmo).node()
+            ..propertyEquals('color', bytes.buffer.asUint8List()),
+          hasNoErrors);
     });
 
     test('can be mutated', () {
       var pancakes = toByteData('pancakes');
       var property = node.byteDataProperty('breakfast')..setValue(pancakes);
 
-      expect(readProperty(vmo, property.index), equalsByteData(pancakes));
+      expect(
+          VmoMatcher(vmo).node()
+            ..propertyEquals('breakfast', pancakes.buffer.asUint8List()),
+          hasNoErrors);
 
       var waffles = toByteData('waffles');
       property.setValue(waffles);
-      expect(readProperty(vmo, property.index), equalsByteData(waffles));
+      expect(
+          VmoMatcher(vmo).node()
+            ..propertyEquals('breakfast', waffles.buffer.asUint8List()),
+          hasNoErrors);
     });
 
     test('can be deleted', () {
       var property = node.byteDataProperty('scallops');
-      var index = property.index;
+      expect(VmoMatcher(vmo).node().property('scallops'), hasNoErrors);
 
       property.delete();
 
-      expect(() => readProperty(vmo, index),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(vmo).node()..missingChild('scallops'), hasNoErrors);
     });
 
     test('setting a value on an already deleted property is a no-op', () {
       var property = node.byteDataProperty('paella');
-      var index = property.index;
+      expect(VmoMatcher(vmo).node().property('paella'), hasNoErrors);
       property.delete();
 
       var bytes = toByteData('this will not set');
       expect(() => property.setValue(bytes), returnsNormally);
-      expect(() => readProperty(vmo, index),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(vmo).node()..missingChild('paella'), hasNoErrors);
     });
 
     test('removing an already deleted property is a no-op', () {
@@ -199,88 +200,83 @@ void main() {
     });
 
     test('If no space, creation gives a deleted StringProperty', () {
-      var tinyVmo = FakeVmo(64);
-      var writer = VmoWriter(tinyVmo);
+      var tinyVmo = FakeVmoHolder(64);
+      var writer = VmoWriter.withVmo(tinyVmo);
       var context = StartupContext.fromStartupInfo();
-      Inspect inspect = InspectImpl(context, writer);
+      Inspect inspect =
+          InspectImpl(context.outgoing.debugDir(), 'root.inspect', writer);
       var tinyRoot = inspect.root;
       var missingProperty = tinyRoot.stringProperty('missing');
       expect(() => missingProperty.setValue('something'), returnsNormally);
-      expect(() => readProperty(vmo, missingProperty.index),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(tinyVmo).node()..missingChild('missing'), hasNoErrors);
     });
 
     test('If no space, creation gives a deleted ByteDataProperty', () {
-      var tinyVmo = FakeVmo(64);
-      var writer = VmoWriter(tinyVmo);
+      var tinyVmo = FakeVmoHolder(64);
+      var writer = VmoWriter.withVmo(tinyVmo);
       var context = StartupContext.fromStartupInfo();
-      Inspect inspect = InspectImpl(context, writer);
+      Inspect inspect =
+          InspectImpl(context.outgoing.debugDir(), 'root.inspect', writer);
       var tinyRoot = inspect.root;
       var bytes = toByteData('this will not set');
       var missingProperty = tinyRoot.byteDataProperty('missing');
       expect(() => missingProperty.setValue(bytes), returnsNormally);
-      expect(() => readProperty(vmo, missingProperty.index),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(tinyVmo).node()..missingChild('missing'), hasNoErrors);
     });
   });
 
   group('Int Properties', () {
     test('are created with value 0', () {
-      var property = node.intProperty('foo');
+      var _ = node.intProperty('foo');
 
-      expect(readInt(vmo, property), isZero);
+      expect(VmoMatcher(vmo).node().propertyEquals('foo', 0), hasNoErrors);
     });
 
     test('are written to the VMO when the value is set', () {
-      var property = node.intProperty('eggs')..setValue(12);
+      var _ = node.intProperty('eggs')..setValue(12);
 
-      expect(readInt(vmo, property), 12);
+      expect(VmoMatcher(vmo).node().propertyEquals('eggs', 12), hasNoErrors);
     });
 
     test('can be mutated', () {
       var property = node.intProperty('locusts')..setValue(10);
-      expect(readInt(vmo, property), 10);
+      expect(VmoMatcher(vmo).node().propertyEquals('locusts', 10), hasNoErrors);
 
       property.setValue(1000);
 
-      expect(readInt(vmo, property), 1000);
+      expect(
+          VmoMatcher(vmo).node().propertyEquals('locusts', 1000), hasNoErrors);
     });
 
     test('can add arbitrary values', () {
       var property = node.intProperty('bagels')..setValue(13);
-      expect(readInt(vmo, property), 13);
+      expect(VmoMatcher(vmo).node().propertyEquals('bagels', 13), hasNoErrors);
 
       property.add(13);
 
-      expect(readInt(vmo, property), 26);
+      expect(VmoMatcher(vmo).node().propertyEquals('bagels', 26), hasNoErrors);
     });
 
     test('can subtract arbitrary values', () {
       var property = node.intProperty('bagels')..setValue(13);
-      expect(readInt(vmo, property), 13);
+      expect(VmoMatcher(vmo).node().propertyEquals('bagels', 13), hasNoErrors);
 
       property.subtract(6);
 
-      expect(readInt(vmo, property), 7);
+      expect(VmoMatcher(vmo).node().propertyEquals('bagels', 7), hasNoErrors);
     });
 
     test('can be deleted', () {
-      var property = node.intProperty('sheep')..delete();
+      var _ = node.intProperty('sheep')..delete();
 
-      expect(() => readInt(vmo, property),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(vmo).node()..missingChild('sheep'), hasNoErrors);
     });
 
     test('setting a value on an already deleted property is a no-op', () {
       var property = node.intProperty('webpages')..delete();
 
       expect(() => property.setValue(404), returnsNormally);
-      expect(() => readInt(vmo, property),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(vmo).node()..missingChild('webpages'), hasNoErrors);
     });
 
     test('removing an already deleted property is a no-op', () {
@@ -292,59 +288,56 @@ void main() {
 
   group('DoubleProperties', () {
     test('are created with value 0', () {
-      var property = node.doubleProperty('foo');
+      var _ = node.doubleProperty('foo');
 
-      expect(readDouble(vmo, property), isZero);
+      expect(VmoMatcher(vmo).node().propertyEquals('foo', 0.0), hasNoErrors);
     });
 
     test('are written to the VMO when the value is set', () {
-      var property = node.doubleProperty('foo')..setValue(2.5);
+      var _ = node.doubleProperty('foo')..setValue(2.5);
 
-      expect(readDouble(vmo, property), 2.5);
+      expect(VmoMatcher(vmo).node().propertyEquals('foo', 2.5), hasNoErrors);
     });
 
     test('can be mutated', () {
       var property = node.doubleProperty('bar')..setValue(3.0);
-      expect(readDouble(vmo, property), 3.0);
+      expect(VmoMatcher(vmo).node().propertyEquals('bar', 3.0), hasNoErrors);
 
       property.setValue(3.5);
 
-      expect(readDouble(vmo, property), 3.5);
+      expect(VmoMatcher(vmo).node().propertyEquals('bar', 3.5), hasNoErrors);
     });
 
     test('can add arbitrary values', () {
       var property = node.doubleProperty('cake')..setValue(1.5);
-      expect(readDouble(vmo, property), 1.5);
+      expect(VmoMatcher(vmo).node().propertyEquals('cake', 1.5), hasNoErrors);
 
       property.add(1.5);
 
-      expect(readDouble(vmo, property), 3);
+      expect(VmoMatcher(vmo).node().propertyEquals('cake', 3.0), hasNoErrors);
     });
 
     test('can subtract arbitrary values', () {
       var property = node.doubleProperty('cake')..setValue(5);
-      expect(readDouble(vmo, property), 5);
+      expect(VmoMatcher(vmo).node().propertyEquals('cake', 5.0), hasNoErrors);
 
       property.subtract(0.5);
 
-      expect(readDouble(vmo, property), 4.5);
+      expect(VmoMatcher(vmo).node().propertyEquals('cake', 4.5), hasNoErrors);
     });
 
     test('can be deleted', () {
-      var property = node.doubleProperty('circumference')..delete();
+      var _ = node.doubleProperty('circumference')..delete();
 
-      expect(() => readDouble(vmo, property),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(
+          VmoMatcher(vmo).node()..missingChild('circumference'), hasNoErrors);
     });
 
     test('setting a value on an already deleted property is a no-op', () {
       var property = node.doubleProperty('pounds')..delete();
 
       expect(() => property.setValue(50.6), returnsNormally);
-      expect(() => readDouble(vmo, property),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(vmo).node()..missingChild('pounds'), hasNoErrors);
     });
 
     test('removing an already deleted property is a no-op', () {
@@ -429,29 +422,41 @@ void main() {
     });
 
     test('If no space, creation gives a deleted IntProperty', () {
-      var tinyVmo = FakeVmo(64);
-      var writer = VmoWriter(tinyVmo);
+      var tinyVmo = FakeVmoHolder(64);
+      var writer = VmoWriter.withVmo(tinyVmo);
       var context = StartupContext.fromStartupInfo();
-      Inspect inspect = InspectImpl(context, writer);
+      Inspect inspect =
+          InspectImpl(context.outgoing.debugDir(), 'root.inspect', writer);
       var tinyRoot = inspect.root;
       var missingProperty = tinyRoot.intProperty('missing');
       expect(() => missingProperty.setValue(1), returnsNormally);
-      expect(() => readInt(vmo, missingProperty),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(tinyVmo).node()..missingChild('missing'), hasNoErrors);
     });
 
     test('If no space, creation gives a deleted DoubleProperty', () {
-      var tinyVmo = FakeVmo(64);
-      var writer = VmoWriter(tinyVmo);
+      var tinyVmo = FakeVmoHolder(64);
+      var writer = VmoWriter.withVmo(tinyVmo);
       var context = StartupContext.fromStartupInfo();
-      Inspect inspect = InspectImpl(context, writer);
+      Inspect inspect =
+          InspectImpl(context.outgoing.debugDir(), 'root.inspect', writer);
       var tinyRoot = inspect.root;
       var missingProperty = tinyRoot.doubleProperty('missing');
       expect(() => missingProperty.setValue(1.0), returnsNormally);
-      expect(() => readDouble(vmo, missingProperty),
-          throwsA(const TypeMatcher<StateError>()),
-          reason: 'cannot read VMO values from a deleted property');
+      expect(VmoMatcher(tinyVmo).node()..missingChild('missing'), hasNoErrors);
     });
+  });
+
+  test('Able to call InspectImpl at a specified path', () {
+    var tinyVmo = FakeVmoHolder(64);
+    var tinyVmo2 = FakeVmoHolder(64);
+    var writer = VmoWriter.withVmo(tinyVmo);
+    var writer2 = VmoWriter.withVmo(tinyVmo2);
+    var context = StartupContext.fromStartupInfo();
+    Inspect inspect =
+        InspectImpl(context.outgoing.debugDir(), 'root.inspect', writer);
+    Inspect inspect2 =
+        InspectImpl(context.outgoing.debugDir(), 'test.inspect', writer2);
+    expect(() => inspect, isNotNull);
+    expect(() => inspect2, isNotNull);
   });
 }

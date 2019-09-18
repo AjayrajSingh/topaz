@@ -19,6 +19,7 @@ flutter_app("story_shell_labs") {
   sources = [
     "src/story_shell_impl.dart",
     "src/story_visual_state_watcher_impl.dart",
+    "src/widgets/remove_button_target_widget.dart",
     "src/widgets/story_widget.dart",
   ]
 

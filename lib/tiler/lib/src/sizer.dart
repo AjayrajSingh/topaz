@@ -20,7 +20,7 @@ class Sizer extends StatelessWidget {
   final TileModel tileAfter;
   final bool horizontal;
 
-  Sizer({
+  const Sizer({
     this.direction,
     this.tileBefore,
     this.tileAfter,

@@ -4,10 +4,19 @@
 
 // ignore_for_file: public_member_api_docs
 
+// TODO(FIDL-754) Generate these values.
+enum FidlErrorCode {
+  unknown,
+  fidlStringTooLong,
+  fidlNonNullableTypeWithNullValue
+}
+
 class FidlError implements Exception {
-  FidlError(this.message);
+  // TODO(FIDL-541) Make code a required parameter.
+  FidlError(this.message, [this.code = FidlErrorCode.unknown]);
 
   final String message;
+  final FidlErrorCode code;
 
   @override
   String toString() => 'FidlError: $message';

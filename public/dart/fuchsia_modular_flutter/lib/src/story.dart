@@ -34,4 +34,10 @@ abstract class Story {
 
   /// Delete this story instance.
   void delete();
+
+  /// Callback when a module is added.
+  void onModuleAdded(ModuleData moduleData);
+
+  /// Callback when a module is focused.
+  void onModuleFocused(List<String> modulePath);
 }

@@ -9,9 +9,8 @@
 #include "third_party/tonic/dart_library_natives.h"
 #include "third_party/tonic/dart_microtask_queue.h"
 #include "third_party/tonic/dart_state.h"
-#include "third_party/tonic/typed_data/uint8_list.h"
+#include "third_party/tonic/typed_data/typed_list.h"
 #include "topaz/runtime/dart/utils/inlines.h"
-
 #include "topaz/runtime/dart_runner/builtin_libraries.h"
 #include "topaz/runtime/dart_runner/dart_component_controller.h"
 #include "topaz/runtime/dart_runner/logging.h"
@@ -21,8 +20,6 @@ namespace {
 
 MappedResource mapped_isolate_snapshot_data;
 MappedResource mapped_isolate_snapshot_instructions;
-MappedResource mapped_shared_snapshot_data;
-MappedResource mapped_shared_snapshot_instructions;
 tonic::DartLibraryNatives* service_natives = nullptr;
 
 Dart_NativeFunction GetNativeFunction(Dart_Handle name, int argument_count,
@@ -103,33 +100,15 @@ Dart_Isolate CreateServiceIsolate(const char* uri, Dart_IsolateFlags* flags,
     return nullptr;
   }
 
-#if defined(AOT_RUNTIME)
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/vmservice_shared_snapshot_data.bin",
-          mapped_shared_snapshot_data)) {
-    *error = strdup("Failed to load snapshot for service isolate");
-    FX_LOG(ERROR, LOG_TAG, *error);
-    return nullptr;
-  }
-  if (!MappedResource::LoadFromNamespace(
-          nullptr, "pkg/data/vmservice_shared_snapshot_instructions.bin",
-          mapped_shared_snapshot_instructions, true /* executable */)) {
-    *error = strdup("Failed to load snapshot for service isolate");
-    FX_LOG(ERROR, LOG_TAG, *error);
-    return nullptr;
-  }
-#endif
-
   auto state = new std::shared_ptr<tonic::DartState>(new tonic::DartState());
-  Dart_Isolate isolate =
-      Dart_CreateIsolate(uri, DART_VM_SERVICE_ISOLATE_NAME,
-                         mapped_isolate_snapshot_data.address(),
-                         mapped_isolate_snapshot_instructions.address(),
-                         mapped_shared_snapshot_data.address(),
-                         mapped_shared_snapshot_instructions.address(),
-                         nullptr /* flags */, state, error);
+  Dart_Isolate isolate = Dart_CreateIsolateGroup(
+      uri, DART_VM_SERVICE_ISOLATE_NAME, mapped_isolate_snapshot_data.address(),
+      mapped_isolate_snapshot_instructions.address(),
+      nullptr /* shared_snapshot_data */,
+      nullptr /* shared_snapshot_instructions */, nullptr /* flags */, state,
+      state, error);
   if (!isolate) {
-    FX_LOGF(ERROR, LOG_TAG, "Dart_CreateIsolate failed: %s", *error);
+    FX_LOGF(ERROR, LOG_TAG, "Dart_CreateIsolateGroup failed: %s", *error);
     return nullptr;
   }
 

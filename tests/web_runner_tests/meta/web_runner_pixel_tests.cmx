@@ -13,7 +13,8 @@
                 "fuchsia.web.ContextProvider": "fuchsia-pkg://fuchsia.com/chromium#meta/chromium.cmx"
             },
             "system-services": [
-                "fuchsia.net.SocketProvider",
+                "fuchsia.posix.socket.Provider",
+                "fuchsia.net.NameLookup",
                 "fuchsia.netstack.Netstack"
             ]
         }
@@ -23,16 +24,18 @@
     },
     "sandbox": {
         "features": [
-            "shell-commands"
+            "shell-commands",
+            "deprecated-ambient-replace-as-executable"
         ],
         "services": [
             "fuchsia.fonts.Provider",
-            "fuchsia.net.SocketProvider",
+            "fuchsia.posix.socket.Provider",
+            "fuchsia.net.NameLookup",
             "fuchsia.netstack.Netstack",
             "fuchsia.process.Launcher",
             "fuchsia.process.Resolver",
             "fuchsia.sys.Launcher",
-            "fuchsia.tracelink.Registry",
+            "fuchsia.tracing.provider.Registry",
             "fuchsia.ui.input.ImeService",
             "fuchsia.ui.input.ImeVisibilityService",
             "fuchsia.ui.input.InputDeviceRegistry",

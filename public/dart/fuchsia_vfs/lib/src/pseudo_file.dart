@@ -150,7 +150,11 @@ class PseudoFile extends Vnode {
   }
 
   void _onClose(_FileConnection obj) {
-    assert(_connections.remove(obj));
+    final result = _connections.remove(obj);
+    scheduleMicrotask(() {
+      obj.closeBinding();
+    });
+    assert(result);
   }
 
   int _validateFlags(int parentFlags, int flags) {
@@ -318,7 +322,9 @@ class _FileConnection extends File {
       status = file._writeFn(_buffer.buffer.asUint8List(0, _currentLen));
     }
     // no more read/write operations should be possible
-    file._onClose(this);
+    scheduleMicrotask(() {
+      file._onClose(this);
+    });
     _isClosed = true;
     return status;
   }

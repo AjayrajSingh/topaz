@@ -4,25 +4,47 @@
 
 import 'dart:async';
 import 'dart:collection' show SplayTreeMap;
-import 'dart:io';
 
 import 'package:collection/collection.dart' show SetEquality;
 import 'package:test/test.dart';
 
 import 'package:fidl/fidl.dart';
+import 'package:fidl_fuchsia_modular/fidl_async.dart' as modular;
+import 'package:fidl_fuchsia_modular_session/fidl_async.dart';
+import 'package:fidl_fuchsia_modular_testing/fidl_async.dart';
 import 'package:fidl_fuchsia_sys/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_app/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_policy/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_scenic/fidl_async.dart';
 import 'package:fidl_fuchsia_ui_views/fidl_async.dart';
+import 'package:fuchsia_modular_testing/test.dart';
 import 'package:fuchsia_scenic/views.dart';
 import 'package:fuchsia_services/services.dart';
 import 'package:pedantic/pedantic.dart';
+import 'package:zircon/zircon.dart';
 
 const _testAppUrl =
     'fuchsia-pkg://fuchsia.com/flutter_screencap_test_app#meta/flutter_screencap_test_app.cmx';
-const _basemgrUrl = 'fuchsia-pkg://fuchsia.com/basemgr#meta/basemgr.cmx';
-const _ermineUrl = 'fuchsia-pkg://fuchsia.com/ermine#meta/ermine.cmx';
+
+final _addModCommand = modular.AddMod(
+    modName: ['flutter_screencap_test_app.cmx'],
+    modNameTransitional: 'root',
+    intent: modular.Intent(action: 'action', handler: _testAppUrl),
+    surfaceRelation: modular.SurfaceRelation());
+
+final _ermineConfig = BasemgrConfig(
+  sessionShellMap: [
+    SessionShellMapEntry(
+      name: 'Ermine',
+      config: SessionShellConfig(
+        appConfig: AppConfig(
+          url: 'fuchsia-pkg://fuchsia.com/ermine#meta/ermine.cmx',
+        ),
+      ),
+    ),
+  ],
+  useSessionShellForStoryShellFactory: true,
+);
 
 // Use a custom timeout rather than the test framework's timeout so that we can
 // output a sensible failure message.
@@ -113,40 +135,19 @@ Future<void> _startAppAsRootView(
   }
 }
 
-// Starts basemgr with dev shells. This should be called from within a
-// try/finally or similar construct that closes the component controller.
-Future<void> _startDevBasemgr(
-    InterfaceRequest<ComponentController> controllerRequest) async {
-  final context = StartupContext.fromStartupInfo();
+Future<void> _launchModUnderTest(TestHarnessProxy testHarness) async {
+  // get the puppetMaster service from the encapsulated test env
+  final puppetMaster = modular.PuppetMasterProxy();
+  await testHarness.connectToModularService(
+      ModularService.withPuppetMaster(puppetMaster.ctrl.request()));
 
-  final launchInfo = LaunchInfo(url: _basemgrUrl, arguments: [
-    '--base_shell=fuchsia-pkg://fuchsia.com/dev_base_shell#meta/dev_base_shell.cmx',
-    '--session_shell=fuchsia-pkg://fuchsia.com/dev_session_shell#meta/dev_session_shell.cmx',
-    '--session_shell_args=--root_module=$_testAppUrl',
-    '--story_shell=fuchsia-pkg://fuchsia.com/dev_story_shell#meta/dev_story_shell.cmx',
-    '--test',
-    '--enable_presenter',
-    '--run_base_shell_with_test_runner=false'
-  ]);
-  final launcher = LauncherProxy();
-  context.incoming.connectToService(launcher);
-  await launcher.createComponent(launchInfo, controllerRequest);
-  launcher.ctrl.close();
-}
-
-// Starts the basemgr configured to launch the Ermine session shell. This
-// should be called from within a try/finally or similar construct that closes
-// the component controller.
-Future<void> _startErmine(
-    InterfaceRequest<ComponentController> controllerRequest) async {
-  final context = StartupContext.fromStartupInfo();
-
-  final launchInfo =
-      LaunchInfo(url: _basemgrUrl, arguments: ['--session_shell=$_ermineUrl']);
-  final launcher = LauncherProxy();
-  context.incoming.connectToService(launcher);
-  await launcher.createComponent(launchInfo, controllerRequest);
-  launcher.ctrl.close();
+  // use puppetMaster to start a fake story an launch the mod under test
+  final storyPuppetMaster = modular.StoryPuppetMasterProxy();
+  await puppetMaster.controlStory(
+      'flutter_screencap_test', storyPuppetMaster.ctrl.request());
+  await storyPuppetMaster
+      .enqueue([modular.StoryCommand.withAddMod(_addModCommand)]);
+  await storyPuppetMaster.execute();
 }
 
 // Blank can manifest as invalid screenshots or blackness.
@@ -208,36 +209,36 @@ void main() {
     }
   });
 
-  test(
-      'flutter screencap as root mod in dev shells should have expected top two colors',
+  test('flutter screencap in test shells should have expected top two colors',
       () async {
-    final controller = ComponentControllerProxy();
+    final testHarness = await launchTestHarness();
 
     try {
-      await _startDevBasemgr(controller.ctrl.request());
+      await testHarness.run(TestHarnessSpec(
+          envServices:
+              EnvironmentServicesSpec(serviceDir: Channel.fromFile('/svc'))));
+      await _launchModUnderTest(testHarness);
+
       await _expectTopColors(scenic, _expectedTopTwoColors);
     } finally {
-      controller.ctrl.close();
+      testHarness.ctrl.close();
     }
   });
 
-  // This test starts Ermine session shell and uses sessionctl to add the
-  // flutter screencap test app.
   test('flutter screencap as mod in Ermine should have expected top two colors',
       () async {
-    final controller = ComponentControllerProxy();
+    final testHarness = await launchTestHarness();
 
     try {
-      await _startErmine(controller.ctrl.request());
-      // sessionctl uses the basemgr debug service exposed on the /hub.
-      await controller.onDirectoryReady.first;
-      final ProcessResult result =
-          await Process.run('/bin/sessionctl', ['add_mod', _testAppUrl]);
-      print(result.stdout);
-      expect(result.exitCode, 0, reason: result.stderr);
+      await testHarness.run(TestHarnessSpec(
+          basemgrConfig: _ermineConfig,
+          envServices:
+              EnvironmentServicesSpec(serviceDir: Channel.fromFile('/svc'))));
+      await _launchModUnderTest(testHarness);
+
       await _expectTopColors(scenic, _expectedTopTwoColors);
     } finally {
-      controller.ctrl.close();
+      testHarness.ctrl.close();
     }
   });
 }

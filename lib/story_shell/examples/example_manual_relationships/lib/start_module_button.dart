@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Intent;
 import 'package:fuchsia_modular/module.dart';
 import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl_mod;
 import 'package:fuchsia_logger/logger.dart';

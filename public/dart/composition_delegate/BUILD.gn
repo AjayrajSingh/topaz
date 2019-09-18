@@ -17,6 +17,7 @@ dart_library("composition_delegate") {
     "src/internal/tree/_surface_tree.dart",
     "src/internal/layout_logic/_layout_strategy.dart",
     "src/internal/layout_logic/_layout_logic.dart",
+    "src/internal/layout_logic/copresent_strategy/copresent_strategy.dart",
     "src/internal/layout_logic/split_evenly_strategy/split_evenly_strategy.dart",
     "src/internal/layout_logic/stack_strategy/stack_strategy.dart",
     "src/surface/surface_relation.dart",
@@ -35,6 +36,7 @@ dart_test("composition_delegate_tests") {
     "encode_decode_test.dart",
     "internal/surface_node_test.dart",
     "internal/surface_tree_test.dart",
+    "layout_logic/copresent_layout_test.dart",
     "layout_logic/stack_layout_test.dart",
     "layout_logic/split_layout_test.dart",
   ]

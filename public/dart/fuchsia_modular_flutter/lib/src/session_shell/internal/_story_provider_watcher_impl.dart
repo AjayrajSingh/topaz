@@ -14,10 +14,16 @@ class StoryProviderWatcherImpl extends modular.StoryProviderWatcher {
     modular.StoryState,
     modular.StoryVisibilityState,
   ) _onChangeCallback;
+  final void Function(
+    modular.StoryInfo2,
+    modular.StoryState,
+    modular.StoryVisibilityState,
+  ) _onChange2Callback;
   final void Function(String) _onDeleteCallback;
 
   /// Constructor.
-  StoryProviderWatcherImpl(this._onChangeCallback, this._onDeleteCallback);
+  StoryProviderWatcherImpl(
+      this._onChangeCallback, this._onChange2Callback, this._onDeleteCallback);
 
   @override
   Future<void> onChange(
@@ -26,6 +32,16 @@ class StoryProviderWatcherImpl extends modular.StoryProviderWatcher {
     modular.StoryVisibilityState storyVisibilityState,
   ) async {
     _onChangeCallback?.call(storyInfo, storyState, storyVisibilityState);
+  }
+
+  // TODO(MF-481) Remove once StoryInfo transitioned to table
+  @override
+  Future<void> onChange2(
+    modular.StoryInfo2 storyInfo,
+    modular.StoryState storyState,
+    modular.StoryVisibilityState storyVisibilityState,
+  ) async {
+    _onChange2Callback?.call(storyInfo, storyState, storyVisibilityState);
   }
 
   @override

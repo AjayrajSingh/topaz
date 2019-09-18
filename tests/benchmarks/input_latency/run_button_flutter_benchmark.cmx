@@ -4,17 +4,17 @@
     },
     "sandbox": {
         "features": [
-            "shell"
+            "deprecated-shell",
+            "deprecated-ambient-replace-as-executable"
         ],
         "services": [
+            "fuchsia.boot.RootJob",
             "fuchsia.process.Launcher",
             "fuchsia.process.Resolver",
             "fuchsia.sys.Environment",
             "fuchsia.sys.Launcher",
             "fuchsia.sys.Loader",
-            "fuchsia.tracelink.Registry",
-            "fuchsia.tracelink.Provider",
-            "fuchsia.tracing.TraceController",
+            "fuchsia.tracing.provider.Registry",
             "fuchsia.tracing.controller.Controller",
             "fuchsia.ui.input.ImeService",
             "fuchsia.ui.input.InputDeviceRegistry",

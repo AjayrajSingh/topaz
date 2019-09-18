@@ -38,45 +38,39 @@ class FakeLedgerPage extends ledger.PageProxy {
   StorageState get storageState => _storageState;
 
   @override
-  Future<ledger.Status> put(Uint8List key, Uint8List value) async {
+  Future<void> put(Uint8List key, Uint8List value) async {
     _modification.changedEntries.add(KeyValue(key, value));
-    return ledger.Status.ok;
   }
 
   @override
-  Future<ledger.Status> delete(Uint8List key) async {
+  Future<void> delete(Uint8List key) async {
     _modification.deletedKeys.add(key);
-    return ledger.Status.ok;
   }
 
   @override
-  Future<ledger.Status> startTransaction() async {
+  Future<void> startTransaction() async {
     assert(_modification.changedEntries.isEmpty);
     assert(_modification.deletedKeys.isEmpty);
-    return ledger.Status.ok;
   }
 
   @override
-  Future<ledger.Status> commit() async {
+  Future<void> commit() async {
     _storageState.applyChange(_modification);
     onChange(_modification);
     _modification.clear();
-    return ledger.Status.ok;
   }
 
   @override
-  Future<ledger.Status> rollback() async {
+  Future<void> rollback() async {
     _modification.clear();
-    return ledger.Status.ok;
   }
 
   @override
-  Future<ledger.Status> getSnapshot(Object snapshotRequest, Uint8List keyPrefix,
+  Future<void> getSnapshot(Object snapshotRequest, Uint8List keyPrefix,
       $fidl.InterfaceHandle<ledger.PageWatcher> watcher) async {
     if (watcher != null) {
       _watcher = watcher;
     }
-    return ledger.Status.ok;
   }
 
   List<ledger.Entry> getEntries(Uint8List keyPrefix) =>

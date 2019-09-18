@@ -33,13 +33,6 @@ class LedgerObjectsFactoryImpl implements LedgerObjectsFactory {
       ledger.PageWatcherBinding();
 }
 
-/// Throws an exception containing [operation] if the status is not `ok`.
-void checkStatus(ledger.Status status, String operation) {
-  if (status != ledger.Status.ok) {
-    throw Exception('Ledger operation `$operation` failed.');
-  }
-}
-
 /// Returns data stored in [buffer].
 Uint8List readBuffer(Buffer buffer) {
   ReadResult readResult = buffer.vmo.read(buffer.size);
@@ -64,11 +57,10 @@ Future<Null> _getFullEntriesRecursively(
 
   List<ledger.Entry> entries = response.entries;
   ledger.Token nextToken = response.nextToken;
-  ledger.IterationStatus status = response.status;
 
   result.addAll(entries.takeWhile((entry) => hasPrefix(entry.key, keyPrefix)));
 
-  if (status == ledger.IterationStatus.partialResult &&
+  if (nextToken != null &&
       hasPrefix(entries[entries.length - 1].key, keyPrefix)) {
     return _getFullEntriesRecursively(
       snapshot,
@@ -82,7 +74,7 @@ Future<Null> _getFullEntriesRecursively(
 /// Gets the full list of [Entry] objects from a given [PageSnapshot].
 ///
 /// This will continuously call the [PageSnapshot.getEntries] method in case the
-/// returned status code is [Status.partialResult].
+/// returned token is not null.
 Future<List<ledger.Entry>> getFullEntries(
   ledger.PageSnapshot snapshot, {
   List<int> keyPrefix,

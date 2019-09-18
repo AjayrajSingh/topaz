@@ -10,7 +10,7 @@ import 'package:zircon/zircon.dart';
 
 const int kMessageHeaderSize = 16;
 const int kMessageTxidOffset = 0;
-const int kMessageOrdinalOffset = 12;
+const int kMessageOrdinalOffset = 8;
 
 class Message {
   Message(this.data, this.handles, this.dataLength, this.handlesLength);
@@ -30,7 +30,7 @@ class Message {
   set txid(int value) =>
       data.setUint32(kMessageTxidOffset, value, Endian.little);
 
-  int get ordinal => data.getUint32(kMessageOrdinalOffset, Endian.little);
+  int get ordinal => data.getUint64(kMessageOrdinalOffset, Endian.little);
 
   void hexDump() {
     const int width = 16;

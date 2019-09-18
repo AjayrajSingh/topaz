@@ -21,7 +21,7 @@ class TileModel<T> extends ChangeNotifier {
   T content;
   double flex;
   Offset position;
-  Size _minSize;
+  final Size _minSize;
   List<TileModel<T>> tiles;
 
   TileModel({

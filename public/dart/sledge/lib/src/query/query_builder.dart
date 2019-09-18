@@ -5,7 +5,7 @@ import 'query_field_comparison.dart';
 
 /// Helper class to create Query instances.
 class QueryBuilder {
-  Schema _schema;
+  final Schema _schema;
   final Map<String, QueryFieldComparison> _comparisons;
 
   /// Default constructor.

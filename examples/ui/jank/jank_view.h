@@ -8,11 +8,11 @@
 #include <fuchsia/fonts/cpp/fidl.h>
 #include <fuchsia/images/cpp/fidl.h>
 #include <fuchsia/ui/input/cpp/fidl.h>
-#include <src/lib/fxl/macros.h>
-#include <src/lib/fxl/time/time_point.h>
 
 #include "examples/ui/lib/skia_font_loader.h"
 #include "examples/ui/lib/skia_view.h"
+#include "src/lib/fxl/macros.h"
+#include "src/lib/fxl/time/time_point.h"
 #include "third_party/skia/include/core/SkCanvas.h"
 #include "third_party/skia/include/core/SkColor.h"
 #include "third_party/skia/include/core/SkFont.h"

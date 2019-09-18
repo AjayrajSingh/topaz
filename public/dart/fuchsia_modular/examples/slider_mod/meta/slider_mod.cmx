@@ -15,7 +15,6 @@
             "fuchsia.logger.LogSink",
             "fuchsia.modular.Clipboard",
             "fuchsia.modular.ComponentContext",
-            "fuchsia.modular.ContextWriter",
             "fuchsia.modular.ModuleContext",
             "fuchsia.sys.Launcher",
             "fuchsia.sys.Environment",

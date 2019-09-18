@@ -8,9 +8,10 @@
             "system-temp"
         ],
         "services": [
-            "fuchsia.net.SocketProvider",
+            "fuchsia.posix.socket.Provider",
+            "fuchsia.net.NameLookup",
             "fuchsia.timezone.Timezone",
-            "fuchsia.tracelink.Registry"
+            "fuchsia.tracing.provider.Registry"
         ]
     }
 }

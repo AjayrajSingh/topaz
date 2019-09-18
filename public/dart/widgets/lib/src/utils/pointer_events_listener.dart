@@ -40,8 +40,10 @@ class PointerEventsListener extends PointerCaptureListenerHack {
     _originalCallback = ui.window.onPointerDataPacket;
     ui.window.onPointerDataPacket = (ui.PointerDataPacket packet) {};
 
-    presentation
-        .capturePointerEventsHack(_pointerCaptureListenerBinding.wrap(this));
+    if (_pointerCaptureListenerBinding.isUnbound) {
+      presentation
+          .capturePointerEventsHack(_pointerCaptureListenerBinding.wrap(this));
+    }
   }
 
   /// Stops listening to pointer events. Also restores the
@@ -49,6 +51,9 @@ class PointerEventsListener extends PointerCaptureListenerHack {
   void stop() {
     if (_originalCallback != null) {
       _cleanupPointerEvents();
+      if (_pointerCaptureListenerBinding.isBound) {
+        _pointerCaptureListenerBinding.unbind();
+      }
       _pointerCaptureListenerBinding.close();
 
       // Restore the original pointer events callback on the window.

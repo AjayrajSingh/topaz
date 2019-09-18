@@ -28,6 +28,6 @@ dart_library("lib.base_shell") {
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/dart/widgets:lib.widgets",
-    "//zircon/public/fidl/fuchsia-net:fuchsia-net",
+    "//zircon/system/fidl/fuchsia-net:fuchsia-net",
   ]
 }

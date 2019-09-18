@@ -81,7 +81,7 @@ class FuchsiaFontManagerTest : public gtest::RealLoopFixture {
   fuchsia::sys::LaunchInfo GetLaunchInfoForFontService() {
     fuchsia::sys::LaunchInfo launch_info;
     launch_info.url = kFontsServiceUrl;
-    launch_info.arguments.reset(
+    launch_info.arguments.emplace(
         {"--no-default-fonts", "--font-manifest=/test_fonts/manifest.json"});
     auto tmp_dir_fd = open("/pkg/data/testdata/test_fonts",
                            O_DIRECTORY | O_RDONLY);

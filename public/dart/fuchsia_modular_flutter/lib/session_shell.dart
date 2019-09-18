@@ -4,4 +4,6 @@
 
 /// A collection of utilities simplifying Session Shell creation.
 export 'src/session_shell.dart';
+export 'src/session_shell_2.dart';
 export 'src/story.dart';
+export 'src/story_2.dart';

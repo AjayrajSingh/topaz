@@ -37,7 +37,7 @@ abstract class LayoutStrategy {
   /// layout is a list of [Layer]s, comprised of a collection of positioned
   /// elements that implement [LayoutElement].
   List<Layer> getLayout({
-    LinkedHashSet focusedSurfaces,
+    LinkedHashSet<String> focusedSurfaces,
     Set<String> hiddenSurfaces,
     LayoutContext layoutContext,
     List<Layer> previousLayout,

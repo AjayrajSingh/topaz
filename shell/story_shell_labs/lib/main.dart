@@ -27,9 +27,13 @@ void main() {
 
   runApp(
     MaterialApp(
-      home: Directionality(
-        textDirection: TextDirection.ltr,
-        child: StoryWidget(presenter: _layoutManager.presenter),
+      theme: ThemeData(fontFamily: 'RobotoMono'),
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        body: Directionality(
+          textDirection: TextDirection.ltr,
+          child: StoryWidget(presenter: _layoutManager.presenter),
+        ),
       ),
     ),
   );

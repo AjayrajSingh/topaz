@@ -26,7 +26,7 @@ dart_library("fuchsia_logger") {
     "//third_party/dart-pkg/pub/meta",
     "//topaz/public/dart/fuchsia_services",
     "//topaz/public/dart/zircon",
-    "//zircon/public/fidl/fuchsia-logger",
+    "//zircon/system/fidl/fuchsia-logger",
   ]
 }
 

@@ -21,7 +21,7 @@ typedef UserLayoutRequestCallback = void Function(TilerModel<ModuleInfo>);
 
 /// The layout strategy manages a model of the layout that is shared with the
 /// Presenter through the TileLayoutModel.
-class DejaLayout extends Layout<TileLayoutModel> {
+class DejaLayout extends Layout {
   var _tilerModel = TilerModel<ModuleInfo>();
   List<TilerModel<ModuleInfo>> _tilerModelSuggestions = [];
   final _connections = <String, ChildViewConnection>{};
@@ -98,8 +98,8 @@ class DejaLayout extends Layout<TileLayoutModel> {
   void _userLayoutRequest(TilerModel<ModuleInfo> model) {
     final modsToRemove = getModsDifference(_tilerModel, model);
     _tilerModel = model;
-    removeSurface(modsToRemove);
     if (modsToRemove.isNotEmpty) {
+      removeSurface(modsToRemove);
       // Regenerate Layout Suggestions.
       final tilerModels = _layoutPolicy.getLayout(_tilerModel);
       _tilerModel = tilerModels.first;

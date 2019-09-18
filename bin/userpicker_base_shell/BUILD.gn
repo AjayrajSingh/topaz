@@ -45,6 +45,6 @@ flutter_app("userpicker_base_shell") {
     "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/dart/widgets:lib.widgets",
     "//topaz/public/lib/device/dart",
-    "//zircon/public/fidl/fuchsia-device-manager",
+    "//zircon/system/fidl/fuchsia-device-manager",
   ]
 }

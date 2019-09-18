@@ -106,7 +106,7 @@ SkFontStyle::Slant FuchsiaToSkSlant(fuchsia::fonts::Slant slant) {
 fidl::VectorPtr<std::string> BuildLanguageList(const char* bcp47[],
                                                int bcp47_count) {
   DEBUG_CHECK(bcp47 != nullptr || bcp47_count == 0, LOG_TAG, "");
-  auto languages = fidl::VectorPtr<std::string>::New(0);
+  std::vector<std::string> languages;
   for (int i = 0; i < bcp47_count; i++) {
     languages.push_back(bcp47[i]);
   }

@@ -2,9 +2,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "fuchsia/accessibility/cpp/fidl.h"
 #define RAPIDJSON_HAS_STDSTRING 1
-
-#include "platform_view.h"
 
 #include <trace/event.h>
 
@@ -13,6 +12,9 @@
 #include "flutter/fml/logging.h"
 #include "flutter/lib/ui/compositing/scene_host.h"
 #include "flutter/lib/ui/window/pointer_data.h"
+#include "flutter/lib/ui/window/window.h"
+#include "fuchsia/ui/views/cpp/fidl.h"
+#include "platform_view.h"
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
@@ -61,6 +63,7 @@ static constexpr char kFlutterPlatformChannel[] = "flutter/platform";
 static constexpr char kTextInputChannel[] = "flutter/textinput";
 static constexpr char kKeyEventChannel[] = "flutter/keyevent";
 static constexpr char kAccessibilityChannel[] = "flutter/accessibility";
+static constexpr char kFlutterPlatformViewsChannel[] = "flutter/platform_views";
 
 // FL(77): Terminate engine if Fuchsia system FIDL connections have error.
 template <class T>
@@ -79,7 +82,9 @@ void SetInterfaceErrorHandler(fidl::Binding<T>& binding, std::string name) {
 
 PlatformView::PlatformView(
     PlatformView::Delegate& delegate, std::string debug_label,
-    flutter::TaskRunners task_runners,
+    fuchsia::ui::views::ViewRefControl view_ref_control,
+    fuchsia::ui::views::ViewRef view_ref, flutter::TaskRunners task_runners,
+    std::shared_ptr<sys::ServiceDirectory> runner_services,
     fidl::InterfaceHandle<fuchsia::sys::ServiceProvider>
         parent_environment_service_provider_handle,
     fidl::InterfaceRequest<fuchsia::ui::scenic::SessionListener>
@@ -87,18 +92,20 @@ PlatformView::PlatformView(
     fit::closure session_listener_error_callback,
     OnMetricsUpdate session_metrics_did_change_callback,
     OnSizeChangeHint session_size_change_hint_callback,
-    fidl::InterfaceHandle<fuchsia::modular::ContextWriter>
-        accessibility_context_writer,
+    OnEnableWireframe wireframe_enabled_callback,
     zx_handle_t vsync_event_handle)
     : flutter::PlatformView(delegate, std::move(task_runners)),
       debug_label_(std::move(debug_label)),
+      view_ref_control_(std::move(view_ref_control)),
+      view_ref_(std::move(view_ref)),
       session_listener_binding_(this, std::move(session_listener_request)),
       session_listener_error_callback_(
           std::move(session_listener_error_callback)),
       metrics_changed_callback_(std::move(session_metrics_did_change_callback)),
       size_change_hint_callback_(std::move(session_size_change_hint_callback)),
+      wireframe_enabled_callback_(std::move(wireframe_enabled_callback)),
       ime_client_(this),
-      context_writer_bridge_(std::move(accessibility_context_writer)),
+      a11y_settings_watcher_binding_(this),
       surface_(std::make_unique<Surface>(debug_label_)),
       vsync_event_handle_(vsync_event_handle) {
   // Register all error handlers.
@@ -108,6 +115,8 @@ PlatformView::PlatformView(
   SetInterfaceErrorHandler(clipboard_, "Clipboard");
   SetInterfaceErrorHandler(parent_environment_service_provider_,
                            "Parent Environment Service Provider");
+  SetInterfaceErrorHandler(a11y_settings_manager_,
+                           "Accessibility Settings Manager");
   // Access the clipboard.
   parent_environment_service_provider_ =
       parent_environment_service_provider_handle.Bind();
@@ -122,10 +131,17 @@ PlatformView::PlatformView(
   // Finally! Register the native platform message handlers.
   RegisterPlatformMessageHandlers();
 
-  // TODO(SCN-975): Re-enable.  Likely that Engine should clone the ViewToken
-  // and pass the clone in here.
-  //   view_->GetToken(std::bind(&PlatformView::ConnectSemanticsProvider, this,
-  //                             std::placeholders::_1));
+  fuchsia::ui::views::ViewRef accessibility_view_ref;
+  view_ref_.Clone(&accessibility_view_ref);
+  accessibility_bridge_ = std::make_unique<AccessibilityBridge>(
+      runner_services, std::move(accessibility_view_ref));
+  // Register with the A11y Settings Manager
+  runner_services->Connect(fuchsia::accessibility::SettingsManager::Name_,
+                           a11y_settings_manager_.NewRequest().TakeChannel());
+  fidl::InterfaceHandle<fuchsia::accessibility::SettingsWatcher>
+      a11y_watcher_handle;
+  a11y_settings_watcher_binding_.Bind(a11y_watcher_handle.NewRequest());
+  a11y_settings_manager_->Watch(std::move(a11y_watcher_handle));
 }
 
 PlatformView::~PlatformView() = default;
@@ -140,6 +156,26 @@ void PlatformView::RegisterPlatformMessageHandlers() {
   platform_message_handlers_[kAccessibilityChannel] =
       std::bind(&PlatformView::HandleAccessibilityChannelPlatformMessage, this,
                 std::placeholders::_1);
+  platform_message_handlers_[kFlutterPlatformViewsChannel] =
+      std::bind(&PlatformView::HandleFlutterPlatformViewsChannelPlatformMessage,
+                this, std::placeholders::_1);
+}
+
+void PlatformView::OnSettingsChange(fuchsia::accessibility::Settings settings) {
+  int32_t flags = 0;
+  if (settings.has_color_inversion_enabled() &&
+      settings.color_inversion_enabled()) {
+    flags |=
+        static_cast<int32_t>(flutter::AccessibilityFeatureFlag::kInvertColors);
+  }
+  bool screen_reader_enabled =
+      settings.has_screen_reader_enabled() && settings.screen_reader_enabled();
+  if (screen_reader_enabled) {
+    flags |= static_cast<int32_t>(
+        flutter::AccessibilityFeatureFlag::kAccessibleNavigation);
+  }
+  SetSemanticsEnabled(screen_reader_enabled);
+  SetAccessibilityFeatures(flags);
 }
 
 void PlatformView::OnPropertiesChanged(
@@ -162,13 +198,6 @@ void PlatformView::OnPropertiesChanged(
 
   FlushViewportMetrics();
 }
-
-// TODO(SCN-975): Re-enable.
-// void PlatformView::ConnectSemanticsProvider(
-//     fuchsia::ui::views::ViewToken token) {
-//   semantics_bridge_.SetupEnvironment(
-//       token, parent_environment_service_provider_.get());
-// }
 
 void PlatformView::UpdateViewportMetrics(
     const fuchsia::ui::gfx::Metrics& metrics) {
@@ -297,7 +326,7 @@ void PlatformView::OnScenicEvent(
       case fuchsia::ui::scenic::Event::Tag::kGfx:
         switch (event.gfx().Which()) {
           case fuchsia::ui::gfx::Event::Tag::kMetrics: {
-            if (event.gfx().metrics().metrics != scenic_metrics_) {
+            if (!fidl::Equals(event.gfx().metrics().metrics, scenic_metrics_)) {
               scenic_metrics_ = std::move(event.gfx().metrics().metrics);
               metrics_changed_callback_(scenic_metrics_);
               UpdateViewportMetrics(scenic_metrics_);
@@ -588,14 +617,16 @@ void PlatformView::HandlePlatformMessage(
 }
 
 // |flutter::PlatformView|
+void PlatformView::SetSemanticsEnabled(bool enabled) {
+  accessibility_bridge_->SetSemanticsEnabled(enabled);
+  flutter::PlatformView::SetSemanticsEnabled(enabled);
+}
+
+// |flutter::PlatformView|
 void PlatformView::UpdateSemantics(
     flutter::SemanticsNodeUpdates update,
     flutter::CustomAccessibilityActionUpdates actions) {
-  // TODO(MI4-1262): Figure out if the context_writer_bridge should be removed
-  // as it is unused.
-  // context_writer_bridge_.UpdateSemantics(update);
-  // TODO(MIT-1539): Uncomment/Reimplement following code, to add A11y support.
-  // semantics_bridge_.UpdateSemantics(update);
+  accessibility_bridge_->AddSemanticsNodeUpdate(update);
 }
 
 // Channel handler for kAccessibilityChannel
@@ -633,7 +664,7 @@ void PlatformView::HandleFlutterPlatformChannelPlatformMessage(
       writer.StartArray();
       writer.StartObject();
       writer.Key("text");
-      writer.String(text.get());
+      writer.String(text.value_or(""));
       writer.EndObject();
       writer.EndArray();
       std::string result = json_buffer.GetString();
@@ -730,6 +761,43 @@ void PlatformView::HandleFlutterTextInputChannelPlatformMessage(
     current_text_input_client_ = 0;
     last_text_state_ = nullptr;
     DeactivateIme();
+  } else {
+    FML_DLOG(ERROR) << "Unknown " << message->channel() << " method "
+                    << method->value.GetString();
+  }
+}
+
+void PlatformView::HandleFlutterPlatformViewsChannelPlatformMessage(
+    fml::RefPtr<flutter::PlatformMessage> message) {
+  FML_DCHECK(message->channel() == kFlutterPlatformViewsChannel);
+  const auto& data = message->data();
+  rapidjson::Document document;
+  document.Parse(reinterpret_cast<const char*>(data.data()), data.size());
+  if (document.HasParseError() || !document.IsObject()) {
+    FXL_VLOG(2) << "Could not parse document";
+    return;
+  }
+  auto root = document.GetObject();
+  auto method = root.FindMember("method");
+  if (method == root.MemberEnd() || !method->value.IsString()) {
+    return;
+  }
+
+  if (method->value == "View.enableWireframe") {
+    auto args_it = root.FindMember("args");
+    if (args_it == root.MemberEnd() || !args_it->value.IsObject()) {
+      FXL_VLOG(2) << "No arguments found.";
+      return;
+    }
+    const auto& args = args_it->value;
+
+    auto enable = args.FindMember("enable");
+    if (!enable->value.IsBool()) {
+      FXL_VLOG(2) << "Argument 'enable' is not a bool";
+      return;
+    }
+
+    wireframe_enabled_callback_(enable->value.GetBool());
   } else {
     FML_DLOG(ERROR) << "Unknown " << message->channel() << " method "
                     << method->value.GetString();

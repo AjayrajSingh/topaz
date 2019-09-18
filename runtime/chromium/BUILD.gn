@@ -2,21 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-import("//build/fidl/fidl.gni")
-import("//build/package.gni")
 import("//build/packages/prebuilt_package.gni")
-import("//topaz/runtime/chromium/chromium_web_sources.gni")
-
-fidl("chromium.web") {
-  sources = chromium_web_sources
-
-  deps = [
-    "//sdk/fidl/fuchsia.sys",
-    "//sdk/fidl/fuchsia.ui.gfx",
-    "//sdk/fidl/fuchsia.ui.views",
-    "//zircon/public/fidl/fuchsia-io",
-  ]
-}
+import("//build/packages/prebuilt_test_manifest.gni")
 
 prebuilt_package("chromium") {
   archive = "//topaz/third_party/chromium/arch/$target_cpu/chromium.far"
@@ -24,4 +11,20 @@ prebuilt_package("chromium") {
 
 prebuilt_package("web_runner") {
   archive = "//topaz/third_party/chromium/arch/$target_cpu/web_runner.far"
+}
+
+# Prebuilt FAR tests
+test_env = [
+  {
+    dimensions = {
+      device_type = "Intel NUC Kit NUC7i5DNHE"
+    }
+    tags = [ "chromium-prebuilts" ]
+  },
+]
+
+prebuilt_test_manifest("chromium_prebuilts") {
+  archive_dir = "//prebuilt/third_party/chromium_tests/arch/x64"
+  package_name_prefix = "chromium_prebuilts"
+  environments = test_env
 }

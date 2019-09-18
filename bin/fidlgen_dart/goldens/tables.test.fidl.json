@@ -6,6 +6,7 @@
   "const_declarations": [],
   "enum_declarations": [],
   "interface_declarations": [],
+  "service_declarations": [],
   "struct_declarations": [],
   "table_declarations": [
     {
@@ -19,7 +20,8 @@
       "size": 16,
       "max_out_of_line": 0,
       "alignment": 8,
-      "max_handles": 0
+      "max_handles": 0,
+      "strict": false
     },
     {
       "name": "test.name/SimpleTable",
@@ -96,7 +98,8 @@
       "size": 16,
       "max_out_of_line": 48,
       "alignment": 8,
-      "max_handles": 0
+      "max_handles": 0,
+      "strict": false
     },
     {
       "name": "test.name/OlderSimpleTable",
@@ -137,7 +140,8 @@
       "size": 16,
       "max_out_of_line": 24,
       "alignment": 8,
-      "max_handles": 0
+      "max_handles": 0,
+      "strict": false
     },
     {
       "name": "test.name/NewerSimpleTable",
@@ -241,15 +245,17 @@
       "size": 16,
       "max_out_of_line": 72,
       "alignment": 8,
-      "max_handles": 0
+      "max_handles": 0,
+      "strict": false
     }
   ],
   "union_declarations": [],
   "xunion_declarations": [],
+  "type_alias_declarations": [],
   "declaration_order": [
+    "test.name/SimpleTable",
     "test.name/OlderSimpleTable",
     "test.name/NewerSimpleTable",
-    "test.name/SimpleTable",
     "test.name/EmptyTable"
   ],
   "declarations": {

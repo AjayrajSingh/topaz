@@ -18,28 +18,28 @@ int main(int argc, const char** argv) {
 
   auto& benchmarks_runner = *maybe_benchmarks_runner;
 
+  benchmarks_runner.AddTspecBenchmark(
+      "dart_inspect.basic_benchmarks",
+      "/pkgfs/packages/dart_inspect_benchmarks/0/data/basic_benchmarks.tspec");
+
   if (benchmarking::IsVulkanSupported()) {
-    // DISABLED: See SCN-1223
-    // AddGraphicsBenchmarks(&benchmarks_runner);
-    FXL_LOG(INFO) << "Graphics performance tests disabled";
+    AddGraphicsBenchmarks(&benchmarks_runner);
   } else {
     FXL_LOG(INFO) << "Vulkan not supported; graphics tests skipped.";
   }
 
-  std::string benchmarks_bot_name = benchmarks_runner.benchmarks_bot_name();
-
   // TODO(PT-118): Input latency tests are only currently supported on NUC.
-  if (benchmarks_bot_name == "topaz-x64-perf-dawson_canyon") {
-    constexpr const char* kLabel = "fuchsia.input_latency.button_flutter";
-    std::string out_file = benchmarks_runner.MakeTempFile();
-    benchmarks_runner.AddCustomBenchmark(
-        kLabel,
-        {"/bin/run",
-         "fuchsia-pkg://fuchsia.com/topaz_input_latency_benchmarks#meta/"
-         "run_button_flutter_benchmark.cmx",
-         "--out_file", out_file, "--benchmark_label", kLabel},
-        out_file);
-  }
+#if !defined(__aarch64__)
+  constexpr const char* kLabel = "fuchsia.input_latency.button_flutter";
+  std::string out_file = benchmarks_runner.MakePerfResultsOutputFilename(kLabel);
+  benchmarks_runner.AddCustomBenchmark(
+      kLabel,
+      {"/bin/run",
+       "fuchsia-pkg://fuchsia.com/topaz_input_latency_benchmarks#meta/"
+       "run_button_flutter_benchmark.cmx",
+       "--out_file", out_file, "--benchmark_label", kLabel},
+      out_file);
+#endif
 
   benchmarks_runner.Finish();
 }

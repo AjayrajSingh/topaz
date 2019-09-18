@@ -24,17 +24,8 @@ const int bytesPerIndex = 16;
 /// Version for HEADER block.
 const int headerVersionNumber = 0;
 
-/// Index of the one-and-only root node (16 bytes).
-const int rootNodeIndex = 1;
-
-/// Each Node needs a parent; Root's parent is 0, which is never a real node.
-const int rootParentIndex = 0;
-
-/// Index of the NAME of the one-and-only root node (32 bytes).
-const int rootNameIndex = 2;
-
-/// First index availalbe for the heap.
-const int heapStartIndex = 4;
+/// First index available for the heap.
+const int heapStartIndex = 2;
 
 /// Size of VMO-block's header bitfield in bytes.
 const int headerSizeBytes = 8;

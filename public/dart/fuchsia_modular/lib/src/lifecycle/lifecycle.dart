@@ -4,6 +4,8 @@
 
 import 'dart:async';
 
+import 'package:fuchsia/fuchsia.dart' as fuchsia;
+
 import 'internal/_lifecycle_impl.dart';
 
 /// Allows running components to be notified when lifecycle events happen in the
@@ -13,7 +15,7 @@ abstract class Lifecycle {
 
   /// Initializes the shared [Lifecycle] instance
   factory Lifecycle() {
-    return _lifecycle ??= LifecycleImpl();
+    return _lifecycle ??= LifecycleImpl(exitHandler: fuchsia.exit);
   }
 
   /// Adds a terminate [listener] which will be called when the system starts to

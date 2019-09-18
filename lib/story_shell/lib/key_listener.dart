@@ -49,10 +49,12 @@ class KeyListener extends KeyboardCaptureListenerHack {
     // cache the Presentation so we can register new events
     _presentation = presentation;
     for (KeyboardEvent ev in registeredEvents.keys) {
-      _presentation?.captureKeyboardEventHack(
-        ev,
-        _keyEventListener.wrap(this),
-      );
+      if (_keyEventListener.isUnbound) {
+        _presentation?.captureKeyboardEventHack(
+          ev,
+          _keyEventListener.wrap(this),
+        );
+      }
     }
   }
 

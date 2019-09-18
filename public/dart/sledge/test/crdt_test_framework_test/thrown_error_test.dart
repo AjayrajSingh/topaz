@@ -72,15 +72,15 @@ void main() async {
 
   test('Checker fails. Random orders. Random sync.', () async {
     final fleet = intMapFleetFactory.newFleet(2)
-      ..runInTransaction(0, (MapValue<int, int> m0) {
+      ..runInTransaction(0, (MapValue<int, int> m0) async {
         m0[1] = 2;
       })
       ..synchronize([0, 1])
-      ..runInTransaction(1, (MapValue<int, int> m1) {
+      ..runInTransaction(1, (MapValue<int, int> m1) async {
         m1[1] = 4;
         m1[2] = 2;
       })
-      ..runInTransaction(0, (MapValue<int, int> m0) {
+      ..runInTransaction(0, (MapValue<int, int> m0) async {
         m0[2] = 4;
       })
       ..setRandomSynchronizationsRate(1.0)

@@ -13,20 +13,31 @@ dart_library("fuchsia_modular_flutter") {
   sources = [
     "session_shell.dart",
     "src/session_shell.dart",
-    "src/story.dart",
     "src/session_shell/internal/_focus_request_watcher_impl.dart",
     "src/session_shell/internal/_focus_watcher_impl.dart",
     "src/session_shell/internal/_modular_session_shell_impl.dart",
+    "src/session_shell/internal/_session_shell_2_impl.dart",
     "src/session_shell/internal/_session_shell_impl.dart",
     "src/session_shell/internal/_session_shell_presentation_provider_impl.dart",
     "src/session_shell/internal/_story_provider_watcher_impl.dart",
+    "src/session_shell/internal/_story_watcher_impl.dart",
+    "src/session_shell_2.dart",
+    "src/story.dart",
+    "src/story_2.dart",
+    "src/story_shell.dart",
+    "src/story_shell/internal/_modular_story_shell_impl.dart",
+    "src/story_shell/internal/_story_shell_factory_impl.dart",
+    "src/surface.dart",
+    "story_shell.dart",
   ]
 
   deps = [
+    "//sdk/fidl/fuchsia.app.discover",
     "//sdk/fidl/fuchsia.modular",
     "//sdk/fidl/fuchsia.ui.views",
     "//third_party/dart-pkg/git/flutter/packages/flutter",
     "//third_party/dart-pkg/pub/meta",
+    "//topaz/public/dart/fuchsia_modular",
     "//topaz/public/dart/fuchsia_scenic_flutter",
     "//topaz/public/dart/fuchsia_services",
   ]
@@ -36,7 +47,9 @@ dart_library("fuchsia_modular_flutter") {
 #   fx run-host-tests fuchsia_modular_flutter_unittests
 flutter_test("fuchsia_modular_flutter_unittests") {
   sources = [
+    "session_shell_2_test.dart",
     "session_shell_test.dart",
+    "story_shell_test.dart",
   ]
 
   deps = [

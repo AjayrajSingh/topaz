@@ -18,7 +18,7 @@ class DisplayPolicyBrightnessModel extends Model {
   /// Returns the maximum brightness level.
   static const double maxLevel = 1.0;
 
-  Display _display;
+  final Display _display;
 
   // ignore: public_member_api_docs
   DisplayPolicyBrightnessModel(this._display) {

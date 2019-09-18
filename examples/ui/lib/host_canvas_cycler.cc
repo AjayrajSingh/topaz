@@ -54,7 +54,7 @@ void HostCanvasCycler::ReleaseAndSwapCanvas() {
   acquired_surface_->flush();
   acquired_surface_.reset();
 
-  const scenic::HostImage* image = surface_pool_.GetImage(surface_index_);
+  const scenic_util::HostImage* image = surface_pool_.GetImage(surface_index_);
   FXL_DCHECK(image);
   content_material_.SetTexture(*image);
 

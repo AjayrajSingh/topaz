@@ -5,11 +5,7 @@
 // ignore_for_file: implementation_imports
 
 import 'dart:typed_data';
-
-import 'package:fuchsia_inspect/src/vmo/vmo_writer.dart';
-import 'package:fuchsia_inspect/src/vmo/vmo_holder.dart';
-import 'package:fuchsia_services/services.dart';
-import 'package:fuchsia_vfs/vfs.dart';
+import 'package:fuchsia_inspect/src/inspect/inspect.dart';
 
 const String value = 'value';
 
@@ -24,58 +20,61 @@ String uniqueName(String prefix) =>
 /// [Item]s are stored in [Table]s. This is an example of a child node
 /// with a parent.
 class Item {
-  final VmoWriter _writer;
-  final int _parent;
-  int _value;
+  final Node node;
 
   /// Constructs an Item.
-  Item(this._writer, this._parent, String name) {
-    var item = _writer.createNode(_parent, name);
-    _value = _writer.createMetric(item, 'value', 0);
+  Item(this.node) {
+    node.intProperty('value');
   }
 
   /// Adds [value] to the [Item]'s metric.
-  void add(int value) => _writer.addMetric(_value, value);
+  void add(int value) => node.intProperty('value').add(value);
 }
 
 /// [Table]s can contain [Items]. This is an example of a parent
 /// containing children.
 class Table {
-  final VmoWriter _writer;
-  final int _parent;
+  final Node node;
   final List<Item> _items = [];
-  final int _table;
 
   /// Constructs a [Table].
-  Table(this._writer, this._parent, String name)
-      : _table = _writer.createNode(_parent, name) {
-    var version = _writer.createProperty(_table, 'version');
-    var frame = _writer.createProperty(_table, 'frame');
-    _writer
-      ..createMetric(_table, 'value', -10)
-      ..setProperty(frame, ByteData(3))
-      ..setProperty(version, '1.0');
+  Table(this.node) {
+    node
+      ..intProperty('value').add(-10)
+      ..byteDataProperty('frame').setValue(ByteData(3))
+      ..stringProperty('version').setValue('1.0');
   }
 
   /// Adds an [Item] with value [value] to the [Table].
   Item newItem(int value) {
-    var item = Item(_writer, _table, uniqueName('item-'))..add(value);
+    var item = Item(node.child(uniqueName('item-')))..add(value);
     _items.add(item);
     return item;
   }
 }
 
 void main(List<String> args) {
-  var vmo = VmoHolder(4096);
-  var writer = VmoWriter(vmo);
-  var t1 = Table(writer, writer.rootNode, 't1');
-  var t2 = Table(writer, writer.rootNode, 't2');
+  // ReadHierarchy Test
+  var inspect = Inspect();
+  var t1 = Table(inspect.root.child('t1'));
+  var t2 = Table(inspect.root.child('t2'));
 
-  t1.newItem(10);
-  t1.newItem(90).add(10);
+  t1
+    ..newItem(10)
+    ..newItem(90).add(10);
   t2.newItem(2).add(2);
 
-  final context = StartupContext.fromStartupInfo();
-  final vnode = VmoFile.readOnly(vmo.vmo, VmoSharingMode.shareDuplicate);
-  context.outgoing.debugDir().addNode('root.inspect', vnode);
+  // DynamicGeneratesNewHierarchy Test
+  int nextDigit = 0;
+  void writeNextDigit(Node root) {
+    root.child('increments').stringProperty('value').setValue('$nextDigit');
+    root.child('doubles').stringProperty('value').setValue('${nextDigit * 2}');
+    nextDigit += 1;
+  }
+
+  Inspect.onDemand('digits_of_numbers', writeNextDigit);
+
+  // NamedInspectVisible Test
+  Inspect.named('test');
+  Inspect.named('test');
 }

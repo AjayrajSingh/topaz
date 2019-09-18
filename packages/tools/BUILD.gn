@@ -2,31 +2,11 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-group("fidlgen_dart") {
-  testonly = true
-  public_deps = [
-    "//topaz/bin/fidlgen_dart:install(//build/toolchain:host_x64)",
-  ]
-}
-
-group("dart") {
-  testonly = true
-  public_deps = [
-  ]
-}
-
-group("all") {
-  testonly = true
-  public_deps = [
-    "//topaz/packages/tools:dart",
-    "//topaz/packages/tools:doc_checker",
-    "//topaz/packages/tools:fidlgen_dart",
-  ]
-}
-
+# WARNING: Known to infrastructure.
 group("doc_checker") {
   testonly = true
   public_deps = [
     "//topaz/tools/doc_checker(//build/toolchain:host_x64)",
+    "//topaz/tools/doc_checker:tests(//build/toolchain:host_x64)",
   ]
 }

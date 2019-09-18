@@ -84,13 +84,6 @@ void main() {
         mod.addModuleToStory(name: 'foo', intent: null), throwsArgumentError);
   });
 
-  test('verify requestFocus should call context.requestFocus', () {
-    final mockContext = MockModuleContext();
-    ModuleImpl(intentHandlerImpl: handlerImpl, moduleContext: mockContext)
-        .requestFocus();
-    verify(mockContext.requestFocus());
-  });
-
   test('verify removeSelfFromStory should call context.removeSelfFromStory',
       () {
     final mockContext = MockModuleContext();

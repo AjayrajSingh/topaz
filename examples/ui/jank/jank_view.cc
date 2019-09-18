@@ -8,7 +8,6 @@
 
 #include <string>
 
-#include "lib/component/cpp/connect.h"
 #include "src/lib/fxl/logging.h"
 #include "src/lib/fxl/macros.h"
 #include "src/lib/fxl/time/time_delta.h"
@@ -87,12 +86,13 @@ void JankView::DrawButton(SkCanvas* canvas, const char* label,
   SkFont textFont;
   textFont.setTypeface(typeface_);
   textFont.setSize(kTextSize);
-  textFont.measureText(label, strlen(label), kUTF8_SkTextEncoding, &textBounds);
+  textFont.measureText(label, strlen(label), SkTextEncoding::kUTF8,
+                       &textBounds);
 
   SkPaint textPaint;
   textPaint.setColor(SK_ColorBLACK);
   textPaint.setAntiAlias(true);
-  canvas->drawSimpleText(label, strlen(label), kUTF8_SkTextEncoding,
+  canvas->drawSimpleText(label, strlen(label), SkTextEncoding::kUTF8,
                          bounds.centerX() - textBounds.centerX(),
                          bounds.centerY() - textBounds.centerY(), textFont,
                          textPaint);

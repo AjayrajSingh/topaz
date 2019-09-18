@@ -105,6 +105,7 @@ template("dart_fuchsia_test") {
   dart_jit_app(target_name) {
     forward_variables_from(invoker,
                            [
+                             "deprecated_shell",
                              "disable_analysis",
                              "sandbox",
                              "meta",

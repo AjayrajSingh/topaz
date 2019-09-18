@@ -7,11 +7,10 @@
 #include <lib/fdio/directory.h>
 #include <lib/fdio/fd.h>
 #include <lib/fdio/fdio.h>
-#include <lib/inspect/reader.h>
-#include <lib/inspect/testing/inspect.h>
+#include <lib/inspect/cpp/reader.h>
+#include <lib/inspect/testing/cpp/inspect.h>
 
 #include "gmock/gmock.h"
-#include "lib/inspect/deprecated/expose.h"
 #include "lib/sys/cpp/testing/test_with_environment.h"
 #include "src/lib/files/glob.h"
 #include "src/lib/fxl/strings/substitute.h"
@@ -20,7 +19,6 @@ namespace {
 
 using ::fxl::Substitute;
 using sys::testing::EnclosingEnvironment;
-using ::testing::ElementsAre;
 using ::testing::UnorderedElementsAre;
 using namespace inspect::testing;
 
@@ -28,6 +26,8 @@ constexpr char kTestComponent[] =
     "fuchsia-pkg://fuchsia.com/dart_inspect_vmo_test_writer#meta/"
     "dart_inspect_vmo_test_writer.cmx";
 constexpr char kTestProcessName[] = "dart_inspect_vmo_test_writer.cmx";
+constexpr char kTestInspectFileName1[] = "test";
+constexpr char kTestInspectFileName2[] = "test_2";
 
 class InspectTest : public sys::testing::TestWithEnvironment {
  protected:
@@ -61,40 +61,45 @@ class InspectTest : public sys::testing::TestWithEnvironment {
 
   // Open the root object connection on the given sync pointer.
   // Returns ZX_OK on success.
-  zx_status_t GetInspectVmo(zx::vmo* out_vmo) {
-    files::Glob glob(Substitute(
-        "/hub/r/test/*/c/*/*/c/$0/*/out/debug/root.inspect", kTestProcessName));
+  fit::result<fuchsia::io::FileSyncPtr, zx_status_t> OpenInspectVmoFile(
+      const std::string& file_name) {
+    files::Glob glob(
+        Substitute("/hub/r/test/*/c/*/*/c/$0/*/out/debug/$1.inspect",
+                   kTestProcessName, file_name));
     if (glob.size() == 0) {
       printf("Size == 0\n");
-      return ZX_ERR_NOT_FOUND;
+      return fit::error(ZX_ERR_NOT_FOUND);
     }
 
     fuchsia::io::FileSyncPtr file;
-    zx_status_t status;
-    status = fdio_open(std::string(*glob.begin()).c_str(),
-                       fuchsia::io::OPEN_RIGHT_READABLE,
-                       file.NewRequest().TakeChannel().release());
+    auto status = fdio_open(std::string(*glob.begin()).c_str(),
+                            fuchsia::io::OPEN_RIGHT_READABLE,
+                            file.NewRequest().TakeChannel().release());
     if (status != ZX_OK) {
       printf("Status bad %d\n", status);
-      return status;
+      return fit::error(status);
     }
 
     EXPECT_TRUE(file.is_bound());
 
+    return fit::ok(std::move(file));
+  }
+
+  fit::result<zx::vmo, zx_status_t> DescribeInspectVmoFile(
+      const fuchsia::io::FileSyncPtr& file) {
     fuchsia::io::NodeInfo info;
-    auto get_status = file->Describe(&info);
-    if (get_status != ZX_OK) {
+    auto status = file->Describe(&info);
+    if (status != ZX_OK) {
       printf("get failed\n");
-      return get_status;
+      return fit::error(status);
     }
 
     if (!info.is_vmofile()) {
       printf("not a vmofile");
-      return ZX_ERR_NOT_FOUND;
+      return fit::error(ZX_ERR_NOT_FOUND);
     }
 
-    *out_vmo = std::move(info.vmofile().vmo);
-    return ZX_OK;
+    return fit::ok(std::move(info.vmofile().vmo));
   }
 
  private:
@@ -103,47 +108,118 @@ class InspectTest : public sys::testing::TestWithEnvironment {
 };
 
 TEST_F(InspectTest, ReadHierarchy) {
-  zx::vmo vmo;
-  ASSERT_EQ(ZX_OK, GetInspectVmo(&vmo));
-  auto result = inspect::ReadFromVmo(std::move(vmo));
-  ASSERT_TRUE(result.is_ok());
-  inspect::ObjectHierarchy hierarchy = result.take_value();
+  auto open_file_result(InspectTest::OpenInspectVmoFile("root"));
+  ASSERT_TRUE(open_file_result.is_ok());
+  fuchsia::io::FileSyncPtr file(open_file_result.take_value());
+  auto describe_file_result = InspectTest::DescribeInspectVmoFile(file);
+  ASSERT_TRUE(describe_file_result.is_ok());
+  zx::vmo vmo(describe_file_result.take_value());
+  auto read_file_result = inspect::ReadFromVmo(std::move(vmo));
+  ASSERT_TRUE(read_file_result.is_ok());
+  inspect::Hierarchy hierarchy = read_file_result.take_value();
+
+  // TODO(36155): Remove this once root migration is complete.
+  auto* real_hierarchy = hierarchy.GetByPath({"root"});
+  if (real_hierarchy == nullptr) {
+    real_hierarchy = &hierarchy;
+  }
+
   EXPECT_THAT(
-      hierarchy,
+      *real_hierarchy,
       AllOf(
           NodeMatches(NameMatches("root")),
           ChildrenMatch(UnorderedElementsAre(
-              AllOf(NodeMatches(AllOf(
-                        NameMatches("t1"),
-                        PropertyList(UnorderedElementsAre(
-                            StringPropertyIs("version", "1.0"),
-                            ByteVectorPropertyIs(
-                                "frame", std::vector<uint8_t>({0, 0, 0})))),
-                        MetricList(
-                            UnorderedElementsAre(IntMetricIs("value", -10))))),
+              AllOf(NodeMatches(
+                        AllOf(NameMatches("t1"),
+                              PropertyList(UnorderedElementsAre(
+                                  StringIs("version", "1.0"),
+                                  ByteVectorIs("frame",
+                                               std::vector<uint8_t>({0, 0, 0})),
+                                  IntIs("value", -10))))),
                     ChildrenMatch(UnorderedElementsAre(
                         NodeMatches(AllOf(NameMatches("item-0x0"),
-                                          MetricList(UnorderedElementsAre(
-                                              IntMetricIs("value", 10))))),
+                                          PropertyList(UnorderedElementsAre(
+                                              IntIs("value", 10))))),
                         NodeMatches(AllOf(NameMatches("item-0x1"),
-                                          MetricList(UnorderedElementsAre(
-                                              IntMetricIs("value", 100)))))
+                                          PropertyList(UnorderedElementsAre(
+                                              IntIs("value", 100)))))
 
                             ))),
               AllOf(
                   NodeMatches(AllOf(
                       NameMatches("t2"),
                       PropertyList(UnorderedElementsAre(
-                          StringPropertyIs("version", "1.0"),
-                          ByteVectorPropertyIs(
-                              "frame", std::vector<uint8_t>({0, 0, 0})))),
-                      MetricList(
-                          UnorderedElementsAre(IntMetricIs("value", -10))))),
+                          StringIs("version", "1.0"),
+                          ByteVectorIs("frame",
+                                       std::vector<uint8_t>({0, 0, 0})),
+                          IntIs("value", -10))))),
                   ChildrenMatch(UnorderedElementsAre(NodeMatches(AllOf(
-                      NameMatches("item-0x2"), MetricList(UnorderedElementsAre(
-                                                   IntMetricIs("value", 4)))))))
+                      NameMatches("item-0x2"),
+                      PropertyList(UnorderedElementsAre(IntIs("value", 4)))))))
 
                       )))));
 }
 
+TEST_F(InspectTest, DynamicGeneratesNewHierarchy) {
+  auto open_file_result(OpenInspectVmoFile("digits_of_numbers"));
+  ASSERT_TRUE(open_file_result.is_ok());
+  fuchsia::io::FileSyncPtr file(open_file_result.take_value());
+
+  std::vector<std::string> increments_value;
+  std::vector<std::string> doubles_value;
+  auto expectInspectOnDemandVmoFile = [&]() {
+    auto describe_file_result(DescribeInspectVmoFile(file));
+    ASSERT_TRUE(describe_file_result.is_ok());
+    zx::vmo vmo(describe_file_result.take_value());
+    auto read_file_result = inspect::ReadFromVmo(std::move(vmo));
+    ASSERT_TRUE(read_file_result.is_ok());
+    inspect::Hierarchy hierarchy = read_file_result.take_value();
+
+    // TODO(36155): Remove this once root migration is complete.
+    auto* real_hierarchy = hierarchy.GetByPath({"root"});
+    if (real_hierarchy == nullptr) {
+      real_hierarchy = &hierarchy;
+    }
+
+    EXPECT_THAT(
+        *real_hierarchy,
+        AllOf(
+            NodeMatches(NameMatches("root")),
+            ChildrenMatch(UnorderedElementsAre(
+                NodeMatches(AllOf(  // child one
+                    NameMatches("increments"),
+                    PropertyList(UnorderedElementsAre(StringIs(
+                        "value", ::testing::Truly([&](const std::string& val) {
+                          increments_value.push_back(val);
+                          return true;
+                        })))))),
+                NodeMatches(AllOf(  // child two
+                    NameMatches("doubles"),
+                    PropertyList(UnorderedElementsAre(StringIs(
+                        "value", ::testing::Truly([&](const std::string& val) {
+                          doubles_value.push_back(val);
+                          return true;
+                        }))))))))));
+  };
+
+  expectInspectOnDemandVmoFile();
+  expectInspectOnDemandVmoFile();
+
+  ASSERT_EQ(2u, increments_value.size());
+  ASSERT_EQ(2u, doubles_value.size());
+
+  EXPECT_NE(increments_value[0], increments_value[1]);
+  EXPECT_NE(doubles_value[0], doubles_value[1]);
+}
+
+TEST_F(InspectTest, NamedInspectVisible) {
+  files::Glob glob1(
+      Substitute("/hub/r/test/*/c/*/*/c/$0/*/out/debug/$1.inspect",
+                 kTestProcessName, kTestInspectFileName1));
+  files::Glob glob2(
+      Substitute("/hub/r/test/*/c/*/*/c/$0/*/out/debug/$1.inspect",
+                 kTestProcessName, kTestInspectFileName2));
+  EXPECT_TRUE(glob1.size() > 0);
+  EXPECT_TRUE(glob2.size() > 0);
+}
 }  // namespace

@@ -31,7 +31,7 @@ class TilePresenter extends Presenter<TileLayoutModel> {
   // Stream controllers
   final _layoutSuggestionController =
       StreamController<LayoutSuggestionUpdate>.broadcast();
-  final _updateController = StreamController<TileLayoutModel>();
+  final _updateController = StreamController<TileLayoutModel>.broadcast();
 
   /// Streams the current layout.
   Stream<TileLayoutModel> get update => _updateController.stream;

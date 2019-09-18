@@ -13,7 +13,7 @@ struct Status {
     uint32 duration;
 };
 
-// Defines additional options used during |Load|.
+// Defines additional options used during `Load`.
 struct Options {
     uint32 background_color;
     bool loop;
@@ -23,20 +23,20 @@ struct Options {
 // Defines the player interface to control the animation. It is returned upon
 // successful load of the animation.
 protocol Player {
-    // Seek to position |t| where 0 <= t <= 1.
+    // Seek to position `t` where 0 <= t <= 1.
     Seek(float32 t);
-    // Play and stop at |t| = 1 if |loop| = false.
+    // Play and stop at `t` = 1 if `loop` = false.
     Play();
     // Pause player.
     Pause();
 };
 
 [Discoverable]
-// Skottie loader exported by |ViewProvider| to load skottie JSON animations
+// Skottie loader exported by `ViewProvider` to load skottie JSON animations
 // into views created from it.
 protocol Loader {
     // Load the snapshot from the Vmo buffer payload. Returns a callback with
-    // |Player| controller and load status |Status|. |player| is null if loading
+    // `Player` controller and load status `Status`. `player` is null if loading
     // failed.
     Load(fuchsia.mem.Buffer payload, Options options) -> (Status status, Player? player);
 };

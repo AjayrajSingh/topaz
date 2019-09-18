@@ -70,39 +70,11 @@ if (is_linux || is_mac) {
     }
   }
 
-  # TODO(IN-819) Delete the following two targets once we are no longer running
-  # host tests out of one directory.
-  _deprecated_test_data_dir =
-      "$root_build_dir/host_tests/test_data/extract_zircon_constants"
-  copy("deprecated_extract_zircon_constants_data") {
-    sources = [
-      "//prebuilt/third_party/dart/$host_os-$host_cpu/bin/dart",
-      "//prebuilt/third_party/dart/$host_os-$host_cpu/bin/dartfmt",
-      "//zircon/system/public/zircon/errors.h",
-      "//zircon/system/public/zircon/rights.h",
-      "//zircon/system/public/zircon/types.h",
-      "extract-zircon-constants.py",
-      "lib/src/constants.dart",
-    ]
-
-    outputs = [
-      "$_deprecated_test_data_dir/{{source_file_part}}",
-    ]
-  }
-
-  copy("deprecated_extract_zircon_constants_snapshot_data") {
-    sources = [
-      "//prebuilt/third_party/dart/$host_os-$host_cpu/bin/snapshots/dartfmt.dart.snapshot",
-    ]
-    outputs = [
-      "$_deprecated_test_data_dir/snapshots/dartfmt.dart.snapshot",
-    ]
-  }
-
   _test = "$root_out_dir/test_extract_zircon_constants"
   test_spec("test_extract_zircon_constants_spec") {
-    name = get_label_info(":test_extract_zircon_constants", "name")
-    location = _test
+    name = "test_extract_zircon_constants"
+    install_path = _test
+
     deps = [
       ":extract_zircon_constants_data",
       ":extract_zircon_constants_snapshot_data",
@@ -119,8 +91,6 @@ if (is_linux || is_mac) {
       _test,
     ]
     deps = [
-      ":deprecated_extract_zircon_constants_data",
-      ":deprecated_extract_zircon_constants_snapshot_data",
       ":test_extract_zircon_constants_spec",
     ]
   }

@@ -6,9 +6,7 @@ import("//build/package.gni")
 import("//build/testing/environments.gni")
 
 source_set("logging") {
-  visibility = [
-    ":*",
-  ]
+  visibility = [ ":*" ]
 
   sources = [
     "logging.h",
@@ -33,11 +31,12 @@ source_set("utils") {
 
   deps = [
     ":logging",
+    "//sdk/fidl/fuchsia.feedback",
     "//third_party/tonic",
-    "//zircon/public/fidl/fuchsia-crash",
-    "//zircon/public/fidl/fuchsia-io",
-    "//zircon/public/fidl/fuchsia-mem",
+    "//zircon/system/fidl/fuchsia-io",
+    "//zircon/system/fidl/fuchsia-mem",
     "//zircon/public/lib/async-loop-cpp",
+    "//zircon/public/lib/async-loop-default",
     "//zircon/public/lib/memfs",
     "//zircon/public/lib/syslog",
   ]
@@ -50,7 +49,7 @@ source_set("vmo") {
   ]
 
   public_deps = [
-    "//zircon/public/fidl/fuchsia-mem",
+    "//zircon/system/fidl/fuchsia-mem",
     "//zircon/public/lib/fdio",
   ]
 

@@ -25,7 +25,7 @@ class LocalizedModStrings {
         name: 'bodyText',
         args: [itemCount],
         desc: 'How many messages are in the list.',
-        examples: {'itemCount': 42},
+        examples: const {'itemCount': 42},
       );
 
   static String get footer => Intl.message(

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:fuchsia_services/services.dart';
+import 'package:fuchsia_vfs/vfs.dart' as vfs;
 
 import '../../vmo/vmo_writer.dart';
 import '../inspect.dart';
@@ -15,8 +15,8 @@ class InspectImpl implements Inspect {
   Node _root;
 
   /// The default constructor for this instance.
-  InspectImpl(StartupContext context, VmoWriter writer) {
-    context.outgoing.debugDir().addNode('root.inspect', writer.vmoNode);
+  InspectImpl(vfs.PseudoDir directory, String fileName, VmoWriter writer) {
+    directory.addNode(fileName, writer.vmoNode);
 
     _root = RootNode(writer);
   }

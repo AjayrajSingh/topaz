@@ -20,6 +20,7 @@ import '_focus_watcher_impl.dart';
 import '_modular_session_shell_impl.dart';
 import '_session_shell_presentation_provider_impl.dart';
 import '_story_provider_watcher_impl.dart';
+import '_story_watcher_impl.dart';
 
 typedef StoryFactory = Story Function({
   SessionShell sessionShell,
@@ -50,6 +51,9 @@ class SessionShellImpl implements SessionShell {
 
   /// Holds the [Story] instance mapped by it's id.
   final _stories = <String, Story>{};
+
+  /// Holds the [modular.StoryWatcherBinding] instances mapped by story id.
+  final _storyWatchers = <String, modular.StoryWatcherBinding>{};
 
   final _focusController = modular.FocusControllerProxy();
   final _focusProvider = modular.FocusProviderProxy();
@@ -93,17 +97,16 @@ class SessionShellImpl implements SessionShell {
     startupContext.outgoing.addPublicService(
       (InterfaceRequest<modular.SessionShellPresentationProvider> request) =>
           _presentationBindings.add(
-            modular.SessionShellPresentationProviderBinding()
-              ..bind(
-                  SessionShellPresentationProviderImpl(context.getPresentation,
-                      (storyId, watcher) {
-                    _visualStateWatchers[storyId] =
-                        modular.StoryVisualStateWatcherProxy()
-                          ..ctrl.bind(watcher);
-                    _updateVisualStateWatchers();
-                  }),
-                  request),
-          ),
+        modular.SessionShellPresentationProviderBinding()
+          ..bind(
+              SessionShellPresentationProviderImpl(context.getPresentation,
+                  (storyId, watcher) {
+                _visualStateWatchers[storyId] =
+                    modular.StoryVisualStateWatcherProxy()..ctrl.bind(watcher);
+                _updateVisualStateWatchers();
+              }),
+              request),
+      ),
       modular.SessionShellPresentationProvider.$serviceName,
     );
   }
@@ -196,7 +199,7 @@ class SessionShellImpl implements SessionShell {
     ArgumentError.checkNotNull(context, 'context');
 
     storyProvider.watch(_storyProviderWatcherBinding
-        .wrap(StoryProviderWatcherImpl(onChange, _onDelete)));
+        .wrap(StoryProviderWatcherImpl(onChange, _onChange2, _onDelete)));
 
     context.getFocusController(_focusController.ctrl.request());
     _focusController.watchRequest(_focusRequestWatcherBinding
@@ -205,6 +208,19 @@ class SessionShellImpl implements SessionShell {
     context.getFocusProvider(_focusProvider.ctrl.request());
     _focusProvider
         .watch(_focusWatcherBinding.wrap(FocusWatcherImpl(onFocusChange)));
+  }
+
+  /// Watch modular framework for stories and focus.
+  @visibleForTesting
+  modular.StoryWatcherBinding watchStory(
+      modular.StoryController storyController,
+      modular.StoryWatcher storyWatcher) {
+    ArgumentError.checkNotNull(storyController, 'storyController');
+    ArgumentError.checkNotNull(storyWatcher, 'storyWatcher');
+
+    final watcher = modular.StoryWatcherBinding();
+    storyController.watch(watcher.wrap(storyWatcher));
+    return watcher;
   }
 
   /// Called by [modular.StoryProviderWatcher] to update story state.
@@ -220,13 +236,19 @@ class SessionShellImpl implements SessionShell {
         storyProvider.getController(info.id, storyController.ctrl.request());
         storyController.requestStart();
 
-        _stories[info.id] = onStoryStarted(
+        final story = onStoryStarted(
           info: info,
           sessionShell: this,
           controller: storyController,
         )
           ..state = state
           ..visibilityState = visibilityState;
+
+        final watcher = watchStory(storyController,
+            StoryWatcherImpl(story.onModuleAdded, story.onModuleFocused));
+        _storyWatchers[info.id] = watcher;
+
+        _stories[info.id] = story;
 
         onStoryChanged?.call(_stories[info.id]);
       }
@@ -238,6 +260,14 @@ class SessionShellImpl implements SessionShell {
       onStoryChanged?.call(_stories[info.id]);
     }
   }
+
+  /// Called by [modular.StoryProviderWatcher] to update story state.
+  /// Unimplemented because this class works only with [StoryInfo].
+  void _onChange2(
+    modular.StoryInfo2 info,
+    modular.StoryState state,
+    modular.StoryVisibilityState visibilityState,
+  ) {}
 
   /// Returns a new instance of [modular.StoryControllerProxy].
   @visibleForTesting
@@ -254,6 +284,8 @@ class SessionShellImpl implements SessionShell {
     _stories.remove(storyId);
 
     _visualStateWatchers.remove(storyId);
+
+    _storyWatchers.remove(storyId);
 
     if (focusedStory == story) {
       focusedStory = null;

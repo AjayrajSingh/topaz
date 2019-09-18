@@ -7,7 +7,7 @@ import 'package:fidl/fidl.dart' as fidl;
 
 class FakePageWatcherInterfaceHandle
     extends fidl.InterfaceHandle<ledger.PageWatcher> {
-  ledger.PageWatcher _pageWatcher;
+  final ledger.PageWatcher _pageWatcher;
   FakePageWatcherInterfaceHandle(this._pageWatcher) : super(null);
 
   Future<fidl.InterfaceRequest<ledger.PageSnapshot>> onChange(

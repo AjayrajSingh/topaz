@@ -7,7 +7,6 @@
         "services": [
             "fuchsia.fonts.Provider",
             "fuchsia.media.playback.Player",
-            "fuchsia.modular.ContextWriter",
             "fuchsia.modular.Clipboard",
             "fuchsia.sys.Environment",
             "fuchsia.ui.input.ImeService",

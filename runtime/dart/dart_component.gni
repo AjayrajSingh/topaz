@@ -110,6 +110,7 @@ template("_flutter_dart_jit_package") {
     forward_variables_from(invoker,
                            [
                              "deprecated_global_persistent_storage",
+                             "deprecated_shell",
                              "testonly",
                              "tests",
                            ])
@@ -897,6 +898,7 @@ template("flutter_dart_aot_component") {
             rebase_path(shared_snapshot_instructions_path),
         "--print-instructions-sizes-to=" + rebase_path(stats_json_path),
       ]
+
       # No asserts in debug or release product.
       # No asserts in release with flutter_profile=true (non-product)
       # Yes asserts in non-product debug.

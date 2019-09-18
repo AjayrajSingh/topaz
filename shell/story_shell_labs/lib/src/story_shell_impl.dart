@@ -10,8 +10,7 @@ import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl_modular;
 import 'package:fuchsia_logger/logger.dart';
 import 'package:fuchsia_modular/lifecycle.dart';
 import 'package:fuchsia_scenic_flutter/child_view_connection.dart';
-// TODO: figure out how to include layout.dart instead
-import 'package:story_shell_labs_lib/layout/deja_layout.dart';
+import 'package:story_shell_labs_lib/layout/layout.dart';
 import 'package:meta/meta.dart';
 
 import 'story_visual_state_watcher_impl.dart';
@@ -21,7 +20,7 @@ class StoryShellImpl extends fidl_modular.StoryShell {
   final _storyShellContext = fidl_modular.StoryShellContextProxy();
   final _visualStateWatcherBinding =
       fidl_modular.StoryVisualStateWatcherBinding();
-  final DejaLayout layoutManager;
+  final Layout layoutManager;
 
   fidl_modular.StoryShellBinding _storyShellBinding;
   StoryVisualStateWatcherImpl _storyVisualStateWatcher;

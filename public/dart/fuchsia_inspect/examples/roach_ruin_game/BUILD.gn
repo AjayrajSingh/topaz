@@ -1,0 +1,73 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+import("//topaz/runtime/dart/dart_fuchsia_test.gni")
+import("//topaz/runtime/dart/flutter_test.gni")
+import("//topaz/runtime/flutter_runner/flutter_app.gni")
+
+dart_library("roach_ruin") {
+  package_name = "roach_ruin"
+  sdk_category = "partner"
+  sources = [
+    "main.dart",
+    "roachGame.dart",
+    "roachLogic.dart",
+    "root_intent_handler.dart",
+  ]
+
+  deps = [
+    "//third_party/dart-pkg/git/flutter/packages/flutter",
+    "//topaz/public/dart/fuchsia_inspect",
+    "//topaz/public/dart/fuchsia_modular",
+    "//topaz/public/dart/fuchsia_inspect_flutter",
+  ]
+}
+
+flutter_app("roach_ruin_game") {
+  main_dart = "lib/main.dart"
+  manifest = "pubspec.yaml"
+  meta = [
+    {
+      path = rebase_path("meta/roach_ruin_game.cmx")
+      dest = "roach_ruin_game.cmx"
+    },
+  ]
+
+  source_dir = "."
+  sources = []
+  deps = [
+    ":roach_ruin",
+  ]
+}
+
+flutter_test("roach_flutter_test") {
+  source_dir = "test/fluttertest"
+  sources = [
+    "roach_flutter_test.dart",
+  ]
+
+  deps = [
+    ":roach_ruin",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/pub/mockito",
+  ]
+}
+
+dart_fuchsia_test("roach_dart_test") {
+  source_dir = "test/darttest"
+  sources = [
+    "roach_dart_test.dart",
+  ]
+
+  meta = [
+    {
+      path = rebase_path("meta/roach_dart_test.cmx")
+      dest = "roach_dart_test.cmx"
+    },
+  ]
+  deps = [
+    ":roach_ruin",
+    "//third_party/dart-pkg/git/flutter/packages/flutter_test",
+    "//third_party/dart-pkg/pub/mockito",
+  ]
+}

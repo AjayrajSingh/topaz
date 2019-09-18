@@ -25,7 +25,7 @@ class SkiaFontLoader {
 
   // Loads the requested font and invokes the callback when done.
   // If the request fails, the callback will receive a null typeface.
-  void LoadFont(fuchsia::fonts::Request request, FontCallback callback);
+  void LoadFont(fuchsia::fonts::TypefaceRequest request, FontCallback callback);
 
   // Loads the default font and invokes the callback when done.
   // If the request fails, the callback will receive a null typeface.

@@ -6,7 +6,7 @@
                 "fuchsia.devicesettings.DeviceSettingsManager": "fuchsia-pkg://fuchsia.com/device_settings_manager#meta/device_settings_manager.cmx",
                 "fuchsia.fonts.Provider": "fuchsia-pkg://fuchsia.com/fonts#meta/fonts.cmx",
                 "fuchsia.sysmem.Allocator": "fuchsia-pkg://fuchsia.com/sysmem_connector#meta/sysmem_connector.cmx",
-                "fuchsia.tracelink.Registry": "fuchsia-pkg://fuchsia.com/trace_manager#meta/trace_manager.cmx",
+                "fuchsia.tracing.provider.Registry": "fuchsia-pkg://fuchsia.com/trace_manager#meta/trace_manager.cmx",
                 "fuchsia.ui.policy.Presenter": "fuchsia-pkg://fuchsia.com/root_presenter#meta/root_presenter.cmx",
                 "fuchsia.ui.scenic.Scenic": "fuchsia-pkg://fuchsia.com/scenic#meta/scenic.cmx",
                 "fuchsia.vulkan.loader.Loader": "fuchsia-pkg://fuchsia.com/vulkan_loader#meta/vulkan_loader.cmx"
@@ -18,13 +18,19 @@
     },
     "sandbox": {
         "features": [
-            "shell"
+            "deprecated-shell",
+            "deprecated-ambient-replace-as-executable"
         ],
         "services": [
+            "fuchsia.auth.account.AccountManager",
+            "fuchsia.devicesettings.DeviceSettingsManager",
+            "fuchsia.fonts.Provider",
             "fuchsia.sys.Environment",
             "fuchsia.sys.Launcher",
+            "fuchsia.sysmem.Allocator",
             "fuchsia.ui.policy.Presenter",
-            "fuchsia.ui.scenic.Scenic"
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.vulkan.loader.Loader"
         ]
     }
 }

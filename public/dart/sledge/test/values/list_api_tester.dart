@@ -13,8 +13,8 @@ import '../dummies/dummy_value_observer.dart';
 
 /// Generic class, to test if [TestingList] correctly implements List API.
 class ListApiTester<TestingList extends List, E> {
-  List<E> Function() _newList;
-  E Function(int id) _newElement;
+  final List<E> Function() _newList;
+  final E Function(int id) _newElement;
 
   ListApiTester(this._newList, this._newElement);
 

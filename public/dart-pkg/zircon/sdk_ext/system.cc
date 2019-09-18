@@ -444,7 +444,9 @@ Dart_Handle System::VmoMap(fxl::RefPtr<Handle> vmo) {
 }
 
 uint64_t System::ClockGet(uint32_t clock_id) {
-  return zx_clock_get(clock_id);
+  zx_time_t result = 0;
+  zx_clock_get(clock_id, &result);
+  return result;
 }
 
 // clang-format: off

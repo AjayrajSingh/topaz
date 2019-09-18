@@ -13,6 +13,8 @@ class Graph {
   int _nextId = 0;
   Node _root;
 
+  int get nodeCount => _nodes.length;
+
   /// Returns or creates a node with the given [label].
   Node getNode(String label) =>
       _nodes.putIfAbsent(label, () => Node._internal(label, _nextId++));

@@ -6,6 +6,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:meta/meta.dart';
 
 class Link<P> {
   final Uri uri;
@@ -28,28 +29,31 @@ Future<Null> verifyLinks<P>(
     urisByDomain.putIfAbsent(link.uri.authority, () => []).add(link);
   }
   await Future.wait(urisByDomain.keys.map((String domain) =>
-      _LinkVerifier(urisByDomain[domain]).verify(callback)));
+      LinkVerifier(urisByDomain[domain], http.Client()).verify(callback)));
   return null;
 }
 
-class _LinkVerifier<P> {
+@visibleForTesting
+class LinkVerifier<P> {
   final List<Link<P>> links;
+  final http.Client client;
 
-  _LinkVerifier(this.links);
+  LinkVerifier(this.links, this.client);
 
   Future<Null> verify(OnElementVerified<P> callback) async {
     for (Link<P> link in links) {
-      callback(link, await _verifyLink(link));
+      callback(link, await verifyLink(link));
     }
     return null;
   }
 
-  Future<bool> _verifyLink(Link<P> link) async {
+  @visibleForTesting
+  Future<bool> verifyLink(Link<P> link) async {
     try {
       for (int i = 0; i < 3; i++) {
-        final http.Response response = await http.get(link.uri, headers: {
-            HttpHeaders.acceptHeader:
-                'text/html,application/xhtml+xml,application/xml,',
+        final http.Response response = await client.get(link.uri, headers: {
+          HttpHeaders.acceptHeader:
+              'text/html,application/xhtml+xml,application/xml,',
         });
         final int code = response.statusCode;
         if (code == HttpStatus.tooManyRequests) {
@@ -62,8 +66,9 @@ class _LinkVerifier<P> {
         // Http client doesn't automatically follow 308 (Permanent Redirect).
         if (code == HttpStatus.permanentRedirect) {
           if (response.headers.containsKey('location')) {
-            Uri redirectUri = Uri.parse(link.uri.origin + response.headers['location']);
-            return _verifyLink(Link<P>(redirectUri, link.payload));
+            Uri redirectUri =
+                Uri.parse(link.uri.origin + response.headers['location']);
+            return verifyLink(Link<P>(redirectUri, link.payload));
           }
           return false;
         }

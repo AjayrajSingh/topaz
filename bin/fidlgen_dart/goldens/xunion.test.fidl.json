@@ -5,8 +5,120 @@
   "bits_declarations": [],
   "const_declarations": [],
   "enum_declarations": [],
-  "interface_declarations": [],
-  "struct_declarations": [],
+  "interface_declarations": [
+    {
+      "name": "test.name/TestProtocol",
+      "location": {
+        "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+        "line": 38,
+        "column": 10
+      },
+      "methods": [
+        {
+          "ordinal": 8188024295608287232,
+          "generated_ordinal": 8188024295608287232,
+          "name": "StrictXUnionHenceResponseMayBeStackAllocated",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+            "line": 39,
+            "column": 5
+          },
+          "has_request": true,
+          "maybe_request": [],
+          "maybe_request_size": 16,
+          "maybe_request_alignment": 8,
+          "maybe_request_has_padding": false,
+          "experimental_maybe_request_has_flexible_envelope": false,
+          "has_response": true,
+          "maybe_response": [
+            {
+              "type": {
+                "kind": "identifier",
+                "identifier": "test.name/StrictBoundedXUnion",
+                "nullable": false
+              },
+              "name": "xu",
+              "location": {
+                "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+                "line": 39,
+                "column": 76
+              },
+              "size": 24,
+              "max_out_of_line": 32,
+              "alignment": 8,
+              "offset": 16,
+              "max_handles": 0
+            }
+          ],
+          "maybe_response_size": 40,
+          "maybe_response_alignment": 8,
+          "maybe_response_has_padding": true,
+          "experimental_maybe_response_has_flexible_envelope": false,
+          "is_composed": false
+        },
+        {
+          "ordinal": 4132614547208929280,
+          "generated_ordinal": 4132614547208929280,
+          "name": "FlexibleXUnionHenceResponseMustBeHeapAllocated",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+            "line": 40,
+            "column": 5
+          },
+          "has_request": true,
+          "maybe_request": [],
+          "maybe_request_size": 16,
+          "maybe_request_alignment": 8,
+          "maybe_request_has_padding": false,
+          "experimental_maybe_request_has_flexible_envelope": false,
+          "has_response": true,
+          "maybe_response": [
+            {
+              "type": {
+                "kind": "identifier",
+                "identifier": "test.name/OlderSimpleUnion",
+                "nullable": false
+              },
+              "name": "xu",
+              "location": {
+                "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+                "line": 40,
+                "column": 75
+              },
+              "size": 24,
+              "max_out_of_line": 8,
+              "alignment": 8,
+              "offset": 16,
+              "max_handles": 0
+            }
+          ],
+          "maybe_response_size": 40,
+          "maybe_response_alignment": 8,
+          "maybe_response_has_padding": true,
+          "experimental_maybe_response_has_flexible_envelope": true,
+          "is_composed": false
+        }
+      ]
+    }
+  ],
+  "service_declarations": [],
+  "struct_declarations": [
+    {
+      "name": "test.name/Empty",
+      "location": {
+        "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+        "line": 25,
+        "column": 8
+      },
+      "anonymous": false,
+      "members": [],
+      "size": 1,
+      "max_out_of_line": 0,
+      "alignment": 1,
+      "max_handles": 0,
+      "has_padding": false
+    }
+  ],
   "table_declarations": [],
   "union_declarations": [],
   "xunion_declarations": [
@@ -28,7 +140,7 @@
           "location": {
             "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
             "line": 4,
-            "column": 9
+            "column": 11
           },
           "size": 8,
           "max_out_of_line": 0,
@@ -45,7 +157,7 @@
           "location": {
             "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
             "line": 5,
-            "column": 11
+            "column": 13
           },
           "size": 4,
           "max_out_of_line": 0,
@@ -56,7 +168,8 @@
       "size": 24,
       "max_out_of_line": 8,
       "alignment": 8,
-      "max_handles": 0
+      "max_handles": 0,
+      "strict": false
     },
     {
       "name": "test.name/NewerSimpleUnion",
@@ -76,7 +189,7 @@
           "location": {
             "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
             "line": 11,
-            "column": 9
+            "column": 11
           },
           "size": 8,
           "max_out_of_line": 0,
@@ -93,7 +206,7 @@
           "location": {
             "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
             "line": 13,
-            "column": 10
+            "column": 12
           },
           "size": 16,
           "max_out_of_line": 4294967295,
@@ -114,7 +227,7 @@
           "location": {
             "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
             "line": 14,
-            "column": 18
+            "column": 20
           },
           "size": 16,
           "max_out_of_line": 4294967295,
@@ -125,15 +238,163 @@
       "size": 24,
       "max_out_of_line": 4294967295,
       "alignment": 8,
-      "max_handles": 0
+      "max_handles": 0,
+      "strict": false
+    },
+    {
+      "name": "test.name/StrictSimpleXUnion",
+      "location": {
+        "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+        "line": 19,
+        "column": 15
+      },
+      "members": [
+        {
+          "ordinal": 1851697276,
+          "type": {
+            "kind": "primitive",
+            "subtype": "int32"
+          },
+          "name": "i",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+            "line": 20,
+            "column": 11
+          },
+          "size": 4,
+          "max_out_of_line": 0,
+          "alignment": 4,
+          "offset": 0
+        },
+        {
+          "ordinal": 855207063,
+          "type": {
+            "kind": "primitive",
+            "subtype": "float32"
+          },
+          "name": "f",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+            "line": 21,
+            "column": 13
+          },
+          "size": 4,
+          "max_out_of_line": 0,
+          "alignment": 4,
+          "offset": 0
+        },
+        {
+          "ordinal": 850602487,
+          "type": {
+            "kind": "string",
+            "nullable": false
+          },
+          "name": "s",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+            "line": 22,
+            "column": 12
+          },
+          "size": 16,
+          "max_out_of_line": 4294967295,
+          "alignment": 8,
+          "offset": 0
+        }
+      ],
+      "size": 24,
+      "max_out_of_line": 4294967295,
+      "alignment": 8,
+      "max_handles": 0,
+      "strict": true
+    },
+    {
+      "name": "test.name/XUnionContainingEmptyStruct",
+      "location": {
+        "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+        "line": 28,
+        "column": 8
+      },
+      "members": [
+        {
+          "ordinal": 424858069,
+          "type": {
+            "kind": "identifier",
+            "identifier": "test.name/Empty",
+            "nullable": false
+          },
+          "name": "empty",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+            "line": 31,
+            "column": 11
+          },
+          "size": 1,
+          "max_out_of_line": 0,
+          "alignment": 1,
+          "offset": 0
+        }
+      ],
+      "size": 24,
+      "max_out_of_line": 8,
+      "alignment": 8,
+      "max_handles": 0,
+      "strict": false
+    },
+    {
+      "name": "test.name/StrictBoundedXUnion",
+      "location": {
+        "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+        "line": 34,
+        "column": 15
+      },
+      "members": [
+        {
+          "ordinal": 2024555624,
+          "type": {
+            "kind": "vector",
+            "element_type": {
+              "kind": "primitive",
+              "subtype": "uint8"
+            },
+            "maybe_element_count": 10,
+            "nullable": false
+          },
+          "name": "v",
+          "location": {
+            "filename": "garnet/go/src/fidl/compiler/backend/typestest/xunion.test.fidl",
+            "line": 35,
+            "column": 22
+          },
+          "size": 16,
+          "max_out_of_line": 16,
+          "alignment": 8,
+          "offset": 0
+        }
+      ],
+      "size": 24,
+      "max_out_of_line": 32,
+      "alignment": 8,
+      "max_handles": 0,
+      "strict": true
     }
   ],
+  "type_alias_declarations": [],
   "declaration_order": [
+    "test.name/StrictSimpleXUnion",
+    "test.name/StrictBoundedXUnion",
     "test.name/OlderSimpleUnion",
-    "test.name/NewerSimpleUnion"
+    "test.name/TestProtocol",
+    "test.name/NewerSimpleUnion",
+    "test.name/Empty",
+    "test.name/XUnionContainingEmptyStruct"
   ],
   "declarations": {
+    "test.name/TestProtocol": "interface",
+    "test.name/Empty": "struct",
     "test.name/OlderSimpleUnion": "xunion",
-    "test.name/NewerSimpleUnion": "xunion"
+    "test.name/NewerSimpleUnion": "xunion",
+    "test.name/StrictSimpleXUnion": "xunion",
+    "test.name/XUnionContainingEmptyStruct": "xunion",
+    "test.name/StrictBoundedXUnion": "xunion"
   }
 }

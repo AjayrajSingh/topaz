@@ -1,0 +1,19 @@
+{
+    "program": {
+        "data": "data/dart_inspect_benchmarks"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.fonts.Provider",
+            "fuchsia.logger.LogSink",
+            "fuchsia.modular.ComponentContext",
+            "fuchsia.modular.ModuleContext",
+            "fuchsia.netstack.Netstack",
+            "fuchsia.sys.Environment",
+            "fuchsia.tracing.provider.Registry",
+            "fuchsia.ui.input.ImeService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic"
+        ]
+    }
+}

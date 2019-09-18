@@ -5,11 +5,12 @@
 import 'dart:async';
 import 'dart:convert' show base64;
 import 'dart:io';
+import 'dart:typed_data';
 
 // ignore_for_file: public_member_api_docs
 
 /// A BASE64 encoded 1x1 transparent PNG image.
-final List<int> _kTransparentImageBytes = base64.decode(
+final Uint8List _kTransparentImageBytes = base64.decode(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
 );
 
@@ -63,17 +64,17 @@ class FakeHttpClientResponse implements HttpClientResponse {
   }
 
   @override
-  StreamSubscription<List<int>> listen(void onData(List<int> event),
+  StreamSubscription<Uint8List> listen(void onData(Uint8List event),
       {Function onError, void onDone(), bool cancelOnError}) {
-    return Stream<List<int>>.fromIterable(
-            <List<int>>[_kTransparentImageBytes])
+    return Stream<Uint8List>.fromIterable(
+            <Uint8List>[_kTransparentImageBytes])
         .listen(onData,
             onDone: onDone, onError: onError, cancelOnError: cancelOnError);
   }
 
   // Some libraries, including flutter_image, make use of this method.
   @override
-  Future<S> fold<S>(S initialValue, S combine(S previous, List<int> element)) {
+  Future<S> fold<S>(S initialValue, S combine(S previous, Uint8List element)) {
     return Future.value(combine(initialValue, _kTransparentImageBytes));
   }
 

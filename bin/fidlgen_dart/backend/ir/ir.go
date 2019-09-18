@@ -5,13 +5,14 @@
 package ir
 
 import (
-	"fidl/compiler/backend/common"
-	"fidl/compiler/backend/types"
 	"fmt"
 	"log"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"fidl/compiler/backend/common"
+	"fidl/compiler/backend/types"
 )
 
 // Documented is embedded in structs for declarations that may hold documentation.
@@ -177,8 +178,7 @@ type MethodResponse struct {
 
 // Method represents a method declaration within an interface declaration.
 type Method struct {
-	Ordinal            types.Ordinal
-	OrdinalName        string
+	types.Ordinals
 	Name               string
 	HasRequest         bool
 	Request            []Parameter
@@ -264,7 +264,7 @@ func init() {
 		"async":        allContexts,
 		"await":        allContexts,
 		"break":        allContexts,
-		"bool":         []context{structMemberContext, tableMemberContext},
+		"bool":         {structMemberContext, tableMemberContext},
 		"case":         allContexts,
 		"catch":        allContexts,
 		"class":        allContexts,
@@ -272,8 +272,8 @@ func init() {
 		"continue":     allContexts,
 		"default":      allContexts,
 		"do":           allContexts,
-		"double":       []context{structMemberContext, tableMemberContext},
-		"dynamic":      []context{bitsMemberContext, enumMemberContext, methodContext, unionMemberContext, constantContext, tableMemberContext, structMemberContext},
+		"double":       {structMemberContext, tableMemberContext},
+		"dynamic":      {bitsMemberContext, enumMemberContext, methodContext, unionMemberContext, constantContext, tableMemberContext, structMemberContext},
 		"else":         allContexts,
 		"enum":         allContexts,
 		"extends":      allContexts,
@@ -281,21 +281,22 @@ func init() {
 		"final":        allContexts,
 		"finally":      allContexts,
 		"for":          allContexts,
-		"hashCode":     []context{methodContext, bitsMemberContext, enumMemberContext, unionMemberContext, structMemberContext, tableMemberContext},
-		"noSuchMethod": []context{methodContext, enumMemberContext, unionMemberContext, structMemberContext, tableMemberContext},
-		"runtimeType":  []context{methodContext, enumMemberContext, unionMemberContext, structMemberContext, tableMemberContext},
-		"index":        []context{unionMemberTagContext},
+		"hashCode":     {methodContext, bitsMemberContext, enumMemberContext, unionMemberContext, structMemberContext, tableMemberContext},
+		"noSuchMethod": {methodContext, enumMemberContext, unionMemberContext, structMemberContext, tableMemberContext},
+		"runtimeType":  {methodContext, enumMemberContext, unionMemberContext, structMemberContext, tableMemberContext},
+		"index":        {unionMemberTagContext},
 		"if":           allContexts,
 		"in":           allContexts,
-		"int":          []context{bitsMemberContext, enumMemberContext, methodContext, unionMemberContext, constantContext, tableMemberContext, structMemberContext},
+		"int":          {bitsMemberContext, enumMemberContext, methodContext, unionMemberContext, constantContext, tableMemberContext, structMemberContext},
 		"is":           allContexts,
-		"List":         []context{declarationContext},
-		"Map":          []context{declarationContext},
+		"List":         {declarationContext},
+		"Map":          {declarationContext},
 		"new":          allContexts,
+		"Never":        {declarationContext},
 		"null":         allContexts,
-		"Null":         []context{declarationContext},
-		"num":          []context{enumMemberContext, methodContext, unionMemberContext, constantContext, tableMemberContext, structMemberContext},
-		"Object":       []context{declarationContext},
+		"Null":         {declarationContext},
+		"num":          {enumMemberContext, methodContext, unionMemberContext, constantContext, tableMemberContext, structMemberContext},
+		"Object":       {declarationContext},
 		"override":     allContexts,
 		"rethrow":      allContexts,
 		"return":       allContexts,
@@ -304,10 +305,10 @@ func init() {
 		"switch":       allContexts,
 		"this":         allContexts,
 		"throw":        allContexts,
-		"toString":     []context{methodContext, bitsMemberContext, enumMemberContext, structMemberContext, tableMemberContext, unionMemberContext},
+		"toString":     {methodContext, bitsMemberContext, enumMemberContext, structMemberContext, tableMemberContext, unionMemberContext},
 		"true":         allContexts,
 		"try":          allContexts,
-		"values":       []context{unionMemberTagContext},
+		"values":       {unionMemberTagContext},
 		"var":          allContexts,
 		"void":         allContexts,
 		"while":        allContexts,
@@ -565,7 +566,11 @@ func (c *compiler) compileUpperCamelCompoundIdentifier(val types.CompoundIdentif
 }
 
 func (c *compiler) compileLowerCamelCompoundIdentifier(val types.CompoundIdentifier, ext string, context context) string {
-	str := context.changeIfReserved(common.ToLowerCamelCase(string(val.Name))) + ext
+	constName := string(val.Name)
+	if string(val.Member) != "" {
+		constName = string(val.Member)
+	}
+	str := context.changeIfReserved(common.ToLowerCamelCase(string(constName))) + ext
 	val.Name = types.Identifier(str)
 	return c.compileCompoundIdentifier(val, context)
 }
@@ -596,7 +601,7 @@ func (c *compiler) compileLiteral(val types.Literal) string {
 		if err != nil {
 			panic(fmt.Sprintf("JSON IR contains invalid numeric literal: %s", val.Value))
 		}
-		return fmt.Sprintf("0x%s", strconv.FormatUint(num, 16))
+		return fmt.Sprintf("%#x", num)
 	case types.TrueLiteral:
 		return "true"
 	case types.FalseLiteral:
@@ -964,8 +969,11 @@ func (c *compiler) compileMethod(val types.Method, protocol Interface) Method {
 	}
 	_, transitional := val.LookupAttribute("Transitional")
 	return Method{
-		Ordinal:            val.Ordinal,
-		OrdinalName:        fmt.Sprintf("_k%s_%s_Ordinal", protocol.Name, val.Name),
+		Ordinals: types.NewOrdinalsStep5(
+			val,
+			fmt.Sprintf("_k%s_%s_Ordinal", protocol.Name, val.Name),
+			fmt.Sprintf("_k%s_%s_GenOrdinal", protocol.Name, val.Name),
+		),
 		Name:               name,
 		HasRequest:         val.HasRequest,
 		Request:            request,
@@ -1235,7 +1243,6 @@ func Compile(r types.Root) Root {
 		}
 		library := types.ParseLibraryName(l.Name)
 		root.Imports = append(root.Imports, Import{
-			URL:       fmt.Sprintf("package:fidl_%s/fidl.dart", formatLibraryName(library)),
 			LocalName: libraryPrefix(library),
 			AsyncURL:  fmt.Sprintf("package:fidl_%s/fidl_async.dart", formatLibraryName(library)),
 		})

@@ -24,6 +24,8 @@ flutter_app("flutter_screencap_test_app") {
 }
 
 dart_fuchsia_test("flutter_screencap_test") {
+  deprecated_shell = "//topaz"
+
   meta = [
     {
       path = rebase_path("meta/flutter_screencap_test.cmx")
@@ -36,6 +38,9 @@ dart_fuchsia_test("flutter_screencap_test") {
     "//sdk/fidl/fuchsia.ui.app",
     "//sdk/fidl/fuchsia.ui.policy",
     "//sdk/fidl/fuchsia.ui.scenic",
+    "//sdk/fidl/fuchsia.ui.views",
+    "//third_party/dart-pkg/pub/pedantic",
+    "//topaz/public/dart/fuchsia_modular_testing",
     "//topaz/public/dart/fuchsia_scenic",
     "//topaz/public/dart/fuchsia_services",
     "//topaz/public/dart/zircon",
@@ -46,6 +51,7 @@ dart_fuchsia_test("flutter_screencap_test") {
       dimensions = {
         device_type = "Intel NUC Kit NUC7i5DNHE"
       }
+      tags = [ "flaky" ]  # FLK-352
     },
   ]
 }

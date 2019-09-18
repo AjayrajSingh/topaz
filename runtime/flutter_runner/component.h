@@ -75,9 +75,9 @@ class Application final : public Engine::Delegate,
   fidl::BindingSet<fuchsia::ui::app::ViewProvider> shells_bindings_;
 
   fml::RefPtr<flutter::DartSnapshot> isolate_snapshot_;
-  fml::RefPtr<flutter::DartSnapshot> shared_snapshot_;
   std::set<std::unique_ptr<Engine>> shell_holders_;
   std::pair<bool, uint32_t> last_return_code_;
+  fml::WeakPtrFactory<Application> weak_factory_;
 
   Application(
       TerminationCallback termination_callback, fuchsia::sys::Package package,

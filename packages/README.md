@@ -1,7 +1,3 @@
-# Build packages
+# Deprecated
 
-This directory contains build packages used to customize the content of a build.
-Its structure follows [a strict format][package-layout], enforced by continuous
-builds.
-
-[package-layout]: https://fuchsia.googlesource.com/docs/+/master/development/build/package_layout.md
+This directory is deprecated and should be removed.

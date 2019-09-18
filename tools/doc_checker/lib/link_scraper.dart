@@ -5,13 +5,19 @@
 import 'dart:io';
 
 import 'package:markdown/markdown.dart';
+import 'package:meta/meta.dart';
 
 /// Scrapes links in a markdown document.
 class LinkScraper {
   /// Extracts links from the given [file].
   Iterable<String> scrape(String file) {
-    final List<Node> nodes =
-        Document().parseLines(File(file).readAsLinesSync());
+    return scrapeLines(File(file).readAsLinesSync());
+  }
+
+  /// Extracts links from the given list of [lines].
+  @visibleForTesting
+  Iterable<String> scrapeLines(List<String> lines) {
+    final List<Node> nodes = Document().parseLines(lines);
     final _Visitor visitor = _Visitor();
     for (Node node in nodes) {
       node.accept(visitor);
@@ -22,6 +28,8 @@ class LinkScraper {
 
 class _Visitor implements NodeVisitor {
   static const String _key = 'href';
+  static const String _imgSrc = 'src';
+  static const String _imgTag = 'img';
 
   final Set<String> links = <String>{};
 
@@ -29,6 +37,9 @@ class _Visitor implements NodeVisitor {
   bool visitElementBefore(Element element) {
     if (element.attributes.containsKey(_key)) {
       links.add(element.attributes[_key]);
+    } else if (element.tag == _imgTag &&
+        element.attributes.containsKey(_imgSrc)) {
+      links.add(element.attributes[_imgSrc]);
     }
     return true;
   }

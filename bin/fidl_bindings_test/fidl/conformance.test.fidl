@@ -74,3 +74,12 @@ table XUnionInTable {
 struct TestXUnionInTable {
     XUnionInTable value;
 };
+
+struct TestString3 {
+    array<string:4>:2 a;
+    array<string:4?>:2 b;
+};
+
+struct TestStringWithBound {
+    string:8 a;
+};

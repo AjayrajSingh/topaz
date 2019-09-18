@@ -25,7 +25,7 @@ abstract class FieldValue implements Comparable<Value> {
 abstract class _TemplatedFieldValue<T extends Comparable<T>>
     implements FieldValue {
   final _converter = Converter<T>();
-  T _value;
+  final T _value;
 
   _TemplatedFieldValue(this._value);
 

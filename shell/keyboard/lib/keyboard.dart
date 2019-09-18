@@ -15,7 +15,6 @@ const Color _backgroundColor = Color(0xFFFFFFFF);
 const Color _contentColor = Color(0xFF202124);
 const TextStyle _defaultTextStyle = TextStyle(
   color: _contentColor,
-  fontFamily: 'GoogleSans',
   fontSize: 16.0,
 );
 
@@ -97,7 +96,7 @@ class Keyboard extends StatefulWidget {
   final VoidCallback onHide;
 
   /// Constructor.
-  Keyboard(
+  const Keyboard(
       {Key key,
       this.onText,
       this.onSuggestion,

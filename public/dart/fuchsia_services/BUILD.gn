@@ -5,9 +5,9 @@
 import("//build/dart/dart_library.gni")
 import("//build/fidl/fidl.gni")
 import("//build/testing/environments.gni")
-import("//topaz/runtime/dart_runner/dart_app.gni")
 import("//topaz/runtime/dart/dart_fuchsia_test.gni")
 import("//topaz/runtime/dart/flutter_test.gni")
+import("//topaz/runtime/dart_runner/dart_app.gni")
 
 dart_library("fuchsia_services") {
   package_name = "fuchsia_services"
@@ -30,7 +30,7 @@ dart_library("fuchsia_services") {
     "//topaz/public/dart/fuchsia",
     "//topaz/public/dart/fuchsia_vfs",
     "//topaz/public/dart/zircon",
-    "//zircon/public/fidl/fuchsia-io",
+    "//zircon/system/fidl/fuchsia-io",
   ]
 }
 
@@ -43,11 +43,19 @@ flutter_test("fuchsia_services_package_unittests") {
   deps = [
     ":fuchsia_services",
     "//third_party/dart-pkg/pub/test",
-    "//zircon/public/fidl/fuchsia-io",
+    "//zircon/system/fidl/fuchsia-io",
   ]
 }
 
 fidl("test_foo_fidl") {
+  # TODO(fxb/35879): Remove lint exclusions by fixing known FIDL lint violations in this target
+  excluded_checks = [
+    "disallowed-library-name-component",
+    "invalid-case-for-decl-name",
+    "string-bounds-not-specified",
+    "too-many-nested-libraries",
+  ]
+
   name = "test.fuchsia.service.foo"
 
   sources = [
@@ -65,8 +73,8 @@ dart_fuchsia_test("fuchsia_services_package_integration_tests") {
   ]
 
   sources = [
-    "launch_flow_test.dart",
     "incoming_test.dart",
+    "launch_flow_test.dart",
     "outgoing_test.dart",
   ]
 
@@ -74,14 +82,13 @@ dart_fuchsia_test("fuchsia_services_package_integration_tests") {
     ":fuchsia_services",
     ":test_foo_fidl",
     "//third_party/dart-pkg/pub/test",
-    "//zircon/public/fidl/fuchsia-io",
+    "//zircon/system/fidl/fuchsia-io",
   ]
   environments = basic_envs
 }
 
 # The foo test server used for integration testing
 dart_app("fuchsia_services_foo_test_server") {
-
   main_dart = "test_support/foo_test_server/main.dart"
 
   meta = [
@@ -98,4 +105,3 @@ dart_app("fuchsia_services_foo_test_server") {
     "//topaz/public/dart/fuchsia_services",
   ]
 }
-

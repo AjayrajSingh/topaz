@@ -25,6 +25,7 @@
 #include "flutter/fml/synchronization/waitable_event.h"
 #include "flutter/shell/common/switches.h"
 #include "task_observers.h"
+#include "task_runner_adapter.h"
 #include "third_party/flutter/runtime/dart_vm_lifecycle.h"
 #include "thread.h"
 #include "topaz/runtime/dart/utils/files.h"
@@ -79,7 +80,8 @@ Application::Application(
       debug_label_(DebugLabelForURL(startup_info.launch_info.url)),
       application_controller_(this),
       outgoing_dir_(new vfs::PseudoDir()),
-      runner_incoming_services_(runner_incoming_services) {
+      runner_incoming_services_(runner_incoming_services),
+      weak_factory_(this) {
   application_controller_.set_error_handler(
       [this](zx_status_t status) { Kill(); });
 
@@ -89,7 +91,7 @@ Application::Application(
 
   // LaunchInfo::arguments optional.
   if (auto& arguments = launch_info.arguments) {
-    settings_.dart_entrypoint_args = arguments;
+    settings_.dart_entrypoint_args = arguments.value();
   }
 
   // Determine /pkg/data directory from StartupInfo.
@@ -107,7 +109,7 @@ Application::Application(
   }
 
   // Setup /tmp to be mapped to the process-local memfs.
-  dart_utils::SetupComponentTemp(fdio_ns_.get());
+  dart_utils::RunnerTemp::SetupComponent(fdio_ns_.get());
 
   // LaunchInfo::flat_namespace optional.
   for (size_t i = 0; i < startup_info.flat_namespace.paths.size(); ++i) {
@@ -157,7 +159,7 @@ Application::Application(
   // flutter_public_dir is only accessed once we receive OnOpen Event.
   // That will prevent FL-175 for public directory
   auto request = flutter_public_dir.NewRequest().TakeChannel();
-  fdio_service_connect_at(directory_ptr_.channel().get(), "public",
+  fdio_service_connect_at(directory_ptr_.channel().get(), "svc",
                           request.release());
 
   auto composed_service_dir = std::make_unique<vfs::ComposedServiceDir>();
@@ -207,7 +209,7 @@ Application::Application(
                           std::move(channel)));
           }));
 
-  outgoing_dir_->AddEntry("public", std::move(composed_service_dir));
+  outgoing_dir_->AddEntry("svc", std::move(composed_service_dir));
 
   // Setup the application controller binding.
   if (application_controller_request) {
@@ -253,6 +255,9 @@ Application::Application(
   settings_.enable_observatory = false;
 #else
   settings_.enable_observatory = true;
+
+  // TODO(cbracken): pass this in as a param to allow 0.0.0.0, ::1, etc.
+  settings_.observatory_host = "127.0.0.1";
 #endif
 
   // Set this to true to enable category "skia" trace events.
@@ -304,17 +309,37 @@ Application::Application(
   // Don't collect CPU samples from Dart VM C++ code.
   settings_.dart_flags.push_back("--no_profile_vm");
 
-  auto dispatcher = async_get_default_dispatcher();
-  FML_CHECK(dispatcher);
+  auto weak_application = weak_factory_.GetWeakPtr();
+  auto platform_task_runner =
+      CreateFMLTaskRunner(async_get_default_dispatcher());
   const std::string component_url = package.resolved_url;
   settings_.unhandled_exception_callback =
-      [dispatcher, runner_incoming_services, component_url](
-          const std::string& error, const std::string& stack_trace) {
-        async::PostTask(dispatcher, [runner_incoming_services, component_url,
-                                     error, stack_trace]() {
-          dart_utils::HandleException(runner_incoming_services, component_url,
-                                      error, stack_trace);
-        });
+      [weak_application, platform_task_runner, runner_incoming_services,
+       component_url](const std::string& error,
+                      const std::string& stack_trace) {
+        if (weak_application) {
+          // TODO(cbracken): unsafe. The above check and the PostTask below are
+          // happening on the UI thread. If the Application dtor and thread
+          // termination happen (on the platform thread) between the previous
+          // line and the next line, a crash will occur since we'll be posting
+          // to a dead thread. See Runner::OnApplicationTerminate() in
+          // runner.cc.
+          platform_task_runner->PostTask([weak_application,
+                                          runner_incoming_services,
+                                          component_url, error, stack_trace]() {
+            if (weak_application) {
+              dart_utils::HandleException(runner_incoming_services,
+                                          component_url, error, stack_trace);
+            } else {
+              FML_LOG(ERROR)
+                  << "Unhandled exception after application shutdown: "
+                  << error;
+            }
+          });
+        } else {
+          FML_LOG(ERROR) << "Unhandled exception after application shutdown: "
+                         << error;
+        }
         // Ideally we would return whether HandleException returned ZX_OK, but
         // short of knowing if the exception was correctly handled, we return
         // false to have the error and stack trace printed in the logs.
@@ -425,18 +450,9 @@ void Application::AttemptVMLaunchWithCurrentSettings(
           application_assets_directory_.get() /* /pkg/data */,
           "isolate_snapshot_instructions.bin", true));
 
-  shared_snapshot_ = fml::MakeRefCounted<flutter::DartSnapshot>(
-      CreateWithContentsOfFile(
-          application_assets_directory_.get() /* /pkg/data */,
-          "shared_snapshot_data.bin", false),
-      CreateWithContentsOfFile(
-          application_assets_directory_.get() /* /pkg/data */,
-          "shared_snapshot_instructions.bin", true));
-
   auto vm = flutter::DartVMRef::Create(settings_,               //
                                        std::move(vm_snapshot),  //
-                                       isolate_snapshot_,       //
-                                       shared_snapshot_         //
+                                       isolate_snapshot_        //
   );
   FML_CHECK(vm) << "Mut be able to initialize the VM.";
 }
@@ -495,15 +511,27 @@ void Application::CreateView(
            "create a shell for a view provider request.";
     return;
   }
+  // TODO(MI4-2490): remove once ViewRefControl and ViewRef come as a parameters
+  // to CreateView
+  fuchsia::ui::views::ViewRefControl view_ref_control;
+  fuchsia::ui::views::ViewRef view_ref;
+  zx_status_t status = zx::eventpair::create(
+      /*flags*/ 0u, &view_ref_control.reference, &view_ref.reference);
+  FML_DCHECK(status == ZX_OK);
+
+  status = view_ref.reference.replace(ZX_RIGHTS_BASIC, &view_ref.reference);
+  FML_DCHECK(status == ZX_OK);
 
   shell_holders_.emplace(std::make_unique<Engine>(
       *this,                         // delegate
       debug_label_,                  // thread label
       svc_,                          // Component incoming services
+      runner_incoming_services_,     // Runner incoming services
       settings_,                     // settings
       std::move(isolate_snapshot_),  // isolate snapshot
-      std::move(shared_snapshot_),   // shared snapshot
       scenic::ToViewToken(std::move(view_token)),  // view token
+      std::move(view_ref_control),                 // view ref control
+      std::move(view_ref),                         // view ref
       std::move(fdio_ns_),                         // FDIO namespace
       std::move(directory_request_)                // outgoing request
       ));

@@ -1,0 +1,28 @@
+{
+    "program": {
+        "data": "data/fuchsia_webview_flutter_target_tests"
+    },
+    "sandbox": {
+        "services": [
+            "fuchsia.cobalt.LoggerFactory",
+            "fuchsia.fonts.Provider",
+            "fuchsia.logger.LogSink",
+            "fuchsia.modular.Clipboard",
+            "fuchsia.modular.ComponentContext",
+            "fuchsia.modular.ModuleContext",
+            "fuchsia.net.NameLookup",
+            "fuchsia.netstack.Netstack",
+            "fuchsia.posix.socket.Provider",
+            "fuchsia.process.Launcher",
+            "fuchsia.sys.Environment",
+            "fuchsia.sys.Launcher",
+            "fuchsia.sysmem.Allocator",
+            "fuchsia.ui.input.ImeService",
+            "fuchsia.ui.input.ImeVisibilityService",
+            "fuchsia.ui.policy.Presenter",
+            "fuchsia.ui.scenic.Scenic",
+            "fuchsia.vulkan.loader.Loader",
+            "fuchsia.web.ContextProvider"
+        ]
+    }
+}

@@ -14,16 +14,20 @@ class DropTargetWidget extends StatefulWidget {
     @required this.axis,
     @required this.baseSize,
     @required this.hoverSize,
+    this.onLeave,
   });
 
   /// Axis
   final Axis axis;
 
-  /// On drop accept callback
+  /// Called when tile was dropped and accepted over target
   final DragTargetAccept<TileModel> onAccept;
 
-  /// On drop will accept callback
+  /// Called when tile hovers over target, and should return whether it can be accepted
   final DragTargetWillAccept<TileModel> onWillAccept;
+
+  /// Called when tile leaves the target area
+  final DragTargetLeave<TileModel> onLeave;
 
   /// Base size
   final double baseSize;
@@ -43,7 +47,6 @@ class _DropTargetWidgetState extends State<DropTargetWidget>
       builder: (context, candidateData, rejectedData) {
         final hovering = candidateData.isNotEmpty;
         final size = hovering ? widget.hoverSize : widget.baseSize;
-        final color = hovering ? Colors.purple : Colors.transparent;
         return AnimatedSize(
           duration: Duration(milliseconds: 200),
           curve: Curves.ease,
@@ -51,13 +54,10 @@ class _DropTargetWidgetState extends State<DropTargetWidget>
           child: Container(
             width: widget.axis == Axis.horizontal ? size : null,
             height: widget.axis == Axis.vertical ? size : null,
-            child: Material(
-              elevation: 8,
-              color: color,
-            ),
           ),
         );
       },
+      onLeave: widget.onLeave,
       onWillAccept: widget.onWillAccept,
       onAccept: widget.onAccept,
     );

@@ -21,29 +21,34 @@ class Node {
 
   final _properties = <String, Property>{};
   final _children = <String, Node>{};
+  final Node _parent;
+  final String _name;
 
   /// Creates a [Node] with [name] under the [parentIndex].
   ///
   /// Private as an implementation detail to code that understands VMO indices.
   /// Client code that wishes to create [Node]s should use [child].
-  Node._(String name, int parentIndex, this._writer)
-      : index = _writer.createNode(parentIndex, name) {
+  Node._(this._parent, this._name, int parentIndex, this._writer)
+      : index = _writer.createNode(parentIndex, _name) {
     if (index == invalidIndex) {
       _writer = null;
     }
   }
 
   /// Wraps the special root node.
-  Node._root(this._writer) : index = _writer.rootNode;
+  Node._root(this._writer)
+      : index = _writer.rootNode,
+        _parent = null,
+        _name = null;
 
   /// Creates a Node that never does anything.
   ///
   /// These are returned when calling createChild on a deleted [Node].
   Node._deleted()
       : _writer = null,
+        _parent = null,
+        _name = null,
         index = invalidIndex;
-
-  bool get _isDeleted => _writer == null;
 
   /// Returns a child [Node] with [name].
   ///
@@ -53,13 +58,21 @@ class Node {
     if (_writer == null) {
       return Node._deleted();
     }
-    // TODO(cphoenix): Tell parents when deleted, instead of asking children.
-    // Asking children allows the map to grow without limit as children are
-    // created and deleted (e.g. ring buffer).
-    if (_children.containsKey(name) && !_children[name]._isDeleted) {
+    if (_children.containsKey(name)) {
       return _children[name];
     }
-    return _children[name] = Node._(name, index, _writer);
+    return _children[name] = Node._(this, name, index, _writer);
+  }
+
+  /// Returns true only if this node is present in underlying storage.
+  bool get valid => _writer != null;
+
+  void _forgetChild(String name) {
+    _children.remove(name);
+  }
+
+  void _forgetProperty(String name) {
+    _properties.remove(name);
   }
 
   /// Deletes this node and any children from underlying storage.
@@ -68,16 +81,23 @@ class Node {
   /// no effect and do not result in an error. Calls on a deleted node that
   /// return a Node or property return an already-deleted object.
   void delete() {
+    _delete();
+  }
+
+  void _delete({bool deletedByParent = false}) {
     if (_writer == null) {
       return;
     }
     _properties
-      ..forEach((_, property) => property.delete())
+      ..forEach((_, property) => property._delete(deletedByParent: true))
       ..clear();
     _children
-      ..forEach((_, node) => node.delete())
+      ..forEach((_, node) => node._delete(deletedByParent: true))
       ..clear();
 
+    if (!deletedByParent) {
+      _parent._forgetChild(_name);
+    }
     _writer.deleteEntity(index);
     _writer = null;
   }
@@ -95,14 +115,14 @@ class Node {
     if (_writer == null) {
       return StringProperty._deleted();
     }
-    if (_properties.containsKey(name) && !_properties[name]._isDeleted) {
+    if (_properties.containsKey(name)) {
       if (_properties[name] is! StringProperty) {
         throw InspectStateError("Can't create StringProperty named $name;"
             ' a different type exists.');
       }
       return _properties[name];
     }
-    return _properties[name] = StringProperty._(name, index, _writer);
+    return _properties[name] = StringProperty._(name, this, _writer);
   }
 
   /// Returns a [ByteDataProperty] with [name] on this node.
@@ -119,14 +139,14 @@ class Node {
     if (_writer == null) {
       return ByteDataProperty._deleted();
     }
-    if (_properties.containsKey(name) && !_properties[name]._isDeleted) {
+    if (_properties.containsKey(name)) {
       if (_properties[name] is! ByteDataProperty) {
         throw InspectStateError("Can't create ByteDataProperty named $name;"
             ' a different type exists.');
       }
       return _properties[name];
     }
-    return _properties[name] = ByteDataProperty._(name, index, _writer);
+    return _properties[name] = ByteDataProperty._(name, this, _writer);
   }
 
   /// Returns an [IntProperty] with [name] on this node.
@@ -142,14 +162,14 @@ class Node {
     if (_writer == null) {
       return IntProperty._deleted();
     }
-    if (_properties.containsKey(name) && !_properties[name]._isDeleted) {
+    if (_properties.containsKey(name)) {
       if (_properties[name] is! IntProperty) {
         throw InspectStateError(
             "Can't create IntProperty named $name; a different type exists.");
       }
       return _properties[name];
     }
-    return _properties[name] = IntProperty._(name, index, _writer);
+    return _properties[name] = IntProperty._(name, this, _writer);
   }
 
   /// Returns a [DoubleProperty] with [name] on this node.
@@ -165,14 +185,14 @@ class Node {
     if (_writer == null) {
       return DoubleProperty._deleted();
     }
-    if (_properties.containsKey(name) && !_properties[name]._isDeleted) {
+    if (_properties.containsKey(name)) {
       if (_properties[name] is! DoubleProperty) {
         throw InspectStateError("Can't create DoubleProperty named $name;"
             ' a different type exists.');
       }
       return _properties[name];
     }
-    return _properties[name] = DoubleProperty._(name, index, _writer);
+    return _properties[name] = DoubleProperty._(name, this, _writer);
   }
 }
 

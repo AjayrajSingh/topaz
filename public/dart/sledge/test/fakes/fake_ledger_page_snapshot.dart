@@ -18,7 +18,7 @@ class _FakeProxyController<T> extends AsyncProxyController<T> {
 
 /// Fake implementation of a PageSnapshot.
 class FakeLedgerPageSnapshot extends ledger.PageSnapshotProxy {
-  FakeLedgerPage _fakeLedgerPage;
+  final FakeLedgerPage _fakeLedgerPage;
 
   FakeLedgerPageSnapshot(this._fakeLedgerPage);
 
@@ -30,7 +30,7 @@ class FakeLedgerPageSnapshot extends ledger.PageSnapshotProxy {
   Future<ledger.PageSnapshot$GetEntries$Response> getEntries(
       Uint8List keyStart, ledger.Token token) async {
     final response = ledger.PageSnapshot$GetEntries$Response(
-        ledger.IterationStatus.ok, _fakeLedgerPage.getEntries(keyStart), token);
+        _fakeLedgerPage.getEntries(keyStart), token);
     return response;
   }
 }

@@ -6,7 +6,6 @@ import 'dart:async';
 
 import 'package:fidl/fidl.dart';
 import 'package:fidl_fuchsia_auth/fidl_async.dart' as fidl_auth;
-import 'package:fidl_fuchsia_modular/fidl_async.dart' as fidl_agent;
 
 import 'agent_task_handler.dart';
 import 'internal/_agent_impl.dart';
@@ -103,12 +102,4 @@ abstract class Agent {
   /// class MyAgentTaskHandler extends AgentTaskHandler { ... }
   /// ```
   void registerTaskHandler(AgentTaskHandler taskHandler);
-
-  /// Schedules a task described in [taskInfo]. [registerTaskHandler] must be
-  /// called before scheduling any tasks. When this task is scheduled to
-  /// run, [AgentTaskHandler.runTask()] is called.
-  void scheduleTask(fidl_agent.TaskInfo taskInfo);
-
-  /// No new runs of this [taskId] will be scheduled.
-  void deleteTask(String taskId);
 }

@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'dart:collection' show ListBase;
+import 'package:meta/meta.dart';
 import 'package:quiver/core.dart';
 
 /// Generic class for layout elements: provides the box coordinates of
@@ -79,7 +80,7 @@ class Layer<LayoutElement> extends ListBase<LayoutElement> {
 /// screen
 class SurfaceLayout extends LayoutElement {
   /// Constructor
-  SurfaceLayout({x, y, w, h, String surfaceId})
+  SurfaceLayout({double x, double y, double w, double h, String surfaceId})
       : super(x: x, y: y, w: w, h: h, element: surfaceId);
 
   /// Export to JSON
@@ -104,6 +105,15 @@ class SurfaceLayout extends LayoutElement {
   String toString() {
     return toJson().toString();
   }
+
+  /// Create a full size SurfaceLayout with this surfaceId for the given context
+  SurfaceLayout.fullSize({LayoutContext layoutContext, String surfaceId})
+      : super(
+            x: 0,
+            y: 0,
+            w: layoutContext.size.width,
+            h: layoutContext.size.height,
+            element: surfaceId);
 }
 
 /// Convenience class for placing a Stack of [Surface] elements at a coordinate
@@ -145,8 +155,11 @@ class LayoutContext {
   /// The size of the viewport the CompositionDelegate can use
   final Size size;
 
+  /// The acceptable minimum width of a Surface in this context
+  final double minSurfaceWidth;
+
   /// Constructor
-  const LayoutContext({this.size});
+  const LayoutContext({@required this.size, @required this.minSurfaceWidth});
 }
 
 /// Simple class for capturing 2D size of boxes in layout.
@@ -176,4 +189,10 @@ enum layoutStrategyType {
   /// Split the space evenly.
   /// Logic in split_evenly_strategy/split_evenly_strategy.dart.
   splitEvenlyStrategy,
+
+  /// The Mondrian layout logic. Uses co-presentation signals to lay out
+  /// as many of the surfaces that want to co-present together as can fit,
+  /// starting with the most focused surface.
+  /// Logic in copresent_strategy/copresent_strategy.dart
+  copresentStrategy,
 }

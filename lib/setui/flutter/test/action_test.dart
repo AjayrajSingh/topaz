@@ -90,6 +90,7 @@ void main() {
 
     when(client.state = State.started).thenAnswer((state) {
       actionResultSender.sendResult(null);
+      return State.started;
     });
 
     final WidgetBlueprint blueprint =

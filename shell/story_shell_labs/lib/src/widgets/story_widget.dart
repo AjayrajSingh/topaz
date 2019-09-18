@@ -11,6 +11,8 @@ import 'package:tiler/tiler.dart';
 import 'package:story_shell_labs_lib/layout/tile_model.dart';
 import 'package:story_shell_labs_lib/layout/tile_presenter.dart';
 
+import 'remove_button_target_widget.dart';
+
 final List<Color> _kColors = [
   Colors.red,
   Colors.blue,
@@ -38,9 +40,8 @@ class _StoryWidgetState extends State<StoryWidget> {
   StreamSubscription _tilerUpdateListener;
   bool _isEditing = false;
   OverlayEntry _layoutSuggestionsOverlay;
-  Map<String, Color> _modNamesToColors;
   Map<String, Color> _parametersToColors;
-  final ValueNotifier _focusedMod = ValueNotifier(null);
+  final ValueNotifier _focusedMod = ValueNotifier<String>(null);
 
   @override
   void initState() {
@@ -66,10 +67,6 @@ class _StoryWidgetState extends State<StoryWidget> {
     update ??= widget.presenter.currentState;
     _tilerModel = update.model;
     _connections = update.connections;
-    _modNamesToColors = _mapFromKeysAndCircularValues(
-      _connections.keys,
-      _kColors,
-    );
     _parametersToColors = _mapFromKeysAndCircularValues(
       _allParametersInModel(_tilerModel),
       _kColors,
@@ -96,37 +93,32 @@ class _StoryWidgetState extends State<StoryWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Offstage(
-      offstage: _tilerModel.root.isEmpty,
-      child: PhysicalModel(
-        color: Colors.white,
-        child: Stack(
-          children: <Widget>[
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: _buildStoryTitleBar(),
-            ),
-            Positioned(
-              top: 24,
-              left: 4,
-              bottom: 4,
-              right: 4,
-              child: _layoutSuggestionColorModeBuilder(
-                (colorForMod) => LayoutPresenter(
-                      tilerModel: _tilerModel,
-                      connections: _connections,
-                      isEditing: _isEditing,
-                      focusedMod: _focusedMod,
-                      colorForMod: colorForMod,
-                      parametersToColors: _parametersToColors,
-                    ),
-              ),
-            ),
-          ],
+    return Stack(
+      children: <Widget>[
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: _buildStoryTitleBar(),
         ),
-      ),
+        Positioned.fill(
+          child: Padding(
+            padding: _isEditing ? EdgeInsets.zero : const EdgeInsets.all(24.0),
+            child: LayoutPresenter(
+              tilerModel: _tilerModel,
+              connections: _connections,
+              isEditing: _isEditing,
+              focusedMod: _focusedMod,
+              parametersToColors: _parametersToColors,
+              setTilerModel: (model) {
+                setState(() {
+                  _tilerModel = cloneTiler(model);
+                });
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -157,44 +149,48 @@ class _StoryWidgetState extends State<StoryWidget> {
           return Positioned(
             left: 0,
             right: 0,
-            height: 84,
-            bottom: 20,
+            bottom: 8,
             child: Align(
               alignment: Alignment.bottomCenter,
               child: SizedBox(
-                height: 84,
-                child: _layoutSuggestionColorModeBuilder(
-                  (colorForMod) => LayoutSuggestionsWidget(
-                        presenter: widget.presenter,
-                        colorForMod: colorForMod,
-                        onSelect: (model) {
-                          setState(() {
-                            _tilerModel = model;
-                          });
-                        },
-                      ),
+                height: 32,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    LayoutSuggestionsWidget(
+                      presenter: widget.presenter,
+                      focusedMod: _focusedMod,
+                      onSelect: (model) {
+                        setState(() {
+                          _tilerModel = cloneTiler(model);
+                        });
+                      },
+                    ),
+                    RemoveButtonTargetWidget(
+                      onTap: () {
+                        getTileContent(_tilerModel)
+                            .where((TileModel tile) =>
+                                tile.content.modName == _focusedMod.value)
+                            .forEach(_tilerModel.remove);
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
           );
         },
       );
-      print('adding overlay $_layoutSuggestionsOverlay');
       Overlay.of(context).insert(_layoutSuggestionsOverlay);
     }
     if (!_isEditing && _layoutSuggestionsOverlay != null) {
-      print('removing overlay $_layoutSuggestionsOverlay');
       _layoutSuggestionsOverlay.remove();
       _layoutSuggestionsOverlay = null;
     }
   }
 
-  Widget _layoutSuggestionColorModeBuilder(
-    Widget Function(Color Function(String) colorForMod) builder,
-  ) =>
-      builder((modName) => _modNamesToColors[modName]);
-
-  Widget _buildTitleBarTextButton(String title, VoidCallback onTap) => InkWell(
+  Widget _buildTitleBarTextButton(String title, VoidCallback onTap) =>
+      GestureDetector(
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -202,7 +198,6 @@ class _StoryWidgetState extends State<StoryWidget> {
             child: Text(
               title,
               style: const TextStyle(
-                fontFamily: 'RobotoMono',
                 fontSize: 12,
               ),
             ),
@@ -211,38 +206,39 @@ class _StoryWidgetState extends State<StoryWidget> {
       );
 
   Widget _buildStoryTitleBar() {
-    return Material(
-      color: Colors.white,
-      child: _isEditing
-          ? SizedBox(
-              height: 36,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  _buildTitleBarTextButton('Cancel', _cancelEditing),
-                  _buildTitleBarTextButton('Done', _endEditing),
-                ],
-              ),
-            )
-          : Center(
-              child: SizedBox(
-                height: 24,
-                width: 40,
-                child: InkWell(
-                  onTap: _startEditing,
+    return _isEditing
+        ? SizedBox(
+            height: 36,
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                _buildTitleBarTextButton('Cancel', _cancelEditing),
+                Spacer(),
+                _buildTitleBarTextButton('Done', _endEditing),
+              ],
+            ),
+          )
+        : Center(
+            child: SizedBox(
+              height: 24,
+              child: GestureDetector(
+                onTap: _startEditing,
+                child: Container(
+                  color: Colors.transparent,
+                  width: 32.0,
                   child: Center(
-                    child: SizedBox(
-                      width: 12,
-                      height: 11,
+                    child: Container(
+                      width: 18,
+                      height: 12,
+                      color: Colors.black,
+                      padding: EdgeInsets.all(1.0),
                       child: Tiler(
                         sizerThickness: 0,
                         model: cloneTiler(_tilerModel),
                         chromeBuilder: (BuildContext context, TileModel tile) =>
                             Padding(
-                              padding: EdgeInsets.all(0.5),
-                              child: Container(color: Colors.black),
+                              padding: EdgeInsets.all(1.0),
+                              child: Container(color: Colors.white),
                             ),
                       ),
                     ),
@@ -250,6 +246,6 @@ class _StoryWidgetState extends State<StoryWidget> {
                 ),
               ),
             ),
-    );
+          );
   }
 }

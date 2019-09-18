@@ -11,7 +11,8 @@ export 'package:lib.widgets/model.dart'
     show ScopedModel, Model, ScopedModelDescendant;
 
 class SystemInfoModel extends Model {
-  int _temperature = 0;
+  // Temperature in degrees Celsius.
+  double _temperature = 0.0;
   int _fanLevel = 0;
   int _cpuUtilization = 0;
   int _memoryUtilization = 0;
@@ -53,7 +54,7 @@ class SystemInfoModel extends Model {
   int get cpuUtilization => _cpuUtilization;
   int get memoryUtilization => _memoryUtilization;
   int get fanLevel => _fanLevel;
-  int get temperature => _temperature;
+  double get temperature => _temperature;
   double get bigClusterFrequency => _bigClusterFrequency;
   double get littleClusterFrequency => _littleClusterFrequency;
   double get bigClusterVoltage => _bigClusterVoltage;
@@ -66,7 +67,7 @@ class SystemInfoModel extends Model {
   void _updateSysInformation() {
     _systemControllerProxy.getSystemStatus().then((result) {
       final systemStatus = result.sysStatus;
-      _temperature = systemStatus.temperature;
+      _temperature = systemStatus.temperatureCelsius;
       _fanLevel = systemStatus.fanLevel;
       _bigClusterFrequency =
           (_bigClusterOpps[systemStatus.bigClusterOpIndex].freqHz) / 1000000000;
@@ -74,9 +75,9 @@ class SystemInfoModel extends Model {
           (_smallClusterOpps[systemStatus.smallClusterOpIndex].freqHz) /
               1000000000;
       _bigClusterVoltage =
-          (_bigClusterOpps[systemStatus.bigClusterOpIndex].voltMv) / 1000;
+          (_bigClusterOpps[systemStatus.bigClusterOpIndex].voltUv) / 1000000;
       _littleClusterVoltage =
-          (_smallClusterOpps[systemStatus.smallClusterOpIndex].voltMv) / 1000;
+          (_smallClusterOpps[systemStatus.smallClusterOpIndex].voltUv) / 1000000;
       _cpuUtilization = systemStatus.cpuUtilization;
       _memoryUtilization = systemStatus.memoryUtilization;
       _update();

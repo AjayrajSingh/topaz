@@ -13,7 +13,6 @@ dart_library("dart") {
 
   deps = [
     "//sdk/fidl/fuchsia.device.display",
-    "//sdk/fidl/fuchsia.devicesettings",
     "//topaz/public/dart/fidl",
     "//topaz/public/dart/fuchsia_logger",
     "//topaz/public/dart/fuchsia_services",  ]

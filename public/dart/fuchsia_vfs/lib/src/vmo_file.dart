@@ -50,12 +50,10 @@ class VmoFile extends PseudoFile {
       final Vmo duplicatedVmo =
           _vmo.duplicate(ZX.RIGHTS_BASIC | ZX.RIGHT_READ | ZX.RIGHT_MAP);
 
-      if (duplicatedVmo == null) {
-        return null;
+      if (duplicatedVmo != null) {
+        return NodeInfo.withVmofile(Vmofile(
+            vmo: duplicatedVmo, offset: 0, length: _vmo.getSize().size));
       }
-
-      return NodeInfo.withVmofile(Vmofile(
-          vmo: duplicatedVmo, offset: 0, length: _vmo.getSize().size));
     }
 
     return NodeInfo.withFile(FileObject(event: null));

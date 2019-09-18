@@ -5,7 +5,7 @@
 #ifndef LIB_UI_SCENIC_SKIA_HOST_SURFACES_H_
 #define LIB_UI_SCENIC_SKIA_HOST_SURFACES_H_
 
-#include "lib/ui/scenic/cpp/host_memory.h"
+#include "src/lib/ui/scenic/cpp/host_memory.h"
 #include "third_party/skia/include/core/SkSurface.h"
 
 namespace scenic {
@@ -13,14 +13,14 @@ namespace skia {
 
 // Creates a Skia surface backed by host-accessible shared memory associated
 // with an image resource.
-sk_sp<SkSurface> MakeSkSurface(const HostImage& image);
+sk_sp<SkSurface> MakeSkSurface(const scenic_util::HostImage& image);
 
 // Creates a Skia surface backed by host-accessible shared memory.
 sk_sp<SkSurface> MakeSkSurface(const fuchsia::images::ImageInfo& image_info,
-                               std::shared_ptr<HostData> data,
+                               std::shared_ptr<scenic_util::HostData> data,
                                off_t memory_offset);
 sk_sp<SkSurface> MakeSkSurface(SkImageInfo image_info, size_t row_bytes,
-                               std::shared_ptr<HostData> data,
+                               std::shared_ptr<scenic_util::HostData> data,
                                off_t memory_offset);
 
 // Represents a pool of Skia surfaces and image resources backed by
@@ -61,7 +61,7 @@ class HostSkSurfacePool {
   // The |index| must be between 0 and |num_images() - 1|.
   // The returned pointer is valid until the image is discarded or the
   // pool is reconfigured.  Returns nullptr if the pool is not configured.
-  const HostImage* GetImage(uint32_t index) {
+  const scenic_util::HostImage* GetImage(uint32_t index) {
     return image_pool_.GetImage(index);
   }
 
@@ -70,7 +70,7 @@ class HostSkSurfacePool {
   void DiscardImage(uint32_t index) { image_pool_.DiscardImage(index); }
 
  private:
-  HostImagePool image_pool_;
+  scenic_util::HostImagePool image_pool_;
   std::vector<sk_sp<SkSurface>> surface_ptrs_;
 };
 

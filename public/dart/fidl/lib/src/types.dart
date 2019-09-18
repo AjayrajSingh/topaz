@@ -22,14 +22,15 @@ import 'xunion.dart';
 
 void _throwIfNotNullable(bool nullable) {
   if (!nullable) {
-    throw FidlError('Found null for a non-nullable type');
+    throw FidlError('Found null for a non-nullable type',
+        FidlErrorCode.fidlNonNullableTypeWithNullValue);
   }
 }
 
 void _throwIfExceedsLimit(int count, int limit) {
   if (limit != null && count > limit) {
-    throw FidlError(
-        'Found an object wth $count elements. Limited to $limit.');
+    throw FidlError('Found an object wth $count elements. Limited to $limit.',
+        FidlErrorCode.fidlStringTooLong);
   }
 }
 

@@ -1,0 +1,105 @@
+{
+  "test_suite_name": "fuchsia.dart_inspect.basic_benchmarks",
+  "app": "fuchsia-pkg://fuchsia.com/dart_inspect_benchmarks#meta/dart_inspect_benchmarks.cmx",
+  "args": ["--iterations=50000"],
+  "categories": ["dart:dart"],
+  "duration": 30,
+  "measure": [
+    {
+      "type": "duration",
+      "output_test_name": "basic/increment",
+      "event_name": "Inc integer",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/setInt",
+      "event_name": "Set integer",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/delNode",
+      "event_name": "Delete node",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/addNode",
+      "event_name": "Add child",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/setByte",
+      "event_name": "Set byte",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/resetByte",
+      "event_name": "Reset byte",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/setByteLong",
+      "event_name": "Set byte long",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/resetByteLong",
+      "event_name": "Reset byte long",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/setString",
+      "event_name": "Set string",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/resetString",
+      "event_name": "Reset string",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/setStringLong",
+      "event_name": "Set string long",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/resetStringLong",
+      "event_name": "Reset string long",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/incDouble",
+      "event_name": "Inc double",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/setDouble",
+      "event_name": "Set double",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/alloc",
+      "event_name": "Allocation",
+      "event_category": "dart:dart"
+    },
+    {
+      "type": "duration",
+      "output_test_name": "basic/url",
+      "event_name": "URL sized string",
+      "event_category": "dart:dart"
+    }
+  ]
+}
